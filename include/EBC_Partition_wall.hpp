@@ -24,7 +24,7 @@ class EBC_Partition_wall : public EBC_Partition
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_wall();
+    virtual ~EBC_Partition_wall() = default;
 
     // write the data to hdf5 file in folder /ebc_wall 
     virtual void write_hdf5( const std::string &FileName ) const;

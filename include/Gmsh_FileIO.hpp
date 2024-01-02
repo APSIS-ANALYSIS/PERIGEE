@@ -8,7 +8,6 @@
 // Date Created: July 1 2017
 // Author: Ju Liu
 // ==================================================================
-#include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 #include "HDF5_Writer.hpp"
 
@@ -229,6 +228,10 @@ class Gmsh_FileIO
     // The elm type 2 is a three-node triangle
     // The elm type 3 is a 4-node quadrangle
     // The elm type 4 is a 4-node tetrahedron
+    // The elm type 5 is a 8-node hexahedron
+    // ...
+    // The elm type 11 is a 10-node tetrahedron
+    // The elm type 12 is a 27-node hexahedron
     // ...
     // The elm type 31 is a 56-node fifth-order tetrahedron
     // the complete array reads as {0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,

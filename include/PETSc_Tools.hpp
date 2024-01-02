@@ -169,7 +169,7 @@ namespace PETSc_T
   std::vector<double> GetLocalArray( const Vec &vv );
 
   // Write a vector to disk with file_name
-  void WriteBinary( const Vec &a, const char * const &file_name );
+  void WriteBinary( const Vec &a, const std::string &file_name );
 
   // ==========================================================================
   // The followings are system function to monitor system memory usages

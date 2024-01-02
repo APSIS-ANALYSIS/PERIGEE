@@ -25,7 +25,7 @@ class EBC_Partition_outflow_MF : public EBC_Partition
         const std::vector<INodalBC *> &nbc_list,
         const std::vector< std::vector<int> > &grid2id );
 
-    virtual ~EBC_Partition_outflow_MF();
+    virtual ~EBC_Partition_outflow_MF() = default;
 
     // write the data to hdf5 file in group /ebc/ebcid_xxx, 
     // xxx is the ebc_id

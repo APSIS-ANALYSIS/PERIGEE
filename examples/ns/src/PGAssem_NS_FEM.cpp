@@ -70,13 +70,11 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-
 PGAssem_NS_FEM::~PGAssem_NS_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
-
 
 void PGAssem_NS_FEM::EssBC_KG(
     const ALocal_NBC * const &nbc_part, const int &field )
@@ -107,7 +105,6 @@ void PGAssem_NS_FEM::EssBC_KG(
   }
 }
 
-
 void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part, 
     const int &field )
 {
@@ -131,7 +128,6 @@ void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part,
     }
   }
 }
-
 
 void PGAssem_NS_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
@@ -185,7 +181,6 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 }
-
 
 void PGAssem_NS_FEM::Assem_mass_residual(
     const PDNSolution * const &sol_a,
@@ -283,7 +278,6 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   VecAssemblyEnd(G);
 }
 
-
 void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
@@ -373,7 +367,6 @@ void PGAssem_NS_FEM::Assem_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 }
-
 
 void PGAssem_NS_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
@@ -470,7 +463,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   VecAssemblyEnd(G);
 }
 
-
 void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -513,7 +505,6 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
   delete [] sctrl_z; sctrl_z = nullptr;
   delete [] srow_index; srow_index = nullptr;
 }
-
 
 void PGAssem_NS_FEM::BackFlow_G( 
     const PDNSolution * const &dot_sol,
@@ -573,7 +564,6 @@ void PGAssem_NS_FEM::BackFlow_G(
   delete [] sctrl_z; sctrl_z = nullptr;
   delete [] srow_index; srow_index = nullptr;
 }
-
 
 void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     const PDNSolution * const &dot_sol,
@@ -637,7 +627,6 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
   delete [] srow_index; srow_index = nullptr;
 }
 
-
 double PGAssem_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
@@ -687,7 +676,6 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
   return sum;
 }
 
-
 double PGAssem_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
@@ -736,7 +724,6 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 
   return sum;
 }
-
 
 double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
@@ -795,7 +782,6 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
-
 double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
@@ -852,7 +838,6 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 
   return sum_pres / sum_area;
 }
-
 
 void PGAssem_NS_FEM::NatBC_Resis_G(
     const double &curr_time, const double &dt,
@@ -922,7 +907,6 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
   delete [] sctrl_y; sctrl_y = nullptr;
   delete [] sctrl_z; sctrl_z = nullptr;
 }
-
 
 void PGAssem_NS_FEM::NatBC_Resis_KG(
     const double &curr_time, const double &dt,

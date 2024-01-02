@@ -18,7 +18,7 @@ class ElemBC_3D : public ElemBC
 
     ElemBC_3D( const std::vector<std::string> &vtkfileList, const int &elemtype );
 
-    virtual ~ElemBC_3D();
+    virtual ~ElemBC_3D() = default;
 
     virtual int get_num_ebc() const {return num_ebc;}
 

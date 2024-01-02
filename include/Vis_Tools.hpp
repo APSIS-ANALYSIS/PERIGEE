@@ -24,6 +24,7 @@
 #include "vtkHexahedron.h"
 #include "vtkTetra.h"
 #include "vtkQuadraticTetra.h"
+#include "vtkTriQuadraticHexahedron.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
@@ -117,6 +118,30 @@ namespace VIS_T
   // ----------------------------------------------------------------
   void setHexelem( const int &segs, const int &segt, const int &segu,
       const int &ptoffset, vtkUnstructuredGrid * gridData );
+
+  // ----------------------------------------------------------------
+  // ! setHexelem: build Hexa element connectivity using the specified
+  //                 point index.
+  // ----------------------------------------------------------------
+  void setHexelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      vtkUnstructuredGrid * gridData );
+
+  // ----------------------------------------------------------------
+  // ! setQuadTetraelem: build triquadratic hex element connectivity
+  //   using the specified point index. There are 27 points in the element.
+  // ----------------------------------------------------------------
+  void setTriQuadHexelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      const int &ptid8, const int &ptid9, const int &ptid10,
+      const int &ptid11, const int &ptid12, const int &ptid13,
+      const int &ptid14, const int &ptid15, const int &ptid16,
+      const int &ptid17, const int &ptid18, const int &ptid19,
+      const int &ptid20, const int &ptid21, const int &ptid22,
+      const int &ptid23, const int &ptid24, const int &ptid25,
+      const int &ptid26, vtkUnstructuredGrid * gridData );
 
   // --------------------------------------------------------------
   // ! setQuadelem: build Quad element connectivity with vtkPoints

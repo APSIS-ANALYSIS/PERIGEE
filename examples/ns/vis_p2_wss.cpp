@@ -12,7 +12,7 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
 
-void range_generator( const int &ii, std::vector<int> &surface_id_range );
+std::vector<int> range_generator( const int &ii );
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
     const char * const &mapping_type, const int &node_size );
@@ -49,12 +49,17 @@ int main( int argc, char * argv[] )
   int time_step = 1;
   int time_end = 1;
 
-  const int nLocBas = 6;
-  const int v_nLocBas = 10;
+  constexpr int nLocBas = 6;
+  constexpr int v_nLocBas = 10;
 
   constexpr int dof = 4; 
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
+  
   SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_p2_wss is a serial program! \n");
 
   // Read the geometry file name from preprocessor hdf5 file
@@ -158,7 +163,7 @@ int main( int argc, char * argv[] )
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=3, "Error: the associated tet element is incompatible with the triangle element.\n");
+    SYS_T::print_fatal_if(node_check != 3, "Error: the associated tet element is incompatible with the triangle element.\n");
 
     // Now we have found the interior node's volumetric mesh index, record its
     // spatial xyz coordinate
@@ -217,8 +222,7 @@ int main( int argc, char * argv[] )
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
 
-    PetscPrintf(PETSC_COMM_WORLD, "Time %d: Read %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_write.c_str() );
+    SYS_T::commPrint("Time %d: Read %s and Write %s \n", time, name_to_read.c_str(), name_to_write.c_str());
 
     // Read the solution vector and renumber them based on the nodal mappings
     const auto sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
@@ -250,15 +254,16 @@ int main( int argc, char * argv[] )
       // Construct the quadratic tetrahedral element
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
-      // Obtain the local indices of nodes on the wall surface
-      std::vector<int> id_range;
-      range_generator( interior_node_local_index[ee], id_range );
+      // Obtain the local indices of nodes on the wall surface based on the local indices of the four interior nodes
+      const std::vector<int> id_range = range_generator( interior_node_local_index[ee] );
 
       // Obtain the control point coordinates for this element
       double * ectrl_x = new double [nLocBas];
       double * ectrl_y = new double [nLocBas];
       double * ectrl_z = new double [nLocBas];
 
+      // Here the coordinates of the control points on the wall are obtained via the v_vecIEN
+      // Note that their order is determined by the id_range
       for(int ii=0; ii<nLocBas; ++ii)
       {
         ectrl_x[ii] = v_ctrlPts[ 3*v_vecIEN[v_nLocBas * ee_vol_id + id_range[ii] ] + 0 ];
@@ -292,6 +297,8 @@ int main( int argc, char * argv[] )
       for(int qua=0; qua<quad_tri_gau->get_num_quadPts(); ++qua)
         tri_area += element_tri->get_detJac(qua) * quad_tri_gau->get_qw(qua);
 
+      // Here the coordinates of the control points read through the surface-IEN 
+      // are just used to find out their global number on the wall
       for(int ii=0; ii<nLocBas; ++ii)
       {
         ectrl_x[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 0 ];
@@ -394,10 +401,9 @@ int main( int argc, char * argv[] )
   return EXIT_SUCCESS;
 }
 
-
-void range_generator( const int &ii, std::vector<int> &surface_id_range )
+std::vector<int> range_generator( const int &ii )
 {
-  surface_id_range.resize(6);
+  std::vector<int> surface_id_range(6, -1);
   switch (ii)
   {
     case 0:
@@ -436,6 +442,8 @@ void range_generator( const int &ii, std::vector<int> &surface_id_range )
       SYS_T::print_fatal("Error: the interior node index is wrong!\n");
       break;
   }
+  
+  return surface_id_range;
 }
 
 std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
@@ -449,7 +457,7 @@ std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
 
   if( data_rank != 1)
   {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the node mapping file has wrong format. \n");
+    SYS_T::commPrint("Error: the node mapping file has wrong format. \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
@@ -463,7 +471,7 @@ std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
 
   if( int(dSize) != node_size )
   {
-    PetscPrintf(PETSC_COMM_SELF, "Error: the allocated array has wrong size! \n");
+    SYS_T::commPrint("Error: the allocated array has wrong size! \n");
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
 
@@ -500,8 +508,7 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   VecGetSize(sol_temp, &get_sol_temp_size);
   if( get_sol_temp_size != vec_size )
   {
-    PetscPrintf(PETSC_COMM_SELF,
-        "The solution size %d is not compatible with the size %d given by partition file! \n",
+    SYS_T::commPrint("The solution size %d is not compatible with the size %d given by partition file! \n",
         get_sol_temp_size, vec_size);
     MPI_Abort(PETSC_COMM_WORLD, 1);
   }
@@ -531,7 +538,6 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
 
   return sol;
 }
-
 
 int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,

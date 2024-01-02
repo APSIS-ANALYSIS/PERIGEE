@@ -16,7 +16,7 @@ class ALocal_InflowBC
   public:
     ALocal_InflowBC( const std::string &fileBaseName, const int &cpu_rank );
 
-    virtual ~ALocal_InflowBC();
+    virtual ~ALocal_InflowBC() = default;
 
     // ------------------------------------------------------------------------
     // Get the number of surfaces with prescribed flow

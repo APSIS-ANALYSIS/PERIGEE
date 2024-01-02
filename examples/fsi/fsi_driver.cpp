@@ -7,12 +7,16 @@
 #include "HDF5_Tools.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
-#include "ALocal_Elem.hpp"
+#include "APart_Node_FSI.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "FEAElement_Hex8.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "CVFlowRate_Steady.hpp"
@@ -23,22 +27,22 @@
 #include "GenBC_Pressure.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Incompressible.hpp"
-#include "PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity.hpp"
-#include "PLocAssem_Tet4_FSI_Mesh_Elastostatic.hpp"
-#include "PLocAssem_Tet4_FSI_Mesh_Laplacian.hpp"
+#include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
+#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_FSI_Mesh_Elastostatic.hpp"
+#include "PLocAssem_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_FSI.hpp"
 #include "PGAssem_Mesh.hpp"
 #include "PTime_FSI_Solver.hpp"
 
-#include "PDNTimeStep.hpp"
-#include "PETSc_Tools.hpp"
-#include "APart_Node_FSI.hpp"
-
 int main(int argc, char *argv[])
 {
+  // Number of quadrature points for tet and triangle
   int nqp_tet = 5, nqp_tri = 4;
+
+  // Number of quadrature points for hex and quadrangle
+  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // Estimate the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -113,7 +117,11 @@ int main(int argc, char *argv[])
   std::string yaml_file("./runscript.yml");
 
   // ===== Initialization of PETSc =====
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
@@ -135,6 +143,8 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt(   "-nqp_tet",           nqp_tet);
   SYS_T::GetOptionInt(   "-nqp_tri",           nqp_tri);
+  SYS_T::GetOptionInt(   "-nqp_vol_1d",        nqp_vol_1D);
+  SYS_T::GetOptionInt(   "-nqp_sur_1d",        nqp_sur_1D);
   SYS_T::GetOptionInt(   "-nz_estimate",       nz_estimate);
   SYS_T::GetOptionReal(  "-bs_beta",           bs_beta);
   SYS_T::GetOptionReal(  "-rho_inf",           genA_rho_inf);
@@ -175,6 +185,8 @@ int main(int argc, char *argv[])
   // ===== Print the command line argumetn on screen =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
@@ -258,6 +270,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar(     "sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
     cmdh5w->write_intScalar(     "nqp_tet",         nqp_tet);
+    cmdh5w->write_intScalar(     "nqp_sur_1d",      nqp_sur_1D);
+    cmdh5w->write_intScalar(     "nqp_vol_1d",      nqp_vol_1D);
     cmdh5w->write_string(        "lpn_file",        lpn_file);
     cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
@@ -307,7 +321,11 @@ int main(int argc, char *argv[])
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_tet, rank, is_load_ps, "./ps_data/prestress");
+  const int nqp_vol { (GMIptr->get_elemType() == 501) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
+
+  const int nqp_sur { (GMIptr->get_elemType() == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
@@ -343,14 +361,36 @@ int main(int argc, char *argv[])
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
       "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
 
-  // ===== Quadrature rules and FEM container =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-
+  // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = new FEAElement_Tet4( nqp_tet );
-  FEAElement * elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+  FEAElement * elementv = nullptr;
+  FEAElement * elements = nullptr;
+
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  IQuadPts * quadv = nullptr;
+  IQuadPts * quads = nullptr;
+
+  if( GMIptr->get_elemType() == 501 )
+  {
+    if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
+    if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
+
+    elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
+    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
+  }
+  else if( GMIptr->get_elemType() == 601 )
+  {
+    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
+  }
+  else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // ===== Generate the IS for pres and velo =====
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
@@ -398,9 +438,9 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_Tet4_ALE_VMS_NS_GenAlpha(
+  IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
-      fluid_density, fluid_mu, bs_beta );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
   IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
@@ -409,21 +449,21 @@ int main(int argc, char *argv[])
   {
     matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Incompressible(
+    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
     matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_Tet4_VMS_Hyperelasticity(
+    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
 
   matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_Tet4_FSI_Mesh_Laplacian();
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
   
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
@@ -443,29 +483,29 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_check(restart_u_name.c_str());
-    SYS_T::file_check(restart_v_name.c_str());
-    SYS_T::file_check(restart_p_name.c_str());
+    SYS_T::file_check(restart_u_name);
+    SYS_T::file_check(restart_v_name);
+    SYS_T::file_check(restart_p_name);
     
-    disp->ReadBinary(restart_u_name.c_str());
-    velo->ReadBinary(restart_v_name.c_str());
-    pres->ReadBinary(restart_p_name.c_str());
+    disp->ReadBinary(restart_u_name);
+    velo->ReadBinary(restart_v_name);
+    pres->ReadBinary(restart_p_name);
     
     // Read dot_sol file
     std::string restart_dot_u_name = "dot_";
     restart_dot_u_name.append(restart_u_name);
-    SYS_T::file_check(restart_dot_u_name.c_str());
-    dot_disp->ReadBinary(restart_dot_u_name.c_str());
+    SYS_T::file_check(restart_dot_u_name);
+    dot_disp->ReadBinary(restart_dot_u_name);
 
     std::string restart_dot_v_name = "dot_";
     restart_dot_v_name.append(restart_v_name);
-    SYS_T::file_check(restart_dot_v_name.c_str());
-    dot_velo->ReadBinary(restart_dot_v_name.c_str());
+    SYS_T::file_check(restart_dot_v_name);
+    dot_velo->ReadBinary(restart_dot_v_name);
 
     std::string restart_dot_p_name = "dot_";
     restart_dot_p_name.append(restart_p_name);
-    SYS_T::file_check(restart_dot_p_name.c_str());
-    dot_pres->ReadBinary(restart_dot_p_name.c_str());
+    SYS_T::file_check(restart_dot_p_name);
+    dot_pres->ReadBinary(restart_dot_p_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());

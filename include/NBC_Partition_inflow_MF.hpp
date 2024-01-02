@@ -19,7 +19,7 @@ class NBC_Partition_inflow_MF : public NBC_Partition_inflow
         const INodalBC * const &nbc,
         const std::vector< std::vector<int> > &grid2id );
 
-    virtual ~NBC_Partition_inflow_MF();
+    virtual ~NBC_Partition_inflow_MF() = default;
 
     virtual void write_hdf5( const std::string &FileName ) const;
 

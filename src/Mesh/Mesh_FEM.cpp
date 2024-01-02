@@ -6,11 +6,6 @@ Mesh_FEM::Mesh_FEM(const int &in_nfunc, const int &in_nelem,
   sdeg(in_deg), tdeg(in_deg), udeg(in_deg)
 {}
 
-
-Mesh_FEM:: ~Mesh_FEM()
-{}
-
-
 void Mesh_FEM::print_info() const
 {
   std::cout<<'\n';

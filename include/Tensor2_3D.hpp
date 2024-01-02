@@ -38,7 +38,7 @@ class Tensor2_3D
     Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
     
     // Destructor
-    ~Tensor2_3D();
+    ~Tensor2_3D() = default;
 
     // Copy
     void copy( const Tensor2_3D &source );    
@@ -288,6 +288,12 @@ namespace Ten2
 
   // Return a zero matrix
   Tensor2_3D gen_zero();
+
+  // Return the exponential of the input matrix
+  // exp(X) = sum_{k=0}^{infty} 1/(k!) X^k
+  // The algorithm can be found on page 749 of Computational Methods for Plasticity
+  // written by E.A. De Souza Neto, D. Peric and D.R.J. Owen.
+  Tensor2_3D exp( const Tensor2_3D &input );
 }
 
 #endif

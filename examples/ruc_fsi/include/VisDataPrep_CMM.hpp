@@ -15,7 +15,7 @@ class VisDataPrep_CMM : public IVisDataPrep
   public:
     VisDataPrep_CMM();
 
-    virtual ~VisDataPrep_CMM();
+    virtual ~VisDataPrep_CMM() = default;
 
     // Return the number of physical fields to be read from solution
     // vector

@@ -15,9 +15,6 @@ Tensor4_2D::Tensor4_2D( const Tensor4_2D &source )
   for(int ii=0; ii<16; ++ii) ten[ii] = source(ii);
 }
 
-Tensor4_2D::~Tensor4_2D()
-{}
-
 void Tensor4_2D::print() const
 {
   std::cout<<"Tensor4_2D: \n";

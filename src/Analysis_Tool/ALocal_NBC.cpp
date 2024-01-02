@@ -68,15 +68,6 @@ ALocal_NBC::ALocal_NBC( const std::string &fileBaseName,
   VEC_T::shrink2fit( LPM_offset );
 }
 
-ALocal_NBC::~ALocal_NBC()
-{
-  clean_LocalMaster();
-  VEC_T::clean(LID);
-  VEC_T::clean(LDN); VEC_T::clean(LPSN); VEC_T::clean(LPMN);
-  VEC_T::clean(Num_LD); VEC_T::clean(Num_LPS);
-  VEC_T::clean(LD_offset); VEC_T::clean(LPS_offset);
-}
-
 void ALocal_NBC::print_info() const
 {
   std::cout<<"ALocal_NBC: \n";

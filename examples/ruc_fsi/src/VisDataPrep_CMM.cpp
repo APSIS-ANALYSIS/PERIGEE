@@ -19,9 +19,6 @@ VisDataPrep_CMM::VisDataPrep_CMM()
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_CMM::~VisDataPrep_CMM()
-{}
-
 void VisDataPrep_CMM::get_pointArray(
     const std::vector<std::string> solution_file_names,
     const std::string analysis_node_mapping_file,

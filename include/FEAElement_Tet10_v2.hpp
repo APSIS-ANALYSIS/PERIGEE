@@ -11,7 +11,7 @@
 //
 // Tet10 : 10-node tet element, aka, quadratic tet.
 //
-//                     u
+//                     t
 //                     ^
 //                     |
 //                     3

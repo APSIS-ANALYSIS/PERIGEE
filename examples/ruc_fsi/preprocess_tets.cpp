@@ -30,6 +30,10 @@
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
   // Clean the potentially pre-existing hdf5 files in the job folder
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
   SYS_T::execute("rm -rf apart"); 
@@ -77,7 +81,11 @@ int main( int argc, char * argv[] )
   bool is_loadYaml = true;
   std::string yaml_file("./options_pre.yml");
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   SYS_T::GetOptionBool(  "-is_loadYaml",       is_loadYaml);
   SYS_T::GetOptionString("-yaml_file",         yaml_file);
@@ -307,7 +315,7 @@ int main( int argc, char * argv[] )
 
     SYS_T::file_check( centerlines_combined ); cout << centerlines_combined << " found. \n";
 
-    //wall_ebc = new ElemBC_3D_tet_wall( walls_combined, centerlines_combined,
+    //wall_ebc = new ElemBC_3D_wall( walls_combined, centerlines_combined,
     //    thickness2radius_combined, wall_springconst, wall_dampingconst, elemType );
 
     // --------------------------------------------------------------------------
@@ -357,7 +365,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
 
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "RUC"} );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 

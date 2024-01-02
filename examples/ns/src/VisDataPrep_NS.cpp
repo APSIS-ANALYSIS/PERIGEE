@@ -16,9 +16,6 @@ VisDataPrep_NS::VisDataPrep_NS()
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_NS::~VisDataPrep_NS()
-{}
-
 void VisDataPrep_NS::get_pointArray(
     const std::string solution_file_name,
     const std::string analysis_node_mapping_file,

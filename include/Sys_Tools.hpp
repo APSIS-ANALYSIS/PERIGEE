@@ -13,24 +13,38 @@
 #include <ctime>
 #include <sys/stat.h>
 #include "petsc.h"
+#ifdef USE_OPENMP
+#include "omp.h"
+#endif
+#ifdef _OPENMP
+#define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
+#define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
+#define PERIGEE_OMP_FOR _Pragma("omp for")
+#define PERIGEE_OMP_CRITICAL _Pragma("omp critical")
+#define PERIGEE_OMP_SINGLE _Pragma("omp single")
+#else
+#define PERIGEE_OMP_PARALLEL_FOR
+#define PERIGEE_OMP_PARALLEL
+#define PERIGEE_OMP_FOR
+#define PERIGEE_OMP_CRITICAL
+#define PERIGEE_OMP_SINGLE
+#endif
 
-#define PETSC_SILENCE_DEPRECATION_WARNINGS_3_19_0
-
-  // ================================================================
-  // The following are used for backward compatibility like PetscDefined(USE_DEBUG).
-  // ================================================================
-  // Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode;
-  //           < 3.14.x : defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode.
+// ================================================================
+// The following are used for backward compatibility like PetscDefined(USE_DEBUG).
+// ================================================================
+// Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode;
+//           < 3.14.x : defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode.
 #if PETSC_VERSION_LT(3,14,6)
   #define PETSC_DEFINED(def) defined(PETSC_ ## def)
 #else
   #define PETSC_DEFINED(def) PetscDefined(def)
 #endif
 
-  // ================================================================
-  // The following are used for ASSERT.
-  // ================================================================
-  // In debug mode, ASSERT is called to determine a "cond" condition.
+// ================================================================
+// The following are used for ASSERT.
+// ================================================================
+// In debug mode, ASSERT is called to determine a "cond" condition.
 #if PETSC_DEFINED(USE_DEBUG)
   #define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
 #else
@@ -172,10 +186,21 @@ namespace SYS_T
     }
     else
     {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf(stdout, output, Argp);
+        va_end(Argp);
+      }
+      #pragma omp barrier
+#else
       va_list Argp;
       va_start(Argp, output);
-      vfprintf (stderr, output, Argp);
+      vfprintf(stdout, output, Argp);
       va_end(Argp);
+#endif
     }
   }
 
@@ -208,11 +233,25 @@ namespace SYS_T
     }
     else
     {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+      }
+      else exit( EXIT_FAILURE );
+#else
       va_list Argp;
       va_start(Argp, output);
       vfprintf (stderr, output, Argp);
       va_end(Argp);
+
       exit( EXIT_FAILURE );
+#endif
     }
   }
 
@@ -236,12 +275,25 @@ namespace SYS_T
       }
       else
       {
+#ifdef _OPENMP
+        if( !omp_get_thread_num() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          vfprintf (stderr, output, Argp);
+          va_end(Argp);
+
+          exit( EXIT_FAILURE );
+        }
+        else exit( EXIT_FAILURE );
+#else
         va_list Argp;
         va_start(Argp, output);
         vfprintf (stderr, output, Argp);
         va_end(Argp);
 
         exit( EXIT_FAILURE );
+#endif
       }      
     }
   }
@@ -250,36 +302,71 @@ namespace SYS_T
   {
     if( !a )
     {
-      if( !get_MPI_rank() )
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
       {
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
+      }
+      else
+      {
+#ifdef _OPENMP
+        if( !omp_get_thread_num() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          vfprintf (stderr, output, Argp);
+          va_end(Argp);
+
+          exit( EXIT_FAILURE );
+        }
+        else exit( EXIT_FAILURE );
+#else
         va_list Argp;
         va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        vfprintf (stderr, output, Argp);
         va_end(Argp);
-      }
 
-      MPI_Barrier(PETSC_COMM_WORLD);
-      MPI_Abort(PETSC_COMM_WORLD, 1);
+        exit( EXIT_FAILURE );
+#endif
+      }      
     }
   }
 
-  // 5. Print message (without termination the code) under conditions
-  inline void print_message_if( bool a, const char output[], ... )
+  // 5. print the number of threads used in openmp
+  inline void print_omp_info()
   {
-    if( a )
+#ifdef _OPENMP
+    PERIGEE_OMP_PARALLEL
     {
-      if( !get_MPI_rank() )
+      PERIGEE_OMP_SINGLE
       {
-        va_list Argp;
-        va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-        va_end(Argp);
+        std::cout<<"The number of threads used: "<<omp_get_num_threads()<<", and ";
+        std::cout<<"the number of processors on the machine: ";
+        std::cout<<omp_get_num_procs()<<".\n";
       }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
     }
+#else
+    std::cout<<"OpenMP is not invoked.\n";
+#endif
   }
 
+  // 6. set the number of threads used in openmp
+  inline void set_omp_num_threads()
+  {
+#ifdef _OPENMP
+    omp_set_num_threads( omp_get_num_procs() );
+#endif
+  }
+  
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
@@ -409,8 +496,10 @@ namespace SYS_T
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetReal(PETSC_NULL, name, &outdata, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetReal(PETSC_NULL, PETSC_NULL, name, &outdata, PETSC_NULL);
+#else
+    PetscOptionsGetReal(PETSC_NULLPTR, PETSC_NULLPTR, name, &outdata, PETSC_NULLPTR);
 #endif
   }
 
@@ -418,8 +507,10 @@ namespace SYS_T
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetInt(PETSC_NULL, name, &outdata, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetInt(PETSC_NULL, PETSC_NULL, name, &outdata, PETSC_NULL);
+#else
+    PetscOptionsGetInt(PETSC_NULLPTR, PETSC_NULLPTR, name, &outdata, PETSC_NULLPTR);
 #endif
   }
 
@@ -429,8 +520,10 @@ namespace SYS_T
     PetscBool flg;
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetBool(PETSC_NULL, name, &pdata, &flg);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetBool(PETSC_NULL, PETSC_NULL, name, &pdata, &flg);
+#else
+    PetscOptionsGetBool(PETSC_NULLPTR, PETSC_NULLPTR, name, &pdata, &flg);
 #endif
     if(flg)
     {
@@ -447,8 +540,10 @@ namespace SYS_T
     char char_outdata[PETSC_MAX_PATH_LEN];
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetString(PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetString(PETSC_NULL, PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
+#else
+    PetscOptionsGetString(PETSC_NULLPTR, PETSC_NULLPTR, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
 #endif
     if(flg) outdata = char_outdata;
   }
@@ -485,19 +580,30 @@ namespace SYS_T
 
       ~Timer() {};
 
-      void Start() {startedAt = clock();}
-
-      void Stop() {stoppedAt = clock();}
-
       void Reset() { startedAt = 0; stoppedAt = 0; }
 
+#ifdef _OPENMP
+      void Start() { startedAt = omp_get_wtime(); }
+      void Stop()  { stoppedAt = omp_get_wtime(); }
+      double get_sec() const
+      {
+        return (stoppedAt - startedAt);
+      }
+#else
+      void Start() { startedAt = clock(); }
+      void Stop()  { stoppedAt = clock(); }
       double get_sec() const
       {
         return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
       }
+#endif
 
     private:
+#ifdef _OPENMP
+      double startedAt, stoppedAt;
+#else
       clock_t startedAt, stoppedAt;
+#endif
   };
 
   // Print ASCII art text for the code

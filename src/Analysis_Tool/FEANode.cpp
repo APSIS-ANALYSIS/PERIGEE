@@ -21,9 +21,6 @@ FEANode::FEANode( const std::string &fileBaseName, const int &cpu_rank )
   delete h5r; H5Fclose( file_id );
 }
 
-FEANode::~FEANode()
-{}
-
 void FEANode::print_info() const
 {
   std::cout<<"\n ctrlPts_x: \n";

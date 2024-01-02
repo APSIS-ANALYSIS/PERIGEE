@@ -11,17 +11,12 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
     const ALocal_NBC * const &part_nbc_p,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
-: nLocBas(4), snLocBas(3),
+: nLocBas( locassem_s_ptr->get_nLocBas_0() ), 
+  snLocBas( locassem_s_ptr->get_snLocBas_0() ),
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn_v( pnode_v -> get_nlocghonode() ),
   nlgn_p( pnode_p -> get_nlocghonode() )
 {
-  SYS_T::print_fatal_if( nLocBas != locassem_s_ptr->get_nLocBas_0(),
-      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
-
-  SYS_T::print_fatal_if( snLocBas != locassem_s_ptr->get_snLocBas_0(),
-      "Error: PGAssem_FSI::nLocBas does not match that in local assembly of solid.\n");
-
   // Make sure the data structure is compatible
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -46,8 +41,13 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
   // Create matrix with routh preallocation
+#if PETSC_VERSION_LT(3,19,0)
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 4*in_nz_estimate, PETSC_NULL, 4*in_nz_estimate, PETSC_NULL, &K);
+#else
+  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, 4*in_nz_estimate, PETSC_NULLPTR, 4*in_nz_estimate, PETSC_NULLPTR, &K);
+#endif
 
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();

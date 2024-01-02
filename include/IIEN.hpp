@@ -7,15 +7,13 @@
 // Author: Ju Liu
 // Date: Sept. 24th 2013
 // ==================================================================
-#include <cstdlib>
-#include <iostream>
 
 class IIEN
 {
   public:
-    IIEN(){};
+    IIEN() = default;
 
-    virtual ~IIEN(){};
+    virtual ~IIEN() = default;
 
     // get the IEN arrray for element e at local node ii
     virtual int get_IEN( const int &ee, const int &ii ) const = 0;

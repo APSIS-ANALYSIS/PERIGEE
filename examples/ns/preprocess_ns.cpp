@@ -8,6 +8,7 @@
 // ==================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -20,9 +21,14 @@
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
 #include "EBC_Partition_wall_turbulence.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
   // Clean the potentially pre-existing hdf5 files in the job folder
   SYS_T::execute("rm -rf part_p*.h5");
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
@@ -30,56 +36,35 @@ int main( int argc, char * argv[] )
   // Define basic problem settins
   constexpr int dofNum = 4; // degree-of-freedom for the physical problem
   constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
-  const std::string part_file("part");
-  
-  // Element options: 501 linear tets, 502 quadratic tets
-  int elemType = 501;
-  int num_outlet = 1;
-  int num_inlet = 1;
 
+  // Yaml options
+  const std::string yaml_file("ns_preprocess.yml");
+
+  // Check if the yaml file exist on disk
+  SYS_T::file_check(yaml_file);
+
+  YAML::Node paras = YAML::LoadFile( yaml_file );
+
+  const int elemType                  = paras["elem_type"].as<int>();
+  const int num_inlet                 = paras["num_inlet"].as<int>();
+  const int num_outlet                = paras["num_outlet"].as<int>();
+  const std::string geo_file          = paras["geo_file"].as<std::string>();
+  const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
+  const std::string sur_file_wall     = paras["sur_file_wall"].as<std::string>();
+  const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
+  const std::string part_file         = paras["part_file"].as<std::string>();
+  const int cpu_size                  = paras["cpu_size"].as<int>();
+  const int in_ncommon                = paras["in_ncommon"].as<int>();
+  const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
+
+  // Optional:
+  const int weakBC_type               = paras["weakbc_type"].as<int>();
   // weakBC_type: 0 no weakly enforced Dirichlet bc;
   //              1 weakly enforced Dirichlet bc in all direction;
   //              2 strongly enforced in wall-normal direction,
   //                and weakly enforced in wall-tangent direction
-  int weakBC_type = 0;
-  
-  // Default names for input geometry files
-  std::string geo_file("./whole_vol.vtu");
-  std::string sur_file_in_base("./inflow_vol_");
-  std::string sur_file_wall("./wall_vol.vtp");
-  std::string sur_file_out_base("./outflow_vol_");
 
-  // Mesh partition setting
-  int cpu_size = 1;
-  int in_ncommon = 2;
-  bool isDualGraph = true;
-
-  // Yaml options
-  bool is_loadYaml = true;
-  std::string yaml_file("./options_pre.yml");
-
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-
-  SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
-  SYS_T::GetOptionString("-yaml_file", yaml_file);
-
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
-
-  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
-
-  // Get the command line arguments
-  SYS_T::GetOptionInt("-cpu_size", cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
-  SYS_T::GetOptionInt("-num_inlet", num_inlet);
-  SYS_T::GetOptionInt("-num_outlet", num_outlet);
-  SYS_T::GetOptionInt("-elem_type", elemType);
-  SYS_T::GetOptionInt("-weakbc_type", weakBC_type);
-  SYS_T::GetOptionString("-geo_file", geo_file);
-  SYS_T::GetOptionString("-sur_file_in_base", sur_file_in_base);
-  SYS_T::GetOptionString("-sur_file_wall", sur_file_wall);
-  SYS_T::GetOptionString("-sur_file_out_base", sur_file_out_base);
-
-  if( elemType != 501 && elemType !=502 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
@@ -93,7 +78,8 @@ int main( int argc, char * argv[] )
   cout<<" -part_file: "<<part_file<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  cout<<" -isDualGraph: true \n";
+  if(isDualGraph) cout<<" -isDualGraph: true \n";
+  else cout<<" -isDualGraph: false \n";
   cout<<"---- Problem definition ----\n";
   cout<<" dofNum: "<<dofNum<<endl;
   cout<<" dofMat: "<<dofMat<<endl;
@@ -101,13 +87,6 @@ int main( int argc, char * argv[] )
 
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
-
-  // If it is quadratic mesh, the mesh file will be all in vtu format
-  if(elemType == 502)
-  {
-    sur_file_wall.erase( sur_file_wall.end()-4, sur_file_wall.end() );
-    sur_file_wall += ".vtu";
-  }
 
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
@@ -117,10 +96,12 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_inlet; ++ii)
   {  
-    if(elemType == 501 )
+    if(elemType == 501 || elemType == 601)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" );   
+    else if(elemType == 502 || elemType == 602)
+      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" );
     else
-      sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" ); 
+      SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
   
     SYS_T::file_check(sur_file_in[ii]);
     cout<<sur_file_in[ii]<<" found. \n";
@@ -132,11 +113,13 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    if(elemType == 501 )
+    if(elemType == 501 || elemType == 601)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
-    else
+    else if(elemType == 502 || elemType == 602)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
- 
+    else
+      SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
+
     SYS_T::file_check(sur_file_out[ii]);
     cout<<sur_file_out[ii]<<" found. \n";
   }
@@ -181,12 +164,18 @@ int main( int argc, char * argv[] )
     case 502:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
+    case 601:
+      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
+      break;
+    case 602:
+      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
+      break;      
     default:
       SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
       break;
   }
 
-  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas() );
 
   mesh -> print_info();
   
@@ -225,19 +214,41 @@ int main( int argc, char * argv[] )
 
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
-  for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-    inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );
+
+  if(elemType == 501 || elemType == 502)
+  {
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );    
+  }
+  else if(elemType == 601 || elemType == 602)
+  {
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      inlet_outvec[ii] = HEX_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );  
+  }
+  else
+    SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the inflow boundary condition. \n");
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
-  InFBC -> resetSurIEN_outwardnormal( IEN ); // assign outward orientation for triangles
+  InFBC -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
-  for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-    outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
+  
+  if(elemType == 501 || elemType == 502)
+  {
+    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );  
+  }
+  else if(elemType == 601 || elemType == 602)
+  {
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
+  }
+  else
+    SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the elemental boundary conditions. \n");
 
   ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
@@ -260,7 +271,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, dofNum, dofMat, elemType );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
@@ -315,11 +326,11 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto it_nbc=NBC_list.begin(); it_nbc != NBC_list.end(); ++it_nbc) delete *it_nbc;
+  for(auto &it_nbc : NBC_list) delete it_nbc;
 
   delete InFBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
-  PetscFinalize();
+
   return EXIT_SUCCESS;
 }
 

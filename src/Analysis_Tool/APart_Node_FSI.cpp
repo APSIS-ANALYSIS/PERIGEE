@@ -23,12 +23,6 @@ APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, const int &rank 
   delete h5r; H5Fclose( file_id );
 }
 
-APart_Node_FSI::~APart_Node_FSI()
-{
-  VEC_T::clean(node_loc_solid);
-  VEC_T::clean(node_loc_fluid);
-}
-
 void APart_Node_FSI::print_info() const
 {
   APart_Node::print_info();

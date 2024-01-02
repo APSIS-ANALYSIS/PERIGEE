@@ -7,14 +7,11 @@ PTime_NS_Solver::PTime_NS_Solver(
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
-PTime_NS_Solver::~PTime_NS_Solver()
-{}
-
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 {
-  int aux = 900000000 + counter;
   std::ostringstream temp;
-  temp<<aux;
+  temp.str("");
+  temp<<900000000 + counter;
 
   std::string out_name(pb_name);
   out_name.append(temp.str());
@@ -23,9 +20,9 @@ std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 
 std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
 {
-  int aux = 900000000 + counter;
   std::ostringstream temp;
-  temp<<aux;
+  temp.str("");
+  temp<<900000000 + counter;
 
   std::string out_name("dot_");
   out_name.append(pb_name);
@@ -91,17 +88,14 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
 
-  std::string sol_name ("");
-  std::string sol_dot_name ("");
-
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
-    sol_name = Name_Generator(time_info->get_index());
-    cur_sol->WriteBinary(sol_name.c_str());
+    const auto sol_name = Name_Generator(time_info->get_index());
+    cur_sol->WriteBinary(sol_name);
     
-    sol_dot_name = Name_dot_Generator(time_info->get_index());
-    cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+    const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
+    cur_dot_sol->WriteBinary(sol_dot_name);
   }
 
   bool conv_flag, renew_flag;
@@ -145,11 +139,11 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
-      sol_name = Name_Generator( time_info->get_index() );
-      cur_sol->WriteBinary(sol_name.c_str());
+      const auto sol_name = Name_Generator( time_info->get_index() );
+      cur_sol->WriteBinary(sol_name);
 
-      sol_dot_name = Name_dot_Generator(time_info->get_index());
-      cur_dot_sol->WriteBinary(sol_dot_name.c_str());
+      const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
+      cur_dot_sol->WriteBinary(sol_dot_name);
     }
 
     // Calculate the flow rate & averaged pressure on all outlets

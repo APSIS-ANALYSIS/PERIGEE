@@ -228,7 +228,6 @@ double MaterialModel_GOH06_Incompressible_Mixed::get_strain_energy(
     const Tensor2_3D &F ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 

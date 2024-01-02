@@ -65,13 +65,6 @@ Tissue_prestress::Tissue_prestress(
   }// Finish initializing the prestress data structure
 }
 
-Tissue_prestress::~Tissue_prestress()
-{
-  for(int ee=0; ee<nlocalele; ++ee) VEC_T::clean( qua_prestress[ee] );
-
-  VEC_T::clean( qua_prestress );
-}
-
 std::vector<double> Tissue_prestress::get_prestress( const int &ee ) const
 {
   return qua_prestress[ee];

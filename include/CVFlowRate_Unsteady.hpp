@@ -28,7 +28,7 @@ class CVFlowRate_Unsteady : public ICVFlowRate
   public:
     CVFlowRate_Unsteady( const std::string &filename );
 
-    virtual ~CVFlowRate_Unsteady();
+    virtual ~CVFlowRate_Unsteady() = default;
 
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 

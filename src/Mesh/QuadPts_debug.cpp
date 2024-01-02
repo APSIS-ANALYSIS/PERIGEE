@@ -1,27 +1,12 @@
 #include "QuadPts_debug.hpp"
 
-QuadPts_debug::QuadPts_debug(const int &len, const std::vector<double> &in_qp,
-    const std::vector<double> &in_qw )
-: num_pts( len ), dim(1), qp( in_qp ), qw( in_qw )
-{
-  SYS_T::print_fatal_if( qp.size() != qw.size(), 
-      "Error: QuadPts_debug, input vector does not have the same length.\n");
-  SYS_T::print_fatal_if( qp.size() != static_cast<unsigned int>(num_pts), 
-      "Error: QuadPts_debug, input vector does not match the input parameter.\n");
-}
-
-QuadPts_debug::QuadPts_debug( const int &in_dim, const int &in_numpt, 
-    const std::vector<double> &in_qp, const std::vector<double> &in_qw )
-: num_pts( in_numpt ), dim( in_dim ), qp( in_qp ), qw( in_qw )
+QuadPts_debug::QuadPts_debug( const std::vector<double> &in_qp, 
+    const std::vector<double> &in_qw, const int &in_dim )
+: num_pts( VEC_T::get_size(in_qw) ), dim( in_dim ), qp( in_qp ), qw( in_qw )
 {
   SYS_T::print_fatal_if( qp.size() != dim*qw.size(), 
       "Error: QuadPts_debug, input vector does not have the same length.\n");
-  SYS_T::print_fatal_if( qp.size() != static_cast<unsigned int>(num_pts*dim), 
-      "Error: QuadPts_debug, input vector does not match the input parameters.\n");
 }
-
-QuadPts_debug::~QuadPts_debug()
-{}
 
 void QuadPts_debug::print_info() const
 {
@@ -35,7 +20,7 @@ void QuadPts_debug::print_info() const
   for(int ii=0; ii<num_pts; ++ii)
     std::cout<<qw[ii]<<'\t';
   std::cout<<std::endl;
-  std::cout<<"========================="<<std::endl;
+  std::cout<<"=========================="<<std::endl;
 }
 
 // EOF

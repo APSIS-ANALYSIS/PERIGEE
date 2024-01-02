@@ -15,11 +15,17 @@
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Hex8.hpp"
+#include "FEAElement_Hex27.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "GenBC_Resistance.hpp"
@@ -27,7 +33,7 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
-#include "PLocAssem_Tet_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
@@ -45,6 +51,10 @@ int main(int argc, char *argv[])
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
+
+  // Number of quadrature points for hexs and quadrangles
+  // Suggested values: 2 / 2 for linear, 4 / 4 for quadratic
+  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -101,7 +111,11 @@ int main(int argc, char *argv[])
   bool is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
 
+#if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
@@ -119,6 +133,8 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
+  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
@@ -154,6 +170,8 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
+  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
@@ -280,31 +298,57 @@ int main(int argc, char *argv[])
 
   inflow_rate_ptr->print_info();
 
-  // ===== Quadrature rules =====
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = new QuadPts_Gauss_Tet( nqp_tet );
-  IQuadPts * quads = new QuadPts_Gauss_Triangle( nqp_tri );
-
-  // ===== Finite Element Container =====
+  // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
+
+  SYS_T::commPrint("===> Build quadrature rules. \n");
+  const int nqp_vol { (GMIptr->get_elemType() == 501 || GMIptr->get_elemType() == 502) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
+  const int nqp_sur { (GMIptr->get_elemType() == 501 || GMIptr->get_elemType() == 502) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+
+  IQuadPts * quadv = nullptr;
+  IQuadPts * quads = nullptr;
 
   if( GMIptr->get_elemType() == 501 )
   {
     if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
     if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
 
-    elementv = new FEAElement_Tet4( nqp_tet ); // elem type 501
-    elements = new FEAElement_Triangle3_3D_der0( nqp_tri );
+    elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
+    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
   else if( GMIptr->get_elemType() == 502 )
   {
     SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for tets.\n" );
     SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for triangles.\n" );
 
-    elementv = new FEAElement_Tet10_v2( nqp_tet ); // elem type 502
-    elements = new FEAElement_Triangle6_3D_der0( nqp_tri );
+    elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
+    elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Tet( nqp_vol );
+    quads = new QuadPts_Gauss_Triangle( nqp_sur );
+  }
+  else if( GMIptr->get_elemType() == 601 )
+  {
+    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur);
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
+  }
+  else if( GMIptr->get_elemType() == 602 )
+  {
+    SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
+    SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
+
+    elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
+    elements = new FEAElement_Quad9_3D_der0( nqp_sur );
+    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
+    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
@@ -322,10 +366,10 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Tet_VMS_NS_GenAlpha(
-      tm_galpha_ptr, GMIptr->get_nLocBas(),
+  IPLocAssem * locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
+      tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, c_ct, c_tauc, GMIptr->get_elemType() );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 3 );
@@ -341,16 +385,16 @@ int main(int argc, char *argv[])
     initial_step  = restart_step;
 
     // Read sol file
-    SYS_T::file_check(restart_name.c_str());
-    sol->ReadBinary(restart_name.c_str());
+    SYS_T::file_check(restart_name);
+    sol->ReadBinary(restart_name);
 
     // generate the corresponding dot_sol file name
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
 
     // Read dot_sol file
-    SYS_T::file_check(restart_dot_name.c_str());
-    dot_sol->ReadBinary(restart_dot_name.c_str());
+    SYS_T::file_check(restart_dot_name);
+    dot_sol->ReadBinary(restart_dot_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());

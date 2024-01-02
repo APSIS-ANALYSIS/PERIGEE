@@ -6,17 +6,23 @@
 // Date: Jan 16 2022
 // ==================================================================
 #include "HDF5_Reader.hpp"
-#include "Tet_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "Mesh_Tet.hpp"
+#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Part_FEM_FSI.hpp"
+#include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
   // clean the potentially pre-existing postpart h5 files
-  if( SYS_T::directory_exist("apart") )
+  if( SYS_T::directory_exist("ppart") )
   {
     std::cout<<"Clean the folder ppart.\n";
     SYS_T::execute("rm -rf ppart");
@@ -24,18 +30,8 @@ int main( int argc, char * argv[] )
 
   SYS_T::execute("mkdir ppart");
 
-  const std::string part_file_p("./ppart/postpart_p");
-  const std::string part_file_v("./ppart/postpart_v");
-
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
-
-  int cpu_size = 1;
-  bool isDualGraph = true;
-
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-  
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor is a serial program! \n");
 
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -48,17 +44,26 @@ int main( int argc, char * argv[] )
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
-  SYS_T::GetOptionInt("-cpu_size", cpu_size);
-  SYS_T::GetOptionInt("-in_ncommon", in_ncommon);
-  SYS_T::GetOptionBool("-METIS_isDualGraph", isDualGraph);
+  // The user can specify the new mesh partition options from the yaml file
+  const std::string yaml_file("fsi_prepost.yml");
+
+  SYS_T::file_check(yaml_file);
+
+  YAML::Node paras = YAML::LoadFile( yaml_file );
+
+  const int cpu_size = paras["cpu_size"].as<int>();
+  in_ncommon = paras["in_ncommon"].as<int>();
+  const bool isDualGraph = paras["is_dualgraph"].as<bool>();
+  const std::string part_file_v = paras["part_file_v"].as<std::string>();
+  const std::string part_file_p = paras["part_file_p"].as<std::string>();
 
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -part_file_v: "<<part_file_v<<endl;
   cout<<" -part_file_p: "<<part_file_p<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
-  else cout<<" -METIS_isDualGraph: false \n";
+  if(isDualGraph) cout<<" -is_dualgraph: true \n";
+  else cout<<" -is_dualgraph: false \n";
   cout<<"----------------------------------\n";
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<endl;
@@ -95,15 +100,28 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 1 )
+    if(phy_tag[ee] == 1)
     {
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
-      for(int ii=0; ii<4; ++ii)
-      {
-        const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4 +ii] );
-        if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;
+      if(elemType == 501)
+      {  
+        for(int ii=0; ii<4; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4+ii] );
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;
+        }
       }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii)
+        {
+          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8+ii] );
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+        }
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating a new IEN array for the pressure variable. \n", elemType);
     }
   }
 
@@ -117,13 +135,31 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 0 )
+    if(phy_tag[ee] == 0)
     {
-      for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );        
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the pre-postprocessing. \n", elemType);
     }
     else
     {
-      for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );   
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the pre-postprocessing. \n", elemType);
     }
   }
 
@@ -133,23 +169,56 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if( phy_tag[ee] == 0 )
+    if(phy_tag[ee] == 0)
     {
-      for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );    
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the pre-postprocessing. \n", elemType);
     }
     else
     {
-      for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );       
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );            
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the pre-postprocessing. \n", elemType);        
     }
   }
 
   VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
   // Generate the mesh for kinematics
-  IMesh * mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+  IMesh * mesh_v = nullptr;
 
   // Generate the mesh for pressure (discontinuous over interface)
-  IMesh * mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+  IMesh * mesh_p = nullptr;
+
+  switch( elemType )
+  {
+    case 501:
+      mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
+      mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
+      break;
+    case 601:
+      mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
+      mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
+      break;
+    default:
+      SYS_T::print_fatal("Error: elemType %d is not supported when generating the mesh.\n", elemType);
+      break;
+  }
 
   std::vector<IMesh const *> mlist;
   mlist.push_back(mesh_p); mlist.push_back(mesh_v);
@@ -237,15 +306,15 @@ int main( int argc, char * argv[] )
     mytimer->Start();
     
     IPart * part_p = new Part_FEM_FSI( mesh_p, global_part, mnindex_p, IEN_p,
-        ctrlPts, phy_tag, p_node_f, p_node_s,
-        proc_rank, cpu_size, elemType, 0, dof_fields[0], start_idx_p[proc_rank], false );
+        ctrlPts, phy_tag, p_node_f, p_node_s, proc_rank, cpu_size, elemType,
+        start_idx_p[proc_rank], {0, dof_fields[0], false, "pressure"} );
 
     part_p -> write( part_file_p );
     delete part_p;
 
     IPart * part_v = new Part_FEM_FSI( mesh_v, global_part, mnindex_v, IEN_v,
-        ctrlPts, phy_tag, v_node_f, v_node_s,
-        proc_rank, cpu_size, elemType, 1, dof_fields[1], start_idx_v[proc_rank], true );
+        ctrlPts, phy_tag, v_node_f, v_node_s, proc_rank, cpu_size, elemType,
+        start_idx_v[proc_rank], {1, dof_fields[1], true, "velocity"} );
 
     part_v -> write( part_file_v );
     delete part_v;
@@ -257,7 +326,6 @@ int main( int argc, char * argv[] )
   // Clean up Memory
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v;
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part;
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
