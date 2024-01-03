@@ -28,9 +28,6 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
-  flist = new locassem_tet_vms_ns_funs[1];
-  flist[0] = &PLocAssem_Tet_VMS_NS_GenAlpha::get_cubic_velo_traction;
-
   print_info();
 }
 
@@ -40,8 +37,6 @@ PLocAssem_VMS_NS_GenAlpha::~PLocAssem_VMS_NS_GenAlpha()
   delete [] Residual; Residual = nullptr;
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
-
-  delete [] flist;
 }
 
 void PLocAssem_VMS_NS_GenAlpha::print_info() const
@@ -1000,7 +995,7 @@ void PLocAssem_VMS_NS_GenAlpha::get_pressure_area(
   }
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     const double &time, const double &dt,
     const double * const &sol,
     FEAElement * const &elementv,
@@ -1126,7 +1121,7 @@ void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Residual_Weak1(
   } // qua-loop
 }
 
-void PLocAssem_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
     const double &time, const double &dt,
     const double * const &sol,
     FEAElement * const &elementv,
