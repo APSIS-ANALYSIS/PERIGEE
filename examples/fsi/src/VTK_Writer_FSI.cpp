@@ -131,6 +131,98 @@ void VTK_Writer_FSI::interpolateJ4( const int * const &ptid,
   }
 }
 
+void VTK_Writer_FSI::interpolateVonStress( const int * const &ptid,
+    const double * const &ctrlPts_x,
+    const double * const &ctrlPts_y,
+    const double * const &ctrlPts_z,
+    const std::vector<double> &inputDisp,
+    const std::vector<double> &inputPres,
+    const FEAElement * const &elem,
+    IMaterialModel * const &model,
+    vtkDoubleArray * const &vtkData )
+{
+  // interpolate reference points
+  Interpolater intep( nLocBas );
+
+  std::vector<double> ref_x, ref_y, ref_z;
+
+  intep.interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
+
+  // interpolate dispacment
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0), p (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputDisp[ii*3];
+    v[ii] = inputDisp[ii*3+1];
+    w[ii] = inputDisp[ii*3+2];
+    p[ii] = inputPres[ii];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  const int nqp = elem->get_numQuapts();
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    // calculate fibre direction vector
+    Vector_3 basis_r(0.0, 0.0, 0.0);
+    Vector_3 basis_c(0.0, 0.0, 0.0);
+    Vector_3 basis_l(0.0, 0.0, 0.0);
+    const double x1 = ref_x[ii];
+    const double y1 = ref_y[ii];
+    const double z1 = ref_z[ii];
+
+    if(x1 < 0.0)
+    {
+      const double x0 = - sqrt( 1.0 / (1 + z1*z1/x1/x1) );
+      const double y0 = 0.0;
+      const double z0 = z1 / x1 * x0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vec3::normalize( Vector_3( - z1, 0.0, x1 ) );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+    else
+    {
+      const double x0 = x1;
+      const double y0 = 0.0;
+      const double z0 = 1.0;
+
+      basis_r = Vec3::normalize( Vector_3( x1-x0, y1-y0, z1-z0 ) );
+      basis_l = Vector_3( 1.0, 0.0, 0.0 );
+      basis_c = Vec3::cross_product(basis_l, basis_r);
+    }
+
+    model->update_fibre_dir(basis_r, basis_c, basis_l);
+
+    // F
+    const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                  vx[ii],       vy[ii] + 1.0, vz[ii],
+                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    // Cauchy stress
+    Tensor2_3D sigma = model -> get_Cauchy_stress( F );
+
+    Tensor2_3D pres( -p[ii], 0.0, 0.0, 0.0, -p[ii], 0.0, 0.0, 0.0, -p[ii]);
+
+    Tensor2_3D sigma_p = sigma + pres;
+
+    // Principal stress
+    double eta1, eta2, eta3;
+    Vector_3 vec1, vec2, vec3, temp_vec;
+    const int num_dif_eigen = sigma_p.eigen_decomp(eta1, eta2, eta3, vec1, vec2, vec3);
+
+    double sigma_v = 0.5 * std::sqrt(2.0) * std::sqrt( (eta1 - eta2) * (eta1 - eta2)
+		    + (eta2 - eta3) * (eta2 - eta3) + (eta3 - eta1) * (eta3 - eta1) );
+
+    vtkData->InsertComponent( ptid[ii], 0, sigma_v );
+  }
+}
+
 void VTK_Writer_FSI::writeOutput(
         const FEANode * const &fnode_ptr,
         const ALocal_IEN * const &lien_v,
@@ -550,6 +642,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
     const std::vector<int> &sien,
     const ALocal_Elem * const &lelem_ptr,
     const IVisDataPrep * const &vdata_ptr,
+    IMaterialModel * const &matmodel,
     FEAElement * const &elemptr,
     const IQuadPts * const &quad,
     const double * const * const &pointArrays,
@@ -586,7 +679,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
   // Check if the number of visualization quantities equal a given number
   // I will have to manually interpolate these quantities in the for-loop
-  if(numDArrays != 5) SYS_T::print_fatal("Error: vdata size numDArrays != 5. \n");
+  if(numDArrays != 6) SYS_T::print_fatal("Error: vdata size numDArrays != 6. \n");
 
   // dataVecs is the holder of the interpolated data
   vtkDoubleArray ** dataVecs = new vtkDoubleArray * [numDArrays];
@@ -621,41 +714,44 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
       // Interpolate data and assign to dataVecs
-      std::vector<double> inputInfo; inputInfo.clear();
+      std::vector<double> inputInfo_d; inputInfo_d.clear();
       int asize = vdata_ptr -> get_arraySizes(0);
 
       for(int jj=0; jj<nLocBas; ++jj)
       {
         int pt_index = IEN_v[jj];
         for(int kk=0; kk<asize; ++kk)
-          inputInfo.push_back( pointArrays[0][pt_index * asize + kk] );
+          inputInfo_d.push_back( pointArrays[0][pt_index * asize + kk] );
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo_d, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
+      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, elemptr, points );
 
       // Interpolate detF
-      interpolateJ( &IEN_s[0], inputInfo, elemptr, dataVecs[1] );
+      interpolateJ( &IEN_s[0], inputInfo_d, elemptr, dataVecs[1] );
 
       // Interpolate J_4 for fibre reinforce model
-      interpolateJ4( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, dataVecs[4] );
+      interpolateJ4( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, elemptr, dataVecs[4] );
 
       // Interpolate the pressure scalar
-      inputInfo.clear();
+      std::vector<double> inputInfo_p; inputInfo_p.clear();
       asize = vdata_ptr->get_arraySizes(2);  
       for(int jj=0; jj<nLocBas; ++jj)
       {
         int pt_index = IEN_p[jj];
         for(int kk=0; kk<asize; ++kk)
-          inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
+          inputInfo_p.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] ); 
+      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo_p, elemptr, dataVecs[2] ); 
       
+      // Interpolate von Mises stress
+      interpolateVonStress( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, inputInfo_p, elemptr, matmodel, dataVecs[5] );
+
       // Interpolate the velocity vector
-      inputInfo.clear();
+      std::vector<double> inputInfo; inputInfo.clear();
       asize = vdata_ptr->get_arraySizes( 3 );  
       for(int jj=0; jj<nLocBas; ++jj)
       {

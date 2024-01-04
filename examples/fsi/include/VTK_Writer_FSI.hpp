@@ -13,6 +13,7 @@
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"
+#include "IMaterialModel.hpp"
 
 #include "vtkIntArray.h"
 #include "vtkCellData.h"
@@ -67,6 +68,7 @@ class VTK_Writer_FSI
     	const std::vector<int> &sien,
     	const ALocal_Elem * const &lelem_ptr,
     	const IVisDataPrep * const &vdata_ptr,
+	IMaterialModel * const &matmodel,
     	FEAElement * const &elemptr,
     	const IQuadPts * const &quad,
     	const double * const * const &pointArrays,
@@ -117,6 +119,17 @@ class VTK_Writer_FSI
         const std::vector<double> &inputData,
         const FEAElement * const &elem,
         vtkDoubleArray * const &vtkData );
+
+    void interpolateVonStress( const int * const &ptid,
+        const double * const &ctrlPts_x,
+        const double * const &ctrlPts_y,
+        const double * const &ctrlPts_z,
+        const std::vector<double> &inputDisp,
+	const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
+        vtkDoubleArray * const &vtkData );
+
 };
 
 #endif

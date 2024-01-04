@@ -14,7 +14,9 @@
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "VisDataPrep_Hyperelastic.hpp"  
-#include "VTK_Writer_FSI.hpp"   
+#include "VTK_Writer_FSI.hpp"
+#include "MaterialModel_GOH06_ST91_Mixed.hpp"
+#include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 
 int main ( int argc , char * argv[] )
 {
@@ -37,6 +39,20 @@ int main ( int argc , char * argv[] )
   bool isXML = true;
   bool isRef = false;
   bool isClean = true;
+
+  // Solid properties
+  bool is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
+  double solid_density = 1.0;
+  double solid_E = 2.0e6;
+  double solid_nu = 0.5;
+  double solid_mu = 6.67e5;
+  double solid_f1the = 40.02;
+  double solid_f1phi = 0.0;
+  double solid_f2the = -40.02;
+  double solid_f2phi = 0.0;
+  double solid_fk1 = 9.966e5;
+  double solid_fk2 = 524.6;
+  double solid_fkd = 0.333;
 
   // Load analysis code parameter from solver_cmd.h5 file
   hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -99,6 +115,28 @@ int main ( int argc , char * argv[] )
     SYS_T::execute("rm -rf VIS_S_*.pvtu");
     SYS_T::execute("rm -rf VIS_S_.pvd");
   }
+
+  if( is_read_material )
+  {
+    SYS_T::commPrint("-is_read_material: true \n");
+    SYS_T::file_check("material_model.h5" );
+    SYS_T::commPrint("material_model.h5 found. \n");
+  }
+  else
+  {
+    SYS_T::commPrint("-is_read_material: false \n");
+    SYS_T::cmdPrint("-sl_density:", solid_density);
+    SYS_T::cmdPrint("-sl_E:", solid_E);
+    SYS_T::cmdPrint("-sl_nu:", solid_nu);
+    SYS_T::cmdPrint("-sl_mu:", solid_mu);
+    SYS_T::cmdPrint("-sl_f1the:", solid_f1the);
+    SYS_T::cmdPrint("-sl_f1phi:", solid_f1phi);
+    SYS_T::cmdPrint("-sl_f2the:", solid_f2the);
+    SYS_T::cmdPrint("-sl_f2phi:", solid_f2phi);
+    SYS_T::cmdPrint("-sl_fk1:", solid_fk1);
+    SYS_T::cmdPrint("-sl_fk2:", solid_fk2);
+    SYS_T::cmdPrint("-sl_fkd:", solid_fkd);
+  }
   
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
 
@@ -137,6 +175,35 @@ int main ( int argc , char * argv[] )
   else SYS_T::print_fatal( "Error: unsupported element type \n" );
 
   quad -> print_info();
+
+  // material model
+  IMaterialModel * matmodel;
+  if( is_read_material )
+  {
+    if( solid_nu == 0.5 )
+    {
+      matmodel = new MaterialModel_GOH06_Incompressible_Mixed( "material_model.h5" );
+    }
+    else
+    {
+      matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
+    }
+  }
+  else
+  {
+    if( solid_nu == 0.5 )
+    {
+      matmodel = new MaterialModel_GOH06_Incompressible_Mixed( solid_density, solid_mu,
+        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
+    }
+    else
+    {
+      matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
+        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
+    }
+  }
+
+  matmodel -> print_info();
 
   // For the solid subdomain, we need to prepare a mapping from the
   // FSI nodal index to the solid subdomain nodal index
@@ -200,7 +267,7 @@ int main ( int argc , char * argv[] )
           time * dt, out_bname, name_to_write, isXML );
     else
       vtk_w->writeOutput_solid_cur( fNode, locIEN_v, locIEN_p, sIEN, locElem,
-          visprep, element, quad, pointArrays, rank, size,
+          visprep, matmodel, element, quad, pointArrays, rank, size,
           num_subdomain_nodes,
           time * dt, out_bname, name_to_write, isXML );    
 
@@ -209,7 +276,7 @@ int main ( int argc , char * argv[] )
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // Clean up memory
-  delete quad; delete element; delete visprep;
+  delete quad; delete element; delete visprep; delete matmodel;
   delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p;
   delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
