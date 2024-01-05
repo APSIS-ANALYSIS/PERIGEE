@@ -28,6 +28,7 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
+#include "CVFlowRate_Cosine2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -294,7 +295,7 @@ int main(int argc, char *argv[])
   // if( SYS_T::file_exist( inflow_file ) )
   //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   // else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
 
   inflow_rate_ptr->print_info();
 
