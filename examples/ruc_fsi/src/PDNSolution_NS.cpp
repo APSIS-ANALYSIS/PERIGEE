@@ -20,6 +20,9 @@ PDNSolution_NS::PDNSolution_NS(
     case 2:
       Init_pipe_parabolic( pNode, fNode_ptr );
       break;
+    case 3:
+      Init_no_flow_with_pressure( pNode );
+      break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_NS: No such type of initial condition.\n");
       break;
@@ -37,6 +40,9 @@ PDNSolution_NS::PDNSolution_NS(
   {
     case 0:
       Init_zero( pNode );
+      break;
+    case 3:
+      Init_no_flow_with_pressure( pNode );
       break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_NS : No such type of initial condition.\n");
@@ -198,6 +204,29 @@ void PDNSolution_NS::Init_pipe_parabolic(
     SYS_T::commPrint("                       velo_z = parabolic \n");
     SYS_T::commPrint("                       flow rate 100.0 .\n");
     SYS_T::commPrint("                       direction [%e %e %e].\n", out_nx, out_ny, out_nz);
+  }
+}
+
+void PDNSolution_NS::Init_no_flow_with_pressure( const APart_Node * const &pNode_ptr )
+{
+  const double pres = 1500.0;
+  const double value[4] = {pres, 0.0, 0.0, 0.0};
+
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    const int pos = pNode_ptr->get_node_loc(ii) * 4;
+    const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
+    VecSetValues(solution, 4, location, value, INSERT_VALUES);
+  }
+
+  Assembly_GhostUpdate();
+
+  if(is_print)
+  {
+    SYS_T::commPrint("===> Initial solution: pres   = %e \n", pres);
+    SYS_T::commPrint("                       velo_x = 0.0 \n");
+    SYS_T::commPrint("                       velo_y = 0.0 \n");
+    SYS_T::commPrint("                       velo_z = 0.0 \n");
   }
 }
 
