@@ -373,7 +373,7 @@ int main(int argc, char *argv[])
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
 
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 3 );
+  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
