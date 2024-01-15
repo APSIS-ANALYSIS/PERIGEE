@@ -1053,9 +1053,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
       v_z += sol[ii4 + 2] * dR_dz[ii];
       w_z += sol[ii4 + 3] * dR_dz[ii];
 
-      coor.x() += eleCtrlPts_x[ii];
-      coor.y() += eleCtrlPts_y[ii];
-      coor.z() += eleCtrlPts_z[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const Vector_3 u_vec (u, v, w);
@@ -1181,9 +1181,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
       v_z += sol[ii4 + 2] * dR_dz[ii];
       w_z += sol[ii4 + 3] * dR_dz[ii];
 
-      coor.x() += eleCtrlPts_x[ii];
-      coor.y() += eleCtrlPts_y[ii];
-      coor.z() += eleCtrlPts_z[ii];
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const Vector_3 u_vec (u, v, w);
