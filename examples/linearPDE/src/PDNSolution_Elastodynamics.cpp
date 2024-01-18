@@ -25,7 +25,7 @@ void PDNSolution_Elastodynamics::Init_zero( const APart_Node * const &pNode )
 
   for(int ii=0; ii<nlocalnode; ++ii)
   {
-    const int pos = pNode -> get_node_loc(ii);
+    const int pos = pNode -> get_node_loc(ii) * 3;
     const int location[3] = { pos, pos+1, pos+2 };
 
     VecSetValues(solution, 3, location, value, INSERT_VALUES);
