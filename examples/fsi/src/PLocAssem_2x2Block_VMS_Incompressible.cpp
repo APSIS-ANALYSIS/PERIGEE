@@ -110,8 +110,6 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
     const double * const &qua_prestress,
     const IQuadPts * const &quad )
 {
-  const double nu_stab = 1.0;
-
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -121,32 +119,6 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
   Zero_Residual();
 
   const int nqp = quad -> get_num_quadPts();
-
-  double PI_p = 0.0;
-  std::vector<double> PI_N(nLocBas, 0.0);
-  double bot = 0.0;
-
-  for(int qua=0; qua < nqp; ++qua)
-  {
-    double p = 0.0;
-
-    std::vector<double> R(nLocBas);
-
-    element->get_R( qua, &R[0] );
-
-    for(int ii=0; ii<nLocBas; ++ii) p += pres[ii] * R[ii];
-
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
-
-    PI_p += p * gwts;
-
-    for(int A=0; A<nLocBas; ++A) PI_N[A] += R[A] * gwts;
-
-    bot += gwts;
-  }
-
-  PI_p = PI_p / bot;
-  for(int A=0; A<nLocBas; ++A) PI_N[A] = PI_N[A] / bot;
 
   for(int qua=0; qua < nqp; ++qua)
   {
@@ -242,9 +214,9 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
     const double tau_c = tau[1];
 
     // Residual of momentum equation
-    // const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ),
-    //  rho * detF * ( vy_t - f_body.y() ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
-    //  rho * detF * ( vz_t - f_body.z() ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
+    const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ),
+      rho * detF * ( vy_t - f_body.y() ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
+      rho * detF * ( vz_t - f_body.z() ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
 
     // Residual of mass equation
     const double Res_Mas = detF * invFDV_t;
@@ -257,9 +229,9 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
       const Vector_3 gradNA = invF.VecMultT( Vector_3(NA_x, NA_y, NA_z) );
 
       // tau_m stabilization term
-      // const double gradNA_ResMom = tau_m * ( gradNA.x() * Res_Mom[0] + gradNA.y() * Res_Mom[1] + gradNA.z() * Res_Mom[2] );
+      const double gradNA_ResMom = tau_m * ( gradNA.x() * Res_Mom[0] + gradNA.y() * Res_Mom[1] + gradNA.z() * Res_Mom[2] );
 
-      Residual1[A] += gwts * ( NA * Res_Mas + (NA - PI_N[A]) * (p - PI_p) / nu_stab );
+      Residual1[A] += gwts * ( NA * Res_Mas + gradNA_ResMom );
 
       Residual0[3*A  ] += gwts * ( NA * rho * detF * (vx_t - f_body.x())
           + NA_x * P_iso(0) + NA_y * P_iso(1) + NA_z * P_iso(2)
@@ -291,8 +263,6 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
         const double * const &qua_prestress,
         const IQuadPts * const &quad )
 {
-  const double nu_stab = 1.0;
-
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
@@ -306,32 +276,6 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
   Zero_Tangent_Residual();
 
   const int nqp = quad -> get_num_quadPts();
-
-  double PI_p = 0.0;
-  std::vector<double> PI_N(nLocBas, 0.0);
-  double bot = 0.0;
-
-  for(int qua=0; qua < nqp; ++qua)
-  {
-    double p = 0.0;
-
-    std::vector<double> R(nLocBas);
-
-    element->get_R( qua, &R[0] );
-
-    for(int ii=0; ii<nLocBas; ++ii) p += pres[ii] * R[ii];
-
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
-
-    PI_p += p * gwts;
-
-    for(int A=0; A<nLocBas; ++A) PI_N[A] += R[A] * gwts;
-
-    bot += gwts;
-  }
-
-  PI_p = PI_p / bot;
-  for(int A=0; A<nLocBas; ++A) PI_N[A] = PI_N[A] / bot;
 
   for(int qua=0; qua < nqp; ++qua)
   {
@@ -432,9 +376,9 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
     const double tau_c = tau[1];
 
     // Residual of momentum equation
-    // const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ),
-    //   rho * detF * ( vy_t - f_body.y() ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
-    //   rho * detF * ( vz_t - f_body.z() ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
+    const double Res_Mom[3] { rho * detF * ( vx_t - f_body.x() ) + detF * ( invF(0) * p_x + invF(3) * p_y + invF(6) * p_z ),
+      rho * detF * ( vy_t - f_body.y() ) + detF * ( invF(1) * p_x + invF(4) * p_y + invF(7) * p_z ),
+      rho * detF * ( vz_t - f_body.z() ) + detF * ( invF(2) * p_x + invF(5) * p_y + invF(8) * p_z ) };
     
     // Residual of mass equation
     const double Res_Mas = detF * invFDV_t;
@@ -448,15 +392,15 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
       invF.VecMultT( NA_x, NA_y, NA_z, GradNA_invF[0], GradNA_invF[1], GradNA_invF[2] );
 
       // tau_m stabilization term
-      // const double GradNA_invF_ResMom = tau_m * ( GradNA_invF[0] * Res_Mom[0] + GradNA_invF[1] * Res_Mom[1] + GradNA_invF[2] * Res_Mom[2] );
+      const double GradNA_invF_ResMom = tau_m * ( GradNA_invF[0] * Res_Mom[0] + GradNA_invF[1] * Res_Mom[1] + GradNA_invF[2] * Res_Mom[2] );
 
-      // const double GradNA_invF_dot_GradP_invF = GradNA_invF[0] * GradP_invF[0] +
-      //   GradNA_invF[1] * GradP_invF[1] + GradNA_invF[2] * GradP_invF[2];
+      const double GradNA_invF_dot_GradP_invF = GradNA_invF[0] * GradP_invF[0] +
+        GradNA_invF[1] * GradP_invF[1] + GradNA_invF[2] * GradP_invF[2];
 
-      // const double GradNA_invF_dot_part_Mom = GradNA_invF[0] * (vx_t - f_body.x()) 
-      //   + GradNA_invF[1] * (vy_t - f_body.y()) + GradNA_invF[2] * (vz_t - f_body.z());
+      const double GradNA_invF_dot_part_Mom = GradNA_invF[0] * (vx_t - f_body.x()) 
+        + GradNA_invF[1] * (vy_t - f_body.y()) + GradNA_invF[2] * (vz_t - f_body.z());
 
-      Residual1[A] += gwts * ( NA * Res_Mas + (NA - PI_N[A]) * (p - PI_p) / nu_stab );
+      Residual1[A] += gwts * ( NA * Res_Mas + GradNA_invF_ResMom );
 
       Residual0[3*A  ] += gwts * ( NA * rho * detF * (vx_t - f_body.x())
           + NA_x * P_iso(0) + NA_y * P_iso(1) + NA_z * P_iso(2) 
@@ -477,51 +421,51 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
         double GradNB_invF[3];
         invF.VecMultT( NB_x, NB_y, NB_z, GradNB_invF[0], GradNB_invF[1], GradNB_invF[2] );
 
-        // const double GradNB_invF_dot_Res_Mom = GradNB_invF[0] * Res_Mom[0]
-        //   + GradNB_invF[1] * Res_Mom[1] + GradNB_invF[2] * Res_Mom[2];
+        const double GradNB_invF_dot_Res_Mom = GradNB_invF[0] * Res_Mom[0]
+          + GradNB_invF[1] * Res_Mom[1] + GradNB_invF[2] * Res_Mom[2];
 
         const double GradNA_invF_dot_GradNB_invF = GradNA_invF[0] * GradNB_invF[0] +
           GradNA_invF[1] * GradNB_invF[1] + GradNA_invF[2] * GradNB_invF[2];
 
-        Tangent11[ nLocBas*A + B ] += gwts * dd_dv * (NA - PI_N[A]) * (NB - PI_N[B]) / nu_stab;
+        Tangent11[ nLocBas*A + B ] += gwts * dd_dv * GradNA_invF_dot_GradNB_invF * tau_m * detF;
 
         Tangent10[ 3*nLocBas*A + 3*B ] += gwts * ( 
-            // alpha_m * GradNA_invF[0] * tau_m * detF * rho * NB
+            alpha_m * GradNA_invF[0] * tau_m * detF * rho * NB
             + dd_dv * NA * detF * GradNB_invF[0]
             + ddvm * ( NA * detF * ( invFDV_t*GradNB_invF[0] 
                 - Dvelo_invF(0) * GradNB_invF[0]
                 - Dvelo_invF(3) * GradNB_invF[1] 
                 - Dvelo_invF(6) * GradNB_invF[2] )
-            //   - GradNA_invF[0] * tau_m * GradNB_invF_dot_Res_Mom
-            //   + tau_m * detF * ( GradNA_invF_dot_GradP_invF * GradNB_invF[0]
-            //   - GradNA_invF_dot_GradNB_invF * GradP_invF[0] )
-            //   + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[0]
+              - GradNA_invF[0] * tau_m * GradNB_invF_dot_Res_Mom
+              + tau_m * detF * ( GradNA_invF_dot_GradP_invF * GradNB_invF[0]
+              - GradNA_invF_dot_GradNB_invF * GradP_invF[0] )
+             + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[0]
               ) );
 
         Tangent10[ 3*nLocBas*A + 3*B + 1 ] += gwts * (
-            // alpha_m * GradNA_invF[1] * tau_m * rho * detF * NB
+            alpha_m * GradNA_invF[1] * tau_m * rho * detF * NB
             + dd_dv * NA * detF * GradNB_invF[1]
             + ddvm * ( NA * detF * ( invFDV_t*GradNB_invF[1] 
                 - Dvelo_invF(1) * GradNB_invF[0]
                 - Dvelo_invF(4) * GradNB_invF[1] 
                 - Dvelo_invF(7) * GradNB_invF[2] )
-            //   - GradNA_invF[1] * tau_m * GradNB_invF_dot_Res_Mom
-            //   + tau_m * detF * ( GradNA_invF_dot_GradP_invF * GradNB_invF[1]
-            //   - GradNA_invF_dot_GradNB_invF * GradP_invF[1] ) 
-            //   + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[1]
+              - GradNA_invF[1] * tau_m * GradNB_invF_dot_Res_Mom
+              + tau_m * detF * ( GradNA_invF_dot_GradP_invF * GradNB_invF[1]
+                - GradNA_invF_dot_GradNB_invF * GradP_invF[1] ) 
+               + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[1]
               ) );
 
         Tangent10[ 3*nLocBas*A + 3*B + 2 ] += gwts * (
-            // alpha_m * GradNA_invF[2] * tau_m * rho * detF * NB
+            alpha_m * GradNA_invF[2] * tau_m * rho * detF * NB
             + dd_dv * NA * detF * GradNB_invF[2]
             + ddvm * ( NA * detF * ( invFDV_t*GradNB_invF[2] 
                 - Dvelo_invF(2) * GradNB_invF[0]
                 - Dvelo_invF(5) * GradNB_invF[1] 
                 - Dvelo_invF(8) * GradNB_invF[2] )
-            //   - GradNA_invF[2] * tau_m * GradNB_invF_dot_Res_Mom
-            //   + tau_m * detF * ( GradNA_invF_dot_GradP_invF * GradNB_invF[2]
-            //   - GradNA_invF_dot_GradNB_invF * GradP_invF[2] ) 
-            //   + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[2]
+              - GradNA_invF[2] * tau_m * GradNB_invF_dot_Res_Mom
+              + tau_m * detF * ( GradNA_invF_dot_GradP_invF * GradNB_invF[2]
+                - GradNA_invF_dot_GradNB_invF * GradP_invF[2] ) 
+              + tau_m * rho * detF * GradNA_invF_dot_part_Mom * GradNB_invF[2]
               ) );
 
         Tangent01[nLocBas*(3*A+0)+B] -= gwts * GradNA_invF[0] * detF * NB * dd_dv;
