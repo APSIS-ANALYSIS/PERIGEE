@@ -157,12 +157,11 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
 
       for(int B=0; B<nLocBas; ++B)
       {
-        Tangent[osol_dof*nLocBas*(osol_dof*A)   + osol_dof*B   ] += gwts * NA * R[B];
-        Tangent[osol_dof*nLocBas*(osol_dof*A+1) + osol_dof*B+1 ] += gwts * NA * R[B];
-        Tangent[osol_dof*nLocBas*(osol_dof*A+2) + osol_dof*B+2 ] += gwts * NA * R[B];
-        Tangent[osol_dof*nLocBas*(osol_dof*A+3) + osol_dof*B+3 ] += gwts * NA * R[B];
-        Tangent[osol_dof*nLocBas*(osol_dof*A+4) + osol_dof*B+4 ] += gwts * NA * R[B];
-        Tangent[osol_dof*nLocBas*(osol_dof*A+5) + osol_dof*B+5 ] += gwts * NA * R[B];
+        // Non-zero diagonal of each A-B block
+        for(int C=0; C<osol_dof; ++C)
+        {
+          Tangent[osol_dof*nLocBas*(osol_dof*A + C) + osol_dof*B + C] += gwts * NA * R[B];
+        }
       }
     }
   }
