@@ -115,7 +115,7 @@ class ElemBC_3D : public ElemBC
     {SYS_T::commPrint("Warning: get_face_id is not implemented. \n"); return -1;}
 
     // Access the data in ElemBC_3D_weak, rotation matrices at nodes used in weak BC
-    virtual std::vector<double> get_rotation_matrix( const int &ebcid) const
+    virtual std::vector<double> get_rotation_matrix( const int &ebcid ) const
     {SYS_T::commPrint("Warning: get_rotation_matrix is not implemented. \n"); return {};}
 
     // Overwrite ElemBC_3D_wall properties from a vtp/vtu file
