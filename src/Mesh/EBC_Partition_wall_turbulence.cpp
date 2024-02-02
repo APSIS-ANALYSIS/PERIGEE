@@ -2,8 +2,7 @@
 
 EBC_Partition_wall_turbulence::EBC_Partition_wall_turbulence(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)
-: EBC_Partition(part, mnindex, ebc),
-weak_bc_type {ebc->get_weak_bc_type()}
+: EBC_Partition(part, mnindex, ebc), weak_bc_type {ebc->get_weak_bc_type()}
 {
   if(weak_bc_type == 0)
     ;   // do nothing
@@ -55,3 +54,5 @@ void EBC_Partition_wall_turbulence::write_hdf5(const std::string &FileName) cons
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
+
+// EOF
