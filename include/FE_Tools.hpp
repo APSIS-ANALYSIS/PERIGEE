@@ -229,16 +229,16 @@ namespace FE_T
   // rule on a curve boundary of a surface element, with higher-dimensional
   // coordinates
   // ==================================================================
-  class QuadPts_Gauss_on_boundary : public IQuadPts
+  class QuadPts_on_face : public IQuadPts
   {
     public:
       // Input: \para higher_eleType  : the element type of the higher-dimensional element
       //        \para boundary_id     : the boundary index defined specifically
       //        \para lower_quad_rule : the quadrature rlue of the lower-dimensional element
-      QuadPts_Gauss_on_boundary(const int &higher_elemType, const int &boundary_id, 
+      QuadPts_on_face(const int &vol_elemType, const int &face_id, 
           const IQuadPts * const lower_quad_rule);
 
-      ~QuadPts_Gauss_on_boundary();
+      ~QuadPts_on_face();
 
       virtual void print_info() const {lower_rule->print_info();}
 
@@ -249,18 +249,15 @@ namespace FE_T
       virtual double get_qp(unsigned int ii, unsigned int comp) const
       {return qp[dim * ii + comp];}
 
-      virtual double get_qw(unsigned int ii) const
-      {return lower_rule->get_qw(ii);}
-
     private:
-      int dim;
+      const int dim;
 
       std::vector<double> qp {};
 
       const IQuadPts * lower_rule;
 
       // disallow default constructor
-      QuadPts_Gauss_on_boundary() = delete;
+      QuadPts_on_face() = delete;
   };
       
 } // End of FE_T

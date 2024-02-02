@@ -524,7 +524,7 @@ namespace FE_T
   }
 
   QuadPts_Gauss_on_boundary::QuadPts_Gauss_on_boundary(const int &higher_elemType, const int &boundary_id, 
-      const IQuadPts * const lower_quad_rule) : lower_rule(lower_quad_rule)
+      const IQuadPts * const lower_quad_rule) : dim(lower_rule->get_dim() + 1), lower_rule(lower_quad_rule)
   {
     if(higher_elemType == 501 || higher_elemType == 502) // Tet element
     {
@@ -548,11 +548,11 @@ namespace FE_T
       //       /,',  "
       //      1'
       //    ,'
-      // r * 
+      // r *
+
       SYS_T::print_fatal_if( lower_rule -> get_dim() != 3,
         "FE_T::QuadPts_on_boundary, wrong surface quadrature rule.\n" );
 
-      dim = 4;
       qp.assign( 4 * lower_rule->get_num_quadPts(), 0.0 );
       
       switch(boundary_id)
@@ -625,7 +625,6 @@ namespace FE_T
       SYS_T::print_fatal_if( lower_rule -> get_dim() != 2,
         "FE_T::QuadPts_on_boundary, wrong surface quadrature rule.\n" );
 
-      dim = 3;
       qp.assign( 3 * lower_rule->get_num_quadPts(), 0.0 );
       
       switch(boundary_id)
