@@ -58,18 +58,18 @@ int main( int argc, char * argv[] )
   const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
 
   // Optional:
-  const int weakBC_type               = paras["weakbc_type"].as<int>();
-  // weakBC_type: 0 no weakly enforced Dirichlet bc;
-  //              1 weakly enforced Dirichlet bc in all direction;
-  //              2 strongly enforced in wall-normal direction,
-  //                and weakly enforced in wall-tangent direction
+  const int wall_model_type               = paras["wall_model_type"].as<int>();
+  // wall_model_type: 0 no weakly enforced Dirichlet bc;
+  //                 1 weakly enforced Dirichlet bc in all direction;
+  //                 2 strongly enforced in wall-normal direction,
+  //                   and weakly enforced in wall-tangent direction
 
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
-  cout<<" -weakbc_type: "<<weakBC_type<<endl;
+  cout<<" -wall_model_type: "<<wall_model_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
@@ -135,7 +135,6 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofNum", dofNum);
   cmdh5w->write_intScalar("dofMat", dofMat);
   cmdh5w->write_intScalar("elemType", elemType);
-  cmdh5w->write_intScalar("weakBC_type", weakBC_type);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
@@ -200,12 +199,12 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<num_inlet; ++ii)
     dir_list.push_back( sur_file_in[ii] );
   
-  if (weakBC_type == 0)
+  if (wall_model_type == 0)
     dir_list.push_back( sur_file_wall );
-  else if (weakBC_type == 1 || weakBC_type == 2)
+  else if (wall_model_type == 1 || wall_model_type == 2)
     weak_list.push_back( sur_file_wall );
   else
-    SYS_T::print_fatal("Unknown weak BC type.");
+    SYS_T::print_fatal("Unknown wall model type.");
 
   NBC_list[0] = new NodalBC( nFunc );
   NBC_list[1] = new NodalBC( dir_list, nFunc );
@@ -254,8 +253,8 @@ int main( int argc, char * argv[] )
 
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
-  // Setup weak BC
-  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, weakBC_type, IEN, elemType );
+  // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
+  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, wall_model_type, IEN, elemType );
  
   // Start partition the mesh for each cpu_rank 
 

@@ -133,9 +133,9 @@ class ElemBC
     virtual double get_fluid_density() const
     {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
 
-    // Access the data in ElemBC_3D_wall_turbulence, weak BC type
-    virtual int get_weak_bc_type() const
-    {SYS_T::commPrint("Warning: get_weak_bC_type is not implemented. \n"); return -1;}
+    // Access the data in ElemBC_3D_wall_turbulence, wall model type
+    virtual int get_wall_model_type() const
+    {SYS_T::commPrint("Warning: get_wall_model_type is not implemented. \n"); return -1;}
 
     // Access the data in ElemBC_3D_wall_turbulence, coefficient used in weak BC
     virtual double get_C_bI() const

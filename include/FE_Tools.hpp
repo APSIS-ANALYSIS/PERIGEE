@@ -225,14 +225,12 @@ namespace FE_T
 
   // ==================================================================
   // This is a quadrature rule class that expresses a surface quadrature
-  // rule on a face of a volume element, or expresses a line quadrature
-  // rule on a curve boundary of a surface element, with higher-dimensional
-  // coordinates
+  // rule on a face of a volume element, with higher-dimensional coordinates
   // ==================================================================
   class QuadPts_on_face : public IQuadPts
   {
     public:
-      // Input: \para higher_eleType  : the element type of the higher-dimensional element
+      // Input: \para vol_eleType     : the element type of the volume element
       //        \para boundary_id     : the boundary index defined specifically
       //        \para lower_quad_rule : the quadrature rlue of the lower-dimensional element
       QuadPts_on_face(const int &vol_elemType, const int &face_id, 
@@ -250,11 +248,11 @@ namespace FE_T
       {return qp[dim * ii + comp];}
 
     private:
+      const IQuadPts * lower_rule;
+
       const int dim;
 
       std::vector<double> qp {};
-
-      const IQuadPts * lower_rule;
 
       // disallow default constructor
       QuadPts_on_face() = delete;

@@ -25,7 +25,7 @@ class EBC_Partition_wall_turbulence : public EBC_Partition
     virtual void write_hdf5( const std::string &FileName ) const;
 
   protected:
-    const int weak_bc_type;
+    const int wall_model_type;
 
     // stores the local volume element id in this part
     std::vector<int> part_vol_ele_id {};

@@ -131,7 +131,7 @@ class FEAElement_Hex8 : public FEAElement
     //   Hex-Face-3 : Node 1 2 6 5
     //   Hex-Face-4 : Node 3 7 6 2
     //   Hex-Face-5 : Node 0 4 7 3
-    virtual void buildBasis( const IQuadPts * const &quad_rule_s, const int &face_id,
+    virtual void buildBasis( const int &face_id, const IQuadPts * const &quad_rule_s,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z );

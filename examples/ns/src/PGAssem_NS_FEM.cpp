@@ -230,7 +230,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
-  if(wbc_part->get_weakbc_type() > 0)
+  if(wbc_part->get_wall_model_type() > 0)
   {
     const int num_wele {wbc_part->get_num_ele()};
 
@@ -245,7 +245,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
       const int face_id {wbc_part->get_ele_face_id(ee)};
 
-      if(wbc_part->get_weakbc_type() == 1)
+      if(wbc_part->get_wall_model_type() == 1)
         lassem_ptr->Assem_Residual_Weak1(0, 0, local_a, elementv,
           ectrl_x, ectrl_y, ectrl_z, quad_s, face_id, wbc_part->get_C_bI());
 
@@ -352,7 +352,7 @@ void PGAssem_NS_FEM::Assem_residual(
       nbc_part, ebc_part, gbc );
 
   // Weak enforced no-slip boundary condition
-  if (wbc_part->get_weakbc_type() > 0)
+  if (wbc_part->get_wall_model_type() > 0)
     Weak_EssBC_G(curr_time, dt, sol_b, lassem_ptr, elementv, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
@@ -442,7 +442,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
       nbc_part, ebc_part, gbc );
 
   // Weak enforced no-slip boundary condition
-  if (wbc_part->get_weakbc_type() > 0)
+  if (wbc_part->get_wall_model_type() > 0)
     Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementv, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
@@ -1096,7 +1096,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
-    if(wbc_part->get_weakbc_type() == 1)
+    if(wbc_part->get_wall_model_type() == 1)
       lassem_ptr->Assem_Tangent_Residual_Weak1(curr_time, dt, local_b, temp_element_v,
         ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
 
@@ -1176,7 +1176,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
-    if(wbc_part->get_weakbc_type() == 1)
+    if(wbc_part->get_wall_model_type() == 1)
       lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_b, temp_element_v,
         ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
 

@@ -2,11 +2,11 @@
 
 EBC_Partition_wall_turbulence::EBC_Partition_wall_turbulence(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)
-: EBC_Partition(part, mnindex, ebc), weak_bc_type {ebc->get_weak_bc_type()}
+: EBC_Partition(part, mnindex, ebc), wall_model_type {ebc->get_wall_model_type()}
 {
-  if(weak_bc_type == 0)
+  if(wall_model_type == 0)
     ;   // do nothing
-  else if(weak_bc_type == 1 || weak_bc_type == 2)
+  else if(wall_model_type == 1 || wall_model_type == 2)
   {
     for(int ee{0}; ee < ebc->get_num_cell(0); ++ee)
     {
@@ -20,7 +20,7 @@ EBC_Partition_wall_turbulence::EBC_Partition_wall_turbulence(const IPart * const
     }
   }
   else
-    SYS_T::print_fatal("Error: EBC_Partition_wall_turbulence, unknown weak bc type.\n");
+    SYS_T::print_fatal("Error: EBC_Partition_wall_turbulence, unknown wall model type.\n");
 }
 
 EBC_Partition_wall_turbulence::~EBC_Partition_wall_turbulence()
@@ -39,9 +39,9 @@ void EBC_Partition_wall_turbulence::write_hdf5(const std::string &FileName) cons
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
-  h5w -> write_intScalar( g_id, "weakBC_type", weak_bc_type );
+  h5w -> write_intScalar( g_id, "wall_model_type", wall_model_type );
 
-  if(weak_bc_type > 0)
+  if(wall_model_type > 0)
   {
     h5w -> write_intScalar( g_id, "num_local_cell", num_local_cell[0] );
 
@@ -50,7 +50,7 @@ void EBC_Partition_wall_turbulence::write_hdf5(const std::string &FileName) cons
     h5w -> write_intVector( g_id, "cell_face_id", ele_face_id );
   }
   else
-    ;   // stop writing if weak_bc_type = 0
+    ;   // stop writing if wall_model_type = 0
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }

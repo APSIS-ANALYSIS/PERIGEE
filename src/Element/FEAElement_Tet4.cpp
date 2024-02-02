@@ -228,13 +228,13 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
   return 2.0 * r;
 }
 
-void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad_s, const int &face_id,
+void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
   // Build the volume element
-  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
+  const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
 
   std::vector<double> face_ctrl_x( 3, 0.0 ), face_ctrl_y( 3, 0.0 ), face_ctrl_z( 3, 0.0 );

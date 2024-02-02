@@ -18,7 +18,7 @@ class ALocal_WeakBC
     virtual ~ALocal_WeakBC();
 
     // Get the type of weak enforced Dirichlet BC
-    virtual int get_weakbc_type() const { return weakbc_type; }
+    virtual int get_wall_model_type() const { return wall_model_type; }
 
     virtual int get_C_bI() const { return C_bI; }
 
@@ -28,13 +28,15 @@ class ALocal_WeakBC
 
     virtual const int get_ele_face_id( const int &ee ) const { return ele_face_id[ee]; }
 
+    virtual void print_info() const;
+
   protected:
     // type = 0: the whole wall is set to be strongly no-slip BC
     // type = 1: all dof of wall nodes are set to be weakly essential BC;
     // type = 2: the normal direction of wall nodes (the rotated-x component)
     //           are set to be strongly no-slip, and the tanget direction 
     //           of wall nodes are set to be weakly essential BC.       
-    int weakbc_type;
+    int wall_model_type;
 
     // Coefficient for weak BC
     const double C_bI;

@@ -40,12 +40,6 @@
 
 int main(int argc, char *argv[])
 {
-  // ===== Read preprocessor arguments =====
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-  
-  // weak bc type
-  const int weakBC_type  = cmd_h5r -> read_intScalar("/", "weakBC_type");
   // Coefficient for weak bc
   double C_bI = 4.0;
 
@@ -181,12 +175,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
 
-  if(weakBC_type > 0)
-  {
-    SYS_T::cmdPrint("weakBC_type:", weakBC_type);
-    SYS_T::cmdPrint("-C_bI:", C_bI);
-  }
-
   // if inflow file exists, print the file name
   // otherwise, print the parameter for linear2steady inflow setting
   if( SYS_T::file_exist( inflow_file ) )
@@ -274,6 +262,7 @@ int main(int argc, char *argv[])
 
   // Local sub_domain's weak bc
   ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank, C_bI);
+  locwbc -> print_info();
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);

@@ -17,7 +17,7 @@
 // 3. Face id of the volume element, we will use the face id and the local ien of
 //    volume element to build the quadrature rule and the basis;
 //
-// To be distinguished from other ElemBC_3D, it uses EBC_Partition_weak to 
+// To be distinguished from other ElemBC_3D, it uses EBC_Partition_wall_turbulence to 
 // write h5 file and serves a unique ALocal_WeakBC object.
 //
 // Author: Xuanming Huang
@@ -35,17 +35,17 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D
 
     virtual ~ElemBC_3D_wall_turbulence();
 
-    virtual int get_weak_bc_type() const { return weak_bc_type; };
+    virtual int get_wall_model_type() const { return wall_model_type; };
 
     virtual int get_faceID( const int &cell_index ) const { return face_id[cell_index]; }
 
   private:
-    // Weak bc type
+    // Wall model type
     // type = 0 : strongly no-slip bc in all direction (do nothing)
     // type = 1 : weakly no-slip bc in all direction
     // type = 2 : strongly no-slip bc in wall-normal direction,
     //            and weakly no-slip bc in wall-tangent direction
-    const int weak_bc_type;
+    const int wall_model_type;
 
     // the face id of the volume element
     std::vector<int> face_id;

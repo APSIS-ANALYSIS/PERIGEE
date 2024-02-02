@@ -416,13 +416,13 @@ std::array<double,9> FEAElement_Tet10_v2::get_invJacobian(const int &quaindex) c
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Tet10_v2::buildBasis( const IQuadPts * const &quad_s, const int &face_id,
+void FEAElement_Tet10_v2::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )
 {
   // Build the volume element
-  const auto quad_v = FE_T::QuadPts_Gauss_on_boundary( this->get_Type(), face_id, quad_s );
+  const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
 
   std::vector<double> face_ctrl_x( 6, 0.0 ), face_ctrl_y( 6, 0.0 ), face_ctrl_z( 6, 0.0 );

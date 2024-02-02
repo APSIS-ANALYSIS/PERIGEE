@@ -15,4 +15,4 @@ in_ncommon: 2
 is_dualgraph: true
 # Optional: 0 strongly no-slip bc in all direction, 1 weakly no-slip bc in all direction, 
 #           2 strongly no-slip bc in wall-normal direction, and weakly no-slip bc in wall-tangent direction
-weakbc_type: 0
+wall_model_type: 0

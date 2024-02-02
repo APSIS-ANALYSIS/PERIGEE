@@ -141,7 +141,7 @@ class FEAElement_Tet4 : public FEAElement
     //   Tet-Face-1 : Node 0 3 2
     //   Tet-Face-2 : Node 0 1 3
     //   Tet-Face-3 : Node 0 2 1
-    virtual void buildBasis( const IQuadPts * const &quad_rule_s, const int &face_id,
+    virtual void buildBasis( const int &face_id, const IQuadPts * const &quad_rule_s,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z );

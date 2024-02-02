@@ -273,17 +273,14 @@ class FEAElement
     }
 
     // ------------------------------------------------------------------------
-    // Build the boundary element with boundary id from the specific quad_rule.
-    // For a volume element, it will build a surface element, and for a
-    // surface element, it will build a line element.
-    // This function will not be called in a line element.
+    // Build the volume element with a face id and the quad_rule on surface element.
     // ------------------------------------------------------------------------
-    virtual void buildBasis( const IQuadPts * const &quad_rule_boundary,
-        const int &boundary_id,
+    virtual void buildBasis( const int &face_id,
+        const IQuadPts * const &quad_rule_s,
         const double * const &ctrl_x, 
         const double * const &ctrl_y,
         const double * const &ctrl_z )
-    {SYS_T::commPrint("Warning: buildBoundary is not implemented. \n");}
+    {SYS_T::commPrint("Warning: buildBasis is not implemented. \n");}
 };
 
 #endif

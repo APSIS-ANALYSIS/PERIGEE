@@ -523,10 +523,10 @@ namespace FE_T
     std::cout<<'\n'<<std::endl;
   }
 
-  QuadPts_Gauss_on_boundary::QuadPts_Gauss_on_boundary(const int &higher_elemType, const int &boundary_id, 
-      const IQuadPts * const lower_quad_rule) : dim(lower_rule->get_dim() + 1), lower_rule(lower_quad_rule)
+  QuadPts_on_face::QuadPts_on_face(const int &vol_elemType, const int &face_id, 
+      const IQuadPts * const lower_quad_rule) : lower_rule(lower_quad_rule), dim(lower_rule->get_dim() + 1)
   {
-    if(higher_elemType == 501 || higher_elemType == 502) // Tet element
+    if(vol_elemType == 501 || vol_elemType == 502) // Tet element
     {
       //                     t
       //                     ^
@@ -551,11 +551,11 @@ namespace FE_T
       // r *
 
       SYS_T::print_fatal_if( lower_rule -> get_dim() != 3,
-        "FE_T::QuadPts_on_boundary, wrong surface quadrature rule.\n" );
+        "Error: FE_T::QuadPts_on_face, wrong surface quadrature rule.\n" );
 
       qp.assign( 4 * lower_rule->get_num_quadPts(), 0.0 );
       
-      switch(boundary_id)
+      switch(face_id)
       {
         case 0: // u = 0 : node1 = node0', node2 = node1', node3 = node2'       //      t                                     s'
           for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
@@ -594,11 +594,11 @@ namespace FE_T
           break;                                                                //  (u) 0 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
 
         default:
-          SYS_T::print_fatal("Error: QuadPts_Gauss_on_boundary, wrong face id input.\n");
+          SYS_T::print_fatal("Error: FE_T::QuadPts_on_face, wrong face id input.\n");
           break;
       }
     }
-    else if (higher_elemType == 601 || higher_elemType == 602) // Hex element
+    else if (vol_elemType == 601 || vol_elemType == 602) // Hex element
     {
       //                    t
       //                    ^
@@ -623,11 +623,11 @@ namespace FE_T
       //           *
       //           r
       SYS_T::print_fatal_if( lower_rule -> get_dim() != 2,
-        "FE_T::QuadPts_on_boundary, wrong surface quadrature rule.\n" );
+        "Error: FE_T::QuadPts_on_face, wrong surface quadrature rule.\n" );
 
       qp.assign( 3 * lower_rule->get_num_quadPts(), 0.0 );
       
-      switch(boundary_id)
+      switch(face_id)
       {
         case 0: // t = 0 : node0 = node0', node3 = node1', node2 = node2', node1 = node3' //    r                          s'
           for(unsigned int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
@@ -684,15 +684,15 @@ namespace FE_T
           break;                                                                          //    0 -------- 4 - -> t        0'-------- 1'- -> r'
         
         default:
-          SYS_T::print_fatal("Error: QuadPts_Gauss_on_boundary, wrong face id input.\n");
+          SYS_T::print_fatal("Error: FE_T::QuadPts_on_face, wrong face id input.\n");
           break;
       }
     }
     else
-      SYS_T::print_fatal("Error: FE_T::QuadPts_Gausson_boundary, unknown element type.\n");
+      SYS_T::print_fatal("Error: FE_T::QuadPts_on_face, unknown element type.\n");
   }
 
-  QuadPts_Gauss_on_boundary::~QuadPts_Gauss_on_boundary()
+  QuadPts_on_face::~QuadPts_on_face()
   {
     VEC_T::clean(qp);
     lower_rule = nullptr;

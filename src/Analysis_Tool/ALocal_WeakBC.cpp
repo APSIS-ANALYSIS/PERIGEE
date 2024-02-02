@@ -1,7 +1,7 @@
 #include "ALocal_WeakBC.hpp"
 
 ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank, const double &in_C_bI)
-: weakbc_type {0}, C_bI {in_C_bI}
+: wall_model_type {0}, C_bI {in_C_bI}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -11,9 +11,9 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
   const std::string gname("weak");
 
-  weakbc_type = h5r -> read_intScalar( gname.c_str(), "weakBC_type" );
+  wall_model_type = h5r -> read_intScalar( gname.c_str(), "wall_model_type" );
 
-  if (weakbc_type > 0)
+  if (wall_model_type > 0)
   {
     num_sur_ele = h5r -> read_intScalar( gname.c_str(), "num_local_cell" );
 
@@ -27,10 +27,25 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_ra
 
 ALocal_WeakBC::~ALocal_WeakBC()
 {
-  if(weakbc_type > 0)
+  if(wall_model_type > 0)
   {
     VEC_T::clean( part_vol_ele_id );
     VEC_T::clean( ele_face_id );
+  }
+}
+
+void ALocal_WeakBC::print_info() const
+{
+  SYS_T::commPrint("Weakly enforced wall boundary condition: ");
+  if (wall_model_type == 0)
+  {
+    SYS_T::commPrint("false\n");
+  }
+  else
+  {
+    SYS_T::commPrint("true\n");
+    SYS_T::cmdPrint("-wall_model_type: %d\n", wall_model_type);
+    SYS_T::cmdPrint("-C_bI: %e\n", C_bI);
   }
 }
 
