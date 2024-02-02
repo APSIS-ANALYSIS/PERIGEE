@@ -33,3 +33,5 @@ ALocal_WeakBC::~ALocal_WeakBC()
     VEC_T::clean( ele_face_id );
   }
 }
+
+// EOF
