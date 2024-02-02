@@ -60,8 +60,8 @@ int main( int argc, char * argv[] )
   // Optional:
   const int wall_model_type               = paras["wall_model_type"].as<int>();
   // wall_model_type: 0 no weakly enforced Dirichlet bc;
-  //                 1 weakly enforced Dirichlet bc in all direction;
-  //                 2 strongly enforced in wall-normal direction,
+  //                  1 weakly enforced Dirichlet bc in all direction;
+  //                  2 strongly enforced in wall-normal direction,
   //                   and weakly enforced in wall-tangent direction
 
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
