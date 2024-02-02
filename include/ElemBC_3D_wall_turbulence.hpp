@@ -23,10 +23,10 @@
 // Author: Xuanming Huang
 // Date Created: Oct. 20th  2023
 // ============================================================================
-
 #include "ElemBC_3D.hpp"
 
-class ElemBC_3D_wall_turbulence : public ElemBC_3D {
+class ElemBC_3D_wall_turbulence : public ElemBC_3D 
+{
   public:
     ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
                     const int &in_weak_bc_type,
@@ -53,7 +53,6 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D {
     // ------------------------------------------------------------------------
     // Disallow default constructor
     ElemBC_3D_wall_turbulence() = delete;
-     
 };
 
 #endif
