@@ -292,6 +292,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Setup element container. \n");
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
+  FEAElement * elementvs = nullptr;
 
   SYS_T::commPrint("===> Build quadrature rules. \n");
   const int nqp_vol { (GMIptr->get_elemType() == 501 || GMIptr->get_elemType() == 502) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
@@ -307,6 +308,7 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Tet4( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
@@ -317,6 +319,7 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
     elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Tet10_v2( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
@@ -326,7 +329,8 @@ int main(int argc, char *argv[])
     SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
 
     elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur);
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Hex8( nqp_sur );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
@@ -337,6 +341,7 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
     elements = new FEAElement_Quad9_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Hex27( nqp_sur );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
@@ -449,7 +454,7 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
+        elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -560,7 +565,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, quadv, quads,
+      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
@@ -569,7 +574,7 @@ int main(int argc, char *argv[])
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
+  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
   delete lsolver; delete nsolver; delete tsolver;

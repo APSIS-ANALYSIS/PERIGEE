@@ -41,6 +41,7 @@ class PTime_NS_Solver
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementvs,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IPLocAssem * const &lassem_ptr,

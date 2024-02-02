@@ -76,6 +76,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementvs,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     IPLocAssem * const &lassem_fluid_ptr,
@@ -126,7 +127,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
+        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
         gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
 
     // Update the time step information
