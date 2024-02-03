@@ -53,7 +53,6 @@ class ALocal_WeakBC
     // ------------------------------------------------------------------------
     // Disallow default constructor
     ALocal_WeakBC() = delete;
-
 };
 
 #endif
