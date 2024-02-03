@@ -1,6 +1,7 @@
 #include "ElemBC_3D_wall_turbulence.hpp"
 
-ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
+ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence( 
+    const std::vector<std::string> &vtkfileList,
     const int &in_wall_model_type, const IIEN * const &VIEN, const int &elemtype )
 : ElemBC_3D ( vtkfileList, elemtype ), wall_model_type {in_wall_model_type}
 {

@@ -29,9 +29,9 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D
 {
   public:
     ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
-                    const int &in_weak_bc_type,
-                    const IIEN * const &VIEN,
-                    const int &elemtype );
+        const int &in_wall_model_type,
+        const IIEN * const &VIEN,
+        const int &elemtype );
 
     virtual ~ElemBC_3D_wall_turbulence();
 
