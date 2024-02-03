@@ -22,6 +22,12 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName,
 
     ele_face_id = h5r -> read_intVector( gname.c_str(), "cell_face_id" );
   }
+  else
+  {
+    num_sur_ele = 0;
+    part_vol_ele_id = {};
+    ele_face_id = {};
+  }
 
   delete h5r; H5Fclose( file_id );
 }
