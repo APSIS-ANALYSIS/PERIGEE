@@ -256,6 +256,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Input: \para u_tan : the tangential velocity vector relative to the wall.
     //        \para yy    : the distance from the wall i.e. the 'y' in the formulation.
     //        \para fl_mu : the fluid viscosity i.e the 'mu' in the formulation.
+    //
+    // Ref: Y.Basilevs et al. Isogeometric variational multiscale modeling of wall-bounded turbulent flows 
+    //      with weakly enforced boundary conditions on unstretched meshes, CMAME 2010
     // ----------------------------------------------------------------
     double get_tau_B(const Vector_3 &u_tan, const double &yy, const double &fl_mu)
     {
