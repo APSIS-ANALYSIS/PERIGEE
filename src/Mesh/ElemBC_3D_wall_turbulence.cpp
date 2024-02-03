@@ -64,7 +64,7 @@ ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence( const std::vector<std::str
       SYS_T::print_fatal("Error: ElemBC_3D_wall_turbulence, unknown element type.\n");
   }
   else
-    ; // do nothing
+    ; // The weak_list is empty and the wall file was put in the dir_list. Strongly enforced Dirichlet BC will be appiled.
 }
 
 ElemBC_3D_wall_turbulence::~ElemBC_3D_wall_turbulence()
