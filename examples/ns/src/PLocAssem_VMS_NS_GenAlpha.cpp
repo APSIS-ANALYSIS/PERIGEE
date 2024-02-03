@@ -1063,7 +1063,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     const double inflow_factor = ( u_dot_n < 0.0 ? u_dot_n : 0.0 );
 
     // Calculate the g_qua
-    const Vector_3 g_vec = get_g_weak(coor, curr);
+    const Vector_3 u_minus_g = u_vec - get_g_weak(coor, curr);
 
     // Calculate h_b and tau_B
     const auto dxi_dx = elementv->get_invJacobian(qua);
@@ -1075,13 +1075,13 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
     // Assembly
     const double gwts = surface_area * quads->get_qw(qua);
 
+    const double penalty_wall = C_bI * vis_mu / h_b - tau_B;
+
     for( int A {0}; A < nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       const int A4 = 4 * A;
-
-      const Vector_3 u_minus_g = u_vec - g_vec;
 
       Residual[A4] += gwts * (-1.0) * NA * u_minus_g.dot_product(n_out);
 
@@ -1093,7 +1093,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           - NA_y * n_out.x() * vis_mu * u_minus_g.y()
           - NA_z * n_out.x() * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.x()
-          + NA * n_out.x() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+          + NA * n_out.x() * penalty_wall * u_minus_g.dot_product(n_out) );
 
       Residual[A4 + 2] += gwts * ( NA * (u_dot_n * v + p * n_out.y()
                                   - vis_mu * (v_x + u_y) * n_out.x()
@@ -1103,7 +1103,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           - (NA_x * n_out.x() + 2 * NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.y()
           - NA_z * n_out.y() * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.y()
-          + NA * n_out.y() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+          + NA * n_out.y() * penalty_wall * u_minus_g.dot_product(n_out) );
 
       Residual[A4 + 3] += gwts * ( NA * (u_dot_n * w + p * n_out.z()
                                   - vis_mu * (w_x + u_z) * n_out.x()
@@ -1113,7 +1113,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
           - NA_y * n_out.z() * vis_mu * u_minus_g.y()
           - (NA_x * n_out.x() + NA_y * n_out.y() + 2 * NA_z * n_out.z()) * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.z()
-          + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+          + NA * n_out.z() * penalty_wall * u_minus_g.dot_product(n_out) );
     } // A-loop
   } // qua-loop
 }
@@ -1188,7 +1188,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
     const double inflow_flag   = (u_dot_n < 0.0 ? 1.0 : 0.0);
     
     // Calculate the g_qua
-    const Vector_3 g_vec = get_g_weak(coor, curr);
+    const Vector_3 u_minus_g = u_vec - get_g_weak(coor, curr);
 
     // Calculate h_b and tau_B
     const auto dxi_dx = elementv->get_invJacobian(qua);
@@ -1200,13 +1200,15 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
     // Assembly
     const double gwts = surface_area * quads->get_qw(qua);
 
+    const double common_coef = gwts * dd_dv;
+
+    const double penalty_wall = C_bI * vis_mu / h_b - tau_B;
+
     for( int A {0}; A < nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
       const int A4 = 4 * A;
-
-      const Vector_3 u_minus_g = u_vec - g_vec;
 
       Residual[A4] += gwts * (-1.0) * NA * u_minus_g.dot_product(n_out);
 
@@ -1218,7 +1220,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
           - NA_y * n_out.x() * vis_mu * u_minus_g.y()
           - NA_z * n_out.x() * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.x()
-          + NA * n_out.x() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+          + NA * n_out.x() * penalty_wall * u_minus_g.dot_product(n_out) );
 
       Residual[A4 + 2] += gwts * ( NA * (u_dot_n * v + p * n_out.y()
                                   - vis_mu * (v_x + u_y) * n_out.x()
@@ -1228,7 +1230,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
           - (NA_x * n_out.x() + 2 * NA_y * n_out.y() + NA_z * n_out.z()) * vis_mu * u_minus_g.y()
           - NA_z * n_out.y() * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.y()
-          + NA * n_out.y() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+          + NA * n_out.y() * penalty_wall * u_minus_g.dot_product(n_out) );
 
       Residual[A4 + 3] += gwts * ( NA * (u_dot_n * w + p * n_out.z()
                                   - vis_mu * (w_x + u_z) * n_out.x()
@@ -1238,17 +1240,13 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Weak1(
           - NA_y * n_out.z() * vis_mu * u_minus_g.y()
           - (NA_x * n_out.x() + NA_y * n_out.y() + 2 * NA_z * n_out.z()) * vis_mu * u_minus_g.z()
           + NA * (tau_B - inflow_factor) * u_minus_g.z()
-          + NA * n_out.z() * (C_bI * vis_mu / h_b - tau_B) * u_minus_g.dot_product(n_out) );
+          + NA * n_out.z() * penalty_wall * u_minus_g.dot_product(n_out) );
 
       for (int B {0}; B < nLocBas; ++B )
       {
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
 
         const double NANB = NA * NB;
-
-        const double common_coef = gwts * dd_dv;
-
-        const double penalty_wall = C_bI * vis_mu / h_b - tau_B;
 
         const int B4 = 4 * B, nLocBas4 = 4 * nLocBas;
 
