@@ -1021,7 +1021,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
   {
     elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
-    double surface_area {0.0}, inflow_factor {0.0};
+    double surface_area {0.0};
 
     // Calculate surface Jacobian and normal_qua
     const Vector_3 n_out = elementv->get_2d_normal_out(qua, surface_area);
@@ -1060,10 +1060,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Weak1(
 
     const Vector_3 u_vec (u, v, w);
     const double u_dot_n = u_vec.dot_product(n_out);
-    if(u_dot_n < 0.0)
-      inflow_factor = u_dot_n;
-    else
-      ; // Initialized inflow_factor = 0.0
+    const double inflow_factor = ( u_dot_n < 0.0 ? u_dot_n : 0.0 );
 
     // Calculate the g_qua
     const Vector_3 g_vec = get_g_weak(coor, curr);
