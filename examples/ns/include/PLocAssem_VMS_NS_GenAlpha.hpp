@@ -289,4 +289,5 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       return u_t * (1.0 / (u_p * u_p));   //  tau_B = [u*]^2 / ||u_tan|| = ||u_tan|| / [u+]^2
     }
 };
+
 #endif
