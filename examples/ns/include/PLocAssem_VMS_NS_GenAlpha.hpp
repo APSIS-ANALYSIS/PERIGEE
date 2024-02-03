@@ -229,14 +229,14 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     // ----------------------------------------------------------------
     // ! get_h_b : Calculate the coefficient h_b for weak BC
-    // Input: \para dx_dxi : the inverse Jacobian
+    // Input: \para dxi_dx : the inverse Jacobian
     //        \para n_out  : the outward normal 
     // ----------------------------------------------------------------
-    double get_h_b(const std::array<double, 9> &dx_dxi, const Vector_3 &n_out)
+    double get_h_b(const std::array<double, 9> &dxi_dx, const Vector_3 &n_out)
     {
-      const Tensor2_3D inv_Jac (dx_dxi[0], dx_dxi[1], dx_dxi[2],
-                                dx_dxi[3], dx_dxi[4], dx_dxi[5],
-                                dx_dxi[6], dx_dxi[7], dx_dxi[8]);
+      const Tensor2_3D inv_Jac (dxi_dx[0], dxi_dx[1], dxi_dx[2],
+                                dxi_dx[3], dxi_dx[4], dxi_dx[5],
+                                dxi_dx[6], dxi_dx[7], dxi_dx[8]);
       
       const Vector_3 temp_vec = inv_Jac.VecMult(n_out);
 
