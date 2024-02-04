@@ -13,14 +13,12 @@
 class ALocal_WeakBC
 {
   public:
-    ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank, const double &in_C_bI );
+    ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank );
 
     virtual ~ALocal_WeakBC();
 
     // Get the type of weak enforced Dirichlet BC
     virtual int get_wall_model_type() const { return wall_model_type; }
-
-    virtual int get_C_bI() const { return C_bI; }
 
     virtual int get_num_ele() const { return num_sur_ele; }
 
@@ -37,9 +35,6 @@ class ALocal_WeakBC
     //           are set to be strongly no-slip, and the tanget direction 
     //           of wall nodes are set to be weakly essential BC.       
     int wall_model_type;
-
-    // Coefficient for weak BC
-    const double C_bI;
 
     // stores the number of surface elements.
     int num_sur_ele;

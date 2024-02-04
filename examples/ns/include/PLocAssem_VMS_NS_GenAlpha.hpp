@@ -12,7 +12,6 @@
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
-#include "Math_Tools.hpp"
 
 class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 {
@@ -141,29 +140,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Residual_Weak1(
-        const double &time, const double &dt,
-        const double * const &sol,
-        FEAElement * const &elementv,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quads,
-        const int &face_id,
-        const double &C_bI);
-
-    virtual void Assem_Tangent_Residual_Weak1(
-        const double &time, const double &dt,
-        const double * const &sol,
-        FEAElement * const &elementv,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quads,
-        const int &face_id,
-        const double &C_bI);
-
-  private:
+  protected:
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
@@ -183,7 +160,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     const std::array<double, 9> mm; 
 
     // Private functions
-    void print_info() const;
+    virtual void print_info() const;
 
     SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
@@ -220,73 +197,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double &tt, const Vector_3 &n_out ) const
     {
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
-    }
-
-    Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)
-    {
-      return Vector_3( 0.0, 0.0, 0.0 );
-    }
-
-    // ----------------------------------------------------------------
-    // ! get_h_b : Calculate the coefficient h_b for weak BC
-    // Input: \para dxi_dx : the inverse Jacobian
-    //        \para n_out  : the outward normal 
-    // ----------------------------------------------------------------
-    double get_h_b(const std::array<double, 9> &dxi_dx, const Vector_3 &n_out)
-    {
-      const Tensor2_3D inv_Jac (dxi_dx[0], dxi_dx[1], dxi_dx[2],
-                                dxi_dx[3], dxi_dx[4], dxi_dx[5],
-                                dxi_dx[6], dxi_dx[7], dxi_dx[8]);
-      
-      const Vector_3 temp_vec = inv_Jac.VecMult(n_out);
-
-      const double nT_G_n = temp_vec.dot_product(temp_vec);
-
-      return 2.0 / std::sqrt(nT_G_n);
-    }
-
-    // ----------------------------------------------------------------
-    // ! get_tau_B : Calculate the coefficient tau_B := [u*]^2 / ||u_tan||,
-    //               by solving the non-linear equation of [u+]:
-    // g([u+]) = [u+] + 0.1108 * (exp(0.4*[u+]) - 1 - 0.4*[u+] - (0.4*[u+])^2 / 2 - (0.4*[u+])^3 / 6) - [y+]
-    //         = 0,
-    //               where [u+] := ||u_tan|| / [u*],
-    //                     [y+] := y * [u*] / mu = y * ||u_tan|| / (mu * [u+]),
-    //               according to Spalding's paper in 1961.
-    // Input: \para u_tan : the tangential velocity vector relative to the wall.
-    //        \para yy    : the distance from the wall i.e. the 'y' in the formulation.
-    //        \para fl_mu : the fluid viscosity i.e the 'mu' in the formulation.
-    //
-    // Ref: Y.Basilevs et al. Isogeometric variational multiscale modeling of wall-bounded turbulent flows 
-    //      with weakly enforced boundary conditions on unstretched meshes, CMAME 2010
-    // ----------------------------------------------------------------
-    double get_tau_B(const Vector_3 &u_tan, const double &yy, const double &fl_mu)
-    {
-      // Use Newton-Raphson method to solve g([u+]) = 0.
-      // When [u+] > 0 and [y+] > 0, g([u+]) is monotonically increasing, and there is a unique root.
-      const double u_t = u_tan.norm2();
-
-      double u_p0 = 0.0;  // [u+]_i
-
-      double u_p = 1.0;   // [u+]_(i+1)
-
-      do
-      {
-        u_p0 = u_p;
-
-        const double g_0 = u_p0
-        + 0.110803158362334 * (std::exp(0.4*u_p0) - 1.0 - 0.4*u_p0 - 0.08*u_p0*u_p0 - 0.032*u_p0*u_p0*u_p0* (1.0/3.0))
-        - yy * u_t * (1.0 / (fl_mu * u_p0));    // g([u+]_i)
-
-        const double g_der_0 = 1
-        + 0.110803158362334 * (0.4 * std::exp(0.4*u_p0) - 0.4 - 0.16*u_p0 - 0.032*u_p0*u_p0)
-        + yy * u_t * (1.0 / (fl_mu * u_p0 * u_p0)); // dg/d[u+] at [u+]_i
-
-        u_p = u_p0 - g_0 * (1.0 / g_der_0);
-
-      } while (std::abs(u_p - u_p0) > 1.0e-13);
-      
-      return u_t * (1.0 / (u_p * u_p));   //  tau_B = [u*]^2 / ||u_tan|| = ||u_tan|| / [u+]^2
     }
 };
 

@@ -35,6 +35,7 @@
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
@@ -261,7 +262,7 @@ int main(int argc, char *argv[])
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // Local sub_domain's weak bc
-  ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank, C_bI);
+  ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
   locwbc -> print_info();
 
   // Local sub-domain's nodal indices
@@ -361,10 +362,22 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
+  IPLocAssem * locAssem_ptr = nullptr;
+  if( locwbc->get_wall_model_type() == 0 )
+  {
+    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+  }
+  else if( locwbc->get_wall_model_type() == 1 )
+  {
+    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
+      tm_galpha_ptr, elementv->get_nLocBas(),
+      quadv->get_num_quadPts(), elements->get_nLocBas(),
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+  }
+  else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );

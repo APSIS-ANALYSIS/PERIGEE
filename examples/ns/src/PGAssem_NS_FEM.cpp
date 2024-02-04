@@ -235,10 +235,10 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
 
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_wall_model_type() > 0)
-    Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
-      lien_ptr, fnode_ptr, nbc_part, wbc_part);
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
+    lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -325,9 +325,9 @@ void PGAssem_NS_FEM::Assem_residual(
   NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
 
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_wall_model_type() > 0)
-    Weak_EssBC_G(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  Weak_EssBC_G(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   VecAssemblyBegin(G);
@@ -416,10 +416,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
 
-  // Weak enforced no-slip boundary condition
-  if (wbc_part->get_wall_model_type() > 0)
-    Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
-      lien_ptr, fnode_ptr, nbc_part, wbc_part);
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+    lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1040,6 +1040,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
   const int num_wele {wbc_part->get_num_ele()};
 
+  // If wall_model_type = 0, num_wele will be 0 and this loop will be skipped.
   for(int ee{0}; ee < num_wele; ++ee)
   {
     const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
@@ -1051,9 +1052,8 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
-    if(wbc_part->get_wall_model_type() == 1)
-      lassem_ptr->Assem_Tangent_Residual_Weak1(curr_time, dt, local_b, element_vs,
-        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
+    lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, element_vs,
+      ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
 
     for(int ii{0}; ii < nLocBas; ++ii)
     {
@@ -1099,6 +1099,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
   const int num_wele {wbc_part->get_num_ele()};
 
+  // If wall_model_type = 0, num_wele will be 0 and this loop will be skipped.
   for(int ee{0}; ee < num_wele; ++ee)
   {
     const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
@@ -1109,10 +1110,9 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
-
-    if(wbc_part->get_wall_model_type() == 1)
-      lassem_ptr->Assem_Residual_Weak1(curr_time, dt, local_b, element_vs,
-        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id, wbc_part->get_C_bI());
+    
+    lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, element_vs,
+      ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
 
     for(int ii{0}; ii < nLocBas; ++ii)
     {

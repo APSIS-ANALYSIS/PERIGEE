@@ -456,7 +456,7 @@ class IPLocAssem
     }
 
     // virtual function for type 1 weak bc
-    virtual void Assem_Residual_Weak1(
+    virtual void Assem_Residual_Weak(
         const double &time, const double &dt,
         const double * const &sol,
         FEAElement * const &elementv,
@@ -464,11 +464,10 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &veleCtrlPts_z,
         const IQuadPts * const &quads,
-        const int &face_id,
-        const double &C_bI)
-    {SYS_T::commPrint("Warning: this Assem_Residual_Weak1 is not implemented.\n");}
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
 
-    virtual void Assem_Tangent_Residual_Weak1(
+    virtual void Assem_Tangent_Residual_Weak(
         const double &time, const double &dt,
         const double * const &sol,
         FEAElement * const &elementv,
@@ -476,9 +475,8 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
-        const int &face_id,
-        const double &C_bI)
-    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak1 is not implemented.\n");}
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
 };
 
 #endif

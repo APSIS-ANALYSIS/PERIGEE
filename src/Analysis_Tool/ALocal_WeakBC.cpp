@@ -1,8 +1,8 @@
 #include "ALocal_WeakBC.hpp"
 
 ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, 
-    const int &cpu_rank, const double &in_C_bI )
-: wall_model_type {0}, C_bI {in_C_bI}
+    const int &cpu_rank )
+: wall_model_type {0}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -45,8 +45,6 @@ void ALocal_WeakBC::print_info() const
 {
   SYS_T::commPrint("Weakly enforced wall boundary condition:\n");
   SYS_T::commPrint("-wall_model_type: %d\n", wall_model_type);
-  if (wall_model_type != 0)
-    SYS_T::commPrint("-C_bI: %e\n", C_bI);
 }
 
 // EOF
