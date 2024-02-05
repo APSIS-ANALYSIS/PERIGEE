@@ -8,12 +8,13 @@
 // Date: Jan. 16 2024
 // ============================================================================
 #include "IPLocAssem.hpp"
+#include "IMaterialModel.hpp"
 
 class PLocAssem_Smooth_Vol : public IPLocAssem
 {
   public: 
     PLocAssem_Smooth_Vol(
-        const double &in_module_E, const double &in_nu,
+        IMaterialModel * const &in_matmodel,
         const int &in_isol_dof, const int &in_osol_dof,
         const int &in_nlocbas );
     
@@ -56,10 +57,10 @@ class PLocAssem_Smooth_Vol : public IPLocAssem
         const IQuadPts * const &quad );
     
   private:
-    const double lambda, mu;
     const int isol_dof, osol_dof;
     const int nLocBas;
     const int vec_size;
+    IMaterialModel * matmodel;
 
     void print_info() const;
 };
