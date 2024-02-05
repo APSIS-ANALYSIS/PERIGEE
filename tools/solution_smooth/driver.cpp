@@ -17,6 +17,7 @@
 #include "PLocAssem_Smooth_Vol.hpp"
 #include "PGAssem_Smooth_Vol.hpp"
 #include "PLinear_Solver_PETSc.hpp"
+#include "MaterialModel_Linear_Elasticity.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -149,19 +150,18 @@ int main(int argc, char *argv[])
   elementv->print_info();
   quadv->print_info();
 
-  // Output solution type
-  hid_t cmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( cmd_file );
-  double module_E = cmd_h5r -> read_doubleScalar("/", "youngs_module");
-  double nu       = cmd_h5r -> read_doubleScalar("/", "poissons_ratio");
-
-  // Local assembly routine
-  IPLocAssem * locAssem_ptr = new PLocAssem_Smooth_Vol(module_E, nu, isol_dof, osol_dof, elementv->get_nLocBas());
-
   // Solution vector
   PDNSolution * disp = new PDNSolution_Smooth_Velo( pNode, 0 );
 
   PDNSolution * stress = new PDNSolution_Smooth_Stress( pNode, 0 );
+
+  // Material model
+  const double in_module = 1.0e+5;
+  const double in_nu = 0.3;
+  IMaterialModel * matmodel = new MaterialModel_Linear_Elasticity( in_module, in_nu );
+  
+  // Local assembly routine
+  IPLocAssem * locAssem_ptr = new PLocAssem_Smooth_Vol(matmodel, isol_dof, osol_dof, elementv->get_nLocBas());
 
   // Global assembly
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
