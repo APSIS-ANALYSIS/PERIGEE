@@ -455,7 +455,7 @@ class IPLocAssem
       return output;
     }
 
-    // virtual function for type 1 weak bc
+    // virtual function for weak Dirichlet bc
     virtual void Assem_Residual_Weak(
         const double &time, const double &dt,
         const double * const &sol,
