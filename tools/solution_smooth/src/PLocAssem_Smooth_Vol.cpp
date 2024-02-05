@@ -1,15 +1,15 @@
 #include "PLocAssem_Smooth_Vol.hpp"
 
 PLocAssem_Smooth_Vol::PLocAssem_Smooth_Vol(
-    const double &in_module_E, const double &in_nu,
+    IMaterialModel * const &in_matmodel,
     const int &in_isol_dof, const int &in_osol_dof,
     const int &in_nlocbas )
-: lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
-  mu( 0.5 * in_module_E / (1.0 + in_nu) ),
-  isol_dof( in_isol_dof ), osol_dof( in_osol_dof ),
+: isol_dof( in_isol_dof ), osol_dof( in_osol_dof ),
   nLocBas( in_nlocbas ),
   vec_size( osol_dof * in_nlocbas )
 {
+  matmodel = in_matmodel;
+
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
 
@@ -52,8 +52,6 @@ void PLocAssem_Smooth_Vol::Assem_Residual(
 
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double l2mu = lambda + 2.0 * mu;
-
   Zero_Residual();
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
@@ -83,18 +81,24 @@ void PLocAssem_Smooth_Vol::Assem_Residual(
       uz_z += isol[iiisol+2] * dR_dz[ii];
     }
 
+    const Tensor2_3D F(ux_x, ux_y, ux_z,
+                       uy_x, uy_y, uy_z,
+                       uz_x, uz_y, uz_z);
+    
+    const Tensor2_3D stress = matmodel->get_Cauchy_stress( F );
+
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A];
 
-      Residual[osol_dof*A  ] += gwts * NA * ( l2mu * ux_x + lambda * (uy_y + uz_z) );
-      Residual[osol_dof*A+1] += gwts * NA * ( l2mu * uy_y + lambda * (ux_x + uz_z) );
-      Residual[osol_dof*A+2] += gwts * NA * ( l2mu * uz_z + lambda * (uy_y + ux_x) );
-      Residual[osol_dof*A+3] += gwts * NA * mu * ( ux_y + uy_x );
-      Residual[osol_dof*A+4] += gwts * NA * mu * ( uy_z + uz_y );
-      Residual[osol_dof*A+5] += gwts * NA * mu * ( ux_z + uz_x );
+      Residual[osol_dof*A  ] += gwts * NA * stress(0);
+      Residual[osol_dof*A+1] += gwts * NA * stress(4);
+      Residual[osol_dof*A+2] += gwts * NA * stress(8);
+      Residual[osol_dof*A+3] += gwts * NA * stress(1);
+      Residual[osol_dof*A+4] += gwts * NA * stress(5);
+      Residual[osol_dof*A+5] += gwts * NA * stress(2);
     }
   }
 }
@@ -110,8 +114,6 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
   const int nqp = quad -> get_num_quadPts();
 
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const double l2mu = lambda + 2.0 * mu;
 
   Zero_Tangent_Residual();
 
@@ -142,18 +144,24 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
       uz_z += isol[iiisol+2] * dR_dz[ii];
     }
 
+    const Tensor2_3D F(ux_x, ux_y, ux_z,
+                       uy_x, uy_y, uy_z,
+                       uz_x, uz_y, uz_z);
+    
+    const Tensor2_3D stress = matmodel->get_Cauchy_stress( F );
+
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A];
 
-      Residual[osol_dof*A  ] += gwts * NA * ( l2mu * ux_x + lambda * (uy_y + uz_z) );
-      Residual[osol_dof*A+1] += gwts * NA * ( l2mu * uy_y + lambda * (ux_x + uz_z) );
-      Residual[osol_dof*A+2] += gwts * NA * ( l2mu * uz_z + lambda * (uy_y + ux_x) );
-      Residual[osol_dof*A+3] += gwts * NA * mu * ( ux_y + uy_x );
-      Residual[osol_dof*A+4] += gwts * NA * mu * ( uy_z + uz_y );
-      Residual[osol_dof*A+5] += gwts * NA * mu * ( ux_z + uz_x );
+      Residual[osol_dof*A  ] += gwts * NA * stress(0);
+      Residual[osol_dof*A+1] += gwts * NA * stress(4);
+      Residual[osol_dof*A+2] += gwts * NA * stress(8);
+      Residual[osol_dof*A+3] += gwts * NA * stress(1);
+      Residual[osol_dof*A+4] += gwts * NA * stress(5);
+      Residual[osol_dof*A+5] += gwts * NA * stress(2);
 
       for(int B=0; B<nLocBas; ++B)
       {
@@ -166,3 +174,5 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
     }
   }
 }
+
+//EOF
