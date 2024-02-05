@@ -34,6 +34,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
+  ${perigee_source}/System/Tensor4_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
@@ -64,6 +65,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
+  ${perigee_source}/Model/MaterialModel_Linear_Elasticity.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_Smooth_Velo.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_Smooth_Stress.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Smooth_Vol.cpp
