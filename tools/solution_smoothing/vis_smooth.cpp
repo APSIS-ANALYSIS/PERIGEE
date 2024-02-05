@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  double dt       = cmd_h5r -> read_doubleScalar("/","init_step");
+  double dt = cmd_h5r -> read_doubleScalar("/","init_step");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
