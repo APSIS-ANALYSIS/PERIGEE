@@ -1,7 +1,7 @@
 #ifndef PDNSOLUTION_SMOOTH_Velo_HPP
 #define PDNSOLUTION_SMOOTH_Velo_HPP
 // ============================================================================
-// PDNSolution_Smooth_Vol.hpp
+// PDNSolution_Smooth_Velo.hpp
 //
 // This is the solution for the solution smoother.
 //
