@@ -189,3 +189,5 @@ void PGAssem_Smooth_Vol::Assem_mass_residual(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 }
+
+//EOF

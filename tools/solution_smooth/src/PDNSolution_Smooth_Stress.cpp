@@ -38,3 +38,5 @@ void PDNSolution_Smooth_Stress::Init_zero( const APart_Node * const &pNode )
     SYS_T::commPrint("All components of the solution are zero \n");
   }
 }
+
+//EOF
