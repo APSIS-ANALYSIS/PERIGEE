@@ -184,12 +184,14 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementvs,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const ALocal_EBC * const &ebc_part,
+    const ALocal_WeakBC * const &wbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -233,6 +235,11 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
 
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
+    lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
@@ -255,13 +262,15 @@ void PGAssem_NS_FEM::Assem_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementvs,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -316,6 +325,11 @@ void PGAssem_NS_FEM::Assem_residual(
   NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
 
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  Weak_EssBC_G(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+      lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
@@ -336,13 +350,15 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
+    FEAElement * const &elementvs,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -399,6 +415,11 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Resistance type boundary condition
   NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
       nbc_part, ebc_part, gbc );
+
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+    lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -993,6 +1014,122 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
   delete [] sctrl_z; sctrl_z = nullptr;
+}
+
+void PGAssem_NS_FEM::Weak_EssBC_KG(
+    const double &curr_time, const double &dt,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_vs,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_WeakBC * const &wbc_part)
+{
+  const int loc_dof {dof_mat * nLocBas};
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
+  int * IEN_v = new int [nLocBas];
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
+  sol->GetLocalArray( array_b );
+
+  const int num_wele {wbc_part->get_num_ele()};
+
+  // If wall_model_type = 0, num_wele will be 0 and this loop will be skipped.
+  for(int ee{0}; ee < num_wele; ++ee)
+  {
+    const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
+
+    lien_ptr->get_LIEN(local_ee_index, IEN_v);
+    GetLocal(array_b, IEN_v, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
+
+    const int face_id {wbc_part->get_ele_face_id(ee)};
+
+    lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, element_vs,
+      ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+
+    for(int ii{0}; ii < nLocBas; ++ii)
+    {
+      for(int mm{0}; mm < dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_v[ii]) + mm;
+    }
+
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index, lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  delete [] array_b; array_b = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_v; IEN_v = nullptr;
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
+}
+
+void PGAssem_NS_FEM::Weak_EssBC_G(
+    const double &curr_time, const double &dt,
+    const PDNSolution * const &sol,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_vs,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_WeakBC * const &wbc_part)
+{
+  const int loc_dof {dof_mat * nLocBas};
+  double * array_b = new double [nlgn * dof_sol];
+  double * local_b = new double [nLocBas * dof_sol];
+  int * IEN_v = new int [nLocBas];
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
+  sol->GetLocalArray( array_b );
+
+  const int num_wele {wbc_part->get_num_ele()};
+
+  // If wall_model_type = 0, num_wele will be 0 and this loop will be skipped.
+  for(int ee{0}; ee < num_wele; ++ee)
+  {
+    const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
+
+    lien_ptr->get_LIEN(local_ee_index, IEN_v);
+    GetLocal(array_b, IEN_v, local_b);
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
+
+    const int face_id {wbc_part->get_ele_face_id(ee)};
+    
+    lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, element_vs,
+      ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+
+    for(int ii{0}; ii < nLocBas; ++ii)
+    {
+      for(int mm{0}; mm < dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_v[ii]) + mm;
+    }
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  delete [] array_b; array_b = nullptr;
+  delete [] local_b; local_b = nullptr;
+  delete [] IEN_v; IEN_v = nullptr;
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
 }
 
 // EOF

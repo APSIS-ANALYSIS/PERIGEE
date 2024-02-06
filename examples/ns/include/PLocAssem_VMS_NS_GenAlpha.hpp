@@ -140,7 +140,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-  private:
+  protected:
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
@@ -160,7 +160,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     const std::array<double, 9> mm; 
 
     // Private functions
-    void print_info() const;
+    virtual void print_info() const;
 
     SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 

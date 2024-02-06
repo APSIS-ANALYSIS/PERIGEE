@@ -455,6 +455,28 @@ class IPLocAssem
       return output;
     }
 
+    // virtual function for weak Dirichlet bc
+    virtual void Assem_Residual_Weak(
+        const double &time, const double &dt,
+        const double * const &sol,
+        FEAElement * const &elementv,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &veleCtrlPts_z,
+        const IQuadPts * const &quads,
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_Weak(
+        const double &time, const double &dt,
+        const double * const &sol,
+        FEAElement * const &elementv,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quads,
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
 };
 
 #endif

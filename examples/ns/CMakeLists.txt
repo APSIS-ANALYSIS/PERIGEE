@@ -43,6 +43,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_wall_turbulence.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -52,6 +53,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
+  ${perigee_source}/Mesh/EBC_Partition_wall_turbulence.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
@@ -83,6 +85,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
@@ -102,11 +105,13 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Pressure.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
+  ${perigee_source}/Model/CVFlowRate_Cosine2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp

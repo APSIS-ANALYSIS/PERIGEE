@@ -849,7 +849,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;;
+    double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {
       const int ii4 = ii * 4;

@@ -12,6 +12,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
+#include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
@@ -27,17 +28,22 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
+#include "CVFlowRate_Cosine2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
+  // Coefficient for weak bc
+  double C_bI = 4.0;
+
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
   int nqp_tet = 5, nqp_tri = 4;
@@ -155,6 +161,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-restart_time", restart_time);
   SYS_T::GetOptionReal("-restart_step", restart_step);
   SYS_T::GetOptionString("-restart_name", restart_name);
+  SYS_T::GetOptionReal("-C_bI", C_bI);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
@@ -254,6 +261,10 @@ int main(int argc, char *argv[])
   // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
+  // Local sub_domain's weak bc
+  ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
+  locwbc -> print_info();
+
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node(part_file, rank);
 
@@ -271,10 +282,10 @@ int main(int argc, char *argv[])
 
   // If inflow file exist, load it
   // otherwise, call the linear incremental flow rate to reach a steady flow
-  if( SYS_T::file_exist( inflow_file ) )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
-  else
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+  // if( SYS_T::file_exist( inflow_file ) )
+  //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  // else
+  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
 
   inflow_rate_ptr->print_info();
 
@@ -282,6 +293,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Setup element container. \n");
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
+  FEAElement * elementvs = nullptr;
 
   SYS_T::commPrint("===> Build quadrature rules. \n");
   const int nqp_vol { (GMIptr->get_elemType() == 501 || GMIptr->get_elemType() == 502) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
@@ -297,6 +309,7 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Tet4( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
@@ -307,6 +320,7 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
     elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Tet10_v2( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
@@ -316,7 +330,8 @@ int main(int argc, char *argv[])
     SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
 
     elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur);
+    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Hex8( nqp_sur );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
@@ -327,6 +342,7 @@ int main(int argc, char *argv[])
 
     elementv = new FEAElement_Hex27( nqp_vol ); // elem type 602
     elements = new FEAElement_Quad9_3D_der0( nqp_sur );
+    elementvs = new FEAElement_Hex27( nqp_sur );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
   }
@@ -346,10 +362,22 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local Assembly routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
+  IPLocAssem * locAssem_ptr = nullptr;
+  if( locwbc->get_wall_model_type() == 0 )
+  {
+    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+  }
+  else if( locwbc->get_wall_model_type() == 1 )
+  {
+    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
+      tm_galpha_ptr, elementv->get_nLocBas(),
+      quadv->get_num_quadPts(), elements->get_nLocBas(),
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+  }
+  else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
@@ -439,7 +467,7 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, fNode, locnbc, locebc );
+        elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -550,7 +578,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, pmat, elementv, elements, quadv, quads,
+      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
@@ -558,8 +586,8 @@ int main(int argc, char *argv[])
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
-  delete locElem; delete locnbc; delete locebc; delete pNode; delete locinfnbc;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements;
+  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
+  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
   delete lsolver; delete nsolver; delete tsolver;

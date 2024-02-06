@@ -271,6 +271,16 @@ class FEAElement
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
       return Vector_3();
     }
+
+    // ------------------------------------------------------------------------
+    // Build the volume element with a face id and the quad_rule on surface element.
+    // ------------------------------------------------------------------------
+    virtual void buildBasis( const int &face_id,
+        const IQuadPts * const &quad_rule_s,
+        const double * const &ctrl_x, 
+        const double * const &ctrl_y,
+        const double * const &ctrl_z )
+    {SYS_T::commPrint("Warning: buildBasis is not implemented. \n");}
 };
 
 #endif

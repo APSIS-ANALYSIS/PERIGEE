@@ -59,12 +59,14 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementvs,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part );
 
     // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
@@ -78,13 +80,15 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementvs,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc );
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
 
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
@@ -99,13 +103,15 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
+        FEAElement * const &elementvs,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc );
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
@@ -199,6 +205,27 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
+
+    // Weak imposition of no-slip boundary condition on wall
+    void Weak_EssBC_KG( const double &curr_time, const double &dt,
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_vs,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_WeakBC * const &wbc_part);
+
+    void Weak_EssBC_G( const double &curr_time, const double &dt,
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_vs,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_WeakBC * const &wbc_part);
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const

@@ -16,9 +16,11 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
+#include "ElemBC_3D_wall_turbulence.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
+#include "EBC_Partition_wall_turbulence.hpp"
 #include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
@@ -55,11 +57,19 @@ int main( int argc, char * argv[] )
   const int in_ncommon                = paras["in_ncommon"].as<int>();
   const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
 
+  // Optional:
+  const int wall_model_type               = paras["wall_model_type"].as<int>();
+  // wall_model_type: 0 no weakly enforced Dirichlet bc;
+  //                  1 weakly enforced Dirichlet bc in all direction;
+  //                  2 strongly enforced in wall-normal direction,
+  //                   and weakly enforced in wall-tangent direction
+
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType<<endl;
+  cout<<" -wall_model_type: "<<wall_model_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
@@ -185,10 +195,16 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
 
   std::vector<std::string> dir_list {};
+  std::vector<std::string> weak_list {};
   for(int ii=0; ii<num_inlet; ++ii)
     dir_list.push_back( sur_file_in[ii] );
- 
-  dir_list.push_back( sur_file_wall );
+  
+  if (wall_model_type == 0)
+    dir_list.push_back( sur_file_wall );
+  else if (wall_model_type == 1 || wall_model_type == 2)
+    weak_list.push_back( sur_file_wall );
+  else
+    SYS_T::print_fatal("Unknown wall model type.");
 
   NBC_list[0] = new NodalBC( nFunc );
   NBC_list[1] = new NodalBC( dir_list, nFunc );
@@ -236,6 +252,9 @@ int main( int argc, char * argv[] )
   ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+
+  // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
+  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, wall_model_type, IEN, elemType );
  
   // Start partition the mesh for each cpu_rank 
 
@@ -275,6 +294,11 @@ int main( int argc, char * argv[] )
 
     ebcpart -> write_hdf5( part_file );
 
+    // Partition Weak BC and write to h5 file
+    EBC_Partition * wbcpart = new EBC_Partition_wall_turbulence(part, mnindex, wbc);
+
+    wbcpart -> write_hdf5( part_file );
+
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
     list_nghostnode.push_back(part->get_nghostnode());
@@ -283,7 +307,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; 
+    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; 
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
@@ -303,7 +327,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto &it_nbc : NBC_list) delete it_nbc;
 
-  delete InFBC; delete ebc; delete mytimer;
+  delete InFBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
 
   return EXIT_SUCCESS;

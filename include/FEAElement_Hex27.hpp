@@ -79,6 +79,7 @@
 // Date Created: Sep 6 2023
 // ==================================================================
 #include "FEAElement.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
 class FEAElement_Hex27 : public FEAElement
@@ -169,6 +170,22 @@ class FEAElement_Hex27 : public FEAElement
     // Get the determinant of the Jacobian matrix
     virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
 
+    // Build basis and build the boundary element
+    //   Hex-Face-0 : Node 0 3 2 1 11 10 9 8 24
+    //   Hex-Face-1 : Node 4 5 6 7 12 13 14 15 25
+    //   Hex-Face-2 : Node 0 1 5 4 8 17 12 16 22
+    //   Hex-Face-3 : Node 1 2 6 5 9 18 13 17 21
+    //   Hex-Face-4 : Node 3 7 6 2 19 14 18 10 23
+    //   Hex-Face-5 : Node 0 4 7 3 16 15 19 11 20
+    virtual void buildBasis( const int &face_id, const IQuadPts * const &quad_rule_s,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z );
+
+    // Get the outwardnormal on faces
+    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
+    {return quadrilateral_face->get_2d_normal_out( quaindex, area );}
+
   private:
     // Number of quadrature points
     const int numQuapts;
@@ -187,6 +204,8 @@ class FEAElement_Hex27 : public FEAElement
 
     // detJac : 0 <= ii < numQuapts
     double * detJac;
+
+    FEAElement * quadrilateral_face;
 };
 
 #endif
