@@ -8,14 +8,27 @@ EBC_Partition_wall_turbulence::EBC_Partition_wall_turbulence(const IPart * const
     ;   // do nothing
   else if(wall_model_type == 1 || wall_model_type == 2)
   {
-    for(int ee{0}; ee < ebc->get_num_cell(0); ++ee)
+    PERIGEE_OMP_PARALLEL
     {
-      const int global_vol_ele_id = ebc -> get_global_cell(0, ee);
-      const int loc_id = part -> get_elemLocIndex(global_vol_ele_id);
-      if( loc_id != -1 )
+      std::vector<int> temp_part_vol_ele_id {};
+      std::vector<int> temp_ele_face_id {};
+
+      PERIGEE_OMP_FOR
+      for(int ee=0; ee < ebc->get_num_cell(0); ++ee)
       {
-        part_vol_ele_id.push_back( loc_id );
-        ele_face_id.push_back( ebc -> get_faceID(ee) );
+        const int global_vol_ele_id = ebc -> get_global_cell(0, ee);
+        const int loc_id = part -> get_elemLocIndex(global_vol_ele_id);
+        if( loc_id != -1 )
+        {
+          temp_part_vol_ele_id.push_back( loc_id );
+          temp_ele_face_id.push_back( ebc -> get_faceID(ee) );
+        }
+      }
+
+      PERIGEE_OMP_CRITICAL
+      {
+        VEC_T::insert_end(part_vol_ele_id, temp_part_vol_ele_id);
+        VEC_T::insert_end(ele_face_id, temp_ele_face_id);
       }
     }
   }
