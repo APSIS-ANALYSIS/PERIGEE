@@ -62,7 +62,7 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
 
     virtual void Assem_Residual(
         const double &time, const double &dt,
-        const double * const &sol_n1,
+        const double * const &sol_0,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -70,9 +70,9 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Tangent_Residual(
+    virtual void Assem_Tanget_Residual(
         const double &time, const double &dt,
-        const double * const &dot_sol,
+        const double * const &sol_0,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -121,8 +121,8 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
         const double * const &sol,
+        const double * const &sol_0,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -131,8 +131,8 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
+        const double * const &sol_0,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -141,7 +141,7 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
 
   protected:
     // Private data
-    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
+    const double rho0, vis_mu, beta;
 
     const double CI, CT; // Constants for stabilization parameters
     
