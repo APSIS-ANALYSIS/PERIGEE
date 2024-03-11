@@ -45,7 +45,7 @@ class VTK_Writer_Elastodynamics
 
     std::vector<int> epart_map;
 
-    void interpolateCauchy( const int * const &ptid,
+    void interpolateCauchy( const int &ptOffset,
         const double * const &inputData, FEAElement * const &elem,
         vtkDoubleArray * const &vtkData_x );
 };

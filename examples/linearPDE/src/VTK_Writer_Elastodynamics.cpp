@@ -50,6 +50,8 @@ void VTK_Writer_Elastodynamics::writeOutput(
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
 
+  int ptOffset = 0;
+  int delta_offset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
@@ -63,7 +65,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
     elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
     
     // Interpolate nodal coordinates
-    intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
+    intep.interpolateVTKPts(ptOffset, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
         elemptr, points );
   
     std::vector<double> inputInfo; inputInfo.clear();
@@ -76,31 +78,34 @@ void VTK_Writer_Elastodynamics::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+    intep.interpolateVTKData( asize, ptOffset, &inputInfo[0],
         elemptr, dataVecs[0] );
 
-    interpolateCauchy( &IEN_e[0], &inputInfo[0], elemptr, dataVecs[1] );
+    interpolateCauchy( ptOffset, &inputInfo[0], elemptr, dataVecs[1] );
 
     // Set mesh connectivity
-    if( elemptr->get_Type() == 501 )
-      VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );
-    else if( elemptr->get_Type() == 502 )
-      VIS_T::setQuadTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
-          IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
-          gridData );
-    else if( elemptr->get_Type() == 601 )
-      VIS_T::setHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
-        IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], gridData );
-    else if( elemptr->get_Type() == 602 )
-      VIS_T::setTriQuadHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
-        IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
-        IEN_e[10], IEN_e[11], IEN_e[12], IEN_e[13], IEN_e[14], IEN_e[15],
-        IEN_e[16], IEN_e[17], IEN_e[18], IEN_e[19], IEN_e[20], IEN_e[21],
-        IEN_e[22], IEN_e[23], IEN_e[24], IEN_e[25], IEN_e[26], gridData );
+    if( elemptr->get_Type() == 501 ){
+      VIS_T::setTetraelem( ptOffset, gridData );
+      delta_offset = 4;
+    }
+    else if( elemptr->get_Type() == 502 ){
+      VIS_T::setQuadTetraelem( ptOffset, gridData );
+      delta_offset = 10;
+    }
+    else if( elemptr->get_Type() == 601 ){
+      VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
+      delta_offset = 8;
+    }
+    else if( elemptr->get_Type() == 602 ){
+      VIS_T::setHexelem( 3, 3, 3, ptOffset, gridData );
+      delta_offset = 27;
+    }
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Mesh partition info
     anaprocId->InsertNextValue( epart_map[ lelem_ptr->get_elem_loc(ee) ] );
+
+    ptOffset += delta_offset;
   }
 
   gridData -> SetPoints( points );
@@ -138,7 +143,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
   gridData->Delete();
 }
 
-void VTK_Writer_Elastodynamics::interpolateCauchy( const int * const &ptid,
+void VTK_Writer_Elastodynamics::interpolateCauchy( const int &ptOffset,
     const double * const &inputData, FEAElement * const &elem,
     vtkDoubleArray * const &vtkData)
 {
@@ -176,12 +181,12 @@ void VTK_Writer_Elastodynamics::interpolateCauchy( const int * const &ptid,
     sigma_xy = mu * ( ux_y[ii] + uy_x[ii] );
     sigma_xz = mu * ( ux_z[ii] + uz_x[ii] );
     sigma_yz = mu * ( uy_z[ii] + uz_y[ii] );
-    vtkData->InsertComponent(ptid[ii], 0, sigma_xx);
-    vtkData->InsertComponent(ptid[ii], 1, sigma_yy);
-    vtkData->InsertComponent(ptid[ii], 2, sigma_zz);
-    vtkData->InsertComponent(ptid[ii], 3, sigma_xy);
-    vtkData->InsertComponent(ptid[ii], 4, sigma_yz);
-    vtkData->InsertComponent(ptid[ii], 5, sigma_xz);
+    vtkData->InsertComponent(ptOffset+ii, 0, sigma_xx);
+    vtkData->InsertComponent(ptOffset+ii, 1, sigma_yy);
+    vtkData->InsertComponent(ptOffset+ii, 2, sigma_zz);
+    vtkData->InsertComponent(ptOffset+ii, 3, sigma_xy);
+    vtkData->InsertComponent(ptOffset+ii, 4, sigma_yz);
+    vtkData->InsertComponent(ptOffset+ii, 5, sigma_xz);
   }
 
   delete [] ux; delete [] uy; delete [] uz;
