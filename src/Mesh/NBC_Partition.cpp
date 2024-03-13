@@ -40,29 +40,45 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
     }
 
     Num_LPS[ii] = 0; Num_LPM[ii] = 0;
-    PERIGEE_OMP_PARALLEL_FOR
-    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
+    PERIGEE_OMP_PARALLEL
     {
-      unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
-      unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(jj);
+      std::vector<int> temp_LPSN {}, temp_LPMN {}, temp_LocalMaster {}, temp_LocalMasterSlave {};
+      int temp_num_LPS = 0, temp_num_LPM = 0;
 
-      node_ps = mnindex->get_old2new(node_ps);
-      node_pm = mnindex->get_old2new(node_pm);
-
-      if(part->isNodeInPart(node_ps))
+      PERIGEE_OMP_FOR
+      for(unsigned int jj=0; jj<nbc_list[ii]->get_num_per_nodes(); ++jj)
       {
-        LPSN.push_back(node_ps);
-        LPMN.push_back(node_pm);
-        Num_LPS[ii] += 1;
-      }
+        unsigned int node_ps = nbc_list[ii]->get_per_slave_nodes(jj);
+        unsigned int node_pm = nbc_list[ii]->get_per_master_nodes(jj);
 
-      if(part->isNodeInPart(node_pm))
+        node_ps = mnindex->get_old2new(node_ps);
+        node_pm = mnindex->get_old2new(node_pm);
+
+        if(part->isNodeInPart(node_ps))
+        {
+          temp_LPSN.push_back(node_ps);
+          temp_LPMN.push_back(node_pm);
+          temp_num_LPS += 1;
+        }
+
+        if(part->isNodeInPart(node_pm))
+        {
+          temp_LocalMaster.push_back(node_pm);
+          temp_LocalMasterSlave.push_back(node_ps);
+          temp_num_LPM += 1;
+        }
+      } // end jj-loop
+
+      PERIGEE_OMP_CRITICAL
       {
-        LocalMaster.push_back(node_pm);
-        LocalMasterSlave.push_back(node_ps);
-        Num_LPM[ii] += 1;
+        VEC_T::insert_end(LPSN, temp_LPSN);
+        VEC_T::insert_end(LPMN, temp_LPMN);
+        VEC_T::insert_end(LocalMaster, temp_LocalMaster);
+        VEC_T::insert_end(LocalMasterSlave, temp_LocalMasterSlave);
+        Num_LPS[ii] += temp_num_LPS;
+        Num_LPM[ii] += temp_num_LPM;
       }
-    } // end jj-loop
+    }
   } // end ii-loop over dof
 
   VEC_T::shrink2fit( LDN ); VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
