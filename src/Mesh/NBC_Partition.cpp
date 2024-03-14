@@ -14,30 +14,18 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
   for(int ii=0; ii<dof; ++ii)
   {
     Num_LD[ii] = 0;
-    PERIGEE_OMP_PARALLEL
+    
+    for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
     {
-      std::vector<int> temp_LDN {};
-      int temp_num_LD = 0;
+      unsigned int node_index = nbc_list[ii]->get_dir_nodes(jj);
+      node_index = mnindex->get_old2new(node_index);
 
-      PERIGEE_OMP_FOR
-      for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
+      if(part->isNodeInPart(node_index))
       {
-        unsigned int node_index = nbc_list[ii]->get_dir_nodes(jj);
-        node_index = mnindex->get_old2new(node_index);
-
-        if(part->isNodeInPart(node_index))
-        {
-          temp_LDN.push_back(node_index);
-          temp_num_LD += 1;
-        }
-      } // end jj-loop
-
-      PERIGEE_OMP_CRITICAL
-      {
-        VEC_T::insert_end(LDN, temp_LDN);
-        Num_LD[ii] += temp_num_LD;
+        LDN.push_back(node_index);
+        Num_LD[ii] += 1;
       }
-    }
+    } // end jj-loop
 
     Num_LPS[ii] = 0; Num_LPM[ii] = 0;
     PERIGEE_OMP_PARALLEL
