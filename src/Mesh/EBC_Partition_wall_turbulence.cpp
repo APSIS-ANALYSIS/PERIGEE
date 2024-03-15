@@ -48,7 +48,7 @@ void EBC_Partition_wall_turbulence::write_hdf5(const std::string &FileName) cons
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t g_id = H5Gcreate(file_id, "weak", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t g_id = H5Gcreate(file_id, "/weak", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
   HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
