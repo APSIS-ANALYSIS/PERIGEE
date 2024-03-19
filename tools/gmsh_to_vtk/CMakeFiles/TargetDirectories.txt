@@ -1,0 +1,4 @@
+/Users/chiding/chid/code/PERIGEE-Code/PERIGEE/tools/gmsh_to_vtk/CMakeFiles/perigee-mesh.dir
+/Users/chiding/chid/code/PERIGEE-Code/PERIGEE/tools/gmsh_to_vtk/CMakeFiles/gmsh2vtk.dir
+/Users/chiding/chid/code/PERIGEE-Code/PERIGEE/tools/gmsh_to_vtk/CMakeFiles/edit_cache.dir
+/Users/chiding/chid/code/PERIGEE-Code/PERIGEE/tools/gmsh_to_vtk/CMakeFiles/rebuild_cache.dir

@@ -196,7 +196,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
         const double &tt, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
+      return Vector_3( 0.0, 0.0, 0.0 ); 
+      //return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 };
 

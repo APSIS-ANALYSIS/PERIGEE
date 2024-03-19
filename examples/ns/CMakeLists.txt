@@ -112,7 +112,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_SemiBDF1.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_NS_SemiBDF1.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
@@ -161,6 +163,8 @@ ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
 ADD_EXECUTABLE( vis_601_p1_wss vis_601_p1_wss.cpp)
 ADD_EXECUTABLE( vis_602_p2_wss vis_602_p2_wss.cpp)
+ADD_EXECUTABLE( ns_gen_alpha Gen_alpha_driver.cpp)
+ADD_EXECUTABLE( test local_driver.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
@@ -170,6 +174,8 @@ TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_601_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_602_p2_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( ns_gen_alpha perigee_postprocess )
+TARGET_LINK_LIBRARIES( test perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

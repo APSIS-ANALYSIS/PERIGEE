@@ -119,8 +119,8 @@ double PLocAssem_VMS_NS_SemiBDF1::get_DC(
 
 void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual(
     const double &time, const double &dt,
-    const double * const &sol,
     const double * const &sol_0,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -394,10 +394,10 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual(
   } //qua-loop
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
+void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual(
     const double &time, const double &dt,
-    const double * const &sol,
     const double * const &sol_0,
+    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -410,7 +410,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
 
   const double curr = time + dt;
 
-  Zero_Residual();
+  Zero_Tangent_Residual();
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
@@ -707,9 +707,9 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
 
         // Continuity equation with respect to p, u, v, w
         Tangent[16*nLocBas*A+4*B]   += gwts * tau_m * (NAxNBx + NAyNBy + NAzNBz);
-        Tangent[16*nLocBas*A+4*B+1] += gwts * tau_m * (NA_x * drx_du_B + NA_y * dry_du_B + NA_z * drz_du_B );
-        Tangent[16*nLocBas*A+4*B+2] += gwts * tau_m * (NA_x * drx_dv_B + NA_y * dry_dv_B + NA_z * drz_dv_B );
-        Tangent[16*nLocBas*A+4*B+3] += gwts * tau_m * (NA_x * drx_dw_B + NA_y * dry_dw_B + NA_z * drz_dw_B );
+        Tangent[16*nLocBas*A+4*B+1] += gwts * ( NA * NB_x + tau_m * (NA_x * drx_du_B + NA_y * dry_du_B + NA_z * drz_du_B ) );
+        Tangent[16*nLocBas*A+4*B+2] += gwts * ( NA * NB_y + tau_m * (NA_x * drx_dv_B + NA_y * dry_dv_B + NA_z * drz_dv_B ) );
+        Tangent[16*nLocBas*A+4*B+3] += gwts * ( NA * NB_z + tau_m * (NA_x * drx_dw_B + NA_y * dry_dw_B + NA_z * drz_dw_B ) );
 
         // Momentum-x with respect to p, u, v, w
         Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * ( (-1.0) * NAxNB
@@ -723,21 +723,21 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
             + velo_NG_dot_gradR * rho0 * tau_m * drx_du_B
             - NA * rho0 * tau_m * ( drx_du_B * u_x_NG + dry_du_B * u_y_NG + drz_du_B * u_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * ( drx_tilde_du_B +rho0 / dt * alpha_sig * NB)
-            + (drx_tilde_du_B * NA_x + dry_tilde_du_B * NA_y + drz_tilde_du_B * NA_z) * rho0 * tau_m_2 * rho0 / dt * u_BDF
+            + (drx_du_B * NA_x + dry_du_B * NA_y + drz_du_B * NA_z) * rho0 * tau_m_2 * rho0 / dt * u_BDF
             + tau_c * NAxNBx );
 
         Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * ( vis_mu * NAyNBx 
             + velo_NG_dot_gradR * rho0 * tau_m * drx_dv_B
             - NA * rho0 * tau_m * (drx_dv_B * u_x_NG + dry_dv_B * u_y_NG + drz_dv_B * u_z_NG)
             - r_hat_dot_gradR * rho0 * tau_m_2 * drx_tilde_dv_B
-            + (drx_tilde_dv_B * NA_x + dry_tilde_dv_B * NA_y + drz_tilde_dv_B * NA_z) * rho0 * tau_m_2 * rho0 / dt * u_BDF
+            + (drx_dv_B * NA_x + dry_dv_B * NA_y + drz_dv_B * NA_z) * rho0 * tau_m_2 * rho0 / dt * u_BDF
             + tau_c * NAxNBy );
 
         Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * ( vis_mu * NAzNBx 
             + velo_NG_dot_gradR * rho0 * tau_m * drx_dw_B
             - NA * rho0 * tau_m * (drx_dw_B * u_x_NG + dry_dw_B * u_y_NG + drz_dw_B * u_z_NG)
             - r_hat_dot_gradR * rho0 * tau_m_2 * drx_tilde_dw_B
-            + (drx_tilde_dw_B * NA_x + dry_tilde_dw_B * NA_y + drz_tilde_dw_B * NA_z) * rho0 * tau_m_2 * rho0/ dt * u_BDF
+            + (drx_dw_B * NA_x + dry_dw_B * NA_y + drz_dw_B * NA_z) * rho0 * tau_m_2 * rho0/ dt * u_BDF
             + tau_c * NAxNBz );
 
         // Momentum-y with respect to p, u, v, w
@@ -751,7 +751,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
             + velo_NG_dot_gradR * rho0 * tau_m * dry_du_B
             - NA * rho0 * tau_m * ( drx_du_B * v_x_NG + dry_du_B * v_y_NG + drz_du_B * v_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * dry_tilde_du_B
-            + (drx_tilde_du_B * NA_x + dry_tilde_du_B * NA_y + drz_tilde_du_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
+            + (drx_du_B * NA_x + dry_du_B * NA_y + drz_du_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
             + tau_c * NAyNBx );
 
          Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * ( rho0 /dt * alpha_sig  * NANB
@@ -759,14 +759,14 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
             + velo_NG_dot_gradR * rho0 * tau_m * dry_dv_B
             - NA * rho0 * tau_m * ( drx_dv_B * v_x_NG + dry_dv_B * v_y_NG + drz_dv_B * v_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * ( dry_tilde_dv_B + rho0/dt * alpha_sig * NB)
-            + (drx_tilde_dv_B * NA_x + dry_tilde_dv_B * NA_y + drz_tilde_dv_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
+            + (drx_dv_B * NA_x + dry_dv_B * NA_y + drz_dv_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
             + tau_c * NAyNBy );  
 
         Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * ( vis_mu * NAzNBy
             + velo_NG_dot_gradR * rho0 * tau_m * dry_dw_B
             - NA * rho0 * tau_m * ( drx_dw_B * v_x_NG + dry_dw_B * v_y_NG + drz_dw_B * v_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * dry_tilde_dw_B
-            + (drx_tilde_dw_B * NA_x + dry_tilde_dw_B * NA_y + drz_tilde_dw_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
+            + (drx_dw_B * NA_x + dry_dw_B * NA_y + drz_dw_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
             + tau_c * NAyNBz );
 
         // Momentum-z with respect to p, u, v, w
@@ -780,14 +780,14 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
             + velo_NG_dot_gradR * rho0 * tau_m * drz_du_B
             - NA * rho0 * tau_m * ( drx_du_B * w_x_NG + dry_du_B * w_y_NG + drz_du_B * w_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * drz_tilde_du_B
-            + (drx_tilde_du_B * NA_x + dry_tilde_du_B * NA_y + drz_tilde_du_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
+            + (drx_du_B * NA_x + dry_du_B * NA_y + drz_du_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
             + tau_c * NAzNBx );
 
         Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * ( vis_mu * NAyNBz
             + velo_NG_dot_gradR * rho0 * tau_m * drz_dv_B
             - NA * rho0 * tau_m * ( drx_dv_B * w_x_NG + dry_dv_B * w_y_NG + drz_dv_B * w_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * drz_tilde_dv_B
-            + (drx_tilde_dv_B * NA_x + dry_tilde_dv_B * NA_y + drz_tilde_dv_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
+            + (drx_dv_B * NA_x + dry_dv_B * NA_y + drz_dv_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
             + tau_c * NAzNBy );
 
         Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * ( rho0 /dt * alpha_sig  * NANB
@@ -795,7 +795,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tanget_Residual(
             + velo_NG_dot_gradR * rho0 * tau_m * drz_dw_B
             - NA * rho0 * tau_m * ( drx_dw_B * w_x_NG + dry_dw_B * w_y_NG + drz_dw_B * w_z_NG )
             - r_hat_dot_gradR * rho0 * tau_m_2 * (drz_tilde_dw_B + rho0/dt * alpha_sig * NB)
-            + (drx_tilde_dw_B * NA_x + dry_tilde_dw_B * NA_y + drz_tilde_dw_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
+            + (drx_dw_B * NA_x + dry_dw_B * NA_y + drz_dw_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
             + tau_c * NAzNBz );
 
       } // B-loop
@@ -983,7 +983,6 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_EBC_Resistance(
 
 void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_BackFlowStab(
     const double * const &sol_0,
-    const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -1009,9 +1008,6 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_BackFlowStab(
     for(int ii=0; ii<snLocBas; ++ii)
     {
       const int ii4 = ii * 4;
-      u += sol[ii4+1] * R[ii];
-      v += sol[ii4+2] * R[ii];
-      w += sol[ii4+3] * R[ii];
       u_0 += sol_0[ii4+1] * R[ii];
       v_0 += sol_0[ii4+2] * R[ii];
       w_0 += sol_0[ii4+3] * R[ii];
@@ -1029,78 +1025,9 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_BackFlowStab(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
-      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
-      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
-    }
-  }
-}
-
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual_BackFlowStab(
-    const double &dt,
-    const double * const &sol_0,
-    const double * const &sol,
-    FEAElement * const &element,
-    const double * const &eleCtrlPts_x,
-    const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
-{
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
-
-  Zero_sur_Tangent_Residual();
-
-  for(int qua = 0; qua < face_nqp; ++qua)
-  {
-    const std::vector<double> R = element->get_R(qua);
-
-    double surface_area, factor;
-
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
-
-    double u = 0.0, v = 0.0, w = 0.0;
-    double u_0 = 0.0, v_0 = 0.0, w_0 = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii)
-    {
-      const int ii4 = ii * 4;
-      u += sol[ii4+1] * R[ii];
-      v += sol[ii4+2] * R[ii];
-      w += sol[ii4+3] * R[ii];
-      u_0 += sol_0[ii4+1] * R[ii];
-      v_0 += sol_0[ii4+2] * R[ii];
-      w_0 += sol_0[ii4+3] * R[ii];
-    }
-
-    // Newton-Gregory Polynominal
-    const double u_NG = u_0;
-    const double v_NG = v_0;
-    const double w_NG = w_0;
-
-    const double temp = u_NG * n_out.x() + v_NG * n_out.y() + w_NG * n_out.z();
-
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
-
-    const double gwts = surface_area * quad -> get_qw(qua);
-
-    // snLocBas = 3 for linear tri element
-    //            6 for quadratic tri element
-    for(int A=0; A<snLocBas; ++A)
-    {
-      sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
-      sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
-      sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
-
-      for(int B=0; B<snLocBas; ++B)
-      {
-        // index := A *snLocBas+B here ranges from 0 to 8 for linear triangle
-        //                        0 to 35 for quadratic triangle
-        sur_Tangent[ 4*snLocBas*(4*A+1) + 4*B+1 ] -= gwts * R[A] * factor * R[B];
-        sur_Tangent[ 4*snLocBas*(4*A+2) + 4*B+2 ] -= gwts * R[A] * factor * R[B];
-        sur_Tangent[ 4*snLocBas*(4*A+3) + 4*B+3 ] -= gwts * R[A] * factor * R[B];
-      }
+      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u_NG;
+      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v_NG;
+      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w_NG;
     }
   }
 }

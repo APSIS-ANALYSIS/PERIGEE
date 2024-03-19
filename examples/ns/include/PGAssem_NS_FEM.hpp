@@ -34,7 +34,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
-        const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
     // Destructor
@@ -49,8 +48,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc );
+        const ALocal_EBC * const &ebc_part);
 
     // Assem mass matrix and residual vector
     virtual void Assem_mass_residual(
@@ -87,7 +85,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part );
 
     // Assembly the residual vector and tangent matrix 
@@ -110,7 +107,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part );
 
     // Assembly routine for the surface integrals of flow rate and
@@ -186,25 +182,25 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     // Resistance type boundary condition on outlet surfaces
-    void NatBC_Resis_G( const double &curr_time, const double &dt,
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc );
+    // void NatBC_Resis_G( const double &curr_time, const double &dt,
+    //     const PDNSolution * const &dot_sol,
+    //     const PDNSolution * const &sol,
+    //     IPLocAssem * const &lassem_ptr,
+    //     FEAElement * const &element_s,
+    //     const IQuadPts * const &quad_s,
+    //     const ALocal_NBC * const &nbc_part,
+    //     const ALocal_EBC * const &ebc_part,
+    //     const IGenBC * const &gbc );
 
-    void NatBC_Resis_KG( const double &curr_time, const double &dt,
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc );
+    // void NatBC_Resis_KG( const double &curr_time, const double &dt,
+    //     const PDNSolution * const &dot_sol,
+    //     const PDNSolution * const &sol,
+    //     IPLocAssem * const &lassem_ptr,
+    //     FEAElement * const &element_s,
+    //     const IQuadPts * const &quad_s,
+    //     const ALocal_NBC * const &nbc_part,
+    //     const ALocal_EBC * const &ebc_part,
+    //     const IGenBC * const &gbc );
 
     // Weak imposition of no-slip boundary condition on wall
     void Weak_EssBC_KG( const double &curr_time, const double &dt,

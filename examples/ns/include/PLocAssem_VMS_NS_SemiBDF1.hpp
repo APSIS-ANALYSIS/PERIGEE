@@ -10,7 +10,6 @@
 // Date   : March 4, 2024
 // ==================================================================
 #include "IPLocAssem.hpp"
-#include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
 
 class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
@@ -70,7 +69,7 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Tanget_Residual(
+    virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &sol_0,
         const double * const &sol,
@@ -121,17 +120,6 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &sol,
-        const double * const &sol_0,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_BackFlowStab(
-        const double &dt,
-        const double * const &sol,
         const double * const &sol_0,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -175,7 +163,7 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_f(const Vector_3 &pt, const double &tt) const
+    Vector_3 get_f( const Vector_3 &pt, const double &tt ) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
@@ -195,7 +183,8 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
     Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
         const double &tt, const Vector_3 &n_out ) const
     {
-      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
+      return Vector_3( 0.0, 0.0, 0.0 );
+      //return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 };
 
