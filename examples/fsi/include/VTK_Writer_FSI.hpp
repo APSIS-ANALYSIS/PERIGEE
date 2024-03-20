@@ -13,6 +13,8 @@
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"
+#include "IMaterialModel.hpp"
+#include "Tissue_property.hpp"
 
 #include "vtkIntArray.h"
 #include "vtkCellData.h"
@@ -67,8 +69,10 @@ class VTK_Writer_FSI
     	const std::vector<int> &sien,
     	const ALocal_Elem * const &lelem_ptr,
     	const IVisDataPrep * const &vdata_ptr,
+	IMaterialModel * const &matmodel,
     	FEAElement * const &elemptr,
     	const IQuadPts * const &quad,
+	const Tissue_property * const &tp_ptr,
     	const double * const * const &pointArrays,
     	const int &rank, const int &size,
     	const int &num_of_nodes,
@@ -105,6 +109,22 @@ class VTK_Writer_FSI
     void interpolateJ( const int * const &ptid,
         const std::vector<double> &inputData,
         const FEAElement * const &elem,
+        vtkDoubleArray * const &vtkData );
+
+    // --------------------------------------------------------------
+    // Interpolate von-Mises stress at sampling points
+    // --------------------------------------------------------------
+    void interpolateVonStress( const int * const &ptid,
+        const double * const &ctrlPts_x,
+        const double * const &ctrlPts_y,
+        const double * const &ctrlPts_z,
+	const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<double> &inputDisp,
+        const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
         vtkDoubleArray * const &vtkData );
 };
 
