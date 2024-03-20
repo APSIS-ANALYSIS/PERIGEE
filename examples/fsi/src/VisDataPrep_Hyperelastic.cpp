@@ -15,7 +15,7 @@ VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
   }
   else
   {
-  arrayCompSize = 4;
+  arrayCompSize = 5;
 
   arrayNames.push_back("Displacement");
   arraySizes.push_back(3);
@@ -25,6 +25,8 @@ VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
   arraySizes.push_back(1);
   arrayNames.push_back("Velocity");
   arraySizes.push_back(3);
+  arrayNames.push_back("VonMisesStress");
+  arraySizes.push_back(1);
   }
 
   pt_array_len.clear();
