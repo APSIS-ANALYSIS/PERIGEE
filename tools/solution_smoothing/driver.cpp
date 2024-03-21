@@ -143,9 +143,11 @@ int main(int argc, char *argv[])
   quadv->print_info();
 
   // Solution vector
-  PDNSolution * disp = new PDNSolution_Smooth_Velo( pNode, 0 );
+  PDNSolution * disp = new PDNSolution( pNode, 3 );
+  PDNSolution * stress = new PDNSolution( pNode, 6 );
 
-  PDNSolution * stress = new PDNSolution_Smooth_Stress( pNode, 0 );
+  disp -> ScaleValue( 0.0 );
+  stress -> ScaleValue( 0.0 );
 
   // Material model
   const double in_module = 1.0e+5;

@@ -3,8 +3,6 @@
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
-#include "PDNSolution_Smooth_Velo.hpp"
-#include "PDNSolution_Smooth_Stress.hpp"
 
 class PGAssem_Smooth_Vol : public IPGAssem
 {
