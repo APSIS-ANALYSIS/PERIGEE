@@ -7,16 +7,13 @@ PGAssem_Smooth_Vol::PGAssem_Smooth_Vol(
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
     const int &in_nz_estimate )
-: nLocBas( agmi_ptr->get_nLocBas() ),
-  isol_dof( locassem_ptr->get_dof() ),
-  osol_dof( locassem_ptr->get_dof_mat() ),
-  nlgn( pnode_ptr->get_nlocghonode() )
+: nLocBas( agmi_ptr->get_nLocBas() ), nlgn( pnode_ptr->get_nlocghonode() )
 {
-  const int nlocrow = osol_dof * pnode_ptr -> get_nlocalnode();
+  const int nlocrow = 6 * pnode_ptr -> get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, isol_dof*in_nz_estimate, NULL, isol_dof*in_nz_estimate, NULL, &K);
+      PETSC_DETERMINE, 3*in_nz_estimate, NULL, 3*in_nz_estimate, NULL, &K);
 
   // Allocate the vector G
   VecCreate(PETSC_COMM_WORLD, &G);
@@ -58,7 +55,7 @@ void PGAssem_Smooth_Vol::Assem_nonzero_estimate(
   
   lassem_ptr->Assem_Estimate();
 
-  PetscInt * row_index = new PetscInt [nLocBas * osol_dof];
+  PetscInt * row_index = new PetscInt [nLocBas * 6];
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -66,11 +63,11 @@ void PGAssem_Smooth_Vol::Assem_nonzero_estimate(
     {
       const int loc_index = lien_ptr -> get_LIEN(ee, ii);
       
-      for(int mm=0; mm<osol_dof; ++mm)
-        row_index[osol_dof * ii + mm] = osol_dof * pnode_ptr->get_local_to_global(loc_index) + mm;
+      for(int mm=0; mm<6; ++mm)
+        row_index[6 * ii + mm] = 6 * pnode_ptr->get_local_to_global(loc_index) + mm;
     }
 
-    MatSetValues(K, osol_dof * nLocBas, row_index, osol_dof * nLocBas, row_index, lassem_ptr->Tangent, ADD_VALUES);
+    MatSetValues(K, 6 * nLocBas, row_index, 6 * nLocBas, row_index, lassem_ptr->Tangent, ADD_VALUES);
   }
 
   delete [] row_index; row_index = nullptr;
@@ -93,20 +90,20 @@ void PGAssem_Smooth_Vol::Assem_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
-  double * array_a = new double [nlgn * isol_dof];
-  double * local_a = new double [nLocBas * isol_dof];
+  double * array_a = new double [nlgn * 3];
+  double * local_a = new double [nLocBas * 3];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
-  PetscInt * row_index = new PetscInt [nLocBas * osol_dof];
+  PetscInt * row_index = new PetscInt [nLocBas * 6];
 
   isol -> GetLocalArray( array_a );
   
   for( int ee=0; ee<nElem; ++ee )
   {
     lien_ptr -> get_LIEN(ee, IEN_e);
-    GetLocal(array_a, IEN_e, local_a, isol_dof);
+    GetLocal(array_a, IEN_e, local_a);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -114,11 +111,11 @@ void PGAssem_Smooth_Vol::Assem_residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      for(int mm=0; mm<osol_dof; ++mm)
-        row_index[osol_dof*ii+mm] = osol_dof * pnode_ptr->get_local_to_global(IEN_e[ii]) + mm;
+      for(int mm=0; mm<6; ++mm)
+        row_index[6*ii+mm] = 6 * pnode_ptr->get_local_to_global(IEN_e[ii]) + mm;
     }
 
-    VecSetValues(G, osol_dof * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, 6 * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -145,20 +142,20 @@ void PGAssem_Smooth_Vol::Assem_mass_residual(
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
-  double * array_a = new double [nlgn * isol_dof];
-  double * local_a = new double [nLocBas * isol_dof];
+  double * array_a = new double [nlgn * 3];
+  double * local_a = new double [nLocBas * 3];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
-  PetscInt * row_index = new PetscInt [nLocBas * osol_dof];
+  PetscInt * row_index = new PetscInt [nLocBas * 6];
   isol->GetLocalArray( array_a );
   
   for(int ee=0; ee<nElem; ++ee)
   {
     lien_ptr->get_LIEN(ee, IEN_e);
     
-    GetLocal(array_a, IEN_e, local_a, isol_dof);
+    GetLocal(array_a, IEN_e, local_a);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -166,14 +163,14 @@ void PGAssem_Smooth_Vol::Assem_mass_residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      for(int mm=0; mm<osol_dof; ++mm)
-        row_index[osol_dof*ii+mm] = osol_dof * pnode_ptr->get_local_to_global(IEN_e[ii]) + mm;
+      for(int mm=0; mm<6; ++mm)
+        row_index[6*ii+mm] = 6 * pnode_ptr->get_local_to_global(IEN_e[ii]) + mm;
     }
 
-    MatSetValues(K, osol_dof * nLocBas, row_index, osol_dof * nLocBas, row_index,
+    MatSetValues(K, 6 * nLocBas, row_index, 6 * nLocBas, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
 
-    VecSetValues(G, osol_dof * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, 6 * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
   
   delete [] array_a; array_a = nullptr;

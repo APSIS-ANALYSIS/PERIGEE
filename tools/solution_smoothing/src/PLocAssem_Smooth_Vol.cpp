@@ -1,17 +1,13 @@
 #include "PLocAssem_Smooth_Vol.hpp"
 
 PLocAssem_Smooth_Vol::PLocAssem_Smooth_Vol(
-    IMaterialModel * const &in_matmodel,
-    const int &in_isol_dof, const int &in_osol_dof,
-    const int &in_nlocbas )
-: isol_dof( in_isol_dof ), osol_dof( in_osol_dof ),
-  nLocBas( in_nlocbas ),
-  vec_size( osol_dof * in_nlocbas )
+    IMaterialModel * const &in_matmodel, const int &in_nlocbas )
+: nLocBas( in_nlocbas ), vec_size( 6 * nLocBas )
 {
   matmodel = in_matmodel;
 
-  Tangent = new PetscScalar[vec_size * vec_size];
-  Residual = new PetscScalar[vec_size];
+  Tangent = new PetscScalar[ vec_size * vec_size ];
+  Residual = new PetscScalar[ vec_size ];
 
   Zero_Tangent_Residual();
 
@@ -66,19 +62,19 @@ void PLocAssem_Smooth_Vol::Assem_Residual(
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int iiisol = isol_dof * ii;
+      const int ii3 = 3 * ii;
 
-      ux_x += isol[iiisol  ] * dR_dx[ii];
-      uy_x += isol[iiisol+1] * dR_dx[ii];
-      uz_x += isol[iiisol+2] * dR_dx[ii];
+      ux_x += isol[ii3  ] * dR_dx[ii];
+      uy_x += isol[ii3+1] * dR_dx[ii];
+      uz_x += isol[ii3+2] * dR_dx[ii];
 
-      ux_y += isol[iiisol  ] * dR_dy[ii];
-      uy_y += isol[iiisol+1] * dR_dy[ii];
-      uz_y += isol[iiisol+2] * dR_dy[ii];
+      ux_y += isol[ii3  ] * dR_dy[ii];
+      uy_y += isol[ii3+1] * dR_dy[ii];
+      uz_y += isol[ii3+2] * dR_dy[ii];
 
-      ux_z += isol[iiisol  ] * dR_dz[ii];
-      uy_z += isol[iiisol+1] * dR_dz[ii];
-      uz_z += isol[iiisol+2] * dR_dz[ii];
+      ux_z += isol[ii3  ] * dR_dz[ii];
+      uy_z += isol[ii3+1] * dR_dz[ii];
+      uz_z += isol[ii3+2] * dR_dz[ii];
     }
 
     const Tensor2_3D F(ux_x, ux_y, ux_z,
@@ -93,12 +89,12 @@ void PLocAssem_Smooth_Vol::Assem_Residual(
     {
       const double NA = R[A];
 
-      Residual[osol_dof*A  ] += gwts * NA * stress(0);
-      Residual[osol_dof*A+1] += gwts * NA * stress(4);
-      Residual[osol_dof*A+2] += gwts * NA * stress(8);
-      Residual[osol_dof*A+3] += gwts * NA * stress(1);
-      Residual[osol_dof*A+4] += gwts * NA * stress(5);
-      Residual[osol_dof*A+5] += gwts * NA * stress(2);
+      Residual[6*A  ] += gwts * NA * stress(0);
+      Residual[6*A+1] += gwts * NA * stress(4);
+      Residual[6*A+2] += gwts * NA * stress(8);
+      Residual[6*A+3] += gwts * NA * stress(1);
+      Residual[6*A+4] += gwts * NA * stress(5);
+      Residual[6*A+5] += gwts * NA * stress(2);
     }
   }
 }
@@ -129,19 +125,19 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int iiisol = isol_dof * ii;
+      const int ii3 = 3 * ii;
 
-      ux_x += isol[iiisol  ] * dR_dx[ii];
-      uy_x += isol[iiisol+1] * dR_dx[ii];
-      uz_x += isol[iiisol+2] * dR_dx[ii];
+      ux_x += isol[ii3  ] * dR_dx[ii];
+      uy_x += isol[ii3+1] * dR_dx[ii];
+      uz_x += isol[ii3+2] * dR_dx[ii];
 
-      ux_y += isol[iiisol  ] * dR_dy[ii];
-      uy_y += isol[iiisol+1] * dR_dy[ii];
-      uz_y += isol[iiisol+2] * dR_dy[ii];
+      ux_y += isol[ii3  ] * dR_dy[ii];
+      uy_y += isol[ii3+1] * dR_dy[ii];
+      uz_y += isol[ii3+2] * dR_dy[ii];
 
-      ux_z += isol[iiisol  ] * dR_dz[ii];
-      uy_z += isol[iiisol+1] * dR_dz[ii];
-      uz_z += isol[iiisol+2] * dR_dz[ii];
+      ux_z += isol[ii3  ] * dR_dz[ii];
+      uy_z += isol[ii3+1] * dR_dz[ii];
+      uz_z += isol[ii3+2] * dR_dz[ii];
     }
 
     const Tensor2_3D F(ux_x, ux_y, ux_z,
@@ -156,19 +152,19 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
     {
       const double NA = R[A];
 
-      Residual[osol_dof*A  ] += gwts * NA * stress(0);
-      Residual[osol_dof*A+1] += gwts * NA * stress(4);
-      Residual[osol_dof*A+2] += gwts * NA * stress(8);
-      Residual[osol_dof*A+3] += gwts * NA * stress(1);
-      Residual[osol_dof*A+4] += gwts * NA * stress(5);
-      Residual[osol_dof*A+5] += gwts * NA * stress(2);
+      Residual[6*A  ] += gwts * NA * stress(0);
+      Residual[6*A+1] += gwts * NA * stress(4);
+      Residual[6*A+2] += gwts * NA * stress(8);
+      Residual[6*A+3] += gwts * NA * stress(1);
+      Residual[6*A+4] += gwts * NA * stress(5);
+      Residual[6*A+5] += gwts * NA * stress(2);
 
       for(int B=0; B<nLocBas; ++B)
       {
         // Non-zero diagonal of each A-B block
-        for(int C=0; C<osol_dof; ++C)
+        for(int C=0; C<6; ++C)
         {
-          Tangent[osol_dof*nLocBas*(osol_dof*A + C) + osol_dof*B + C] += gwts * NA * R[B];
+          Tangent[6*nLocBas*(6*A + C) + 6*B + C] += gwts * NA * R[B];
         }
       }
     }

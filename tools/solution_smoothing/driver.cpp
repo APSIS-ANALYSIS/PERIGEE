@@ -37,10 +37,6 @@ int main(int argc, char *argv[])
   std::string isol_bname = "SOL_disp_";
   std::string osol_bname = "SOL_Cauchy_";
 
-  // Input and output solutions' degrees of freedom
-  int isol_dof = 3;
-  int osol_dof = 6;
-
   // Yaml options
   bool is_loadYaml = true;
   std::string yaml_file("./smooth.yml");
@@ -72,9 +68,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-time_step", time_step);
   SYS_T::GetOptionInt("-time_end", time_end);
   SYS_T::GetOptionString("-isol_bname", isol_bname);
-  SYS_T::GetOptionInt("-isol_dof", isol_dof);
   SYS_T::GetOptionString("-osol_bname", osol_bname);
-  SYS_T::GetOptionInt("-osol_dof", osol_dof);
 
   // Print arguments
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
@@ -85,9 +79,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-time_step", time_step);
   SYS_T::cmdPrint("-time_end", time_end);
   SYS_T::cmdPrint("-isol_bname", isol_bname);
-  SYS_T::cmdPrint("-isol_dof", isol_dof);
   SYS_T::cmdPrint("-osol_bname", osol_bname);
-  SYS_T::cmdPrint("-osol_dof", osol_dof);
 
   MPI_Barrier(PETSC_COMM_WORLD);
 
@@ -161,7 +153,7 @@ int main(int argc, char *argv[])
   IMaterialModel * matmodel = new MaterialModel_Linear_Elasticity( in_module, in_nu );
   
   // Local assembly routine
-  IPLocAssem * locAssem_ptr = new PLocAssem_Smooth_Vol(matmodel, isol_dof, osol_dof, elementv->get_nLocBas());
+  IPLocAssem * locAssem_ptr = new PLocAssem_Smooth_Vol(matmodel, elementv->get_nLocBas());
 
   // Global assembly
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");

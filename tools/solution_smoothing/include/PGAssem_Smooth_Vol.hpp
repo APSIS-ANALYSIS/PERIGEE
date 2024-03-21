@@ -52,16 +52,16 @@ class PGAssem_Smooth_Vol : public IPGAssem
     
     private:
       // Private data
-      const int nLocBas, isol_dof, osol_dof, nlgn;
+      const int nLocBas, nlgn;
 
       void GetLocal( const double * const &array, const int * const &IEN,
-        double * const &local_array, const int &dof_mat ) const
+        double * const &local_array ) const
       {
         for(int ii=0; ii<nLocBas; ++ii)
         {
-          const int offset1 = ii * dof_mat;
-          const int offset2 = IEN[ii] * dof_mat;
-          for(int jj=0; jj<dof_mat; ++jj)
+          const int offset1 = ii * 3;
+          const int offset2 = IEN[ii] * 3;
+          for(int jj=0; jj<3; ++jj)
             local_array[offset1 + jj] = array[offset2 + jj];
           }
       }

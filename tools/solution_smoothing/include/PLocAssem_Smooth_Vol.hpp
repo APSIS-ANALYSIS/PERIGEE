@@ -14,15 +14,11 @@ class PLocAssem_Smooth_Vol : public IPLocAssem
 {
   public: 
     PLocAssem_Smooth_Vol(
-        IMaterialModel * const &in_matmodel,
-        const int &in_isol_dof, const int &in_osol_dof,
-        const int &in_nlocbas );
+        IMaterialModel * const &in_matmodel, const int &in_nlocbas );
     
     virtual ~PLocAssem_Smooth_Vol();
 
-    int get_dof() const {return isol_dof;}
-
-    int get_dof_mat() const {return osol_dof;}
+    int get_dof() const { return 6; }
 
     virtual void Zero_Residual()
     {
@@ -57,9 +53,7 @@ class PLocAssem_Smooth_Vol : public IPLocAssem
         const IQuadPts * const &quad );
     
   private:
-    const int isol_dof, osol_dof;
-    const int nLocBas;
-    const int vec_size;
+    const int nLocBas, vec_size;
     IMaterialModel * matmodel;
 
     void print_info() const;
