@@ -16,7 +16,7 @@ class MaterialModel_Linear_Elasticity : public IMaterialModel
 {
   public:
     MaterialModel_Linear_Elasticity(
-       const double &in_module, const double &in_nu );
+       const double &in_modulus_E, const double &in_nu );
 
     MaterialModel_Linear_Elasticity(
         const char * const &fname = "material_model.h5" );
@@ -49,14 +49,14 @@ class MaterialModel_Linear_Elasticity : public IMaterialModel
 
     virtual double get_elastic_nu() const {return nu;}
 
-    virtual double get_elastic_mu() const {return mu;}
+    virtual double get_elastic_mu() const {return 0.5 * modulus_E / (1.0 + nu);}
 
-    virtual double get_elastic_lambda() const {return lambda;}
+    virtual double get_elastic_lambda() const {return nu * modulus_E / ((1.0 + nu) * (1.0 - 2.0 * nu));}
 
     virtual Tensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const;
 
   private:
-    double modulus_E, nu, lambda, mu;
+    double modulus_E, nu;
 };
 
 #endif
