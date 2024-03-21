@@ -31,7 +31,6 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 # 1. Preprocessor source cpp
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
-  ${perigee_source}/System/Matrix_PETSc.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
@@ -39,17 +38,11 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
-  ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
-  ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
@@ -57,17 +50,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
-  ${perigee_source}/Solver/PDNTimeStep.cpp
-  ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_source}/Model/MaterialModel_Linear_Elasticity.cpp
-  ${perigee_SOURCE_DIR}/src/PDNSolution_Smooth_Velo.cpp
-  ${perigee_SOURCE_DIR}/src/PDNSolution_Smooth_Stress.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Smooth_Vol.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Smooth_Vol.cpp
   )
