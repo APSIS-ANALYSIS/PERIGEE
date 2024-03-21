@@ -62,19 +62,19 @@ void PLocAssem_Smooth_Vol::Assem_Residual(
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int ii3 = 3 * ii;
+      const int offset = 3 * ii;
 
-      ux_x += isol[ii3  ] * dR_dx[ii];
-      uy_x += isol[ii3+1] * dR_dx[ii];
-      uz_x += isol[ii3+2] * dR_dx[ii];
+      ux_x += isol[offset  ] * dR_dx[ii];
+      uy_x += isol[offset+1] * dR_dx[ii];
+      uz_x += isol[offset+2] * dR_dx[ii];
 
-      ux_y += isol[ii3  ] * dR_dy[ii];
-      uy_y += isol[ii3+1] * dR_dy[ii];
-      uz_y += isol[ii3+2] * dR_dy[ii];
+      ux_y += isol[offset  ] * dR_dy[ii];
+      uy_y += isol[offset+1] * dR_dy[ii];
+      uz_y += isol[offset+2] * dR_dy[ii];
 
-      ux_z += isol[ii3  ] * dR_dz[ii];
-      uy_z += isol[ii3+1] * dR_dz[ii];
-      uz_z += isol[ii3+2] * dR_dz[ii];
+      ux_z += isol[offset  ] * dR_dz[ii];
+      uy_z += isol[offset+1] * dR_dz[ii];
+      uz_z += isol[offset+2] * dR_dz[ii];
     }
 
     const Tensor2_3D F(ux_x, ux_y, ux_z,
@@ -125,19 +125,19 @@ void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int ii3 = 3 * ii;
+      const int offset = 3 * ii;
 
-      ux_x += isol[ii3  ] * dR_dx[ii];
-      uy_x += isol[ii3+1] * dR_dx[ii];
-      uz_x += isol[ii3+2] * dR_dx[ii];
+      ux_x += isol[offset  ] * dR_dx[ii];
+      uy_x += isol[offset+1] * dR_dx[ii];
+      uz_x += isol[offset+2] * dR_dx[ii];
 
-      ux_y += isol[ii3  ] * dR_dy[ii];
-      uy_y += isol[ii3+1] * dR_dy[ii];
-      uz_y += isol[ii3+2] * dR_dy[ii];
+      ux_y += isol[offset  ] * dR_dy[ii];
+      uy_y += isol[offset+1] * dR_dy[ii];
+      uz_y += isol[offset+2] * dR_dy[ii];
 
-      ux_z += isol[ii3  ] * dR_dz[ii];
-      uy_z += isol[ii3+1] * dR_dz[ii];
-      uz_z += isol[ii3+2] * dR_dz[ii];
+      ux_z += isol[offset  ] * dR_dz[ii];
+      uy_z += isol[offset+1] * dR_dz[ii];
+      uz_z += isol[offset+2] * dR_dz[ii];
     }
 
     const Tensor2_3D F(ux_x, ux_y, ux_z,
