@@ -73,8 +73,7 @@ void VTK_Writer_Smooth_Vol::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
-        elemptr, dataVecs[0] );
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0], elemptr, dataVecs[0] );
 
     // Set mesh connectivity
     if( elemptr->get_Type() == 501 )
