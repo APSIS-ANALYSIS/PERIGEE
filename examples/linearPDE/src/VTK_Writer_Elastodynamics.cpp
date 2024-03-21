@@ -51,7 +51,6 @@ void VTK_Writer_Elastodynamics::writeOutput(
   anaprocId -> SetNumberOfComponents(1);
 
   int ptOffset = 0;
-  int delta_offset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
@@ -86,26 +85,24 @@ void VTK_Writer_Elastodynamics::writeOutput(
     // Set mesh connectivity
     if( elemptr->get_Type() == 501 ){
       VIS_T::setTetraelem( ptOffset, gridData );
-      delta_offset = 4;
+      ptOffset += 4;
     }
     else if( elemptr->get_Type() == 502 ){
       VIS_T::setQuadTetraelem( ptOffset, gridData );
-      delta_offset = 10;
+      ptOffset += 10;
     }
     else if( elemptr->get_Type() == 601 ){
       VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
-      delta_offset = 8;
+      ptOffset += 8;
     }
     else if( elemptr->get_Type() == 602 ){
       VIS_T::setHexelem( 3, 3, 3, ptOffset, gridData );
-      delta_offset = 27;
+      ptOffset += 27;
     }
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     // Mesh partition info
     anaprocId->InsertNextValue( epart_map[ lelem_ptr->get_elem_loc(ee) ] );
-
-    ptOffset += delta_offset;
   }
 
   gridData -> SetPoints( points );
