@@ -5,6 +5,7 @@
 //
 // Parallel Local Assembly routine for solution smoother
 //
+// Reference: Oden and Brauchli, IJNME, Vol.3, 317-325 (1971) 
 // Date: Jan. 16 2024
 // ============================================================================
 #include "IPLocAssem.hpp"

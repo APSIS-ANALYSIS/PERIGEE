@@ -27,8 +27,7 @@ class MaterialModel_Linear_Elasticity : public IMaterialModel
 
     virtual std::string get_model_name() const
     {
-      const std::string mname = "Linear_Elasticity";
-      return mname;
+      return std::string("Linear_Elasticity");
     }
 
     virtual void write_hdf5( const char * const &fname = "material_model.h5") const;
