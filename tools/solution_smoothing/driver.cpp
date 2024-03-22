@@ -14,8 +14,8 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
-#include "PLocAssem_Smooth_Vol.hpp"
-#include "PGAssem_Smooth_Vol.hpp"
+#include "PLocAssem_Stress_Recovery.hpp"
+#include "PGAssem_Stress_Recovery.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 #include "MaterialModel_Linear_Elasticity.hpp"
 
@@ -155,11 +155,11 @@ int main(int argc, char *argv[])
   IMaterialModel * matmodel = new MaterialModel_Linear_Elasticity( in_module, in_nu );
   
   // Local assembly routine
-  IPLocAssem * locAssem_ptr = new PLocAssem_Smooth_Vol(matmodel, elementv->get_nLocBas());
+  IPLocAssem * locAssem_ptr = new PLocAssem_Stress_Recovery(matmodel, elementv->get_nLocBas());
 
   // Global assembly
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_Smooth_Vol( locAssem_ptr,
+  IPGAssem * gloAssem_ptr = new PGAssem_Stress_Recovery( locAssem_ptr,
       GMIptr, locElem, locIEN, pNode, nz_estimate );
   
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");

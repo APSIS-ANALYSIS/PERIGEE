@@ -1,6 +1,6 @@
-#include "PLocAssem_Smooth_Vol.hpp"
+#include "PLocAssem_Stress_Recovery.hpp"
 
-PLocAssem_Smooth_Vol::PLocAssem_Smooth_Vol(
+PLocAssem_Stress_Recovery::PLocAssem_Stress_Recovery(
     IMaterialModel * const &in_matmodel, const int &in_nlocbas )
 : nLocBas( in_nlocbas ), vec_size( 6 * nLocBas )
 {
@@ -14,13 +14,13 @@ PLocAssem_Smooth_Vol::PLocAssem_Smooth_Vol(
   print_info();
 }
 
-PLocAssem_Smooth_Vol::~PLocAssem_Smooth_Vol()
+PLocAssem_Stress_Recovery::~PLocAssem_Stress_Recovery()
 {
   delete [] Tangent; Tangent = nullptr;
   delete [] Residual; Residual = nullptr;
 }
 
-void PLocAssem_Smooth_Vol::print_info() const
+void PLocAssem_Stress_Recovery::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional elastodynamics equation: \n");
@@ -36,7 +36,7 @@ void PLocAssem_Smooth_Vol::print_info() const
   SYS_T::print_sep_line();
 }
 
-void PLocAssem_Smooth_Vol::Assem_Residual(
+void PLocAssem_Stress_Recovery::Assem_Residual(
     const double * const &isol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -99,7 +99,7 @@ void PLocAssem_Smooth_Vol::Assem_Residual(
   }
 }
 
-void PLocAssem_Smooth_Vol::Assem_Mass_Residual(
+void PLocAssem_Stress_Recovery::Assem_Mass_Residual(
     const double * const &isol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,

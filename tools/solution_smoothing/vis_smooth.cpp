@@ -15,8 +15,8 @@
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
-#include "VisDataPrep_Smooth_Vol.hpp"
-#include "VTK_Writer_Smooth_Vol.hpp"
+#include "VisDataPrep_Stress_Recovery.hpp"
+#include "VTK_Writer_Stress_Recovery.hpp"
 
 int main( int argc, char * argv[] ) 
 { 
@@ -126,7 +126,7 @@ int main( int argc, char * argv[] )
   quad -> print_info();
 
   // Create the visualization data object
-  IVisDataPrep * visprep = new VisDataPrep_Smooth_Vol();
+  IVisDataPrep * visprep = new VisDataPrep_Stress_Recovery();
 
   visprep->print_info();
 
@@ -136,7 +136,7 @@ int main( int argc, char * argv[] )
     solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
   // VTK writer 
-  VTK_Writer_Smooth_Vol * vtk_w = new VTK_Writer_Smooth_Vol( GMIptr->get_nElem(), 
+  VTK_Writer_Stress_Recovery * vtk_w = new VTK_Writer_Stress_Recovery( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
   
   std::ostringstream time_index;

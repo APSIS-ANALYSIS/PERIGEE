@@ -1,7 +1,7 @@
-#ifndef VISDATAPREP_SMOOTH_VOL_HPP
-#define VISDATAPREP_SMOOTH_VOL_HPP
+#ifndef VISDATAPREP_STRESS_RECOVERY_HPP
+#define VISDATAPREP_STRESS_RECOVERY_HPP
 // ==================================================================
-// VisDataPrep_Smooth_Vol.hpp
+// VisDataPrep_Stress_Recovery.hpp
 //
 // This is the data preparation for visualizing smoothed solutions
 //
@@ -9,12 +9,12 @@
 // ==================================================================
 #include "IVisDataPrep.hpp"
 
-class VisDataPrep_Smooth_Vol : public IVisDataPrep
+class VisDataPrep_Stress_Recovery : public IVisDataPrep
 {
   public:
-    VisDataPrep_Smooth_Vol();
+    VisDataPrep_Stress_Recovery();
 
-    virtual ~VisDataPrep_Smooth_Vol() = default;
+    virtual ~VisDataPrep_Stress_Recovery() = default;
 
     // Return the number of physical fields to be read from solution
     // vector

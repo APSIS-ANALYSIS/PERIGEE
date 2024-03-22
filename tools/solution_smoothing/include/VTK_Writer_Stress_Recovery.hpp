@@ -1,7 +1,7 @@
-#ifndef VTK_WRITER_SMOOTH_VOL_HPP
-#define VTK_WRITER_SMOOTH_VOL_HPP
+#ifndef VTK_WRITER_STRESS_RECOVERY_HPP
+#define VTK_WRITER_STRESS_RECOVERY_HPP
 // ==================================================================
-// VTK_Writer_Smooth_Vol.hpp
+// VTK_Writer_Stress_Recovery.hpp
 // 
 // This is a class that specifically designed for the visualization
 // for smoothed solutions. 
@@ -16,13 +16,13 @@
 
 #include "vtkIntArray.h"
 
-class VTK_Writer_Smooth_Vol
+class VTK_Writer_Stress_Recovery
 {
   public:
-    VTK_Writer_Smooth_Vol( const int &in_nelem, const int &in_nlocbas, 
+    VTK_Writer_Stress_Recovery( const int &in_nelem, const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_Smooth_Vol() = default;
+    ~VTK_Writer_Stress_Recovery() = default;
     
     void writeOutput(
         const FEANode * const &fnode_ptr,

@@ -1,14 +1,14 @@
-#ifndef PGASSEM_SMOOTH_VOL_HPP
-#define PGASSEM_SMOOTH_VOL_HPP
+#ifndef PGASSEM_STRESS_RECOVERY_HPP
+#define PGASSEM_STRESS_RECOVERY_HPP
 
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 
-class PGAssem_Smooth_Vol : public IPGAssem
+class PGAssem_Stress_Recovery : public IPGAssem
 {
   public:
     // Constructor
-    PGAssem_Smooth_Vol(
+    PGAssem_Stress_Recovery(
         IPLocAssem * const &locassem_ptr,
         const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
@@ -17,7 +17,7 @@ class PGAssem_Smooth_Vol : public IPGAssem
         const int &in_nz_estimate = 60);
     
     // Destructor
-    virtual ~PGAssem_Smooth_Vol();
+    virtual ~PGAssem_Stress_Recovery();
 
     // Nonzero pattern estimate
     virtual void Assem_nonzero_estimate(

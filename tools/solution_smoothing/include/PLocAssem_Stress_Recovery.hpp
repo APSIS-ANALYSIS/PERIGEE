@@ -1,7 +1,7 @@
-#ifndef PLOCASSEM_SMOOTH_VOL_HPP
-#define PLOCASSEM_SMOOTH_VOL_HPP
+#ifndef PLOCASSEM_STRESS_RECOVERY_HPP
+#define PLOCASSEM_STRESS_RECOVERY_HPP
 // ============================================================================
-// PLocAssem_Smooth_Vol.hpp
+// PLocAssem_Stress_Recovery.hpp
 //
 // Parallel Local Assembly routine for solution smoother
 //
@@ -10,13 +10,13 @@
 #include "IPLocAssem.hpp"
 #include "IMaterialModel.hpp"
 
-class PLocAssem_Smooth_Vol : public IPLocAssem
+class PLocAssem_Stress_Recovery : public IPLocAssem
 {
   public: 
-    PLocAssem_Smooth_Vol(
+    PLocAssem_Stress_Recovery(
         IMaterialModel * const &in_matmodel, const int &in_nlocbas );
     
-    virtual ~PLocAssem_Smooth_Vol();
+    virtual ~PLocAssem_Stress_Recovery();
 
     int get_dof() const { return 6; }
 

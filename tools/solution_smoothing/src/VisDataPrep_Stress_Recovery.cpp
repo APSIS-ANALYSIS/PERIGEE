@@ -1,6 +1,6 @@
-#include "VisDataPrep_Smooth_Vol.hpp"
+#include "VisDataPrep_Stress_Recovery.hpp"
 
-VisDataPrep_Smooth_Vol::VisDataPrep_Smooth_Vol()
+VisDataPrep_Stress_Recovery::VisDataPrep_Stress_Recovery()
 {
   // Data to be written
   arrayCompSize = 1;
@@ -13,7 +13,7 @@ VisDataPrep_Smooth_Vol::VisDataPrep_Smooth_Vol()
   pt_array_len.push_back(6);
 }
 
-void VisDataPrep_Smooth_Vol::get_pointArray(
+void VisDataPrep_Stress_Recovery::get_pointArray(
     const std::string solution_file_name,
     const std::string analysis_node_mapping_file,
     const std::string post_node_mapping_file,

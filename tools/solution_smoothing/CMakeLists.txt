@@ -53,16 +53,16 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_source}/Model/MaterialModel_Linear_Elasticity.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_Smooth_Vol.cpp
-  ${perigee_SOURCE_DIR}/src/PGAssem_Smooth_Vol.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Stress_Recovery.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_Stress_Recovery.cpp
   )
 
 SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
-  ${perigee_SOURCE_DIR}/src/VisDataPrep_Smooth_Vol.cpp
-  ${perigee_SOURCE_DIR}/src/VTK_Writer_Smooth_Vol.cpp
+  ${perigee_SOURCE_DIR}/src/VisDataPrep_Stress_Recovery.cpp
+  ${perigee_SOURCE_DIR}/src/VTK_Writer_Stress_Recovery.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )

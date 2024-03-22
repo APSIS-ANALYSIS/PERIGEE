@@ -1,13 +1,13 @@
-#include "VTK_Writer_Smooth_Vol.hpp"
+#include "VTK_Writer_Stress_Recovery.hpp"
 
-VTK_Writer_Smooth_Vol::VTK_Writer_Smooth_Vol( const int &in_nelem,
+VTK_Writer_Stress_Recovery::VTK_Writer_Stress_Recovery( const int &in_nelem,
     const int &in_nlocbas, const std::string &epart_file )
 : nLocBas( in_nlocbas ), nElem( in_nelem )
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
 
-void VTK_Writer_Smooth_Vol::writeOutput(
+void VTK_Writer_Stress_Recovery::writeOutput(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_ptr,
     const ALocal_Elem * const &lelem_ptr,

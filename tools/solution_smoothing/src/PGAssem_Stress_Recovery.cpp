@@ -1,6 +1,6 @@
-#include "PGAssem_Smooth_Vol.hpp"
+#include "PGAssem_Stress_Recovery.hpp"
 
-PGAssem_Smooth_Vol::PGAssem_Smooth_Vol(
+PGAssem_Stress_Recovery::PGAssem_Stress_Recovery(
     IPLocAssem * const &locassem_ptr,
     const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -39,13 +39,13 @@ PGAssem_Smooth_Vol::PGAssem_Smooth_Vol(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-PGAssem_Smooth_Vol::~PGAssem_Smooth_Vol()
+PGAssem_Stress_Recovery::~PGAssem_Stress_Recovery()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
 
-void PGAssem_Smooth_Vol::Assem_nonzero_estimate(
+void PGAssem_Stress_Recovery::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -78,7 +78,7 @@ void PGAssem_Smooth_Vol::Assem_nonzero_estimate(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Smooth_Vol::Assem_residual(
+void PGAssem_Stress_Recovery::Assem_residual(
     const PDNSolution * const &isol,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
@@ -130,7 +130,7 @@ void PGAssem_Smooth_Vol::Assem_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_Smooth_Vol::Assem_mass_residual(
+void PGAssem_Stress_Recovery::Assem_mass_residual(
     const PDNSolution * const &isol,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
