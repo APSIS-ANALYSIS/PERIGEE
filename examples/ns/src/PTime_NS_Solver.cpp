@@ -59,7 +59,7 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    const PDNSolution * const &sol_base,
+    PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
     const TimeMethod_GenAlpha * const &tmga_ptr,
@@ -121,6 +121,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // If the previous step is solved in ONE Newton iteration, we do not update
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
+
+    sol_base->randomly_perturbed(0.005);
 
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 

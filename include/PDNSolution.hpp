@@ -167,6 +167,12 @@ class PDNSolution
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
 
+    virtual void randomly_perturbed( const double &std_dev )
+    {
+      SYS_T::print_fatal("Error: PDNSolution::randomly_perturbed is not implemented.\n");
+      return;
+    } 
+
   protected:
     // ------------------------------------------------------------------------
     // dof_num default value is apart_node -> get_dof, but user may reset its value.
