@@ -1,38 +1,36 @@
-#ifndef PLOCASSEM_VMS_NS_GENALPHA_HPP
-#define PLOCASSEM_VMS_NS_GENALPHA_HPP
+#ifndef PLOCASSEM_VMS_NS_SEMIBDF1_HPP
+#define PLOCASSEM_VMS_NS_SEMIBDF1_HPP
 // ==================================================================
 // PLocAssem_VMS_NS_GenAlpha.hpp
 // 
-// Parallel Local Assembly routine for VMS and Gen-alpha based NS
+// Parallel Local Assembly routine for VMS and Semi-BDF1 based NS
 // solver.
 //
-// Author: Ju Liu
-// Date: Feb. 10 2020
+// Author : Chi Ding
+// Date   : March 4, 2024
 // ==================================================================
 #include "IPLocAssem.hpp"
-#include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
 
-class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
+class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
 {
   public:
-    PLocAssem_VMS_NS_GenAlpha(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
+    PLocAssem_VMS_NS_SemiBDF1(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const int &elemtype,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
-    virtual ~PLocAssem_VMS_NS_GenAlpha();
+    virtual ~PLocAssem_VMS_NS_SemiBDF1();
 
     virtual int get_dof() const {return 4;}
 
     virtual int get_dof_mat() const {return 4;}
 
-    virtual double get_model_para_1() const {return alpha_f;}
+    //virtual double get_model_para_1() const {return alpha_f;}
 
-    virtual double get_model_para_2() const {return gamma;}
+    //virtual double get_model_para_2() const {return gamma;}
 
     virtual void Zero_Tangent_Residual()
     {
@@ -63,7 +61,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Residual(
         const double &time, const double &dt,
-        const double * const &dot_sol,
+        const double * const &sol_0,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -73,7 +71,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
-        const double * const &dot_sol,
+        const double * const &sol_0,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -122,18 +120,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
-        const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_BackFlowStab(
-        const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
+        const double * const &sol_0,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -142,7 +129,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
   protected:
     // Private data
-    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
+    const double rho0, vis_mu, beta;
 
     const double CI, CT; // Constants for stabilization parameters
     
@@ -176,7 +163,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_f(const Vector_3 &pt, const double &tt) const
+    Vector_3 get_f( const Vector_3 &pt, const double &tt ) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
@@ -188,7 +175,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
-    typedef Vector_3 ( PLocAssem_VMS_NS_GenAlpha::*locassem_vms_ns_funs )( 
+    typedef Vector_3 ( PLocAssem_VMS_NS_SemiBDF1::*locassem_vms_ns_funs )( 
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_vms_ns_funs * flist;
@@ -196,7 +183,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
         const double &tt, const Vector_3 &n_out ) const
     {
-      return Vector_3( 0.0, 0.0, 0.0 ); 
+      return Vector_3( 0.0, 0.0, 0.0 );
       //return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 };
