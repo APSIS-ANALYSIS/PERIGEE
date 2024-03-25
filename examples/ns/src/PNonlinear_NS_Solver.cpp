@@ -82,14 +82,11 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
         PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
     #endif
 
-    // Initialize the counter and error
-    // double residual_norm = 0.0, initial_norm = 0.0;
-
     // Predict the solution at t_n+1
     sol->Copy(*pre_sol);
 
     // Update the inflow boundary values
-    rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
+    rescale_inflow_value(curr_time + dt, infnbc_part, flr_ptr, sol_base, sol);
 
     gassem_ptr->Clear_KG();
   
@@ -111,9 +108,6 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
     // linear solver will generate the preconditioner based on the new matrix.
     lsolver_ptr->SetOperator( gassem_ptr->K );
 
-    //VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
-    //SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
-
 
     #ifdef PETSC_USE_LOG
         PetscLogEventBegin(lin_solve_event, 0,0,0,0);
@@ -128,13 +122,7 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
 
     bc_mat->MatMultSol( sol_step );
     
-    sol->PlusAX( sol_step, (-1.0) * dt );
-
-    //VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    
-    //SYS_T::print_fatal_if( residual_norm != residual_norm, "Error: nonlinear solver residual norm is NaN. Job killed.\n" );
-    
-    //SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
+    sol->PlusAX( sol_step, -1.0 );
 
 }
 
