@@ -188,6 +188,14 @@ int main(int argc, char *argv[])
     time_index<< 900000000 + time;
     name_to_read.append(time_index.str());
 
+    std::string name_to_write(osol_bname);
+    time_index.str("");
+    time_index<< 900000000 + time;
+    name_to_write.append(time_index.str());
+
+    SYS_T::commPrint("Time %d: Read %s and Write %s \n",
+        time, name_to_read.c_str(), name_to_write.c_str() );
+
     disp->ReadBinary(name_to_read);
 
     gloAssem_ptr->Clear_G();
@@ -195,13 +203,10 @@ int main(int argc, char *argv[])
     gloAssem_ptr->Assem_residual(disp, locElem, locAssem_ptr, elementv, quadv, locIEN, fNode, pNode);
 
     lsolver_ptr->Solve( gloAssem_ptr->G, stress );
-  
-    std::string name_to_write(osol_bname);
-    time_index.str("");
-    time_index<< 900000000 + time;
-    name_to_write.append(time_index.str());
 
     stress->WriteBinary(name_to_write);
+
+    SYS_T::commPrint("\n" );
   }
   // Print complete solver info
   lsolver_ptr -> print_info();
