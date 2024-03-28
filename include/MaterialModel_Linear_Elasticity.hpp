@@ -16,12 +16,13 @@ class MaterialModel_Linear_Elasticity : public IMaterialModel
 {
   public:
     MaterialModel_Linear_Elasticity(
-       const double &in_modulus_E, const double &in_nu );
+       const double &in_modulus_E, const double &in_nu )
+    : modulus_E( in_modulus_E ), nu( in_nu ) {}
 
     MaterialModel_Linear_Elasticity(
         const char * const &fname = "material_model.h5" );
     
-    virtual ~MaterialModel_Linear_Elasticity();
+    virtual ~MaterialModel_Linear_Elasticity() = default;
 
     virtual void print_info() const;
 

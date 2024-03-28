@@ -1,12 +1,6 @@
 #include "MaterialModel_Linear_Elasticity.hpp"
 
 MaterialModel_Linear_Elasticity::MaterialModel_Linear_Elasticity(
-    const double &in_modulus_E, const double &in_nu )
-: modulus_E( in_modulus_E ), nu( in_nu )
-{
-}
-
-MaterialModel_Linear_Elasticity::MaterialModel_Linear_Elasticity(
     const char * const &fname)
 {
   hid_t h5file = H5Fopen(fname, H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -21,9 +15,6 @@ MaterialModel_Linear_Elasticity::MaterialModel_Linear_Elasticity(
   
   delete h5r; H5Fclose(h5file);
 }
-
-MaterialModel_Linear_Elasticity::~MaterialModel_Linear_Elasticity()
-{}
 
 void MaterialModel_Linear_Elasticity::print_info() const
 {
