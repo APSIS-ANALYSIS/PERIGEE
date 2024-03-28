@@ -13,7 +13,7 @@ PGAssem_Stress_Recovery::PGAssem_Stress_Recovery(
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, 3*in_nz_estimate, NULL, 3*in_nz_estimate, NULL, &K);
+      PETSC_DETERMINE, 6*in_nz_estimate, NULL, 6*in_nz_estimate, NULL, &K);
 
   // Allocate the vector G
   VecCreate(PETSC_COMM_WORLD, &G);
