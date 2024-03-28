@@ -52,6 +52,8 @@ class MaterialModel_Linear_Elasticity : public IMaterialModel
 
     virtual double get_elastic_lambda() const {return nu * modulus_E / ((1.0 + nu) * (1.0 - 2.0 * nu));}
 
+    // F here is NOT the deformation gradient which is given by gradu + I.
+    // Instead, it is gradu. In index notation, F_ij = u_i,j
     virtual Tensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const;
 
   private:
