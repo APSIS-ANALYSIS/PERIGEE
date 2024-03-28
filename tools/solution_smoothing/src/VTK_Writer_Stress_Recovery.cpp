@@ -63,7 +63,7 @@ void VTK_Writer_Stress_Recovery::writeOutput(
     intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
         elemptr, points );
   
-    std::vector<double> inputInfo; inputInfo.clear();
+    std::vector<double> inputInfo{};
     
     // Interpolate velocity vector
     int asize = vdata_ptr->get_arraySizes(0);
