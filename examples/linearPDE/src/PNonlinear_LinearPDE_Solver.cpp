@@ -309,7 +309,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
   else conv_flag = false;
 
-  delete dot_step;
+  delete dot_step; delete dot_velo_alpha; delete disp_alpha;
 }
 
 // EOF
