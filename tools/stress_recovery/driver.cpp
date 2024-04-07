@@ -1,7 +1,7 @@
 // ============================================================================
 // driver.cpp
 //
-// Finite element code for smooth solution.
+// Finite element code for stress recovery.
 //
 // Date: Dec. 20 2023
 // ============================================================================
