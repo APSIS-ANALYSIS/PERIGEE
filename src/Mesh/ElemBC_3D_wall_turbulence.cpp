@@ -33,6 +33,8 @@ ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence(
 
         face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
       }
+
+      delete tetcell;
     }
     else if(elem_type == 601 || elem_type == 602)
     {
@@ -60,6 +62,8 @@ ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence(
 
         face_id[ee] = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);
       }
+
+      delete hexcell;
     }
     else
       SYS_T::print_fatal("Error: ElemBC_3D_wall_turbulence, unknown element type.\n");
