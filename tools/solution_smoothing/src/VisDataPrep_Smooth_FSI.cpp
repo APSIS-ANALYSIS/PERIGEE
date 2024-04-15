@@ -16,7 +16,7 @@ VisDataPrep_Smooth_FSI::VisDataPrep_Smooth_FSI()
   arrayNames.push_back("F");
   arraySizes.push_back(9);
   arrayNames.push_back("Von Mises_nop");
-  arraySizes.push_back(1);
+  arraySizes.push_back(9);
   arrayNames.push_back("Strain");
   arraySizes.push_back(9);
   arrayNames.push_back("disp");
