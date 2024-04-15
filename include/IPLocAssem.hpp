@@ -153,6 +153,18 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double * const &isol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l )
+    {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 
@@ -205,6 +217,18 @@ class IPLocAssem
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
         const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
+
+    virtual void Assem_Mass_Residual(
+        const double * const &sol_disp,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
     // ------------------------------------------------------------------------

@@ -123,6 +123,13 @@ class IPGAssem
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &pnode_ptr )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
+    virtual void Assem_nonzero_estimate(
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
@@ -310,6 +317,19 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const Tissue_prestress * const &ps_ptr,
 	const Tissue_property * const &tp_ptr )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
+    // Special-purpose functions for GOH06 material models, where tissue property is needed
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &isol,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        const IQuadPts * const &quad_v,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const APart_Node * const &pnode_ptr,
+        const Tissue_property * const &tp_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -590,7 +610,20 @@ class IPGAssem
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,
         const Tissue_prestress * const &ps_ptr,
-	const Tissue_property * const &tp_ptr ) 
+	    const Tissue_property * const &tp_ptr ) 
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    // Special for GOH06 material models, where tissue property is needed.
+    virtual void Assem_residual(
+        const PDNSolution * const &isol,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        const IQuadPts * const &quad_v,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const APart_Node * const &pnode_ptr,
+        const Tissue_property * const &tp_ptr )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
