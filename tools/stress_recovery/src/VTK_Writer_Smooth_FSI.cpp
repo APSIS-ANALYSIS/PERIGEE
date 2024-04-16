@@ -266,8 +266,7 @@ void VTK_Writer_Smooth_FSI::interpolateVonMises_nop( const int * const &ptid,
 
   std::vector<double> ux (nLocBas, 0.0), uy (nLocBas, 0.0), uz (nLocBas, 0.0),
                       vx (nLocBas, 0.0), vy (nLocBas, 0.0), vz (nLocBas, 0.0),
-                      wx (nLocBas, 0.0), wy (nLocBas, 0.0), wz (nLocBas, 0.0),
-                      pp (nLocBas, 0.0);                    
+                      wx (nLocBas, 0.0), wy (nLocBas, 0.0), wz (nLocBas, 0.0);                   
 
   Vector_3 basis_r(0.0, 0.0, 0.0);
   Vector_3 basis_c(0.0, 0.0, 0.0);
@@ -324,6 +323,68 @@ void VTK_Writer_Smooth_FSI::interpolateVonMises_nop( const int * const &ptid,
 
   }
 }
+
+void VTK_Writer_Smooth_FSI::interpolateCurrentOrientation( const int * const &ptid,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<double> &inputGradDisp,
+    const FEAElement * const &elem,
+    vtkDoubleArray * const &vtkData )
+{
+  const int nqp = elem->get_numQuapts();
+
+  std::vector<double> ux (nLocBas, 0.0), uy (nLocBas, 0.0), uz (nLocBas, 0.0),
+                      vx (nLocBas, 0.0), vy (nLocBas, 0.0), vz (nLocBas, 0.0),
+                      wx (nLocBas, 0.0), wy (nLocBas, 0.0), wz (nLocBas, 0.0),                  
+
+  Vector_3 basis_r(0.0, 0.0, 0.0);
+  Vector_3 basis_c(0.0, 0.0, 0.0);
+  Vector_3 basis_l(0.0, 0.0, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    ux[ii] = inputGradDisp[ii*9];
+    uy[ii] = inputGradDisp[ii*9+1];
+    uz[ii] = inputGradDisp[ii*9+2];
+    vx[ii] = inputGradDisp[ii*9+3];
+    vy[ii] = inputGradDisp[ii*9+4];
+    vz[ii] = inputGradDisp[ii*9+5];
+    wx[ii] = inputGradDisp[ii*9+6];
+    wy[ii] = inputGradDisp[ii*9+7];
+    wz[ii] = inputGradDisp[ii*9+8];
+
+    basis_r = eleBasis_r[ii];
+    basis_c = eleBasis_c[ii];
+    basis_l = eleBasis_l[ii];
+  }
+
+  Interpolater intep( nLocBas );
+
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    // update fibre direction by the basis vector on an arbitrary node
+    //model->update_fibre_dir(basis_r, basis_c, basis_l);
+    model->update_fibre_dir(eleBasis_r[ii], eleBasis_c[ii], eleBasis_l[ii]);
+    
+    const Vector_3 aa1 = model->get_fibre_dir(0);
+
+    const Vector_3 aa2 = model->get_fibre_dir(1);
+ 
+    // F
+    const Tensor2_3D FF( ux[ii] + 1.0, uy[ii],       uz[ii],
+                         vx[ii],       vy[ii] + 1.0, vz[ii],
+                         wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    Tensor2_3D CC; CC.MatMultTransposeLeft(FF);
+
+    const double a1Ca2 = CC.VecMatVec(aa1, aa2);
+
+    vtkData->InsertComponent( ptid[ii], 0, a1Ca2 );
+  }
+}
+
+
 //++
 
 void VTK_Writer_Smooth_FSI::writeOutput(
@@ -470,6 +531,8 @@ void VTK_Writer_Smooth_FSI::writeOutput(
       interpolateVonMises_nop( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, matmodel, dataVecs[5] );
 
       interpolateStrain( &IEN_s[0], inputInfo_grad, elemptr, matmodel, dataVecs[6] );
+
+      interpolateCurrentOrientation( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, dataVecs[8] );
 //++
 
       // Set mesh connectivity

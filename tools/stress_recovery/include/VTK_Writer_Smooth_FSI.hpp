@@ -87,6 +87,17 @@ class VTK_Writer_Smooth_FSI
       const FEAElement * const &elem,
       IMaterialModel * const &model,
       vtkDoubleArray * const &vtkData );  
+
+    // Computation of the current collagen orientations using the parameter a1.C.a2, 
+    // where a1 and a2 are the fiber direction vector in the initial configuration,
+    // and C is the Right Cauchy-Green tensor.
+    void interpolateCurrentOrientation( const int * const &ptid,
+      const std::vector<Vector_3> &eleBasis_r,
+      const std::vector<Vector_3> &eleBasis_c,
+      const std::vector<Vector_3> &eleBasis_l,
+      const std::vector<double> &inputGradDisp,
+      const FEAElement * const &elem,
+      vtkDoubleArray * const &vtkData );    
 };
 
 #endif

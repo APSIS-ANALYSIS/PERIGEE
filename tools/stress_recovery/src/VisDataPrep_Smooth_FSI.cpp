@@ -21,6 +21,8 @@ VisDataPrep_Smooth_FSI::VisDataPrep_Smooth_FSI()
   arraySizes.push_back(9);
   arrayNames.push_back("disp");
   arraySizes.push_back(3);
+  arrayNames.push_back("Current Orientation");
+  arraySizes.push_back(1);
 
   // Data to be read
   pt_array_len.clear();
