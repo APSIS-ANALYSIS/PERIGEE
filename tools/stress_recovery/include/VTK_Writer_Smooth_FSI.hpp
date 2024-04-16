@@ -49,13 +49,6 @@ class VTK_Writer_Smooth_FSI
 
     std::vector<int> epart_map;
 
-/*
-    void interpolateVonMises( const int * const &ptid,
-        const std::vector<double> &inputCauchy,
-        const std::vector<double> &inputPres,
-        const FEAElement * const &elem,
-        vtkDoubleArray * const &vtkData );
-*/
     void interpolateF( const int * const &ptid,
       const std::vector<double> &inputGradDisp,
       const FEAElement * const &elem,
