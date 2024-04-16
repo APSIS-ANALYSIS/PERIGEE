@@ -509,6 +509,8 @@ void VTK_Writer_Smooth_FSI::writeOutput(
       interpolateVonMises_nop( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, matmodel, dataVecs[5] );
 
       interpolateStrain( &IEN_s[0], inputInfo_grad, elemptr, matmodel, dataVecs[6] );
+
+      interpolateCurrentOrientation( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, dataVecs[8] );
 //++
 
       // Set mesh connectivity
