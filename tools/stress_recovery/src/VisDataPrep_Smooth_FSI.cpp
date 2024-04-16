@@ -3,7 +3,7 @@
 VisDataPrep_Smooth_FSI::VisDataPrep_Smooth_FSI()
 {
   // Data to be written
-  arrayCompSize = 8;
+  arrayCompSize = 9;
 
   arrayNames.push_back("CauchyStress");
   arraySizes.push_back(9);

@@ -256,9 +256,9 @@ void VTK_Writer_Smooth_FSI::interpolateVonMises_nop( const int * const &ptid,
     const std::vector<Vector_3> &eleBasis_r,
     const std::vector<Vector_3> &eleBasis_c,
     const std::vector<Vector_3> &eleBasis_l,
-    IMaterialModel * const &model,
     const std::vector<double> &inputGradDisp,
     const FEAElement * const &elem,
+    IMaterialModel * const &model,
     vtkDoubleArray * const &vtkData )
 {
   const int nqp = elem->get_numQuapts();
@@ -328,8 +328,8 @@ void VTK_Writer_Smooth_FSI::interpolateCurrentOrientation( const int * const &pt
     const std::vector<Vector_3> &eleBasis_c,
     const std::vector<Vector_3> &eleBasis_l,
     const std::vector<double> &inputGradDisp,
-    IMaterialModel * const &model,
     const FEAElement * const &elem,
+    IMaterialModel * const &model,
     vtkDoubleArray * const &vtkData )
 {
   const int nqp = elem->get_numQuapts();
@@ -507,11 +507,11 @@ void VTK_Writer_Smooth_FSI::writeOutput(
 
       interpolateVonMises( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, inputInfo_p, elemptr, matmodel, dataVecs[2] );
 
-      interpolateVonMises_nop( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, matmodel, inputInfo_grad, elemptr, dataVecs[5] );
+      interpolateVonMises_nop( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, matmodel, dataVecs[5] );
 
       interpolateStrain( &IEN_s[0], inputInfo_grad, elemptr, matmodel, dataVecs[6] );
 
-      interpolateCurrentOrientation( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, matmodel, elemptr, dataVecs[8] );
+      interpolateCurrentOrientation( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, matmodel, dataVecs[8] );
 //++
 
       // Set mesh connectivity
