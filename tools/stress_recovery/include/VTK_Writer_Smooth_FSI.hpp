@@ -85,7 +85,7 @@ class VTK_Writer_Smooth_FSI
       const std::vector<Vector_3> &eleBasis_l,
       const std::vector<double> &inputGradDisp,
       const FEAElement * const &elem,
-       IMaterialModel * const &model,
+      IMaterialModel * const &model,
       vtkDoubleArray * const &vtkData );  
 
     // Computation of the current collagen orientations using the parameter a1.C.a2, 
