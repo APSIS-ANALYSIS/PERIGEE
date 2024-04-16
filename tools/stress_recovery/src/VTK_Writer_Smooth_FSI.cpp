@@ -12,7 +12,6 @@ VTK_Writer_Smooth_FSI::~VTK_Writer_Smooth_FSI()
   VEC_T::clean(epart_map);
 }
 
-//++
 void VTK_Writer_Smooth_FSI::interpolateF( const int * const &ptid,
     const std::vector<double> &inputGradDisp,
     const FEAElement * const &elem,
@@ -324,7 +323,6 @@ void VTK_Writer_Smooth_FSI::interpolateVonMises_nop( const int * const &ptid,
 
   }
 }
-//++
 
 void VTK_Writer_Smooth_FSI::writeOutput(
     const FEANode * const &fnode_ptr,
@@ -384,7 +382,6 @@ void VTK_Writer_Smooth_FSI::writeOutput(
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
-//++
       // get fibre direction basis
       std::vector<Vector_3> ebasis_r(nLocBas);
       std::vector<Vector_3> ebasis_c(nLocBas);
@@ -396,7 +393,6 @@ void VTK_Writer_Smooth_FSI::writeOutput(
         ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_v[ii]);
         ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_v[ii]);
       }
-//++
 
       elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
 
@@ -421,21 +417,6 @@ void VTK_Writer_Smooth_FSI::writeOutput(
       // use displacement to update points
       intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, elemptr, points );
 
-      // Interpolate nodal coordinates
-      //intep.interpolateVTKPts(&IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
-      //    elemptr, points );
-/*  
-      std::vector<double> inputInfo_c; inputInfo_c.clear();
-      int asize = vdata_ptr->get_arraySizes(0);
-      for(int jj=0; jj<nLocBas; ++jj)
-      {
-        int pt_index = IEN_v[jj];
-        for(int kk=0; kk<asize; ++kk)
-          inputInfo_c.push_back( pointArrays[0][pt_index * asize + kk ] );
-      }
-      intep.interpolateVTKData( asize, &IEN_s[0], &inputInfo_c[0], elemptr, dataVecs[0] );
-*/     
-
       std::vector<double> inputInfo_p; inputInfo_p.clear();
       asize = vdata_ptr->get_arraySizes(1);  
       for(int jj=0; jj<nLocBas; ++jj)
@@ -446,9 +427,6 @@ void VTK_Writer_Smooth_FSI::writeOutput(
       }
       intep.interpolateVTKData( asize, &IEN_s[0], inputInfo_p, elemptr, dataVecs[1] );
 
-      //interpolateVonMises(&IEN_s[0], inputInfo_c, inputInfo_p, elemptr, dataVecs[2] );
-
-//++ grad_disp
       std::vector<double> inputInfo_grad; inputInfo_grad.clear();
       asize = vdata_ptr->get_arraySizes(3);
       for(int jj=0; jj<nLocBas; ++jj)
@@ -462,7 +440,6 @@ void VTK_Writer_Smooth_FSI::writeOutput(
       // Interpolate F
       interpolateF( &IEN_s[0], inputInfo_grad, elemptr, dataVecs[4] );
 
-//++
       interpolateCauchy( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, matmodel, dataVecs[0] );
 
       interpolateVonMises( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, inputInfo_p, elemptr, matmodel, dataVecs[2] );
@@ -470,7 +447,6 @@ void VTK_Writer_Smooth_FSI::writeOutput(
       interpolateVonMises_nop( &IEN_s[0], ebasis_r, ebasis_c, ebasis_l, inputInfo_grad, elemptr, matmodel, dataVecs[5] );
 
       interpolateStrain( &IEN_s[0], inputInfo_grad, elemptr, matmodel, dataVecs[6] );
-//++
 
       // Set mesh connectivity
       if( elemptr->get_Type() == 501 )
