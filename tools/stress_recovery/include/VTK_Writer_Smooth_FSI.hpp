@@ -83,9 +83,9 @@ class VTK_Writer_Smooth_FSI
       const std::vector<Vector_3> &eleBasis_r,
       const std::vector<Vector_3> &eleBasis_c,
       const std::vector<Vector_3> &eleBasis_l,
+      IMaterialModel * const &model,
       const std::vector<double> &inputGradDisp,
       const FEAElement * const &elem,
-      IMaterialModel * const &model,
       vtkDoubleArray * const &vtkData );  
 
     // Computation of the current collagen orientations using the parameter a1.C.a2, 
@@ -96,6 +96,7 @@ class VTK_Writer_Smooth_FSI
       const std::vector<Vector_3> &eleBasis_c,
       const std::vector<Vector_3> &eleBasis_l,
       const std::vector<double> &inputGradDisp,
+      IMaterialModel * const &model,
       const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData );    
 };
