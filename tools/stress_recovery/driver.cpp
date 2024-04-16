@@ -19,7 +19,6 @@
 #include "PLinear_Solver_PETSc.hpp"
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH06_ST91_Mixed.hpp"
-#include "Tissue_property.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -121,8 +120,6 @@ int main(int argc, char *argv[])
 
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  Tissue_property * tp_data = new Tissue_property(part_file, rank);
-
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
   SYS_T::print_fatal_if( size != PartBasic->get_cpu_size(),
@@ -177,21 +174,8 @@ int main(int argc, char *argv[])
   disp -> ScaleValue( 0.0 );
   Grad_disp -> ScaleValue( 0.0 );
 
-  // Material model
-  IMaterialModel * matmodel = nullptr;
-  if( solid_nu == 0.5 )
-  {
-    matmodel = new MaterialModel_GOH06_Incompressible_Mixed( solid_density, solid_mu,
-        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-  }
-  else
-  {
-    matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
-        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-  }
-
   // Local assembly routine
-  IPLocAssem * locAssem_ptr = new PLocAssem_Stress_Recovery(matmodel, elementv->get_nLocBas());
+  IPLocAssem * locAssem_ptr = new PLocAssem_Stress_Recovery( elementv->get_nLocBas() );
 
   // Global assembly
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
@@ -211,7 +195,7 @@ int main(int argc, char *argv[])
 
   // Smooth the solutions
   // Assemble mass matrix
-  gloAssem_ptr->Assem_mass_residual(disp, locElem, locAssem_ptr, elementv, quadv, locIEN, fNode, pNode, tp_data);
+  gloAssem_ptr->Assem_mass_residual(disp, locElem, locAssem_ptr, elementv, quadv, locIEN, fNode, pNode );
 
   lsolver_ptr->SetOperator( gloAssem_ptr->K );
 
@@ -236,7 +220,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Clear_G();
 
-    gloAssem_ptr->Assem_residual(disp, locElem, locAssem_ptr, elementv, quadv, locIEN, fNode, pNode, tp_data);
+    gloAssem_ptr->Assem_residual(disp, locElem, locAssem_ptr, elementv, quadv, locIEN, fNode, pNode );
 
     lsolver_ptr->Solve( gloAssem_ptr->G, Grad_disp );
 
@@ -249,7 +233,7 @@ int main(int argc, char *argv[])
 
   delete lsolver_ptr; delete gloAssem_ptr; delete locAssem_ptr; delete disp; delete Grad_disp;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
-  delete quadv; delete elementv; delete matmodel; delete tp_data;
+  delete quadv; delete elementv;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

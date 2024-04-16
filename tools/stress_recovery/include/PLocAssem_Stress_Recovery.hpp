@@ -9,17 +9,15 @@
 // Date: Jan. 16 2024
 // ============================================================================
 #include "IPLocAssem.hpp"
-#include "IMaterialModel.hpp"
 
 class PLocAssem_Stress_Recovery : public IPLocAssem
 {
   public: 
-    PLocAssem_Stress_Recovery(
-        IMaterialModel * const &in_matmodel, const int &in_nlocbas );
+    PLocAssem_Stress_Recovery( const int &in_nlocbas );
     
     virtual ~PLocAssem_Stress_Recovery();
 
-    int get_dof() const { return 6; }
+    int get_dof() const { return 9; }
 
     virtual void Zero_Residual()
     {
@@ -43,21 +41,7 @@ class PLocAssem_Stress_Recovery : public IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad,
-        const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_c,
-        const std::vector<Vector_3> &eleBasis_l );
-    
-    virtual void Assem_Mass_Residual(
-        const double * const &sol_disp,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad,
-        const std::vector<Vector_3> &eleBasis_r,
-        const std::vector<Vector_3> &eleBasis_c,
-        const std::vector<Vector_3> &eleBasis_l );
+        const IQuadPts * const &quad );
     
     virtual void Assem_Mass_Residual(
         const double * const &sol_disp,
@@ -69,7 +53,6 @@ class PLocAssem_Stress_Recovery : public IPLocAssem
     
   private:
     const int nLocBas, vec_size;
-    IMaterialModel * matmodel;
 
     void print_info() const;
 };

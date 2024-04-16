@@ -86,8 +86,7 @@ void PGAssem_Stress_Recovery::Assem_residual(
     const IQuadPts * const &quad_v,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const APart_Node * const &pnode_ptr,
-    const Tissue_property * const &tp_ptr )
+    const APart_Node * const &pnode_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -115,24 +114,9 @@ void PGAssem_Stress_Recovery::Assem_residual(
     }
 
     if( alelem_ptr->get_elem_tag(ee) == 1)
-    {
-      std::vector<Vector_3> ebasis_r(nLocBas);
-      std::vector<Vector_3> ebasis_c(nLocBas);
-      std::vector<Vector_3> ebasis_l(nLocBas);
-
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_e[ii]);
-        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_e[ii]);
-        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_e[ii]);
-      }
-
-      lassem_ptr->Assem_Residual(local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v, ebasis_r, ebasis_c, ebasis_l );
-    }
+      lassem_ptr->Assem_Residual( local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
     else
-    {
       lassem_ptr->Zero_Residual();
-    }
 
     VecSetValues(G, 9 * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
@@ -157,8 +141,7 @@ void PGAssem_Stress_Recovery::Assem_mass_residual(
     const IQuadPts * const &quad_v,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const APart_Node * const &pnode_ptr,
-    const Tissue_property * const &tp_ptr )
+    const APart_Node * const &pnode_ptr )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -185,25 +168,7 @@ void PGAssem_Stress_Recovery::Assem_mass_residual(
         row_index[9*ii+mm] = 9 * pnode_ptr->get_local_to_global(IEN_e[ii]) + mm;
     }
 
-    if( alelem_ptr->get_elem_tag(ee) == 1)
-    {
-      std::vector<Vector_3> ebasis_r(nLocBas);
-      std::vector<Vector_3> ebasis_c(nLocBas);
-      std::vector<Vector_3> ebasis_l(nLocBas);
-
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        ebasis_r[ii] = tp_ptr -> get_basis_r(IEN_e[ii]);
-        ebasis_c[ii] = tp_ptr -> get_basis_c(IEN_e[ii]);
-        ebasis_l[ii] = tp_ptr -> get_basis_l(IEN_e[ii]);
-      }
-
-      lassem_ptr->Assem_Mass_Residual(local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v, ebasis_r, ebasis_c, ebasis_l );
-    }
-    else
-    {
-      lassem_ptr->Assem_Mass_Residual(local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    }
+    lassem_ptr->Assem_Mass_Residual(local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
 
     MatSetValues(K, 9 * nLocBas, row_index, 9 * nLocBas, row_index,
         lassem_ptr->Tangent, ADD_VALUES);

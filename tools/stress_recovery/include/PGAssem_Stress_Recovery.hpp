@@ -35,8 +35,7 @@ class PGAssem_Stress_Recovery : public IPGAssem
         const IQuadPts * const &quad_v,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const APart_Node * const &pnode_ptr,
-        const Tissue_property * const &tp_ptr );
+        const APart_Node * const &pnode_ptr );
     
     // Assembly the residual and mass matrix
     virtual void Assem_mass_residual(
@@ -47,8 +46,7 @@ class PGAssem_Stress_Recovery : public IPGAssem
         const IQuadPts * const &quad_v,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const APart_Node * const &pnode_ptr,
-        const Tissue_property * const &tp_ptr );
+        const APart_Node * const &pnode_ptr );
     
     private:
       // Private data
