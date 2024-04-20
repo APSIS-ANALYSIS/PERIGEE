@@ -768,16 +768,30 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   delete mytimer;
 }
 
+// void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
+//     const std::string &phy2 ) const
+// {
+//   SYS_T::print_fatal_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
+
+//   const std::string name0 = phy_3d_name[ 0 ];
+//   const std::string name1 = phy_3d_name[ 1 ];
+
+//   SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
+//   SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
+// }
+
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
-    const std::string &phy2 ) const
+       const std::string &phy2, const std::string &phy3 ) const
 {
-  SYS_T::print_fatal_if( num_phy_domain_3d != 2, "Error: Gmsh_FileIO FSI mesh should contain only 2 physical domains.\n");
+  SYS_T::print_fatal_if( num_phy_domain_3d != 3, "Error: Gmsh_FileIO FSI mesh should contain 3 physical domains.\n");
 
   const std::string name0 = phy_3d_name[ 0 ];
   const std::string name1 = phy_3d_name[ 1 ];
+  const std::string name2 = phy_3d_name[ 2 ];
 
   SYS_T::print_fatal_if( name0.compare(phy1), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 0 should be fluid domain.\n" );
-  SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
+  SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid_1 domain.\n" );
+  SYS_T::print_fatal_if( name2.compare(phy3), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 2 should be solid_2 domain.\n" );
 }
 
 void Gmsh_FileIO::write_sur_h5( const int &index_2d, 

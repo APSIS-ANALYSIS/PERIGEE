@@ -54,8 +54,12 @@ class Gmsh_FileIO
     // and "tissue" as the name for the solid sub-domain, in the gmsh
     // file, so the user may put proper name in the argument.
     // --------------------------------------------------------------
+    // void check_FSI_ordering( const std::string &phy1="fluid",
+    //    const std::string &phy2="solid" ) const;
+    
     void check_FSI_ordering( const std::string &phy1="fluid",
-       const std::string &phy2="solid" ) const;
+       const std::string &phy2="solid_1",
+       const std::string &phy3="solid_2" ) const;
 
     // --------------------------------------------------------------
     // In FSI problems, in addition to make the elements start from
