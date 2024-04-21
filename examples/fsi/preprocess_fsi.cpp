@@ -245,7 +245,7 @@ int main( int argc, char * argv[] )
   for(unsigned int ii=0; ii<phy_tag.size(); ++ii)
   {
     bool isRightTag = false;
-    for(int jj=0; jj<num_layer; ++jj)
+    for(int jj=0; jj<=num_layer; ++jj)
     {
       if(phy_tag[ii] == jj) isRightTag = true;
     }
