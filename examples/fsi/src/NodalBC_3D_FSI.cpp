@@ -1,9 +1,9 @@
 #include "NodalBC_3D_FSI.hpp"
 
 NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
-    const std::string &solid_file,
+    const std::vector<std::string> &solid_file,
     const std::string &fluid_wall_file,
-    const std::string &solid_wall_file,
+    const std::vector<std::string> &solid_wall_file,
     const std::vector<std::string> &fluid_inlet_files,
     const std::vector<std::string> &fluid_outlet_files,
     const std::vector<std::string> &solid_inlet_files,
@@ -43,8 +43,9 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       // ====== Rigid wall ======
     case 1:
       {
-        dir_nodes = VEC_T::cast_to_unsigned_int( VTK_T::read_int_PointData( solid_file, "GlobalNodeID" ) );
-
+        for(unsigned int ii=0; ii<solid_file.size(); ++ii)
+          dir_nodes = VEC_T::insert_end(VEC_T::cast_to_unsigned_int(VTK_T::read_int_PointData( solid_file[ii], "GlobalNodeID" )));
+        
         VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( fluid_inlet_files ) );
 
         VEC_T::sort_unique_resize( dir_nodes );
