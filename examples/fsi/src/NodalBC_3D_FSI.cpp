@@ -44,8 +44,8 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
     case 1:
       {
         for(unsigned int ii=0; ii<solid_file.size(); ++ii)
-          dir_nodes = VEC_T::insert_end(VEC_T::cast_to_unsigned_int(VTK_T::read_int_PointData( solid_file[ii], "GlobalNodeID" )));
-        
+          VEC_T::insert_end( dir_nodes, VEC_T::cast_to_unsigned_int(VTK_T::read_int_PointData( solid_file[ii], "GlobalNodeID" )));
+
         VEC_T::insert_end( dir_nodes, get_vtk_nodal_id( fluid_inlet_files ) );
 
         VEC_T::sort_unique_resize( dir_nodes );

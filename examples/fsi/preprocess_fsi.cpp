@@ -58,7 +58,7 @@ int main( int argc, char * argv[] )
   const int num_layer                         = paras["num_layer"].as<int>();
   const std::string geo_file                  = paras["geo_file"].as<std::string>();
   const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
-  const std::string geo_s_file_base           = paras["geo_s_file"].as<std::string>();
+  const std::string geo_s_file_base           = paras["geo_s_file_base"].as<std::string>();
 
   const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
   const std::string sur_f_file_in_base        = paras["sur_f_file_in_base"].as<std::string>();
@@ -66,8 +66,8 @@ int main( int argc, char * argv[] )
 
   const std::string sur_s_file_interior_wall_base    = paras["sur_s_file_interior_wall_base"].as<std::string>();
   const std::string sur_s_file_wall_base             = paras["sur_s_file_wall_base"].as<std::string>();
-  const std::vector<std::string sur_s_file_in_base>  = paras["sur_s_file_in_base"].as<std::vector<std::string>>();
-  const std::vector<std::string sur_s_file_out_base> = paras["sur_s_file_out_base"].as<std::vector<std::string>>();
+  const std::vector<std::string> sur_s_file_in_base  = paras["sur_s_file_in_base"].as<std::vector<std::string>>();
+  const std::vector<std::string> sur_s_file_out_base = paras["sur_s_file_out_base"].as<std::vector<std::string>>();
 
   const std::string part_file_p               = paras["part_file_p"].as<std::string>();
   const std::string part_file_v               = paras["part_file_v"].as<std::string>();
@@ -215,8 +215,12 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
   for(int ii=0; ii<num_layer; ++ii)
   {
-    cmdh5w->write_string("sur_s_file_in_base_"+std::to_string(ii),  sur_s_file_in_base[ii]);
-    cmdh5w->write_string("sur_s_file_out_base_"+std::to_string(ii), sur_s_file_out_base[ii]);
+    std::string sur_s_file_in_base_name( "sur_s_file_in_base_" );
+    std::string sur_s_file_out_base_name( "sur_s_file_out_base_" );
+    sur_s_file_in_base_name.append(std::to_string(ii));
+    sur_s_file_out_base_name.append(std::to_string(ii));
+    cmdh5w->write_string(sur_s_file_in_base_name.c_str(), sur_s_file_in_base[ii]);
+    cmdh5w->write_string(sur_s_file_out_base_name.c_str(), sur_s_file_out_base[ii]);
   }
   cmdh5w->write_string("sur_s_file_wall_base",           sur_s_file_wall_base);
   cmdh5w->write_string("sur_s_file_interior_wall_basse", sur_s_file_interior_wall_base);
@@ -538,7 +542,7 @@ int main( int argc, char * argv[] )
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
-  std::vector<std::string> meshdir_file_list = geo_s_file;
+  std::vector<std::string> meshdir_file_list = geo_s_file_in;
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
