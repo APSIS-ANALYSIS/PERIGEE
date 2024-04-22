@@ -30,7 +30,7 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NBC * const &part_nbc_p,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
-        const int &num_layer,
+        const int &in_num_layer,
         const int &in_nz_estimate = 60 );
 
     virtual ~PGAssem_FSI();
