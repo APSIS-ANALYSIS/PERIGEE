@@ -207,6 +207,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("elemType",         elemType);
   cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
   cmdh5w->write_intScalar("ringBC_type",      ringBC_type);
+  cmdh5w->write_intScalar("num_layer",        num_layer);
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
   cmdh5w->write_string("geo_s_file_base",     geo_s_file_base);
