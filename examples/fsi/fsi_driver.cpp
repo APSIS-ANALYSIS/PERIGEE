@@ -55,10 +55,23 @@ int main(int argc, char *argv[])
   double fluid_density = 1.06;
   double fluid_mu = 4.0e-2;
 
+  // number of solid layer
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  const int num_layer = cmd_h5r -> read_intScalar("/","num_layer");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
+
   // solid properties
-  double solid_density = 1.0;
-  double solid_E = 2.0e6;
-  double solid_nu = 0.5;
+  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    solid_density[ii] = -1.0;
+    solid_E[ii] = -1.0;
+    solid_nu[ii] = -1.0;
+  }
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;
@@ -156,9 +169,20 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionBool(  "-is_load_ps",        is_load_ps);
   SYS_T::GetOptionReal(  "-fl_density",        fluid_density);
   SYS_T::GetOptionReal(  "-fl_mu",             fluid_mu);
-  SYS_T::GetOptionReal(  "-sl_density",        solid_density);
-  SYS_T::GetOptionReal(  "-sl_E",              solid_E);
-  SYS_T::GetOptionReal(  "-sl_nu",             solid_nu);
+  for (int ii=0; ii<num_layer; ++ii)
+  {
+    std::string sl_density_name = "-sl_density_";
+    std::string sl_E_name = "-sl_E_";
+    std::string sl_nu_name = "-sl_nu_";
+    
+    sl_density_name = sl_density_name + std::to_string(ii);
+    sl_E_name = sl_E_name + std::to_string(ii);
+    sl_nu_name = sl_nu_name + std::to_string(ii);
+
+    SYS_T::GetOptionReal(  sl_density_name.c_str(),        solid_density[ii]);
+    SYS_T::GetOptionReal(  sl_E_name.c_str(),              solid_E[ii]);
+    SYS_T::GetOptionReal(  sl_nu_name.c_str(),             solid_nu[ii]);
+  }
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
   SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
@@ -195,9 +219,20 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
-  SYS_T::cmdPrint("-sl_density:", solid_density);
-  SYS_T::cmdPrint("-sl_E:", solid_E);
-  SYS_T::cmdPrint("-sl_nu:", solid_nu);
+  for (int ii=0; ii<num_layer; ++ii)
+  {
+    std::string sl_density_name = "-sl_density_";
+    std::string sl_E_name = "-sl_E_";
+    std::string sl_nu_name = "-sl_nu_";
+    
+    sl_density_name = sl_density_name + std::to_string(ii);
+    sl_E_name = sl_E_name + std::to_string(ii);
+    sl_nu_name = sl_nu_name + std::to_string(ii);
+
+    SYS_T::cmdPrint(  sl_density_name.c_str(),        solid_density[ii]);
+    SYS_T::cmdPrint(  sl_E_name.c_str(),              solid_E[ii]);
+    SYS_T::cmdPrint(  sl_nu_name.c_str(),             solid_nu[ii]);
+  }
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
 
@@ -265,9 +300,20 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "fl_density",      fluid_density);
     cmdh5w->write_doubleScalar(  "fl_mu",           fluid_mu);
     cmdh5w->write_doubleScalar(  "fl_bs_beta",      bs_beta);
-    cmdh5w->write_doubleScalar(  "sl_density",      solid_density);
-    cmdh5w->write_doubleScalar(  "sl_E",            solid_E);
-    cmdh5w->write_doubleScalar(  "sl_nu",           solid_nu);
+    for (int ii=0; ii<num_layer; ++ii)
+    {
+      std::string sl_density_name = "sl_density_";
+      std::string sl_E_name = "sl_E_";
+      std::string sl_nu_name = "sl_nu_";
+    
+      sl_density_name = sl_density_name + std::to_string(ii);
+      sl_E_name = sl_E_name + std::to_string(ii);
+      sl_nu_name = sl_nu_name + std::to_string(ii);
+
+      cmdh5w->write_doubleScalar(  sl_density_name.c_str(),        solid_density[ii]);
+      cmdh5w->write_doubleScalar(  sl_E_name.c_str(),              solid_E[ii]);
+      cmdh5w->write_doubleScalar(  sl_nu_name.c_str(),             solid_nu[ii]);
+    }
     cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
@@ -446,25 +492,32 @@ int main(int argc, char *argv[])
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
-  IMaterialModel * matmodel = nullptr;
-  IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
+  IMaterialModel ** matmodel = new IMaterialModel* [num_layer];
+  IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer];
 
-  if( solid_nu == 0.5 )
+  for(int ii=0; ii<num_layer; ++ii)
   {
-    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+    if( solid_nu[ii] == 0.5 )
+    {
+      matmodel[ii] = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density[ii], solid_E[ii] );
 
-    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
-        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+      locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Incompressible(
+          matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      matmodel[ii] = new MaterialModel_NeoHookean_M94_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii] );
+
+      locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+          matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    
+    std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
+    std::string print_string = "Material model of solid " + std::to_string(ii) + " :\n";
+    SYS_T::commPrint(print_string.c_str());
+    matmodel[ii] -> print_info();
+    matmodel[ii] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
   }
-  else
-  {
-    matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
-
-    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-  }
-
-  matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
@@ -764,14 +817,20 @@ int main(int argc, char *argv[])
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
   delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
-  delete locAssem_mesh_ptr; delete matmodel; delete locAssem_fluid_ptr;
-  delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
+  delete locAssem_mesh_ptr; delete locAssem_fluid_ptr;
+  delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 
   delete locIEN_v; delete locIEN_p; delete ps_data;
+  for (int ii = 0; ii<num_layer; ++ii)
+  {
+    delete locAssem_solid_ptr[ii];
+    delete matmodel[ii];
+  }
+  delete [] locAssem_solid_ptr; delete [] matmodel;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

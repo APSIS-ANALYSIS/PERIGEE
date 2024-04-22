@@ -104,7 +104,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const IQuadPts * const &quad_s,
     const Tissue_prestress * const &ps_ptr,
     IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
+    IPLocAssem_2x2Block ** const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
     IPGAssem * const &gassem_ptr,
     IPGAssem * const &gassem_mesh_ptr,
