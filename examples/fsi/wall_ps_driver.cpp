@@ -427,7 +427,7 @@ int main( int argc, char *argv[] )
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_Wall_Prestress( locAssem_solid_ptr, locElem, 
-      locIEN_v, locIEN_p, pNode_v, pNode_p, locnbc_v, locnbc_p, locebc_v, nz_estimate );
+      locIEN_v, locIEN_p, pNode_v, pNode_p, locnbc_v, locnbc_p, locebc_v, num_layer, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_solid_ptr, locIEN_v, locIEN_p, 
