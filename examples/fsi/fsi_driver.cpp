@@ -497,6 +497,7 @@ int main(int argc, char *argv[])
 
   for(int ii=0; ii<num_layer; ++ii)
   {
+    SYS_T::commPrint("Material model of solid %d :\n", ii);
     if( solid_nu[ii] == 0.5 )
     {
       matmodel[ii] = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density[ii], solid_E[ii] );
@@ -513,9 +514,6 @@ int main(int argc, char *argv[])
     }
     
     std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
-    std::string print_string = "Material model of solid " + std::to_string(ii) + " :\n";
-    SYS_T::commPrint(print_string.c_str());
-    matmodel[ii] -> print_info();
     matmodel[ii] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
   }
 
