@@ -375,7 +375,7 @@ int main(int argc, char *argv[])
 
   const int nqp_sur { (GMIptr->get_elemType() == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, num_layer, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
   std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };

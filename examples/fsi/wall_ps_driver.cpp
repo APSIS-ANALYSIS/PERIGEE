@@ -258,7 +258,7 @@ int main( int argc, char *argv[] )
 
   const int nqp_sur { (elemType == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, ps_file_name);
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, num_layer, ps_file_name);
  
   SYS_T::commPrint("===> Mesh HDF5 files are read from disk.\n");
 

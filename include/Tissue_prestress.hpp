@@ -17,7 +17,7 @@ class Tissue_prestress
 {
   public:
     Tissue_prestress( const ALocal_Elem * const &locelem, const int &in_nqp_tet,
-       const int &in_cpu_rank, const bool &load_from_file,
+       const int &in_cpu_rank, const bool &load_from_file, const int &num_layer,
        const std::string &in_ps_fName = "prestress" );
 
     virtual ~Tissue_prestress();
