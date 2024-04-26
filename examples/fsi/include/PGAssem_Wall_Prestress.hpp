@@ -104,9 +104,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
     void EssBC_G( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
 
     void NatBC_G( const double &curr_time,
-        const ALocal_Elem * const &alelem_ptr,
         const PDNSolution * const &pres,
-        IPLocAssem_2x2Block ** const &lassem_s_ptr,
+        IPLocAssem_2x2Block * const &lassem_s_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
         const ALocal_NBC * const &nbc_v,

@@ -233,9 +233,8 @@ void PGAssem_Wall_Prestress::EssBC_G( const ALocal_NBC * const &nbc_v,
 }
 
 void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
-    const ALocal_Elem * const &alelem_ptr,
     const PDNSolution * const &pres,
-    IPLocAssem_2x2Block ** const &lassem_s_ptr,
+    IPLocAssem_2x2Block * const &lassem_s_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_v,
@@ -264,9 +263,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
 
     const std::vector<double> local_p = GetLocal( array_p, LSIEN_p, snLocBas, 1 );
 
-    int phy_tag = alelem_ptr->get_elem_tag(ee) - 1;
-
-    lassem_s_ptr[phy_tag] -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+    lassem_s_ptr -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -275,7 +272,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
       srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN_v[ii]);
     }
 
-    VecSetValues(G, 3*snLocBas, srow_index, lassem_s_ptr[phy_tag]->sur_Residual0, ADD_VALUES);
+    VecSetValues(G, 3*snLocBas, srow_index, lassem_s_ptr->sur_Residual0, ADD_VALUES);
   }
 
   delete [] srow_index; srow_index = nullptr;
@@ -371,7 +368,7 @@ void PGAssem_Wall_Prestress::Assem_Residual(
   delete [] row_id_v; delete [] row_id_p;
   row_id_v = nullptr; row_id_p = nullptr;
 
-  NatBC_G( curr_time, alelem_ptr, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_v, ebc_p );
+  NatBC_G( curr_time, pres, lassem_s_ptr[0], elements, quad_s, nbc_v, ebc_v, ebc_p );
   
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
@@ -476,7 +473,7 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
   delete [] row_id_v; delete [] row_id_p;
   row_id_v = nullptr; row_id_p = nullptr;
 
-  NatBC_G( curr_time, alelem_ptr, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_v, ebc_p );
+  NatBC_G( curr_time, pres, lassem_s_ptr[0], elements, quad_s, nbc_v, ebc_v, ebc_p );
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
