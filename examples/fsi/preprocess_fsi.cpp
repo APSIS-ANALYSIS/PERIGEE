@@ -158,9 +158,9 @@ int main( int argc, char * argv[] )
 
     for(int jj=0; jj<num_layer; ++jj)
     {
-      sur_s_file_in[ii*num_inlet+jj] = SYS_T::gen_capfile_name( sur_s_file_in_base[jj], ii, ".vtp" );
-      SYS_T::file_check( sur_s_file_in[ii*num_inlet+jj] );
-      std::cout<<sur_s_file_in[ii*num_inlet+jj]<<" found. \n";
+      sur_s_file_in[ii*num_layer+jj] = SYS_T::gen_capfile_name( sur_s_file_in_base[jj], ii, ".vtp" );
+      SYS_T::file_check( sur_s_file_in[ii*num_layer+jj] );
+      std::cout<<sur_s_file_in[ii*num_layer+jj]<<" found. \n";
     }
   }
 
@@ -172,9 +172,9 @@ int main( int argc, char * argv[] )
 
     for(int jj=0; jj<num_layer; ++jj)
     {
-      sur_s_file_out[ii*num_outlet+jj] = SYS_T::gen_capfile_name( sur_s_file_out_base[jj], ii, ".vtp" );
-      SYS_T::file_check( sur_s_file_out[ii*num_outlet+jj] );
-      std::cout<<sur_s_file_out[ii*num_outlet+jj]<<" found. \n"; 
+      sur_s_file_out[ii*num_layer+jj] = SYS_T::gen_capfile_name( sur_s_file_out_base[jj], ii, ".vtp" );
+      SYS_T::file_check( sur_s_file_out[ii*num_layer+jj] );
+      std::cout<<sur_s_file_out[ii*num_layer+jj]<<" found. \n"; 
     }
   }
 
@@ -263,12 +263,18 @@ int main( int argc, char * argv[] )
   // Read the F-S interface vtp file
   std::vector<std::vector<int>> wall_node_id( num_layer );
   std::vector<int> nFunc_interface( num_layer );
+  std::vector<int> layer_offset( num_layer );
   int nFunc_p = nFunc_v;
   for(int ii=0; ii<num_layer; ++ii)
   {
     wall_node_id[ii] = VTK_T::read_int_PointData( sur_s_file_interior_wall_in[ii], "GlobalNodeID" );
     nFunc_interface[ii] = static_cast<int>( wall_node_id[ii].size() );
     nFunc_p += nFunc_interface[ii];
+  }
+  layer_offset[0] = 0;
+  for(int ii=1; ii<num_layer; ++ii)
+  {
+    layer_offset[ii] = nFunc_interface[ii-1];
   }
 
   // We will generate a new IEN array for the pressure variable by updating the
@@ -288,7 +294,7 @@ int main( int argc, char * argv[] )
         for(int ii=0; ii<4; ++ii)
         {
           const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*4+ii] );
-          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + layer_offset[layer_num] + pos;     
         }
       }
       else if(elemType == 601)
@@ -296,7 +302,7 @@ int main( int argc, char * argv[] )
         for(int ii=0; ii<8; ++ii)
         {
           const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*8+ii] );
-          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + layer_offset[layer_num] + pos;     
         }
       }
       else
