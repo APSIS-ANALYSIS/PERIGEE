@@ -12,7 +12,7 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_EBC_outflow.hpp"
-//#include "ALocal_WeakBC.hpp"
+#include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
@@ -29,6 +29,11 @@
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "CVFlowRate_Cosine2Steady.hpp"
+#include "GenBC_Resistance.hpp"
+#include "GenBC_RCR.hpp"
+#include "GenBC_Inductance.hpp"
+#include "GenBC_Coronary.hpp"
+#include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
@@ -60,7 +65,7 @@ int main(int argc, char *argv[])
   std::string inflow_file("inflow_fourier_series.txt");
 
   double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
-  double inflow_tgt_rate = -1.0; // prescribed flow rate at steady state
+  double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
@@ -280,7 +285,7 @@ int main(int argc, char *argv[])
   // if( SYS_T::file_exist( inflow_file ) )
   //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   // else
-  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( 1, inflow_thd_time, inflow_tgt_rate );
+  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
 
   inflow_rate_ptr->print_info();
 
@@ -375,7 +380,7 @@ int main(int argc, char *argv[])
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 3 );
+  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
@@ -411,35 +416,35 @@ int main(int argc, char *argv[])
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
   // ===== LPN models =====
-  // IGenBC * gbc = nullptr;
+  IGenBC * gbc = nullptr;
 
-  // if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-  //   gbc = new GenBC_Resistance( lpn_file );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
-  //   gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
-  //   gbc = new GenBC_Inductance( lpn_file );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
-  //   gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-  //   gbc = new GenBC_Pressure( lpn_file, initial_time );
-  // else
-  //   SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
+    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
+    gbc = new GenBC_Inductance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
+    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
+    gbc = new GenBC_Pressure( lpn_file, initial_time );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
-  // gbc -> print_info();
+  gbc -> print_info();
 
   // Make sure the gbc number of faces matches that of ALocal_EBC
-  // SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
-  //     "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, locnbc, locebc );
+      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -496,84 +501,84 @@ int main(int argc, char *argv[])
   tsolver->print_info();
 
   // ===== Outlet data recording files =====
-  // for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
-  // {
-  //   const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-  //       dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  {
+    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
 
-  //   const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-  //       sol, locAssem_ptr, elements, quads, locebc, ff );
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
-  //   const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-  //       sol, locAssem_ptr, elements, quads, locebc, ff );
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
-  //   // set the gbc initial conditions using the 3D data
-  //   gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
+    // set the gbc initial conditions using the 3D data
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
 
-  //   const double dot_lpn_flowrate = dot_face_flrate;
-  //   const double lpn_flowrate = face_flrate;
-  //   const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
+    const double dot_lpn_flowrate = dot_face_flrate;
+    const double lpn_flowrate = face_flrate;
+    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
 
-  //   // Create the txt files and write the initial flow rates
-  //   if(rank == 0)
-  //   {
-  //     std::ofstream ofile;
+    // Create the txt files and write the initial flow rates
+    if(rank == 0)
+    {
+      std::ofstream ofile;
 
-  //     // If this is NOT a restart run, generate a new file, otherwise append to
-  //     // existing file
-  //     if( !is_restart )
-  //       ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-  //     else
-  //       ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+      // If this is NOT a restart run, generate a new file, otherwise append to
+      // existing file
+      if( !is_restart )
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-  //     // If this is NOT a restart, then record the initial values
-  //     if( !is_restart )
-  //     {
-  //       ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
-  //       ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-  //     }
+      // If this is NOT a restart, then record the initial values
+      if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+      }
 
-  //     ofile.close();
-  //   }
-  // }
+      ofile.close();
+    }
+  }
 
-  // MPI_Barrier(PETSC_COMM_WORLD);
+  MPI_Barrier(PETSC_COMM_WORLD);
 
-  // // ===== Inlet data recording files =====
-  // for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  // {
-  //   const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-  //       sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+  // ===== Inlet data recording files =====
+  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
+  {
+    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-  //   const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-  //       sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-  //   if( rank == 0 )
-  //   {
-  //     std::ofstream ofile;
-  //     if( !is_restart )
-  //       ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-  //     else
-  //       ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+    if( rank == 0 )
+    {
+      std::ofstream ofile;
+      if( !is_restart )
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-  //     if( !is_restart )
-  //     {
-  //       ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
-  //       ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-  //     }
+      if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+      }
 
-  //     ofile.close();
-  //   }
-  // }
+      ofile.close();
+    }
+  }
 
-  // MPI_Barrier(PETSC_COMM_WORLD);
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
+      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
@@ -583,7 +588,7 @@ int main(int argc, char *argv[])
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
-  delete quads; delete quadv; delete inflow_rate_ptr; delete timeinfo;
+  delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
   delete lsolver; delete nsolver; delete tsolver;
 
