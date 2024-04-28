@@ -27,9 +27,6 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   Zero_Tangent_Residual();
 
   Zero_sur_Tangent_Residual();
-  
-  flist = new locassem_vms_ns_funs[1];
-  flist[0] = &PLocAssem_VMS_NS_GenAlpha::get_cubic_velo_traction;
 
   print_info();
 }
