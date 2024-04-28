@@ -189,8 +189,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
-       MPI_Barrier(PETSC_COMM_WORLD);
-     }
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
    
     // Calcualte the inlet data
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
