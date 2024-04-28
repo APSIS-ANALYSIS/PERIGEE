@@ -98,7 +98,7 @@ void SemiBDF1_Solve_NS(
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
     // vector container for the step update in the smaller matrix problem
-    PDNSolution * dot_step, *sol_step;
+    PDNSolution * step;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const

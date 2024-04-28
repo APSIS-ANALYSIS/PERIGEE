@@ -11,6 +11,7 @@
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "SymmTensor2_3D.hpp"
+#include "Math_Tools.hpp"
 
 class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
 {
@@ -163,9 +164,54 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_f( const Vector_3 &pt, const double &tt ) const
+    Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {
-      return Vector_3( 0.0, 0.0, 0.0 );
+
+      const double RR   = 1.0;
+      const double RR_3 = RR * RR * RR;
+      const double Area = MATH_T::PI * RR * RR;
+
+      const double yy   = pt.y(), zz = pt.z();
+      const double rr   = std::sqrt(yy * yy + zz * zz);
+      const double rr_3 = rr * rr * rr;
+     
+      const double fr    = 5.0/(3.0 * Area) * (1 - rr_3/RR_3 );
+      //const double d2f_dxx = 0.0;
+      //const double d2f_dyy = 5.0/(3.0 * Area) * ( -3.0 * (yy * yy / rr + rr) / RR_3 );
+      //const double d2f_dzz = 5.0/(3.0 * Area) * ( -3.0 * (zz * zz / rr + rr) / RR_3 );
+
+      const double Q_thd = 1.0;
+      const double T_thd = 1.0;
+      
+      double Qt = 0.0, dQ_dt = 0.0;
+
+      // if-else statement
+      if (tt < T_thd)
+    {
+        Qt    = Q_thd * 0.5 * (1-std::cos(MATH_T::PI*tt/T_thd));
+        dQ_dt = Q_thd * 0.5 * (MATH_T::PI/T_thd * std::sin(MATH_T::PI*tt/T_thd));
+    }
+     else
+    { 
+        Qt    = Q_thd;
+        dQ_dt = 0.0;
+    }
+
+      //const double d2u_dxx = Qt * d2f_dxx;
+      //const double d2u_dyy = Qt * d2f_dyy;
+      //const double d2u_dzz = Qt * d2f_dzz;
+
+      const double du_dt  = dQ_dt * fr;
+
+      const double fl_mu = 4.0e-2, fl_density = 1.0;
+
+      const double f_acc = fl_density * du_dt ; 
+      const double dp_dx = -100.0;
+      const double f_vis = fl_mu * Qt * 5.0/(3.0 * Area) * ( -3.0 * (3.0 * rr) / RR_3 );
+
+      double fx =  (f_acc + dp_dx - f_vis)/ fl_density;
+      
+      return Vector_3( fx, 0.0, 0.0 );
     }
 
     Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
@@ -180,11 +226,52 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
 
     locassem_vms_ns_funs * flist;
 
+    Vector_3 get_cubic_velo_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
+    {
+      const double RR   = 1.0;
+      const double RR_3 = RR * RR * RR;
+      const double Area = MATH_T::PI * RR * RR;
+
+      const double yy   = pt.y(), zz = pt.z();
+      const double rr   = std::sqrt(yy * yy + zz * zz);
+
+      const double df_dx = 0.0;
+      const double df_dy = 5.0/(3.0 * Area) * ( -3.0 * rr * yy / RR_3 );
+      const double df_dz = 5.0/(3.0 * Area) * ( -3.0 * rr * zz / RR_3 );
+
+      const double Q_thd = 1.0;
+      const double T_thd = 1.0;
+      
+      // if-else statement
+      double Qt = 0.0;
+      if (tt < T_thd)  Qt = Q_thd * 0.5 * (1-std::cos(MATH_T::PI*tt/T_thd));
+      else  Qt  = Q_thd;
+      
+      const double du_dx = Qt * df_dx; 
+      const double du_dy = Qt * df_dy;
+      const double du_dz = Qt * df_dz;
+
+      const double fl_mu = 4.0e-2;
+      
+      Tensor2_3D velo_grad (du_dx, du_dy, du_dz,
+                            0.0, 0.0, 0.0,
+                            0.0, 0.0, 0.0);
+
+      Tensor2_3D velo_grad_T = velo_grad;
+      velo_grad_T.transpose();
+
+      Tensor2_3D SS = velo_grad + velo_grad_T;
+
+      SS *= fl_mu;
+
+      return SS * n_out;
+    }
+
     Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
         const double &tt, const Vector_3 &n_out ) const
     {
-      return Vector_3( 0.0, 0.0, 0.0 );
-      //return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
+      //return Vector_3( 0.0, 0.0, 0.0 ); 
+      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 };
 

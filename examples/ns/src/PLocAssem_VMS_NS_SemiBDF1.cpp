@@ -25,6 +25,9 @@ PLocAssem_VMS_NS_SemiBDF1::PLocAssem_VMS_NS_SemiBDF1(
 
   Zero_sur_Tangent_Residual();
 
+  flist = new locassem_vms_ns_funs[1];
+  flist[0] = &PLocAssem_VMS_NS_SemiBDF1::get_cubic_velo_traction;
+
   print_info();
 }
 
@@ -220,15 +223,15 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual(
       p_z_0 += sol_0[ii4+0] * dR_dz[ii];
 
       u_xx_0 += sol_0[ii4+1] * d2R_dxx[ii];
-      u_yy_0 += sol_0[ii4+1] * d2R_dyy[ii];
-      u_zz_0 += sol_0[ii4+1] * d2R_dzz[ii];
-
       v_xx_0 += sol_0[ii4+2] * d2R_dxx[ii];
-      v_yy_0 += sol_0[ii4+2] * d2R_dyy[ii];
-      v_zz_0 += sol_0[ii4+2] * d2R_dzz[ii];
-
       w_xx_0 += sol_0[ii4+3] * d2R_dxx[ii];
+      
+      u_yy_0 += sol_0[ii4+1] * d2R_dyy[ii];
+      v_yy_0 += sol_0[ii4+2] * d2R_dyy[ii];
       w_yy_0 += sol_0[ii4+3] * d2R_dyy[ii];
+      
+      u_zz_0 += sol_0[ii4+1] * d2R_dzz[ii];
+      v_zz_0 += sol_0[ii4+2] * d2R_dzz[ii];
       w_zz_0 += sol_0[ii4+3] * d2R_dzz[ii];
 
       coor.x() += eleCtrlPts_x[ii] * R[ii];
@@ -335,9 +338,13 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual(
 
     const double div_vel = u_x + v_y + w_z;
 
-    const double r_dot_gradu_NG = u_x_NG * rx + u_y_NG * ry + u_z_NG * rz;
-    const double r_dot_gradv_NG = v_x_NG * rx + v_y_NG * ry + v_z_NG * rz;
-    const double r_dot_gradw_NG = w_x_NG * rx + w_y_NG * ry + w_z_NG * rz;
+    //const double r_dot_gradu_NG = u_x_NG * rx + u_y_NG * ry + u_z_NG * rz;
+    //const double r_dot_gradv_NG = v_x_NG * rx + v_y_NG * ry + v_z_NG * rz;
+    //const double r_dot_gradw_NG = w_x_NG * rx + w_y_NG * ry + w_z_NG * rz;
+
+    const double r_dot_gradu_NG = rx * u_x_NG + ry * u_y_NG + rz * u_z_NG;
+    const double r_dot_gradv_NG = rx * v_x_NG + ry * v_y_NG + rz * v_z_NG;
+    const double r_dot_gradw_NG = rx * w_x_NG + ry * w_y_NG + rz * w_z_NG;
     
     // Get the Discontinuity Capturing tau
     //const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
@@ -497,15 +504,15 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual(
       p_z_0 += sol_0[ii4+0] * dR_dz[ii];
 
       u_xx_0 += sol_0[ii4+1] * d2R_dxx[ii];
-      u_yy_0 += sol_0[ii4+1] * d2R_dyy[ii];
-      u_zz_0 += sol_0[ii4+1] * d2R_dzz[ii];
-
       v_xx_0 += sol_0[ii4+2] * d2R_dxx[ii];
-      v_yy_0 += sol_0[ii4+2] * d2R_dyy[ii];
-      v_zz_0 += sol_0[ii4+2] * d2R_dzz[ii];
-
       w_xx_0 += sol_0[ii4+3] * d2R_dxx[ii];
+
+      u_yy_0 += sol_0[ii4+1] * d2R_dyy[ii];
+      v_yy_0 += sol_0[ii4+2] * d2R_dyy[ii];
       w_yy_0 += sol_0[ii4+3] * d2R_dyy[ii];
+
+      u_zz_0 += sol_0[ii4+1] * d2R_dzz[ii];
+      v_zz_0 += sol_0[ii4+2] * d2R_dzz[ii];
       w_zz_0 += sol_0[ii4+3] * d2R_dzz[ii];
 
       coor.x() += eleCtrlPts_x[ii] * R[ii];
@@ -514,7 +521,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual(
 
     }
     // 1st-order BDF scheme  
-    const double alpha_sig = 1;
+    const double alpha_sig = 1.0;
 
     const double u_BDF = u_0;
     const double v_BDF = v_0;
@@ -612,9 +619,14 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual(
 
     const double div_vel = u_x + v_y + w_z;
 
-    const double r_dot_gradu_NG = u_x_NG * rx + u_y_NG * ry + u_z_NG * rz;
-    const double r_dot_gradv_NG = v_x_NG * rx + v_y_NG * ry + v_z_NG * rz;
-    const double r_dot_gradw_NG = w_x_NG * rx + w_y_NG * ry + w_z_NG * rz;
+    //const double r_dot_gradu_NG = u_x_NG * rx + u_y_NG * ry + u_z_NG * rz;
+    //const double r_dot_gradv_NG = v_x_NG * rx + v_y_NG * ry + v_z_NG * rz;
+    //const double r_dot_gradw_NG = w_x_NG * rx + w_y_NG * ry + w_z_NG * rz;
+
+    const double r_dot_gradu_NG = rx * u_x_NG + ry * u_y_NG + rz * u_z_NG;
+    const double r_dot_gradv_NG = rx * v_x_NG + ry * v_y_NG + rz * v_z_NG;
+    const double r_dot_gradw_NG = rx * w_x_NG + ry * w_y_NG + rz * w_z_NG;
+
     
     // Get the Discontinuity Capturing tau
     //const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
@@ -1003,7 +1015,6 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_BackFlowStab(
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
     double u_0 = 0.0, v_0 = 0.0, w_0 = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
     {

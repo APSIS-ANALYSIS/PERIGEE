@@ -14,9 +14,8 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 {
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
-  dot_step = new PDNSolution_NS( anode_ptr, 0, false );
-  sol_step = new PDNSolution_NS( anode_ptr, 0, false );
-}
+  step = new PDNSolution_NS( anode_ptr, 0, false );
+  }
 
 PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     const APart_Node * const &anode_ptr,
@@ -27,14 +26,12 @@ nrenew_threshold(10)
 {
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
-  dot_step = new PDNSolution_NS( anode_ptr, 0, false );
-  sol_step = new PDNSolution_NS( anode_ptr, 0, false );
+  step = new PDNSolution_NS( anode_ptr, 0, false );
 }
 
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
-  delete dot_step; dot_step = nullptr;
-  delete sol_step; sol_step = nullptr;
+  delete step; step = nullptr;
 }
 
 
@@ -82,11 +79,14 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
         PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
     #endif
 
+    // Initialize the counter and error
+    // double residual_norm = 0.0, initial_norm = 0.0;
+
     // Predict the solution at t_n+1
     sol->Copy(*pre_sol);
 
     // Update the inflow boundary values
-    rescale_inflow_value(curr_time + dt, infnbc_part, flr_ptr, sol_base, sol);
+    rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
 
     gassem_ptr->Clear_KG();
   
@@ -108,21 +108,30 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
     // linear solver will generate the preconditioner based on the new matrix.
     lsolver_ptr->SetOperator( gassem_ptr->K );
 
+    //VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
+    //SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
+
 
     #ifdef PETSC_USE_LOG
         PetscLogEventBegin(lin_solve_event, 0,0,0,0);
     #endif
     
-    // solve the equation K dot_step = G
-    lsolver_ptr->Solve( gassem_ptr->G, sol_step );
+    // solve the equation K step = G
+    lsolver_ptr->Solve( gassem_ptr->G, step );
 
     #ifdef PETSC_USE_LOG
         PetscLogEventEnd(lin_solve_event,0,0,0,0);
     #endif
 
-    bc_mat->MatMultSol( sol_step );
+    bc_mat->MatMultSol( step );
     
-    sol->PlusAX( sol_step, -1.0 );
+    sol->PlusAX( step, -1.0 );
+
+    //VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
+    
+    //SYS_T::print_fatal_if( residual_norm != residual_norm, "Error: nonlinear solver residual norm is NaN. Job killed.\n" );
+    
+    //SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
 }
 
@@ -249,22 +258,22 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(lin_solve_event, 0,0,0,0);
 #endif
     
-    // solve the equation K dot_step = G
-    lsolver_ptr->Solve( gassem_ptr->G, dot_step );
+    // solve the equation K step = G
+    lsolver_ptr->Solve( gassem_ptr->G, step );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(lin_solve_event,0,0,0,0);
 #endif
 
-    bc_mat->MatMultSol( dot_step );
+    bc_mat->MatMultSol( step );
 
     nl_counter += 1;
 
-    dot_sol->PlusAX( dot_step, -1.0 );
-    sol->PlusAX( dot_step, (-1.0) * gamma * dt );
+    dot_sol->PlusAX( step, -1.0 );
+    sol->PlusAX( step, (-1.0) * gamma * dt );
 
-    dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
-    sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+    dot_sol_alpha.PlusAX( step, (-1.0) * alpha_m );
+    sol_alpha.PlusAX( step, (-1.0) * alpha_f * gamma * dt );
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )

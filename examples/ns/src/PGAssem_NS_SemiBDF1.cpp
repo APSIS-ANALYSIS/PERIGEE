@@ -169,9 +169,7 @@ void PGAssem_NS_SemiBDF1::Assem_nonzero_estimate(
    //VecAssemblyBegin(G);
    //VecAssemblyEnd(G);
 
-  // test 
-  SYS_T::commPrint("=========> Chi's test 1642 <==========.\n"); 
-
+  
   for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
