@@ -42,7 +42,7 @@ class PTime_NS_Solver
         const ALocal_NBC * const &nbc_part,
         const ALocal_InflowBC * const &infnbc_part,
         const ALocal_EBC * const &ebc_part,
-	IGenBC * const &gbc,
+        IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
