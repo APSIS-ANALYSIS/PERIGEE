@@ -143,7 +143,7 @@ int main ( int argc , char * argv[] )
   std::vector<int> subdomain_nodes; subdomain_nodes.clear();
   for(int ee=0; ee<locElem->get_nlocalele(); ++ee)
   {
-    if( locElem -> get_elem_tag(ee) == 1 )
+    if( locElem -> get_elem_tag(ee) >= 1 )
       VEC_T::insert_end( subdomain_nodes, locIEN_v -> get_LIEN(ee) );
   }
   VEC_T::sort_unique_resize( subdomain_nodes );

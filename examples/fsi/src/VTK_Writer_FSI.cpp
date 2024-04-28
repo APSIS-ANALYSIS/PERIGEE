@@ -521,7 +521,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    if( lelem_ptr->get_elem_tag(ee) == 1 )
+    if( lelem_ptr->get_elem_tag(ee) >= 1 )
     {
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
@@ -688,7 +688,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    if( lelem_ptr->get_elem_tag(ee) == 1 )
+    if( lelem_ptr->get_elem_tag(ee) >= 1 )
     {
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
