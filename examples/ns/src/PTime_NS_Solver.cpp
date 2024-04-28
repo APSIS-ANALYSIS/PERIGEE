@@ -48,16 +48,6 @@ void PTime_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-void PTime_NS_Solver::print_info_SemiBDF1() const
-{
-  SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("Semi-BDF1 time scheme:\n");
-  SYS_T::commPrint("Time stepping solver setted up:\n");
-  SYS_T::commPrint("  final time: %e \n", final_time);
-  SYS_T::commPrint("  solution record frequency : %d \n", sol_record_freq);
-  SYS_T::commPrint("  solution base name: %s \n", pb_name.c_str());
-  SYS_T::commPrint("----------------------------------------------------------- \n");
-}
 
 void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     const std::string &solname ) const
@@ -89,6 +79,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_EBC * const &ebc_part,
+    IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
@@ -144,7 +135,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
+        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
         gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
 
     // Update the time step information
@@ -164,42 +155,42 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       cur_dot_sol->WriteBinary(sol_dot_name);
     }
 
-    // // Calculate the flow rate & averaged pressure on all outlets
-    // for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
-    // {
-    //   // Calculate the 3D dot flow rate on the outlet
-    //   const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-    //       cur_dot_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+    // Calculate the flow rate & averaged pressure on all outlets
+    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
+     {
+       // Calculate the 3D dot flow rate on the outlet
+       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+           cur_dot_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
 
-    //   // Calculate the 3D flow rate on the outlet
-    //   const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-    //       cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+       // Calculate the 3D flow rate on the outlet
+       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+           cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
 
-    //   // Calculate the 3D averaged pressure on the outlet
-    //   const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-    //       cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
+       // Calculate the 3D averaged pressure on the outlet
+       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
+           cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
 
-    //   // Calculate the 0D pressure from LPN model
-    //   const double dot_lpn_flowrate = dot_face_flrate;
-    //   const double lpn_flowrate = face_flrate;
-    //   const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate,
-    //      time_info -> get_time() );
+       // Calculate the 0D pressure from LPN model
+       const double dot_lpn_flowrate = dot_face_flrate;
+       const double lpn_flowrate = face_flrate;
+       const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate,
+          time_info -> get_time() );
 
-    //   // Update the initial values in genbc
-    //   gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
+       // Update the initial values in genbc
+       gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
 
-      // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
-      // calculated pressure into the txt file, which is first generated in the
-      // driver
-    //   if( SYS_T::get_MPI_rank() == 0 )
-    //   {
-    //     std::ofstream ofile;
-    //     ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-    //     ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-    //     ofile.close();
-    //   }
-    //   MPI_Barrier(PETSC_COMM_WORLD);
-    // }
+    // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
+    // calculated pressure into the txt file, which is first generated in the
+    // driver
+       if( SYS_T::get_MPI_rank() == 0 )
+       {
+         std::ofstream ofile;
+         ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+         ofile.close();
+       }
+       MPI_Barrier(PETSC_COMM_WORLD);
+     }
    
     // Calcualte the inlet data
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
@@ -363,6 +354,17 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
   }
+
+void PTime_NS_Solver::print_info_SemiBDF1() const
+{
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+  SYS_T::commPrint("Semi-BDF1 time scheme:\n");
+  SYS_T::commPrint("Time stepping solver setted up:\n");
+  SYS_T::commPrint("  final time: %e \n", final_time);
+  SYS_T::commPrint("  solution record frequency : %d \n", sol_record_freq);
+  SYS_T::commPrint("  solution base name: %s \n", pb_name.c_str());
+  SYS_T::commPrint("----------------------------------------------------------- \n");
+}
 
   delete pre_sol; delete cur_sol;
 }
