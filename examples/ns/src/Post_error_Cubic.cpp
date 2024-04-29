@@ -247,3 +247,5 @@ double POST_ERROR_C::get_manu_sol_u_H1(
 
   return norm;
 }
+
+//EOF
