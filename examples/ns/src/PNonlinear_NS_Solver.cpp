@@ -311,9 +311,6 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
         PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
     #endif
 
-    // Initialize the counter and error
-    // double residual_norm = 0.0, initial_norm = 0.0;
-
     // Predict the solution at t_n+1
     sol->Copy(*pre_sol);
 
@@ -334,15 +331,11 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
         PetscLogEventEnd(mat_vec_assem_event,0,0,0,0);
     #endif
 
-    SYS_T::commPrint("  --- M updated");
+    //SYS_T::commPrint("  --- M updated");
     
     // SetOperator will pass the tangent matrix to the linear solver and the
     // linear solver will generate the preconditioner based on the new matrix.
     lsolver_ptr->SetOperator( gassem_ptr->K );
-
-    //VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
-    //SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
-
 
     #ifdef PETSC_USE_LOG
         PetscLogEventBegin(lin_solve_event, 0,0,0,0);
@@ -358,12 +351,6 @@ void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
     bc_mat->MatMultSol( step );
     
     sol->PlusAX( step, -1.0 );
-
-    //VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
-    
-    //SYS_T::print_fatal_if( residual_norm != residual_norm, "Error: nonlinear solver residual norm is NaN. Job killed.\n" );
-    
-    //SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
 }
 

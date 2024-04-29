@@ -249,7 +249,7 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
 
   //bool rest_flag = restart_init_assembly_flag;
 
-  SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
+  SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s,",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
 
@@ -264,10 +264,13 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
         ebc_part, bc_mat, elementv, elements, quad_v, quad_s, lassem_fluid_ptr,
         gassem_ptr, lsolver_ptr, cur_sol );
 
+    // End a line 
+    SYS_T::commPrint("\n");
+
     // Update the time step information
     time_info->TimeIncrement();
 
-    SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
+    SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s,",
         time_info->get_time(), time_info->get_step(), time_info->get_index(),
         SYS_T::get_time().c_str());
 
@@ -337,7 +340,10 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
   }
-    delete pre_sol; delete cur_sol;
+  // End a line 
+  SYS_T::commPrint("\n");  
+  
+  delete pre_sol; delete cur_sol;
 }
 
 void PTime_NS_Solver::print_info_SemiBDF1() const
