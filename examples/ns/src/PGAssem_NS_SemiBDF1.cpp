@@ -78,9 +78,9 @@ void PGAssem_NS_SemiBDF1::EssBC_KG(
 
   if(local_dir > 0)
   {
-    for(int i=0; i<local_dir; ++i)
+    for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
+      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
@@ -89,10 +89,10 @@ void PGAssem_NS_SemiBDF1::EssBC_KG(
   const int local_sla = nbc_part->get_Num_LPS(field);
   if(local_sla > 0)
   {
-    for(int i=0; i<local_sla; ++i)
+    for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc_part->get_LPSN(field, i) * dof_mat + field;
-      const int col = nbc_part->get_LPMN(field, i) * dof_mat + field;
+      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      const int col = nbc_part->get_LPMN(field, ii) * dof_mat + field;
       MatSetValue(K, row, col, 1.0, ADD_VALUES);
       MatSetValue(K, row, row, -1.0, ADD_VALUES);
       VecSetValue(G, row, 0.0, INSERT_VALUES);
@@ -141,14 +141,14 @@ void PGAssem_NS_SemiBDF1::Assem_nonzero_estimate(
 
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
-  for(int e=0; e<nElem; ++e)
+  for(int ee=0; ee<nElem; ++ee)
   {
-    for(int i=0; i<nLocBas; ++i)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int loc_index  = lien_ptr->get_LIEN(e, i);
+      const int loc_index  = lien_ptr->get_LIEN(ee, ii);
 
-      for(int m=0; m<dof_mat; ++m)
-        row_index[dof_mat * i + m] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat * ii + mm] = dof_mat * nbc_part->get_LID( mm, loc_index ) + mm;
     }
     
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
