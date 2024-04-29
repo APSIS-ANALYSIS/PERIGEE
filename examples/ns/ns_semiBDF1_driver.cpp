@@ -76,6 +76,9 @@ int main(int argc, char *argv[])
   // back flow stabilization
   double bs_beta = 0.2;
 
+  // generalized-alpha rho_inf
+  double genA_rho_inf = 0.5;
+
   // part file location
   std::string part_file("part");
 
@@ -85,7 +88,7 @@ int main(int argc, char *argv[])
   int initial_index = 0;     // indiex of the initial condition
   double final_time = 1.0;   // final time
   std::string sol_bName("SOL_"); // base name of the solution file
-  //int ttan_renew_freq = 1;   // frequency of tangent matrix renewal
+  int ttan_renew_freq = 1;   // frequency of tangent matrix renewal
   int sol_record_freq = 1;   // frequency of recording the solution
 
   // Restart options
@@ -125,7 +128,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
-  //SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
+  SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
@@ -139,7 +142,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-fina_time", final_time);
   SYS_T::GetOptionReal("-init_step", initial_step);
   SYS_T::GetOptionInt("-init_index", initial_index);
-  //SYS_T::GetOptionInt("-ttan_freq", ttan_renew_freq);
+  SYS_T::GetOptionInt("-ttan_freq", ttan_renew_freq);
   SYS_T::GetOptionInt("-sol_rec_freq", sol_record_freq);
   SYS_T::GetOptionString("-sol_name", sol_bName);
   SYS_T::GetOptionBool("-is_restart", is_restart);
@@ -475,7 +478,7 @@ int main(int argc, char *argv[])
 
   // ===== Temporal solver context =====
   PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
-      sol_record_freq, final_time );
+      sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info_SemiBDF1();
 

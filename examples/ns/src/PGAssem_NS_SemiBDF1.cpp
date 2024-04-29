@@ -992,6 +992,4 @@ double PGAssem_NS_SemiBDF1::Assem_surface_ave_pressure(
 //   delete [] row_index; row_index = nullptr;
 // }
 
-
-
 // EOF
