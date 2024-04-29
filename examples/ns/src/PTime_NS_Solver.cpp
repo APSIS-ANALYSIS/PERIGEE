@@ -7,13 +7,6 @@ PTime_NS_Solver::PTime_NS_Solver(
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 {}
 
-PTime_NS_Solver::PTime_NS_Solver(
-    const std::string &input_name, const int &input_record_freq,
-    const double &input_final_time )
-: final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(1), pb_name(input_name)
-{}
-
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
 {
   std::ostringstream temp;
@@ -357,7 +350,5 @@ void PTime_NS_Solver::print_info_SemiBDF1() const
   SYS_T::commPrint("  solution base name: %s \n", pb_name.c_str());
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
-
-
 
 // EOF
