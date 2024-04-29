@@ -18,10 +18,6 @@ class PTime_NS_Solver
         const int &input_record_freq, const int &input_renew_tang_freq, 
         const double &input_final_time );
 
-    PTime_NS_Solver(
-        const std::string &input_name, const int &input_record_freq,
-        const double &input_final_time );
-
     ~PTime_NS_Solver() = default;
 
     void print_info() const;
