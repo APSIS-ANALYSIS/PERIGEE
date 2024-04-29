@@ -1,6 +1,6 @@
-#include "PLocAssem_VMS_NS_SemiBDF1.hpp"
+#include "PLocAssem_VMS_NS_ImexBDF1.hpp"
 
-PLocAssem_VMS_NS_SemiBDF1::PLocAssem_VMS_NS_SemiBDF1(
+PLocAssem_VMS_NS_ImexBDF1::PLocAssem_VMS_NS_ImexBDF1(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
@@ -26,12 +26,12 @@ PLocAssem_VMS_NS_SemiBDF1::PLocAssem_VMS_NS_SemiBDF1(
   Zero_sur_Tangent_Residual();
 
   flist = new locassem_vms_ns_funs[1];
-  flist[0] = &PLocAssem_VMS_NS_SemiBDF1::get_cubic_velo_traction;
+  flist[0] = &PLocAssem_VMS_NS_ImexBDF1::get_cubic_velo_traction;
 
   print_info();
 }
 
-PLocAssem_VMS_NS_SemiBDF1::~PLocAssem_VMS_NS_SemiBDF1()
+PLocAssem_VMS_NS_ImexBDF1::~PLocAssem_VMS_NS_ImexBDF1()
 {
   delete [] Tangent; Tangent = nullptr; 
   delete [] Residual; Residual = nullptr;
@@ -39,7 +39,7 @@ PLocAssem_VMS_NS_SemiBDF1::~PLocAssem_VMS_NS_SemiBDF1()
   delete [] sur_Residual; sur_Residual = nullptr;
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::print_info() const
+void PLocAssem_VMS_NS_ImexBDF1::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
@@ -53,7 +53,7 @@ void PLocAssem_VMS_NS_SemiBDF1::print_info() const
     SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
   else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
-  SYS_T::commPrint("  Temporal: Semi-BDF-1st Method \n");
+  SYS_T::commPrint("  Temporal: Imex-BDF-1st Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
   SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
   SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
@@ -67,7 +67,7 @@ void PLocAssem_VMS_NS_SemiBDF1::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-SymmTensor2_3D PLocAssem_VMS_NS_SemiBDF1::get_metric(
+SymmTensor2_3D PLocAssem_VMS_NS_ImexBDF1::get_metric(
     const std::array<double, 9> &f ) const
 {
   const double fk0 = mm[0] * f[0] + (mm[1] * f[3] + mm[2] * f[6]);
@@ -88,7 +88,7 @@ SymmTensor2_3D PLocAssem_VMS_NS_SemiBDF1::get_metric(
   coef * ( fk0 * f[1] + fk1 * f[4] + fk2 * f[7] ) );
 }
 
-std::array<double, 2> PLocAssem_VMS_NS_SemiBDF1::get_tau(
+std::array<double, 2> PLocAssem_VMS_NS_ImexBDF1::get_tau(
     const double &dt, const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -104,7 +104,7 @@ std::array<double, 2> PLocAssem_VMS_NS_SemiBDF1::get_tau(
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
 
-double PLocAssem_VMS_NS_SemiBDF1::get_DC(
+double PLocAssem_VMS_NS_ImexBDF1::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
 {
@@ -120,7 +120,7 @@ double PLocAssem_VMS_NS_SemiBDF1::get_DC(
   return dc_tau;
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual(
+void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual(
     const double &time, const double &dt,
     const double * const &sol_0,
     const double * const &sol,
@@ -401,7 +401,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual(
   } //qua-loop
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual(
+void PLocAssem_VMS_NS_ImexBDF1::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &sol_0,
     const double * const &sol,
@@ -822,7 +822,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Tangent_Residual(
   // ----------------------------------------------------------------  
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Mass_Residual(
+void PLocAssem_VMS_NS_ImexBDF1::Assem_Mass_Residual(
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -917,7 +917,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Mass_Residual(
   }
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_EBC(
+void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     FEAElement * const &element,
@@ -961,7 +961,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_EBC(
   }
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_EBC_Resistance(
+void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
     FEAElement * const &element,
@@ -993,7 +993,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_EBC_Resistance(
   }
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_BackFlowStab(
+void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual_BackFlowStab(
     const double * const &sol_0,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -1043,7 +1043,7 @@ void PLocAssem_VMS_NS_SemiBDF1::Assem_Residual_BackFlowStab(
   }
 }
 
-double PLocAssem_VMS_NS_SemiBDF1::get_flowrate( const double * const &sol,
+double PLocAssem_VMS_NS_ImexBDF1::get_flowrate( const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -1078,7 +1078,7 @@ double PLocAssem_VMS_NS_SemiBDF1::get_flowrate( const double * const &sol,
   return flrate;
 }
 
-void PLocAssem_VMS_NS_SemiBDF1::get_pressure_area( 
+void PLocAssem_VMS_NS_ImexBDF1::get_pressure_area( 
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,

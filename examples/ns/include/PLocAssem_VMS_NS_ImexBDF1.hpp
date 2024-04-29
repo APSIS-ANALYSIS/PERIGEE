@@ -1,29 +1,29 @@
-#ifndef PLOCASSEM_VMS_NS_SEMIBDF1_HPP
-#define PLOCASSEM_VMS_NS_SEMIBDF1_HPP
+#ifndef PLOCASSEM_VMS_NS_IMEXBDF1_HPP
+#define PLOCASSEM_VMS_NS_IMEXBDF1_HPP
 // ==================================================================
 // PLocAssem_VMS_NS_GenAlpha.hpp
 // 
-// Parallel Local Assembly routine for VMS and Semi-BDF1 based NS
+// Parallel Local Assembly routine for VMS and Imex-BDF1 based NS
 // solver.
 //
 // Author : Chi Ding
-// Date   : March 4, 2024
+// Date   : April 29, 2024
 // ==================================================================
 #include "IPLocAssem.hpp"
 #include "SymmTensor2_3D.hpp"
 #include "Math_Tools.hpp"
 
-class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
+class PLocAssem_VMS_NS_ImexBDF1 : public IPLocAssem
 {
   public:
-    PLocAssem_VMS_NS_SemiBDF1(
+    PLocAssem_VMS_NS_ImexBDF1(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const int &elemtype,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
-    virtual ~PLocAssem_VMS_NS_SemiBDF1();
+    virtual ~PLocAssem_VMS_NS_ImexBDF1();
 
     virtual int get_dof() const {return 4;}
 
@@ -221,7 +221,7 @@ class PLocAssem_VMS_NS_SemiBDF1 : public IPLocAssem
       return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
-    typedef Vector_3 ( PLocAssem_VMS_NS_SemiBDF1::*locassem_vms_ns_funs )( 
+    typedef Vector_3 ( PLocAssem_VMS_NS_ImexBDF1::*locassem_vms_ns_funs )( 
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_vms_ns_funs * flist;

@@ -112,9 +112,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
-  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_SemiBDF1.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_ImexBDF1.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
-  ${perigee_SOURCE_DIR}/src/PGAssem_NS_SemiBDF1.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_NS_ImexBDF1.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
@@ -158,7 +158,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns3d ns_driver.cpp)
-ADD_EXECUTABLE( ns3d_semiBDF1 ns_semiBDF1_driver.cpp)
+ADD_EXECUTABLE( ns3d_ImexBDF1 ns_ImexBDF1_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
@@ -169,7 +169,7 @@ ADD_EXECUTABLE( post_comp post_compare_manu.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
-TARGET_LINK_LIBRARIES( ns3d_semiBDF1 perigee_analysis )
+TARGET_LINK_LIBRARIES( ns3d_ImexBDF1 perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )

@@ -1,5 +1,5 @@
-#ifndef PGASSEM_NS_SEMIBDF1_HPP
-#define PGASSEM_NS_SEMIBDF1_HPP
+#ifndef PGASSEM_NS_IMEXBDF1_HPP
+#define PGASSEM_NS_IMEXBDF1_HPP
 // ==================================================================
 // PGAssem_NS_SemiBDF1.hpp
 //
@@ -8,22 +8,22 @@
 // means we do not need extraction operators and local mesh sizes.
 //
 // This assembly is for the NS Equations written in VMS formulation.
-// The time scheme is Semi-BDF. 
+// The time scheme is Imex-BDF. 
 // The input solution vectors contains
 //  [ pressure; velocity ].
 //
 // Author: Chi Ding 
-// Date  : Mar 11, 2024
+// Date  : April 29, 2024
 // ==================================================================
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
 
-class PGAssem_NS_SemiBDF1 : public IPGAssem
+class PGAssem_NS_ImexBDF1 : public IPGAssem
 {
   public:
     // Constructor for NS equations
-    PGAssem_NS_SemiBDF1( 
+    PGAssem_NS_ImexBDF1( 
         IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
@@ -36,7 +36,7 @@ class PGAssem_NS_SemiBDF1 : public IPGAssem
         const int &in_nz_estimate=60 );
 
     // Destructor
-    virtual ~PGAssem_NS_SemiBDF1();
+    virtual ~PGAssem_NS_ImexBDF1();
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(

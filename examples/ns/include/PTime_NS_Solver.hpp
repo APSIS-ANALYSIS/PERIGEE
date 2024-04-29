@@ -22,7 +22,7 @@ class PTime_NS_Solver
 
     void print_info() const;
 
-    void print_info_SemiBDF1() const;
+    void print_info_ImexBDF1() const;
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
@@ -51,7 +51,7 @@ class PTime_NS_Solver
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PNonlinear_NS_Solver * const &nsolver_ptr ) const;
 
-    void TM_NS_SemiBDF1( 
+    void TM_NS_ImexBDF1( 
         const bool &restart_init_assembly_flag,
         const PDNSolution * const &sol_base,
         const PDNSolution * const &init_sol,

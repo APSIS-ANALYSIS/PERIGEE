@@ -2,12 +2,12 @@
 // ns_tet_driver.cpp
 //
 // Tetrahedral element based finite element code for 3D Navier-Stokes
-// equations using Variational Multiscale Formulation and Semi-BDF
+// equations using Variational Multiscale Formulation and Imex-BDF
 // time stepping.
 //
 // Author :  Chi Ding
 // Email  :  chid246@outlook.com
-// Date   :  March 16, 2024
+// Date   :  April 29, 2024
 // ==================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
@@ -35,11 +35,11 @@
 //#include "GenBC_Inductance.hpp"
 //#include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
-#include "PLocAssem_VMS_NS_SemiBDF1.hpp"
+#include "PLocAssem_VMS_NS_ImexBDF1.hpp"
 //#include "PLocAssem_VMS_NS_GenAlpha.hpp"
 //#include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
-#include "PGAssem_NS_SemiBDF1.hpp"
+#include "PGAssem_NS_ImexBDF1.hpp"
 #include "PTime_NS_Solver.hpp"
 
 int main(int argc, char *argv[])
@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
 
-  locAssem_ptr = new PLocAssem_VMS_NS_SemiBDF1(
+  locAssem_ptr = new PLocAssem_VMS_NS_ImexBDF1(
       elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_NS_SemiBDF1( locAssem_ptr, elements, quads,
+  IPGAssem * gloAssem_ptr = new PGAssem_NS_ImexBDF1( locAssem_ptr, elements, quads,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
@@ -480,7 +480,7 @@ int main(int argc, char *argv[])
   PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
 
-  tsolver->print_info_SemiBDF1();
+  tsolver->print_info_ImexBDF1();
 
   // // ===== Outlet data recording files =====
   // for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
@@ -558,7 +558,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_SemiBDF1(is_restart, base, sol,
+  tsolver->TM_NS_ImexBDF1(is_restart, base, sol,
       timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, pmat, elementv, elements, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);

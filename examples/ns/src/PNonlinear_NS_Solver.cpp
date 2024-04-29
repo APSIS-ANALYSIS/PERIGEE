@@ -269,7 +269,7 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
   sol->Assembly_GhostUpdate();
 }
 
-void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
+void PNonlinear_NS_Solver::ImexBDF1_Solve_NS(
     const double &curr_time,
     const double &dt,
     const PDNSolution * const &sol_base,

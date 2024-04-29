@@ -1,6 +1,6 @@
-#include "PGAssem_NS_SemiBDF1.hpp"
+#include "PGAssem_NS_ImexBDF1.hpp"
 
-PGAssem_NS_SemiBDF1::PGAssem_NS_SemiBDF1(
+PGAssem_NS_ImexBDF1::PGAssem_NS_ImexBDF1(
     IPLocAssem * const &locassem_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quads,
@@ -65,13 +65,13 @@ PGAssem_NS_SemiBDF1::PGAssem_NS_SemiBDF1(
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-PGAssem_NS_SemiBDF1::~PGAssem_NS_SemiBDF1()
+PGAssem_NS_ImexBDF1::~PGAssem_NS_ImexBDF1()
 {
   VecDestroy(&G);
   MatDestroy(&K);
 }
 
-void PGAssem_NS_SemiBDF1::EssBC_KG(
+void PGAssem_NS_ImexBDF1::EssBC_KG(
     const ALocal_NBC * const &nbc_part, const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -100,7 +100,7 @@ void PGAssem_NS_SemiBDF1::EssBC_KG(
   }
 }
 
-void PGAssem_NS_SemiBDF1::EssBC_G( const ALocal_NBC * const &nbc_part, 
+void PGAssem_NS_ImexBDF1::EssBC_G( const ALocal_NBC * const &nbc_part, 
     const int &field )
 {
   const int local_dir = nbc_part->get_Num_LD(field);
@@ -124,7 +124,7 @@ void PGAssem_NS_SemiBDF1::EssBC_G( const ALocal_NBC * const &nbc_part,
   }
 }
 
-void PGAssem_NS_SemiBDF1::Assem_nonzero_estimate(
+void PGAssem_NS_ImexBDF1::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elements,
@@ -178,7 +178,7 @@ void PGAssem_NS_SemiBDF1::Assem_nonzero_estimate(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_NS_SemiBDF1::Assem_mass_residual(
+void PGAssem_NS_ImexBDF1::Assem_mass_residual(
     const PDNSolution * const &sol,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
@@ -249,7 +249,7 @@ void PGAssem_NS_SemiBDF1::Assem_mass_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_NS_SemiBDF1::Assem_residual(
+void PGAssem_NS_ImexBDF1::Assem_residual(
     const PDNSolution * const &sol_0,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -335,7 +335,7 @@ void PGAssem_NS_SemiBDF1::Assem_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_NS_SemiBDF1::Assem_tangent_residual(
+void PGAssem_NS_ImexBDF1::Assem_tangent_residual(
     const PDNSolution * const &sol_0,
     const PDNSolution * const &sol,
     const double &curr_time,
@@ -423,7 +423,7 @@ void PGAssem_NS_SemiBDF1::Assem_tangent_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_NS_SemiBDF1::NatBC_G( const double &curr_time, const double &dt,
+void PGAssem_NS_ImexBDF1::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
     const IQuadPts * const &quad_s,
@@ -466,7 +466,7 @@ void PGAssem_NS_SemiBDF1::NatBC_G( const double &curr_time, const double &dt,
   delete [] srow_index; srow_index = nullptr;
 }
 
-void PGAssem_NS_SemiBDF1::BackFlow_G( 
+void PGAssem_NS_ImexBDF1::BackFlow_G( 
     const PDNSolution * const &sol_0,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -519,7 +519,7 @@ void PGAssem_NS_SemiBDF1::BackFlow_G(
 }
 
 
-double PGAssem_NS_SemiBDF1::Assem_surface_flowrate(
+double PGAssem_NS_ImexBDF1::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -568,7 +568,7 @@ double PGAssem_NS_SemiBDF1::Assem_surface_flowrate(
   return sum;
 }
 
-double PGAssem_NS_SemiBDF1::Assem_surface_flowrate(
+double PGAssem_NS_ImexBDF1::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -617,7 +617,7 @@ double PGAssem_NS_SemiBDF1::Assem_surface_flowrate(
   return sum;
 }
 
-double PGAssem_NS_SemiBDF1::Assem_surface_ave_pressure(
+double PGAssem_NS_ImexBDF1::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -674,7 +674,7 @@ double PGAssem_NS_SemiBDF1::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
-double PGAssem_NS_SemiBDF1::Assem_surface_ave_pressure(
+double PGAssem_NS_ImexBDF1::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -731,7 +731,7 @@ double PGAssem_NS_SemiBDF1::Assem_surface_ave_pressure(
   return sum_pres / sum_area;
 }
 
-// void PGAssem_NS_SemiBDF1::NatBC_Resis_G(
+// void PGAssem_NS_ImexBDF1::NatBC_Resis_G(
 //     const double &curr_time, const double &dt,
 //     const PDNSolution * const &dot_sol,
 //     const PDNSolution * const &sol,
@@ -800,7 +800,7 @@ double PGAssem_NS_SemiBDF1::Assem_surface_ave_pressure(
 //   delete [] sctrl_z; sctrl_z = nullptr;
 // }
 
-// void PGAssem_NS_SemiBDF1::NatBC_Resis_KG(
+// void PGAssem_NS_ImexBDF1::NatBC_Resis_KG(
 //     const double &curr_time, const double &dt,
 //     const PDNSolution * const &dot_sol,
 //     const PDNSolution * const &sol,

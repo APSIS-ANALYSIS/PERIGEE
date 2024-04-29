@@ -212,7 +212,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
 }
 
-void PTime_NS_Solver::TM_NS_SemiBDF1( 
+void PTime_NS_Solver::TM_NS_ImexBDF1( 
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &sol_base,
     const PDNSolution * const &init_sol,
@@ -252,7 +252,7 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
   while( time_info->get_time() < final_time )
   {
     // Call the nonlinear equation solver
-    nsolver_ptr->SemiBDF1_Solve_NS(
+    nsolver_ptr->ImexBDF1_Solve_NS(
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_sol, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
@@ -341,10 +341,10 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
   delete pre_sol; delete cur_sol;
 }
 
-void PTime_NS_Solver::print_info_SemiBDF1() const
+void PTime_NS_Solver::print_info_ImexBDF1() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
-  SYS_T::commPrint("Semi-BDF1 time scheme:\n");
+  SYS_T::commPrint("Imex-BDF1 time scheme:\n");
   SYS_T::commPrint("Time stepping solver setted up:\n");
   SYS_T::commPrint("  final time: %e \n", final_time);
   SYS_T::commPrint("  solution record frequency : %d \n", sol_record_freq);
