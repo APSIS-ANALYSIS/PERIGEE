@@ -131,15 +131,6 @@ class IPLocAssem
     //                functions
     // ------------------------------------------------------------------------
     virtual void Assem_Residual(
-        const double * const &vec_a,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
-    {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
-
-    virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
@@ -260,6 +251,14 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual_BackFlowStab is not implemented.\n");}
 
+    virtual void Assem_Residual_BackFlowStab(
+        const double * const &sol_0,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_BackFlowStab is not implemented.\n");}
     // ------------------------------------------------------------------------
     // Perform elemental BC surface integration for backflow stabilization
     // for the residual as well as the tangent matrix

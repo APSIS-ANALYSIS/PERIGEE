@@ -14,13 +14,13 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 {
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
-  dot_step = new PDNSolution_NS( anode_ptr, 0, false );
+  step = new PDNSolution_NS( anode_ptr, 0, false );
 }
 
 
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
-  delete dot_step; dot_step = nullptr;
+  delete step; step = nullptr;
 }
 
 
@@ -162,22 +162,22 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(lin_solve_event, 0,0,0,0);
 #endif
     
-    // solve the equation K dot_step = G
-    lsolver_ptr->Solve( gassem_ptr->G, dot_step );
+    // solve the equation K step = G
+    lsolver_ptr->Solve( gassem_ptr->G, step );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(lin_solve_event,0,0,0,0);
 #endif
 
-    bc_mat->MatMultSol( dot_step );
+    bc_mat->MatMultSol( step );
 
     nl_counter += 1;
 
-    dot_sol->PlusAX( dot_step, -1.0 );
-    sol->PlusAX( dot_step, (-1.0) * gamma * dt );
+    dot_sol->PlusAX( step, -1.0 );
+    sol->PlusAX( step, (-1.0) * gamma * dt );
 
-    dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
-    sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+    dot_sol_alpha.PlusAX( step, (-1.0) * alpha_m );
+    sol_alpha.PlusAX( step, (-1.0) * alpha_f * gamma * dt );
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
@@ -267,6 +267,80 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
   }
 
   sol->Assembly_GhostUpdate();
+}
+
+void PNonlinear_NS_Solver::SemiBDF1_Solve_NS(
+    const double &curr_time,
+    const double &dt,
+    const PDNSolution * const &sol_base,
+    const PDNSolution * const &pre_sol, 
+    const ICVFlowRate * const flr_ptr,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &feanode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const Matrix_PETSc * const &bc_mat,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    IPLocAssem * const &lassem_ptr,
+    IPGAssem * const &gassem_ptr,
+    PLinear_Solver_PETSc * const &lsolver_ptr,
+    PDNSolution * const &sol ) const
+{
+    #ifdef PETSC_USE_LOG
+        PetscLogEvent mat_vec_assem_event;
+        PetscLogEvent lin_solve_event;
+        PetscClassId classid_assembly;
+        PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
+        PetscLogEventRegister("assembly mat_vec", classid_assembly, &mat_vec_assem_event);
+        PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
+    #endif
+
+    // Predict the solution at t_n+1
+    sol->Copy(*pre_sol);
+
+    // Update the inflow boundary values
+    rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
+
+    gassem_ptr->Clear_KG();
+  
+    #ifdef PETSC_USE_LOG
+        PetscLogEventBegin(mat_vec_assem_event, 0,0,0,0);
+    #endif
+
+    gassem_ptr->Assem_tangent_residual( pre_sol, sol, 
+        curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements,
+        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part );
+   
+    #ifdef PETSC_USE_LOG
+        PetscLogEventEnd(mat_vec_assem_event,0,0,0,0);
+    #endif
+
+    //SYS_T::commPrint("  --- M updated");
+    
+    // SetOperator will pass the tangent matrix to the linear solver and the
+    // linear solver will generate the preconditioner based on the new matrix.
+    lsolver_ptr->SetOperator( gassem_ptr->K );
+
+    #ifdef PETSC_USE_LOG
+        PetscLogEventBegin(lin_solve_event, 0,0,0,0);
+    #endif
+    
+    // solve the equation K step = G
+    lsolver_ptr->Solve( gassem_ptr->G, step );
+
+    #ifdef PETSC_USE_LOG
+        PetscLogEventEnd(lin_solve_event,0,0,0,0);
+    #endif
+
+    bc_mat->MatMultSol( step );
+    
+    sol->PlusAX( step, -1.0 );
+
 }
 
 // EOF

@@ -111,13 +111,6 @@ class IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &pnode_ptr )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
         const ALocal_NBC * const &nbc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
@@ -231,17 +224,6 @@ class IPGAssem
     //                         cached quadrature info.
     // ------------------------------------------------------------------------
     // Assemble mass matrix and residual vector for NS equations
-     virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        const IQuadPts * const &quad_v,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const APart_Node * const &pnode_ptr )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const ALocal_Elem * const &alelem_ptr,
@@ -327,21 +309,25 @@ class IPGAssem
         const ALocal_WeakBC * const &wbc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &sol,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
     // ------------------------------------------------------------------------
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        const IQuadPts * const &quad_v,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const APart_Node * const &pnode_ptr )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
