@@ -17,17 +17,6 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   step = new PDNSolution_NS( anode_ptr, 0, false );
 }
 
-PNonlinear_NS_Solver::PNonlinear_NS_Solver(
-    const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr )
-: nr_tol(1e-3), na_tol(1e-3), nd_tol(1e-3),
-nmaxits(10), nrenew_freq(10),
-nrenew_threshold(10)
-{
-  // Generate the incremental solution vector used for update 
-  // the solution of the nonlinear algebraic system 
-  step = new PDNSolution_NS( anode_ptr, 0, false );
-}
 
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {

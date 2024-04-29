@@ -20,13 +20,10 @@ class PNonlinear_NS_Solver
   public:
     PNonlinear_NS_Solver( const APart_Node * const &anode_ptr,
         const FEANode * const &feanode_ptr,
-        const double &input_nrtol, const double &input_natol, 
-        const double &input_ndtol, const int &input_max_iteration, 
-        const int &input_renew_freq, 
+        const double &input_nrtol = 1e-3, const double &input_natol = 1e-3,  
+        const double &input_ndtol = 1e-3, const int &input_max_iteration = 10, 
+        const int &input_renew_freq = 10, 
         const int &input_renew_threshold = 4 );
-
-    PNonlinear_NS_Solver( const APart_Node * const &anode_ptr,
-        const FEANode * const &feanode_ptr );
 
     ~PNonlinear_NS_Solver();
 
