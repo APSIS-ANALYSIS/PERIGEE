@@ -244,11 +244,6 @@ void PTime_NS_Solver::TM_NS_SemiBDF1(
     cur_sol->WriteBinary(sol_name);
   }
 
-  //bool conv_flag, renew_flag;
-  //int nl_counter = 0;
-
-  //bool rest_flag = restart_init_assembly_flag;
-
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s,",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
