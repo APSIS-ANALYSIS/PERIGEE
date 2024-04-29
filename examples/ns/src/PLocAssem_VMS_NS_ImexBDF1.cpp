@@ -147,10 +147,7 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual(
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
-    double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
-    double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
-    double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+    double p = 0.0;
 
     // variables at t_n
     double u_0 = 0.0, u_x_0 = 0.0, u_y_0 = 0.0, u_z_0 = 0.0;
@@ -178,29 +175,14 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual(
       u_x += sol[ii4+1] * dR_dx[ii];
       v_x += sol[ii4+2] * dR_dx[ii];
       w_x += sol[ii4+3] * dR_dx[ii];
-      p_x += sol[ii4+0] * dR_dx[ii];
 
       u_y += sol[ii4+1] * dR_dy[ii];
       v_y += sol[ii4+2] * dR_dy[ii];
       w_y += sol[ii4+3] * dR_dy[ii];
-      p_y += sol[ii4+0] * dR_dy[ii];
 
       u_z += sol[ii4+1] * dR_dz[ii];
       v_z += sol[ii4+2] * dR_dz[ii];
       w_z += sol[ii4+3] * dR_dz[ii];
-      p_z += sol[ii4+0] * dR_dz[ii];
-
-      u_xx += sol[ii4+1] * d2R_dxx[ii];
-      u_yy += sol[ii4+1] * d2R_dyy[ii];
-      u_zz += sol[ii4+1] * d2R_dzz[ii];
-
-      v_xx += sol[ii4+2] * d2R_dxx[ii];
-      v_yy += sol[ii4+2] * d2R_dyy[ii];
-      v_zz += sol[ii4+2] * d2R_dzz[ii];
-
-      w_xx += sol[ii4+3] * d2R_dxx[ii];
-      w_yy += sol[ii4+3] * d2R_dyy[ii];
-      w_zz += sol[ii4+3] * d2R_dzz[ii];
 
       // variables at t_n
       u_0 += sol_0[ii4+1] * R[ii];
@@ -284,10 +266,6 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual(
     const double v_lap_NG = v_xx_NG + v_yy_NG + v_zz_NG;
     const double w_lap_NG = w_xx_NG + w_yy_NG + w_zz_NG;
 
-    const double u_lap = u_xx + u_yy + u_zz;
-    const double v_lap = v_xx + v_yy + v_zz;
-    const double w_lap = w_xx + w_yy + w_zz;
-
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
@@ -315,36 +293,11 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual(
                         + u_NG * w_x_NG + v_NG * w_y_NG + w_NG * w_z_NG - f_body.z() ) 
                         + p_z_NG - vis_mu * w_lap_NG;  
 
-    const double rx_tilde = rho0 * ( u_NG * u_x + v_NG * u_y + w_NG * u_z - f_body.x() )
-                          + p_x - vis_mu * u_lap;
-
-    const double ry_tilde = rho0 * ( u_NG * v_x + v_NG * v_y + w_NG * v_z - f_body.y() )
-                          + p_y - vis_mu * v_lap;
-
-    const double rz_tilde = rho0 * ( u_NG * w_x + v_NG * w_y + w_NG * w_z - f_body.z() ) 
-                          + p_z - vis_mu * w_lap;
-
-    const double rx = rho0 * ( (alpha_sig * u - u_BDF)/dt 
-                    + u_NG * u_x + v_NG * u_y + w_NG * u_z - f_body.x() ) 
-                    + p_x - vis_mu * u_lap;
-
-    const double ry = rho0 * ( (alpha_sig * v - v_BDF)/dt 
-                    + u_NG * v_x + v_NG * v_y + w_NG * v_z - f_body.y() ) 
-                    + p_y - vis_mu * v_lap;
-
-    const double rz = rho0 * ( (alpha_sig * w - w_BDF)/dt 
-                    + u_NG * w_x + v_NG * w_y + w_NG * w_z - f_body.z() ) 
-                    + p_z - vis_mu * w_lap;
-
     const double div_vel = u_x + v_y + w_z;
 
-    //const double r_dot_gradu_NG = u_x_NG * rx + u_y_NG * ry + u_z_NG * rz;
-    //const double r_dot_gradv_NG = v_x_NG * rx + v_y_NG * ry + v_z_NG * rz;
-    //const double r_dot_gradw_NG = w_x_NG * rx + w_y_NG * ry + w_z_NG * rz;
-
-    const double r_dot_gradu_NG = rx * u_x_NG + ry * u_y_NG + rz * u_z_NG;
-    const double r_dot_gradv_NG = rx * v_x_NG + ry * v_y_NG + rz * v_z_NG;
-    const double r_dot_gradw_NG = rx * w_x_NG + ry * w_y_NG + rz * w_z_NG;
+    const double r_hat_dot_gradu_NG = rx_hat * u_x_NG + ry_hat * u_y_NG + rz_hat * u_z_NG;
+    const double r_hat_dot_gradv_NG = rx_hat * v_x_NG + ry_hat * v_y_NG + rz_hat * v_z_NG;
+    const double r_hat_dot_gradw_NG = rx_hat * w_x_NG + ry_hat * w_y_NG + rz_hat * w_z_NG;
     
     // Get the Discontinuity Capturing tau
     //const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
@@ -355,47 +308,43 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Residual(
       
       const double velo_NG_dot_gradR  =  u_NG * NA_x    + v_NG * NA_y    + w_NG * NA_z;
       const double r_hat_dot_gradR    =  rx_hat * NA_x  + ry_hat * NA_y  + rz_hat * NA_z;
-      const double r_dot_gradR        =  rx * NA_x      + ry * NA_y      + rz * NA_z;
-
-      Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
+      
+      Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_hat_dot_gradR );
 
       Residual[4*A+1] += gwts * ( NA * rho0 / dt * (alpha_sig * u - u_BDF) 
-          + NA * rho0 * (u_NG * u_x + v_NG * u_y + w_NG * u_z)
+          + NA * rho0 * (u_NG * u_x_NG + v_NG * u_y_NG + w_NG * u_z_NG)
           - NA_x * p
           + NA_x * two_mu * u_x
           + NA_y * vis_mu * (u_y + v_x)
           + NA_z * vis_mu * (u_z + w_x)
           - NA * rho0 * f_body.x()
-          + velo_NG_dot_gradR * rho0 * tau_m * rx
-          - NA * rho0 * tau_m * r_dot_gradu_NG
-          - r_hat_dot_gradR * rho0 * tau_m_2 * (rx_tilde +rho0 / dt * alpha_sig * u)
-          + r_dot_gradR * rho0 * tau_m_2 * rho0 / dt * u_BDF
+          + velo_NG_dot_gradR * rho0 * tau_m * rx_hat
+          - NA * rho0 * tau_m * r_hat_dot_gradu_NG
+          - r_hat_dot_gradR * rho0 * tau_m_2 * rx_hat
           + NA_x * tau_c * div_vel );
 
       Residual[4*A+2] += gwts * ( NA * rho0 / dt * (alpha_sig * v - v_BDF) 
-          + NA * rho0 * (u_NG * v_x + v_NG * v_y + w_NG * v_z)
+          + NA * rho0 * (u_NG * v_x_NG + v_NG * v_y_NG + w_NG * v_z_NG)
           - NA_y * p
           + NA_x * vis_mu * (v_x + u_y)
           + NA_y * two_mu * v_y 
           + NA_z * vis_mu * (v_z + w_y)
           - NA * rho0 * f_body.y()
-          + velo_NG_dot_gradR * rho0 * tau_m * ry
-          - NA * rho0 * tau_m * r_dot_gradv_NG
-          - r_hat_dot_gradR * rho0 * tau_m_2 * (ry_tilde + rho0 / dt * alpha_sig * v)
-          + r_dot_gradR * rho0 * tau_m_2 * rho0 / dt * v_BDF
+          + velo_NG_dot_gradR * rho0 * tau_m * ry_hat
+          - NA * rho0 * tau_m * r_hat_dot_gradv_NG
+          - r_hat_dot_gradR * rho0 * tau_m_2 * ry_hat 
           + NA_y * tau_c * div_vel );
 
       Residual[4*A+3] += gwts * ( NA * rho0 / dt * (alpha_sig * w - w_BDF)
-          + NA * rho0 * (u_NG * w_x + v_NG * w_y + w_NG * w_z)
+          + NA * rho0 * (u_NG * w_x_NG + v_NG * w_y_NG + w_NG * w_z_NG)
           - NA_z * p
           + NA_x * vis_mu * (w_x + u_z)
           + NA_y * vis_mu * (w_y + v_z)
           + NA_z * two_mu * w_z
           - NA * rho0 * f_body.z()
-          + velo_NG_dot_gradR * rho0 * tau_m * rz
-          - NA * rho0 * tau_m * r_dot_gradw_NG
-          - r_hat_dot_gradR * rho0 * tau_m_2 * (rz_tilde + rho0 / dt * alpha_sig * w)
-          + r_dot_gradR * rho0 * tau_m_2 * rho0 / dt * w_BDF
+          + velo_NG_dot_gradR * rho0 * tau_m * rz_hat
+          - NA * rho0 * tau_m * r_hat_dot_gradw_NG
+          - r_hat_dot_gradR * rho0 * tau_m_2 * rz_hat 
           + NA_z * tau_c * div_vel );
     } // A-loop
   } //qua-loop
@@ -428,10 +377,7 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Tangent_Residual(
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
     double w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
-    double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
-    double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
-    double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
-    double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+    double p = 0.0;
 
     // variables at t_n
     double u_0 = 0.0, u_x_0 = 0.0, u_y_0 = 0.0, u_z_0 = 0.0;
@@ -459,29 +405,14 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Tangent_Residual(
       u_x += sol[ii4+1] * dR_dx[ii];
       v_x += sol[ii4+2] * dR_dx[ii];
       w_x += sol[ii4+3] * dR_dx[ii];
-      p_x += sol[ii4+0] * dR_dx[ii];
 
       u_y += sol[ii4+1] * dR_dy[ii];
       v_y += sol[ii4+2] * dR_dy[ii];
       w_y += sol[ii4+3] * dR_dy[ii];
-      p_y += sol[ii4+0] * dR_dy[ii];
 
       u_z += sol[ii4+1] * dR_dz[ii];
       v_z += sol[ii4+2] * dR_dz[ii];
       w_z += sol[ii4+3] * dR_dz[ii];
-      p_z += sol[ii4+0] * dR_dz[ii];
-
-      u_xx += sol[ii4+1] * d2R_dxx[ii];
-      u_yy += sol[ii4+1] * d2R_dyy[ii];
-      u_zz += sol[ii4+1] * d2R_dzz[ii];
-
-      v_xx += sol[ii4+2] * d2R_dxx[ii];
-      v_yy += sol[ii4+2] * d2R_dyy[ii];
-      v_zz += sol[ii4+2] * d2R_dzz[ii];
-
-      w_xx += sol[ii4+3] * d2R_dxx[ii];
-      w_yy += sol[ii4+3] * d2R_dyy[ii];
-      w_zz += sol[ii4+3] * d2R_dzz[ii];
 
       // variables at t_n
       u_0 += sol_0[ii4+1] * R[ii];
@@ -565,10 +496,6 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Tangent_Residual(
     const double v_lap_NG = v_xx_NG + v_yy_NG + v_zz_NG;
     const double w_lap_NG = w_xx_NG + w_yy_NG + w_zz_NG;
 
-    const double u_lap = u_xx + u_yy + u_zz;
-    const double v_lap = v_xx + v_yy + v_zz;
-    const double w_lap = w_xx + w_yy + w_zz;
-
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
@@ -596,37 +523,11 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Tangent_Residual(
                         + u_NG * w_x_NG + v_NG * w_y_NG + w_NG * w_z_NG - f_body.z() ) 
                         + p_z_NG - vis_mu * w_lap_NG;  
 
-    const double rx_tilde = rho0 * ( u_NG * u_x + v_NG * u_y + w_NG * u_z - f_body.x() )
-                          + p_x - vis_mu * u_lap;
-
-    const double ry_tilde = rho0 * ( u_NG * v_x + v_NG * v_y + w_NG * v_z - f_body.y() )
-                          + p_y - vis_mu * v_lap;
-
-    const double rz_tilde = rho0 * ( u_NG * w_x + v_NG * w_y + w_NG * w_z - f_body.z() ) 
-                          + p_z - vis_mu * w_lap;
-
-    const double rx = rho0 * ( (alpha_sig * u - u_BDF)/dt 
-                    + u_NG * u_x + v_NG * u_y + w_NG * u_z - f_body.x() ) 
-                    + p_x - vis_mu * u_lap;
-
-    const double ry = rho0 * ( (alpha_sig * v - v_BDF)/dt 
-                    + u_NG * v_x + v_NG * v_y + w_NG * v_z - f_body.y() ) 
-                    + p_y - vis_mu * v_lap;
-
-    const double rz = rho0 * ( (alpha_sig * w - w_BDF)/dt 
-                    + u_NG * w_x + v_NG * w_y + w_NG * w_z - f_body.z() ) 
-                    + p_z - vis_mu * w_lap;
-
     const double div_vel = u_x + v_y + w_z;
 
-    //const double r_dot_gradu_NG = u_x_NG * rx + u_y_NG * ry + u_z_NG * rz;
-    //const double r_dot_gradv_NG = v_x_NG * rx + v_y_NG * ry + v_z_NG * rz;
-    //const double r_dot_gradw_NG = w_x_NG * rx + w_y_NG * ry + w_z_NG * rz;
-
-    const double r_dot_gradu_NG = rx * u_x_NG + ry * u_y_NG + rz * u_z_NG;
-    const double r_dot_gradv_NG = rx * v_x_NG + ry * v_y_NG + rz * v_z_NG;
-    const double r_dot_gradw_NG = rx * w_x_NG + ry * w_y_NG + rz * w_z_NG;
-
+    const double r_hat_dot_gradu_NG = rx_hat * u_x_NG + ry_hat * u_y_NG + rz_hat * u_z_NG;
+    const double r_hat_dot_gradv_NG = rx_hat * v_x_NG + ry_hat * v_y_NG + rz_hat * v_z_NG;
+    const double r_hat_dot_gradw_NG = rx_hat * w_x_NG + ry_hat * w_y_NG + rz_hat * w_z_NG;
     
     // Get the Discontinuity Capturing tau
     //const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
@@ -637,177 +538,97 @@ void PLocAssem_VMS_NS_ImexBDF1::Assem_Tangent_Residual(
       
       const double velo_NG_dot_gradR  =  u_NG * NA_x    + v_NG * NA_y    + w_NG * NA_z;
       const double r_hat_dot_gradR    =  rx_hat * NA_x  + ry_hat * NA_y  + rz_hat * NA_z;
-      const double r_dot_gradR        =  rx * NA_x      + ry * NA_y      + rz * NA_z;
-
-      Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
+      
+      Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_hat_dot_gradR );
 
       Residual[4*A+1] += gwts * ( NA * rho0 / dt * (alpha_sig * u - u_BDF) 
-          + NA * rho0 * (u_NG * u_x + v_NG * u_y + w_NG * u_z)
+          + NA * rho0 * (u_NG * u_x_NG + v_NG * u_y_NG + w_NG * u_z_NG)
           - NA_x * p
           + NA_x * two_mu * u_x
           + NA_y * vis_mu * (u_y + v_x)
           + NA_z * vis_mu * (u_z + w_x)
           - NA * rho0 * f_body.x()
-          + velo_NG_dot_gradR * rho0 * tau_m * rx
-          - NA * rho0 * tau_m * r_dot_gradu_NG
-          - r_hat_dot_gradR * rho0 * tau_m_2 * (rx_tilde +rho0 / dt * alpha_sig * u)
-          + r_dot_gradR * rho0 * tau_m_2 * rho0 / dt * u_BDF
+          + velo_NG_dot_gradR * rho0 * tau_m * rx_hat
+          - NA * rho0 * tau_m * r_hat_dot_gradu_NG
+          - r_hat_dot_gradR * rho0 * tau_m_2 * rx_hat
           + NA_x * tau_c * div_vel );
 
       Residual[4*A+2] += gwts * ( NA * rho0 / dt * (alpha_sig * v - v_BDF) 
-          + NA * rho0 * (u_NG * v_x + v_NG * v_y + w_NG * v_z)
+          + NA * rho0 * (u_NG * v_x_NG + v_NG * v_y_NG + w_NG * v_z_NG)
           - NA_y * p
           + NA_x * vis_mu * (v_x + u_y)
           + NA_y * two_mu * v_y 
           + NA_z * vis_mu * (v_z + w_y)
           - NA * rho0 * f_body.y()
-          + velo_NG_dot_gradR * rho0 * tau_m * ry
-          - NA * rho0 * tau_m * r_dot_gradv_NG
-          - r_hat_dot_gradR * rho0 * tau_m_2 * (ry_tilde + rho0 / dt * alpha_sig * v)
-          + r_dot_gradR * rho0 * tau_m_2 * rho0 / dt * v_BDF
+          + velo_NG_dot_gradR * rho0 * tau_m * ry_hat
+          - NA * rho0 * tau_m * r_hat_dot_gradv_NG
+          - r_hat_dot_gradR * rho0 * tau_m_2 * ry_hat 
           + NA_y * tau_c * div_vel );
 
       Residual[4*A+3] += gwts * ( NA * rho0 / dt * (alpha_sig * w - w_BDF)
-          + NA * rho0 * (u_NG * w_x + v_NG * w_y + w_NG * w_z)
+          + NA * rho0 * (u_NG * w_x_NG + v_NG * w_y_NG + w_NG * w_z_NG)
           - NA_z * p
           + NA_x * vis_mu * (w_x + u_z)
           + NA_y * vis_mu * (w_y + v_z)
           + NA_z * two_mu * w_z
           - NA * rho0 * f_body.z()
-          + velo_NG_dot_gradR * rho0 * tau_m * rz
-          - NA * rho0 * tau_m * r_dot_gradw_NG
-          - r_hat_dot_gradR * rho0 * tau_m_2 * (rz_tilde + rho0 / dt * alpha_sig * w)
-          + r_dot_gradR * rho0 * tau_m_2 * rho0 / dt * w_BDF
+          + velo_NG_dot_gradR * rho0 * tau_m * rz_hat
+          - NA * rho0 * tau_m * r_hat_dot_gradw_NG
+          - r_hat_dot_gradR * rho0 * tau_m_2 * rz_hat 
           + NA_z * tau_c * div_vel );
       
       for(int B=0; B<nLocBas; ++B)
       {
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
-        const double NB_xx = d2R_dxx[B], NB_yy = d2R_dyy[B], NB_zz = d2R_dzz[B];
-        const double NB_lap = NB_xx + NB_yy + NB_zz;
-
-        const double velo_NG_dot_gradNB = u_NG * NB_x + v_NG * NB_y + w_NG * NB_z;
 
         const double NANB  = NA*NB;
         const double NAxNB = NA_x*NB, NAxNBx = NA_x*NB_x, NAxNBy = NA_x*NB_y, NAxNBz = NA_x*NB_z;
         const double NAyNB = NA_y*NB, NAyNBx = NA_y*NB_x, NAyNBy = NA_y*NB_y, NAyNBz = NA_y*NB_z;
         const double NAzNB = NA_z*NB, NAzNBx = NA_z*NB_x, NAzNBy = NA_z*NB_y, NAzNBz = NA_z*NB_z;
 
-        const double drx_du_B = rho0 * ( alpha_sig * NB / dt + velo_NG_dot_gradNB ) - vis_mu * NB_lap; 
-        const double drx_dv_B = 0;
-        const double drx_dw_B = 0;
-
-        const double dry_du_B = 0;
-        const double dry_dv_B = rho0 * ( alpha_sig * NB / dt + velo_NG_dot_gradNB ) - vis_mu * NB_lap; 
-        const double dry_dw_B = 0;
-
-        const double drz_du_B = 0;
-        const double drz_dv_B = 0;
-        const double drz_dw_B = rho0 * ( alpha_sig * NB / dt + velo_NG_dot_gradNB ) - vis_mu * NB_lap; 
-
-        const double drx_tilde_du_B = rho0 * velo_NG_dot_gradNB - vis_mu * NB_lap; 
-        const double drx_tilde_dv_B = 0;
-        const double drx_tilde_dw_B = 0;
-
-        const double dry_tilde_du_B = 0;
-        const double dry_tilde_dv_B = rho0 * velo_NG_dot_gradNB - vis_mu * NB_lap; 
-        const double dry_tilde_dw_B = 0;
-
-        const double drz_tilde_du_B = 0;
-        const double drz_tilde_dv_B = 0;
-        const double drz_tilde_dw_B = rho0 * velo_NG_dot_gradNB - vis_mu * NB_lap; 
-
         // Continuity equation with respect to p, u, v, w
-        Tangent[16*nLocBas*A+4*B]   += gwts * tau_m * (NAxNBx + NAyNBy + NAzNBz);
-        Tangent[16*nLocBas*A+4*B+1] += gwts * ( NA * NB_x + tau_m * (NA_x * drx_du_B + NA_y * dry_du_B + NA_z * drz_du_B ) );
-        Tangent[16*nLocBas*A+4*B+2] += gwts * ( NA * NB_y + tau_m * (NA_x * drx_dv_B + NA_y * dry_dv_B + NA_z * drz_dv_B ) );
-        Tangent[16*nLocBas*A+4*B+3] += gwts * ( NA * NB_z + tau_m * (NA_x * drx_dw_B + NA_y * dry_dw_B + NA_z * drz_dw_B ) );
+        Tangent[16*nLocBas*A+4*B]   += 0.0;
+        Tangent[16*nLocBas*A+4*B+1] += gwts *  NA * NB_x;
+        Tangent[16*nLocBas*A+4*B+2] += gwts *  NA * NB_y;
+        Tangent[16*nLocBas*A+4*B+3] += gwts *  NA * NB_z;
 
         // Momentum-x with respect to p, u, v, w
-        Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * ( (-1.0) * NAxNB
-            + velo_NG_dot_gradR * rho0 * tau_m * NB_x
-            - NA * rho0 * tau_m * ( NB_x * u_x_NG + NB_y * u_y_NG + NB_z * u_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 *  NB_x
-            + (NAxNBx + NAyNBy + NAzNBz) * rho0 * tau_m_2 * rho0 /dt * u_BDF );
-
+        Tangent[4*nLocBas*(4*A+1)+4*B] += gwts * ( (-1.0) * NAxNB);
+        
         Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * ( rho0 /dt * alpha_sig  * NANB
-            + NA * rho0 * velo_NG_dot_gradNB + vis_mu * (2.0*NAxNBx + NAyNBy + NAzNBz)
-            + velo_NG_dot_gradR * rho0 * tau_m * drx_du_B
-            - NA * rho0 * tau_m * ( drx_du_B * u_x_NG + dry_du_B * u_y_NG + drz_du_B * u_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * ( drx_tilde_du_B +rho0 / dt * alpha_sig * NB)
-            + (drx_du_B * NA_x + dry_du_B * NA_y + drz_du_B * NA_z) * rho0 * tau_m_2 * rho0 / dt * u_BDF
+            + vis_mu * (2.0*NAxNBx + NAyNBy + NAzNBz)
             + tau_c * NAxNBx );
 
         Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * ( vis_mu * NAyNBx 
-            + velo_NG_dot_gradR * rho0 * tau_m * drx_dv_B
-            - NA * rho0 * tau_m * (drx_dv_B * u_x_NG + dry_dv_B * u_y_NG + drz_dv_B * u_z_NG)
-            - r_hat_dot_gradR * rho0 * tau_m_2 * drx_tilde_dv_B
-            + (drx_dv_B * NA_x + dry_dv_B * NA_y + drz_dv_B * NA_z) * rho0 * tau_m_2 * rho0 / dt * u_BDF
             + tau_c * NAxNBy );
 
         Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * ( vis_mu * NAzNBx 
-            + velo_NG_dot_gradR * rho0 * tau_m * drx_dw_B
-            - NA * rho0 * tau_m * (drx_dw_B * u_x_NG + dry_dw_B * u_y_NG + drz_dw_B * u_z_NG)
-            - r_hat_dot_gradR * rho0 * tau_m_2 * drx_tilde_dw_B
-            + (drx_dw_B * NA_x + dry_dw_B * NA_y + drz_dw_B * NA_z) * rho0 * tau_m_2 * rho0/ dt * u_BDF
             + tau_c * NAxNBz );
 
         // Momentum-y with respect to p, u, v, w
-        Tangent[4*nLocBas*(4*A+2)+4*B] += gwts * ( (-1.0) * NAyNB
-            + velo_NG_dot_gradR * rho0 * tau_m * NB_y
-            - NA * rho0 * tau_m * ( NB_x * v_x_NG + NB_y * v_y_NG + NB_z * v_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 *  NB_y
-            + (NAxNBx + NAyNBy + NAzNBz) * rho0 * tau_m_2 * rho0 /dt * v_BDF );
-
+        Tangent[4*nLocBas*(4*A+2)+4*B] += gwts * (-1.0) * NAyNB;
+          
         Tangent[4*nLocBas*(4*A+2)+4*B+1] += gwts * ( vis_mu * NAxNBy
-            + velo_NG_dot_gradR * rho0 * tau_m * dry_du_B
-            - NA * rho0 * tau_m * ( drx_du_B * v_x_NG + dry_du_B * v_y_NG + drz_du_B * v_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * dry_tilde_du_B
-            + (drx_du_B * NA_x + dry_du_B * NA_y + drz_du_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
             + tau_c * NAyNBx );
 
          Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * ( rho0 /dt * alpha_sig  * NANB
-            + NA * rho0 * velo_NG_dot_gradNB + vis_mu * (NAxNBx + 2.0*NAyNBy + NAzNBz)
-            + velo_NG_dot_gradR * rho0 * tau_m * dry_dv_B
-            - NA * rho0 * tau_m * ( drx_dv_B * v_x_NG + dry_dv_B * v_y_NG + drz_dv_B * v_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * ( dry_tilde_dv_B + rho0/dt * alpha_sig * NB)
-            + (drx_dv_B * NA_x + dry_dv_B * NA_y + drz_dv_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
+            + vis_mu * (NAxNBx + 2.0*NAyNBy + NAzNBz)
             + tau_c * NAyNBy );  
 
         Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * ( vis_mu * NAzNBy
-            + velo_NG_dot_gradR * rho0 * tau_m * dry_dw_B
-            - NA * rho0 * tau_m * ( drx_dw_B * v_x_NG + dry_dw_B * v_y_NG + drz_dw_B * v_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * dry_tilde_dw_B
-            + (drx_dw_B * NA_x + dry_dw_B * NA_y + drz_dw_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * v_BDF
             + tau_c * NAyNBz );
 
         // Momentum-z with respect to p, u, v, w
-        Tangent[4*nLocBas*(4*A+3)+4*B] += gwts * ( (-1.0) * NAzNB
-            + velo_NG_dot_gradR * rho0 * tau_m * NB_z
-            - NA * rho0 * tau_m * ( NB_x * w_x_NG + NB_y * w_y_NG + NB_z * w_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2  * NB_z
-            + (NAxNBx + NAyNBy + NAzNBz) * rho0 * tau_m_2 * rho0 /dt * w_BDF );
+        Tangent[4*nLocBas*(4*A+3)+4*B] += gwts *  (-1.0) * NAzNB;
 
         Tangent[4*nLocBas*(4*A+3)+4*B+1] += gwts * ( vis_mu * NAxNBz
-            + velo_NG_dot_gradR * rho0 * tau_m * drz_du_B
-            - NA * rho0 * tau_m * ( drx_du_B * w_x_NG + dry_du_B * w_y_NG + drz_du_B * w_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * drz_tilde_du_B
-            + (drx_du_B * NA_x + dry_du_B * NA_y + drz_du_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
             + tau_c * NAzNBx );
 
         Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * ( vis_mu * NAyNBz
-            + velo_NG_dot_gradR * rho0 * tau_m * drz_dv_B
-            - NA * rho0 * tau_m * ( drx_dv_B * w_x_NG + dry_dv_B * w_y_NG + drz_dv_B * w_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * drz_tilde_dv_B
-            + (drx_dv_B * NA_x + dry_dv_B * NA_y + drz_dv_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
             + tau_c * NAzNBy );
 
         Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * ( rho0 /dt * alpha_sig  * NANB
-            + NA * rho0 * velo_NG_dot_gradNB + vis_mu * (NAxNBx + NAyNBy + 2.0*NAzNBz)
-            + velo_NG_dot_gradR * rho0 * tau_m * drz_dw_B
-            - NA * rho0 * tau_m * ( drx_dw_B * w_x_NG + dry_dw_B * w_y_NG + drz_dw_B * w_z_NG )
-            - r_hat_dot_gradR * rho0 * tau_m_2 * (drz_tilde_dw_B + rho0/dt * alpha_sig * NB)
-            + (drx_dw_B * NA_x + dry_dw_B * NA_y + drz_dw_B * NA_z ) * rho0 * tau_m_2 * rho0/dt * w_BDF
+            + vis_mu * (NAxNBx + NAyNBy + 2.0*NAzNBz)
             + tau_c * NAzNBz );
 
       } // B-loop
