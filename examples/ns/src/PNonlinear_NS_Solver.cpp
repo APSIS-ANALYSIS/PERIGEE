@@ -48,6 +48,7 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
+
 void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
@@ -95,6 +96,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
+  // Gen-alpha parameters
   const double gamma   = tmga_ptr->get_gamma();
   const double alpha_m = tmga_ptr->get_alpha_m();
   const double alpha_f = tmga_ptr->get_alpha_f();
@@ -242,6 +244,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
   else conv_flag = false;
 }
+
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
