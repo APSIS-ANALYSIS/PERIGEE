@@ -3,7 +3,7 @@
 // ============================================================================
 // Tensor2_3D.hpp
 // This is a 2nd-order tensor in 3D. The components are stored in a 1-D array: 
-// mat[9]. Logically, the matrix is 
+// mat[9]. Logically, the tensor components are organized as 
 //
 //                   mat[0], mat[1], mat[2]
 //                   mat[3], mat[4], mat[5]
@@ -201,13 +201,13 @@ class Tensor2_3D
     void MatMultTransposeRight( const Tensor2_3D &source );
 
     // ------------------------------------------------------------------------
-    // Matrix contraction
+    // Contraction
     // return mat_ij source_ij
     // ------------------------------------------------------------------------
     double MatContraction( const Tensor2_3D &source ) const;
 
     // ------------------------------------------------------------------------
-    // Contraction with the transposed input
+    // Contraction with the transpose of the input
     // return mat_ij source_ji
     // ------------------------------------------------------------------------
     double MatTContraction( const Tensor2_3D &source ) const;
@@ -224,15 +224,14 @@ class Tensor2_3D
     // ------------------------------------------------------------------------
     // Eigen decomposition of the matrix 
     // M = eta1 v1 v1T + eta2 v2 v2T + eta3 v3 v3T. 
-    // The algorithm is based on CMAME 197 2008 4007-4015 paper by W.M. Scherzinger
-    // and C.R. Dohrmann.
     // This function will
     // return 1 if the three eigenvalues are the same
     // return 2 if there are two identical eigenvalues, the most distinct one is
-    // eta_1 and eta_1's associated eigenvector is v1
+    //          eta_1 and eta_1's associated eigenvector is v1
     // return 3 if all three are distinct
-    // Note: this function is applicable to symmetric tensors only. Yet, we do
-    // not perform symmetry check within this function.
+    // Reference: CMAME 197 2008 4007-4015 by W.M. Scherzinger and C.R. Dohrmann.
+    // Note: this function is applicable to symmetric tensors only. However, we 
+    // do not perform symmetry check within this function.
     // ------------------------------------------------------------------------
     int eigen_decomp( double &eta1, double &eta2, double &eta3,
        Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
