@@ -14,12 +14,22 @@ class Mesh_FEM : public IMesh
   public:
     // Constructor
     // Assumes the polyminal degree is uniform
-    Mesh_FEM(const int &in_nfunc, const int &in_nelem, 
-        const int &in_nlocbas, const int &in_deg);
+    Mesh_FEM(const int &in_nfunc, const int &in_nelem, const int &in_nlocbas, 
+        const int &in_deg) : nFunc(in_nfunc), nElem(in_nelem), 
+    nLocBas(in_nlocbas), sdeg(in_deg), tdeg(in_deg), udeg(in_deg) {}
 
     virtual ~Mesh_FEM() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      std::cout<<'\n';
+      std::cout<<"======= Mesh_FEM ======="<<std::endl;
+      std::cout<<"Degree: "<<get_s_degree()<<'\t'<<get_t_degree()<<'\t'<<get_u_degree()<<std::endl;
+      std::cout<<"Total Elem: "<<get_nElem()<<std::endl;
+      std::cout<<"Total Func: "<<get_nFunc()<<std::endl;
+      std::cout<<"Local Basis #: "<<get_nLocBas()<<std::endl;
+      std::cout<<"========================="<<std::endl;
+    }
 
     virtual int get_s_degree() const {return sdeg;}
     virtual int get_t_degree() const {return tdeg;}
