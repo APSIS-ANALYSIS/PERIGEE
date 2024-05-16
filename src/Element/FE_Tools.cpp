@@ -558,7 +558,7 @@ namespace FE_T
       switch(face_id)
       {
         case 0: // u = 0 : node1 = node0', node2 = node1', node3 = node2'       //      t                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      3                                     2'
             qp[4*ii + 0] = lower_rule->get_qp(ii, 2);  // r = t'                //      |  `.                     map         |  `.  
             qp[4*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
@@ -567,7 +567,7 @@ namespace FE_T
           break;                                                                //  (r) 1 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
         
         case 1: // r = 0 : node0 = node0', node3 = node1', node2 = node2'       //      s                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      2                                     2'
             qp[4*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                //      |  `.                     map         |  `.
             qp[4*ii + 2] = lower_rule->get_qp(ii, 0);  // t = r'                //      |     `.                 <----        |     `.
@@ -576,7 +576,7 @@ namespace FE_T
           break;                                                                //  (u) 0 - - - - - - 3 - - -> t         (t') 0'- - - - - - 1'- - -> r'
 
         case 2: // s = 0 : node0 = node0', node1 = node1', node3 = node2'       //      t                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      3                                     2'
             qp[4*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                //      |  `.                     map         |  `.
             qp[4*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                //      |     `.                 <----        |     `.
@@ -585,7 +585,7 @@ namespace FE_T
           break;                                                                //  (u) 0 - - - - - - 1 - - -> r         (t') 0'- - - - - - 1'- - -> r'
 
         case 3: // t = 0 : node0 = node0', node2 = node1', node1 = node2'       //      r                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)    //      ^                                     ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      1                                     2'
             qp[4*ii + 0] = lower_rule->get_qp(ii, 1);  // r = s'                //      |  `.                     map         |  `.
             qp[4*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
@@ -630,7 +630,7 @@ namespace FE_T
       switch(face_id)
       {
         case 0: // t = 0 : node0 = node0', node3 = node1', node2 = node2', node1 = node3' //    r                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = lower_rule->get_qp(ii, 1);  // r = s'                          //    1 -------- 2               3'-------- 2'
             qp[3*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                          //    |          |        map    |          |
@@ -639,7 +639,7 @@ namespace FE_T
           break;                                                                          //    0 -------- 3 - -> s        0'-------- 1'- -> r'
 
         case 1: // t = 1 : node4 = node0', node5 = node1', node6 = node2', node7 = node3' //    s                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                          //    7 -------- 6               3'-------- 2'
             qp[3*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
@@ -648,7 +648,7 @@ namespace FE_T
           break;                                                                          //    4 -------- 5 - -> r        0'-------- 1'- -> r'
         
         case 2: // s = 0 : node0 = node0', node1 = node1', node5 = node2', node4 = node3' //    t                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                          //    4 -------- 5               3'-------- 2'
             qp[3*ii + 1] = 0.0;                        // s = 0                           //    |          |        map    |          |
@@ -657,7 +657,7 @@ namespace FE_T
           break;                                                                          //    0 -------- 1 - -> r        0'-------- 1'- -> r'
 
         case 3: // r = 1 : node1 = node0', node2 = node1', node6 = node2', node5 = node3' //    t                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = 1.0;                        // r = 1                           //    5 -------- 6               3'-------- 2'
             qp[3*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                          //    |          |        map    |          |
@@ -666,7 +666,7 @@ namespace FE_T
           break;                                                                          //    1 -------- 2 - -> s        0'-------- 1'- -> r'
 
         case 4: // s = 1 : node3 = node0', node7 = node1', node6 = node2', node2 = node3' //    r                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = lower_rule->get_qp(ii, 1);  // r = s'                          //    2 -------- 6               3'-------- 2'
             qp[3*ii + 1] = 1.0;                        // s = 1                           //    |          |        map    |          |
@@ -675,7 +675,7 @@ namespace FE_T
           break;                                                                          //    3 -------- 7 - -> t        0'-------- 1'- -> r'
         
         case 5: // r = 0 : node0 = node0', node4 = node1', node7 = node2', node3 = node3' //    s                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)              //    ^                          ^
+          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = 0.0;                        // r = 0                           //    3 -------- 7               3'-------- 2'
             qp[3*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
