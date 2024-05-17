@@ -15,7 +15,7 @@ class Mesh_Tet : public IMesh
 {
   public:
     Mesh_Tet(const int &in_nFunc, const int &in_nElem, 
-        const int &in_deg) : nFunc(in_nfunc), nElem(in_nelem), deg(in_deg)
+        const int &in_deg) : nFunc(in_nFunc), nElem(in_nElem), deg(in_deg)
 {
   switch(deg)
   {
