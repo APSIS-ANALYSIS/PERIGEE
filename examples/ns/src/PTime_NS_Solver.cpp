@@ -122,7 +122,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
 
-    sol_base->randomly_perturbed(0.005);
+    // If add perturbation at the inlet with given turbulence intensity
+    // sol_base->randomly_perturbed(0.005);
 
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
