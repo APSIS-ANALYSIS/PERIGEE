@@ -1,8 +1,7 @@
 #include "IEN_Gmsh.hpp"
 
 IEN_Gmsh::IEN_Gmsh( const int &in_nelem, const int &in_nlocbas,
-            const std::vector<int> &in_ien )
-: nElem(in_nelem), nLocBas(in_nlocbas)
+    const std::vector<int> &in_ien ) : nElem(in_nelem), nLocBas(in_nlocbas)
 {
   IEN = new int [nElem * nLocBas];
 
@@ -12,7 +11,7 @@ IEN_Gmsh::IEN_Gmsh( const int &in_nelem, const int &in_nlocbas,
 
 IEN_Gmsh::~IEN_Gmsh()
 {
-  delete [] IEN; IEN = NULL;
+  delete [] IEN; IEN = nullptr;
 }
 
 int IEN_Gmsh::get_IEN( const int &ee, const int &l_node ) const
