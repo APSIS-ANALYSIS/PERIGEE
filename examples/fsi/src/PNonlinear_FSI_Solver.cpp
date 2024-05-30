@@ -125,7 +125,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const Tissue_prestress * const &ps_ptr,
     const Tissue_property * const &tp_ptr,
     IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
+    IPLocAssem_2x2Block ** const &lassem_solid_ptr,
     IPLocAssem * const &lassem_mesh_ptr,
     IPGAssem * const &gassem_ptr,
     IPGAssem * const &gassem_mesh_ptr,

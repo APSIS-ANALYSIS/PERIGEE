@@ -18,7 +18,7 @@ class PGAssem_FSI : public IPGAssem
   public:
     PGAssem_FSI( 
         IPLocAssem_2x2Block * const &locassem_f_ptr,
-        IPLocAssem_2x2Block * const &locassem_s_ptr,
+        IPLocAssem_2x2Block ** const &locassem_s_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
         const ALocal_Elem * const &alelem_ptr,
@@ -30,6 +30,7 @@ class PGAssem_FSI : public IPGAssem
         const ALocal_NBC * const &part_nbc_p,
         const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
+        const int &in_num_layer,
         const int &in_nz_estimate = 60 );
 
     virtual ~PGAssem_FSI();
@@ -37,7 +38,7 @@ class PGAssem_FSI : public IPGAssem
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_v,
@@ -54,7 +55,7 @@ class PGAssem_FSI : public IPGAssem
         const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -81,7 +82,7 @@ class PGAssem_FSI : public IPGAssem
         const PDNSolution * const &disp_np1,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -109,7 +110,7 @@ class PGAssem_FSI : public IPGAssem
         const PDNSolution * const &disp_np1,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -164,7 +165,7 @@ class PGAssem_FSI : public IPGAssem
         const int &nbc_id );
 
   private:
-    const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
+    const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p, num_layer;
 
     void EssBC_KG( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
 
