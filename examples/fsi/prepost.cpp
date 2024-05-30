@@ -38,9 +38,10 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
+  const int num_layer = cmd_h5r -> read_intScalar("/", "num_layer");
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string geo_s_file = cmd_h5r -> read_string("/", "geo_s_file");
-  const std::string sur_s_file_interior_wall = cmd_h5r -> read_string("/", "sur_s_file_interior_wall");
+  const std::string sur_s_file_interior_wall_base = cmd_h5r -> read_string("/", "sur_s_file_interior_wall_base");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
@@ -67,9 +68,10 @@ int main( int argc, char * argv[] )
   if(isDualGraph) cout<<" -is_dualgraph: true \n";
   else cout<<" -is_dualgraph: false \n";
   cout<<"----------------------------------\n";
+  cout<<"num_layer: "<<num_layer<<endl;
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"geo_s_file: "<<geo_s_file<<endl;
-  cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<endl;
+  cout<<"sur_s_file_interior_wall_base: "<<sur_s_file_interior_wall_base<<endl;
   cout<<"elemType: "<<elemType<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
@@ -91,10 +93,27 @@ int main( int argc, char * argv[] )
   // mapped to a new value by the following rule. The ii-th node in the
   // interface wall node will be assgiend to nFunc_v + ii.
   // Read the F-S interface vtp file
-  const std::vector<int> wall_node_id = VTK_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
+  std::vector< std::string > sur_s_file_interior_wall_in( num_layer );
+  std::vector<std::vector<int>> wall_node_id( num_layer );
+  std::vector<int> nFunc_interface( num_layer );
+  std::vector<int> layer_offset( num_layer );
+  int nFunc_p = nFunc_v;
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    sur_s_file_interior_wall_in[ii] = SYS_T::gen_capfile_name( sur_s_file_interior_wall_base, ii, ".vtp");
 
-  const int nFunc_interface = static_cast<int>( wall_node_id.size() );
-  const int nFunc_p = nFunc_v + nFunc_interface;
+    SYS_T::file_check(sur_s_file_interior_wall_in[ii]);
+    std::cout<<sur_s_file_interior_wall_in[ii]<<" found. \n";
+
+    wall_node_id[ii] = VTK_T::read_int_PointData( sur_s_file_interior_wall_in[ii], "GlobalNodeID" );
+    nFunc_interface[ii] = static_cast<int>( wall_node_id[ii].size() );
+    nFunc_p += nFunc_interface[ii];
+  }
+  layer_offset[0] = 0;
+  for(int ii=1; ii<num_layer; ++ii)
+  {
+    layer_offset[ii] = nFunc_interface[ii-1];
+  }
 
   // We will generate a new IEN array for the pressure variable by updating the
   // IEN for the solid element. If the solid element has node on the fluid-solid
@@ -103,24 +122,25 @@ int main( int argc, char * argv[] )
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    if(phy_tag[ee] == 1)
+    if(phy_tag[ee] >= 1)
     {
+      const int layer_num = phy_tag[ee] - 1;
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
       if(elemType == 501)
       {  
         for(int ii=0; ii<4; ++ii)
         {
-          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4+ii] );
-          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;
+          const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*4+ii] );
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + layer_offset[layer_num] + pos;
         }
       }
       else if(elemType == 601)
       {
         for(int ii=0; ii<8; ++ii)
         {
-          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8+ii] );
-          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+          const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*8+ii] );
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + layer_offset[layer_num] + pos;     
         }
       }
       else
@@ -231,7 +251,9 @@ int main( int argc, char * argv[] )
 
   std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
-  std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
+  std::cout<<"Fluid-Solid interface: "<<nFunc_interface[0]<<" nodes.\n";
+  for(int ii=1; ii<num_layer; ++ii)
+    std::cout<<"Solid"<<ii<<"-Solid"<<ii+1<<" interface: "<<nFunc_interface[ii]<<" nodes.\n";
 
   // --------------------------------------------------------------------------
   // Read the geometry file for the solid domain, generate the list of direction
