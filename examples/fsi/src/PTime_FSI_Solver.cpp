@@ -316,7 +316,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     const IQuadPts * const &quad_s,
     Tissue_prestress * const &ps_ptr,
     const Tissue_property * const &tp_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
+    IPLocAssem_2x2Block ** const &lassem_solid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
     const PNonlinear_FSI_Solver * const &nsolver_ptr ) const

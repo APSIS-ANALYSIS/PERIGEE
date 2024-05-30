@@ -3,7 +3,7 @@
 Tissue_prestress::Tissue_prestress( 
     const ALocal_Elem * const &locelem, const int &in_nqp_tet, 
     const int &in_cpu_rank, const bool &load_from_file,
-    const std::string &in_ps_fName )
+    const int &num_layer, const std::string &in_ps_fName )
 : cpu_rank( in_cpu_rank ), nlocalele(locelem->get_nlocalele()), nqp(in_nqp_tet),
   ps_fileBaseName( in_ps_fName )
 {
@@ -13,13 +13,13 @@ Tissue_prestress::Tissue_prestress(
   for(int ee=0; ee<nlocalele; ++ee)
   {
     if( locelem->get_elem_tag(ee) == 0 ) qua_prestress[ee].clear();
-    else if( locelem->get_elem_tag(ee) == 1 )
+    else if( > 0 && locelem->get_elem_tag(ee) <= num_layer )
     {
       qua_prestress[ee].resize(nqp * 6);
       counter_elem_s += 1;
     }
     else
-      SYS_T::print_fatal("Error: element tag should be 0 (fluid) or 1 (solid).\n");
+      SYS_T::print_fatal("Error: element tag is wrong.\n");
   }
 
   // Assign the value of qua_prestress data structure
@@ -53,7 +53,7 @@ Tissue_prestress::Tissue_prestress(
       int offset = 0;
       for(int ee=0; ee<nlocalele; ++ee)
       {
-        if( locelem -> get_elem_tag(ee) == 1 )
+        if( locelem -> get_elem_tag(ee) > 0 )
         {
           for(int ii=0; ii<6*nqp; ++ii)
             qua_prestress[ee][ii] = qua_ps_array[ offset + ii ];

@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
 
   const int nqp_sur { (GMIptr->get_elemType() == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
+  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, num_layer, "./ps_data/prestress");
 
   Tissue_property * tp_data = new Tissue_property(part_v_file, rank);
 
@@ -528,8 +528,9 @@ int main(int argc, char *argv[])
   
   for (int ii=0; ii<num_layer; ++ii)
   {
-  if( solid_nu[ii] == 0.5 )
-  {
+    SYS_T::commPrint("Material model of solid %d :\n", ii);
+    if( solid_nu[ii] == 0.5 )
+    {
       matmodel[ii] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[ii], solid_mu[ii],
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
     
@@ -537,9 +538,9 @@ int main(int argc, char *argv[])
 
       locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-  }
-  else
-  {
+    }
+    else
+    {
       matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
 
@@ -550,9 +551,6 @@ int main(int argc, char *argv[])
     }
 
     std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
-    std::string print_string = "Material model of solid " + std::to_string(ii) + " :\n";
-    SYS_T::commPrint(print_string.c_str());
-    matmodel[ii] -> print_info();
     matmodel[ii] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
   }
   // Pseudo elastic mesh motion

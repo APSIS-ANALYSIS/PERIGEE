@@ -14,7 +14,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
 {
   public:
     PGAssem_Wall_Prestress( 
-        IPLocAssem_2x2Block * const &locassem_s_ptr,
+        IPLocAssem_2x2Block ** const &locassem_s_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_v,
         const ALocal_IEN * const &aien_p,
@@ -23,13 +23,14 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const ALocal_NBC * const &part_nbc_v,
         const ALocal_NBC * const &part_nbc_p,
         const ALocal_EBC * const &part_ebc,
+        const int &in_num_layer,
         const int &in_nz_estimate = 60 );
 
     virtual ~PGAssem_Wall_Prestress();
 
     virtual void Assem_nonzero_estimate(
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         const ALocal_IEN * const &lien_v,
         const ALocal_IEN * const &lien_p,
         const ALocal_NBC * const &nbc_v,
@@ -45,7 +46,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &velo,
         const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -70,7 +71,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &velo,
         const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_v,
@@ -89,7 +90,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
+        IPLocAssem_2x2Block ** const &lassem_s_ptr,
         FEAElement * const &elementv,
         const IQuadPts * const &quadv,
         const ALocal_IEN * const &lien_v,
@@ -99,7 +100,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
 	const Tissue_property * const &tp_ptr ) const;
 
   private:
-    const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
+    const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p, num_layer;
 
     void EssBC_KG( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
 
