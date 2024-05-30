@@ -55,18 +55,19 @@ int main( int argc, char * argv[] )
   const int ringBC_type                       = paras["ringBC_type"].as<int>();
   const int num_inlet                         = paras["num_inlet"].as<int>();
   const int num_outlet                        = paras["num_outlet"].as<int>();
+  const int num_layer                         = paras["num_layer"].as<int>();
   const std::string geo_file                  = paras["geo_file"].as<std::string>();
   const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
-  const std::string geo_s_file                = paras["geo_s_file"].as<std::string>();
+  const std::string geo_s_file_base           = paras["geo_s_file_base"].as<std::string>();
 
   const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
   const std::string sur_f_file_in_base        = paras["sur_f_file_in_base"].as<std::string>();
   const std::string sur_f_file_out_base       = paras["sur_f_file_out_base"].as<std::string>();
 
-  const std::string sur_s_file_interior_wall  = paras["sur_s_file_interior_wall"].as<std::string>();
-  const std::string sur_s_file_wall           = paras["sur_s_file_wall"].as<std::string>();
-  const std::string sur_s_file_in_base        = paras["sur_s_file_in_base"].as<std::string>();
-  const std::string sur_s_file_out_base       = paras["sur_s_file_out_base"].as<std::string>();
+  const std::string sur_s_file_interior_wall_base    = paras["sur_s_file_interior_wall_base"].as<std::string>();
+  const std::string sur_s_file_wall_base             = paras["sur_s_file_wall_base"].as<std::string>();
+  const std::vector<std::string> sur_s_file_in_base  = paras["sur_s_file_in_base"].as<std::vector<std::string>>();
+  const std::vector<std::string> sur_s_file_out_base = paras["sur_s_file_out_base"].as<std::vector<std::string>>();
 
   const std::string part_file_p               = paras["part_file_p"].as<std::string>();
   const std::string part_file_v               = paras["part_file_v"].as<std::string>();
@@ -90,14 +91,17 @@ int main( int argc, char * argv[] )
   std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
-  std::cout<<" -geo_s_file: "         <<geo_s_file         <<std::endl;
+  std::cout<<" -geo_s_file_base: "    <<geo_s_file_base    <<std::endl;
   std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
-  std::cout<<" -sur_s_file_wall: "    <<sur_s_file_wall    <<std::endl;
-  std::cout<<" -sur_s_file_int_wall: "<<sur_s_file_interior_wall <<std::endl;
+  std::cout<<" -sur_s_file_wall_base: " <<sur_s_file_wall_base <<std::endl;
+  std::cout<<" -sur_s_file_int_wall_base: " <<sur_s_file_interior_wall_base <<std::endl;
   std::cout<<" -sur_f_file_in_base: " <<sur_f_file_in_base <<std::endl;
   std::cout<<" -sur_f_file_out_base: "<<sur_f_file_out_base<<std::endl;
-  std::cout<<" -sur_s_file_in_base: " <<sur_s_file_in_base <<std::endl;
-  std::cout<<" -sur_s_file_out_base: "<<sur_s_file_out_base<<std::endl;
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    std::cout<<" -sur_s_file_in_base: "  << "layer " << ii << " : " <<sur_s_file_in_base[ii]  <<std::endl;
+    std::cout<<" -sur_s_file_out_base: " << "layer " << ii << " : " <<sur_s_file_out_base[ii] <<std::endl;
+  }
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   if(isDualGraph) std::cout<<" -isDualGraph: true \n";
@@ -118,47 +122,78 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(geo_f_file); std::cout<<geo_f_file<<" found. \n";
 
-  SYS_T::file_check(geo_s_file); std::cout<<geo_s_file<<" found. \n";
+  std::vector< std::string > geo_s_file_in( num_layer );
+
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    geo_s_file_in[ii] = SYS_T::gen_capfile_name( geo_s_file_base, ii, ".vtu" );
+    SYS_T::file_check(geo_s_file_in[ii]); 
+    std::cout<<geo_s_file_in[ii]<<" found. \n";
+  }
 
   SYS_T::file_check(sur_f_file_wall); std::cout<<sur_f_file_wall<<" found. \n";
 
-  SYS_T::file_check(sur_s_file_wall); std::cout<<sur_s_file_wall<<" found. \n";
+  std::vector< std::string > sur_s_file_wall_in( num_layer );
+  std::vector< std::string > sur_s_file_interior_wall_in( num_layer );
 
-  SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    sur_s_file_wall_in[ii] = SYS_T::gen_capfile_name( sur_s_file_wall_base, ii, ".vtp" );
+    sur_s_file_interior_wall_in[ii] = SYS_T::gen_capfile_name( sur_s_file_interior_wall_base, ii, ".vtp");
 
-  std::vector< std::string > sur_f_file_in(  num_inlet ) , sur_s_file_in(  num_inlet );
-  std::vector< std::string > sur_f_file_out( num_outlet ), sur_s_file_out( num_outlet );
+    SYS_T::file_check(sur_s_file_wall_in[ii]); 
+    std::cout<<sur_s_file_wall_in[ii]<<" found. \n";
+    SYS_T::file_check(sur_s_file_interior_wall_in[ii]);
+    std::cout<<sur_s_file_interior_wall_in[ii]<<" found. \n";
+  }
+
+  std::vector< std::string > sur_f_file_in(  num_inlet ) , sur_s_file_in(  num_inlet * num_layer );
+  std::vector< std::string > sur_f_file_out( num_outlet ), sur_s_file_out( num_outlet * num_layer );
 
   for(int ii=0; ii<num_inlet; ++ii)
   {
     sur_f_file_in[ii] = SYS_T::gen_capfile_name( sur_f_file_in_base, ii, ".vtp" );
-    sur_s_file_in[ii] = SYS_T::gen_capfile_name( sur_s_file_in_base, ii, ".vtp" );
-
     SYS_T::file_check( sur_f_file_in[ii] );
     std::cout<<sur_f_file_in[ii]<<" found. \n";
-    SYS_T::file_check( sur_s_file_in[ii] );
-    std::cout<<sur_s_file_in[ii]<<" found. \n";
+
+    for(int jj=0; jj<num_layer; ++jj)
+    {
+      sur_s_file_in[ii*num_layer+jj] = SYS_T::gen_capfile_name( sur_s_file_in_base[jj], ii, ".vtp" );
+      SYS_T::file_check( sur_s_file_in[ii*num_layer+jj] );
+      std::cout<<sur_s_file_in[ii*num_layer+jj]<<" found. \n";
+    }
   }
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
     sur_f_file_out[ii] = SYS_T::gen_capfile_name( sur_f_file_out_base, ii, ".vtp" );
-    sur_s_file_out[ii] = SYS_T::gen_capfile_name( sur_s_file_out_base, ii, ".vtp" );
-
     SYS_T::file_check( sur_f_file_out[ii] );
     std::cout<<sur_f_file_out[ii]<<" found. \n";
-    SYS_T::file_check( sur_s_file_out[ii] );
-    std::cout<<sur_s_file_out[ii]<<" found. \n";
+
+    for(int jj=0; jj<num_layer; ++jj)
+    {
+      sur_s_file_out[ii*num_layer+jj] = SYS_T::gen_capfile_name( sur_s_file_out_base[jj], ii, ".vtp" );
+      SYS_T::file_check( sur_s_file_out[ii*num_layer+jj] );
+      std::cout<<sur_s_file_out[ii*num_layer+jj]<<" found. \n"; 
+    }
   }
 
   // If we can still detect additional files on disk, throw an warning
-  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) ||
-      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_inlet, ".vtp")) )
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) )
     cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base[ii], num_inlet, ".vtp")) )
+    cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
+  }
 
-  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
-      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base, num_outlet, ".vtp")) )
+  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) )
     cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base[ii], num_outlet, ".vtp")) )
+    cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+  }
 
   // ----- Write the input argument into a HDF5 file
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
@@ -172,14 +207,22 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("elemType",         elemType);
   cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
   cmdh5w->write_intScalar("ringBC_type",      ringBC_type);
+  cmdh5w->write_intScalar("num_layer", num_layer);
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
-  cmdh5w->write_string("geo_s_file",          geo_s_file);
+  cmdh5w->write_string("geo_s_file_base",     geo_s_file_base);
   cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
-  cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
-  cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
-  cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
-  cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    std::string sur_s_file_in_base_name( "sur_s_file_in_base_" );
+    std::string sur_s_file_out_base_name( "sur_s_file_out_base_" );
+    sur_s_file_in_base_name.append(std::to_string(ii));
+    sur_s_file_out_base_name.append(std::to_string(ii));
+    cmdh5w->write_string(sur_s_file_in_base_name.c_str(), sur_s_file_in_base[ii]);
+    cmdh5w->write_string(sur_s_file_out_base_name.c_str(), sur_s_file_out_base[ii]);
+  }
+  cmdh5w->write_string("sur_s_file_wall_base",           sur_s_file_wall_base);
+  cmdh5w->write_string("sur_s_file_interior_wall_base",  sur_s_file_interior_wall_base);
   cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
   cmdh5w->write_string("sur_s_file_interior_wall", sur_s_file_interior_wall);
   cmdh5w->write_string("part_file_p",         part_file_p);
@@ -202,7 +245,12 @@ int main( int argc, char * argv[] )
 
   for(unsigned int ii=0; ii<phy_tag.size(); ++ii)
   {
-    if(phy_tag[ii] != 0 && phy_tag[ii] != 1) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 (fluid domain) or 1 (solid domain).\n");
+    bool isRightTag = false;
+    for(int jj=0; jj<=num_layer; ++jj)
+    {
+      if(phy_tag[ii] == jj) isRightTag = true;
+    }
+    if(!isRightTag) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 (fluid domain) or 1 (solid1 domain) or 2 (solid2 domain).\n");
   }
 
   // Generate IEN
@@ -213,10 +261,21 @@ int main( int argc, char * argv[] )
   // mapped to a new value by the following rule. The ii-th node in the
   // interface wall node will be assgiend to nFunc_v + ii. 
   // Read the F-S interface vtp file
-  const std::vector<int> wall_node_id = VTK_T::read_int_PointData( sur_s_file_interior_wall, "GlobalNodeID" );
-
-  const int nFunc_interface = static_cast<int>( wall_node_id.size() );
-  const int nFunc_p = nFunc_v + nFunc_interface;
+  std::vector<std::vector<int>> wall_node_id( num_layer );
+  std::vector<int> nFunc_interface( num_layer );
+  std::vector<int> layer_offset( num_layer );
+  int nFunc_p = nFunc_v;
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    wall_node_id[ii] = VTK_T::read_int_PointData( sur_s_file_interior_wall_in[ii], "GlobalNodeID" );
+    nFunc_interface[ii] = static_cast<int>( wall_node_id[ii].size() );
+    nFunc_p += nFunc_interface[ii];
+  }
+  layer_offset[0] = 0;
+  for(int ii=1; ii<num_layer; ++ii)
+  {
+    layer_offset[ii] = nFunc_interface[ii-1];
+  }
 
   // We will generate a new IEN array for the pressure variable by updating the
   // IEN for the solid element. If the solid element has node on the fluid-solid
@@ -225,24 +284,25 @@ int main( int argc, char * argv[] )
   PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nElem; ++ee)
   {
-    if(phy_tag[ee] == 1)
+    if(phy_tag[ee] >= 1)
     {
+      const int layer_num = phy_tag[ee] - 1;
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
       if(elemType == 501)
       {
         for(int ii=0; ii<4; ++ii)
         {
-          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*4+ii] );
-          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
+          const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*4+ii] );
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + layer_offset[num_layer] + pos;     
         }
       }
       else if(elemType == 601)
       {
         for(int ii=0; ii<8; ++ii)
         {
-          const int pos = VEC_T::get_pos( wall_node_id, vecIEN_p[ee*8+ii] );
-          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + pos;     
+          const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*8+ii] );
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + layer_offset[num_layer] + pos;     
         }
       }
       else
@@ -392,7 +452,9 @@ int main( int argc, char * argv[] )
 
   std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
-  std::cout<<"Fluid-Solid interface: "<<nFunc_interface<<" nodes.\n";
+  std::cout<<"Fluid-Solid interface: "<<nFunc_interface[0]<<" nodes.\n";
+  for(int ii=1; ii<num_layer; ++ii)
+    std::cout<<"Solid"<<ii<<"-Solid"<<ii+1<<" interface: "<<nFunc_interface[ii]<<" nodes.\n";
 
   // --------------------------------------------------------------------------
   // Read the geometry file for the solid domain, generate the list of direction
@@ -495,15 +557,15 @@ int main( int argc, char * argv[] )
   NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
   for( int ii=0; ii<3; ++ii )
-    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
-        sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
+    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file_in, sur_f_file_wall, 
+        sur_s_file_wall_in, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
         nFunc_v, ii, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
-  std::vector<std::string> meshdir_file_list { geo_s_file };
+  std::vector<std::string> meshdir_file_list = geo_s_file_in;
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
