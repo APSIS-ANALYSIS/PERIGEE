@@ -69,7 +69,7 @@ class VTK_Writer_FSI
     	const std::vector<int> &sien,
     	const ALocal_Elem * const &lelem_ptr,
     	const IVisDataPrep * const &vdata_ptr,
-	IMaterialModel * const &matmodel,
+	IMaterialModel ** const &matmodel,
     	FEAElement * const &elemptr,
     	const IQuadPts * const &quad,
 	const Tissue_property * const &tp_ptr,

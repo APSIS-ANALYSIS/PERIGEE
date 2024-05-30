@@ -534,7 +534,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
     const std::vector<int> &sien,
     const ALocal_Elem * const &lelem_ptr,
     const IVisDataPrep * const &vdata_ptr,
-    IMaterialModel * const &matmodel,
+    IMaterialModel ** const &matmodel,
     FEAElement * const &elemptr,
     const IQuadPts * const &quad,
     const Tissue_property * const &tp_ptr,
@@ -591,8 +591,10 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    if( lelem_ptr->get_elem_tag(ee) == 1 )
+    int phy_tag = lelem_ptr->get_elem_tag(ee);
+    if( phy_tag >= 1 )
     {
+      --phy_tag;
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
@@ -651,7 +653,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
       // Interpolate von Mises stress
       interpolateVonStress( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], ebasis_r, ebasis_c, ebasis_l, 
-          inputInfo_d, inputInfo_p, elemptr, matmodel, dataVecs[4] );
+          inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
       
       // Interpolate the velocity vector
       std::vector<double> inputInfo_v; inputInfo_v.clear();
@@ -774,7 +776,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    if( lelem_ptr->get_elem_tag(ee) == 1 )
+    if( lelem_ptr->get_elem_tag(ee) >= 1 )
     {
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);

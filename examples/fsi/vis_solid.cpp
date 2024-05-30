@@ -42,18 +42,29 @@ int main ( int argc , char * argv[] )
   bool isClean = true;
 
   // Solid properties
-  bool is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
-  double solid_density = 1.0;
-  double solid_E = 2.0e6;
-  double solid_nu = 0.5;
-  double solid_mu = 6.67e5;
-  double solid_f1the = 40.02;
-  double solid_f1phi = 0.0;
-  double solid_f2the = -40.02;
-  double solid_f2phi = 0.0;
-  double solid_fk1 = 9.966e5;
-  double solid_fk2 = 524.6;
-  double solid_fkd = 0.333;
+  bool   is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
+  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    solid_density[ii] = -1.0;
+    solid_E[ii] = -1.0;
+    solid_nu[ii] = -1.0;
+  }
+
+  std::vector<double> solid_mu(num_layer), solid_f1the(num_layer), solid_f1phi(num_layer),
+  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer)
+  solid_fkd(num_layer);
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    solid_mu[ii] = -1.0;
+    solid_f1the[ii] = -1.0;
+    solid_f1phi[ii] = -1.0;
+    solid_f2the[ii] = -1.0;
+    solid_f2phi[ii] = -1.0;
+    solid_fk1[ii] = -1.0;
+    solid_fk2[ii] = -1.0;
+    solid_fkd[ii] = -1.0;
+  }
 
   // Load analysis code parameter from solver_cmd.h5 file
   hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -61,7 +72,7 @@ int main ( int argc , char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
-
+  const int num_layer = cmd_h5r -> read_intScalar("/", "num_layer");
   const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
@@ -88,17 +99,32 @@ int main ( int argc , char * argv[] )
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-ref", isRef);
   SYS_T::GetOptionBool("-clean", isClean);
-  SYS_T::GetOptionReal(  "-sl_density",        solid_density);
-  SYS_T::GetOptionReal(  "-sl_E",              solid_E);
-  SYS_T::GetOptionReal(  "-sl_nu",             solid_nu);
-  SYS_T::GetOptionReal(  "-sl_mu",             solid_mu);
-  SYS_T::GetOptionReal(  "-sl_f1the",          solid_f1the);
-  SYS_T::GetOptionReal(  "-sl_f1phi",          solid_f1phi);
-  SYS_T::GetOptionReal(  "-sl_f2the",          solid_f2the);
-  SYS_T::GetOptionReal(  "-sl_f2phi",          solid_f2phi);
-  SYS_T::GetOptionReal(  "-sl_fk1",            solid_fk1);
-  SYS_T::GetOptionReal(  "-sl_fk2",            solid_fk2);
-  SYS_T::GetOptionReal(  "-sl_fkd",            solid_fkd);
+  for (int ii=0; ii<num_layer; ++ii)
+  {
+    std::string sl_density_name = "-sl_density_" + std::to_string(ii);
+    std::string sl_E_name = "-sl_E_" + std::to_string(ii);
+    std::string sl_nu_name = "-sl_nu_" + std::to_string(ii);
+    std::string sl_mu_name = "-sl_mu_" + std::to_string(ii);
+    std::string sl_f1the_name = "-sl_f1the_" + std::to_string(ii);
+    std::string sl_f1phi_name = "-sl_f1phi_" + std::to_string(ii);
+    std::string sl_f2the_name = "-sl_f2the_" + std::to_string(ii);
+    std::string sl_f2phi_name = "-sl_f2phi_" + std::to_string(ii);
+    std::string sl_fk1_name = "-sl_fk1_" + std::to_string(ii);
+    std::string sl_fk2_name = "-sl_fk2_" + std::to_string(ii);
+    std::string sl_fkd_name = "-sl_fkd_" + std::to_string(ii);
+
+    SYS_T::GetOptionReal(  sl_density_name.c_str(), solid_density[ii]);
+    SYS_T::GetOptionReal(  sl_E_name.c_str(),       solid_E[ii]);
+    SYS_T::GetOptionReal(  sl_nu_name.c_str(),      solid_nu[ii]);
+    SYS_T::GetOptionReal(  sl_mu_name.c_str(),      solid_mu[ii]);
+    SYS_T::GetOptionReal(  sl_f1the_name.c_str(),   solid_f1the[ii]);
+    SYS_T::GetOptionReal(  sl_f1phi_name.c_str(),   solid_f1phi[ii]);
+    SYS_T::GetOptionReal(  sl_f2the_name.c_str(),   solid_f2the[ii]);
+    SYS_T::GetOptionReal(  sl_f2phi_name.c_str(),   solid_f2phi[ii]);
+    SYS_T::GetOptionReal(  sl_fk1_name.c_str(),     solid_fk1[ii]);
+    SYS_T::GetOptionReal(  sl_fk2_name.c_str(),     solid_fk2[ii]);
+    SYS_T::GetOptionReal(  sl_fkd_name.c_str(),     solid_fkd[ii]);
+  }
 
   // Correct time_step if it does not match with sol_rec_freq
   if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
@@ -127,27 +153,46 @@ int main ( int argc , char * argv[] )
     SYS_T::execute("rm -rf VIS_S_*.pvtu");
     SYS_T::execute("rm -rf VIS_S_.pvd");
   }
-
   if( is_read_material )
   {
-    SYS_T::commPrint("-is_read_material: true \n");
-    SYS_T::file_check("material_model.h5" );
-    SYS_T::commPrint("material_model.h5 found. \n");
+    SYS_T::commPrint(    "-is_read_material: true \n");
+    for (int ii=0; ii<num_layer; ++ii)
+    {
+      std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
+      SYS_T::file_check( matmodel_file_name.c_str() );
+      std::string print_string = "Material model of solid " + std::to_string(ii) + " : "
+                                  + matmodel_file_name + " found. \n";
+      SYS_T::commPrint( print_string.c_str() );
+    }
   }
   else
   {
-    SYS_T::commPrint("-is_read_material: false \n");
-    SYS_T::cmdPrint("-sl_density:", solid_density);
-    SYS_T::cmdPrint("-sl_E:", solid_E);
-    SYS_T::cmdPrint("-sl_nu:", solid_nu);
-    SYS_T::cmdPrint("-sl_mu:", solid_mu);
-    SYS_T::cmdPrint("-sl_f1the:", solid_f1the);
-    SYS_T::cmdPrint("-sl_f1phi:", solid_f1phi);
-    SYS_T::cmdPrint("-sl_f2the:", solid_f2the);
-    SYS_T::cmdPrint("-sl_f2phi:", solid_f2phi);
-    SYS_T::cmdPrint("-sl_fk1:", solid_fk1);
-    SYS_T::cmdPrint("-sl_fk2:", solid_fk2);
-    SYS_T::cmdPrint("-sl_fkd:", solid_fkd);
+    for (int ii=0; ii<num_layer; ++ii)
+    {
+      std::string sl_density_name = "-sl_density_" + std::to_string(ii);
+      std::string sl_E_name = "-sl_E_" + std::to_string(ii);
+      std::string sl_nu_name = "-sl_nu_" + std::to_string(ii);
+      std::string sl_mu_name = "-sl_mu_" + std::to_string(ii);
+      std::string sl_f1the_name = "-sl_f1the_" + std::to_string(ii);
+      std::string sl_f1phi_name = "-sl_f1phi_" + std::to_string(ii);
+      std::string sl_f2the_name = "-sl_f2the_" + std::to_string(ii);
+      std::string sl_f2phi_name = "-sl_f2phi_" + std::to_string(ii);
+      std::string sl_fk1_name = "-sl_fk1_" + std::to_string(ii);
+      std::string sl_fk2_name = "-sl_fk2_" + std::to_string(ii);
+      std::string sl_fkd_name = "-sl_fkd_" + std::to_string(ii);
+
+      SYS_T::commPrint(  sl_density_name.c_str(), solid_density[ii]);
+      SYS_T::commPrint(  sl_E_name.c_str(),       solid_E[ii]);
+      SYS_T::commPrint(  sl_nu_name.c_str(),      solid_nu[ii]);
+      SYS_T::commPrint(  sl_mu_name.c_str(),      solid_mu[ii]);
+      SYS_T::commPrint(  sl_f1the_name.c_str(),   solid_f1the[ii]);
+      SYS_T::commPrint(  sl_f1phi_name.c_str(),   solid_f1phi[ii]);
+      SYS_T::commPrint(  sl_f2the_name.c_str(),   solid_f2the[ii]);
+      SYS_T::commPrint(  sl_f2phi_name.c_str(),   solid_f2phi[ii]);
+      SYS_T::commPrint(  sl_fk1_name.c_str(),     solid_fk1[ii]);
+      SYS_T::commPrint(  sl_fk2_name.c_str(),     solid_fk2[ii]);
+      SYS_T::commPrint(  sl_fkd_name.c_str(),     solid_fkd[ii]);
+    }
   }
   
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
@@ -191,52 +236,47 @@ int main ( int argc , char * argv[] )
   quad -> print_info();
 
   // material model
-  IMaterialModel * matmodel;
-  if( is_read_material )
+  IMaterialModel ** matmodel = new IMaterialModel* [num_layer];
+  for(int ii=0; ii<num_layer; ++ii)
   {
-    // load solid_nu from h5 file
-    hid_t model_file = H5Fopen("material_model.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-
-    HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
-
-    solid_nu = model_h5r -> read_doubleScalar("/", "nu");
-
-    delete model_h5r; H5Fclose(model_file);
-
-    if( solid_nu == 0.5 )
+    if( is_read_material )
     {
-      matmodel = new MaterialModel_GOH06_Incompressible_Mixed( "material_model.h5" );
+      std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
+      if( solid_nu[ii] == 0.5 )
+      {
+        matmodel[ii] = new MaterialModel_GOH06_Incompressible_Mixed( matmodel_file_name.c_str() );
+      }
+      else
+      {
+        //matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
+        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( matmodel_file_name.c_str() );
+      }
     }
     else
     {
-      //matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
-      matmodel = new MaterialModel_GOH14_ST91_Mixed( "material_model.h5" );
+      if( solid_nu[ii] == 0.5 )
+      {
+        matmodel[ii] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[ii], solid_mu[ii],
+          solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
+      }
+      else
+      {
+        //matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
+        //  solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
+        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
+          solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
+      }
     }
-  }
-  else
-  {
-    if( solid_nu == 0.5 )
-    {
-      matmodel = new MaterialModel_GOH06_Incompressible_Mixed( solid_density, solid_mu,
-        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-    }
-    else
-    {
-      //matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
-      //  solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-      matmodel = new MaterialModel_GOH14_ST91_Mixed( solid_density, solid_E, solid_nu,
-        solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-    }
-  }
 
-  matmodel -> print_info();
+    matmodel[ii] -> print_info();
+  }
 
   // For the solid subdomain, we need to prepare a mapping from the
   // FSI nodal index to the solid subdomain nodal index
   std::vector<int> subdomain_nodes; subdomain_nodes.clear();
   for(int ee=0; ee<locElem->get_nlocalele(); ++ee)
   {
-    if( locElem -> get_elem_tag(ee) == 1 )
+    if( locElem -> get_elem_tag(ee) >= 1 )
       VEC_T::insert_end( subdomain_nodes, locIEN_v -> get_LIEN(ee) );
   }
   VEC_T::sort_unique_resize( subdomain_nodes );
@@ -302,11 +342,14 @@ int main ( int argc , char * argv[] )
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // Clean up memory
-  delete quad; delete element; delete visprep; delete matmodel; delete tp_data;
+  delete quad; delete element; delete visprep; delete tp_data;
   delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p;
   delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
   delete [] pointArrays; delete vtk_w;
+  for (int ii = 0; ii<num_layer; ++ii)
+    delete matmodel[ii];
+  delete [] matmodel;
   PetscFinalize();
 
   return EXIT_SUCCESS ;
