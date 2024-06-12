@@ -110,7 +110,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_SemiBDF1.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_NS_SemiBDF1.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
@@ -125,6 +127,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_NS.cpp
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
+  ${perigee_SOURCE_DIR}/src/Post_error_Cubic.cpp
   )
 
 INCLUDE_DIRECTORIES( ../../include )
@@ -153,21 +156,25 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns3d ns_driver.cpp)
+ADD_EXECUTABLE( ns3d_semiBDF1 ns_semiBDF1_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
 ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
 ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
 ADD_EXECUTABLE( vis_601_p1_wss vis_601_p1_wss.cpp)
 ADD_EXECUTABLE( vis_602_p2_wss vis_602_p2_wss.cpp)
+ADD_EXECUTABLE( post_comp post_compare_manu.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
+TARGET_LINK_LIBRARIES( ns3d_semiBDF1 perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_601_p1_wss perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_602_p2_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( post_comp perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
