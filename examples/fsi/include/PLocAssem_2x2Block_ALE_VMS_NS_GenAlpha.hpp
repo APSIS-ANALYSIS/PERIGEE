@@ -218,6 +218,15 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 
     Vector_3 get_H1(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {
+      const double pmax = 1.333e+4;
+      const double tmax = 3.0e-3;
+      const double pi =  3.141592653589793;
+      double p0 = (tt <= tmax) ? 0.5 * pmax * (1.0 - cos(2.0*pi*tt/tmax)) : 0.0;
+      return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
+    }
+
+    Vector_3 get_H2(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
+    {
       const double p0 = 0.0;
       return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }

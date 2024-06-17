@@ -28,6 +28,11 @@ PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
   Zero_Tangent_Residual();
   Zero_sur_Tangent_Residual();
 
+  flist = new locassem_2x2block_ale_vms_ns_funs [2];
+  
+  flist[0] = &PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_H1;
+  flist[1] = &PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_H2;
+
   // print info of this assembly routine
   print_info();
 }
@@ -45,6 +50,8 @@ PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::~PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
   delete [] sur_Tangent00; sur_Tangent00 = nullptr;
 
   delete [] sur_Residual0; sur_Residual0 = nullptr;
+
+  delete [] flist; flist = nullptr;
 }
 
 void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::print_info() const
