@@ -124,6 +124,26 @@ class INodalBC
     }
 
     // ------------------------------------------------------------------------
+    // get_dir_nodes_on_surface return the Dirichlet node index on each moving
+    // surface.
+    // ------------------------------------------------------------------------
+    virtual unsigned int get_dir_nodes_on_surface( const int &nbc_id, const unsigned int &ii ) const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_dir_nodes_on_surface is not implemented.\n");
+      return 0;
+    }
+
+    // ------------------------------------------------------------------------
+    // get_num_dir_nodes_on_surface return the number of Dirichlet nodes on each 
+    // moving surface.
+    // ------------------------------------------------------------------------
+    virtual unsigned int get_num_dir_nodes_on_surface( const int &nbc_id ) const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_num_dir_nodes_on_surface is not implemented.\n");
+      return 0;
+    }
+
+    // ------------------------------------------------------------------------
     // get_outnormal() return inflow cap surface outward normal vector
     // ------------------------------------------------------------------------
     virtual Vector_3 get_outnormal(const int &nbc_id) const
