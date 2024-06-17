@@ -92,7 +92,7 @@ void PNonlinear_FSI_Solver::rescale_moving_value( const double &stime,
     const ALocal_MovingBC * const &movbc,
     PDNSolution * const &sol, PDNSolution * const &dot_sol ) const
 {
-  double velo_radial = 0.1; // given by user
+  double abs_velo_radial = 0.1; // given by user
 
   const int num_nbc = movbc -> get_num_nbc();
 
@@ -113,15 +113,21 @@ void PNonlinear_FSI_Solver::rescale_moving_value( const double &stime,
       // node_pt_xyz.print();
 
       double disp_radial = 0.0;
+      double velo_radial = 0.0;
 
-      if (stime <= 0.5)
+      if (stime <= 0.0005)
       {  
+        velo_radial = abs_velo_radial;
         disp_radial = velo_radial * stime;
+        // std::cout << "velo_radial:"<< velo_radial << std::endl;
+        // std::cout << "disp_radial:"<< disp_radial << std::endl;
       }
       else
       {
-        velo_radial = -velo_radial;
-        disp_radial = 0.1 + velo_radial * stime;
+        velo_radial = -abs_velo_radial;
+        disp_radial = 0.0001 + velo_radial * stime;
+        // std::cout << "velo_radial:"<< velo_radial << std::endl;
+        // std::cout << "disp_radial:"<< disp_radial << std::endl;
       }
 
       // const double center_pt_x = 0.0;
