@@ -91,6 +91,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const ALocal_NBC * const &nbc_v,
     const ALocal_NBC * const &nbc_p,
     const ALocal_InflowBC * const &infnbc,
+    const ALocal_MovingBC * const &movnbc,
     const ALocal_NBC * const &nbc_mesh,
     const ALocal_EBC * const &ebc_v,
     const ALocal_EBC * const &ebc_p,
@@ -177,7 +178,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
         time_info->get_step(), is_v, is_p, sol_base, 
         pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres, 
         tmga_ptr, flr_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p, 
-        nbc_v, nbc_p, infnbc,
+        nbc_v, nbc_p, infnbc, movnbc,
         nbc_mesh, ebc_v, ebc_mesh, gbc, bc_mat, bc_mesh_mat,
         elementv, elements, quad_v, quad_s, ps_ptr, 
         lassem_fluid_ptr, lassem_solid_ptr, lassem_mesh_ptr,
@@ -251,23 +252,23 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       gbc -> write_0D_sol ( time_info->get_index(), time_info->get_time() );
 
     // Calculate the flow rate and averaged pressure on all inlets
-    for(int face=0; face<infnbc -> get_num_nbc(); ++face)
-    {
-      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_disp, cur_velo, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+    // for(int face=0; face<infnbc -> get_num_nbc(); ++face)
+    // {
+    //   const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
+    //       cur_disp, cur_velo, lassem_fluid_ptr, elements, quad_s, infnbc, face );
 
-      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+    //   const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
+    //       cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, infnbc, face );
 
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( infnbc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-        ofile.close();
-      }
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
+    //   if( SYS_T::get_MPI_rank() == 0 )
+    //   {
+    //     std::ofstream ofile;
+    //     ofile.open( infnbc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+    //     ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+    //     ofile.close();
+    //   }
+    //   MPI_Barrier(PETSC_COMM_WORLD);
+    // }
 
     pre_dot_disp -> Copy( cur_dot_disp );
     pre_dot_velo -> Copy( cur_dot_velo );

@@ -44,6 +44,7 @@ class PTime_FSI_Solver
         const ALocal_NBC * const &nbc_v,
         const ALocal_NBC * const &nbc_p,
         const ALocal_InflowBC * const &infnbc,
+        const ALocal_MovingBC * const &movnbc,
         const ALocal_NBC * const &nbc_mesh,
         const ALocal_EBC * const &ebc_v,
         const ALocal_EBC * const &ebc_p,

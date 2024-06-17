@@ -88,6 +88,59 @@ void PNonlinear_FSI_Solver::rescale_inflow_value( const double &stime,
   sol -> Assembly_GhostUpdate();
 }
 
+void PNonlinear_FSI_Solver::rescale_moving_value( const double &stime,
+    const ALocal_MovingBC * const &movbc,
+    PDNSolution * const &sol ) const
+{
+  const double velo_radial = 0.05; // given by user
+
+  const int num_nbc = movbc -> get_num_nbc();
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  {
+    const int numnode = movbc -> get_Num_LD( nbc_id );
+
+    // const double val = flrate -> get_flow_rate( nbc_id, stime );
+
+    for(int ii=0; ii<numnode; ++ii)
+    {
+      // std::cout<<"ii:"<<ii<<std::endl;
+
+      const Vector_3 node_pt_xyz = movbc -> get_local_pt_xyz( nbc_id, ii );
+
+      // std::cout<<"node_pt_x:"<<node_pt_xyz.x()<<std::endl;
+
+      // node_pt_xyz.print();
+
+      const double disp_radial = velo_radial * stime;
+
+      // const double center_pt_x = 0.0;
+
+      // const double center_pt_y = node_pt_xyz.y();
+
+      // const double center_pt_z = 0.0;
+
+      const Vector_3 center_pt_xyz( 0.0, node_pt_xyz.y(), 0.0 ) ;
+
+      Vector_3 vector_radial( -node_pt_xyz.x(), 0.0, -node_pt_xyz.z() );
+
+      vector_radial.normalize();
+
+      const Vector_3 disp_xyz = disp_radial * vector_radial;
+
+      const double value[3] = { disp_xyz.x(), disp_xyz.y(), disp_xyz.z() };  
+
+      const int node_index = movbc -> get_LDN( nbc_id, ii );
+
+      const int locat_idx[3] = { node_index * 3, node_index * 3 + 1, node_index * 3 + 2 };
+
+      VecSetValues(sol->solution, 3, locat_idx, value, INSERT_VALUES);
+    }
+  }
+
+  sol -> Assembly_GhostUpdate();
+}
+
 void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const bool &new_tangent_flag,
     const double &curr_time,
@@ -112,6 +165,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const ALocal_NBC * const &nbc_v,
     const ALocal_NBC * const &nbc_p,
     const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_MovingBC * const &movnbc_part,
     const ALocal_NBC * const &nbc_mesh,
     const ALocal_EBC * const &ebc_part,
     const ALocal_EBC * const &ebc_mesh,
@@ -207,8 +261,13 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
   
   // Update inflow boundary values
-  rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
-  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+  // rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
+  // rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+
+  // Update moving boundary values
+  rescale_moving_value(  curr_time + dt, movnbc_part, disp );
+  rescale_moving_value(  curr_time + alpha_f * dt, movnbc_part, disp_alpha );
+
 
 #ifdef PETSC_USE_LOG
   PetscLogEventBegin(assem_event_0, 0,0,0,0);

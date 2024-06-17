@@ -18,9 +18,11 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_FSI.hpp"
 #include "NodalBC_3D_inflow.hpp"
+#include "NodalBC_3D_moving.hpp"
 #include "ElemBC_3D_outflow.hpp"
 #include "NBC_Partition_MF.hpp"
 #include "NBC_Partition_inflow_MF.hpp"
+#include "NBC_Partition_moving_MF.hpp"
 #include "EBC_Partition_outflow_MF.hpp"
 #include "yaml-cpp/yaml.h"
 
@@ -59,14 +61,15 @@ int main( int argc, char * argv[] )
   const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
   const std::string geo_s_file                = paras["geo_s_file"].as<std::string>();
 
-  const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
-  const std::string sur_f_file_in_base        = paras["sur_f_file_in_base"].as<std::string>();
-  const std::string sur_f_file_out_base       = paras["sur_f_file_out_base"].as<std::string>();
+  const std::string sur_s_file_moving         = paras["solid_moving"].as<std::string>();
+  const std::string sur_s_file_inlet             = paras["solid_inlet"].as<std::string>();
+  const std::string sur_s_file_outlet            = paras["solid_outlet"].as<std::string>();
 
-  const std::string sur_s_file_interior_wall  = paras["sur_s_file_interior_wall"].as<std::string>();
-  const std::string sur_s_file_wall           = paras["sur_s_file_wall"].as<std::string>();
-  const std::string sur_s_file_in_base        = paras["sur_s_file_in_base"].as<std::string>();
-  const std::string sur_s_file_out_base       = paras["sur_s_file_out_base"].as<std::string>();
+  const std::string sur_s_file_interior_wall  = paras["solid_interior"].as<std::string>();
+  const std::string sur_s_file_wall           = paras["solid_wall"].as<std::string>();
+  const std::string sur_f_file_inlet             = paras["fluid_inlet"].as<std::string>();
+  const std::string sur_f_file_outlet            = paras["fluid_outlet"].as<std::string>();
+  const std::string sur_f_file_wall           = paras["fluid_wall"].as<std::string>();
 
   const std::string part_file_p               = paras["part_file_p"].as<std::string>();
   const std::string part_file_v               = paras["part_file_v"].as<std::string>();
@@ -91,13 +94,14 @@ int main( int argc, char * argv[] )
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
   std::cout<<" -geo_s_file: "         <<geo_s_file         <<std::endl;
-  std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
-  std::cout<<" -sur_s_file_wall: "    <<sur_s_file_wall    <<std::endl;
-  std::cout<<" -sur_s_file_int_wall: "<<sur_s_file_interior_wall <<std::endl;
-  std::cout<<" -sur_f_file_in_base: " <<sur_f_file_in_base <<std::endl;
-  std::cout<<" -sur_f_file_out_base: "<<sur_f_file_out_base<<std::endl;
-  std::cout<<" -sur_s_file_in_base: " <<sur_s_file_in_base <<std::endl;
-  std::cout<<" -sur_s_file_out_base: "<<sur_s_file_out_base<<std::endl;
+  std::cout<<" -sur_s_file_moving: "  <<sur_s_file_moving  <<std::endl;
+  std::cout<<" -sur_s_file_inlet: "      <<sur_s_file_inlet      <<std::endl;
+  std::cout<<" -sur_s_file_outlet: "     <<sur_s_file_outlet     <<std::endl;
+  std::cout<<" -sur_s_file_interior_wall: " <<sur_s_file_interior_wall <<std::endl;
+  std::cout<<" -sur_s_file_wall: "<<sur_s_file_wall<<std::endl;
+  std::cout<<" -sur_f_file_inlet: " <<sur_f_file_inlet <<std::endl;
+  std::cout<<" -sur_f_file_outlet: "<<sur_f_file_outlet<<std::endl;
+  std::cout<<" -sur_f_file_wall: "<<sur_f_file_wall<<std::endl;
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   if(isDualGraph) std::cout<<" -isDualGraph: true \n";
@@ -126,39 +130,10 @@ int main( int argc, char * argv[] )
 
   SYS_T::file_check(sur_s_file_interior_wall); std::cout<<sur_s_file_interior_wall<<" found. \n";
 
-  std::vector< std::string > sur_f_file_in(  num_inlet ) , sur_s_file_in(  num_inlet );
-  std::vector< std::string > sur_f_file_out( num_outlet ), sur_s_file_out( num_outlet );
+  SYS_T::file_check(sur_s_file_moving); std::cout<<sur_s_file_moving<<" found. \n";
 
-  for(int ii=0; ii<num_inlet; ++ii)
-  {
-    sur_f_file_in[ii] = SYS_T::gen_capfile_name( sur_f_file_in_base, ii, ".vtp" );
-    sur_s_file_in[ii] = SYS_T::gen_capfile_name( sur_s_file_in_base, ii, ".vtp" );
-
-    SYS_T::file_check( sur_f_file_in[ii] );
-    std::cout<<sur_f_file_in[ii]<<" found. \n";
-    SYS_T::file_check( sur_s_file_in[ii] );
-    std::cout<<sur_s_file_in[ii]<<" found. \n";
-  }
-
-  for(int ii=0; ii<num_outlet; ++ii)
-  {
-    sur_f_file_out[ii] = SYS_T::gen_capfile_name( sur_f_file_out_base, ii, ".vtp" );
-    sur_s_file_out[ii] = SYS_T::gen_capfile_name( sur_s_file_out_base, ii, ".vtp" );
-
-    SYS_T::file_check( sur_f_file_out[ii] );
-    std::cout<<sur_f_file_out[ii]<<" found. \n";
-    SYS_T::file_check( sur_s_file_out[ii] );
-    std::cout<<sur_s_file_out[ii]<<" found. \n";
-  }
-
-  // If we can still detect additional files on disk, throw an warning
-  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) ||
-      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_inlet, ".vtp")) )
-    cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
-
-  if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
-      SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base, num_outlet, ".vtp")) )
-    cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+  // std::vector< std::string > sur_f_file_in{  sur_f_file_inlet } , sur_s_file_in{  sur_s_file_inlet };
+  std::vector< std::string > sur_f_file_out{ sur_f_file_inlet, sur_f_file_outlet }, sur_s_file_out{ sur_s_file_inlet, sur_f_file_outlet };
 
   // ----- Write the input argument into a HDF5 file
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
@@ -175,13 +150,14 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
   cmdh5w->write_string("geo_s_file",          geo_s_file);
-  cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
-  cmdh5w->write_string("sur_f_file_out_base", sur_f_file_out_base);
+  cmdh5w->write_string("sur_f_file_inlet",  sur_f_file_inlet);
+  cmdh5w->write_string("sur_f_file_outlet", sur_f_file_outlet);
   cmdh5w->write_string("sur_f_file_wall",     sur_f_file_wall);
-  cmdh5w->write_string("sur_s_file_in_base",  sur_s_file_in_base);
-  cmdh5w->write_string("sur_s_file_out_base", sur_s_file_out_base);
+  cmdh5w->write_string("sur_s_file_inlet",  sur_s_file_inlet);
+  cmdh5w->write_string("sur_s_file_outlet", sur_f_file_outlet);
   cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
   cmdh5w->write_string("sur_s_file_interior_wall", sur_s_file_interior_wall);
+  cmdh5w->write_string("sur_s_file_moving",     sur_s_file_moving);
   cmdh5w->write_string("part_file_p",         part_file_p);
   cmdh5w->write_string("part_file_v",         part_file_v);
   cmdh5w->write_string("date",                SYS_T::get_date() );
@@ -478,42 +454,55 @@ int main( int argc, char * argv[] )
   // that in the velocity mesh.
   NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
-  for( int ii=0; ii<3; ++ii )
-    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
-        sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
-        nFunc_v, ii, ringBC_type, fsiBC_type );
+  if ( fsiBC_type == 0 )
+  {   
+    const std::vector<std::string> dir_x_list {sur_s_file_inlet, sur_s_file_outlet, sur_s_file_moving};
+    const std::vector<std::string> dir_y_list {sur_s_file_inlet, sur_s_file_outlet, sur_s_file_moving};
+    const std::vector<std::string> dir_z_list {sur_s_file_inlet, sur_s_file_outlet, sur_s_file_moving};
+    
+    NBC_list_v[0] = new NodalBC_3D_FSI( dir_x_list, nFunc_v );
+    NBC_list_v[1] = new NodalBC_3D_FSI( dir_y_list, nFunc_v );
+    NBC_list_v[2] = new NodalBC_3D_FSI( dir_z_list, nFunc_v );
+  }
+  else SYS_T::print_fatal("ERROR: Unknown fsiBC_type. \n");
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_file_list { geo_s_file };
-  VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
+  // VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
   meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
   meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
   meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
 
-  // InflowBC info
-  std::cout<<"3. Inflow cap surfaces: \n";
-  std::vector<Vector_3> inlet_outvec( num_inlet );
-  if(elemType == 501)
-  {
-    for(int ii=0; ii<num_inlet; ++ii)
-      inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
-  }
-  else if(elemType == 601)
-  {
-    for(int ii=0; ii<num_inlet; ++ii)
-      inlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
-  }
-  else
-    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType);
+  // // InflowBC info
+  // std::cout<<"3. Inflow cap surfaces: \n";
+  // std::vector<Vector_3> inlet_outvec( num_inlet );
+  // if(elemType == 501)
+  // {
+  //   for(int ii=0; ii<num_inlet; ++ii)
+  //     inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  // }
+  // else if(elemType == 601)
+  // {
+  //   for(int ii=0; ii<num_inlet; ++ii)
+  //     inlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
+  // }
+  // else
+  //   SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType);
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
+  //INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
-  InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  INodalBC * InFBC = nullptr;
+
+  std::vector<std::string> sur_s_file_moving_list = { sur_s_file_moving };
+
+  INodalBC * SMVBC = new NodalBC_3D_moving( sur_s_file_moving_list, nFunc_v, elemType );
+
+  //InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
   cout<<"4. Elem boundary for the implicit solver: \n";
@@ -586,8 +575,12 @@ int main( int argc, char * argv[] )
     NBC_Partition * mbcpart = new NBC_Partition_MF(part_v, mnindex_v, meshBC_list);
     mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
 
-    NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
-    infpart->write_hdf5( part_file_v );
+    //NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
+    NBC_Partition_inflow * infpart = nullptr;
+    //infpart->write_hdf5( part_file_v );
+
+    NBC_Partition_moving * movpart = new NBC_Partition_moving_MF(part_v, mnindex_v, SMVBC, mapper_v);
+    movpart->write_hdf5( part_file_v );
 
     if( fsiBC_type == 0 || fsiBC_type == 1 )
     {
@@ -611,7 +604,7 @@ int main( int argc, char * argv[] )
     mebcpart-> write_hdf5( part_file_v, "/mesh_ebc" );
 
     delete part_p; delete part_v; delete nbcpart_p; delete nbcpart_v;
-    delete mbcpart; delete infpart; delete mebcpart; 
+    delete mbcpart; delete infpart; delete mebcpart; delete movpart;
   }
 
   // Clean up the memory
@@ -621,7 +614,7 @@ int main( int argc, char * argv[] )
 
   for(auto &it_nbc : meshBC_list) delete it_nbc;
 
-  delete ebc; delete InFBC; delete mesh_ebc; 
+  delete ebc; delete InFBC; delete mesh_ebc; delete SMVBC;
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
 

@@ -9,6 +9,7 @@
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_FSI.hpp"
 #include "ALocal_EBC_outflow.hpp"
+#include "ALocal_MovingBC.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -307,7 +308,10 @@ int main(int argc, char *argv[])
   
   APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
 
-  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_v_file, rank);
+  //ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_v_file, rank);
+  ALocal_InflowBC * locinfnbc = nullptr;
+
+  ALocal_MovingBC * locmovnbc = new ALocal_MovingBC(part_v_file, rank);
 
   ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
   
@@ -346,20 +350,6 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
   ICVFlowRate * inflow_rate_ptr = nullptr;
-
-  if( inflow_type == 0 )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
-  else if( inflow_type == 1 )
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
-  else if( inflow_type == 2 )
-    inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
-  else
-    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
-
-  inflow_rate_ptr->print_info();
-
-  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
-      "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
 
   // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
@@ -466,7 +456,7 @@ int main(int argc, char *argv[])
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
   
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
+  PDNSolution * base = nullptr;
   
   PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
   PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
@@ -695,31 +685,31 @@ int main(int argc, char *argv[])
   if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
-  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  {
-    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, velo, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
+  // for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
+  // {
+  //   const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+  //       disp, velo, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
 
-    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
+  //   const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+  //       disp, pres, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
 
-    if( rank == 0 )
-    {
-      std::ofstream ofile;
-      if( !is_restart )
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+  //   if( rank == 0 )
+  //   {
+  //     std::ofstream ofile;
+  //     if( !is_restart )
+  //       ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+  //     else
+  //       ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-      if( !is_restart )
-      {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      }
+  //     if( !is_restart )
+  //     {
+  //       ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
+  //       ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+  //     }
 
-      ofile.close();
-    }
-  }
+  //     ofile.close();
+  //   }
+  // }
 
   MPI_Barrier(PETSC_COMM_WORLD);
 
@@ -740,7 +730,7 @@ int main(int argc, char *argv[])
   tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
-      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
+      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, locmovnbc, mesh_locnbc, 
       locebc_v, locebc_p, mesh_locebc, 
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
       locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
@@ -765,7 +755,7 @@ int main(int argc, char *argv[])
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
   delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
-  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
+  delete locinfnbc; delete locmovnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 
   delete locIEN_v; delete locIEN_p; delete ps_data;
   PetscFinalize();
