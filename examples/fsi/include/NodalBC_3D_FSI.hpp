@@ -29,6 +29,9 @@ class NodalBC_3D_FSI : public INodalBC
         const int &nFunc,
         const int &fsiBC_type );
 
+    NodalBC_3D_FSI( const std::vector<std::string> &vtpfileList,
+        const int &nFunc );
+
     virtual ~NodalBC_3D_FSI() {};
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const

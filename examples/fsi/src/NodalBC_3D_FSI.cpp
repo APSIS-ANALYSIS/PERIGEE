@@ -124,6 +124,28 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
   Create_ID( nFunc );
 }
 
+NodalBC_3D_FSI::NodalBC_3D_FSI( const std::vector<std::string> &vtpfileList,
+const int &nFunc )
+{
+  dir_nodes.clear();
+
+  dir_nodes = get_vtk_nodal_id( vtpfileList );
+  VEC_T::sort_unique_resize( dir_nodes );
+
+  // count the number of dirichlet nodes
+  num_dir_nodes = dir_nodes.size();
+
+  // generate the ID array
+  Create_ID( nFunc );
+
+  std::cout<<"===> NodalBC_3D_FSI for deformable wall (fsiBC_type = 0) for displacement/velocity: \n";
+  std::cout<<"===> NodalBC_3D_FSI specified by \n";
+  for(unsigned int ii=0; ii<vtpfileList.size(); ++ii)
+    std::cout<<"     "<<"Dirichlet surface:"<<vtpfileList[ii]<<std::endl;
+  std::cout<<"     is generated. \n";
+}
+
+
 std::vector<unsigned int> NodalBC_3D_FSI::get_vtk_nodal_id( const std::vector<std::string> &vtkfileList ) const
 {
   std::vector<unsigned int> output {};
