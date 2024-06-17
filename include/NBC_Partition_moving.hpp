@@ -37,6 +37,9 @@ class NBC_Partition_moving
     // Length: num_nbc x NumLD[ii], for 0 <= ii < num_nbc
     std::vector< std::vector<int> > LDN;
 
+    // Local Dirichlet nodes' coordinates that belong to different inlet surfaces
+    std::vector< std::vector<double> > LDN_pt_xyz;
+
     // Number of Local Dirichlet nodes for each inlet surface
     // Length: num_nbc
     std::vector<int> Num_LD;

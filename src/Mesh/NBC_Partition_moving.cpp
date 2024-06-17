@@ -10,6 +10,9 @@ NBC_Partition_moving::NBC_Partition_moving(
   for(int ii=0; ii<num_nbc; ++ii) LDN[ii].clear();
 
   Num_LD.resize(num_nbc);
+ 
+  LDN_pt_xyz.resize(num_nbc);
+  for(int ii=0; ii<num_nbc; ++ii) LDN_pt_xyz[ii].clear();
 
   cell_nLocBas.resize(num_nbc);      local_cell_ien.resize(num_nbc);
   num_local_node.resize(num_nbc);    num_local_cell.resize(num_nbc);
@@ -85,6 +88,20 @@ NBC_Partition_moving::NBC_Partition_moving(
       local_node_pos[ii][jj] = part->get_nodeLocGhoIndex( mnindex->get_old2new(local_global_node[ii][jj]) );
     }
 
+    LDN_pt_xyz[ii].resize( Num_LD[ii] * 3 );
+
+    for(int jj=0; jj<Num_LD[ii]; ++jj)
+    {
+      const int LDN_old_index = mnindex->get_new2old(LDN[ii][jj]);
+      
+      // LDN_old_pos: the position of old_LDN_index in local_global_node
+      int LDN_old_pos = VEC_T::get_pos(local_global_node[ii] , LDN_old_index);
+
+      LDN_pt_xyz[ii][3*jj+0] = local_pt_xyz[ii][ 3 * LDN_old_pos + 0 ]; 
+      LDN_pt_xyz[ii][3*jj+1] = local_pt_xyz[ii][ 3 * LDN_old_pos + 1 ]; 
+      LDN_pt_xyz[ii][3*jj+2] = local_pt_xyz[ii][ 3 * LDN_old_pos + 2 ]; 
+    }
+
     // create new IEN
     local_cell_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
 
@@ -132,6 +149,8 @@ void NBC_Partition_moving::write_hdf5( const std::string &FileName ) const
     h5w->write_intScalar( group_id, "cell_nLocBas", cell_nLocBas[ii] );
 
     h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
+
+    h5w->write_doubleVector( group_id, "LDN_pt_xyz", LDN_pt_xyz[ii] );
 
     h5w->write_intVector( group_id, "local_cell_ien", local_cell_ien[ii] );
 

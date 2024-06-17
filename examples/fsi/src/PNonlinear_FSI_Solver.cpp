@@ -90,9 +90,9 @@ void PNonlinear_FSI_Solver::rescale_inflow_value( const double &stime,
 
 void PNonlinear_FSI_Solver::rescale_moving_value( const double &stime,
     const ALocal_MovingBC * const &movbc,
-    PDNSolution * const &sol ) const
+    PDNSolution * const &sol, PDNSolution * const &dot_sol ) const
 {
-  const double velo_radial = 0.05; // given by user
+  double velo_radial = 0.1; // given by user
 
   const int num_nbc = movbc -> get_num_nbc();
 
@@ -106,13 +106,23 @@ void PNonlinear_FSI_Solver::rescale_moving_value( const double &stime,
     {
       // std::cout<<"ii:"<<ii<<std::endl;
 
-      const Vector_3 node_pt_xyz = movbc -> get_local_pt_xyz( nbc_id, ii );
+      const Vector_3 node_pt_xyz = movbc -> get_LDN_pt_xyz( nbc_id, ii );
 
       // std::cout<<"node_pt_x:"<<node_pt_xyz.x()<<std::endl;
 
       // node_pt_xyz.print();
 
-      const double disp_radial = velo_radial * stime;
+      double disp_radial = 0.0;
+
+      if (stime <= 0.5)
+      {  
+        disp_radial = velo_radial * stime;
+      }
+      else
+      {
+        velo_radial = -velo_radial;
+        disp_radial = 0.1 + velo_radial * stime;
+      }
 
       // const double center_pt_x = 0.0;
 
@@ -128,17 +138,27 @@ void PNonlinear_FSI_Solver::rescale_moving_value( const double &stime,
 
       const Vector_3 disp_xyz = disp_radial * vector_radial;
 
-      const double value[3] = { disp_xyz.x(), disp_xyz.y(), disp_xyz.z() };  
+      const Vector_3 velo_xyz = velo_radial * vector_radial;
+
+      const double disp_value[3] = { disp_xyz.x(), disp_xyz.y(), disp_xyz.z() };  
+
+      const double velo_value[3] = { velo_xyz.x(), velo_xyz.y(), velo_xyz.z() };  
+
+      // if ( std::abs(node_pt_xyz.x() + 0.5) < 1.0e-10 &&  std::abs(node_pt_xyz.y() - 22) < 1.0e-10 &&  std::abs(node_pt_xyz.z() - 0) < 1.0e-10)
+      // {
+      //   std::cout<<velo_xyz.x()<<","<<velo_xyz.y()<<","<<velo_xyz.z()<<std::endl;
+      // }
 
       const int node_index = movbc -> get_LDN( nbc_id, ii );
 
       const int locat_idx[3] = { node_index * 3, node_index * 3 + 1, node_index * 3 + 2 };
 
-      VecSetValues(sol->solution, 3, locat_idx, value, INSERT_VALUES);
+      VecSetValues(sol->solution, 3, locat_idx, disp_value, INSERT_VALUES);
+      VecSetValues(dot_sol->solution, 3, locat_idx, velo_value, INSERT_VALUES);
     }
   }
-
   sol -> Assembly_GhostUpdate();
+  dot_sol -> Assembly_GhostUpdate();
 }
 
 void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
@@ -265,8 +285,12 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   // rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
 
   // Update moving boundary values
-  rescale_moving_value(  curr_time + dt, movnbc_part, disp );
-  rescale_moving_value(  curr_time + alpha_f * dt, movnbc_part, disp_alpha );
+  // rescale_moving_value(  curr_time + dt, movnbc_part, disp );
+  // rescale_moving_value(  curr_time + alpha_f * dt, movnbc_part, disp_alpha );
+
+  // Update moving boundary values
+  rescale_moving_value(  curr_time + dt, movnbc_part, disp, velo );
+  rescale_moving_value(  curr_time + alpha_f * dt, movnbc_part, disp_alpha, velo_alpha );
 
 
 #ifdef PETSC_USE_LOG

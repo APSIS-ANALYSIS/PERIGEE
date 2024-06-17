@@ -149,7 +149,8 @@ class PNonlinear_FSI_Solver
 
     void rescale_moving_value( const double &stime,
         const ALocal_MovingBC * const &movbc,
-        PDNSolution * const &sol ) const;
+        PDNSolution * const &sol, 
+        PDNSolution * const &dot_sol ) const;
 };
 
 #endif

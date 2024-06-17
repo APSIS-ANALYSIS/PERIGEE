@@ -70,6 +70,14 @@ class ALocal_MovingBC
     {return local_pt_xyz[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
+    // access coordinates of a Local Dirichlet nodes in the local partition by indexing
+    // the LDN_pt_xyz array
+    // 0 <= ii < Num_LD[nbc_id]
+    // Note: make sure Num_LD[nbc_id] > 0 before using this get function
+    virtual Vector_3 get_LDN_pt_xyz( const int &nbc_id, const int &ii) const
+    {return LDN_pt_xyz[nbc_id][ii];}
+
+    // ------------------------------------------------------------------------
     // access an element's IEN array by indexing the local_cell_ien array
     // 0 <= ii < cell_nLocBas[nbc_id] x num_local_cell[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
@@ -128,6 +136,9 @@ class ALocal_MovingBC
     // Nodal coordinates of all local nodes
     // num_nbc times num_local_node[ii]
     std::vector< std::vector<Vector_3> > local_pt_xyz;
+
+    // Nodal coordinates of local Dirichlet nodes' coordinates
+    std::vector< std::vector<Vector_3> > LDN_pt_xyz;
 
     // Surface IEN array of all local elements
     // num_nbc times (cell_nLocBas[ii] x num_local_cell[ii])

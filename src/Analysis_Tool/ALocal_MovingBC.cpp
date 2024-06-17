@@ -15,7 +15,8 @@ ALocal_MovingBC::ALocal_MovingBC(
 
   // Allocate the size of the member data
   Num_LD.resize(num_nbc); 
-  LDN.resize(num_nbc); 
+  LDN.resize(num_nbc);
+  LDN_pt_xyz.resize(num_nbc); 
   num_local_node.resize(num_nbc); 
   num_local_cell.resize(num_nbc); 
   cell_nLocBas.resize(num_nbc);
@@ -37,10 +38,20 @@ ALocal_MovingBC::ALocal_MovingBC(
     if( Num_LD[nbc_id] > 0 )
     {
       LDN[nbc_id]            = h5r -> read_intVector(    subgroup_name.c_str(), "LDN" );
+
+      const std::vector<double> temp_ldn_xyz = h5r->read_doubleVector( subgroup_name.c_str(), "LDN_pt_xyz" );
+
+      ASSERT( VEC_T::get_size(temp_ldn_xyz) == Num_LD[nbc_id]*3, "Error: ALocal_MovingBC LDN_pt_xyz format is wrong.\n");
+
+      LDN_pt_xyz[nbc_id] = std::vector<Vector_3> (Num_LD[nbc_id], Vector_3{ 0, 0, 0 });
+      
+      for(int ii {0}; ii < Num_LD[nbc_id]; ++ii)
+        LDN_pt_xyz[nbc_id][ii] = Vector_3{ temp_ldn_xyz[3 * ii], temp_ldn_xyz[3 * ii + 1], temp_ldn_xyz[3 * ii + 2] };
     }
     else
     {
       LDN[nbc_id].clear();
+      LDN_pt_xyz[nbc_id].clear();
     }
 
     SYS_T::print_fatal_if( Num_LD[nbc_id] != static_cast<int>( LDN[nbc_id].size() ), "Error: the LDN vector size does not match with the value of Num_LD.\n" );
