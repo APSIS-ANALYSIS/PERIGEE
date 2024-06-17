@@ -45,6 +45,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
+  ${perigee_source}/Mesh/NodalBC_3D_moving.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
@@ -52,6 +53,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NBC_Partition_MF.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow_MF.cpp
+  ${perigee_source}/Mesh/NBC_Partition_moving.cpp
+  ${perigee_source}/Mesh/NBC_Partition_moving_MF.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow_MF.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
@@ -89,6 +92,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_MovingBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
