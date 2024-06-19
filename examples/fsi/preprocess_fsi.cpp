@@ -548,7 +548,7 @@ int main( int argc, char * argv[] )
   */
   
   std::vector<std::string> dir_z_list = { sur_s_file_in[0], sur_s_file_in[1],
-                                          sur_s_file_out[0], sur_s_file_out[1]}
+                                          sur_s_file_out[0], sur_s_file_out[1]};
   
   NBC_list_v[0] = new NodalBC_3D( nFunc_v );
   NBC_list_v[1] = new NodalBC_3D( nFunc_v );
