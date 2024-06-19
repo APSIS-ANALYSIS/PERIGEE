@@ -593,9 +593,9 @@ int main( int argc, char * argv[] )
   else
     SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType);
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
+  // INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
-  InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
+  // InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
   cout<<"4. Elem boundary for the implicit solver: \n";
@@ -668,8 +668,8 @@ int main( int argc, char * argv[] )
     NBC_Partition * mbcpart = new NBC_Partition_MF(part_v, mnindex_v, meshBC_list);
     mbcpart -> write_hdf5( part_file_v, "/mesh_nbc" );
 
-    NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
-    infpart->write_hdf5( part_file_v );
+    // NBC_Partition_inflow * infpart = new NBC_Partition_inflow_MF(part_v, mnindex_v, InFBC, mapper_v);
+    // infpart->write_hdf5( part_file_v );
 
     if( fsiBC_type == 0 || fsiBC_type == 1 )
     {
@@ -693,7 +693,8 @@ int main( int argc, char * argv[] )
     mebcpart-> write_hdf5( part_file_v, "/mesh_ebc" );
 
     delete part_p; delete part_v; delete nbcpart_p; delete nbcpart_v;
-    delete mbcpart; delete infpart; delete mebcpart; 
+    delete mbcpart; // delete infpart;
+    delete mebcpart; 
   }
 
   // Clean up the memory
@@ -703,7 +704,8 @@ int main( int argc, char * argv[] )
 
   for(auto &it_nbc : meshBC_list) delete it_nbc;
 
-  delete ebc; delete InFBC; delete mesh_ebc; 
+  delete ebc; // delete InFBC; 
+  delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v; 
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
 
