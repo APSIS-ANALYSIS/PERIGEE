@@ -513,7 +513,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
   // NatBC_Resis_KG( curr_time, dt, disp_np1, dot_velo_np1, velo_np1, lassem_f_ptr, elements, quad_s,
   //    nbc_v, ebc_part, gbc );
 
-  NatBC_G( curr_time, dt, disp_np1, lassem_f_ptr, elements, quads, nbc_v, ebc_part );
+  NatBC_G( curr_time, dt, disp_np1, lassem_f_ptr, elements, quad_s, nbc_v, ebc_part );
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
