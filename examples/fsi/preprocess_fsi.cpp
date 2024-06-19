@@ -540,21 +540,41 @@ int main( int argc, char * argv[] )
   // that in the velocity mesh.
   NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
+  /*
   for( int ii=0; ii<3; ++ii )
     NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file_in, sur_f_file_wall, 
         sur_s_file_wall_in, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
         nFunc_v, ii, ringBC_type, fsiBC_type );
+  */
+  
+  std::vector<std::string> dir_z_list = { sur_s_file_in[0], sur_s_file_in[1],
+                                          sur_s_file_out[0], sur_s_file_out[1]}
+  
+  NBC_list_v[0] = new NodalBC_3D( nFunc_v );
+  NBC_list_v[1] = new NodalBC_3D( nFunc_v );
+  NBC_list_v[2] = new NodalBC_3D( dir_z_list, nFunc_v );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
+  /*
   std::vector<std::string> meshdir_file_list = geo_s_file_in;
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
   meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
   meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
+  */
+
+  std::vector<std::string> meshdir_file_list = geo_s_file_in;
+
+  meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
+
+  VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
+  VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
   meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
 
   // InflowBC info
