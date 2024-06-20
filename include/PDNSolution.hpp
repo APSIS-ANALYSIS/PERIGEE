@@ -21,6 +21,8 @@
 // ============================================================================
 #include "Math_Tools.hpp"
 #include "APart_Node.hpp"
+#include "FEANode.hpp"
+#include "ALocal_InflowBC.hpp"
 
 class PDNSolution
 {
@@ -167,7 +169,10 @@ class PDNSolution
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
 
-    virtual void randomly_perturbed( const double &std_dev )
+    virtual void randomly_perturbed_parabolic_inflow( const double &std_dev,
+        const APart_Node * const &pNode,
+        const FEANode * const &fNode,
+        const ALocal_InflowBC * const &infbc )
     {
       SYS_T::print_fatal("Error: PDNSolution::randomly_perturbed is not implemented.\n");
       return;

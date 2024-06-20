@@ -43,14 +43,13 @@ class PDNSolution_NS : public PDNSolution
 
     // Add a random perturbation to each velocity component on the inflow
     // with zero mean and given standard deviation.
-    void randomly_perturbed( const double &std_dev );
+    void randomly_perturbed_parabolic_inflow( const double &std_dev,
+        const APart_Node * const &pNode,
+        const FEANode * const &fNode,
+        const ALocal_InflowBC * const &infbc );
 
   private:
     const bool is_print;
-
-    const APart_Node * pNode_stored;
-    const FEANode * fNode_stored;
-    const ALocal_InflowBC * infbc_stored;
 };
 
 #endif

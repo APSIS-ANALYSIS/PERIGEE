@@ -5,7 +5,7 @@ PDNSolution_NS::PDNSolution_NS(
     const FEANode * const &fNode_ptr,
     const ALocal_InflowBC * const &infbc,
     const int &type, const bool &isprint ) 
-: PDNSolution( pNode ), is_print(isprint), pNode_stored(pNode), fNode_stored(fNode_ptr), infbc_stored(infbc)
+: PDNSolution( pNode ), is_print(isprint)
 {
   if( pNode->get_dof() != 4 ) SYS_T::print_fatal("Error: PDNSolution_NS : the APart_Node gives wrong dof number. \n");
 
@@ -199,11 +199,14 @@ void PDNSolution_NS::Init_pipe_parabolic(
   }
 }
 
-void PDNSolution_NS::randomly_perturbed( const double &std_dev )
+void PDNSolution_NS::randomly_perturbed_parabolic_inflow( const double &std_dev,
+    const APart_Node * const &pNode_ptr,
+    const FEANode * const &fNode_ptr,
+    const ALocal_InflowBC * const &infbc )
 {
   double value[4] = {0.0, 0.0, 0.0, 0.0};
 
-  const int num_nbc = infbc_stored->get_num_nbc();
+  const int num_nbc = infbc->get_num_nbc();
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
@@ -211,35 +214,35 @@ void PDNSolution_NS::randomly_perturbed( const double &std_dev )
     //             2.0 x flow rate (1.0) / surface area
     // Here I use the unit flow rate, and the actual flow rate is adjusted
     // based on the CVFlowRate class.
-    const double vmax = 2.0 / infbc_stored->get_fularea(nbc_id);
+    const double vmax = 2.0 / infbc->get_fularea(nbc_id);
     
-    const double out_nx = infbc_stored->get_outvec(nbc_id).x();
-    const double out_ny = infbc_stored->get_outvec(nbc_id).y();
-    const double out_nz = infbc_stored->get_outvec(nbc_id).z();
+    const double out_nx = infbc->get_outvec(nbc_id).x();
+    const double out_ny = infbc->get_outvec(nbc_id).y();
+    const double out_nz = infbc->get_outvec(nbc_id).z();
 
     // If there are inflow nodes, set their value to be parabolic flow
-    if( infbc_stored->get_Num_LD(nbc_id) > 0)
+    if( infbc->get_Num_LD(nbc_id) > 0)
     {
       for(int ii=0; ii<nlocalnode; ++ii)
       {
-        if( infbc_stored->is_inLDN(nbc_id, pNode_stored->get_node_loc(ii)) )
+        if( infbc->is_inLDN(nbc_id, pNode_ptr->get_node_loc(ii)) )
         {
-          const int pos = pNode_stored->get_node_loc(ii) * 4;
+          const int pos = pNode_ptr->get_node_loc(ii) * 4;
           const int location[4] = { pos, pos + 1, pos +2, pos + 3 };
 
-          const Vector_3 pt = fNode_stored -> get_ctrlPts_xyz(ii);
-          const double r =  infbc_stored -> get_radius( nbc_id, pt );
+          const Vector_3 pt = fNode_ptr -> get_ctrlPts_xyz(ii);
+          const double r =  infbc -> get_radius( nbc_id, pt );
 
           const double vel = vmax * (1.0 - r*r);
 
-          const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev) * vel;
-          const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev) * vel;
-          const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev) * vel;
+          const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
+          const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
+          const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
 
           // -1.0 is multiplied to make the flow direction inward
-          value[1] = vel * out_nx + perturb_x;
-          value[2] = vel * out_ny + perturb_y;
-          value[3] = vel * out_nz + perturb_z;
+          value[1] = vel * (out_nx + perturb_x);
+          value[2] = vel * (out_ny + perturb_y);
+          value[3] = vel * (out_nz + perturb_z);
 
           VecSetValues(solution, 4, location, value, INSERT_VALUES);
         }

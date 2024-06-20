@@ -67,6 +67,9 @@ int main(int argc, char *argv[])
   double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
   double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
 
+  // Turbulence intensity for the purtabation at inlets, 3% ==> 0.03
+  double inflow_TI_perturbation = 0.0;
+
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
@@ -141,6 +144,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
   SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
+  SYS_T::GetOptionReal("-inflow_TI_perturbation", inflow_TI_perturbation);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -185,6 +189,7 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-inflow_thd_time:", inflow_thd_time);
     SYS_T::cmdPrint("-inflow_tgt_rate:", inflow_tgt_rate);
   }
+  SYS_T::cmdPrint("-inflow_TI_perturbation:", inflow_TI_perturbation);
 
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
@@ -231,6 +236,7 @@ int main(int argc, char *argv[])
       cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
       cmdh5w->write_doubleScalar("inflow_tgt_rate", inflow_tgt_rate );
     }
+    cmdh5w->write_doubleScalar("inflow_TI_perturbation", inflow_TI_perturbation);
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
@@ -579,7 +585,7 @@ int main(int argc, char *argv[])
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+      locAssem_ptr, gloAssem_ptr, lsolver, nsolver, pNode, inflow_TI_perturbation);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();

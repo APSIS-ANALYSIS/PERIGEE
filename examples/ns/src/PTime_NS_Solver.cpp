@@ -82,7 +82,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr ) const
+    PNonlinear_NS_Solver * const &nsolver_ptr,
+    const APart_Node * const &pNode_ptr,
+    const double &TI_std_dev ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
@@ -123,7 +125,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // If add perturbation at the inlet with given turbulence intensity
-    // sol_base->randomly_perturbed(0.005);
+    sol_base->randomly_perturbed_parabolic_inflow(TI_std_dev, pNode_ptr, feanode_ptr, infnbc_part);
 
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
