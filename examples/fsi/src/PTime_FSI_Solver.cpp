@@ -212,6 +212,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       cur_dot_pres->WriteBinary(sol_dot_name);
     }
 
+    /*
     // Calculate the flow rate on all outlets
     for(int face=0; face<ebc_v -> get_num_ebc(); ++face)
     {
@@ -268,7 +269,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       }
       MPI_Barrier(PETSC_COMM_WORLD);
     }
-
+    */
     pre_dot_disp -> Copy( cur_dot_disp );
     pre_dot_velo -> Copy( cur_dot_velo );
     pre_dot_pres -> Copy( cur_dot_pres );
