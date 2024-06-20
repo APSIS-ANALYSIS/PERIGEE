@@ -30,7 +30,6 @@ int main( int argc, char * argv[] )
   std::string sol_bname("SOL_");
   std::string out_bname = sol_bname;
   int time_start = 0, time_step = 1, time_end = 1;
-  double real_time_start = -1;
   bool isXML = true, isRestart = false;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
@@ -56,7 +55,6 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-time_step", time_step);
   SYS_T::GetOptionInt("-time_end", time_end);
   SYS_T::GetOptionReal("-dt", dt);
-  SYS_T::GetOptionReal("-real_time_start", real_time_start);
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionString("-out_bname", out_bname);
   SYS_T::GetOptionBool("-xml", isXML);
@@ -69,9 +67,6 @@ int main( int argc, char * argv[] )
   SYS_T::cmdPrint("-time_step:", time_step);
   SYS_T::cmdPrint("-time_end:", time_end);
   SYS_T::cmdPrint("-dt:",dt);
-  if (real_time_start < 0) 
-    real_time_start = time_start * dt;
-  SYS_T::cmdPrint("-real_time_start:",real_time_start);
   if(isXML) SYS_T::commPrint("-xml: true \n");
   else SYS_T::commPrint("-xml: false \n");
 
@@ -148,7 +143,6 @@ int main( int argc, char * argv[] )
 
   std::ostringstream time_index;
 
-  int time_counter = 0;
   for(int time = time_start; time<=time_end; time+= time_step)
   {
     std::string name_to_read(sol_bname);
@@ -166,9 +160,7 @@ int main( int argc, char * argv[] )
 
     vtk_w->writeOutput( fNode, locIEN, locElem,
         visprep, element, quad, solArrays,
-        rank, size, real_time_start + time_counter * time_step * dt, sol_bname, out_bname, name_to_write, isXML );
-    
-    time_counter += 1;
+        rank, size, time * dt, sol_bname, out_bname, name_to_write, isXML );
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
