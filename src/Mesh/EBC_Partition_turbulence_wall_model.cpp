@@ -1,6 +1,6 @@
-#include "EBC_Partition_wall_turbulence.hpp"
+#include "EBC_Partition_turbulence_wall_model.hpp"
 
-EBC_Partition_wall_turbulence::EBC_Partition_wall_turbulence(const IPart * const &part,
+EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)
 : EBC_Partition(part, mnindex, ebc), wall_model_type {ebc->get_wall_model_type()}
 {
@@ -33,16 +33,16 @@ EBC_Partition_wall_turbulence::EBC_Partition_wall_turbulence(const IPart * const
     }
   }
   else
-    SYS_T::print_fatal("Error: EBC_Partition_wall_turbulence, unknown wall model type.\n");
+    SYS_T::print_fatal("Error: EBC_Partition_turbulence_wall_model, unknown wall model type.\n");
 }
 
-EBC_Partition_wall_turbulence::~EBC_Partition_wall_turbulence()
+EBC_Partition_turbulence_wall_model::~EBC_Partition_turbulence_wall_model()
 {
   part_vol_ele_id.clear();
   ele_face_id.clear();
 }
 
-void EBC_Partition_wall_turbulence::write_hdf5(const std::string &FileName) const
+void EBC_Partition_turbulence_wall_model::write_hdf5(const std::string &FileName) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 

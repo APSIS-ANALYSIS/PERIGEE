@@ -1,12 +1,12 @@
-#include "ElemBC_3D_wall_turbulence.hpp"
+#include "ElemBC_3D_turbulence_wall_model.hpp"
 
-ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence( 
+ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model( 
     const std::vector<std::string> &vtkfileList,
     const int &in_wall_model_type, const IIEN * const &VIEN, const int &elemtype )
 : ElemBC_3D ( vtkfileList, elemtype ), wall_model_type {in_wall_model_type}
 {
   SYS_T::print_fatal_if(VEC_T::get_size(vtkfileList) > 1,
-    "Error, ElemBC_3D_wall_turbulence: The number of wall file should not be more than 1.\n");
+    "Error, ElemBC_3D_turbulence_wall_model: The number of wall file should not be more than 1.\n");
 
   if(VEC_T::get_size(vtkfileList) == 1)
   {
@@ -66,13 +66,13 @@ ElemBC_3D_wall_turbulence::ElemBC_3D_wall_turbulence(
       delete hexcell;
     }
     else
-      SYS_T::print_fatal("Error: ElemBC_3D_wall_turbulence, unknown element type.\n");
+      SYS_T::print_fatal("Error: ElemBC_3D_turbulence_wall_model, unknown element type.\n");
   }
   else
     ; // The weak_list is empty and the wall file was put in the dir_list. Strongly enforced Dirichlet BC will be appiled.
 }
 
-ElemBC_3D_wall_turbulence::~ElemBC_3D_wall_turbulence()
+ElemBC_3D_turbulence_wall_model::~ElemBC_3D_turbulence_wall_model()
 {
   face_id.clear();
 }

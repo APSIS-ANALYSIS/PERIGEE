@@ -1,7 +1,7 @@
-#ifndef EBC_PARTITION_WALL_TURBULENCE_HPP
-#define EBC_PARTITION_WALL_TURBULENCE_HPP
+#ifndef EBC_PARTITION_TURBULENCE_WALL_MODEL_HPP
+#define EBC_PARTITION_TURBULENCE_WALL_MODEL_HPP
 // ==================================================================
-// EBC_Partition_wall_turbulence.hpp
+// EBC_Partition_turbulence_wall_model.hpp
 //
 // Element boundary condition partition for the weak imposition of
 // no-slip boundary condition with wall-function applied.
@@ -11,15 +11,15 @@
 // ==================================================================
 #include "EBC_Partition.hpp"
 
-class EBC_Partition_wall_turbulence : public EBC_Partition
+class EBC_Partition_turbulence_wall_model : public EBC_Partition
 {
   public:
-    // The input ElemBC should be ElemBC_3D_wall_turbulence
-    EBC_Partition_wall_turbulence( const IPart * const &part,
+    // The input ElemBC should be ElemBC_3D_turbulence_wall_model
+    EBC_Partition_turbulence_wall_model( const IPart * const &part,
         const Map_Node_Index * const &mnidex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_wall_turbulence();
+    virtual ~EBC_Partition_turbulence_wall_model();
 
     // write the data to hdf5 file in folder /weak
     virtual void write_hdf5( const std::string &FileName ) const;
