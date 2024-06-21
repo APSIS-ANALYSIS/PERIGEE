@@ -1,7 +1,7 @@
-#ifndef ELEMBC_3D_WALL_TURBULENCE_HPP
-#define ELEMBC_3D_WALL_TURBULENCE_HPP
+#ifndef ELEMBC_3D_TURBULENCE_WALL_MODEL_HPP
+#define ELEMBC_3D_TURBULENCE_WALL_MODEL_HPP
 // ============================================================================
-// ElemBC_3D_wall_turbulence.hpp
+// ElemBC_3D_turbulence_wall_model.hpp
 //
 // This is an instantation of ElemBC_3D for weakly enforced Dirichlet boundary 
 // condition on the wall with 'the law of the wall' applied.
@@ -17,7 +17,7 @@
 // 3. Face id of the volume element, we will use the face id and the local ien of
 //    volume element to build the quadrature rule and the basis;
 //
-// To be distinguished from other ElemBC_3D, it uses EBC_Partition_wall_turbulence to 
+// To be distinguished from other ElemBC_3D, it uses EBC_Partition_turbulence_wall_model to 
 // write h5 file and serves a unique ALocal_WeakBC object.
 //
 // Author: Xuanming Huang
@@ -25,15 +25,15 @@
 // ============================================================================
 #include "ElemBC_3D.hpp"
 
-class ElemBC_3D_wall_turbulence : public ElemBC_3D 
+class ElemBC_3D_turbulence_wall_model : public ElemBC_3D 
 {
   public:
-    ElemBC_3D_wall_turbulence( const std::vector<std::string> &vtkfileList,
+    ElemBC_3D_turbulence_wall_model( const std::vector<std::string> &vtkfileList,
         const int &in_wall_model_type,
         const IIEN * const &VIEN,
         const int &elemtype );
 
-    virtual ~ElemBC_3D_wall_turbulence();
+    virtual ~ElemBC_3D_turbulence_wall_model();
 
     virtual int get_wall_model_type() const { return wall_model_type; };
 
@@ -52,7 +52,7 @@ class ElemBC_3D_wall_turbulence : public ElemBC_3D
 
     // ------------------------------------------------------------------------
     // Disallow default constructor
-    ElemBC_3D_wall_turbulence() = delete;
+    ElemBC_3D_turbulence_wall_model() = delete;
 };
 
 #endif

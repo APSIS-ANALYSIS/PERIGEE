@@ -16,11 +16,11 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_wall_turbulence.hpp"
+#include "ElemBC_3D_turbulence_wall_model.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
-#include "EBC_Partition_wall_turbulence.hpp"
+#include "EBC_Partition_turbulence_wall_model.hpp"
 #include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
@@ -254,7 +254,7 @@ int main( int argc, char * argv[] )
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
-  ElemBC * wbc = new ElemBC_3D_wall_turbulence( weak_list, wall_model_type, IEN, elemType );
+  ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
  
   // Start partition the mesh for each cpu_rank 
 
@@ -295,7 +295,7 @@ int main( int argc, char * argv[] )
     ebcpart -> write_hdf5( part_file );
 
     // Partition Weak BC and write to h5 file
-    EBC_Partition * wbcpart = new EBC_Partition_wall_turbulence(part, mnindex, wbc);
+    EBC_Partition * wbcpart = new EBC_Partition_turbulence_wall_model(part, mnindex, wbc);
 
     wbcpart -> write_hdf5( part_file );
 

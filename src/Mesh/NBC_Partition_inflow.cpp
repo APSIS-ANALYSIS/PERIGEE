@@ -23,14 +23,27 @@ NBC_Partition_inflow::NBC_Partition_inflow(
   {
     // Collect the Dirichlet nodes on the ii-th inlet surface
     Num_LD[ii] = 0;
-    for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_inlet(ii); ++jj)
+    PERIGEE_OMP_PARALLEL
     {
-      int node_index = static_cast<int>( nbc -> get_dir_nodes_on_inlet(ii, jj) );
-      node_index = mnindex -> get_old2new(node_index);
-      if(part->isNodeInPart(node_index))
+      std::vector<int> temp_LDN {};
+      int temp_num_LD = 0;
+
+      PERIGEE_OMP_FOR
+      for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_inlet(ii); ++jj)
       {
-        LDN[ii].push_back(node_index);
-        Num_LD[ii] += 1;
+        int node_index = static_cast<int>( nbc -> get_dir_nodes_on_inlet(ii, jj) );
+        node_index = mnindex -> get_old2new(node_index);
+        if(part->isNodeInPart(node_index))
+        {
+          temp_LDN.push_back(node_index);
+          temp_num_LD += 1;
+        }
+      }
+
+      PERIGEE_OMP_CRITICAL
+      {
+        VEC_T::insert_end(LDN[ii], temp_LDN);
+        Num_LD[ii] += temp_num_LD;
       }
     }
 
@@ -47,30 +60,43 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     centroid[ii] = nbc->get_centroid(ii);
 
     outline_pts[ii].resize( 3*num_out_bc_pts[ii] );
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<3*num_out_bc_pts[ii]; ++jj)
       outline_pts[ii][jj] = nbc->get_outline_pts(ii, jj);
 
     // Record the geometrical info of the inlet in this CPU
     cell_nLocBas[ii] = nbc -> get_nLocBas(ii);
 
-    std::vector<int> local_node, local_elem;
-    local_node.clear(); local_elem.clear();
+    std::vector<int> local_node {}, local_elem {};
 
     local_global_cell[ii].clear();
 
     // Loop over all cells on inlet cap surface
-    for(int jj=0; jj < nbc->get_num_cell(ii); ++jj)
+    PERIGEE_OMP_PARALLEL
     {
-      const int elem_index = nbc -> get_global_cell(ii, jj); // cell vol id
+      std::vector<int> temp_local_elem {}, temp_local_node {}, temp_local_global_cell {};
 
-      if( part -> get_elemLocIndex( elem_index ) != -1  )
+      PERIGEE_OMP_FOR
+      for(int jj=0; jj < nbc->get_num_cell(ii); ++jj)
       {
-        local_elem.push_back( jj );
+        const int elem_index = nbc -> get_global_cell(ii, jj); // cell vol id
 
-        local_global_cell[ii].push_back( elem_index );
+        if( part -> get_elemLocIndex( elem_index ) != -1  )
+        {
+          temp_local_elem.push_back( jj );
 
-        for( int kk=0; kk<cell_nLocBas[ii]; ++kk )
-          local_node.push_back( nbc->get_ien(ii, jj, kk) );
+          temp_local_global_cell.push_back( elem_index );
+
+          for( int kk=0; kk<cell_nLocBas[ii]; ++kk )
+            temp_local_node.push_back( nbc->get_ien(ii, jj, kk) );
+        }
+      }
+
+      PERIGEE_OMP_CRITICAL
+      {
+        VEC_T::insert_end(local_elem, temp_local_elem);
+        VEC_T::insert_end(local_node, temp_local_node);
+        VEC_T::insert_end(local_global_cell[ii], temp_local_global_cell);
       }
     }
 
@@ -83,6 +109,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     local_global_node[ii].resize( num_local_node[ii] );
     local_node_pos[ii].resize(    num_local_node[ii] );
 
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_node[ii]; ++jj)
     {
       local_pt_xyz[ii][3*jj+0] = nbc -> get_pt_xyz( ii, local_node[jj], 0 );
@@ -97,6 +124,7 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     // create new IEN
     local_cell_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
 
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_cell[ii]; ++jj)
     {
       for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
