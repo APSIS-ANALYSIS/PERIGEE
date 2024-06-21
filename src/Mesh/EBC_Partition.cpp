@@ -105,6 +105,7 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
 
     // now create the new IEN
     local_cell_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
+    
     PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_cell[ii]; ++jj)
     {
