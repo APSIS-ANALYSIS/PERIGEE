@@ -582,10 +582,10 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN, fNode,
+  tsolver->TM_NS_GenAlpha(is_restart, inflow_TI_perturbation, base, dot_sol, sol,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver, pNode, inflow_TI_perturbation);
+      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();

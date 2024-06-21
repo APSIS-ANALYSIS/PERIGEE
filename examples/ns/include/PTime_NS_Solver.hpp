@@ -24,12 +24,14 @@ class PTime_NS_Solver
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-      PDNSolution * const &sol_base,
+        const double &TI_std_dev,
+        PDNSolution * const &sol_base,
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         PDNTimeStep * const &time_info,
         const ICVFlowRate * const flr_ptr,
+        const APart_Node * const &pNode_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &feanode_ptr,
@@ -47,9 +49,7 @@ class PTime_NS_Solver
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_NS_Solver * const &nsolver_ptr,
-        const APart_Node * const &pNode_ptr,
-        const double &TI_std_dev ) const;
+        PNonlinear_NS_Solver * const &nsolver_ptr ) const;
 
   private:
     const double final_time;

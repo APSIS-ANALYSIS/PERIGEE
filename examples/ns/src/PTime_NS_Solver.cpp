@@ -59,12 +59,14 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
+    const double &TI_std_dev,
     PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
     const ICVFlowRate * const flr_ptr,
+    const APart_Node * const &pNode_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
@@ -82,9 +84,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr,
-    const APart_Node * const &pNode_ptr,
-    const double &TI_std_dev ) const
+    PNonlinear_NS_Solver * const &nsolver_ptr ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
