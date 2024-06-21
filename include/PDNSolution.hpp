@@ -19,7 +19,6 @@
 // Author: Ju Liu
 // Date: Nov. 23th 2013
 // ============================================================================
-#include "Math_Tools.hpp"
 #include "APart_Node.hpp"
 #include "FEANode.hpp"
 #include "ALocal_InflowBC.hpp"
@@ -174,8 +173,7 @@ class PDNSolution
         const FEANode * const &fNode,
         const ALocal_InflowBC * const &infbc )
     {
-      SYS_T::print_fatal("Error: PDNSolution::randomly_perturbed is not implemented.\n");
-      return;
+      SYS_T::print_fatal("Error: PDNSolution::randomly_perturbed_parabolic_inflow is not implemented.\n");
     } 
 
   protected:
