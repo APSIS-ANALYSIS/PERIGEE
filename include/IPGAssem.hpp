@@ -25,6 +25,7 @@
 #include "ALocal_RingBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "ALocal_WeakBC.hpp"
+#include "ALocal_Interface.hpp"
 #include "IGenBC.hpp"
 #include "Tissue_prestress.hpp"
 
