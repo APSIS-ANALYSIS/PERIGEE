@@ -150,9 +150,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
       const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name);
-
-      cur_sol->WriteBinary(sol_name);
-      
     }
 
     // Calculate the flow rate & averaged pressure on all outlets

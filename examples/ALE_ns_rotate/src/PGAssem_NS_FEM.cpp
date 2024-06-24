@@ -65,10 +65,12 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 
-  // Creat Vec Disp 
+  // Allocate the vector Disp
   const int nlocrow_disp = 3 * pnode_ptr->get_nlocalnode();
   VecCreate(PETSC_COMM_WORLD, &Disp);
   VecSetSizes(Disp, nlocrow_disp, PETSC_DECIDE);
+
+  VecSetFromOptions(Disp);
   VecSet(Disp, 0.0);
   VecSetOption(Disp, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 }
