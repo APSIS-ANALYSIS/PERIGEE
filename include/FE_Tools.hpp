@@ -10,6 +10,7 @@
 #include "Vector_3.hpp"
 #include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
+#include "FEAElement.hpp"
 
 namespace FE_T
 {
@@ -38,6 +39,13 @@ namespace FE_T
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
 
   double get_circumradius( const std::array<Vector_3, 4> &pts );
+
+  bool search_closest_point( const Vector_3 &target_xyz,
+      FEAElement * const &elements,
+      const double * const &electrl_x,
+      const double * const &electrl_y,
+      const double * const &electrl_z,
+      IQuadPts * const &closest_point );
 
   // --------------------------------------------------------------------------
   // Projection operator

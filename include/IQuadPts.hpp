@@ -115,6 +115,28 @@ class IQuadPts
       SYS_T::print_fatal("Error: IQuadPts::get_qp is not implemented.\n");
       return 0.0;
     }
+
+    // For User-defined QuadPts
+    virtual void set_qp(unsigned int ii, const std::vector<double> &value)
+    {
+      SYS_T::print_fatal("Error: IQuadPts::set_qp is not implemented.\n");
+    }
+
+    virtual void set_qw(unsigned int ii, const double &value)
+    {
+      SYS_T::print_fatal("Error: IQuadPts::set_qw is not implemented. \n");
+    }
+
+    virtual void reset()
+    {
+      SYS_T::print_fatal("Error: IQuadPts::reset is not implemented. \n");
+    }
+
+    virtual bool check_qp(const int &ii)
+    {
+      SYS_T::print_fatal("Error: IQuadPts::check_qp is not implemented. \n");
+      return false;
+    }
 };
 
 #endif
