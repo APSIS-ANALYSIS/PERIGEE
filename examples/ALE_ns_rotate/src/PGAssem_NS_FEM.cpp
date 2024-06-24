@@ -419,6 +419,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
+
+      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
     else
     {
@@ -429,12 +431,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
         lassem_ptr->Tangent, ADD_VALUES);
+
+      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
-
-    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
-
-    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
