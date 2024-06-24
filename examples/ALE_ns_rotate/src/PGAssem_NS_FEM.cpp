@@ -296,8 +296,8 @@ void PGAssem_NS_FEM::Assem_residual(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
-        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+    // lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
+    //     elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -305,7 +305,24 @@ void PGAssem_NS_FEM::Assem_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
     
-    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    if( alelem_ptr->get_elem_tag(ee) == 0 )
+    {
+      const Vector_3 rotated_velo (0.0, 0.0, 0.0);
+
+      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    }
+    else
+    {
+      const Vector_3 rotated_velo (1.0, 0.0, 0.0);
+
+      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+          elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    }
   }
 
   delete [] array_a; array_a = nullptr;
@@ -384,13 +401,34 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
-        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+    // lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+    //     elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+    }
+
+    if( alelem_ptr->get_elem_tag(ee) == 0 )
+    {
+      const Vector_3 rotated_velo (0.0, 0.0, 0.0);
+
+      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+      MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+    }
+    else
+    {
+      const Vector_3 rotated_velo (1.0, 0.0, 0.0);
+
+      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+      MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
     }
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,

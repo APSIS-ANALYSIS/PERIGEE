@@ -123,6 +123,7 @@ double PLocAssem_VMS_NS_GenAlpha::get_DC(
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
+    const Vector_3 &rotated_velo,
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -141,6 +142,15 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
+
+  // Coordinate info for each node in the element
+  std::vector<Vector_3> coor_ele {};
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    Vector_3 eleCtrlPts (eleCtrlPts_x[ii], eleCtrlPts_y[ii], eleCtrlPts_z[ii]);
+    coor_ele.push_back(eleCtrlPts);
+  }
 
   for(int qua=0; qua<nqp; ++qua)
   {
@@ -201,6 +211,17 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
+    // Mesh velocity in the quadrature point 
+    const Vector_3 radius_qua = get_radius(coor);
+    const Vector_3 velo_mesh = Vec3::cross_product(rotated_velo, radius_qua);
+    const double mu = velo_mesh.x();
+    const double mv = velo_mesh.y();
+    const double mw = velo_mesh.z();
+
+    // v - hat(v)
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
 
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
@@ -220,9 +241,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -240,14 +261,14 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
       Residual[4*A+1] += gwts * ( NA * rho0 * u_t
-          + NA * rho0 * (u * u_x + v * u_y + w * u_z)
+          + NA * rho0 * (cu * u_x + cv * u_y + cw * u_z)
           - NA_x * p
           + NA_x * two_mu * u_x
           + NA_y * vis_mu * (u_y + v_x)
@@ -261,7 +282,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
           - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
-          + NA * rho0 * (u * v_x + v * v_y + w * v_z)
+          + NA * rho0 * (cu * v_x + cv * v_y + cw * v_z)
           - NA_y * p
           + NA_x * vis_mu * (u_y + v_x)
           + NA_y * two_mu * v_y
@@ -275,7 +296,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
           - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
-          + NA * rho0 * (u * w_x + v * w_y + w * w_z)
+          + NA * rho0 * (cu * w_x + cv * w_y + cw * w_z)
           - NA_z * p
           + NA_x * vis_mu * (u_z + w_x)
           + NA_y * vis_mu * (w_y + v_z)
@@ -293,6 +314,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
+    const Vector_3 &rotated_velo,
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -316,6 +338,15 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
+  // Coordinate info for each node in the element
+  std::vector<Vector_3> coor_ele {};
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    Vector_3 eleCtrlPts (eleCtrlPts_x[ii], eleCtrlPts_y[ii], eleCtrlPts_z[ii]);
+    coor_ele.push_back(eleCtrlPts);
+  }
+
   for(int qua=0; qua<nqp; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
@@ -376,9 +407,21 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
+    // Mesh velocity in the quadrature point 
+    const Vector_3 radius_qua = get_radius(coor);
+    const Vector_3 velo_mesh = Vec3::cross_product(rotated_velo, radius_qua);
+    const double mu = velo_mesh.x();
+    const double mv = velo_mesh.y();
+    const double mw = velo_mesh.z();
+
+    // v - hat(v)
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
+
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, cu, cv, cw );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -392,9 +435,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap ;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -412,14 +455,14 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
       Residual[4*A+1] += gwts * ( NA * rho0 * u_t
-          + NA * rho0 * (u * u_x + v * u_y + w * u_z)
+          + NA * rho0 * (cu * u_x + cv * u_y + cw * u_z)
           - NA_x * p
           + NA_x * two_mu * u_x
           + NA_y * vis_mu * (u_y + v_x)
@@ -433,7 +476,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
-          + NA * rho0 * (u * v_x + v * v_y + w * v_z)
+          + NA * rho0 * (cu * v_x + cv * v_y + cw * v_z)
           - NA_y * p
           + NA_x * vis_mu * (u_y + v_x)
           + NA_y * two_mu * v_y
@@ -447,7 +490,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
-          + NA * rho0 * (u * w_x + v * w_y + w * w_z)
+          + NA * rho0 * (cu * w_x + cv * w_y + cw * w_z)
           - NA_z * p
           + NA_x * vis_mu * (u_z + w_x)
           + NA_y * vis_mu * (w_y + v_z)
@@ -465,7 +508,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         const double NB_xx = d2R_dxx[B], NB_yy = d2R_dyy[B], NB_zz = d2R_dzz[B];
         const double NB_lap = NB_xx + NB_yy + NB_zz;
-        const double velo_dot_gradNB = u * NB_x + v * NB_y + w * NB_z;
+        const double velo_dot_gradNB = cu * NB_x + cv * NB_y + cw * NB_z;
         const double velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
 
         const double NANB  = NA*NB, NANBx = NA*NB_x, NANBy = NA*NB_y, NANBz = NA*NB_z;

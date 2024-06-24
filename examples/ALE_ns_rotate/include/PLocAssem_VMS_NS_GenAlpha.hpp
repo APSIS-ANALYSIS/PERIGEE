@@ -63,6 +63,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Residual(
         const double &time, const double &dt,
+        const Vector_3 &rotated_velo,
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
@@ -73,6 +74,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
+        const Vector_3 &rotated_velo,
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
@@ -198,6 +200,27 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     {
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
+
+    Vector_3 get_radius (const Vector_3 &coor) const
+    { 
+      // Info of rotation axis
+      const Vector_3 point_rotated (0.5, 0.0, 0.0);
+      Vector_3 direction_rotated (1.0, 0.0, 0.0);
+      
+      direction_rotated.normalize();
+
+      // The vector from the rotation point to the input point
+      const Vector_3 point_rotated_to_coor (coor.x()- point_rotated.x(), coor.y()- point_rotated.y(), coor.z()- point_rotated.z());
+
+      const double projectd_length = Vec3::dot_product(point_rotated_to_coor, direction_rotated);
+      
+      // The projection point of the input point on the rotation axis
+      const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
+      
+      // The vector from the projection point to the input point
+      return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z() );
+    } 
+
 };
 
 #endif

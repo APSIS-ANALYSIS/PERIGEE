@@ -153,6 +153,18 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const Vector_3 &rotated_velo,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 
@@ -179,6 +191,18 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const double * const &qua_prestress,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
+
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const Vector_3 &rotated_velo,
+        const double * const &vec_a,
+        const double * const &vec_b,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
