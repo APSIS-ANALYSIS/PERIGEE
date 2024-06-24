@@ -18,6 +18,13 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
     elem_tag = h5r->read_intVector("/Local_Elem", "elem_phy_tag");
   else
     elem_tag.clear();
+
+  isTagged = h5r -> check_data("/Local_Elem/elem_rotated_tag");
+
+  if( isTagged )
+    elem_tag = h5r->read_intVector("/Local_Elem", "elem_rotated_tag");
+  else
+    elem_tag.clear();
     
   delete h5r; H5Fclose( file_id );
 }

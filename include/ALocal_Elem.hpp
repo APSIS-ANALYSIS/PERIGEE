@@ -51,8 +51,8 @@ class ALocal_Elem
 
     // ------------------------------------------------------------------------
     // This is a virtual function for multiphysics simulations. A tag
-    // is attached to each element to denote different physical domains,
-    // such as fluid vs. solid subdomains. For a single domain problem,
+    // is attached to each element to denote different physical/rotated domains,
+    // such as fluid/fixed vs. solid/rotated subdomains. For a single domain problem,
     // this function is NOT needed, and returns a default value of 0.
     // ------------------------------------------------------------------------
     virtual int get_elem_tag(const int &ee) const
@@ -80,8 +80,8 @@ class ALocal_Elem
 
     // ------------------------------------------------------------------------
     // A vector recording the tag of elements. Length is nlocalele.
-    // In FSI problems, we assume tag 0 gives fluid element; 
-    //                            tag 1 gives solid element.
+    // In FSI/ALE problems, we assume tag 0 gives fluid/fixed element; 
+    //                            tag 1 gives solid/rotated element.
     // elem_tag is cleared if isTagged = false
     // ------------------------------------------------------------------------
     std::vector<int> elem_tag {};

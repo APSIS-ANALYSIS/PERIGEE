@@ -199,6 +199,13 @@ int main( int argc, char * argv[] )
   nFunc += rotated_nFunc;
   nElem += rotated_nElem;
 
+  // fixed_geo: tag = 0
+  // rotated_geo: tag = 1
+  std::vector<int> rotated_tag (nElem, 1);
+  
+  for (int ee=0; ee < fixed_nElem; ++ee)
+    rotated_tag [ee] = 0;
+
   for (int &nodeid : rotated_vecIEN)
     nodeid += fixed_nFunc;
 
@@ -391,8 +398,10 @@ int main( int argc, char * argv[] )
   {
     mytimer->Reset();
     mytimer->Start();
+
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
+        ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
+    
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
