@@ -14,6 +14,7 @@
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_V.hpp"
 
 class PNonlinear_NS_Solver
 {
@@ -74,6 +75,9 @@ class PNonlinear_NS_Solver
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_step;
+
+    // vector container for the disp in the smaller matrix problem
+    PDNSolution * disp_mesh;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const

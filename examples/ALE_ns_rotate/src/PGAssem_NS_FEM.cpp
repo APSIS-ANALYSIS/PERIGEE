@@ -64,12 +64,20 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   // Create Mat with precise preallocation 
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+
+  // Creat Vec Disp 
+  const int nlocrow_disp = 3 * pnode_ptr->get_nlocalnode();
+  VecCreate(PETSC_COMM_WORLD, &Disp);
+  VecSetSizes(Disp, nlocrow_disp, PETSC_DECIDE);
+  VecSet(Disp, 0.0);
+  VecSetOption(Disp, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 }
 
 PGAssem_NS_FEM::~PGAssem_NS_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
+  VecDestroy(&Disp);
 }
 
 void PGAssem_NS_FEM::EssBC_KG(
@@ -284,6 +292,7 @@ void PGAssem_NS_FEM::Assem_residual(
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * row_disp_index = new PetscInt [nLocBas * 3];
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
@@ -304,6 +313,12 @@ void PGAssem_NS_FEM::Assem_residual(
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<3; ++mm)
+        row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+    }    
     
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
@@ -323,6 +338,7 @@ void PGAssem_NS_FEM::Assem_residual(
 
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
+    VecSetValues(Disp, 3 * nLocBas, row_disp_index, lassem_ptr->disp_mesh, INSERT_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -389,6 +405,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * row_disp_index = new PetscInt [nLocBas * 3];
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
@@ -408,6 +425,12 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     {
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+    }
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<3; ++mm)
+        row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
     if( alelem_ptr->get_elem_tag(ee) == 0 )
@@ -434,6 +457,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
+    VecSetValues(Disp, 3 * nLocBas, row_disp_index, lassem_ptr->disp_mesh, INSERT_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;

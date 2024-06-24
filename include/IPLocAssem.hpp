@@ -26,8 +26,10 @@ class IPLocAssem
       
       sur_Tangent  = nullptr;
       sur_Residual = nullptr;
+
+      disp_mesh = nullptr;
     }
-    
+
     virtual ~IPLocAssem(){};
 
     // ------------------------------------------------------------------------
@@ -47,6 +49,8 @@ class IPLocAssem
 
     PetscScalar * sur_Residual;
 
+    // Store the mesh disp
+    PetscScalar * disp_mesh;
     // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Get degree of freedom of this problem. In segregated algorithms

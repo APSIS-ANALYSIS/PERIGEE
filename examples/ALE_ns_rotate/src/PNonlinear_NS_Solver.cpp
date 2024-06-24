@@ -15,12 +15,17 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
   dot_step = new PDNSolution_NS( anode_ptr, 0, false );
+
+  // Generate the mesh disp solution vector used for update 
+  // the solution of the nonlinear algebraic system 
+  disp_mesh = new PDNSolution_V( anode_ptr );
 }
 
 
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
   delete dot_step; dot_step = nullptr;
+  delete disp_mesh; disp_mesh = nullptr;
 }
 
 
@@ -178,6 +183,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+
+    // Mesh disp solution
+    VecCopy( gassem_ptr->Disp, disp_mesh->solution );
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
