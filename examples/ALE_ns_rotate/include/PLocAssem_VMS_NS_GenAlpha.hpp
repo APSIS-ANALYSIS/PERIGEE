@@ -221,6 +221,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z() );
     } 
 
+    // Store the mesh disp
+    PetscScalar * disp_mesh = nullptr;
 };
 
 #endif
