@@ -30,6 +30,17 @@ std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
   return out_name;
 }
 
+std::string PTime_NS_Solver::Name_disp_Generator(const int &counter) const
+{
+  std::ostringstream temp;
+  temp.str("");
+  temp<<900000000 + counter;
+
+  std::string out_name("DISP_");
+  out_name.append(temp.str());
+  return out_name;
+}
+
 void PTime_NS_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
@@ -90,6 +101,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+  PDNSolution * disp_mesh = new PDNSolution_V( pNode_ptr );
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -99,6 +111,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     
     const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name);
+  
+    const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
+    disp_mesh->WriteBinary(sol_disp_name);
   }
 
   bool conv_flag, renew_flag;
@@ -133,7 +148,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, disp_mesh, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -150,6 +165,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
       const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name);
+
+      const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
+      disp_mesh->WriteBinary(sol_disp_name);
     }
 
     // Calculate the flow rate & averaged pressure on all outlets

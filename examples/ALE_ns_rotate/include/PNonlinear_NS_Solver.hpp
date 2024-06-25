@@ -67,6 +67,7 @@ class PNonlinear_NS_Solver
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
+        PDNSolution * const &disp_mesh,
         bool &conv_flag, int &nl_counter ) const;
 
   private:
@@ -75,9 +76,6 @@ class PNonlinear_NS_Solver
 
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_step;
-
-    // vector container for the disp in the smaller matrix problem
-    PDNSolution * disp_mesh;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const

@@ -60,6 +60,8 @@ class PTime_NS_Solver
     std::string Name_Generator( const int &counter ) const;
     
     std::string Name_dot_Generator( const int &counter ) const;
+
+    std::string Name_disp_Generator( const int &counter ) const;
     
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
