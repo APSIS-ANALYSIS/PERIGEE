@@ -12,6 +12,7 @@
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
+#include "Math_Tools.hpp"
 
 class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 {
@@ -238,6 +239,37 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         currPt_x[ii] = ept_x[ii] + disp[3*ii];
         currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
         currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
+      }
+    }
+
+    void get_currPts( const double * const &ept_x,
+        const double * const &ept_y,
+        const double * const &ept_z,
+        const double &tt,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z,
+        const int &type) const
+    {
+      // rotation around x-axis
+      const double angular_velo = MATH_T::PI / 60;  // (rad/s)
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+        const Vector_3 radius_ept = get_radius(ept_xyz);
+
+        const double rr = radius_ept.norm2();
+        
+        //switch(type): case 0: x-axis
+
+        double angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
+         
+        angle += angular_velo * tt;
+        
+        currPt_x[ii] = ept_x[ii];
+        currPt_y[ii] = std::cos(angle) * rr;
+        currPt_z[ii] = std::sin(angle) * rr;
       }
     }
 };

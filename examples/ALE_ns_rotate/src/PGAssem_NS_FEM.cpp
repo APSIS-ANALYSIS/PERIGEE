@@ -465,7 +465,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     }
     else
     {
-      const Vector_3 angular_velo (1.0, 0.0, 0.0);
+      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0);
 
       lassem_ptr->Assem_Tangent_Residual(curr_time, dt, angular_velo, local_a, local_b, local_disp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
