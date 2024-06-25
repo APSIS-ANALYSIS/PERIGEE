@@ -392,6 +392,8 @@ int main(int argc, char *argv[])
 
   PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
 
+  PDNSolution * disp_mesh = new PDNSolution_V( pNode );
+
   if( is_restart )
   {
     initial_index = restart_index;
@@ -582,7 +584,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, inflow_TI_perturbation, base, dot_sol, sol,
+  tsolver->TM_NS_GenAlpha(is_restart, inflow_TI_perturbation, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
@@ -595,8 +597,8 @@ int main(int argc, char *argv[])
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
-  delete lsolver; delete nsolver; delete tsolver;
+  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh;
+  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;

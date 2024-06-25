@@ -74,6 +74,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
+    const PDNSolution * const &init_disp,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
     const ICVFlowRate * const flr_ptr,
@@ -101,7 +102,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * disp_mesh = new PDNSolution_V( pNode_ptr );
+  PDNSolution * disp_mesh = new PDNSolution(*init_disp);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)

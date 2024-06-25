@@ -116,6 +116,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
   {
+    gassem_ptr->Clear_Disp();
+
     gassem_ptr->Clear_KG();
 
 #ifdef PETSC_USE_LOG
@@ -138,6 +140,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   }
   else
   {
+    gassem_ptr->Clear_Disp();
+
     gassem_ptr->Clear_G();
 
 #ifdef PETSC_USE_LOG
