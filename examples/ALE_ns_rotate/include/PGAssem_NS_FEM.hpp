@@ -151,7 +151,7 @@ class PGAssem_NS_FEM : public IPGAssem
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
-
+    
     int snLocBas;
 
     // Private function

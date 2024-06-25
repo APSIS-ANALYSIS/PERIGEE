@@ -266,7 +266,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     // Get the Discontinuity Capturing tau
     const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
-    // Mesh displacement
+    // Mesh displacement in the node
     for(int A=0; A<nLocBas; ++A)
     {
       disp_mesh[3*A] = velo_mesh_ele[A].x() * (time + dt);
@@ -470,7 +470,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     
     const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
-    // Mesh displacement
+    // Mesh displacement in the node
     for(int A=0; A<nLocBas; ++A)
     {
       disp_mesh[3*A] = velo_mesh_ele[A].x() * (time + dt);

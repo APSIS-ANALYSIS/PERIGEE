@@ -210,7 +210,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       direction_rotated.normalize();
 
       // The vector from the rotation point to the input point
-      const Vector_3 point_rotated_to_coor (coor.x()- point_rotated.x(), coor.y()- point_rotated.y(), coor.z()- point_rotated.z());
+      const Vector_3 point_rotated_to_coor (coor.x() - point_rotated.x(), coor.y() - point_rotated.y(), coor.z() - point_rotated.z());
 
       const double projectd_length = Vec3::dot_product(point_rotated_to_coor, direction_rotated);
       
