@@ -185,7 +185,10 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
     // Mesh disp solution
-    VecCopy( gassem_ptr->Disp, disp_mesh->solution );
+    //VecCopy( gassem_ptr->Disp, disp_mesh->solution ); // need test??
+    disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
+
+    gassem_ptr->Clear_Disp();
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
