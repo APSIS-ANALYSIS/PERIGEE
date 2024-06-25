@@ -128,10 +128,10 @@ double PLocAssem_VMS_NS_GenAlpha::get_DC(
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
-    const Vector_3 &rotated_velo,
+    const Vector_3 &angular_velo,
     const double * const &dot_sol,
     const double * const &sol,
-    const double * const pre_disp_mesh,
+    const double * const &pre_disp_mesh,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -162,7 +162,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
   {
     const Vector_3 eleCtrlPts (curPt_x[ii], curPt_y[ii], curPt_z[ii]);
     const Vector_3 radius_ele = get_radius(eleCtrlPts);
-    const Vector_3 mesh_velo_ele = Vec3::cross_product(rotated_velo, radius_ele);
+    const Vector_3 mesh_velo_ele = Vec3::cross_product(angular_velo, radius_ele);
 
     velo_mesh_ele.push_back(mesh_velo_ele);
   }
@@ -236,7 +236,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     }
     // Mesh velocity in the quadrature point 
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vec3::cross_product(rotated_velo, radius_qua);
+    const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
     const double mw = velo_mesh.z();
@@ -337,10 +337,10 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
-    const Vector_3 &rotated_velo,
+    const Vector_3 &angular_velo,
     const double * const &dot_sol,
     const double * const &sol,
-    const double * const pre_disp_mesh,
+    const double * const &pre_disp_mesh,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -375,7 +375,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   {
     const Vector_3 eleCtrlPts (curPt_x[ii], curPt_y[ii], curPt_z[ii]);
     const Vector_3 radius_ele = get_radius(eleCtrlPts);
-    const Vector_3 mesh_velo_ele = Vec3::cross_product(rotated_velo, radius_ele);
+    const Vector_3 mesh_velo_ele = Vec3::cross_product(angular_velo, radius_ele);
 
     velo_mesh_ele.push_back(mesh_velo_ele);
   }
@@ -450,7 +450,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     // Mesh velocity in the quadrature point 
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vec3::cross_product(rotated_velo, radius_qua);
+    const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
     const double mw = velo_mesh.z();

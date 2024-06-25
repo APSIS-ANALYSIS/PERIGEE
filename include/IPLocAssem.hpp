@@ -159,7 +159,7 @@ class IPLocAssem
 
     virtual void Assem_Residual(
         const double &time, const double &dt,
-        const Vector_3 &rotated_velo,
+        const Vector_3 &angular_velo,
         const double * const &vec_a,
         const double * const &vec_b,
         const double * const pre_disp_mesh,
@@ -201,7 +201,7 @@ class IPLocAssem
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
-        const Vector_3 &rotated_velo,
+        const Vector_3 &angular_velo,
         const double * const &vec_a,
         const double * const &vec_b,
         const double * const pre_disp_mesh,

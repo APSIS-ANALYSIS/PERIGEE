@@ -329,18 +329,18 @@ void PGAssem_NS_FEM::Assem_residual(
     
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
-      const Vector_3 rotated_velo (0.0, 0.0, 0.0);
+      const Vector_3 angular_velo (0.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
+      lassem_ptr->Assem_Residual(curr_time, dt, angular_velo, local_a, local_b, local_disp,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
     else
     {
-      const Vector_3 rotated_velo (1.0, 0.0, 0.0);
+      const Vector_3 angular_velo (1.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
+      lassem_ptr->Assem_Residual(curr_time, dt, angular_velo, local_a, local_b, local_disp,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
@@ -453,9 +453,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
-      const Vector_3 rotated_velo (0.0, 0.0, 0.0);
+      const Vector_3 angular_velo (0.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
+      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, angular_velo, local_a, local_b, local_disp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
@@ -465,9 +465,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     }
     else
     {
-      const Vector_3 rotated_velo (1.0, 0.0, 0.0);
+      const Vector_3 angular_velo (1.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
+      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, angular_velo, local_a, local_b, local_disp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
