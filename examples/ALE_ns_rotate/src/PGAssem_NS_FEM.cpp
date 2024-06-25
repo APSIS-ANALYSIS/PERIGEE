@@ -264,6 +264,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &disp_n,
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -287,8 +288,10 @@ void PGAssem_NS_FEM::Assem_residual(
   
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
+  double * array_disp = new double [nlgn * 3];
   double * local_a = new double [nLocBas * dof_sol];
   double * local_b = new double [nLocBas * dof_sol];
+  double * local_disp = new double [nLocBas * 3];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -298,12 +301,14 @@ void PGAssem_NS_FEM::Assem_residual(
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
+  disp_n->GetLocalArray( array_disp );
 
   for( int ee=0; ee<nElem; ++ee )
   {
     lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
+    GetLocal_disp(array_disp, IEN_e, 3, local_disp);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -326,7 +331,7 @@ void PGAssem_NS_FEM::Assem_residual(
     {
       const Vector_3 rotated_velo (0.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
@@ -335,7 +340,7 @@ void PGAssem_NS_FEM::Assem_residual(
     {
       const Vector_3 rotated_velo (1.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+      lassem_ptr->Assem_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
@@ -345,8 +350,10 @@ void PGAssem_NS_FEM::Assem_residual(
 
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
+  delete [] array_disp; array_disp = nullptr;
   delete [] local_a; local_a = nullptr;
   delete [] local_b; local_b = nullptr;
+  delete [] local_disp; local_disp = nullptr;
   delete [] IEN_e; IEN_e = nullptr;
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
@@ -381,6 +388,7 @@ void PGAssem_NS_FEM::Assem_residual(
 void PGAssem_NS_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &disp_n,
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -404,8 +412,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
+  double * array_disp = new double [nlgn * 3];
   double * local_a = new double [nLocBas * dof_sol];
   double * local_b = new double [nLocBas * dof_sol];
+  double * local_disp = new double [nLocBas * 3];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -415,12 +425,14 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
+  disp_n->GetLocalArray( array_disp );
 
   for(int ee=0; ee<nElem; ++ee)
   {
     lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
+    GetLocal_disp(array_disp, IEN_e, 3, local_disp);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -443,7 +455,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     {
       const Vector_3 rotated_velo (0.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
@@ -455,7 +467,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     {
       const Vector_3 rotated_velo (1.0, 0.0, 0.0);
 
-      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b,
+      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, rotated_velo, local_a, local_b, local_disp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
       MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
@@ -468,8 +480,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   delete [] array_a; array_a = nullptr;
   delete [] array_b; array_b = nullptr;
+  delete [] array_disp; array_disp = nullptr;
   delete [] local_a; local_a = nullptr;
   delete [] local_b; local_b = nullptr;
+  delete [] local_disp; local_disp = nullptr;
   delete [] IEN_e; IEN_e = nullptr;
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;

@@ -24,7 +24,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   sur_Tangent = new PetscScalar[sur_size * sur_size];
   sur_Residual = new PetscScalar[sur_size];
 
-  const int disp_size = in_nlocbas * 3;
+  const int disp_size = nLocBas * 3;
   disp_mesh = new PetscScalar[disp_size];
 
   for(int ii=0; ii<disp_size; ++ii) disp_mesh[ii] = 0.0;
@@ -131,13 +131,20 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const Vector_3 &rotated_velo,
     const double * const &dot_sol,
     const double * const &sol,
+    const double * const pre_disp_mesh,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
+
+  //Update coordinates using mesh displacement in the previous time step
+
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, pre_disp_mesh, nLocBas, curPt_x, curPt_y, curPt_z);
+
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -153,11 +160,19 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
   for(int ii=0; ii<nLocBas; ++ii)
   {
-    const Vector_3 eleCtrlPts (eleCtrlPts_x[ii], eleCtrlPts_y[ii], eleCtrlPts_z[ii]);
+    const Vector_3 eleCtrlPts (curPt_x[ii], curPt_y[ii], curPt_z[ii]);
     const Vector_3 radius_ele = get_radius(eleCtrlPts);
     const Vector_3 mesh_velo_ele = Vec3::cross_product(rotated_velo, radius_ele);
 
     velo_mesh_ele.push_back(mesh_velo_ele);
+  }
+
+  // Mesh displacement in the node
+  for(int A=0; A<nLocBas; ++A)
+  {
+    disp_mesh[3*A  ] = pre_disp_mesh[3*A  ] + velo_mesh_ele[A].x() * dt;
+    disp_mesh[3*A+1] = pre_disp_mesh[3*A+1] + velo_mesh_ele[A].y() * dt;
+    disp_mesh[3*A+2] = pre_disp_mesh[3*A+2] + velo_mesh_ele[A].z() * dt;  
   }
 
   for(int qua=0; qua<nqp; ++qua)
@@ -266,14 +281,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     // Get the Discontinuity Capturing tau
     const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
 
-    // Mesh displacement in the node
-    for(int A=0; A<nLocBas; ++A)
-    {
-      disp_mesh[3*A] = velo_mesh_ele[A].x() * (time + dt);
-      disp_mesh[3*A+1] = velo_mesh_ele[A].y() * (time + dt);
-      disp_mesh[3*A+2] = velo_mesh_ele[A].z() * (time + dt);  
-    }
-
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
@@ -333,13 +340,20 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const Vector_3 &rotated_velo,
     const double * const &dot_sol,
     const double * const &sol,
+    const double * const pre_disp_mesh,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
+
+  //Update coordinates using mesh displacement in the previous time step
+
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, pre_disp_mesh, nLocBas, curPt_x, curPt_y, curPt_z);
+
+  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -359,11 +373,19 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   for(int ii=0; ii<nLocBas; ++ii)
   {
-    const Vector_3 eleCtrlPts (eleCtrlPts_x[ii], eleCtrlPts_y[ii], eleCtrlPts_z[ii]);
+    const Vector_3 eleCtrlPts (curPt_x[ii], curPt_y[ii], curPt_z[ii]);
     const Vector_3 radius_ele = get_radius(eleCtrlPts);
     const Vector_3 mesh_velo_ele = Vec3::cross_product(rotated_velo, radius_ele);
 
     velo_mesh_ele.push_back(mesh_velo_ele);
+  }
+
+  // Mesh displacement in the node
+  for(int A=0; A<nLocBas; ++A)
+  {
+    disp_mesh[3*A  ] = pre_disp_mesh[3*A  ] + velo_mesh_ele[A].x() * dt;
+    disp_mesh[3*A+1] = pre_disp_mesh[3*A+1] + velo_mesh_ele[A].y() * dt;
+    disp_mesh[3*A+2] = pre_disp_mesh[3*A+2] + velo_mesh_ele[A].z() * dt;  
   }
 
   for(int qua=0; qua<nqp; ++qua)
@@ -469,14 +491,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
     
     const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
-
-    // Mesh displacement in the node
-    for(int A=0; A<nLocBas; ++A)
-    {
-      disp_mesh[3*A] = velo_mesh_ele[A].x() * (time + dt);
-      disp_mesh[3*A+1] = velo_mesh_ele[A].y() * (time + dt);
-      disp_mesh[3*A+2] = velo_mesh_ele[A].z() * (time + dt);  
-    }
 
     for(int A=0; A<nLocBas; ++A)
     {

@@ -66,6 +66,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const Vector_3 &rotated_velo,
         const double * const &dot_sol,
         const double * const &sol,
+        const double * const pre_disp_mesh,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -77,6 +78,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const Vector_3 &rotated_velo,
         const double * const &dot_sol,
         const double * const &sol,
+        const double * const pre_disp_mesh,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -220,6 +222,24 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       // The vector from the projection point to the input point
       return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z() );
     } 
+
+    // Get the current point coordinates
+    void get_currPts( const double * const &ept_x,
+        const double * const &ept_y,
+        const double * const &ept_z,
+        const double * const &disp,
+        const int &len,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z ) const
+    {
+      for(int ii=0; ii<len; ++ii)
+      {
+        currPt_x[ii] = ept_x[ii] + disp[3*ii];
+        currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
+        currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
+      }
+    }
 };
 
 #endif
