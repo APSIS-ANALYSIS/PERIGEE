@@ -372,6 +372,9 @@ void PGAssem_NS_FEM::Assem_residual(
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
+
+  VecAssemblyBegin(Disp);
+  VecAssemblyEnd(Disp);
 }
 
 void PGAssem_NS_FEM::Assem_tangent_residual(
@@ -493,6 +496,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
+
+  VecAssemblyBegin(Disp);
+  VecAssemblyEnd(Disp);
 }
 
 void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
