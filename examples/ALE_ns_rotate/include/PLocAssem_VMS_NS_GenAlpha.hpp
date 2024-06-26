@@ -240,26 +240,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
       
       // The vector from the projection point to the input point
-      return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z() );
+      return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z());
     } 
-
-    // Get the current point coordinates
-    void get_currPts( const double * const &ept_x,
-        const double * const &ept_y,
-        const double * const &ept_z,
-        const double * const &disp,
-        const int &len,
-        double * const &currPt_x,
-        double * const &currPt_y,
-        double * const &currPt_z ) const
-    {
-      for(int ii=0; ii<len; ++ii)
-      {
-        currPt_x[ii] = ept_x[ii] + disp[3*ii];
-        currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
-        currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
-      }
-    }
 
     // Get the current point coordinates for the case of rotation around x/y/z-axis
     void get_currPts( const double * const &ept_x,
@@ -282,6 +264,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double rr = radius_ept.norm2();
         
         double angle = 0.0;
+
          //case 0: x-axis, case 1: y-axis, case 2: z-axis
         switch(type) 
         {
@@ -369,7 +352,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
         const double projectd_length = Vec3::dot_product(point_rotated_to_ept, direction_rotated);
       
-        // The projection point of the input point on the rotation axis
+        // The projection point of the node point on the rotation axis
         const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
         
         ept_xyz -= point_projected;

@@ -8,6 +8,7 @@
 // Date Modified: Jan. 17 2017
 // ============================================================================
 #include "Sys_Tools.hpp"
+#include <vector>
 
 class IQuadPts
 {

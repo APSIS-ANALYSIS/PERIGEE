@@ -326,8 +326,6 @@ void PGAssem_NS_FEM::Assem_residual(
     {
       lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-
-      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
     else
     {
@@ -335,9 +333,10 @@ void PGAssem_NS_FEM::Assem_residual(
 
       lassem_ptr->Assem_Residual(curr_time, dt, angular_velo, local_a, local_b,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-
-      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    
     VecSetValues(Disp, 3 * nLocBas, row_disp_index, lassem_ptr->disp_mesh, INSERT_VALUES);
   }
 
@@ -441,11 +440,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     {
       lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-
-      MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
-
-      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
     else
     {
@@ -453,12 +447,13 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
       lassem_ptr->Assem_Tangent_Residual(curr_time, dt, angular_velo, local_a, local_b,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-
-      MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
-
-      VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
     }
+      
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+      lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+
     VecSetValues(Disp, 3 * nLocBas, row_disp_index, lassem_ptr->disp_mesh, INSERT_VALUES);
   }
 

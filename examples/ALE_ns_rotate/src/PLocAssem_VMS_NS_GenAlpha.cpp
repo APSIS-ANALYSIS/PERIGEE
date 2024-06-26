@@ -165,9 +165,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
   // Mesh displacement in the node
   for(int A=0; A<nLocBas; ++A)
   {
-    disp_mesh[3*A  ] = np1_curPt_x[A  ] - pre_curPt_x[A  ];
-    disp_mesh[3*A+1] = np1_curPt_y[A+1] - pre_curPt_y[A+2];
-    disp_mesh[3*A+2] = np1_curPt_z[A+1] - pre_curPt_z[A+2];
+    disp_mesh[3*A  ] = np1_curPt_x[A] - pre_curPt_x[A];
+    disp_mesh[3*A+1] = np1_curPt_y[A] - pre_curPt_y[A];
+    disp_mesh[3*A+2] = np1_curPt_z[A] - pre_curPt_z[A];
   }
 
   for(int qua=0; qua<nqp; ++qua)
@@ -543,9 +543,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   // Mesh displacement in the node
   for(int A=0; A<nLocBas; ++A)
   {
-    disp_mesh[3*A  ] = np1_curPt_x[A  ] - pre_curPt_x[A  ];
-    disp_mesh[3*A+1] = np1_curPt_y[A+1] - pre_curPt_y[A+2];
-    disp_mesh[3*A+2] = np1_curPt_z[A+1] - pre_curPt_z[A+2];
+    disp_mesh[3*A  ] = np1_curPt_x[A] - pre_curPt_x[A];
+    disp_mesh[3*A+1] = np1_curPt_y[A] - pre_curPt_y[A];
+    disp_mesh[3*A+2] = np1_curPt_z[A] - pre_curPt_z[A];
   }
 
   for(int qua=0; qua<nqp; ++qua)
