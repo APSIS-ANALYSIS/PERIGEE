@@ -67,7 +67,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const Vector_3 &angular_velo,
         const double * const &dot_sol,
         const double * const &sol,
-        const double * const &pre_disp_mesh,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -79,7 +78,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const Vector_3 &angular_velo,
         const double * const &dot_sol,
         const double * const &sol,
-        const double * const &pre_disp_mesh,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -204,11 +202,12 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
-    Vector_3 get_radius (const Vector_3 &coor) const
+    // Get the radius of rotation
+    Vector_3 get_radius (const Vector_3 &coor, const Vector_3 &angular_velo) const
     { 
       // Info of rotation axis
       const Vector_3 point_rotated (0.5, 0.0, 0.0);
-      Vector_3 direction_rotated (1.0, 0.0, 0.0);
+      Vector_3 direction_rotated (angular_velo);
       
       direction_rotated.normalize();
 
@@ -242,24 +241,23 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       }
     }
 
+    // Get the current point coordinates for the case of rotation around x/y/z-axis
     void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
+        const Vector_3 &angular_velo,
         const double &tt,
         double * const &currPt_x,
         double * const &currPt_y,
         double * const &currPt_z,
         const int &type) const
     {
-      // rotation around x-axis about original point
-      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
-
       double mag_angular_velo = 0.0; // (rad/s)
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
         const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
-        const Vector_3 radius_ept = get_radius(ept_xyz);
+        const Vector_3 radius_ept = get_radius(ept_xyz, angular_velo);
 
         const double rr = radius_ept.norm2();
         
@@ -298,13 +296,15 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       }
     }
 
-    //Rodrigues's Formula: a rotation matrix about any axis (unit rotation vector (a, b, c)), theta is the rotation angle
-    //[ cos(theta) + a*a(1-cos(theta)),    a*b(1-cos(theta)) - c*sin(theta), b*sin(theta) + a*c(1-cos(theta))  ]
-    //[ c*sin(theta) + a*b(1-cos(theta)),  cos(theta) + b*b(1-cos(theta)),   -a*sin(theta) + b*c(1-cos(theta)) ]
-    //[ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
+    // Get the current point coordinates for the case of rotation around any axis (i.e., unit rotation vector (a, b, c))
+    // Rodrigues's Formula, theta is the rotation angle
+    // [ cos(theta) + a*a(1-cos(theta)),    a*b(1-cos(theta)) - c*sin(theta), b*sin(theta) + a*c(1-cos(theta))  ]
+    // [ c*sin(theta) + a*b(1-cos(theta)),  cos(theta) + b*b(1-cos(theta)),   -a*sin(theta) + b*c(1-cos(theta)) ]
+    // [ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
     void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
+        const Vector_3 &angular_velo,
         const double &tt,
         double * const &currPt_x,
         double * const &currPt_y,
@@ -312,8 +312,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     {
       // Info of rotation axis
       const Vector_3 point_rotated (0.5, 0.0, 0.0);
-
-      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
 
       const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
 
@@ -355,8 +353,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
         
         ept_xyz -= point_projected;
-
-        const Vector_3 radius_ept = get_radius(ept_xyz);
         
         Vector_3 cur_xyz = mat_rotation.VecMult(ept_xyz);
         

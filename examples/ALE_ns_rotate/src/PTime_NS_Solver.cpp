@@ -102,7 +102,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * pre_disp_mesh = new PDNSolution(*init_disp);
   PDNSolution * disp_mesh = new PDNSolution(*init_disp);
 
   // If this is a restart run, do not re-write the solution binaries
@@ -147,7 +146,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
-        sol_base, pre_dot_sol, pre_sol, pre_disp_mesh, tmga_ptr, flr_ptr,
+        sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
         gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, disp_mesh, conv_flag, nl_counter );
@@ -231,7 +230,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
-    pre_disp_mesh->Copy(*disp_mesh);
   }
 
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;

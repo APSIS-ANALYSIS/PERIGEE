@@ -45,7 +45,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
-    const PDNSolution * const &pre_disp_mesh,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -125,7 +124,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, pre_disp_mesh, dot_sol, sol, 
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
         quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
    
@@ -149,7 +148,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, pre_disp_mesh, dot_sol, sol,
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
         quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
@@ -200,7 +199,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, pre_disp_mesh, dot_sol, sol,
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
           quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
@@ -219,7 +218,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, pre_disp_mesh, dot_sol, sol,
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
           quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 

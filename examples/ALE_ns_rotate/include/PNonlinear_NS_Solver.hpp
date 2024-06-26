@@ -46,7 +46,6 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
-        const PDNSolution * const &pre_disp_mesh,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
