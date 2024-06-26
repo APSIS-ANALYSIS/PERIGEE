@@ -251,7 +251,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         double * const &currPt_z,
         const int &type) const
     {
-      // rotation around x-axis
+      // rotation around x-axis about original point
       const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
 
       const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
@@ -341,14 +341,22 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       for(int ii=0; ii<nLocBas; ++ii)
       {
         Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+
+        // The vector from the rotation point to the node point
+        const Vector_3 point_rotated_to_ept (ept_xyz.x() - point_rotated.x(), ept_xyz.y() - point_rotated.y(), ept_xyz.z() - point_rotated.z());
+
+        const double projectd_length = Vec3::dot_product(point_rotated_to_ept, direction_rotated);
+      
+        // The projection point of the input point on the rotation axis
+        const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
         
-        ept_xyz -= point_rotated;
+        ept_xyz -= point_projected;
 
         const Vector_3 radius_ept = get_radius(ept_xyz);
         
         Vector_3 cur_xyz = mat_rotation.VecMult(ept_xyz);
         
-        cur_xyz += point_rotated;
+        cur_xyz += point_projected;
 
         currPt_x[ii] = cur_xyz.x();
         currPt_y[ii] = cur_xyz.y();
