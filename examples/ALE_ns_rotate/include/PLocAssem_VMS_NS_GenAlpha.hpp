@@ -73,9 +73,29 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_sol,
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const Vector_3 &angular_velo,
+        const double * const &dot_sol,
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
