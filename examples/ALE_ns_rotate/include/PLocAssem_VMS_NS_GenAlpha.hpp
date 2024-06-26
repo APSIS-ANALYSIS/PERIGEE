@@ -252,7 +252,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const int &type) const
     {
       // rotation around x-axis
-      const double angular_velo = MATH_T::PI / 60;  // (rad/s)
+      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
+
+      const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
@@ -261,15 +263,88 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
         const double rr = radius_ept.norm2();
         
-        //switch(type): case 0: x-axis
+        double angle = 0.0;
+         //case 0: x-axis, case 1: y-axis, case 1: z-axis
+        switch(type) 
+        {
+          case 0:
+            angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
+            angle += mag_angular_velo * tt;
+            currPt_x[ii] = ept_x[ii];
+            currPt_y[ii] = std::cos(angle) * rr;
+            currPt_z[ii] = std::sin(angle) * rr;            
+            break;
+          case 1: 
+            angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(2));        
+            angle += mag_angular_velo * tt;
+            currPt_x[ii] = std::cos(angle) * rr;
+            currPt_y[ii] = ept_y[ii];
+            currPt_z[ii] = std::sin(angle) * rr;            
+            break;            
+          case 2: 
+            angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
+            angle += mag_angular_velo * tt;
+            currPt_x[ii] = std::cos(angle) * rr;
+            currPt_y[ii] = std::sin(angle) * rr;
+            currPt_z[ii] = ept_z[ii];            
+            break;            
+          default:
+            SYS_T::print_fatal("Error: PLocAssem_VMS_NS_GenAlpha::get_currPts: No such type of rotation axis. \n");
+            break;        
+        }
+      }
+    }
 
-        double angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
-         
-        angle += angular_velo * tt;
+    //Rodrigues's Formula: a rotation matrix about any axis (unit vector (a, b, c)), theta is the rotation angle
+    //[ cos(theta) + a*a(1-cos(theta)),    a*b(1-cos(theta)) - c*sin(theta), b*sin(theta) + a*c(1-cos(theta))  ]
+    //[ c*sin(theta) + a*b(1-cos(theta)),  cos(theta) + b*b(1-cos(theta)),   -a*sin(theta) + b*c(1-cos(theta)) ]
+    //[ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
+    void get_currPts( const double * const &ept_x,
+        const double * const &ept_y,
+        const double * const &ept_z,
+        const double &tt,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z ) const
+    {
+      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
+
+      const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
+
+      Vector_3 direction_rotated (1.0, 0.0, 0.0);
+
+      direction_rotated.normalize();
+
+      const double aa= direction_rotated.x();
+      const double bb= direction_rotated.y();       
+      const double cc= direction_rotated.z();
+
+      const double theta = mag_angular_velo * tt; // 旋转角度的正负s
         
-        currPt_x[ii] = ept_x[ii];
-        currPt_y[ii] = std::cos(angle) * rr;
-        currPt_z[ii] = std::sin(angle) * rr;
+      const double m00 = std::cos(theta) + aa*aa*(1-std::cos(theta)); 
+      const double m01 = aa*bb*(1-std::cos(theta)) - cc*std::sin(theta);
+      const double m02 = bb*std::sin(theta) + aa*cc*(1-std::cos(theta));
+
+      const double m10 = cc*std::sin(theta) + aa*bb*(1-std::cos(theta));        
+      const double m11 = std::cos(theta) + bb*bb*(1-std::cos(theta)); 
+      const double m12 = -aa*std::sin(theta) + bb*cc*(1-std::cos(theta));         
+
+      const double m20 = -bb*std::sin(theta) + aa*cc*(1-std::cos(theta));
+      const double m21 = aa*std::sin(theta) + bb*cc*(1-std::cos(theta));
+      const double m22 = std::cos(theta) + cc*cc*(1-std::cos(theta));
+
+      const Tensor2_3D mat_rotation (m00, m01, m02, m10, m11, m12, m20, m21, m22);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+        const Vector_3 radius_ept = get_radius(ept_xyz);
+        
+        const Vector_3 cur_xyz = mat_rotation.VecMult(ept_xyz);
+        
+        currPt_x[ii] = cur_xyz.x();
+        currPt_y[ii] = cur_xyz.y();
+        currPt_z[ii] = cur_xyz.z();
       }
     }
 };
