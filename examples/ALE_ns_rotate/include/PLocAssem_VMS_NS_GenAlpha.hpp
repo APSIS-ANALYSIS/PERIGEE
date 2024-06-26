@@ -254,7 +254,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       // rotation around x-axis about original point
       const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
 
-      const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
+      double mag_angular_velo = 0.0; // (rad/s)
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
@@ -264,10 +264,11 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double rr = radius_ept.norm2();
         
         double angle = 0.0;
-         //case 0: x-axis, case 1: y-axis, case 1: z-axis
+         //case 0: x-axis, case 1: y-axis, case 2: z-axis
         switch(type) 
         {
           case 0:
+            mag_angular_velo = angular_velo.x();
             angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
             angle += mag_angular_velo * tt;
             currPt_x[ii] = ept_x[ii];
@@ -275,13 +276,15 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
             currPt_z[ii] = std::sin(angle) * rr;            
             break;
           case 1: 
+            mag_angular_velo = angular_velo.y();
             angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(2));        
             angle += mag_angular_velo * tt;
-            currPt_x[ii] = std::cos(angle) * rr;
+            currPt_x[ii] = std::sin(angle) * rr;
             currPt_y[ii] = ept_y[ii];
-            currPt_z[ii] = std::sin(angle) * rr;            
+            currPt_z[ii] = std::cos(angle) * rr;            
             break;            
           case 2: 
+            mag_angular_velo = angular_velo.z();
             angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
             angle += mag_angular_velo * tt;
             currPt_x[ii] = std::cos(angle) * rr;
@@ -295,7 +298,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       }
     }
 
-    //Rodrigues's Formula: a rotation matrix about any axis (unit vector (a, b, c)), theta is the rotation angle
+    //Rodrigues's Formula: a rotation matrix about any axis (unit rotation vector (a, b, c)), theta is the rotation angle
     //[ cos(theta) + a*a(1-cos(theta)),    a*b(1-cos(theta)) - c*sin(theta), b*sin(theta) + a*c(1-cos(theta))  ]
     //[ c*sin(theta) + a*b(1-cos(theta)),  cos(theta) + b*b(1-cos(theta)),   -a*sin(theta) + b*c(1-cos(theta)) ]
     //[ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
@@ -314,7 +317,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
       const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
 
-      Vector_3 direction_rotated (1.0, 0.0, 0.0);
+      // The rotation direction is the direction of angular velocity
+      Vector_3 direction_rotated (angular_velo);
 
       direction_rotated.normalize();
 
@@ -322,7 +326,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       const double bb= direction_rotated.y();       
       const double cc= direction_rotated.z();
 
-      const double theta = mag_angular_velo * tt; // 旋转角度的正负s
+      const double theta = mag_angular_velo * tt; 
         
       const double m00 = std::cos(theta) + aa*aa*(1-std::cos(theta)); 
       const double m01 = aa*bb*(1-std::cos(theta)) - cc*std::sin(theta);
