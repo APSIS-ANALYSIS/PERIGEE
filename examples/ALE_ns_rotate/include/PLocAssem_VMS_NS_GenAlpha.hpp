@@ -307,6 +307,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         double * const &currPt_y,
         double * const &currPt_z ) const
     {
+      // Info of rotation axis
+      const Vector_3 point_rotated (0.5, 0.0, 0.0);
+
       const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0); // (rad/s)
 
       const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
@@ -337,11 +340,16 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+        Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+        
+        ept_xyz -= point_rotated;
+
         const Vector_3 radius_ept = get_radius(ept_xyz);
         
-        const Vector_3 cur_xyz = mat_rotation.VecMult(ept_xyz);
+        Vector_3 cur_xyz = mat_rotation.VecMult(ept_xyz);
         
+        cur_xyz += point_rotated;
+
         currPt_x[ii] = cur_xyz.x();
         currPt_y[ii] = cur_xyz.y();
         currPt_z[ii] = cur_xyz.z();
