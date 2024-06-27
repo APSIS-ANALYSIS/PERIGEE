@@ -1,12 +1,12 @@
-#ifndef VTK_WRITER_ELASTODYNAMICS_HPP
-#define VTK_WRITER_ELASTODYNAMICS_HPP
+#ifndef VTK_WRITER_STRESS_RECOVERY_HPP
+#define VTK_WRITER_STRESS_RECOVERY_HPP
 // ==================================================================
-// VTK_Writer_Elastodynamics.hpp
+// VTK_Writer_Stress_Recovery.hpp
 // 
 // This is a class that specifically designed for the visualization
-// for elastodynamics. 
+// for smoothed solutions. 
 //
-// Date Created: Nov. 5 2023
+// Date Created: Jan. 22 2024
 // ==================================================================
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
@@ -16,13 +16,13 @@
 
 #include "vtkIntArray.h"
 
-class VTK_Writer_Elastodynamics
+class VTK_Writer_Stress_Recovery
 {
   public:
-    VTK_Writer_Elastodynamics( const int &in_nelem, const int &in_nlocbas, 
-        const std::string &epart_file, const double &in_module_E, const double &in_nu );
+    VTK_Writer_Stress_Recovery( const int &in_nelem, const int &in_nlocbas, 
+        const std::string &epart_file );
 
-    ~VTK_Writer_Elastodynamics() = default;
+    ~VTK_Writer_Stress_Recovery() = default;
     
     void writeOutput(
         const FEANode * const &fnode_ptr,
@@ -41,13 +41,8 @@ class VTK_Writer_Elastodynamics
 
   private:
     const int nLocBas, nElem;
-    const double lambda, mu;
 
     std::vector<int> epart_map;
-
-    void interpolateCauchy( const int &ptOffset,
-        const double * const &inputData, FEAElement * const &elem,
-        vtkDoubleArray * const &vtkData_x );
 };
 
 #endif

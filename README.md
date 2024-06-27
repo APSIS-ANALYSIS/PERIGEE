@@ -72,8 +72,11 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 * I.S. Lan, J. Liu, W. Yang, and A.L. Marsden, [A reduced unified continuum formulation for vascular fluid-structure interaction](https://doi.org/10.1016/j.cma.2022.114852), Computer Methods in Applied Mechanics and Engineering, 394:114852, 2022.
 * J. Liu, I.S. Lan, O.Z. Tikenogullari, and A.L. Marsden, [A note on the accuracy of the generalized-α scheme for the incompressible Navier-Stokes equations](https://doi.org/10.1002/nme.6550), International Journal for Numerical Methods in Engineering, 122:638-651, 2021.
 
-### Verification & Validation
+### Solver technology
 * J. Liu, W. Yang, M. Dong, and A.L. Marsden, [The nested block preconditioning technique for the incompressible Navier-Stokes equations with emphasis on hemodynamic simulations](https://doi.org/10.1016/j.cma.2020.113122), Computer Methods in Applied Mechanics and Engineering, 367:113122, 2020.
+* Y. Sun, Q. Lu, and J. Liu, [A parallel solver framework for fully implicit monolithic fluid-structure interaction](https://doi.org/10.1007/s10409-024-24074-x), Acta Mechanica Sinica 40:324074, 2024. 
+
+### Verification & Validation
 * I.S. Lan, J. Liu, W. Yang, J. Zimmermann, D.B. Ennis, and A.L. Marsden, [Validation of the reduced unified continuum formulation against in vitro 4D-flow MRI](https://doi.org/10.1007/s10439-022-03038-4), Annals of Biomedical Engineering, 51:377-393, 2023.
 * J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, [Fluid-structure interaction modeling of blood flow in the pulmonary arteries using the unified continuum and variational multiscale formulation](https://doi.org/10.1016/j.mechrescom.2020.103556), Mechanics Research Communications, 107:103556, 2020.
 

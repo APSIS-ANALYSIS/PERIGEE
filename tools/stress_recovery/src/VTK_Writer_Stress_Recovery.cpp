@@ -1,16 +1,13 @@
-#include "VTK_Writer_Elastodynamics.hpp"
+#include "VTK_Writer_Stress_Recovery.hpp"
 
-VTK_Writer_Elastodynamics::VTK_Writer_Elastodynamics( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file,
-    const double &in_module_E, const double &in_nu )
-: nLocBas( in_nlocbas ), nElem( in_nelem ),
-  lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
-  mu( 0.5 * in_module_E / (1.0 + in_nu) )
+VTK_Writer_Stress_Recovery::VTK_Writer_Stress_Recovery( const int &in_nelem,
+    const int &in_nlocbas, const std::string &epart_file )
+: nLocBas( in_nlocbas ), nElem( in_nelem )
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
 
-void VTK_Writer_Elastodynamics::writeOutput(
+void VTK_Writer_Stress_Recovery::writeOutput(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_ptr,
     const ALocal_Elem * const &lelem_ptr,
@@ -50,7 +47,6 @@ void VTK_Writer_Elastodynamics::writeOutput(
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
 
-  int ptOffset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
@@ -64,10 +60,10 @@ void VTK_Writer_Elastodynamics::writeOutput(
     elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
     
     // Interpolate nodal coordinates
-    intep.interpolateVTKPts(ptOffset, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
+    intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
         elemptr, points );
   
-    std::vector<double> inputInfo; inputInfo.clear();
+    std::vector<double> inputInfo{};
     
     // Interpolate velocity vector
     int asize = vdata_ptr->get_arraySizes(0);
@@ -77,23 +73,25 @@ void VTK_Writer_Elastodynamics::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, ptOffset, &inputInfo[0],
-        elemptr, dataVecs[0] );
-
-    interpolateCauchy( ptOffset, &inputInfo[0], elemptr, dataVecs[1] );
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0], elemptr, dataVecs[0] );
 
     // Set mesh connectivity
     if( elemptr->get_Type() == 501 )
-      VIS_T::setTetraelem( ptOffset, gridData );
+      VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );
     else if( elemptr->get_Type() == 502 )
-      VIS_T::setQuadTetraelem( ptOffset, gridData );
+      VIS_T::setQuadTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
+          IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
+          gridData );
     else if( elemptr->get_Type() == 601 )
-      VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
+      VIS_T::setHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
+        IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], gridData );
     else if( elemptr->get_Type() == 602 )
-      VIS_T::setHexelem( 3, 3, 3, ptOffset, gridData );
+      VIS_T::setTriQuadHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
+        IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
+        IEN_e[10], IEN_e[11], IEN_e[12], IEN_e[13], IEN_e[14], IEN_e[15],
+        IEN_e[16], IEN_e[17], IEN_e[18], IEN_e[19], IEN_e[20], IEN_e[21],
+        IEN_e[22], IEN_e[23], IEN_e[24], IEN_e[25], IEN_e[26], gridData );
     else SYS_T::print_fatal("Error: unknown element type.\n");
-
-    ptOffset += elemptr->get_nLocBas();
 
     // Mesh partition info
     anaprocId->InsertNextValue( epart_map[ lelem_ptr->get_elem_loc(ee) ] );
@@ -132,55 +130,6 @@ void VTK_Writer_Elastodynamics::writeOutput(
   // Clean gridData
   SYS_T::commPrint("-- Clean gridData object.\n");
   gridData->Delete();
-}
-
-void VTK_Writer_Elastodynamics::interpolateCauchy( const int &ptOffset,
-    const double * const &inputData, FEAElement * const &elem,
-    vtkDoubleArray * const &vtkData)
-{
-  Interpolater intep( nLocBas );
-
-  const double l2mu = lambda + 2.0 * mu;
-
-  const int nqp = elem->get_numQuapts();
-
-  double * ux = new double [nLocBas];
-  double * uy = new double [nLocBas];
-  double * uz = new double [nLocBas];
-
-  std::vector<double> ux_x, ux_y, ux_z, uy_x, uy_y, uy_z, uz_x, uz_y, uz_z;
-
-  for(int ii=0; ii<nLocBas; ++ii)
-  {
-    ux[ii] = inputData[ii*3];
-    uy[ii] = inputData[ii*3+1];
-    uz[ii] = inputData[ii*3+2];
-  }
-
-  intep.interpolateFE_Grad(ux, elem, ux_x, ux_y, ux_z);
-  intep.interpolateFE_Grad(uy, elem, uy_x, uy_y, uy_z);
-  intep.interpolateFE_Grad(uz, elem, uz_x, uz_y, uz_z);
-
-  double sigma_xx = 0.0, sigma_yy = 0.0, sigma_zz = 0.0;
-  double sigma_xy = 0.0, sigma_xz = 0.0, sigma_yz = 0.0;
-
-  for(int ii=0; ii<nqp; ++ii)
-  {
-    sigma_xx = l2mu * ux_x[ii] + lambda * (uy_y[ii] + uz_z[ii]);
-    sigma_yy = l2mu * uy_y[ii] + lambda * (ux_x[ii] + uz_z[ii]);
-    sigma_zz = l2mu * uz_z[ii] + lambda * (uy_y[ii] + ux_x[ii]);
-    sigma_xy = mu * ( ux_y[ii] + uy_x[ii] );
-    sigma_xz = mu * ( ux_z[ii] + uz_x[ii] );
-    sigma_yz = mu * ( uy_z[ii] + uz_y[ii] );
-    vtkData->InsertComponent(ptOffset+ii, 0, sigma_xx);
-    vtkData->InsertComponent(ptOffset+ii, 1, sigma_yy);
-    vtkData->InsertComponent(ptOffset+ii, 2, sigma_zz);
-    vtkData->InsertComponent(ptOffset+ii, 3, sigma_xy);
-    vtkData->InsertComponent(ptOffset+ii, 4, sigma_yz);
-    vtkData->InsertComponent(ptOffset+ii, 5, sigma_xz);
-  }
-
-  delete [] ux; delete [] uy; delete [] uz;
 }
 
 // EOF

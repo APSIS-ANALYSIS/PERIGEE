@@ -1,15 +1,14 @@
 #ifndef EBC_PARTITION_HPP
 #define EBC_PARTITION_HPP
-// ==================================================================
+// ============================================================================
 // EBC_Partition.hpp
 //
-// Elemental boundary condition partition implementation for data 
-// structures readed from .vtp files. This is used mainly for
-// unstructured meshes.
+// Elemental boundary condition partition implementation for data structures 
+// readed from .vtp files. This is used mainly for unstructured meshes.
 //
 // Author: Ju Liu
 // Date: Jan. 15 2017
-// ==================================================================
+// ============================================================================
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "ElemBC.hpp"
