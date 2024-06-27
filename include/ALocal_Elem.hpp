@@ -41,6 +41,12 @@ class ALocal_Elem
     virtual int get_nlocalele( const int &tag_val ) const;
 
     // ------------------------------------------------------------------------
+    // Return the number of elements with rotated tag value being the input rotated tag_val.
+    // This function can only be called when isRotated = true.
+    // ------------------------------------------------------------------------
+    virtual int get_nlocalele_rotated( const int &rotated_val ) const;
+
+    // ------------------------------------------------------------------------
     // Given the global element index, return its location in the vector
     // elem_loc. If it does not belong to this sub-domain, it will return -1
     // ------------------------------------------------------------------------
@@ -51,8 +57,8 @@ class ALocal_Elem
 
     // ------------------------------------------------------------------------
     // This is a virtual function for multiphysics simulations. A tag
-    // is attached to each element to denote different physical/rotated domains,
-    // such as fluid/fixed vs. solid/rotated subdomains. For a single domain problem,
+    // is attached to each element to denote different physical domains,
+    // such as fluid vs. solid subdomains. For a single domain problem,
     // this function is NOT needed, and returns a default value of 0.
     // ------------------------------------------------------------------------
     virtual int get_elem_tag(const int &ee) const
@@ -60,6 +66,18 @@ class ALocal_Elem
       if( isTagged ) return elem_tag[ee];
       else return 0;
     }
+
+    // ------------------------------------------------------------------------
+    // This is a virtual function for rotated ALE simulations. A tag
+    // is attached to each element to denote different domains,
+    // such as fixed vs. rotated subdomains. For a single domain problem,
+    // this function is NOT needed, and returns a default value of 0.
+    // ------------------------------------------------------------------------
+    virtual int get_elem_rotated(const int &ee) const
+    {
+      if( isRotated ) return elem_rotated[ee];
+      else return 0;
+    }    
 
   private:
     // ------------------------------------------------------------------------
@@ -74,17 +92,30 @@ class ALocal_Elem
     std::vector<int> elem_loc {};
     
     // ------------------------------------------------------------------------
-    // Flag that determine if the element has an additional tag
+    // Flag that determine if the element has an additional physical tag
     // ------------------------------------------------------------------------
     bool isTagged;
 
     // ------------------------------------------------------------------------
+    // Flag that determine if the element has an additional rotated tag
+    // ------------------------------------------------------------------------
+    bool isRotated;
+
+    // ------------------------------------------------------------------------
     // A vector recording the tag of elements. Length is nlocalele.
-    // In FSI/ALE problems, we assume tag 0 gives fluid/fixed element; 
-    //                            tag 1 gives solid/rotated element.
+    // In FSI problems, we assume tag 0 gives fluid element; 
+    //                            tag 1 gives solid element.
     // elem_tag is cleared if isTagged = false
     // ------------------------------------------------------------------------
     std::vector<int> elem_tag {};
+
+    // ------------------------------------------------------------------------
+    // A vector recording the tag of elements. Length is nlocalele.
+    // In rotated ALE problems, we assume tag 0 gives fixed element; 
+    //                                    tag 1 gives rotated element.
+    // elem_rotated is cleared if isRotated = false
+    // ------------------------------------------------------------------------
+    std::vector<int> elem_rotated {};
 
     // Disallow default constructor
     ALocal_Elem() = delete;

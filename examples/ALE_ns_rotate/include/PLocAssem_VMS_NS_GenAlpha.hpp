@@ -278,7 +278,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
             break;
           case 1: 
             mag_angular_velo = angular_velo.y();
-            angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(2));        
+            angle = MATH_T::get_angle_2d(ept_xyz(2), ept_xyz(0));        
             angle += mag_angular_velo * tt;
             currPt_x[ii] = std::sin(angle) * rr;
             currPt_y[ii] = ept_y[ii];
