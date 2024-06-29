@@ -5,7 +5,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const int &elemtype, 
+        const double &in_beta, const int &elemtype,
+        const Vector_3 &point_xyz, const Vector_3 &angular, 
         const double &in_ct, const double &in_ctauc )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
@@ -14,6 +15,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   CT( in_ct ), Ctauc( in_ctauc ),
   nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
   vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
+  point_rotated(point_xyz), angular_velo(angular),
   coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365 : 1.0 ),
   mm( (elemtype == 501 || elemtype == 502) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
@@ -126,9 +128,8 @@ double PLocAssem_VMS_NS_GenAlpha::get_DC(
   return dc_tau;
 }
 
-void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Rotated(
     const double &time, const double &dt,
-    const Vector_3 &angular_velo,
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -148,7 +149,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
   double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   //Update coordinates
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, angular_velo, curr, curPt_x, curPt_y, curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, curr, curPt_x, curPt_y, curPt_z, 0);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -159,8 +160,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
   double np1_curPt_x[nLocBas], np1_curPt_y[nLocBas], np1_curPt_z[nLocBas];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, angular_velo, time, pre_curPt_x, pre_curPt_y, pre_curPt_z, 0);
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, angular_velo, time_np1, np1_curPt_x, np1_curPt_y, np1_curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time, pre_curPt_x, pre_curPt_y, pre_curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time_np1, np1_curPt_x, np1_curPt_y, np1_curPt_z, 0);
 
   // Mesh displacement in the node
   for(int A=0; A<nLocBas; ++A)
@@ -230,7 +231,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
       coor.z() += curPt_z[ii] * R[ii];
     }
     // Mesh velocity in the quadrature point at time + alpha_f * dt
-    const Vector_3 radius_qua = get_radius(coor, angular_velo);
+    const Vector_3 radius_qua = get_radius(coor);
     const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
@@ -500,9 +501,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
   }
 }
 
-void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
+void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Rotated(
     const double &time, const double &dt,
-    const Vector_3 &angular_velo,
     const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
@@ -526,7 +526,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
 
   //Update coordinates
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, angular_velo, curr, curPt_x, curPt_y, curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, curr, curPt_x, curPt_y, curPt_z, 0);
 
   element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
 
@@ -537,8 +537,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   double np1_curPt_x[nLocBas], np1_curPt_y[nLocBas], np1_curPt_z[nLocBas];
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, angular_velo, time, pre_curPt_x, pre_curPt_y, pre_curPt_z, 0);
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, angular_velo, time_np1, np1_curPt_x, np1_curPt_y, np1_curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time, pre_curPt_x, pre_curPt_y, pre_curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time_np1, np1_curPt_x, np1_curPt_y, np1_curPt_z, 0);
 
   // Mesh displacement in the node
   for(int A=0; A<nLocBas; ++A)
@@ -609,7 +609,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     }
 
     // Mesh velocity in the quadrature point 
-    const Vector_3 radius_qua = get_radius(coor, angular_velo);
+    const Vector_3 radius_qua = get_radius(coor);
     const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();

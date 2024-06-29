@@ -21,6 +21,7 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const int &elemtype,
+        const Vector_3 &point_xyz, const Vector_3 &angular,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0,
         const double &in_C_bI = 4.0 );
 

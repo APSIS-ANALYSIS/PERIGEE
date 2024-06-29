@@ -329,9 +329,7 @@ void PGAssem_NS_FEM::Assem_residual(
     }
     else
     {
-      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0);
-
-      lassem_ptr->Assem_Residual(curr_time, dt, angular_velo, local_a, local_b,
+      lassem_ptr->Assem_Residual_Rotated(curr_time, dt, local_a, local_b,
           elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
     }
 
@@ -443,9 +441,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     }
     else
     {
-      const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0);
-
-      lassem_ptr->Assem_Tangent_Residual(curr_time, dt, angular_velo, local_a, local_b,
+      lassem_ptr->Assem_Tangent_Residual_Rotated(curr_time, dt, local_a, local_b,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
     }
       

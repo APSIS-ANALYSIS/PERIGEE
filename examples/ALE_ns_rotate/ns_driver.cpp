@@ -106,6 +106,10 @@ int main(int argc, char *argv[])
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
+  // Info of rotation axis
+  const Vector_3 point_rotated (0.5, 0.0, 0.0);
+  const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0);
+
   // Yaml options
   bool is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
@@ -166,6 +170,12 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-restart_step", restart_step);
   SYS_T::GetOptionString("-restart_name", restart_name);
   SYS_T::GetOptionReal("-C_bI", C_bI);
+  // SYS_T::GetOptionReal("-point_x", point_x);
+  // SYS_T::GetOptionReal("-point_y", point_y);
+  // SYS_T::GetOptionReal("-point_z", point_z); 
+  // SYS_T::GetOptionReal("-angular_x", angular_x);
+  // SYS_T::GetOptionReal("-angular_y", angular_y);
+  // SYS_T::GetOptionReal("-angular_z", angular_z);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
@@ -179,6 +189,12 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
+  // SYS_T::cmdPrint("-point_x", point_x);
+  // SYS_T::cmdPrint("-point_y", point_y);
+  // SYS_T::cmdPrint("-point_z", point_z); 
+  // SYS_T::cmdPrint("-angular_x", angular_x);
+  // SYS_T::cmdPrint("-angular_y", angular_y);
+  // SYS_T::cmdPrint("-angular_z", angular_z);
 
   // if inflow file exists, print the file name
   // otherwise, print the parameter for linear2steady inflow setting
@@ -374,14 +390,14 @@ int main(int argc, char *argv[])
     locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
       tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc );
   }
   else if( locwbc->get_wall_model_type() == 1 )
   {
     locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
       tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc, C_bI );
   }
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 

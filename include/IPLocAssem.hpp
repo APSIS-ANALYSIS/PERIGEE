@@ -166,9 +166,8 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
-    virtual void Assem_Residual(
+    virtual void Assem_Residual_Rotated(
         const double &time, const double &dt,
-        const Vector_3 &angular_velo,
         const double * const &vec_a,
         const double * const &vec_b,
         FEAElement * const &element,
@@ -207,9 +206,8 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
-    virtual void Assem_Tangent_Residual(
+    virtual void Assem_Tangent_Residual_Rotated(
         const double &time, const double &dt,
-        const Vector_3 &angular_velo,
         const double * const &vec_a,
         const double * const &vec_b,
         FEAElement * const &element,

@@ -23,6 +23,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
         const int &elemtype,
+        const Vector_3 &point_xyz, const Vector_3 &angular,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
     virtual ~PLocAssem_VMS_NS_GenAlpha();
@@ -62,18 +63,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 1.0;
     }
 
-    virtual void Assem_Residual(
-        const double &time, const double &dt,
-        const Vector_3 &angular_velo,
-        const double * const &dot_sol,
-        const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Residual(
+    virtual void Assem_Residual_Rotated(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
@@ -83,9 +73,18 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Tangent_Residual(
+    virtual void Assem_Residual(
         const double &time, const double &dt,
-        const Vector_3 &angular_velo,
+        const double * const &dot_sol,
+        const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Tangent_Residual_Rotated(
+        const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
@@ -175,6 +174,10 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     
     const int nLocBas, snLocBas, vec_size, sur_size;
 
+    const Vector_3 point_rotated;
+
+    const Vector_3 angular_velo;    
+
     // M matrix for tau_m
     //             mm[0], mm[1], mm[2]
     // M = coef *  mm[3], mm[4], mm[5]
@@ -223,10 +226,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     }
 
     // Get the radius of rotation
-    Vector_3 get_radius (const Vector_3 &coor, const Vector_3 &angular_velo) const
+    Vector_3 get_radius (const Vector_3 &coor) const
     { 
       // Info of rotation axis
-      const Vector_3 point_rotated (0.5, 0.0, 0.0);
       Vector_3 direction_rotated (angular_velo);
       
       direction_rotated.normalize();
@@ -247,7 +249,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
-        const Vector_3 &angular_velo,
         const double &tt,
         double * const &currPt_x,
         double * const &currPt_y,
@@ -259,7 +260,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       for(int ii=0; ii<nLocBas; ++ii)
       {
         const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
-        const Vector_3 radius_ept = get_radius(ept_xyz, angular_velo);
+        const Vector_3 radius_ept = get_radius(ept_xyz);
 
         const double rr = radius_ept.norm2();
         
@@ -307,15 +308,11 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
-        const Vector_3 &angular_velo,
         const double &tt,
         double * const &currPt_x,
         double * const &currPt_y,
         double * const &currPt_z ) const
     {
-      // Info of rotation axis
-      const Vector_3 point_rotated (0.5, 0.0, 0.0);
-
       const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
 
       // The rotation direction is the direction of angular velocity
@@ -323,9 +320,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
       direction_rotated.normalize();
 
-      const double aa= direction_rotated.x();
-      const double bb= direction_rotated.y();       
-      const double cc= direction_rotated.z();
+      const double aa = direction_rotated.x();
+      const double bb = direction_rotated.y();       
+      const double cc = direction_rotated.z();
 
       const double theta = mag_angular_velo * tt; 
         
