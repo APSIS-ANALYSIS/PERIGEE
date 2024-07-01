@@ -14,7 +14,9 @@
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "VisDataPrep_Hyperelastic.hpp"  
-#include "VTK_Writer_FSI.hpp"   
+#include "VTK_Writer_FSI.hpp"
+#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
+#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 
 int main ( int argc , char * argv[] )
 {
@@ -38,10 +40,29 @@ int main ( int argc , char * argv[] )
   bool isRef = false;
   bool isClean = true;
 
-  // Load analysis code parameter from solver_cmd.h5 file
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  // number of solid layer
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  const int num_layer = cmd_h5r -> read_intScalar("/","num_layer");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
+
+  // Solid properties
+  bool is_read_material = true;
+  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
+  for(int ii=0; ii<num_layer; ++ii)
+  {
+    solid_density[ii] = -1.0;
+    solid_E[ii] = -1.0;
+    solid_nu[ii] = -1.0;
+  }
+
+  // Load analysis code parameter from solver_cmd.h5 file
+  prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
 
@@ -71,6 +92,20 @@ int main ( int argc , char * argv[] )
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-ref", isRef);
   SYS_T::GetOptionBool("-clean", isClean);
+  for (int ii=0; ii<num_layer; ++ii)
+  {
+    std::string sl_density_name = "-sl_density_";
+    std::string sl_E_name = "-sl_E_";
+    std::string sl_nu_name = "-sl_nu_";
+    
+    sl_density_name = sl_density_name + std::to_string(ii);
+    sl_E_name = sl_E_name + std::to_string(ii);
+    sl_nu_name = sl_nu_name + std::to_string(ii);
+
+    SYS_T::GetOptionReal(  sl_density_name.c_str(),        solid_density[ii]);
+    SYS_T::GetOptionReal(  sl_E_name.c_str(),              solid_E[ii]);
+    SYS_T::GetOptionReal(  sl_nu_name.c_str(),             solid_nu[ii]);
+  }
 
   // Correct time_step if it does not match with sol_rec_freq
   if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
@@ -98,6 +133,35 @@ int main ( int argc , char * argv[] )
     SYS_T::execute("rm -rf VIS_S_*_p*.vtu");
     SYS_T::execute("rm -rf VIS_S_*.pvtu");
     SYS_T::execute("rm -rf VIS_S_.pvd");
+  }
+
+  if( is_read_material )
+  {
+    SYS_T::commPrint("-is_read_material: true \n");
+    for( int ii=0; ii<num_layer; ++ii)
+    {
+      std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
+      SYS_T::file_check( matmodel_file_name.c_str() );
+      SYS_T::commPrint( "material_model_%d.h5 found. \n", ii );
+    }
+  }
+  else
+  {
+    SYS_T::commPrint("-is_read_material: false \n");
+    for (int ii=0; ii<num_layer; ++ii)
+    {
+      std::string sl_density_name = "-sl_density_";
+      std::string sl_E_name = "-sl_E_";
+      std::string sl_nu_name = "-sl_nu_";
+    
+      sl_density_name = sl_density_name + std::to_string(ii);
+      sl_E_name = sl_E_name + std::to_string(ii);
+      sl_nu_name = sl_nu_name + std::to_string(ii);
+
+      SYS_T::cmdPrint(  sl_density_name.c_str(), solid_density[ii]);
+      SYS_T::cmdPrint(  sl_E_name.c_str(),       solid_E[ii]);
+      SYS_T::cmdPrint(  sl_nu_name.c_str(),      solid_nu[ii]);
+    }
   }
   
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
@@ -137,6 +201,45 @@ int main ( int argc , char * argv[] )
   else SYS_T::print_fatal( "Error: unsupported element type \n" );
 
   quad -> print_info();
+
+  // material model
+  IMaterialModel ** matmodel = new IMaterialModel* [num_layer];
+  for(int ii = 0; ii<num_layer; ++ii)
+  {
+    if( is_read_material )
+    {
+      // load solid_nu from h5 file
+      std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
+
+      hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+      HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
+
+      solid_nu[ii] = model_h5r -> read_doubleScalar("/", "nu");
+
+      delete model_h5r; H5Fclose(model_file);
+
+      if( solid_nu[ii] == 0.5 )
+      {
+        matmodel[ii] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
+      }
+      else
+      {
+        matmodel[ii] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
+      }
+    }
+    else
+    {
+      if( solid_nu[ii] == 0.5 )
+      {
+        matmodel[ii] = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density[ii], solid_E[ii] );
+      }
+      else
+      {
+        matmodel[ii] = new MaterialModel_NeoHookean_M94_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii] );
+      }
+    }
+  }
 
   // For the solid subdomain, we need to prepare a mapping from the
   // FSI nodal index to the solid subdomain nodal index
@@ -200,7 +303,7 @@ int main ( int argc , char * argv[] )
           time * dt, out_bname, name_to_write, isXML );
     else
       vtk_w->writeOutput_solid_cur( fNode, locIEN_v, locIEN_p, sIEN, locElem,
-          visprep, element, quad, pointArrays, rank, size,
+          visprep, matmodel, element, quad, pointArrays, rank, size,
           num_subdomain_nodes,
           time * dt, out_bname, name_to_write, isXML );    
 
@@ -214,6 +317,9 @@ int main ( int argc , char * argv[] )
   delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
   delete [] pointArrays; delete vtk_w;
+  for (int ii = 0; ii<num_layer; ++ii)
+    delete matmodel[ii];
+  delete [] matmodel;
   PetscFinalize();
 
   return EXIT_SUCCESS ;

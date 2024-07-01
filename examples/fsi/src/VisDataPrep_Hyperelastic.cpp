@@ -25,6 +25,8 @@ VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
   arraySizes.push_back(1);
   arrayNames.push_back("Velocity");
   arraySizes.push_back(3);
+  arrayNames.push_back("CauchyStress");
+  arraySizes.push_back(6);
   }
 
   pt_array_len.clear();

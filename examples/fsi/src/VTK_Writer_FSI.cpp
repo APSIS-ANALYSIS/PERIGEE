@@ -47,6 +47,85 @@ void VTK_Writer_FSI::interpolateJ( const int * const &ptid,
   }
 }
 
+void VTK_Writer_FSI::interpolateJ(
+    const int &ptoffset, const std::vector<double> &inputDisp,
+    const FEAElement * const &elem, vtkDoubleArray * const &vtkData )
+{
+  const int nqp = elem->get_numQuapts();
+
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputDisp[ii*3];
+    v[ii] = inputDisp[ii*3+1];
+    w[ii] = inputDisp[ii*3+2];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  Interpolater intep( nLocBas );
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                  vx[ii],       vy[ii] + 1.0, vz[ii],
+                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    vtkData->InsertComponent(ptoffset+ii, 0, F.det());
+  }
+}
+
+void VTK_Writer_FSI::interpolateCauchy( const int &ptoffset,
+    const std::vector<double> &inputData, const std::vector<double> &inputPres,
+    const FEAElement * const &elem,
+    IMaterialModel * const &model, vtkDoubleArray * const &vtkData )
+{
+  const int nqp = elem->get_numQuapts();
+
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0), p (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputData[ii*3];
+    v[ii] = inputData[ii*3+1];
+    w[ii] = inputData[ii*3+2];
+    p[ii] = inputPres[ii];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  Interpolater intep( nLocBas );
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                  vx[ii],       vy[ii] + 1.0, vz[ii],
+                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
+    
+    Tensor2_3D sigma_d = model->get_Cauchy_stress(F);
+
+    Tensor2_3D pres( -p[ii], 0.0, 0.0, 0.0, -p[ii], 0.0, 0.0, 0.0, -p[ii]);
+
+    Tensor2_3D sigma = sigma_d + pres;
+
+    vtkData->InsertComponent(ptoffset+ii, 0, sigma(0,0));
+    vtkData->InsertComponent(ptoffset+ii, 1, sigma(1,1));
+    vtkData->InsertComponent(ptoffset+ii, 2, sigma(2,2));
+    vtkData->InsertComponent(ptoffset+ii, 3, sigma(0,1));
+    vtkData->InsertComponent(ptoffset+ii, 4, sigma(0,2));
+    vtkData->InsertComponent(ptoffset+ii, 5, sigma(1,2));
+  }
+}
+
 void VTK_Writer_FSI::writeOutput(
         const FEANode * const &fnode_ptr,
         const ALocal_IEN * const &lien_v,
@@ -466,6 +545,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
     const std::vector<int> &sien,
     const ALocal_Elem * const &lelem_ptr,
     const IVisDataPrep * const &vdata_ptr,
+    IMaterialModel ** const &model,
     FEAElement * const &elemptr,
     const IQuadPts * const &quad,
     const double * const * const &pointArrays,
@@ -502,7 +582,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
   // Check if the number of visualization quantities equal a given number
   // I will have to manually interpolate these quantities in the for-loop
-  if(numDArrays != 4) SYS_T::print_fatal("Error: vdata size numDArrays != 4. \n");
+  if(numDArrays != 5) SYS_T::print_fatal("Error: vdata size numDArrays != 5. \n");
 
   // dataVecs is the holder of the interpolated data
   vtkDoubleArray ** dataVecs = new vtkDoubleArray * [numDArrays];
@@ -511,18 +591,22 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
     dataVecs[ii] = vtkDoubleArray::New();
     dataVecs[ii] -> SetNumberOfComponents( vdata_ptr->get_arraySizes(ii) );
     dataVecs[ii] -> SetName( vdata_ptr->get_arrayNames(ii).c_str() );
-    dataVecs[ii] -> SetNumberOfTuples( num_of_nodes );
+    // dataVecs[ii] -> SetNumberOfTuples( num_of_nodes );
   }
 
   // An additional array for the analysis partition info
   vtkIntArray * anaprocId = vtkIntArray::New();
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
-
+  
+  int ptOffset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    if( lelem_ptr->get_elem_tag(ee) >= 1 )
+    int phy_tag = lelem_ptr->get_elem_tag(ee);
+    if( phy_tag >= 1 )
     {
+      --phy_tag;
+
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
 
@@ -537,58 +621,62 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       for(int ii=0; ii<nLocBas; ++ii) IEN_s[ii] = sien[ee * nLocBas + ii];
 
       // Interpolate data and assign to dataVecs
-      std::vector<double> inputInfo; inputInfo.clear();
+      std::vector<double> inputInfo_d; inputInfo_d.clear();
       int asize = vdata_ptr -> get_arraySizes(0);
 
       for(int jj=0; jj<nLocBas; ++jj)
       {
         int pt_index = IEN_v[jj];
         for(int kk=0; kk<asize; ++kk)
-          inputInfo.push_back( pointArrays[0][pt_index * asize + kk] );
+          inputInfo_d.push_back( pointArrays[0][pt_index * asize + kk] );
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, ptOffset, inputInfo_d, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
+      intep.interpolateVTKPts( ptOffset, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, elemptr, points );
 
       // Interpolate detF
-      interpolateJ( &IEN_s[0], inputInfo, elemptr, dataVecs[1] );
+      interpolateJ( ptOffset, inputInfo_d, elemptr, dataVecs[1] );
 
       // Interpolate the pressure scalar
-      inputInfo.clear();
+      std::vector<double> inputInfo_p; inputInfo_p.clear();
       asize = vdata_ptr->get_arraySizes(2);  
       for(int jj=0; jj<nLocBas; ++jj)
       {
         int pt_index = IEN_p[jj];
         for(int kk=0; kk<asize; ++kk)
-          inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
+          inputInfo_p.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] ); 
+      intep.interpolateVTKData( asize, ptOffset, inputInfo_p, elemptr, dataVecs[2] ); 
+
+      // Interpolate Cauchy stress
+      interpolateCauchy( ptOffset, inputInfo_d, inputInfo_p, elemptr, model[phy_tag], dataVecs[4] );
       
       // Interpolate the velocity vector
-      inputInfo.clear();
+      std::vector<double> inputInfo_v; inputInfo_v.clear();
       asize = vdata_ptr->get_arraySizes( 3 );  
       for(int jj=0; jj<nLocBas; ++jj)
       {
         int pt_index = IEN_v[jj];
         for(int kk=0; kk<asize; ++kk)
-          inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
+          inputInfo_v.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[3] );
+      intep.interpolateVTKData( asize, ptOffset, inputInfo_v, elemptr, dataVecs[3] );
       
       // Set mesh connectivity
       if( elemptr->get_Type() == 501 )
-        VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
+        VIS_T::setTetraelem( ptOffset, gridData );
       else if( elemptr->get_Type() == 601 )
-        VIS_T::setHexelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], 
-          IEN_s[4], IEN_s[5], IEN_s[6], IEN_s[7], gridData );
+        VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
       else SYS_T::print_fatal("Error: unknown element type.\n");
 
       // Analysis mesh partition
       const int e_global = lelem_ptr->get_elem_loc(ee);
       anaprocId->InsertNextValue( epart_map[e_global] );
+
+      ptOffset += nLocBas;
     }
   }
 

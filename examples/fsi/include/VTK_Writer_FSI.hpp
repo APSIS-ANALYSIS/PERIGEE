@@ -13,6 +13,7 @@
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"
+#include "IMaterialModel.hpp"
 
 #include "vtkIntArray.h"
 #include "vtkCellData.h"
@@ -67,6 +68,7 @@ class VTK_Writer_FSI
     	const std::vector<int> &sien,
     	const ALocal_Elem * const &lelem_ptr,
     	const IVisDataPrep * const &vdata_ptr,
+        IMaterialModel ** const &model,
     	FEAElement * const &elemptr,
     	const IQuadPts * const &quad,
     	const double * const * const &pointArrays,
@@ -100,11 +102,29 @@ class VTK_Writer_FSI
     std::vector<int> epart_map;
 
     // --------------------------------------------------------------
-    // Interpolate det(F) at sampling points
+    // Interpolate det(F) at sampling points by IEN
     // --------------------------------------------------------------
     void interpolateJ( const int * const &ptid,
         const std::vector<double> &inputData,
         const FEAElement * const &elem,
+        vtkDoubleArray * const &vtkData );
+    
+    // --------------------------------------------------------------
+    // Interpolate det(F) at sampling points by ptoffset
+    // --------------------------------------------------------------
+    void interpolateJ( const int &ptoffset,
+        const std::vector<double> &inputData, 
+        const FEAElement * const &elem,
+        vtkDoubleArray * const &vtkData );
+    
+    // --------------------------------------------------------------
+    // Interpolate cauchy stress at elements
+    // --------------------------------------------------------------
+    void interpolateCauchy( const int &ptoffset,
+        const std::vector<double> &inputData_d,
+        const std::vector<double> &inputData_p,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
         vtkDoubleArray * const &vtkData );
 };
 
