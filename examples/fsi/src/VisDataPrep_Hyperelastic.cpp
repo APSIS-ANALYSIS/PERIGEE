@@ -15,7 +15,7 @@ VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
   }
   else
   {
-  arrayCompSize = 4;
+  arrayCompSize = 5;
 
   arrayNames.push_back("Displacement");
   arraySizes.push_back(3);
