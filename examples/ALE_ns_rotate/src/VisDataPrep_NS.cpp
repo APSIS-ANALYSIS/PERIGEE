@@ -20,19 +20,17 @@ VisDataPrep_NS::VisDataPrep_NS()
 }
 
 void VisDataPrep_NS::get_pointArray(
-    const std::string solution_file_name,
-    const std::string disp_file_name,
+    const std::vector<std::string> solution_file_names,
     const std::string analysis_node_mapping_file,
     const std::string post_node_mapping_file,
     const APart_Node * const &nNode_ptr,
     const int &input_nfunc,
-    const int &input_dof,
     double ** &solArrays ) const
 {
-  PostVectSolution pvsolu(solution_file_name, analysis_node_mapping_file,
-      post_node_mapping_file, nNode_ptr, input_nfunc, input_dof);
+  PostVectSolution pvsolu(solution_file_names[0], analysis_node_mapping_file,
+      post_node_mapping_file, nNode_ptr, input_nfunc, 4);
 
-  PostVectSolution pvsolu_disp(disp_file_name, analysis_node_mapping_file,
+  PostVectSolution pvsolu_disp(solution_file_names[1], analysis_node_mapping_file,
       post_node_mapping_file, nNode_ptr, input_nfunc, 3);
 
   // Total number of nodes to be read from the solution vector
@@ -42,10 +40,10 @@ void VisDataPrep_NS::get_pointArray(
   // container 
   for(int ii=0; ii<ntotal; ++ii)
   {
-    solArrays[0][ii]     = pvsolu.get_locsol(ii*input_dof+0);
-    solArrays[1][3*ii]   = pvsolu.get_locsol(ii*input_dof+1);
-    solArrays[1][3*ii+1] = pvsolu.get_locsol(ii*input_dof+2);
-    solArrays[1][3*ii+2] = pvsolu.get_locsol(ii*input_dof+3);
+    solArrays[0][ii]     = pvsolu.get_locsol(ii*4+0);
+    solArrays[1][3*ii]   = pvsolu.get_locsol(ii*4+1);
+    solArrays[1][3*ii+1] = pvsolu.get_locsol(ii*4+2);
+    solArrays[1][3*ii+2] = pvsolu.get_locsol(ii*4+3);
     solArrays[2][3*ii]   = pvsolu_disp.get_locsol(ii*3+0);
     solArrays[2][3*ii+1] = pvsolu_disp.get_locsol(ii*3+1);
     solArrays[2][3*ii+2] = pvsolu_disp.get_locsol(ii*3+2);

@@ -158,11 +158,13 @@ int main( int argc, char * argv[] )
     name_to_write.append(time_index.str());
     name_to_read_disp.append(time_index.str());
 
+    const std::vector<std::string> name_to_read_list {name_to_read, name_to_read_disp};
+
     SYS_T::commPrint("Time %d: Read %s and %s and Write %s \n",
         time, name_to_read.c_str(), name_to_read_disp.c_str(), name_to_write.c_str() );
 
-    visprep->get_pointArray(name_to_read, name_to_read_disp, anode_mapping_file, pnode_mapping_file,
-        pNode, GMIptr->get_nFunc(), dof, solArrays);
+    visprep->get_pointArray(name_to_read_list, anode_mapping_file, pnode_mapping_file,
+        pNode, GMIptr->get_nFunc(), solArrays);
 
     vtk_w->writeOutput( fNode, locIEN, locElem,
         visprep, element, quad, solArrays,
