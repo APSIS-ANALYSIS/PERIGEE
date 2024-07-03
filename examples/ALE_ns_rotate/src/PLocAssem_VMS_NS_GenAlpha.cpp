@@ -146,22 +146,22 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Rotated(
 
   Zero_Residual();
 
-  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
+  std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   //Update coordinates
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, curr, curPt_x, curPt_y, curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, curr, &curPt_x[0], &curPt_y[0], &curPt_z[0], 0);
 
-  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
-  double pre_curPt_x[nLocBas], pre_curPt_y[nLocBas], pre_curPt_z[nLocBas];
+  std::vector<double> pre_curPt_x(nLocBas, 0.0), pre_curPt_y(nLocBas, 0.0), pre_curPt_z(nLocBas, 0.0);  
 
-  double np1_curPt_x[nLocBas], np1_curPt_y[nLocBas], np1_curPt_z[nLocBas];
+  std::vector<double> np1_curPt_x(nLocBas, 0.0), np1_curPt_y(nLocBas, 0.0), np1_curPt_z(nLocBas, 0.0);  
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time, pre_curPt_x, pre_curPt_y, pre_curPt_z, 0);
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time_np1, np1_curPt_x, np1_curPt_y, np1_curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time, &pre_curPt_x[0], &pre_curPt_y[0], &pre_curPt_z[0], 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time_np1, &np1_curPt_x[0], &np1_curPt_y[0], &np1_curPt_z[0], 0);
 
   // Mesh displacement in the node
   for(int A=0; A<nLocBas; ++A)
@@ -523,22 +523,22 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Rotated(
 
   Zero_Tangent_Residual();
 
-  double curPt_x[nLocBas], curPt_y[nLocBas], curPt_z[nLocBas];
+  std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   //Update coordinates
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, curr, curPt_x, curPt_y, curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, curr, &curPt_x[0], &curPt_y[0], &curPt_z[0], 0);
 
-  element->buildBasis( quad, curPt_x, curPt_y, curPt_z );
+  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
-  double pre_curPt_x[nLocBas], pre_curPt_y[nLocBas], pre_curPt_z[nLocBas];
+  std::vector<double> pre_curPt_x(nLocBas, 0.0), pre_curPt_y(nLocBas, 0.0), pre_curPt_z(nLocBas, 0.0);
 
-  double np1_curPt_x[nLocBas], np1_curPt_y[nLocBas], np1_curPt_z[nLocBas];
+  std::vector<double> np1_curPt_x(nLocBas, 0.0), np1_curPt_y(nLocBas, 0.0), np1_curPt_z(nLocBas, 0.0);
 
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time, pre_curPt_x, pre_curPt_y, pre_curPt_z, 0);
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time_np1, np1_curPt_x, np1_curPt_y, np1_curPt_z, 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time, &pre_curPt_x[0], &pre_curPt_y[0], &pre_curPt_z[0], 0);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, time_np1, &np1_curPt_x[0], &np1_curPt_y[0], &np1_curPt_z[0], 0);
 
   // Mesh displacement in the node
   for(int A=0; A<nLocBas; ++A)
