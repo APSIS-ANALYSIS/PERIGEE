@@ -28,6 +28,8 @@ int main( int argc, char * argv[] )
   const int dof = 4;
   
   std::string sol_bname("SOL_");
+  std::string disp_bname("DISP_");
+
   std::string out_bname = sol_bname;
   int time_start = 0, time_step = 1, time_end = 1;
   bool isXML = true, isRestart = false;
@@ -57,12 +59,14 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionReal("-dt", dt);
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionString("-out_bname", out_bname);
+  SYS_T::GetOptionString("-disp_bname", disp_bname);
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-restart", isRestart);
   
   SYS_T::commPrint("=== Command line arguments ===\n");
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);
+  SYS_T::cmdPrint("-disp_bname:", disp_bname);
   SYS_T::cmdPrint("-time_start:", time_start);
   SYS_T::cmdPrint("-time_step:", time_step);
   SYS_T::cmdPrint("-time_end:", time_end);
@@ -147,15 +151,17 @@ int main( int argc, char * argv[] )
   {
     std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
+    std::string name_to_read_disp(disp_bname);    
     time_index.str("");
     time_index<< 900000000 + time;
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
+    name_to_read_disp.append(time_index.str());
 
-    SYS_T::commPrint("Time %d: Read %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_write.c_str() );
+    SYS_T::commPrint("Time %d: Read %s and %s and Write %s \n",
+        time, name_to_read.c_str(), name_to_read_disp.c_str(), name_to_write.c_str() );
 
-    visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
+    visprep->get_pointArray(name_to_read, name_to_read_disp, anode_mapping_file, pnode_mapping_file,
         pNode, GMIptr->get_nFunc(), dof, solArrays);
 
     vtk_w->writeOutput( fNode, locIEN, locElem,

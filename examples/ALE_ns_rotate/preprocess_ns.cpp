@@ -174,6 +174,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofMat", dofMat);
   cmdh5w->write_intScalar("elemType", elemType);
   cmdh5w->write_string("geo_file", geo_file);
+  cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
   cmdh5w->write_string("sur_file_wall", sur_file_wall);

@@ -19,7 +19,7 @@ class VisDataPrep_NS : public IVisDataPrep
 
     // Return the number of physical fields to be read from solution
     // vector
-    virtual int get_ptarray_size() const {return 2;}
+    virtual int get_ptarray_size() const {return 3;}
    
     // Return the number of components for each physical field
     virtual int get_ptarray_comp_length( const int &ii ) const
@@ -27,6 +27,7 @@ class VisDataPrep_NS : public IVisDataPrep
 
     virtual void get_pointArray(
         const std::string solution_file_name,
+        const std::string disp_file_name,
         const std::string analysis_node_mapping_file,
         const std::string post_node_mapping_file,
         const APart_Node * const &nNode_ptr,
