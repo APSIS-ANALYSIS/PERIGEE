@@ -125,11 +125,11 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // If add perturbation at the inlet with given turbulence intensity
-    sol_base->randomly_perturbed_parabolic_inflow(TI_std_dev, pNode_ptr, feanode_ptr, infnbc_part);
+    // sol_base->randomly_perturbed_parabolic_inflow(TI_std_dev, pNode_ptr, feanode_ptr, infnbc_part);
 
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
-        time_info->get_time(), time_info->get_step(), 
+        time_info->get_time(), time_info->get_step(), TI_std_dev,
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
