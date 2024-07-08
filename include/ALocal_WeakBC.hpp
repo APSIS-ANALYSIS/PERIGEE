@@ -22,9 +22,9 @@ class ALocal_WeakBC
 
     virtual int get_num_ele() const { return num_sur_ele; }
 
-    virtual const int get_part_vol_ele_id( const int &ee ) const { return part_vol_ele_id[ee]; }
+    virtual int get_part_vol_ele_id( const int &ee ) const { return part_vol_ele_id[ee]; }
 
-    virtual const int get_ele_face_id( const int &ee ) const { return ele_face_id[ee]; }
+    virtual int get_ele_face_id( const int &ee ) const { return ele_face_id[ee]; }
 
     virtual void print_info() const;
 

@@ -1,8 +1,7 @@
 #include "ALocal_WeakBC.hpp"
 
 ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, 
-    const int &cpu_rank )
-: wall_model_type {0}
+    const int &cpu_rank ) : wall_model_type {0}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
