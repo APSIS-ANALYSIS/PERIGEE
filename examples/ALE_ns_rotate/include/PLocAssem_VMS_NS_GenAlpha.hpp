@@ -188,10 +188,10 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Private functions
     virtual void print_info() const;
 
-    SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
+    virtual SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in RB-VMS
-    std::array<double, 2> get_tau( const double &dt, 
+    virtual std::array<double, 2> get_tau( const double &dt, 
         const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
@@ -199,15 +199,15 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     //        which scales like Time x Density
     // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 
     // for more details
-    double get_DC( const std::array<double, 9> &dxi_dx,
+    virtual double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_f(const Vector_3 &pt, const double &tt) const
+    virtual Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
-    Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
+    virtual Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
         const Vector_3 &n_out ) const
     {
       const double p0 = 0.0;
@@ -219,14 +219,14 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     locassem_vms_ns_funs * flist;
 
-    Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
+    virtual Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
         const double &tt, const Vector_3 &n_out ) const
     {
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
     // Get the radius of rotation
-    Vector_3 get_radius (const Vector_3 &coor) const
+    virtual Vector_3 get_radius (const Vector_3 &coor) const
     { 
       // Info of rotation axis
       Vector_3 direction_rotated (angular_velo);
@@ -246,7 +246,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     } 
 
     // Get the current point coordinates for the case of rotation around x/y/z-axis
-    void get_currPts( const double * const &ept_x,
+    virtual void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
         const double &tt,
@@ -305,7 +305,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // [ cos(theta) + a*a(1-cos(theta)),    a*b(1-cos(theta)) - c*sin(theta), b*sin(theta) + a*c(1-cos(theta))  ]
     // [ c*sin(theta) + a*b(1-cos(theta)),  cos(theta) + b*b(1-cos(theta)),   -a*sin(theta) + b*c(1-cos(theta)) ]
     // [ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
-    void get_currPts( const double * const &ept_x,
+    virtual void get_currPts( const double * const &ept_x,
         const double * const &ept_y,
         const double * const &ept_z,
         const double &tt,

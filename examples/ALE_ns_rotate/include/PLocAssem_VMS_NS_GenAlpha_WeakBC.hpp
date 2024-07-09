@@ -49,10 +49,30 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
         const IQuadPts * const &quads,
         const int &face_id);
 
-  private:
+    virtual void Assem_Residual_Weak_Rotated(
+        const double &time, const double &dt,
+        const double * const &sol,
+        FEAElement * const &elementvs,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quads,
+        const int &face_id);
+
+    virtual void Assem_Tangent_Residual_Weak_Rotated(
+        const double &time, const double &dt,
+        const double * const &sol,
+        FEAElement * const &elementvs,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quads,
+        const int &face_id);
+
+  protected:
     const double C_bI;
 
-    Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)
+    virtual Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)
     {
       return Vector_3( 0.0, 0.0, 0.0 );
     }
@@ -62,7 +82,7 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
     // Input: \para dxi_dx : the inverse Jacobian
     //        \para n_out  : the outward normal 
     // ----------------------------------------------------------------
-    double get_h_b(const std::array<double, 9> &dxi_dx, const Vector_3 &n_out)
+    virtual double get_h_b(const std::array<double, 9> &dxi_dx, const Vector_3 &n_out)
     {
       const Tensor2_3D inv_Jac (dxi_dx[0], dxi_dx[1], dxi_dx[2],
                                 dxi_dx[3], dxi_dx[4], dxi_dx[5],
@@ -90,7 +110,7 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
     // Ref: Y.Basilevs et al. Isogeometric variational multiscale modeling of wall-bounded turbulent flows 
     //      with weakly enforced boundary conditions on unstretched meshes, CMAME 2010
     // ----------------------------------------------------------------
-    double get_tau_B(const Vector_3 &u_tan, const double &yy, const double &fl_mu)
+    virtual double get_tau_B(const Vector_3 &u_tan, const double &yy, const double &fl_mu)
     {
       // Use Newton-Raphson method to solve g([u+]) = 0.
       // When [u+] > 0 and [y+] > 0, g([u+]) is monotonically increasing, and there is a unique root.

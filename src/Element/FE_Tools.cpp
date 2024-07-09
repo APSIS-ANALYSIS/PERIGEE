@@ -251,11 +251,22 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
     // Solve [dRes_r_dr  dRes_r_ds  {dr  = {-Res_r
     //        dRes_s_dr  dRes_s_ds]  ds}    -Res_s}
 
-    std::array<double, 4> tan_mat = {dRes_r_dr, dRes_r_ds, dRes_r_ds, dRes_s_ds};
-    MATH_T::Matrix_Dense<2> Tan_Mat(tan_mat);
-
-    std::array<double, 2> Res_vec = {-Res_r, -Res_s};
-    std::array<double, 2> dxi = Tan_Mat.LU_solve(Res_vec);
+    // Ax = b, A = [a b   inv(A) = 1/(ad - bc) * [d -b      x = inv(A) * b
+    //              c d]                         -c  a]
+    std::array<double, 2> dxi = {0.0, 0.0};
+    const double ad_bc = dRes_r_dr * dRes_s_ds - dRes_r_ds * dRes_r_ds;
+    // if(std::abs(ad_bc) > 1.0e-14)
+    // {
+      dxi[0] = (-dRes_s_ds * Res_r + dRes_r_ds * Res_s) / ad_bc;
+      dxi[1] = (dRes_r_ds * Res_r - dRes_r_dr * Res_s) / ad_bc;
+    // }
+    // else
+    // {
+    //   std::array<double, 4> tan_mat = {dRes_r_dr, dRes_r_ds, dRes_r_ds, dRes_s_ds};
+    //   MATH_T::Matrix_Dense<2> Tan_Mat(tan_mat);
+    //   std::array<double, 2> Res_vec = {-Res_r, -Res_s};
+    //   dxi = Tan_Mat.LU_solve(Res_vec);
+    // }
 
     // SYS_T::commPrint("      dr = %e, ds = %e\n", dxi[0], dxi[1]);
 
@@ -293,7 +304,7 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
     old_dist = curr_dist;
   }
 
-  if( !closest_point->check_qp(0) )
+  if( !closest_point->check_qp_bound(0) )
   {
     // SYS_T::commPrint("    Wrong [r,s,t]\n");
     return false;

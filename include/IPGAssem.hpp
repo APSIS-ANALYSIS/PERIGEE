@@ -343,6 +343,25 @@ class IPGAssem
         const ALocal_WeakBC * const &wbc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &sol_a,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
@@ -606,6 +625,32 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    // Assembly with interface integral
+    virtual void Assem_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -880,6 +925,32 @@ class IPGAssem
         const ALocal_WeakBC * const &wbc_part )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    // Assembly with interface integral
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
     // --------------------------------------------------------------
     // Assembly boundary integrals
     // --------------------------------------------------------------
@@ -1036,6 +1107,16 @@ class IPGAssem
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
+    // search the all the interface quadrature point at each time step
+    virtual void search_all_opposite_point(
+        const double &curr_time,
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        ALocal_Interface * const &itf_part )
+    {SYS_T::commPrint("Warning: search_all_opposite_point() is not implemented. \n");}
 };
 
 #endif

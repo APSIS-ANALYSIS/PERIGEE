@@ -1,6 +1,7 @@
 #include "ALocal_Interface.hpp"
 
-ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank )
+ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
+  const Vector_3 &point_xyz, const Vector_3 &angular )
 : num_itf {0}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -29,12 +30,29 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
   fixed_ele_tag.resize(num_itf);
   fixed_layer_ien.resize(num_itf);
   fixed_node_xyz.resize(num_itf);
+  fixed_node_sol.resize(num_itf);
+  fixed_node_part_tag.resize(num_itf);
+  fixed_node_loc_pos.resize(num_itf);
   fixed_node_id.resize(num_itf);
+  fixed_ID.resize(num_itf);
 
   rotated_layer_ien.resize(num_itf);
   rotated_layer_face_id.resize(num_itf);
   init_rotated_node_xyz.resize(num_itf);
+  rotated_node_sol.resize(num_itf);
+  rotated_node_part_tag.resize(num_itf);
+  rotated_node_loc_pos.resize(num_itf);
   rotated_node_id.resize(num_itf);
+  rotated_ID.resize(num_itf);
+
+  const std::string mesh_info("/Global_Mesh_Info");
+  nLocBas = h5r -> read_intScalar(mesh_info.c_str(), "nLocBas");
+  dof_sol = h5r -> read_intScalar(mesh_info.c_str(), "dofNum");
+
+  const std::string part_node("/Local_Node");
+  nlgn = h5r -> read_intScalar(part_node.c_str(), "nlocghonode");
+
+  cpu = cpu_rank;
 
   for(int ii=0; ii<num_itf; ++ii)
   {
@@ -50,6 +68,14 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
     fixed_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "fixed_node_xyz" );
 
     fixed_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_map" );
+
+    fixed_ID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "fixed_ID" );
+
+    fixed_node_sol[ii] = std::vector<double> (dof_sol * num_fixed_node[ii], 0.0);
+
+    fixed_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_part_tag" );
+
+    fixed_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_loc_pos" );
 
     rotated_layer_ien[ii].resize(num_tag[ii]);
     rotated_layer_face_id[ii].resize(num_tag[ii]);
@@ -76,12 +102,20 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
     init_rotated_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "rotated_node_xyz" );
 
     rotated_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" );
+
+    rotated_ID[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_ID" );
+
+    rotated_node_sol[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
+
+    rotated_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_part_tag" );
+
+    rotated_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_loc_pos" );
   }
 
-  const std::string mesh_info("/Global_Mesh_Info");
-  nLocBas = h5r -> read_intScalar(mesh_info.c_str(), "nLocBas");
-
   delete h5r; H5Fclose( file_id );
+
+  point_rotated = point_xyz;
+  angular_velo = angular;
 }
 
 void ALocal_Interface::print_info() const
@@ -89,25 +123,99 @@ void ALocal_Interface::print_info() const
   SYS_T::commPrint("Interfaces: %d\n", num_itf);
 }
 
-Vector_3 ALocal_Interface::get_curr_xyz(const int &ii, const int &node, const double &tt) const
+// Vector_3 ALocal_Interface::get_curr_xyz(const int &ii, const int &node, const double &tt) const
+// {
+//   Vector_3 xyz (get_init_rotated_node_xyz(ii, 3 * node),
+//                 get_init_rotated_node_xyz(ii, 3 * node + 1),
+//                 get_init_rotated_node_xyz(ii, 3 * node + 2));
+
+//   // rotation around z-axis
+//   const double angular_velo = MATH_T::PI / 60;  // (rad/s)
+
+//   const double rr = std::sqrt(xyz(1) * xyz(1) + xyz(2) * xyz(2));
+
+//   double angle = MATH_T::get_angle_2d(xyz(1), xyz(2));
+
+//   angle += angular_velo * tt;
+
+//   xyz(1) = std::cos(angle) * rr;
+//   xyz(2) = std::sin(angle) * rr;
+
+//   return xyz;
+// }
+
+// Get the radius of rotation
+Vector_3 ALocal_Interface::get_radius (const Vector_3 &coor) const
+{ 
+  // Info of rotation axis
+  Vector_3 direction_rotated (angular_velo);
+  
+  direction_rotated.normalize();
+
+  // The vector from the rotation point to the input point
+  const Vector_3 point_rotated_to_coor (coor.x() - point_rotated.x(), coor.y() - point_rotated.y(), coor.z() - point_rotated.z());
+
+  const double projectd_length = Vec3::dot_product(point_rotated_to_coor, direction_rotated);
+  
+  // The projection point of the input point on the rotation axis
+  const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
+  
+  // The vector from the projection point to the input point
+  return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z());
+}
+
+void ALocal_Interface::get_currPts( const double * const &ept_x,
+    const double * const &ept_y,
+    const double * const &ept_z,
+    const double &tt,
+    double * const &currPt_x,
+    double * const &currPt_y,
+    double * const &currPt_z,
+    const int &type) const
 {
-  Vector_3 xyz (get_init_rotated_node_xyz(ii, 3 * node),
-                get_init_rotated_node_xyz(ii, 3 * node + 1),
-                get_init_rotated_node_xyz(ii, 3 * node + 2));
+  double mag_angular_velo = 0.0; // (rad/s)
 
-  // rotation around z-axis
-  const double angular_velo = MATH_T::PI / 60;  // (rad/s)
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+    const Vector_3 radius_ept = get_radius(ept_xyz);
 
-  const double rr = std::sqrt(xyz(1) * xyz(1) + xyz(2) * xyz(2));
+    const double rr = radius_ept.norm2();
+    
+    double angle = 0.0;
 
-  double angle = MATH_T::get_angle_2d(xyz(1), xyz(2));
-
-  angle += angular_velo * tt;
-
-  xyz(1) = std::cos(angle) * rr;
-  xyz(2) = std::sin(angle) * rr;
-
-  return xyz;
+      //case 0: x-axis, case 1: y-axis, case 2: z-axis
+    switch(type) 
+    {
+      case 0:
+        mag_angular_velo = angular_velo.x();
+        angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
+        angle += mag_angular_velo * tt;
+        currPt_x[ii] = ept_x[ii];
+        currPt_y[ii] = std::cos(angle) * rr;
+        currPt_z[ii] = std::sin(angle) * rr;            
+        break;
+      case 1: 
+        mag_angular_velo = angular_velo.y();
+        angle = MATH_T::get_angle_2d(ept_xyz(2), ept_xyz(0));        
+        angle += mag_angular_velo * tt;
+        currPt_x[ii] = std::sin(angle) * rr;
+        currPt_y[ii] = ept_y[ii];
+        currPt_z[ii] = std::cos(angle) * rr;            
+        break;            
+      case 2: 
+        mag_angular_velo = angular_velo.z();
+        angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
+        angle += mag_angular_velo * tt;
+        currPt_x[ii] = std::cos(angle) * rr;
+        currPt_y[ii] = std::sin(angle) * rr;
+        currPt_z[ii] = ept_z[ii];            
+        break;            
+      default:
+        SYS_T::print_fatal("Error: ALocal_Interface::get_currPts: No such type of rotation axis. \n");
+        break;        
+    }
+  }
 }
 
 void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &ee,
@@ -126,15 +234,94 @@ void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &ee,
 void ALocal_Interface::get_rotated_ele_ctrlPts(const int &ii, const int &tag, const int &ee, const double &tt,
   double * const volctrl_x, double * const volctrl_y, double * const volctrl_z) const
 {
+  std::vector<double> initPt_x(nLocBas, 0.0), initPt_y(nLocBas, 0.0), initPt_z(nLocBas, 0.0);
+
   for(int nn{0}; nn < nLocBas; ++nn)
   {
     int node = get_rotated_layer_ien(ii, tag, nLocBas * ee + nn);
-    Vector_3 cuur_node_xyz = get_curr_xyz(ii, node, tt);
 
-    volctrl_x[nn] = cuur_node_xyz(0);
-    volctrl_y[nn] = cuur_node_xyz(1);
-    volctrl_z[nn] = cuur_node_xyz(2);
+    initPt_x[nn] = get_init_rotated_node_xyz(ii, 3 * node);
+    initPt_y[nn] = get_init_rotated_node_xyz(ii, 3 * node + 1);
+    initPt_z[nn] = get_init_rotated_node_xyz(ii, 3 * node + 2);
   }
+
+  get_currPts(&initPt_x[0], &initPt_y[0], &initPt_z[0], tt, volctrl_x, volctrl_y, volctrl_z, 0);
+}
+
+void ALocal_Interface::restore_node_sol(const PDNSolution * const &sol)
+{
+  double * array = new double [nlgn * dof_sol];
+
+  sol->GetLocalArray( array );
+
+  Zero_node_sol();
+
+  for(int ii = 0; ii < num_itf; ++ii)
+  { 
+    std::vector<double> temp_fixed_node_sol = fixed_node_sol[ii];
+    for(int nn = 0; nn < num_fixed_node[ii]; ++nn)
+    {
+      // Pick out the solution of nodes in each part
+      if(fixed_node_part_tag[ii][nn] == cpu)
+      {  
+        // Like GetLocal in PGAssem
+        const int loc_pos = fixed_node_loc_pos[ii][nn];
+        for(int dd = 0; dd < dof_sol; ++dd)
+          temp_fixed_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
+      }
+    }
+
+    std::vector<double> temp_rotated_node_sol = rotated_node_sol[ii];
+    for(int nn = 0; nn < num_rotated_node[ii]; ++nn)
+    {
+      // Pick out the solution of nodes in each part
+      if(rotated_node_part_tag[ii][nn] == cpu)
+      { 
+        // Like GetLocal in PGAssem
+        const int loc_pos = rotated_node_loc_pos[ii][nn];
+        for(int dd = 0; dd < dof_sol; ++dd)
+          temp_rotated_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
+      }
+    }
+
+    // Summation from each part
+    MPI_Allreduce(&fixed_node_sol[ii][0], &temp_fixed_node_sol[0], num_fixed_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    MPI_Allreduce(&rotated_node_sol[ii][0], &temp_rotated_node_sol[0], num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  }
+
+  delete [] array;
+}
+
+void ALocal_Interface::init_curr(const int &nqp_sur_in)
+{
+  nqp_sur = nqp_sur_in;
+  curr_tag.resize(num_itf);
+  curr_ee.resize(num_itf);
+  curr_xi.resize(num_itf);
+
+  for(int ii = 0; ii < num_itf; ++ii)
+  {
+    curr_tag[ii].assign(num_fixed_ele[ii] * nqp_sur, -1);
+    curr_ee[ii].assign(num_fixed_ele[ii] * nqp_sur, -1);
+    curr_xi[ii].assign(num_fixed_ele[ii] * nqp_sur, std::vector<double>(2, 0.0));
+  }
+}
+
+void ALocal_Interface::set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
+  const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi)
+{
+  curr_tag[itf_id][fixed_ee * nqp_sur + qua] = ele_tag;
+  curr_ee[itf_id][fixed_ee * nqp_sur + qua] = rotated_ee;
+  curr_xi[itf_id][fixed_ee * nqp_sur + qua][0] = xi[0];
+  curr_xi[itf_id][fixed_ee * nqp_sur + qua][1] = xi[1];
+}
+
+void ALocal_Interface::get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
+  int &ele_tag, int &rotated_ee, std::vector<double> &xi) const
+{
+  ele_tag = curr_tag[itf_id][fixed_ee * nqp_sur + qua];
+  rotated_ee = curr_ee[itf_id][fixed_ee * nqp_sur + qua];
+  xi = curr_xi[itf_id][fixed_ee * nqp_sur + qua];
 }
 
 // EOF

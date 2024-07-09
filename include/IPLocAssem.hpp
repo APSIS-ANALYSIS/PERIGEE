@@ -27,6 +27,13 @@ class IPLocAssem
       sur_Tangent  = nullptr;
       sur_Residual = nullptr;
 
+      Tangent_ss = nullptr;
+      Tangent_sr = nullptr;
+      Tangent_rs = nullptr;
+      Tangent_rr = nullptr;
+      Residual_r = nullptr;
+      Residual_s = nullptr;
+
       disp_mesh = nullptr;
     }
 
@@ -48,6 +55,19 @@ class IPLocAssem
     PetscScalar * sur_Tangent;
 
     PetscScalar * sur_Residual;
+    
+    // ------------------------------------------------------------------------
+    // -------------------------------------------------------------- 
+    // Tangent and Residual of sliding-interface
+    // ------------------------------------------------------------------------
+    // -------------------------------------------------------------- 
+    PetscScalar * Tangent_ss;
+    PetscScalar * Tangent_sr;
+    PetscScalar * Tangent_rs;
+    PetscScalar * Tangent_rr;
+
+    PetscScalar * Residual_s;
+    PetscScalar * Residual_r;
 
     // Store the mesh disp
     PetscScalar * disp_mesh;
@@ -512,6 +532,55 @@ class IPLocAssem
         const IQuadPts * const &quads,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
+
+    // for ALE_ns
+    virtual void Assem_Residual_Weak_Rotated(
+        const double &time, const double &dt,
+        const double * const &sol,
+        FEAElement * const &elementv,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &veleCtrlPts_z,
+        const IQuadPts * const &quads,
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Residual_Weak_Rotated is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_Weak_Rotated(
+        const double &time, const double &dt,
+        const double * const &sol,
+        FEAElement * const &elementv,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quads,
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak_Rotated is not implemented.\n");}
+
+    virtual void Assem_Residual_itf(
+      const int &fixed_qua,
+      const double &fixed_qw,
+      const double &dt,
+      const FEAElement * const &fixed_elementv,
+      const FEAElement * const &rotated_elementv,
+      const double * const &fixed_local_sol, 
+      const double * const &rotated_local_sol,
+      const double * const &rotatedCtrlPts_x,
+      const double * const &rotatedCtrlPts_y,
+      const double * const &rotatedCtrlPts_z )
+      {SYS_T::commPrint("Warning: this Assem_Residual_itf is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_itf(
+      const int &fixed_qua,
+      const double &fixed_qw,
+      const double &dt,
+      const FEAElement * const &fixed_elementv,
+      const FEAElement * const &rotated_elementv,
+      const double * const &fixed_local_sol,
+      const double * const &rotated_local_sol,
+      const double * const &rotatedCtrlPts_x,
+      const double * const &rotatedCtrlPts_y,
+      const double * const &rotatedCtrlPts_z )
+      {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf is not implemented.\n");}
 };
 
 #endif

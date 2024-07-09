@@ -50,33 +50,33 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
   switch (elemtype_in)
   {
-  case 501:
-  {
-    s_nLocBas = 3; v_nLocBas = 4;
-  }
-  break;
+    case 501:
+    {
+      s_nLocBas = 3; v_nLocBas = 4;
+    }
+    break;
 
-  case 502:
-  {
-    s_nLocBas = 6; v_nLocBas = 10;
-  }
-  break;
+    case 502:
+    {
+      s_nLocBas = 6; v_nLocBas = 10;
+    }
+    break;
 
-  case 601:
-  {
-    s_nLocBas = 6; v_nLocBas = 8;
-  }
-  break;
+    case 601:
+    {
+      s_nLocBas = 6; v_nLocBas = 8;
+    }
+    break;
 
-  case 602:
-  {
-    s_nLocBas = 9; v_nLocBas = 27;
-  }
-  break;
-  
-  default:
-    SYS_T::print_fatal("Error, Interface_pair: unknown element type.\n");
-  break;
+    case 602:
+    {
+      s_nLocBas = 9; v_nLocBas = 27;
+    }
+    break;
+    
+    default:
+      SYS_T::print_fatal("Error, Interface_pair: unknown element type.\n");
+    break;
   }
 
   fixed_face_id.resize(num_fixed_ele);

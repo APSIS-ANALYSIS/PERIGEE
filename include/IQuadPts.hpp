@@ -133,9 +133,9 @@ class IQuadPts
       SYS_T::print_fatal("Error: IQuadPts::reset is not implemented. \n");
     }
 
-    virtual bool check_qp(const int &ii)
+    virtual bool check_qp_bound(const int &ii)
     {
-      SYS_T::print_fatal("Error: IQuadPts::check_qp is not implemented. \n");
+      SYS_T::print_fatal("Error: IQuadPts::check_qp_bound is not implemented. \n");
       return false;
     }
 };

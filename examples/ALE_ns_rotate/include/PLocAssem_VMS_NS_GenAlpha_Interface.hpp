@@ -27,14 +27,6 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
 
     virtual ~PLocAssem_VMS_NS_GenAlpha_Interface();
 
-    PetscScalar * Tangent_ss;
-    PetscScalar * Tangent_sr;
-    PetscScalar * Tangent_rs;
-    PetscScalar * Tangent_rr;
-
-    PetscScalar * Residual_s;
-    PetscScalar * Residual_r;
-
     virtual void print_info() const;
 
     virtual void Zero_Tangent_Residual_itf()
@@ -62,9 +54,29 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       }
     }
 
-    virtual void Assem_Residual_itf(); // 积分点loop在此函数之外，传入具体某个积分点的、在两个区域中的basis，解和法向量等
+    virtual void Assem_Residual_itf(
+      const int &fixed_qua,
+      const double &fixed_qw,
+      const double &dt,
+      const FEAElement * const &fixed_elementv,
+      const FEAElement * const &rotated_elementv,
+      const double * const &fixed_local_sol, 
+      const double * const &rotated_local_sol,
+      const double * const &rotatedCtrlPts_x,
+      const double * const &rotatedCtrlPts_y,
+      const double * const &rotatedCtrlPts_z );
 
-    virtual void Assem_Tangent_Residual_itf(const double &dt); // 积分点loop在此函数之外，传入具体某个积分点的、在两个区域中的basis，解和法向量等
+    virtual void Assem_Tangent_Residual_itf(
+      const int &fixed_qua,
+      const double &fixed_qw,
+      const double &dt,
+      const FEAElement * const &fixed_elementv,
+      const FEAElement * const &rotated_elementv,
+      const double * const &fixed_local_sol,
+      const double * const &rotated_local_sol,
+      const double * const &rotatedCtrlPts_x,
+      const double * const &rotatedCtrlPts_y,
+      const double * const &rotatedCtrlPts_z );
 };
 
 #endif

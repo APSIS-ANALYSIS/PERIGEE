@@ -87,12 +87,15 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
+    ALocal_Interface * const &itf_part,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
@@ -148,8 +151,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, disp_mesh, conv_flag, nl_counter );
+        ebc_part, gbc, wbc_part, itf_part, bc_mat, elementv, elements, elementvs, elementvs_rotated,
+        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
+        cur_dot_sol, cur_sol, disp_mesh, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();

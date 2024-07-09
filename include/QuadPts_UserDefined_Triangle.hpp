@@ -40,7 +40,7 @@ class QuadPts_UserDefined_Triangle : public IQuadPts
       qw = std::vector<double> (num_pts, 0.5 / num_pts);
     }
 
-    virtual bool check_qp(const int &ii)
+    virtual bool check_qp_bound(const int &ii)
     {
       const double r = qp[3*ii], s = qp[3*ii+1], t = qp[3*ii+2];
       if(r>=0 && r<=1 && s>=0 && s<=1 && t>=0 && t<=1 && std::abs(r+s+t-1)<1e-9)
