@@ -328,7 +328,7 @@ void PGAssem_NS_FEM::Assem_residual(
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<3; ++mm)
-        row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+        row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(0, IEN_e[ii]) + mm;
     }    
     
     if( alelem_ptr->get_elem_rotated(ee) == 0 )
@@ -446,7 +446,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<3; ++mm)
-        row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+        row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(0, IEN_e[ii]) + mm;
     }
 
     if( alelem_ptr->get_elem_rotated(ee) == 0 )

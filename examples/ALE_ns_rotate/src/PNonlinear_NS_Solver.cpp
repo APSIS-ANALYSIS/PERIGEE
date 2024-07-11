@@ -167,6 +167,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
+  // Mesh disp solution
+  disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
+
   // Now do consistent Newton-Raphson iteration
   do
   {
@@ -190,12 +193,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
-
-    // Mesh disp solution
-    //VecCopy( gassem_ptr->Disp, disp_mesh->solution ); // need test??
-    disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
-
-    gassem_ptr->Clear_Disp();
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
