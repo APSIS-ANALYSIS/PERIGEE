@@ -357,6 +357,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
+  for(int A=0; A<nLocBas*3; ++A) disp_mesh[A] = 0.0;
+
   for(int qua=0; qua<nqp; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
@@ -928,6 +930,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
+
+  for(int A=0; A<nLocBas*3; ++A) disp_mesh[A] = 0.0;
 
   for(int qua=0; qua<nqp; ++qua)
   {
