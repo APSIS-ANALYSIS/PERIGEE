@@ -253,11 +253,11 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   Weak_EssBC_G(0, 0, sol_a, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
-
   // Surface integral from Nitsche method
   Interface_G(0, 0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
@@ -373,11 +373,11 @@ void PGAssem_NS_FEM::Assem_residual(
   // For Poiseuille flow
   NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
-
   // Surface integral from Nitsche method
   Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_G( nbc_part, ii );
 
@@ -497,11 +497,11 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // For Poiseuille flow
   NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
-
   // Surface integral from Nitsche method (Only assemble G at present)
   Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
@@ -1264,7 +1264,7 @@ void PGAssem_NS_FEM::Interface_G(
 
   for(int itf_id{0}; itf_id<num_itf; ++itf_id)
   {
-    SYS_T::commPrint("itf_id = %d\n", itf_id);
+    // SYS_T::commPrint("itf_id = %d\n", itf_id);
     const int num_fixed_elem = itf_part->get_num_fixed_ele(itf_id);
 
     for(int ee{0}; ee<num_fixed_elem; ++ee)
@@ -1319,8 +1319,8 @@ void PGAssem_NS_FEM::Interface_G(
         VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
         VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
         
-        VecAssemblyBegin(G);
-        VecAssemblyEnd(G);
+        // VecAssemblyBegin(G);
+        // VecAssemblyEnd(G);
       }
     }
   }
