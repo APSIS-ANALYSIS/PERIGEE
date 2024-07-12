@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Info of rotation axis
-  Vector_3 point_rotated (-0.7, 0.0, 0.0);
+  Vector_3 point_rotated (0.5, 0.0, 0.0);
 
   Vector_3 angular_direction (1.0, 0.0, 0.0);
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
   angular_direction.normalize();
 
-  double angular_velo = MATH_T::PI / 30; //(rad/s)
+  double angular_velo = 0.0; //(rad/s)
 
   // Yaml options
   bool is_loadYaml = true;
