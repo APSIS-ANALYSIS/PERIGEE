@@ -3,13 +3,17 @@
 PGAssem_NS_FEM::PGAssem_NS_FEM(
     IPLocAssem * const &locassem_ptr,
     FEAElement * const &elements,
+    FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quads,
+    IQuadPts * const &free_quad,
     const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
+    const ALocal_Interface * const &part_itf,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -53,7 +57,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   Release_nonzero_err_str();
 
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+      elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -137,14 +141,18 @@ void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part,
 
 void PGAssem_NS_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_Interface * const &itf_part,
+        const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -172,8 +180,10 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
-  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
+  // NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+
+  Interface_KG(0.0, 0.1, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
 
   delete temp;
 
@@ -361,9 +371,9 @@ void PGAssem_NS_FEM::Assem_residual(
   // Backflow stabilization residual contribution
   BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-     nbc_part, ebc_part, gbc );
+  // // Resistance type boundary condition
+  // NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -485,9 +495,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Backflow stabilization residual & tangent contribution
   BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-     nbc_part, ebc_part, gbc );
+  // // Resistance type boundary condition
+  // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -1316,6 +1326,10 @@ void PGAssem_NS_FEM::Interface_KG(
 
         MatSetValues(K, loc_dof, fixed_row_index, loc_dof, fixed_row_index, lassem_ptr->Tangent_ss, ADD_VALUES);
         MatSetValues(K, loc_dof, rotated_row_index, loc_dof, rotated_row_index, lassem_ptr->Tangent_rr, ADD_VALUES);
+
+        // For static problem
+        MatSetValues(K, loc_dof, fixed_row_index, loc_dof, rotated_row_index, lassem_ptr->Tangent_sr, ADD_VALUES);
+        MatSetValues(K, loc_dof, rotated_row_index, loc_dof, fixed_row_index, lassem_ptr->Tangent_rs, ADD_VALUES);
 
         VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
         VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
