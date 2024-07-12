@@ -6,11 +6,12 @@ PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta, const int &elemtype,
-        const Vector_3 &point_xyz, const Vector_3 &angular, 
+        const double &angular,
+        const Vector_3 &point_xyz, const Vector_3 &angular_direc,
         const double &in_ct, const double &in_ctauc,
         const double &in_C_bI )
 : PLocAssem_VMS_NS_GenAlpha(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
-  in_rho, in_vis_mu, in_beta, elemtype, point_xyz, angular, in_ct, in_ctauc), C_bI(in_C_bI)
+  in_rho, in_vis_mu, in_beta, elemtype, angular, point_xyz, angular_direc, in_ct, in_ctauc), C_bI(in_C_bI)
 { }
 
 PLocAssem_VMS_NS_GenAlpha_WeakBC::~PLocAssem_VMS_NS_GenAlpha_WeakBC()

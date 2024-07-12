@@ -28,7 +28,7 @@ class ALocal_Interface
 {
   public:
     ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
-        const Vector_3 &point_xyz, const Vector_3 &angular );
+        const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc );
 
     virtual ~ALocal_Interface() = default;
 
@@ -171,9 +171,12 @@ class ALocal_Interface
 
     int nqp_sur;
 
-    Vector_3 point_rotated;
+    double angular_velo;
 
-    Vector_3 angular_velo;
+    // Info of rotation axis
+    Vector_3 direction_rotated;
+
+    Vector_3 point_rotated;
 
     // the number of fixed volume elements in this part
     // size: num_itf

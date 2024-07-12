@@ -1,7 +1,7 @@
 #include "ALocal_Interface.hpp"
 
 ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
-  const Vector_3 &point_xyz, const Vector_3 &angular )
+  const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc )
 : num_itf {0}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -118,8 +118,11 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
   delete h5r; H5Fclose( file_id );
 
-  point_rotated = point_xyz;
   angular_velo = angular;
+  
+  direction_rotated = angular_direc;
+
+  point_rotated = point_xyz;
 }
 
 void ALocal_Interface::print_info() const
@@ -151,11 +154,6 @@ void ALocal_Interface::print_info() const
 // Get the radius of rotation
 Vector_3 ALocal_Interface::get_radius (const Vector_3 &coor) const
 { 
-  // Info of rotation axis
-  Vector_3 direction_rotated (angular_velo);
-  
-  direction_rotated.normalize();
-
   // The vector from the rotation point to the input point
   const Vector_3 point_rotated_to_coor (coor.x() - point_rotated.x(), coor.y() - point_rotated.y(), coor.z() - point_rotated.z());
 
@@ -192,7 +190,7 @@ void ALocal_Interface::get_currPts( const double * const &ept_x,
     switch(type) 
     {
       case 0:
-        mag_angular_velo = angular_velo.x();
+        mag_angular_velo = angular_velo * direction_rotated.x();
         angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
         angle += mag_angular_velo * tt;
         currPt_x[ii] = ept_x[ii];
@@ -200,7 +198,7 @@ void ALocal_Interface::get_currPts( const double * const &ept_x,
         currPt_z[ii] = std::sin(angle) * rr;            
         break;
       case 1: 
-        mag_angular_velo = angular_velo.y();
+        mag_angular_velo = angular_velo * direction_rotated.y();
         angle = MATH_T::get_angle_2d(ept_xyz(2), ept_xyz(0));        
         angle += mag_angular_velo * tt;
         currPt_x[ii] = std::sin(angle) * rr;
@@ -208,13 +206,13 @@ void ALocal_Interface::get_currPts( const double * const &ept_x,
         currPt_z[ii] = std::cos(angle) * rr;            
         break;            
       case 2: 
-        mag_angular_velo = angular_velo.z();
+        mag_angular_velo = angular_velo * direction_rotated.z();
         angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
         angle += mag_angular_velo * tt;
         currPt_x[ii] = std::cos(angle) * rr;
         currPt_y[ii] = std::sin(angle) * rr;
         currPt_z[ii] = ept_z[ii];            
-        break;            
+        break;             
       default:
         SYS_T::print_fatal("Error: ALocal_Interface::get_currPts: No such type of rotation axis. \n");
         break;        

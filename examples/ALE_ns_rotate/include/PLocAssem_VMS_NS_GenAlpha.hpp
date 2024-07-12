@@ -22,8 +22,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
         const double &in_vis_mu, const double &in_beta,
-        const int &elemtype,
-        const Vector_3 &point_xyz, const Vector_3 &angular,
+        const int &elemtype, const double &angular,
+        const Vector_3 &point_xyz, const Vector_3 &angular_direc,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
     virtual ~PLocAssem_VMS_NS_GenAlpha();
@@ -174,10 +174,13 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     
     const int nLocBas, snLocBas, vec_size, sur_size;
 
+    const double angular_velo;
+
     const Vector_3 point_rotated;
 
-    const Vector_3 angular_velo;    
-
+    // Info of rotation axis
+    const Vector_3 direction_rotated;    
+    
     // M matrix for tau_m
     //             mm[0], mm[1], mm[2]
     // M = coef *  mm[3], mm[4], mm[5]
@@ -314,11 +317,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Get the radius of rotation
     virtual Vector_3 get_radius (const Vector_3 &coor) const
     { 
-      // Info of rotation axis
-      Vector_3 direction_rotated (angular_velo);
-      
-      direction_rotated.normalize();
-
       // The vector from the rotation point to the input point
       const Vector_3 point_rotated_to_coor (coor.x() - point_rotated.x(), coor.y() - point_rotated.y(), coor.z() - point_rotated.z());
 
@@ -356,7 +354,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         // switch(type) 
         // {
         //   case 0:
-        //     mag_angular_velo = angular_velo.x();
+        //     mag_angular_velo = angular_velo * direction_rotated.x();
         //     angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
         //     angle += mag_angular_velo * tt;
         //     currPt_x[ii] = ept_x[ii];
@@ -364,7 +362,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         //     currPt_z[ii] = std::sin(angle) * rr;            
         //     break;
         //   case 1: 
-        //     mag_angular_velo = angular_velo.y();
+        //     mag_angular_velo = angular_velo * direction_rotated.y();
         //     angle = MATH_T::get_angle_2d(ept_xyz(2), ept_xyz(0));        
         //     angle += mag_angular_velo * tt;
         //     currPt_x[ii] = std::sin(angle) * rr;
@@ -372,7 +370,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         //     currPt_z[ii] = std::cos(angle) * rr;            
         //     break;            
         //   case 2: 
-        //     mag_angular_velo = angular_velo.z();
+        //     mag_angular_velo = angular_velo * direction_rotated.z();
         //     angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
         //     angle += mag_angular_velo * tt;
         //     currPt_x[ii] = std::cos(angle) * rr;
@@ -402,18 +400,11 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         double * const &currPt_y,
         double * const &currPt_z ) const
     {
-      const double mag_angular_velo = angular_velo.norm2(); // (rad/s)
-
-      // The rotation direction is the direction of angular velocity
-      Vector_3 direction_rotated (angular_velo);
-
-      direction_rotated.normalize();
-
       const double aa = direction_rotated.x();
       const double bb = direction_rotated.y();       
       const double cc = direction_rotated.z();
 
-      const double theta = mag_angular_velo * tt; 
+      const double theta = angular_velo * tt; 
         
       const double m00 = std::cos(theta) + aa*aa*(1-std::cos(theta)); 
       const double m01 = aa*bb*(1-std::cos(theta)) - cc*std::sin(theta);

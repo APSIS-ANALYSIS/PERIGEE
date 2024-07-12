@@ -5,12 +5,12 @@ PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
   const int &in_nlocbas, const int &in_nqp,
   const int &in_snlocbas, const double &in_rho, 
   const double &in_vis_mu, const double &in_beta,
-  const int &elemtype,
-  const Vector_3 &point_xyz, const Vector_3 &angular,
+  const int &elemtype, const double &angular,
+  const Vector_3 &point_xyz, const Vector_3 &angular_direc,
   const double &in_ct, const double &in_ctauc,
   const double &in_C_bI)
   : PLocAssem_VMS_NS_GenAlpha_WeakBC(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
-  in_rho, in_vis_mu, in_beta, elemtype, point_xyz, angular, in_ct, in_ctauc, in_C_bI)
+  in_rho, in_vis_mu, in_beta, elemtype, angular, point_xyz, angular_direc, in_ct, in_ctauc, in_C_bI)
 {
   Tangent_ss = new PetscScalar[vec_size * vec_size];
   Tangent_sr = new PetscScalar[vec_size * vec_size];
@@ -150,7 +150,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
   // Mesh velocity in the quadrature point
   const Vector_3 radius_qua = get_radius(opposite_xyz);
-  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
+  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
@@ -312,7 +312,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
 
   // Mesh velocity in the quadrature point
   const Vector_3 radius_qua = get_radius(opposite_xyz);
-  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
+  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};

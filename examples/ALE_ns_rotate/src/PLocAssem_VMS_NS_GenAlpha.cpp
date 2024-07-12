@@ -6,7 +6,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta, const int &elemtype,
-        const Vector_3 &point_xyz, const Vector_3 &angular, 
+        const double &angular,
+        const Vector_3 &point_xyz, const Vector_3 &angular_direc,
         const double &in_ct, const double &in_ctauc )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
@@ -14,8 +15,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   CI( (elemtype == 501 || elemtype == 601) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
-  point_rotated(point_xyz), angular_velo(angular),
+  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ), angular_velo(angular),
+  point_rotated(point_xyz), direction_rotated(angular_direc),
   coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365 : 1.0 ),
   mm( (elemtype == 501 || elemtype == 502) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
@@ -237,7 +238,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Rotated(
     }
     // Mesh velocity in the quadrature point at time + alpha_f * dt
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
+    const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
     const double mw = velo_mesh.z();
@@ -617,7 +618,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Rotated(
 
     // Mesh velocity in the quadrature point 
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vector_3(0, 0, 0); //Vec3::cross_product(angular_velo, radius_qua);
+    const Vector_3 velo_mesh = Vector_3(0, 0, 0); //Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
     const double mw = velo_mesh.z();

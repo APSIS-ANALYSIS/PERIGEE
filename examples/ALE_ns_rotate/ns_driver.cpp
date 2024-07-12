@@ -110,8 +110,15 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Info of rotation axis
-  const Vector_3 point_rotated (0.5, 0.0, 0.0);
-  const Vector_3 angular_velo (0.0, 0.0, 0.0);
+  Vector_3 point_rotated (-0.7, 0.0, 0.0);
+
+  Vector_3 angular_direction (1.0, 0.0, 0.0);
+
+  SYS_T::print_fatal_if(std::abs(angular_direction.norm2() - 0.0) < 1e-15, "Error: the direction vector of rotation axis cannot be zero vector. \n" );
+
+  angular_direction.normalize();
+
+  double angular_velo = MATH_T::PI / 30; //(rad/s)
 
   // Yaml options
   bool is_loadYaml = true;
@@ -173,12 +180,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-restart_step", restart_step);
   SYS_T::GetOptionString("-restart_name", restart_name);
   SYS_T::GetOptionReal("-C_bI", C_bI);
-  // SYS_T::GetOptionReal("-point_x", point_x);
-  // SYS_T::GetOptionReal("-point_y", point_y);
-  // SYS_T::GetOptionReal("-point_z", point_z); 
-  // SYS_T::GetOptionReal("-angular_x", angular_x);
-  // SYS_T::GetOptionReal("-angular_y", angular_y);
-  // SYS_T::GetOptionReal("-angular_z", angular_z);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
@@ -192,12 +193,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
-  // SYS_T::cmdPrint("-point_x", point_x);
-  // SYS_T::cmdPrint("-point_y", point_y);
-  // SYS_T::cmdPrint("-point_z", point_z); 
-  // SYS_T::cmdPrint("-angular_x", angular_x);
-  // SYS_T::cmdPrint("-angular_y", angular_y);
-  // SYS_T::cmdPrint("-angular_z", angular_z);
 
   // if inflow file exists, print the file name
   // otherwise, print the parameter for linear2steady inflow setting
@@ -291,7 +286,7 @@ int main(int argc, char *argv[])
   locwbc -> print_info();
 
   // Interfaces info
-  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank, point_rotated, angular_velo);
+  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank, angular_velo, point_rotated, angular_direction);
   locitf -> print_info();
 
   // Local sub-domain's nodal indices
@@ -418,7 +413,7 @@ int main(int argc, char *argv[])
   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_Interface(
     tm_galpha_ptr, elementv->get_nLocBas(),
     quadv->get_num_quadPts(), elements->get_nLocBas(),
-    fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc, C_bI );
+    fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
