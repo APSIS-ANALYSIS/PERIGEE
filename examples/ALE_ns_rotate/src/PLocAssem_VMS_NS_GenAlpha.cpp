@@ -36,8 +36,9 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
-  flist = new locassem_vms_ns_funs[1];
+  flist = new locassem_vms_ns_funs[2];
   flist[0] = &PLocAssem_VMS_NS_GenAlpha::get_Poiseuille_traction;
+  flist[1] = &PLocAssem_VMS_NS_GenAlpha::get_Poiseuille_traction;
 
   print_info();
 }

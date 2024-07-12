@@ -248,6 +248,16 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_WeakBC * const &wbc_part);
 
+    virtual void Interface_KG(
+        const double &curr_time, const double &dt,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_Interface * const &itf_part );
+
     virtual void Interface_G(
         const double &curr_time, const double &dt,
         IPLocAssem * const &lassem_ptr,
