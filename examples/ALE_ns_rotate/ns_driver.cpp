@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
 
   // Info of rotation axis
   const Vector_3 point_rotated (0.5, 0.0, 0.0);
-  const Vector_3 angular_velo (MATH_T::PI / 60, 0.0, 0.0);
+  const Vector_3 angular_velo (0.0, 0.0, 0.0);
 
   // Yaml options
   bool is_loadYaml = true;

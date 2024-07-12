@@ -371,18 +371,18 @@ int main( int argc, char * argv[] )
   ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
-  std::vector<double> intervals_0 {-0.5, -0.4, -0.3, -0.2, -0.1, 0.0, 0.1, 0.2, 0.3, 0.4, 0.5};
+  std::vector<double> intervals_0 {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
   Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_itf.h5",
     fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 0);
 
-  std::vector<double> intervals_12 {0.0, 0.03, 0.06, 0.09, 0.12, 0.15, 0.18, 0.21, 0.24, 0.27, 0.3};
+  std::vector<double> intervals_12 {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1};
 
   Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(0.5, 0.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(1.0, 0.0, 0.0));
 
   Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.5, 0.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(0.2, 0.0, 0.0));
 
   std::vector<Interface_pair> interfaces {itf_0, itf_1, itf_2};
  
@@ -531,7 +531,7 @@ int main( int argc, char * argv[] )
 
       h5w -> write_intVector( group_id, "fixed_node_part_tag", fixed_layer_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "fixed_node_loc_pos", rotated_layer_node_loc_pos[ii] );
+      h5w -> write_intVector( group_id, "fixed_node_loc_pos", fixed_layer_node_loc_pos[ii] );
 
       h5w -> write_intVector( group_id, "rotated_node_part_tag", rotated_layer_node_vol_part_tag[ii] );
 

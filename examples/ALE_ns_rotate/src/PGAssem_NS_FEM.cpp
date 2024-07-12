@@ -253,11 +253,11 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   Weak_EssBC_G(0, 0, sol_a, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
-  // Surface integral from Nitsche method
-  Interface_G(0, 0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
-
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
+
+  // Surface integral from Nitsche method
+  Interface_G(0, 0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
@@ -370,11 +370,14 @@ void PGAssem_NS_FEM::Assem_residual(
   Weak_EssBC_G(curr_time, dt, sol_b, alelem_ptr, lassem_ptr, elementvs, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
-  // Surface integral from Nitsche method
-  Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
+  // For Poiseuille flow
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
+
+  // Surface integral from Nitsche method
+  Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_G( nbc_part, ii );
 
@@ -491,11 +494,14 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   Weak_EssBC_KG(curr_time, dt, sol_b, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
-  // Surface integral from Nitsche method (Only assemble G at present)
-  Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
+  // For Poiseuille flow
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
+
+  // Surface integral from Nitsche method (Only assemble G at present)
+  Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part);
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
 
@@ -1279,13 +1285,14 @@ void PGAssem_NS_FEM::Interface_G(
       // Get the local ien and local sol of this fixed element
       itf_part->get_fixed_local(itf_id, ee, fixed_local_ien, fixed_local_sol);
 
+
       for(int qua{0}; qua<fixed_face_nqp; ++qua)
       {
         fixed_elementv->get_R(qua, &R[0]);
 
         itf_part->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi);
 
-        const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, ee)};
+        const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
 
@@ -1299,16 +1306,21 @@ void PGAssem_NS_FEM::Interface_G(
 
         lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, ctrl_x, ctrl_y, ctrl_z);
 
+
         for(int ii{0}; ii < nLocBas; ++ii)
         {
           for(int mm{0}; mm < dof_mat; ++mm)
           {
-            fixed_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_fixed_ID(itf_id, mm, itf_part->get_fixed_node_id(itf_id, fixed_local_ien[ii])) + mm;
-            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_rotated_ID(itf_id, mm, itf_part->get_rotated_node_id(itf_id, rotated_local_ien[ii])) + mm;
+            fixed_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_fixed_ID(itf_id, mm, fixed_local_ien[ii]) + mm;
+            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_rotated_ID(itf_id, mm, rotated_local_ien[ii]) + mm;
           }
         }
+
         VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
         VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
+        
+        VecAssemblyBegin(G);
+        VecAssemblyEnd(G);
       }
     }
   }

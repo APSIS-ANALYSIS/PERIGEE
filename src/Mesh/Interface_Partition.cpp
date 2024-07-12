@@ -46,7 +46,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     const int num_fixed_node = VEC_T::get_size(fixed_layer_global_node[ii]);
     fixed_layer_node_vol_part_tag[ii].resize(num_fixed_node);
     fixed_layer_node_loc_pos[ii].resize(num_fixed_node);
-    fixed_layer_node_ID.resize(dof * num_fixed_node);
+    fixed_layer_node_ID[ii].resize(dof * num_fixed_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
     PERIGEE_OMP_PARALLEL_FOR
@@ -109,7 +109,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     const int num_rotated_node = VEC_T::get_size(rotated_layer_global_node[ii]);
     rotated_layer_node_vol_part_tag[ii].resize(num_rotated_node);
     rotated_layer_node_loc_pos[ii].resize(num_rotated_node);
-    rotated_layer_node_ID.resize(dof * num_rotated_node);
+    rotated_layer_node_ID[ii].resize(dof * num_rotated_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
     PERIGEE_OMP_PARALLEL_FOR

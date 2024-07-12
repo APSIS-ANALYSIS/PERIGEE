@@ -210,7 +210,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   VEC_T::sort_unique_resize(fixed_layer_global_node);
   const int num_fixed_layer_node = VEC_T::get_size(fixed_layer_global_node);
 
-  PERIGEE_OMP_PARALLEL_FOR
+  // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : fixed_layer_vien)
   {
     const int local_id = VEC_T::get_pos(fixed_layer_global_node, nodeid);
@@ -231,7 +231,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   VEC_T::sort_unique_resize(rotated_layer_global_node);
   const int num_rotated_layer_node = VEC_T::get_size(rotated_layer_global_node);
 
-  PERIGEE_OMP_PARALLEL_FOR
+  // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : rotated_layer_vien)
   {
     const int local_id = VEC_T::get_pos(rotated_layer_global_node, nodeid);

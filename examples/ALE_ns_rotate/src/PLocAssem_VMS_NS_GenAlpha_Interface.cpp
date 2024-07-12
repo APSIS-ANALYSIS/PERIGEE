@@ -150,7 +150,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
   // Mesh velocity in the quadrature point
   const Vector_3 radius_qua = get_radius(opposite_xyz);
-  const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
+  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
@@ -312,7 +312,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
 
   // Mesh velocity in the quadrature point
   const Vector_3 radius_qua = get_radius(opposite_xyz);
-  const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
+  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};

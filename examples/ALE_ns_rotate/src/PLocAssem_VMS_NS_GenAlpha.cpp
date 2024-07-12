@@ -35,6 +35,9 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
+  flist = new locassem_vms_ns_funs[1];
+  flist[0] = &PLocAssem_VMS_NS_GenAlpha::get_Poiseuille_traction;
+
   print_info();
 }
 
@@ -44,6 +47,8 @@ PLocAssem_VMS_NS_GenAlpha::~PLocAssem_VMS_NS_GenAlpha()
   delete [] Residual; Residual = nullptr;
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
+
+  delete [] flist;
 }
 
 void PLocAssem_VMS_NS_GenAlpha::print_info() const
@@ -232,7 +237,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Rotated(
     }
     // Mesh velocity in the quadrature point at time + alpha_f * dt
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
+    const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
     const double mw = velo_mesh.z();
@@ -610,7 +615,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Rotated(
 
     // Mesh velocity in the quadrature point 
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
+    const Vector_3 velo_mesh = Vector_3(0, 0, 0); //Vec3::cross_product(angular_velo, radius_qua);
     const double mu = velo_mesh.x();
     const double mv = velo_mesh.y();
     const double mw = velo_mesh.z();
