@@ -477,12 +477,13 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
+  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, elementvs, elementvs_rotated, quads, free_quad,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  gloAssem_ptr->search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, locitf);
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+      elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -504,7 +505,6 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, locitf);
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
         elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
         locnbc, locebc, locwbc, locitf );
