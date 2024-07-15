@@ -96,7 +96,7 @@ int main( int argc, char *argv[] )
   }
 
   std::vector<double> solid_mu(num_layer), solid_f1the(num_layer), solid_f1phi(num_layer),
-  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer)
+  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer),
   solid_fkd(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -392,7 +392,7 @@ int main( int argc, char *argv[] )
     if( is_read_material )
     {
       std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
-      if( sl_nu[ii] == 0.5 )
+      if( solid_nu[ii] == 0.5 )
       {
         matmodel[ii] = new MaterialModel_GOH06_Incompressible_Mixed( matmodel_file_name.c_str() );
 

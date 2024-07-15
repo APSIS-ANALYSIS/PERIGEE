@@ -41,8 +41,17 @@ int main ( int argc , char * argv[] )
   bool isRef = false;
   bool isClean = true;
 
+  // number of solid layer
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  const int num_layer = cmd_h5r -> read_intScalar("/","num_layer");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
+
   // Solid properties
-  bool   is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
+  bool is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
   std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -52,7 +61,7 @@ int main ( int argc , char * argv[] )
   }
 
   std::vector<double> solid_mu(num_layer), solid_f1the(num_layer), solid_f1phi(num_layer),
-  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer)
+  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer),
   solid_fkd(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -67,12 +76,11 @@ int main ( int argc , char * argv[] )
   }
 
   // Load analysis code parameter from solver_cmd.h5 file
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
-  const int num_layer = cmd_h5r -> read_intScalar("/", "num_layer");
   const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);

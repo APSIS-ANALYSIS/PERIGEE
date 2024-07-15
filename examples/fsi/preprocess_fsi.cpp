@@ -58,6 +58,7 @@ int main( int argc, char * argv[] )
   const int num_layer                         = paras["num_layer"].as<int>();
   const std::string geo_file                  = paras["geo_file"].as<std::string>();
   const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
+  const std::string geo_ws_file               = paras["geo_ws_file"].as<std::string>();
   const std::string geo_s_file_base           = paras["geo_s_file_base"].as<std::string>();
 
   const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
@@ -91,6 +92,7 @@ int main( int argc, char * argv[] )
   std::cout<<" -num_outlet: "         <<num_outlet         <<std::endl;
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
+  std::cout<<" -geo_ws_file: "        <<geo_ws_file        <<std::endl;
   std::cout<<" -geo_s_file_base: "    <<geo_s_file_base    <<std::endl;
   std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
   std::cout<<" -sur_s_file_wall_base: " <<sur_s_file_wall_base <<std::endl;
@@ -121,6 +123,8 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
 
   SYS_T::file_check(geo_f_file); std::cout<<geo_f_file<<" found. \n";
+
+  SYS_T::file_check(geo_ws_file); std::cout<<geo_ws_file<<" found. \n";
 
   std::vector< std::string > geo_s_file_in( num_layer );
 
@@ -210,6 +214,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("num_layer", num_layer);
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
+  cmdh5w->write_string("geo_ws_file",         geo_ws_file);
   cmdh5w->write_string("geo_s_file_base",     geo_s_file_base);
   cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
   for(int ii=0; ii<num_layer; ++ii)
@@ -223,8 +228,7 @@ int main( int argc, char * argv[] )
   }
   cmdh5w->write_string("sur_s_file_wall_base",           sur_s_file_wall_base);
   cmdh5w->write_string("sur_s_file_interior_wall_base",  sur_s_file_interior_wall_base);
-  cmdh5w->write_string("sur_s_file_wall",     sur_s_file_wall);
-  cmdh5w->write_string("sur_s_file_interior_wall", sur_s_file_interior_wall);
+  cmdh5w->write_string("sur_s_file_wall_base",     sur_s_file_wall_base);
   cmdh5w->write_string("part_file_p",         part_file_p);
   cmdh5w->write_string("part_file_v",         part_file_v);
   cmdh5w->write_string("date",                SYS_T::get_date() );
@@ -460,10 +464,10 @@ int main( int argc, char * argv[] )
   // Read the geometry file for the solid domain, generate the list of direction
   // basis vectors of the nodes. The list includes radial, longitudinal, and
   // circumferential basis, denoting by r, l, and c, respectively.
-  const std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_s_file, "GlobalNodeID");
-  const std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_s_file, "radial_basis");
-  const std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_s_file, "circumferential_basis");
-  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_s_file, "longitudinal_basis");
+  const std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_ws_file, "GlobalNodeID");
+  const std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_ws_file, "radial_normal");
+  const std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_ws_file, "circumferential_normal");
+  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_ws_file, "longitudinal_normal");
 
   SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");

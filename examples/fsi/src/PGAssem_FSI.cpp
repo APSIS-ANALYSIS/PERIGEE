@@ -13,8 +13,8 @@ PGAssem_FSI::PGAssem_FSI(
     const ALocal_NBC * const &part_nbc_v,
     const ALocal_NBC * const &part_nbc_p,
     const ALocal_EBC * const &part_ebc,
-    const int &in_num_layer,
     const IGenBC * const &gbc,
+    const int &in_num_layer,
     const int &in_nz_estimate )
 : nLocBas( locassem_f_ptr->get_nLocBas_0() ), 
   snLocBas( locassem_f_ptr->get_snLocBas_0() ),

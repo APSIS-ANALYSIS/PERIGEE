@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   }
 
   std::vector<double> solid_mu(num_layer), solid_f1the(num_layer), solid_f1phi(num_layer),
-  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer)
+  solid_f2the(num_layer), solid_f2phi(num_layer), solid_fk1(num_layer), solid_fk2(num_layer),
   solid_fkd(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -340,9 +340,20 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "fl_density",      fluid_density);
     cmdh5w->write_doubleScalar(  "fl_mu",           fluid_mu);
     cmdh5w->write_doubleScalar(  "fl_bs_beta",      bs_beta);
-    cmdh5w->write_doubleScalar(  "sl_density",      solid_density);
-    cmdh5w->write_doubleScalar(  "sl_E",            solid_E);
-    cmdh5w->write_doubleScalar(  "sl_nu",           solid_nu);
+    for(int ii=0; ii<num_layer; ++ii)
+    {
+      std::string sl_density_name = "sl_density_";
+      std::string sl_E_name = "sl_E_";
+      std::string sl_nu_name = "sl_nu_";
+    
+      sl_density_name = sl_density_name + std::to_string(ii);
+      sl_E_name = sl_E_name + std::to_string(ii);
+      sl_nu_name = sl_nu_name + std::to_string(ii);
+
+      cmdh5w->write_doubleScalar(  sl_density_name.c_str(),        solid_density[ii]);
+      cmdh5w->write_doubleScalar(  sl_E_name.c_str(),              solid_E[ii]);
+      cmdh5w->write_doubleScalar(  sl_nu_name.c_str(),             solid_nu[ii]);
+    }
     cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
@@ -652,7 +663,7 @@ int main(int argc, char *argv[])
   // ===== Global assembly for mesh motion =====
   SYS_T::commPrint("===> Initializing Mat K_mesh and Vec G_mesh ... \n");
   IPGAssem * gloAssem_mesh_ptr = new PGAssem_Mesh( locAssem_mesh_ptr,
-      locElem, locIEN_v, pNode_v, mesh_locnbc, mesh_locebc, num_layer, nz_estimate );
+      locElem, locIEN_v, pNode_v, mesh_locnbc, mesh_locebc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate for K_mesh ... \n");
   gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN_v, mesh_locnbc );
