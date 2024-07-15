@@ -252,7 +252,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_Rotated(
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, cu, cv, cw );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 

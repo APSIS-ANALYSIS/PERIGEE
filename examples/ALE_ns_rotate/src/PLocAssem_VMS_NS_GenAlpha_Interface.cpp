@@ -179,7 +179,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       - (2 * NAs_x * nsx + NAs_y * nsy + NAs_z + nsz) * vis_mu * velo_jump.x()
       - NAs_y * nsx * vis_mu * velo_jump.y()
       - NAs_z * nsx * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - inflow_s) * velo_jump.x());
+      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.x());
 
     // y-dir -- s
     Residual_s[A4+2] += gwts * (0.5 * ( NAs * (ps * nsy - vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
@@ -187,7 +187,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       - NAs_x * nsy * vis_mu * velo_jump.x()
       - (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.y()
       - NAs_z * nsy * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - inflow_s) * velo_jump.y());
+      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.y());
 
     // z-dir -- s
     Residual_s[A4+3] += gwts * (0.5 * ( NAs * (ps * nsz - vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
@@ -195,7 +195,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       - NAs_x * nsz * vis_mu * velo_jump.x()
       - NAs_y * nsz * vis_mu * velo_jump.y()
       - (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - inflow_s) * velo_jump.z());
+      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.z());
 
 
     // Mass -- r
@@ -207,7 +207,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.x()
       + NAr_y * nrx * vis_mu * velo_jump.y()
       + NAr_z * nrx * vis_mu * velo_jump.z() )
-      + NAr * (inflow_r - tau_I) * velo_jump.x());
+      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.x());
 
     // y-dir -- r
     Residual_r[A4+2] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsy + vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
@@ -215,7 +215,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       + NAr_x * nry * vis_mu * velo_jump.x()
       + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
       + NAr_z * nrz * vis_mu * velo_jump.z() )
-      + NAr * (inflow_r - tau_I) * velo_jump.y());
+      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.y());
 
     // z-dir -- r
     Residual_r[A4+3] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsz + vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
@@ -223,7 +223,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       + NAr_x * nrz * vis_mu * velo_jump.x()
       + NAr_y * nrz * vis_mu * velo_jump.y()
       + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * vis_mu * velo_jump.z() )
-      + NAr * (inflow_r - tau_I) * velo_jump.z());
+      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.z());
   }
 }
 
