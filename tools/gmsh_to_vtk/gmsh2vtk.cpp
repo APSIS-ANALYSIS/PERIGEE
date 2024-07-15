@@ -130,8 +130,10 @@ int main( int argc, char * argv[] )
   }
 
   const std::string wmname = config["wmname"].as<std::string>();
+  const std::string sname = config["sname"].as<std::string>();
   const bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );
+  GIO -> write_solid_vtu( sname, isXML );
 
   delete GIO;
   return EXIT_SUCCESS;

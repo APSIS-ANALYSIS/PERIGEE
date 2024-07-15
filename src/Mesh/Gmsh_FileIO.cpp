@@ -768,6 +768,109 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   delete mytimer;
 }
 
+void Gmsh_FileIO::write_solid_vtu( const std::string &in_fname, 
+    const bool &isXML ) const
+{
+  std::cout<<"=== Gmsh_FileIO::write_solid_vtu.\n";
+  std::cout<<"--- There are "<<num_phy_domain_3d-1<<" 3D solid physical domains.\n";
+
+  SYS_T::Timer * mytimer = new SYS_T::Timer();
+
+  mytimer->Reset();
+  mytimer->Start();
+
+  std::cout<<"-----> write solid.vtu \n";
+  
+  std::vector<int> stag {};
+  std::vector<int> solid_node_idx {};
+  int snElem = 0;
+  std::vector<int> sIEN {};
+  std::vector<int> solid_cell_idx {};
+
+  for(int ii=1; ii<num_phy_domain_3d; ++ii)
+  {
+    const int start_eindex = phy_3d_start_index[ii];
+    std::vector<int> local_cell_idx( phy_3d_nElem[ii], 0 );
+    PERIGEE_OMP_PARALLEL_FOR
+    for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
+      local_cell_idx[ee] = start_eindex + ee;
+    VEC_T::insert_end( solid_cell_idx, local_cell_idx );
+    std::cout << "Number of elements of solid " << ii << " : " << phy_3d_nElem[ii] <<  std::endl;
+    snElem += phy_3d_nElem[ii];
+
+    // generate physics tag
+    std::vector<int> ptag(phy_3d_nElem[ii], ii);
+    VEC_T::insert_end( stag, ptag );
+
+    const int domain_index = phy_3d_index[ii];
+    std::vector<int> local_node_idx = eIEN[ domain_index ];
+    VEC_T::sort_unique_resize( local_node_idx );
+    std::cout << "Number of nodes of solid " << ii << " : " << VEC_T::get_size(local_node_idx) <<  std::endl;
+    VEC_T::insert_end( solid_node_idx, local_node_idx );
+
+    VEC_T::insert_end(sIEN, eIEN[domain_index]);
+  }
+
+  VEC_T::sort_unique_resize( solid_node_idx );
+  const int num_solid_node = VEC_T::get_size(solid_node_idx);
+
+  std::vector<double> solid_coor( 3 * num_solid_node , 0.0 );
+  PERIGEE_OMP_PARALLEL_FOR
+  for(int jj=0; jj<num_solid_node; ++jj )
+  {
+    solid_coor[ 3*jj+0 ] = node[ 3*solid_node_idx[jj] + 0 ];
+    solid_coor[ 3*jj+1 ] = node[ 3*solid_node_idx[jj] + 1 ];
+    solid_coor[ 3*jj+2 ] = node[ 3*solid_node_idx[jj] + 2 ];
+  }
+
+  const int nloc = ele_nlocbas[phy_3d_index[0]];
+  std::vector<int> domain_IEN( snElem * nloc, 0 );
+  PERIGEE_OMP_PARALLEL_FOR
+  for(int ee=0; ee<snElem; ++ee)
+  {
+    for(int jj=0; jj<nloc; ++jj)
+    {
+      const int target = sIEN[ ee*nloc + jj ];
+      domain_IEN[ ee * nloc + jj ] = VEC_T::get_pos( solid_node_idx, target );
+    }
+  }
+
+  std::cout << "Number of solid elements : " << snElem << std::endl;
+  std::cout << "Number of solid nodes : " << num_solid_node << std::endl;
+  std::vector<int> temp = domain_IEN;
+  VEC_T::sort_unique_resize(temp);
+  std::cout << "Number of solid IEN : " << VEC_T::get_size(temp) << std::endl;
+
+  // write the solid domain's vtk/vtu file
+  // the subdomain element index start with the start_eindex
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({solid_node_idx, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({solid_cell_idx, "GlobalElementID", AssociateObject::Cell});
+  input_vtk_data.push_back({stag, "Physics_tag", AssociateObject::Cell});
+
+  // Element type of this domain
+  // Element type is defined by Gmsh, different from vtk->GetCellType()!
+  const int Etype = ele_type[phy_3d_index[0]];
+  if ( Etype == 4 || Etype == 11 )
+  {
+    TET_T::write_tet_grid( in_fname, num_solid_node, 
+      snElem, solid_coor, domain_IEN, input_vtk_data, isXML);
+  }
+  else if ( Etype == 5 || Etype == 12 )
+  {
+    HEX_T::write_hex_grid( in_fname, num_solid_node, 
+      snElem, solid_coor, domain_IEN, input_vtk_data, isXML);
+  }
+  else
+    SYS_T::print_fatal("Error: Gmsh_FileIO::write_solid_vtu, undefined element type of domain %d. \n", phy_3d_index[0] + 1);
+
+  mytimer->Stop();
+
+  std::cout<<mytimer->get_sec()<<" sec. \n";
+  
+  delete mytimer;
+}
+
 // void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
 //     const std::string &phy2 ) const
 // {

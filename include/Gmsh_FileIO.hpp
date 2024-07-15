@@ -175,6 +175,13 @@ class Gmsh_FileIO
     void write_vtu( const std::string &in_fname, const bool &isXML ) const;
 
     // --------------------------------------------------------------
+    // Write a vtu file for solid volumetric physical domain together.
+    // a physical tag will be added to distinguish the physical problem
+    // domain.
+    // --------------------------------------------------------------
+    void write_solid_vtu( const std::string &in_fname, const bool &isXML ) const;
+
+    // --------------------------------------------------------------
     // Write a separate vtu file for each physical volumetric domain.
     // E.G. for a FSI problem a fluid and a solid domain will be written;
     //      for a fluid problem, a single fluid domain will be written.
