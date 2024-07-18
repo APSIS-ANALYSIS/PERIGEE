@@ -18,7 +18,8 @@ class CVFlowRate_Cosine2Steady : public ICVFlowRate
     // This constructor will set a uniform thred_time and flrate for all inlets.
     // Same as CVFlowRate_Linear2Steady.
     CVFlowRate_Cosine2Steady( const int &input_num_nbc,
-        const double &in_thred_time, const double &flrate );
+        const double &in_thred_time, const double &flrate,
+        const double &in_TI_std_dev );
 
     // This constructor will set a uniform thred_time for all inlets, and the
     // target flow rate are determined from the file and set to be the flow rate
@@ -26,7 +27,7 @@ class CVFlowRate_Cosine2Steady : public ICVFlowRate
     // the sum of coef_a.
     // Same as CVFlowRate_Linear2Steady.
     CVFlowRate_Cosine2Steady( const double &in_thred_time, 
-        const std::string &filename );
+        const double &in_TI_std_dev, const std::string &filename );
 
     virtual ~CVFlowRate_Cosine2Steady() = default;
 
@@ -34,15 +35,17 @@ class CVFlowRate_Cosine2Steady : public ICVFlowRate
     // From in_time to infty, flow_rate = flrate
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 
+    virtual double get_flow_TI_std_dev( const int &nbc_id ) const { return TI_std_dev; }
+
     virtual int get_num_nbc() const { return num_nbc; }
 
     virtual void print_info() const;
 
   private:
-    const double thred_time;
-    
     int num_nbc;
-
+    
+    const double thred_time, TI_std_dev;
+    
     std::vector<double> target_flow_rate;
 };
 

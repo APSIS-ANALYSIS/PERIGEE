@@ -1,9 +1,10 @@
 #include "CVFlowRate_Cosine2Steady.hpp"
 
 CVFlowRate_Cosine2Steady::CVFlowRate_Cosine2Steady(
-    const int &input_num_nbc,
-    const double &in_thred_time, const double &flrate )
-: thred_time(in_thred_time), num_nbc(input_num_nbc)
+    const int &input_num_nbc, const double &in_thred_time, 
+    const double &flrate, const double &in_TI_std_dev )
+: num_nbc(input_num_nbc), thred_time(in_thred_time), 
+  TI_std_dev( in_TI_std_dev )
 {
   target_flow_rate.resize( num_nbc );
   for(int ii=0; ii<num_nbc; ++ii) target_flow_rate[ii] = flrate;
@@ -25,7 +26,8 @@ CVFlowRate_Cosine2Steady::CVFlowRate_Cosine2Steady(
 }
 
 CVFlowRate_Cosine2Steady::CVFlowRate_Cosine2Steady( const double &in_thred_time, 
-    const std::string &filename ) : thred_time( in_thred_time )
+    const double &in_TI_std_dev, const std::string &filename )
+: thred_time( in_thred_time ), TI_std_dev( in_TI_std_dev )
 {
   SYS_T::commPrint("CVFlowRate_Cosine2Steady: data read from %s \n", filename.c_str() );
 
