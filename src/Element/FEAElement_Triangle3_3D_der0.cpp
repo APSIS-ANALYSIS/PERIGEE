@@ -98,24 +98,4 @@ Vector_3 FEAElement_Triangle3_3D_der0::get_normal_out( const int &quaindex,
   else return un;
 }
 
-Vector_3 FEAElement_Triangle3_3D_der0::get_dx_dr( const int &quaindex,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z ) const
-{
-  return Vector_3( - ctrl_x[0] + ctrl_x[1],
-                   - ctrl_y[0] + ctrl_y[1],
-                   - ctrl_z[0] + ctrl_z[1]);
-}
-
-Vector_3 FEAElement_Triangle3_3D_der0::get_dx_ds( const int &quaindex,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z ) const
-{
-  return Vector_3( - ctrl_x[0] + ctrl_x[2],
-                   - ctrl_y[0] + ctrl_y[2],
-                   - ctrl_z[0] + ctrl_z[2]);
-}
-
 // EOF
