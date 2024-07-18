@@ -298,7 +298,7 @@ int main( int argc, char * argv[] )
         for(int ii=0; ii<4; ++ii)
         {
           const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*4+ii] );
-          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + layer_offset[num_layer] + pos;     
+          if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + layer_offset[layer_num] + pos;     
         }
       }
       else if(elemType == 601)
@@ -306,7 +306,7 @@ int main( int argc, char * argv[] )
         for(int ii=0; ii<8; ++ii)
         {
           const int pos = VEC_T::get_pos( wall_node_id[layer_num], vecIEN_p[ee*8+ii] );
-          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + layer_offset[num_layer] + pos;     
+          if( pos >=0 ) vecIEN_p[ee*8+ii] = nFunc_v + layer_offset[layer_num] + pos;     
         }
       }
       else
