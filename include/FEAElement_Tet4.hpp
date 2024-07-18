@@ -147,6 +147,9 @@ class FEAElement_Tet4 : public FEAElement
         const double * const &ctrl_z );
 
     // Get the outwardnormal on faces
+    // The node numbering of the face element guarantees the get_2d_normal_out
+    // returns the outward normal vector
+    // See FE_T::QuadPts_on_face function for more details.
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
