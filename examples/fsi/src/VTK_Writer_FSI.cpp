@@ -738,7 +738,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
           inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
 
       // Interpolate Cauchy stress
-      interpolateVonStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
+      interpolateCauchyStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
           inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[5] );
       
       // Interpolate the velocity vector
