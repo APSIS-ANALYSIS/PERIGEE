@@ -64,6 +64,10 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
+    // Return the derivatives of the physical coordinates with respect to the
+    // element reference coordinate.
+    // These functions are needed in the FE_T::search_closest_point function,
+    // which is called inside the sliding interface formulation.
     virtual Vector_3 get_dx_dr( const int &quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
