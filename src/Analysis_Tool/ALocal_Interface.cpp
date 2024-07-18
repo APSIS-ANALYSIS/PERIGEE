@@ -1,8 +1,7 @@
 #include "ALocal_Interface.hpp"
 
 ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
-  const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc )
-: num_itf {0}
+    const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
