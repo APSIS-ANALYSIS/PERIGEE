@@ -228,7 +228,6 @@ int main( int argc, char * argv[] )
   }
   cmdh5w->write_string("sur_s_file_wall_base",           sur_s_file_wall_base);
   cmdh5w->write_string("sur_s_file_interior_wall_base",  sur_s_file_interior_wall_base);
-  cmdh5w->write_string("sur_s_file_wall_base",     sur_s_file_wall_base);
   cmdh5w->write_string("part_file_p",         part_file_p);
   cmdh5w->write_string("part_file_v",         part_file_v);
   cmdh5w->write_string("date",                SYS_T::get_date() );
