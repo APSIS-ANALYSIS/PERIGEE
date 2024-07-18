@@ -47,10 +47,41 @@ void VTK_Writer_FSI::interpolateJ( const int * const &ptid,
   }
 }
 
-void VTK_Writer_FSI::interpolateVonStress( const int * const &ptid,
-    const double * const &ctrlPts_x,
-    const double * const &ctrlPts_y,
-    const double * const &ctrlPts_z,
+void VTK_Writer_FSI::interpolateJ( const int &ptoffset,
+    const std::vector<double> &inputData,
+    const FEAElement * const &elem,
+    vtkDoubleArray * const &vtkData )
+{
+  const int nqp = elem->get_numQuapts();
+
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputData[ii*3];
+    v[ii] = inputData[ii*3+1];
+    w[ii] = inputData[ii*3+2];
+  }
+
+  Interpolater intep( nLocBas );
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                  vx[ii],       vy[ii] + 1.0, vz[ii],
+                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    vtkData->InsertComponent( ptoffset+ii, 0, F.det() );
+  }
+}
+
+void VTK_Writer_FSI::interpolateVonStress( const int &ptoffset,
     const std::vector<Vector_3> &eleBasis_r,
     const std::vector<Vector_3> &eleBasis_c,
     const std::vector<Vector_3> &eleBasis_l,
@@ -60,13 +91,6 @@ void VTK_Writer_FSI::interpolateVonStress( const int * const &ptid,
     IMaterialModel * const &model,
     vtkDoubleArray * const &vtkData )
 {
-  // interpolate reference points
-  Interpolater intep( nLocBas );
-
-  std::vector<double> ref_x, ref_y, ref_z;
-
-  intep.interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
-
   // interpolate dispacment
   std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0), p (nLocBas, 0.0);
 
@@ -80,6 +104,8 @@ void VTK_Writer_FSI::interpolateVonStress( const int * const &ptid,
 
   std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
 
+  Interpolater intep( nLocBas );
+
   intep.interpolateFE_Grad(u, elem, ux, uy, uz);
   intep.interpolateFE_Grad(v, elem, vx, vy, vz);
   intep.interpolateFE_Grad(w, elem, wx, wy, wz);
@@ -92,28 +118,83 @@ void VTK_Writer_FSI::interpolateVonStress( const int * const &ptid,
 
     // F
     const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
-                  vx[ii],       vy[ii] + 1.0, vz[ii],
-                  wx[ii],       wy[ii],       wz[ii] + 1.0 );
+                        vx[ii],       vy[ii] + 1.0, vz[ii],
+                        wx[ii],       wy[ii],       wz[ii] + 1.0 );
 
     // Cauchy stress
-    Tensor2_3D sigma = model -> get_Cauchy_stress( F );
+    Tensor2_3D sigma_d = model -> get_Cauchy_stress( F );
 
     Tensor2_3D pres( -p[ii], 0.0, 0.0, 0.0, -p[ii], 0.0, 0.0, 0.0, -p[ii]);
 
-    Tensor2_3D sigma_p = sigma + pres;
+    Tensor2_3D sigma = sigma_d + pres;
 
     // Principal stress
     double eta1, eta2, eta3;
     Vector_3 vec1, vec2, vec3, temp_vec;
-    const int num_dif_eigen = sigma_p.eigen_decomp(eta1, eta2, eta3, vec1, vec2, vec3);
+    const int num_dif_eigen = sigma.eigen_decomp(eta1, eta2, eta3, vec1, vec2, vec3);
 
     double sigma_v = 0.5 * std::sqrt(2.0) * std::sqrt( (eta1 - eta2) * (eta1 - eta2)
                     + (eta2 - eta3) * (eta2 - eta3) + (eta3 - eta1) * (eta3 - eta1) );
 
-    vtkData->InsertComponent( ptid[ii], 0, sigma_v );
+    vtkData->InsertComponent( ptoffset+ii, 0, sigma_v );
   }
 }
 
+void VTK_Writer_FSI::interpolateCauchyStress( const int &ptoffset,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<double> &inputDisp,
+    const std::vector<double> &inputPres,
+    const FEAElement * const &elem,
+    IMaterialModel * const &model,
+    vtkDoubleArray * const &vtkData )
+{
+  // interpolate dispacment
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0), p (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputDisp[ii*3];
+    v[ii] = inputDisp[ii*3+1];
+    w[ii] = inputDisp[ii*3+2];
+    p[ii] = inputPres[ii];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  Interpolater intep( nLocBas );
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  const int nqp = elem->get_numQuapts();
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    // update fibre direction by the basis vector on an arbitrary node
+    model->update_fibre_dir(eleBasis_r[0], eleBasis_c[0], eleBasis_l[0]);
+
+    // F
+    const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                        vx[ii],       vy[ii] + 1.0, vz[ii],
+                        wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    // Cauchy stress
+    Tensor2_3D sigma_d = model -> get_Cauchy_stress( F );
+
+    Tensor2_3D pres( -p[ii], 0.0, 0.0, 0.0, -p[ii], 0.0, 0.0, 0.0, -p[ii]);
+
+    Tensor2_3D sigma = sigma_d + pres;
+
+    vtkData->InsertComponent(ptoffset+ii, 0, sigma(0,0));
+    vtkData->InsertComponent(ptoffset+ii, 1, sigma(1,1));
+    vtkData->InsertComponent(ptoffset+ii, 2, sigma(2,2));
+    vtkData->InsertComponent(ptoffset+ii, 3, sigma(0,1));
+    vtkData->InsertComponent(ptoffset+ii, 4, sigma(0,2));
+    vtkData->InsertComponent(ptoffset+ii, 5, sigma(1,2));
+  }
+}
 
 void VTK_Writer_FSI::writeOutput(
         const FEANode * const &fnode_ptr,
@@ -581,7 +662,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
     dataVecs[ii] = vtkDoubleArray::New();
     dataVecs[ii] -> SetNumberOfComponents( vdata_ptr->get_arraySizes(ii) );
     dataVecs[ii] -> SetName( vdata_ptr->get_arrayNames(ii).c_str() );
-    dataVecs[ii] -> SetNumberOfTuples( num_of_nodes );
+    // dataVecs[ii] -> SetNumberOfTuples( num_of_nodes );
   }
 
   // An additional array for the analysis partition info
@@ -589,6 +670,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
   anaprocId -> SetName("Analysis_Partition");
   anaprocId -> SetNumberOfComponents(1);
 
+  int ptOffset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
     int phy_tag = lelem_ptr->get_elem_tag(ee);
@@ -632,13 +714,13 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo_d, elemptr, dataVecs[0] );
+      intep.interpolateVTKData( asize, ptOffset, inputInfo_d, elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, elemptr, points );
+      intep.interpolateVTKPts( ptOffset, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo_d, elemptr, points );
 
       // Interpolate detF
-      interpolateJ( &IEN_s[0], inputInfo_d, elemptr, dataVecs[1] );
+      interpolateJ( ptOffset, inputInfo_d, elemptr, dataVecs[1] );
 
       // Interpolate the pressure scalar
       std::vector<double> inputInfo_p; inputInfo_p.clear();
@@ -649,11 +731,15 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo_p.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo_p, elemptr, dataVecs[2] );
+      intep.interpolateVTKData( asize, ptOffset, inputInfo_p, elemptr, dataVecs[2] );
 
       // Interpolate von Mises stress
-      interpolateVonStress( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], ebasis_r, ebasis_c, ebasis_l, 
+      interpolateVonStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
           inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
+
+      // Interpolate Cauchy stress
+      interpolateVonStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
+          inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[5] );
       
       // Interpolate the velocity vector
       std::vector<double> inputInfo_v; inputInfo_v.clear();
@@ -664,19 +750,20 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo_v.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo_v, elemptr, dataVecs[3] );
+      intep.interpolateVTKData( asize, ptOffset, inputInfo_v, elemptr, dataVecs[3] );
       
       // Set mesh connectivity
       if( elemptr->get_Type() == 501 )
-        VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
+        VIS_T::setTetraelem( ptOffset, gridData );
       else if( elemptr->get_Type() == 601 )
-        VIS_T::setHexelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], 
-          IEN_s[4], IEN_s[5], IEN_s[6], IEN_s[7], gridData );
+        VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
       else SYS_T::print_fatal("Error: unknown element type.\n");
 
       // Analysis mesh partition
       const int e_global = lelem_ptr->get_elem_loc(ee);
       anaprocId->InsertNextValue( epart_map[e_global] );
+
+      ptOffset += nLocBas;
     }
   }
 

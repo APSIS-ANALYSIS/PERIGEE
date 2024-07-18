@@ -250,6 +250,15 @@ int main ( int argc , char * argv[] )
     if( is_read_material )
     {
       std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
+
+      hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+      HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
+
+      solid_nu[ii] = model_h5r -> read_doubleScalar("/", "nu");
+
+      delete model_h5r; H5Fclose(model_file);
+
       if( solid_nu[ii] == 0.5 )
       {
         matmodel[ii] = new MaterialModel_GOH06_Incompressible_Mixed( matmodel_file_name.c_str() );
@@ -275,8 +284,6 @@ int main ( int argc , char * argv[] )
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
       }
     }
-
-    matmodel[ii] -> print_info();
   }
 
   // For the solid subdomain, we need to prepare a mapping from the

@@ -69,10 +69,10 @@ class VTK_Writer_FSI
     	const std::vector<int> &sien,
     	const ALocal_Elem * const &lelem_ptr,
     	const IVisDataPrep * const &vdata_ptr,
-	IMaterialModel ** const &matmodel,
+	    IMaterialModel ** const &matmodel,
     	FEAElement * const &elemptr,
     	const IQuadPts * const &quad,
-	const Tissue_property * const &tp_ptr,
+	    const Tissue_property * const &tp_ptr,
     	const double * const * const &pointArrays,
     	const int &rank, const int &size,
     	const int &num_of_nodes,
@@ -112,13 +112,31 @@ class VTK_Writer_FSI
         vtkDoubleArray * const &vtkData );
 
     // --------------------------------------------------------------
-    // Interpolate von-Mises stress at sampling points
+    // Interpolate det(F) at elements
     // --------------------------------------------------------------
-    void interpolateVonStress( const int * const &ptid,
-        const double * const &ctrlPts_x,
-        const double * const &ctrlPts_y,
-        const double * const &ctrlPts_z,
-	const std::vector<Vector_3> &eleBasis_r,
+    void interpolateJ( const int &ptoffset,
+        const std::vector<double> &inputData,
+        const FEAElement * const &elem,
+        vtkDoubleArray * const &vtkData );
+
+    // --------------------------------------------------------------
+    // Interpolate von-Mises stress at elements
+    // --------------------------------------------------------------
+    void interpolateVonStress( const int &ptoffset,
+	    const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<double> &inputDisp,
+        const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
+        vtkDoubleArray * const &vtkData );
+    
+    // --------------------------------------------------------------
+    // Interpolate Cauchy stress at elements
+    // --------------------------------------------------------------
+    void interpolateCauchyStress( const int &ptoffset,
+	    const std::vector<Vector_3> &eleBasis_r,
         const std::vector<Vector_3> &eleBasis_c,
         const std::vector<Vector_3> &eleBasis_l,
         const std::vector<double> &inputDisp,
