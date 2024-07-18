@@ -653,7 +653,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
   // Check if the number of visualization quantities equal a given number
   // I will have to manually interpolate these quantities in the for-loop
-  if(numDArrays != 5) SYS_T::print_fatal("Error: vdata size numDArrays != 5. \n");
+  if(numDArrays != 6) SYS_T::print_fatal("Error: vdata size numDArrays != 6. \n");
 
   // dataVecs is the holder of the interpolated data
   vtkDoubleArray ** dataVecs = new vtkDoubleArray * [numDArrays];
