@@ -36,10 +36,10 @@ class QuadPts_Gauss_Quad : public IQuadPts
 
     virtual int get_num_quadPts_y() const {return num_pts_y;}
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    virtual double get_qp(const int &ii, const int &comp) const
     {return qp[2*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(const int &ii) const {return qw[ii];}
 
   private:
     const int num_pts, num_pts_x, num_pts_y;

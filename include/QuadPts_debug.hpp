@@ -25,12 +25,12 @@ class QuadPts_debug : public IQuadPts
 
     virtual int get_num_quadPts() const {return num_pts;}
 
-    virtual double get_qp(unsigned int ii) const {return qp[ii];}
+    virtual double get_qp(const int &ii) const {return qp[ii];}
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    virtual double get_qp(const int &ii, const int &comp) const
     {return qp[dim*ii + comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(const int &ii) const {return qw[ii];}
 
   private:
     const int num_pts, dim;
