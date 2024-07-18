@@ -42,7 +42,6 @@ class PNonlinear_NS_Solver
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
-        const double &TI_std_dev,
         const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
@@ -89,7 +88,6 @@ class PNonlinear_NS_Solver
         PDNSolution * const &sol ) const;
 
     void rescale_inflow_value_randomly_perturbed( const double &stime,
-        const double &std_dev,
         const ALocal_InflowBC * const &infbc,
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,

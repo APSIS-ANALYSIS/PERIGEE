@@ -42,7 +42,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
-    const double &TI_std_dev,
     const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
@@ -103,7 +102,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value_randomly_perturbed(curr_time+dt, TI_std_dev,infnbc_part, flr_ptr, sol_base, sol);
+  rescale_inflow_value_randomly_perturbed(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
   // ------------------------------------------------- 
 
   // Define the sol at alpha_f: sol_alpha
@@ -270,7 +269,6 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 }
 
 void PNonlinear_NS_Solver::rescale_inflow_value_randomly_perturbed( const double &stime,
-    const double &std_dev,
     const ALocal_InflowBC * const &infbc,
     const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
@@ -283,6 +281,7 @@ void PNonlinear_NS_Solver::rescale_inflow_value_randomly_perturbed( const double
     const int numnode = infbc -> get_Num_LD( nbc_id );
 
     const double factor = flrate -> get_flow_rate( nbc_id, stime );
+    const double std_dev = infbc -> get_flow_TI_std_dev( nbc_id );
 
     for(int ii=0; ii<numnode; ++ii)
     {
