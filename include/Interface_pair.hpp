@@ -22,14 +22,7 @@
 // Author: Xuanming Huag
 // Date: Jun 24 2024
 // ============================================================================
-
-#include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
-#include "Vector_3.hpp"
-#include "VTK_Tools.hpp"
 #include "HDF5_Tools.hpp"
-#include "IIEN.hpp"
-#include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 
 class Interface_pair
@@ -103,8 +96,7 @@ class Interface_pair
     const int interface_type;
 
     // the number of local basis function in a surface/volume element
-    int s_nLocBas;
-    int v_nLocBas;
+    int s_nLocBas, v_nLocBas;
 
     // the axial direction of type 0 interface-pair
     const int T0_axial_direction;
@@ -177,7 +169,6 @@ class Interface_pair
     virtual int Group(const Vector_3 &ele_centroid, const std::vector<double> &intervals);
 
     Interface_pair() = delete;
-
 };
 
 #endif
