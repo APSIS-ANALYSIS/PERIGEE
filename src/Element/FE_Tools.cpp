@@ -698,6 +698,17 @@ namespace FE_T
     VEC_T::clean(qp);
   }
 
+  void QuadPts_on_face::print_info() const
+  {
+    SYS_T::commPrint("====== Gauss Points on Face =======\n");
+    SYS_T::commPrint("Number of points = %d\n", num_pts);
+    SYS_T::commPrint("qp.size() = %d\n", qp.size());
+    for(int ii=0; ii<num_pts; ++ii)
+      SYS_T::commPrint("  %.15f %.15f %.15f\n",
+          qp[3*ii], qp[3*ii+1], qp[3*ii+2]);
+    SYS_T::commPrint("========================================\n");
+  }
+
 }
 
 // EOF
