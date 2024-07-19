@@ -146,7 +146,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     rotated_layer_ien[ii].resize(n_tag);
     rotated_ele_face_id[ii].resize(n_tag);
 
-    std::vector<int> total_rotated_layer_ien = interfaces[ii].get_RL_vien();
+    std::vector<int> total_rotated_layer_ien = interfaces[ii].get_rotated_vien();
     std::vector<int> total_rotated_ele_face_id = interfaces[ii].get_rotated_faceID();
 
     for(int jj=0; jj<n_tag; ++jj)

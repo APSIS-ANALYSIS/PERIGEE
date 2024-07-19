@@ -83,7 +83,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   fixed_vien.resize(v_nLocBas * num_fixed_ele);
 
   rotated_face_id.resize(num_rotated_ele);
-  rotated_layer_vien.resize(v_nLocBas * num_rotated_ele);
+  rotated_vien.resize(v_nLocBas * num_rotated_ele);
 
   // Generate the face id and layer's ien array
   if(elemtype_in == 501 || elemtype_in == 502)
@@ -134,7 +134,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       rotated_face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        rotated_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        rotated_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     delete tetcell;
@@ -197,7 +197,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       rotated_face_id[ee] = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        rotated_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        rotated_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     delete hexcell;
@@ -227,12 +227,12 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     fixed_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
   }
 
-  rotated_layer_global_node = rotated_layer_vien;
+  rotated_layer_global_node = rotated_vien;
   VEC_T::sort_unique_resize(rotated_layer_global_node);
   const int num_rotated_layer_node = VEC_T::get_size(rotated_layer_global_node);
 
   // PERIGEE_OMP_PARALLEL_FOR
-  for(int &nodeid : rotated_layer_vien)
+  for(int &nodeid : rotated_vien)
   {
     const int local_id = VEC_T::get_pos(rotated_layer_global_node, nodeid);
     nodeid = local_id;

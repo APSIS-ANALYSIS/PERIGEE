@@ -76,8 +76,8 @@ class Interface_pair
     virtual std::vector<int> get_rotated_faceID() const
     {return rotated_face_id;}
 
-    virtual std::vector<int> get_RL_vien() const
-    {return rotated_layer_vien;}
+    virtual std::vector<int> get_rotated_vien() const
+    {return rotated_vien;}
 
     virtual std::vector<int> get_RLN_GID() const
     {return rotated_layer_global_node;}
@@ -132,7 +132,7 @@ class Interface_pair
     std::vector<int> rotated_face_id;
 
     // the ien array of the rotated layer
-    std::vector<int> rotated_layer_vien;
+    std::vector<int> rotated_vien;
 
     // the GlobalNodeID of the rotated layer nodes
     std::vector<int> rotated_layer_global_node;
