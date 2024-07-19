@@ -14,14 +14,14 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   fixed_lien.resize(num_pair);
   fixed_global_node.resize(num_pair);
   fixed_LID.resize(num_pair);
-  fixed_layer_pt_xyz.resize(num_pair);
+  fixed_pt_xyz.resize(num_pair);
   fixed_interval_tag.resize(num_pair);
 
   fixed_layer_node_vol_part_tag.resize(num_pair);
   fixed_layer_node_loc_pos.resize(num_pair);
 
   rotated_ele_face_id.resize(num_pair);
-  rotated_layer_ien.resize(num_pair);
+  rotated_lien.resize(num_pair);
   rotated_layer_global_node.resize(num_pair);
   rotated_layer_node_ID.resize(num_pair);
   rotated_layer_pt_xyz.resize(num_pair);
@@ -71,7 +71,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       }
     }
 
-    fixed_layer_pt_xyz[ii] = interfaces[ii].get_fixed_pt_xyz();
+    fixed_pt_xyz[ii] = interfaces[ii].get_fixed_pt_xyz();
 
     // partition the fixed element according to the cpu_rank
     PERIGEE_OMP_PARALLEL
@@ -143,15 +143,15 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
     // group the rotated element according to the interval tag
     int n_tag = VEC_T::get_size(tag);
-    rotated_layer_ien[ii].resize(n_tag);
+    rotated_lien[ii].resize(n_tag);
     rotated_ele_face_id[ii].resize(n_tag);
 
-    std::vector<int> total_rotated_layer_ien = interfaces[ii].get_rotated_vien();
+    std::vector<int> total_rotated_lien = interfaces[ii].get_rotated_vien();
     std::vector<int> total_rotated_ele_face_id = interfaces[ii].get_rotated_faceID();
 
     for(int jj=0; jj<n_tag; ++jj)
     {
-      rotated_layer_ien[ii][jj] = std::vector<int> {};
+      rotated_lien[ii][jj] = std::vector<int> {};
       rotated_ele_face_id[ii][jj] = std::vector<int> {};
     }
 
@@ -159,7 +159,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     {
       int ee_tag = rotated_interval_tag[ii][ee];
       for(int jj=0; jj<part->get_nLocBas(); ++jj)
-        rotated_layer_ien[ii][ee_tag].push_back(total_rotated_layer_ien[ee * part->get_nLocBas() + jj]);
+        rotated_lien[ii][ee_tag].push_back(total_rotated_layer_ien[ee * part->get_nLocBas() + jj]);
 
       rotated_ele_face_id[ii][ee_tag].push_back(total_rotated_ele_face_id[ee]);
     }
@@ -205,7 +205,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "fixed_ID", fixed_LID[ii] );
 
-    h5w -> write_doubleVector( group_id, "fixed_node_xyz", fixed_layer_pt_xyz[ii] );
+    h5w -> write_doubleVector( group_id, "fixed_node_xyz", fixed_pt_xyz[ii] );
 
     h5w -> write_intScalar( group_id, "num_rotated_node", VEC_T::get_size(rotated_layer_global_node[ii]) );
 
@@ -226,7 +226,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
       h5w -> write_intScalar( subgroup_id, "num_rotated_cell", VEC_T::get_size(rotated_ele_face_id[ii][jj]) );
 
-      h5w -> write_intVector( subgroup_id, "rotated_cell_ien", rotated_layer_ien[ii][jj] );
+      h5w -> write_intVector( subgroup_id, "rotated_cell_ien", rotated_lien[ii][jj] );
 
       h5w -> write_intVector( subgroup_id, "rotated_cell_face_id", rotated_ele_face_id[ii][jj] );
 

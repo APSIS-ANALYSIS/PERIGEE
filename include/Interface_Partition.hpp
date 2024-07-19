@@ -63,7 +63,7 @@ class Interface_Partition
     std::vector<std::vector<int>> fixed_LID;
 
     // stores the fixed layer nodes' coordinates
-    std::vector<std::vector<double>> fixed_layer_pt_xyz;
+    std::vector<std::vector<double>> fixed_pt_xyz;
 
     // stores the fixed layer nodes' volume partition tag & local position
     std::vector<std::vector<int>> fixed_layer_node_vol_part_tag;
@@ -77,7 +77,7 @@ class Interface_Partition
     std::vector<std::vector<std::vector<int>>> rotated_ele_face_id;
 
     // stores ien of all the volume element of the rotated layer
-    std::vector<std::vector<std::vector<int>>> rotated_layer_ien;
+    std::vector<std::vector<std::vector<int>>> rotated_lien;
 
     // stores the rotated layer nodes indices, converted by get_old2new()
     std::vector<std::vector<int>> rotated_layer_global_node;
