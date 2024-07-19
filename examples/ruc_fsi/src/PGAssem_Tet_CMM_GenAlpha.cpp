@@ -488,7 +488,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual contribution
-  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
+  BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // Residual contribution from the thin-walled linear membrane in CMM
   WallMembrane_G( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
@@ -582,7 +582,7 @@ void PGAssem_Tet_CMM_GenAlpha::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
+  BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ringnbc_part, ebc_part );
 
   // Residual & tangent contributions from the thin-walled linear membrane in CMM
   WallMembrane_KG( curr_time, dt, sol_a, sol_b, sol_wall_disp, lassem_ptr, elementw, quad_s, nbc_part, ringnbc_part, ebc_wall_part );
@@ -651,7 +651,6 @@ void PGAssem_Tet_CMM_GenAlpha::NatBC_G( const double &curr_time, const double &d
 
 
 void PGAssem_Tet_CMM_GenAlpha::BackFlow_G( 
-    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -714,7 +713,6 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
 
 
 void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
-    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
