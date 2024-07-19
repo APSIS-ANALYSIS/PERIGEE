@@ -270,6 +270,8 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
       break;
   }
 
+  // use the triangle element routine to determien the outward normal vector and
+  // the surface Jacobian.
   triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
 }
 
