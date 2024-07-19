@@ -524,7 +524,7 @@ namespace FE_T
   }
 
   QuadPts_on_face::QuadPts_on_face(const int &vol_elemType, const int &face_id, 
-      const IQuadPts * const lower_quad_rule) : lower_rule(lower_quad_rule), dim(lower_rule->get_dim() + 1)
+      const IQuadPts * const lower_quad_rule) : dim(lower_quad_rule->get_dim() + 1)
   {
     if(vol_elemType == 501 || vol_elemType == 502) // Tet element
     {
@@ -550,46 +550,46 @@ namespace FE_T
       //    ,'
       // r *
 
-      SYS_T::print_fatal_if( lower_rule -> get_dim() != 3,
+      SYS_T::print_fatal_if( lower_quad_rule -> get_dim() != 3,
         "Error: FE_T::QuadPts_on_face, wrong surface quadrature rule.\n" );
 
-      qp.assign( 4 * lower_rule->get_num_quadPts(), 0.0 );
+      qp.assign( 4 * lower_quad_rule->get_num_quadPts(), 0.0 );
       
       switch(face_id)
       {
         case 0: // u = 0 : node1 = node0', node2 = node1', node3 = node2'       //      t                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      3                                     2'
-            qp[4*ii + 0] = lower_rule->get_qp(ii, 2);  // r = t'                //      |  `.                     map         |  `.  
-            qp[4*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
-            qp[4*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                //      | front  `.                           |        `.
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 2);  // r = t'                //      |  `.                     map         |  `.  
+            qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
+            qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'                //      | front  `.                           |        `.
           }                                                                     //      |           `.                        |           `.
           break;                                                                //  (r) 1 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
         
         case 1: // r = 0 : node0 = node0', node3 = node1', node2 = node2'       //      s                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      2                                     2'
-            qp[4*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                //      |  `.                     map         |  `.
-            qp[4*ii + 2] = lower_rule->get_qp(ii, 0);  // t = r'                //      |     `.                 <----        |     `.
-            qp[4*ii + 3] = lower_rule->get_qp(ii, 2);  // u = t'                //      | back   `.                           |        `.
+            qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 1);  // s = s'                //      |  `.                     map         |  `.
+            qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 0);  // t = r'                //      |     `.                 <----        |     `.
+            qp[4*ii + 3] = lower_quad_rule->get_qp(ii, 2);  // u = t'                //      | back   `.                           |        `.
           }                                                                     //      |           `.                        |           `.
           break;                                                                //  (u) 0 - - - - - - 3 - - -> t         (t') 0'- - - - - - 1'- - -> r'
 
         case 2: // s = 0 : node0 = node0', node1 = node1', node3 = node2'       //      t                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      3                                     2'
-            qp[4*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                //      |  `.                     map         |  `.
-            qp[4*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                //      |     `.                 <----        |     `.
-            qp[4*ii + 3] = lower_rule->get_qp(ii, 2);  // u = t'                //      | left   `.                           |        `.
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 0);  // r = r'                //      |  `.                     map         |  `.
+            qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'                //      |     `.                 <----        |     `.
+            qp[4*ii + 3] = lower_quad_rule->get_qp(ii, 2);  // u = t'                //      | left   `.                           |        `.
           }                                                                     //      |           `.                        |           `.
           break;                                                                //  (u) 0 - - - - - - 1 - - -> r         (t') 0'- - - - - - 1'- - -> r'
 
         case 3: // t = 0 : node0 = node0', node2 = node1', node1 = node2'       //      r                                     s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)             //      ^                                     ^
           {                                                                     //      1                                     2'
-            qp[4*ii + 0] = lower_rule->get_qp(ii, 1);  // r = s'                //      |  `.                     map         |  `.
-            qp[4*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
-            qp[4*ii + 3] = lower_rule->get_qp(ii, 2);  // u = t'                //      | bottom `.                           |        `.
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 1);  // r = s'                //      |  `.                     map         |  `.
+            qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'                //      |     `.                 <----        |     `.
+            qp[4*ii + 3] = lower_quad_rule->get_qp(ii, 2);  // u = t'                //      | bottom `.                           |        `.
           }                                                                     //      |           `.                        |           `.
           break;                                                                //  (u) 0 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
 
@@ -622,64 +622,64 @@ namespace FE_T
       //            /
       //           *
       //           r
-      SYS_T::print_fatal_if( lower_rule -> get_dim() != 2,
+      SYS_T::print_fatal_if( lower_quad_rule -> get_dim() != 2,
         "Error: FE_T::QuadPts_on_face, wrong surface quadrature rule.\n" );
 
-      qp.assign( 3 * lower_rule->get_num_quadPts(), 0.0 );
+      qp.assign( 3 * lower_quad_rule->get_num_quadPts(), 0.0 );
       
       switch(face_id)
       {
         case 0: // t = 0 : node0 = node0', node3 = node1', node2 = node2', node1 = node3' //    r                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
-            qp[3*ii + 0] = lower_rule->get_qp(ii, 1);  // r = s'                          //    1 -------- 2               3'-------- 2'
-            qp[3*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                          //    |          |        map    |          |
+            qp[3*ii + 0] = lower_quad_rule->get_qp(ii, 1);  // r = s'                          //    1 -------- 2               3'-------- 2'
+            qp[3*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'                          //    |          |        map    |          |
             qp[3*ii + 2] = 0.0;                        // t = 0                           //    |  bottom  |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    0 -------- 3 - -> s        0'-------- 1'- -> r'
 
         case 1: // t = 1 : node4 = node0', node5 = node1', node6 = node2', node7 = node3' //    s                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
-            qp[3*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                          //    7 -------- 6               3'-------- 2'
-            qp[3*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
+            qp[3*ii + 0] = lower_quad_rule->get_qp(ii, 0);  // r = r'                          //    7 -------- 6               3'-------- 2'
+            qp[3*ii + 1] = lower_quad_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
             qp[3*ii + 2] = 1.0;                        // t = 1                           //    |   top    |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    4 -------- 5 - -> r        0'-------- 1'- -> r'
         
         case 2: // s = 0 : node0 = node0', node1 = node1', node5 = node2', node4 = node3' //    t                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
-            qp[3*ii + 0] = lower_rule->get_qp(ii, 0);  // r = r'                          //    4 -------- 5               3'-------- 2'
+            qp[3*ii + 0] = lower_quad_rule->get_qp(ii, 0);  // r = r'                          //    4 -------- 5               3'-------- 2'
             qp[3*ii + 1] = 0.0;                        // s = 0                           //    |          |        map    |          |
-            qp[3*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                          //    |   left   |       <----   |          |
+            qp[3*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'                          //    |   left   |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    0 -------- 1 - -> r        0'-------- 1'- -> r'
 
         case 3: // r = 1 : node1 = node0', node2 = node1', node6 = node2', node5 = node3' //    t                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = 1.0;                        // r = 1                           //    5 -------- 6               3'-------- 2'
-            qp[3*ii + 1] = lower_rule->get_qp(ii, 0);  // s = r'                          //    |          |        map    |          |
-            qp[3*ii + 2] = lower_rule->get_qp(ii, 1);  // t = s'                          //    |   front  |       <----   |          |
+            qp[3*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'                          //    |          |        map    |          |
+            qp[3*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'                          //    |   front  |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    1 -------- 2 - -> s        0'-------- 1'- -> r'
 
         case 4: // s = 1 : node3 = node0', node7 = node1', node6 = node2', node2 = node3' //    r                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
-            qp[3*ii + 0] = lower_rule->get_qp(ii, 1);  // r = s'                          //    2 -------- 6               3'-------- 2'
+            qp[3*ii + 0] = lower_quad_rule->get_qp(ii, 1);  // r = s'                          //    2 -------- 6               3'-------- 2'
             qp[3*ii + 1] = 1.0;                        // s = 1                           //    |          |        map    |          |
-            qp[3*ii + 2] = lower_rule->get_qp(ii, 0);  // t = r'                          //    |   right  |       <----   |          |
+            qp[3*ii + 2] = lower_quad_rule->get_qp(ii, 0);  // t = r'                          //    |   right  |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    3 -------- 7 - -> t        0'-------- 1'- -> r'
         
         case 5: // r = 0 : node0 = node0', node4 = node1', node7 = node2', node3 = node3' //    s                          s'
-          for(int ii {0}; ii < lower_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
+          for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                       //    ^                          ^
           {                                                                               //    |                          |
             qp[3*ii + 0] = 0.0;                        // r = 0                           //    3 -------- 7               3'-------- 2'
-            qp[3*ii + 1] = lower_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
-            qp[3*ii + 2] = lower_rule->get_qp(ii, 0);  // t = r'                          //    |   back   |       <----   |          |
+            qp[3*ii + 1] = lower_quad_rule->get_qp(ii, 1);  // s = s'                          //    |          |        map    |          |
+            qp[3*ii + 2] = lower_quad_rule->get_qp(ii, 0);  // t = r'                          //    |   back   |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    0 -------- 4 - -> t        0'-------- 1'- -> r'
         
@@ -695,7 +695,6 @@ namespace FE_T
   QuadPts_on_face::~QuadPts_on_face()
   {
     VEC_T::clean(qp);
-    lower_rule = nullptr;
   }
 
 }
