@@ -54,7 +54,7 @@ class Interface_Partition
     std::vector<std::vector<int>> fixed_ele_face_id;
 
     // stores ien of the volume element of the fixed layer in this part
-    std::vector<std::vector<int>> fixed_layer_ien;
+    std::vector<std::vector<int>> fixed_lien;
 
     // stores the fixed layer nodes indices, converted by get_old2new()
     std::vector<std::vector<int>> fixed_layer_global_node;

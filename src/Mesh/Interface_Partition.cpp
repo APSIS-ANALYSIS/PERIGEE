@@ -11,7 +11,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
   fixed_nlocalele.resize(num_pair);
   fixed_ele_face_id.resize(num_pair);
-  fixed_layer_ien.resize(num_pair);
+  fixed_lien.resize(num_pair);
   fixed_layer_global_node.resize(num_pair);
   fixed_layer_node_ID.resize(num_pair);
   fixed_layer_pt_xyz.resize(num_pair);
@@ -36,10 +36,10 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   {
     fixed_ele_face_id[ii] = std::vector<int> {};
 
-    const std::vector<int> total_fixed_layer_ien = interfaces[ii].get_fixed_vien();
+    const std::vector<int> total_fixed_ien = interfaces[ii].get_fixed_vien();
     const std::vector<int> total_fixed_interval_tag = interfaces[ii].get_fixed_interval_tag();
 
-    fixed_layer_ien[ii] = std::vector<int> {};    
+    fixed_lien[ii] = std::vector<int> {};    
     fixed_layer_global_node[ii] = interfaces[ii].get_fixed_global_node();
     fixed_interval_tag[ii] = std::vector<int> {};
 
@@ -77,7 +77,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     PERIGEE_OMP_PARALLEL
     {
       std::vector<int> temp_ele_face_id {};
-      std::vector<int> temp_layer_ien {};
+      std::vector<int> temp_ien {};
       std::vector<int> temp_interval_tag {};
 
       PERIGEE_OMP_FOR
@@ -88,7 +88,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
         {
           temp_ele_face_id.push_back(interfaces[ii].get_fixed_faceID(ee));
           for(int jj=0; jj<part->get_nLocBas(); ++jj)
-            temp_layer_ien.push_back(total_fixed_layer_ien[ee * part->get_nLocBas() + jj]);
+            temp_ien.push_back(total_fixed_ien[ee * part->get_nLocBas() + jj]);
 
           temp_interval_tag.push_back(total_fixed_interval_tag[ee]);
         }
@@ -97,7 +97,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       PERIGEE_OMP_CRITICAL
       {
         VEC_T::insert_end(fixed_ele_face_id[ii], temp_ele_face_id);
-        VEC_T::insert_end(fixed_layer_ien[ii], temp_layer_ien);
+        VEC_T::insert_end(fixed_lien[ii], temp_ien);
         VEC_T::insert_end(fixed_interval_tag[ii], temp_interval_tag);
       }
     }
@@ -197,7 +197,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "fixed_cell_face_id", fixed_ele_face_id[ii] );
 
-    h5w -> write_intVector( group_id, "fixed_cell_ien", fixed_layer_ien[ii] );
+    h5w -> write_intVector( group_id, "fixed_cell_ien", fixed_lien[ii] );
 
     h5w -> write_intVector( group_id, "fixed_cell_tag", fixed_interval_tag[ii] );
 
