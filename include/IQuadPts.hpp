@@ -88,7 +88,7 @@ class IQuadPts
     // get_qp : access the ii-th quadrature point, for dim = 1 classes.    
     //          0 <= ii < get_num_quadPts()
     // ------------------------------------------------------------------------
-    virtual double get_qp(unsigned int ii) const
+    virtual double get_qp(const int &ii) const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_qp is not implemented.\n");
       return 0.0;
@@ -98,7 +98,7 @@ class IQuadPts
     // get_qw : access the ii-th quadrature weight
     //          0 <= ii < get_num_quadPts()
     // ------------------------------------------------------------------------
-    virtual double get_qw(unsigned int ii) const
+    virtual double get_qw(const int &ii) const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_qw is not implemented. \n");
       return 0.0;
@@ -111,7 +111,7 @@ class IQuadPts
     //          0 <= ii < get_num_quadPts()
     //          0 <= comp < get_dim()
     // ------------------------------------------------------------------------
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    virtual double get_qp(const int &ii, const int &comp) const
     {
       SYS_T::print_fatal("Error: IQuadPts::get_qp is not implemented.\n");
       return 0.0;

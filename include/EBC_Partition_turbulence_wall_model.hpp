@@ -32,7 +32,6 @@ class EBC_Partition_turbulence_wall_model : public EBC_Partition
 
     // stores the face id of the volume element
     std::vector<int> ele_face_id {};
-
 };
 
 #endif

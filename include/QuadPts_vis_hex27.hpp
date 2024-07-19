@@ -50,10 +50,10 @@ class QuadPts_vis_hex27 : public IQuadPts
 
     virtual int get_num_quadPts_z() const {return 3;}     
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const 
+    virtual double get_qp(const int &ii, const int &comp) const 
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return 0.5;}
+    virtual double get_qw(const int &ii) const {return 0.5;}
 
   private:
     const double qp[81] { 0.0, 0.0, 0.0, 

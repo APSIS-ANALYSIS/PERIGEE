@@ -37,10 +37,10 @@ class QuadPts_vis_tet10 : public IQuadPts
 
     virtual int get_num_quadPts() const {return 10;}
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    virtual double get_qp(const int &ii, const int &comp) const
     {return qp[4*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const {return 0.1/6.0;}
+    virtual double get_qw(const int &ii) const {return 0.1/6.0;}
 
   private:
     const double qp[40] { 0.0, 0.0, 0.0, 1.0,

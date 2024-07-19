@@ -26,9 +26,9 @@ class QuadPts_Gauss_1D : public IQuadPts
     
     virtual int get_num_quadPts() const {return num_pts;}
     
-    virtual double get_qp(unsigned int ii) const {return qp[ii];}
+    virtual double get_qp(const int &ii) const {return qp[ii];}
    
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    virtual double get_qw(const int &ii) const {return qw[ii];}
 
   private:
     // number of quadrature points

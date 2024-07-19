@@ -246,19 +246,17 @@ namespace FE_T
 
       ~QuadPts_on_face();
 
-      virtual void print_info() const {lower_rule->print_info();}
+      virtual void print_info() const;
 
       virtual int get_dim() const {return dim;}
 
-      virtual int get_num_quadPts() const {return lower_rule->get_num_quadPts();}
+      virtual int get_num_quadPts() const {return num_pts;}
 
-      virtual double get_qp(unsigned int ii, unsigned int comp) const
+      virtual double get_qp(const int &ii, const int &comp) const
       {return qp[dim * ii + comp];}
 
     private:
-      const IQuadPts * lower_rule;
-
-      const int dim;
+      const int dim, num_pts;
 
       std::vector<double> qp {};
 
