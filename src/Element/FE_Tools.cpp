@@ -524,7 +524,8 @@ namespace FE_T
   }
 
   QuadPts_on_face::QuadPts_on_face(const int &vol_elemType, const int &face_id, 
-      const IQuadPts * const lower_quad_rule) : dim(lower_quad_rule->get_dim() + 1)
+      const IQuadPts * const lower_quad_rule)
+    : dim(lower_quad_rule->get_dim() + 1), num_pts( lower_quad_rule -> get_num_quadPts() )
   {
     if(vol_elemType == 501 || vol_elemType == 502) // Tet element
     {
