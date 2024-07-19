@@ -70,7 +70,7 @@ class Interface_pair
     virtual std::vector<double> get_fixed_pt_xyz() const
     {return fixed_pt_xyz;}
 
-    virtual std::vector<int> get_FIT() const
+    virtual std::vector<int> get_fixed_interval_tag() const
     {return fixed_interval_tag;}
 
     virtual std::vector<int> get_rotated_faceID() const
