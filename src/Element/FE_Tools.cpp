@@ -284,10 +284,7 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
     old_dist = curr_dist;
   }
 
-  if( !closest_point->check_qp_bound() )
-    return false;
-
-  if(std::abs(curr_dist - 0.0) > dist_tol)
+  if( closest_point->check_qp_bound() == false )
     return false;
   else
     return true;
