@@ -100,15 +100,16 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   dot_sol_alpha.ScaleValue( 1.0 - alpha_m );
   dot_sol_alpha.PlusAX(*dot_sol, alpha_m);
 
-  // ------------------------------------------------- 
-  // Update the inflow boundary values
-  rescale_inflow_value_randomly_perturbed(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
-  // ------------------------------------------------- 
-
   // Define the sol at alpha_f: sol_alpha
   PDNSolution sol_alpha(*pre_sol);
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
+
+  // ------------------------------------------------- 
+  // Update the inflow boundary values
+  rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
+  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
+  // ------------------------------------------------- 
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -233,42 +234,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   else conv_flag = false;
 }
 
-
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
-    const ALocal_InflowBC * const &infbc,
-    const ICVFlowRate * const &flrate,
-    const PDNSolution * const &sol_base,
-    PDNSolution * const &sol ) const
-{
-  const int num_nbc = infbc -> get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    const int numnode = infbc -> get_Num_LD( nbc_id );
-
-    const double factor = flrate -> get_flow_rate( nbc_id, stime );
-
-    for(int ii=0; ii<numnode; ++ii)
-    {
-      const int node_index = infbc -> get_LDN( nbc_id, ii );
-      
-      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
-
-      double base_vals[3];
-
-      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
-
-      const double vals[3] = { base_vals[0] * factor, base_vals[1] * factor,
-          base_vals[2] * factor };
-
-      VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
-    }
-  }
-
-  sol->Assembly_GhostUpdate();
-}
-
-void PNonlinear_NS_Solver::rescale_inflow_value_randomly_perturbed( const double &stime,
     const ALocal_InflowBC * const &infbc,
     const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
@@ -297,8 +263,9 @@ void PNonlinear_NS_Solver::rescale_inflow_value_randomly_perturbed( const double
       const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
       const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
 
-      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), base_vals[1] * factor * (1.0 + perturb_y),
-          base_vals[2] * factor * (1.0 + perturb_z) };
+      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
+        base_vals[1] * factor * (1.0 + perturb_y),
+        base_vals[2] * factor * (1.0 + perturb_z) };
 
       VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
     }

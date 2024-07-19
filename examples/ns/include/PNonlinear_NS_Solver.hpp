@@ -86,12 +86,6 @@ class PNonlinear_NS_Solver
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
-
-    void rescale_inflow_value_randomly_perturbed( const double &stime,
-        const ALocal_InflowBC * const &infbc,
-        const ICVFlowRate * const &flrate,
-        const PDNSolution * const &sol_base,
-        PDNSolution * const &sol ) const;
 };
 
 #endif
