@@ -86,7 +86,7 @@ class Interface_Partition
     std::vector<std::vector<int>> rotated_LID;
 
     // stores the rotated layer nodes' coordinates
-    std::vector<std::vector<double>> rotated_layer_pt_xyz;
+    std::vector<std::vector<double>> rotated_pt_xyz;
 
     // stores the rotated layer nodes' volume partition tag & local position
     std::vector<std::vector<int>> rotated_layer_node_vol_part_tag;

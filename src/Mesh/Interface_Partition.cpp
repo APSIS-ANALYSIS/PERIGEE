@@ -24,7 +24,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   rotated_lien.resize(num_pair);
   rotated_global_node.resize(num_pair);
   rotated_LID.resize(num_pair);
-  rotated_layer_pt_xyz.resize(num_pair);
+  rotated_pt_xyz.resize(num_pair);
   rotated_interval_tag.resize(num_pair);
 
   rotated_layer_node_vol_part_tag.resize(num_pair);
@@ -134,7 +134,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       }
     }
 
-    rotated_layer_pt_xyz[ii] = interfaces[ii].get_rotated_pt_xyz();
+    rotated_pt_xyz[ii] = interfaces[ii].get_rotated_pt_xyz();
 
     rotated_interval_tag[ii] = interfaces[ii].get_rotated_interval_tag();
 
@@ -213,7 +213,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "rotated_ID", rotated_LID[ii] );
 
-    h5w -> write_doubleVector( group_id, "rotated_node_xyz", rotated_layer_pt_xyz[ii] );
+    h5w -> write_doubleVector( group_id, "rotated_node_xyz", rotated_pt_xyz[ii] );
 
     const std::string subgroupbase("tag_");
 
