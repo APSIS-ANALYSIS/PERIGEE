@@ -61,8 +61,8 @@ class Interface_pair
     virtual int get_fixed_faceID(const int &cell_index) const
     {return fixed_face_id[cell_index];}
 
-    virtual std::vector<int> get_FL_vien() const
-    {return fixed_layer_vien;}
+    virtual std::vector<int> get_fixed_vien() const
+    {return fixed_vien;}
 
     virtual std::vector<int> get_FLN_GID() const
     {return fixed_layer_global_node;}
@@ -114,7 +114,7 @@ class Interface_pair
     std::vector<int> fixed_face_id;
 
     // the ien array of the fixed layer
-    std::vector<int> fixed_layer_vien;
+    std::vector<int> fixed_vien;
 
     // the GlobalNodeID of the fixed layer nodes
     std::vector<int> fixed_layer_global_node;

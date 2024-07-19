@@ -80,7 +80,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   }
 
   fixed_face_id.resize(num_fixed_ele);
-  fixed_layer_vien.resize(v_nLocBas * num_fixed_ele);
+  fixed_vien.resize(v_nLocBas * num_fixed_ele);
 
   rotated_face_id.resize(num_rotated_ele);
   rotated_layer_vien.resize(v_nLocBas * num_rotated_ele);
@@ -112,7 +112,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       fixed_face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        fixed_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     for(int ee=0; ee<num_rotated_ele; ++ee)
@@ -170,7 +170,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       fixed_face_id[ee] = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        fixed_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     for(int ee=0; ee<num_rotated_ele; ++ee)
@@ -206,12 +206,12 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     SYS_T::print_fatal("Error: Interface_pair, unknown element type.\n");
 
   // Generate the global node id and xyz
-  fixed_layer_global_node = fixed_layer_vien;
+  fixed_layer_global_node = fixed_vien;
   VEC_T::sort_unique_resize(fixed_layer_global_node);
   const int num_fixed_layer_node = VEC_T::get_size(fixed_layer_global_node);
 
   // PERIGEE_OMP_PARALLEL_FOR
-  for(int &nodeid : fixed_layer_vien)
+  for(int &nodeid : fixed_vien)
   {
     const int local_id = VEC_T::get_pos(fixed_layer_global_node, nodeid);
     nodeid = local_id;

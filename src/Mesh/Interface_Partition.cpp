@@ -36,7 +36,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   {
     fixed_ele_face_id[ii] = std::vector<int> {};
 
-    const std::vector<int> total_fixed_layer_ien = interfaces[ii].get_FL_vien();
+    const std::vector<int> total_fixed_layer_ien = interfaces[ii].get_fixed_vien();
     const std::vector<int> total_fixed_interval_tag = interfaces[ii].get_FIT();
 
     fixed_layer_ien[ii] = std::vector<int> {};    
