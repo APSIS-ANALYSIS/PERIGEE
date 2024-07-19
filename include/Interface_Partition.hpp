@@ -57,7 +57,7 @@ class Interface_Partition
     std::vector<std::vector<int>> fixed_lien;
 
     // stores the fixed layer nodes indices, converted by get_old2new()
-    std::vector<std::vector<int>> fixed_layer_global_node;
+    std::vector<std::vector<int>> fixed_global_node;
 
     // stores the fixed layer nodes ID array
     std::vector<std::vector<int>> fixed_layer_node_ID;

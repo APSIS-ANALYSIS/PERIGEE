@@ -12,7 +12,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   fixed_nlocalele.resize(num_pair);
   fixed_ele_face_id.resize(num_pair);
   fixed_lien.resize(num_pair);
-  fixed_layer_global_node.resize(num_pair);
+  fixed_global_node.resize(num_pair);
   fixed_layer_node_ID.resize(num_pair);
   fixed_layer_pt_xyz.resize(num_pair);
   fixed_interval_tag.resize(num_pair);
@@ -40,10 +40,10 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     const std::vector<int> total_fixed_interval_tag = interfaces[ii].get_fixed_interval_tag();
 
     fixed_lien[ii] = std::vector<int> {};    
-    fixed_layer_global_node[ii] = interfaces[ii].get_fixed_global_node();
+    fixed_global_node[ii] = interfaces[ii].get_fixed_global_node();
     fixed_interval_tag[ii] = std::vector<int> {};
 
-    const int num_fixed_node = VEC_T::get_size(fixed_layer_global_node[ii]);
+    const int num_fixed_node = VEC_T::get_size(fixed_global_node[ii]);
     fixed_layer_node_vol_part_tag[ii].resize(num_fixed_node);
     fixed_layer_node_loc_pos[ii].resize(num_fixed_node);
     fixed_layer_node_ID[ii].resize(dof * num_fixed_node);
@@ -52,9 +52,9 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_fixed_node; ++jj)
     {
-      const int old_gid = fixed_layer_global_node[ii][jj];
+      const int old_gid = fixed_global_node[ii][jj];
       const int new_gid = mnindex->get_old2new(old_gid);
-      fixed_layer_global_node[ii][jj] = new_gid;
+      fixed_global_node[ii][jj] = new_gid;
 
       for(int kk=0; kk<dof; ++kk)
         fixed_layer_node_ID[ii][kk * num_fixed_node + jj] = mnindex->get_old2new(nbc_list[kk]->get_ID(old_gid));
@@ -193,7 +193,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-    h5w -> write_intScalar( group_id, "num_fixed_node", VEC_T::get_size(fixed_layer_global_node[ii]) );
+    h5w -> write_intScalar( group_id, "num_fixed_node", VEC_T::get_size(fixed_global_node[ii]) );
 
     h5w -> write_intVector( group_id, "fixed_cell_face_id", fixed_ele_face_id[ii] );
 
@@ -201,7 +201,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "fixed_cell_tag", fixed_interval_tag[ii] );
 
-    h5w -> write_intVector( group_id, "fixed_node_map", fixed_layer_global_node[ii] );
+    h5w -> write_intVector( group_id, "fixed_node_map", fixed_global_node[ii] );
 
     h5w -> write_intVector( group_id, "fixed_ID", fixed_layer_node_ID[ii] );
 
