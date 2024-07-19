@@ -286,13 +286,13 @@ void Interface_pair::Tag(const std::vector<double> &intervals, const int &num_fi
     Vector_3 ele_centroid(0.0, 0.0, 0.0);
     for(int ii=0; ii<s_nLocBas; ++ii)
     {
-      int node = fixed_sur_ien[ee * s_nLocBas + ii];
+      const int node = fixed_sur_ien[ee * s_nLocBas + ii];
       ele_centroid.x() += fixed_sur_pt_xyz[3 * node];
       ele_centroid.y() += fixed_sur_pt_xyz[3 * node + 1];
       ele_centroid.z() += fixed_sur_pt_xyz[3 * node + 2];
     }
 
-    ele_centroid *= (1.0 / (double) s_nLocBas);
+    ele_centroid *= (1.0 / static_cast<double>(s_nLocBas) );
 
     fixed_interval_tag[ee] = Group(ele_centroid, intervals);
   }
@@ -310,7 +310,7 @@ void Interface_pair::Tag(const std::vector<double> &intervals, const int &num_fi
       ele_centroid.z() += rotated_sur_pt_xyz[3 * node + 2];
     }
 
-    ele_centroid *= (1.0 / (double) s_nLocBas);
+    ele_centroid *= (1.0 / static_cast<double>(s_nLocBas) );
 
     rotated_interval_tag[ee] = Group(ele_centroid, intervals);
   }
@@ -350,11 +350,11 @@ int Interface_pair::Group(const Vector_3 &ele_centroid, const std::vector<double
     break;
     
     default:
-      {
+    {
       SYS_T::print_fatal("Error, Interface_pair: wrong interface type.\n");
       return -1;
-      }
-      break;
+    }
+    break;
   }
   return -1;
 }
