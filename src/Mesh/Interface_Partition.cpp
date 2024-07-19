@@ -71,7 +71,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       }
     }
 
-    fixed_layer_pt_xyz[ii] = interfaces[ii].get_FLN_xyz();
+    fixed_layer_pt_xyz[ii] = interfaces[ii].get_fixed_pt_xyz();
 
     // partition the fixed element according to the cpu_rank
     PERIGEE_OMP_PARALLEL

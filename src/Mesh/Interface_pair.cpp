@@ -217,14 +217,14 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     nodeid = local_id;
   }
 
-  fixed_layer_pt_xyz.resize(3 * num_fixed_layer_node);
+  fixed_pt_xyz.resize(3 * num_fixed_layer_node);
   PERIGEE_OMP_PARALLEL_FOR
   for(int nn=0; nn<num_fixed_layer_node; ++nn)
   {
     const int GID = fixed_global_node[nn];
-    fixed_layer_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
-    fixed_layer_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
-    fixed_layer_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
+    fixed_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
+    fixed_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
+    fixed_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
   }
 
   rotated_layer_global_node = rotated_layer_vien;
