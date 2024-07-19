@@ -55,8 +55,8 @@ class Interface_pair
     virtual int get_num_fixed_ele() const
     {return  num_fixed_ele;}
 
-    virtual int get_fixed_part_tag(const int &cell_index) const
-    {return fixed_part_tag[cell_index];}
+    virtual int get_fixed_part_cpu_rank(const int &cell_index) const
+    {return fixed_part_cpu_rank[cell_index];}
 
     virtual int get_fixed_faceID(const int &cell_index) const
     {return fixed_face_id[cell_index];}
@@ -108,7 +108,7 @@ class Interface_pair
     int num_fixed_ele;
 
     // the partition tag of the fixed layer elements
-    std::vector<int> fixed_part_tag;
+    std::vector<int> fixed_part_cpu_rank;
 
     // the face id of the fixed layer elements
     std::vector<int> fixed_face_id;
