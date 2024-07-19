@@ -40,7 +40,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     const std::vector<int> total_fixed_interval_tag = interfaces[ii].get_FIT();
 
     fixed_layer_ien[ii] = std::vector<int> {};    
-    fixed_layer_global_node[ii] = interfaces[ii].get_FLN_GID();
+    fixed_layer_global_node[ii] = interfaces[ii].get_fixed_global_node();
     fixed_interval_tag[ii] = std::vector<int> {};
 
     const int num_fixed_node = VEC_T::get_size(fixed_layer_global_node[ii]);

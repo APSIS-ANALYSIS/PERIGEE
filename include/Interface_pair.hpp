@@ -64,8 +64,8 @@ class Interface_pair
     virtual std::vector<int> get_fixed_vien() const
     {return fixed_vien;}
 
-    virtual std::vector<int> get_FLN_GID() const
-    {return fixed_layer_global_node;}
+    virtual std::vector<int> get_fixed_global_node() const
+    {return fixed_global_node;}
 
     virtual std::vector<double> get_FLN_xyz() const
     {return fixed_layer_pt_xyz;}
@@ -117,9 +117,9 @@ class Interface_pair
     std::vector<int> fixed_vien;
 
     // the GlobalNodeID of the fixed layer nodes
-    std::vector<int> fixed_layer_global_node;
+    std::vector<int> fixed_global_node;
 
-    // the xyz-coordinate of nodes, corresponding to the fixed_layer_global_node
+    // the xyz-coordinate of nodes, corresponding to the fixed_global_node
     std::vector<double> fixed_layer_pt_xyz;
 
     // the interval tag of the fixed layer elements

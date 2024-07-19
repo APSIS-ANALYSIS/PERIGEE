@@ -206,14 +206,14 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     SYS_T::print_fatal("Error: Interface_pair, unknown element type.\n");
 
   // Generate the global node id and xyz
-  fixed_layer_global_node = fixed_vien;
-  VEC_T::sort_unique_resize(fixed_layer_global_node);
-  const int num_fixed_layer_node = VEC_T::get_size(fixed_layer_global_node);
+  fixed_global_node = fixed_vien;
+  VEC_T::sort_unique_resize(fixed_global_node);
+  const int num_fixed_layer_node = VEC_T::get_size(fixed_global_node);
 
   // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : fixed_vien)
   {
-    const int local_id = VEC_T::get_pos(fixed_layer_global_node, nodeid);
+    const int local_id = VEC_T::get_pos(fixed_global_node, nodeid);
     nodeid = local_id;
   }
 
@@ -221,7 +221,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   PERIGEE_OMP_PARALLEL_FOR
   for(int nn=0; nn<num_fixed_layer_node; ++nn)
   {
-    const int GID = fixed_layer_global_node[nn];
+    const int GID = fixed_global_node[nn];
     fixed_layer_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
     fixed_layer_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
     fixed_layer_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
