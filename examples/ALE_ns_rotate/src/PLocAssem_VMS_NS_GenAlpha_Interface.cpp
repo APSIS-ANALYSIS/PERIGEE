@@ -343,7 +343,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
     // x-dir -- s
     Residual_s[A4+1] += gwts * (0.5 * ( NAs * (ps * nsx - vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
       - pr * nrx + vis_mu * (2 * ur_x * nrx + (ur_y + vr_x) * nry + (ur_z + wr_x) * nrz))
-      - (2 * NAs_x * nsx + NAs_y * nsy + NAs_z + nsz) * vis_mu * velo_jump.x()
+      - (2 * NAs_x * nsx + NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.x()
       - NAs_y * nsx * vis_mu * velo_jump.y()
       - NAs_z * nsx * vis_mu * velo_jump.z() )
       + NAs * (tau_I - rho0 * inflow_s) * velo_jump.x());
