@@ -104,7 +104,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
     num_fixed_part_ele[ii] = VEC_T::get_size(fixed_ele_face_id[ii]);
 
-    rotated_layer_global_node[ii] = interfaces[ii].get_RLN_GID();
+    rotated_layer_global_node[ii] = interfaces[ii].get_rotated_global_node();
 
     const int num_rotated_node = VEC_T::get_size(rotated_layer_global_node[ii]);
     rotated_layer_node_vol_part_tag[ii].resize(num_rotated_node);
