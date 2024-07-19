@@ -1,6 +1,5 @@
 #ifndef INTERFACE_PARTITION_HPP
 #define INTERFACE_PARTITION_HPP
-
 // ============================================================================
 // Interface_Partition.hpp
 // 
@@ -9,10 +8,8 @@
 // Author: Xuanming Huag
 // Date: Jun 24 2024
 // ============================================================================
-
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
-#include "HDF5_Writer.hpp"
 #include "Interface_pair.hpp"
 #include "INodalBC.hpp"
 
@@ -51,7 +48,7 @@ class Interface_Partition
     std::vector<int> num_tag;
 
     // the number of the local elements of the fixed interfaces
-    std::vector<int> num_fixed_part_ele;
+    std::vector<int> num_fixed_localele;
 
     // stores the face id of the volume element of the fixed interface in this part
     std::vector<std::vector<int>> fixed_ele_face_id;

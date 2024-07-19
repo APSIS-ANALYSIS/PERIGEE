@@ -9,7 +9,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 {
   num_tag.resize(num_pair);
 
-  num_fixed_part_ele.resize(num_pair);
+  num_fixed_localele.resize(num_pair);
   fixed_ele_face_id.resize(num_pair);
   fixed_layer_ien.resize(num_pair);
   fixed_layer_global_node.resize(num_pair);
@@ -102,7 +102,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       }
     }
 
-    num_fixed_part_ele[ii] = VEC_T::get_size(fixed_ele_face_id[ii]);
+    num_fixed_localele[ii] = VEC_T::get_size(fixed_ele_face_id[ii]);
 
     rotated_layer_global_node[ii] = interfaces[ii].get_rotated_global_node();
 
@@ -180,7 +180,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
   h5w -> write_intScalar( g_id, "num_interface", num_pair );
 
-  h5w -> write_intVector( g_id, "num_part_fixed_cell", num_fixed_part_ele );
+  h5w -> write_intVector( g_id, "num_part_fixed_cell", num_fixed_localele );
 
   h5w -> write_intVector( g_id, "num_tag", num_tag );
 
