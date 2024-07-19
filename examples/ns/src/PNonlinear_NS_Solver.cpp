@@ -246,8 +246,8 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
   {
     const int numnode = infbc -> get_Num_LD( nbc_id );
 
-    const double factor = flrate -> get_flow_rate( nbc_id, stime );
-    const double std_dev = infbc -> get_flow_TI_std_dev( nbc_id );
+    const double factor  = flrate -> get_flow_rate( nbc_id, stime );
+    const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
 
     for(int ii=0; ii<numnode; ++ii)
     {
