@@ -319,7 +319,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
             - vis_mu * NA * (2 * n_out.x() * NB_x + n_out.y() * NB_y + n_out.z() * NB_z)
             - vis_mu * NB * (2 * n_out.x() * NA_x + n_out.y() * NA_y + n_out.z() * NA_z)
             - NANB * rho0 * (inflow_flag * u_minus_g.x() * n_out.x() + inflow_factor)
-            + NANB * (tau_B + n_out.x() * n_out.x() * penalty_wall) );
+            + NANB * (rho0 * tau_B + n_out.x() * n_out.x() * penalty_wall) );
 
         // K23
         Tangent[nLocBas4 * (A4 + 1) + B4 + 2] += common_coef * ( NANB * rho0 * n_out.y() * u
@@ -350,7 +350,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
             - vis_mu * NA * (n_out.x() * NB_x + 2 * n_out.y() * NB_y + n_out.z() * NB_z)
             - vis_mu * NB * (n_out.x() * NA_x + 2 * n_out.y() * NA_y + n_out.z() * NA_z)
             - NANB * rho0 * (inflow_flag * u_minus_g.y() * n_out.y() + inflow_factor)
-            + NANB * (tau_B + n_out.y() * n_out.y() * penalty_wall) );
+            + NANB * (rho0 * tau_B + n_out.y() * n_out.y() * penalty_wall) );
         
         // K34
         Tangent[nLocBas4 * (A4 + 2) + B4 + 3] += common_coef * ( NANB * rho0 * n_out.z() * v
@@ -381,7 +381,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
             - vis_mu * NA * (n_out.x() * NB_x + n_out.y() * NB_y + 2 * n_out.z() * NB_z)
             - vis_mu * NB * (n_out.x() * NA_x + n_out.y() * NA_y + 2 * n_out.z() * NA_z)
             - NANB * rho0 * (inflow_flag * u_minus_g.z() * n_out.z() + inflow_factor)
-            + NANB * (tau_B + n_out.z() * n_out.z() * penalty_wall) );
+            + NANB * (rho0 * tau_B + n_out.z() * n_out.z() * penalty_wall) );
       } // B-loop
     } // A-loop
   } // qua-loop
