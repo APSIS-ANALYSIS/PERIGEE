@@ -23,7 +23,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   rotated_ele_face_id.resize(num_pair);
   rotated_lien.resize(num_pair);
   rotated_global_node.resize(num_pair);
-  rotated_layer_node_ID.resize(num_pair);
+  rotated_LID.resize(num_pair);
   rotated_layer_pt_xyz.resize(num_pair);
   rotated_interval_tag.resize(num_pair);
 
@@ -109,7 +109,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     const int num_rotated_node = VEC_T::get_size(rotated_global_node[ii]);
     rotated_layer_node_vol_part_tag[ii].resize(num_rotated_node);
     rotated_layer_node_loc_pos[ii].resize(num_rotated_node);
-    rotated_layer_node_ID[ii].resize(dof * num_rotated_node);
+    rotated_LID[ii].resize(dof * num_rotated_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
     PERIGEE_OMP_PARALLEL_FOR
@@ -120,7 +120,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       rotated_global_node[ii][jj] = new_gid;
 
       for(int kk=0; kk<dof; ++kk)
-        rotated_layer_node_ID[ii][kk * num_rotated_node + jj] = mnindex->get_old2new(nbc_list[kk]->get_ID(old_gid));
+        rotated_LID[ii][kk * num_rotated_node + jj] = mnindex->get_old2new(nbc_list[kk]->get_ID(old_gid));
 
       if(part->isNodeInPart( new_gid ))
       {
@@ -211,7 +211,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "rotated_node_map", rotated_global_node[ii] );
 
-    h5w -> write_intVector( group_id, "rotated_ID", rotated_layer_node_ID[ii] );
+    h5w -> write_intVector( group_id, "rotated_ID", rotated_LID[ii] );
 
     h5w -> write_doubleVector( group_id, "rotated_node_xyz", rotated_layer_pt_xyz[ii] );
 
