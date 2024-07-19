@@ -1,13 +1,12 @@
 #ifndef QUADPTS_USERDEFINED_TRIANGLE_HPP
 #define QUADPTS_USERDEFINED_TRIANGLE_HPP
 
-#include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
 class QuadPts_UserDefined_Triangle : public IQuadPts
 {
   public:
-    QuadPts_UserDefined_Triangle( const int &in_num_pts = 1 ) : num_pts( in_num_pts )
+    QuadPts_UserDefined_Triangle()
     {
       reset();
     }
@@ -16,48 +15,38 @@ class QuadPts_UserDefined_Triangle : public IQuadPts
 
     virtual int get_dim() const {return 3;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    virtual int get_num_quadPts() const {return 1;}
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
-    {return qp[3*ii+comp];}
+    virtual double get_qp(const int &comp) const
+    {return qp[comp];}
 
-    virtual double get_qw(unsigned int ii) const
-    {return qw[ii];}
-
-    virtual void set_qp(unsigned int ii, const std::vector<double> &rs_value)
+    virtual void set_qp(const double &xi, const double &eta)
     {
-      qp[3*ii]     = rs_value[0];
-      qp[3*ii + 1] = rs_value[1];
-      qp[3*ii + 2] = 1 - rs_value[0] - rs_value[1];
+      qp[0] = xi;
+      qp[1] = eta;
+      qp[2] = 1 - qp[0] - qp[1];
     }
-
-    virtual void set_qw(unsigned int ii, const double &value)
-    {qw[ii] = value;}
 
     virtual void reset()
     {
-      qp = std::vector<double> (3 * num_pts, 0.333333333333333);
-      qw = std::vector<double> (num_pts, 0.5 / num_pts);
+      qp[0] = 0.333333333333333;
+      qp[1] = 0.333333333333333;
+      qp[2] = 0.333333333333333;
     }
 
-    virtual bool check_qp_bound(const int &ii)
+    virtual bool check_qp_bound() const
     {
-      const double r = qp[3*ii], s = qp[3*ii+1], t = qp[3*ii+2];
-      if(r>=0 && r<=1 && s>=0 && s<=1 && t>=0 && t<=1 && std::abs(r+s+t-1)<1e-9)
+      if( qp[0]>=0 && qp[0]<=1 && qp[1]>=0 && qp[1]<=1 && qp[2]>=0 )
         return true;
       else
         return false;
     }
 
   private:
-    const int num_pts;
-
-    // qp : length 3 x num_pts. Stores the r-s-t coordinates of the
-    //      quadrature points.
+    // qp : length 3. Stores the r-s-t coordinates of the
+    //      quadrature point.
     //      t = 1 - r - s.
-    // qw : length num_pts. Stores the quadrature weights.
-    std::vector<double> qp {};
-    std::vector<double> qw {};
+    double qp[3];
 };
 
 #endif

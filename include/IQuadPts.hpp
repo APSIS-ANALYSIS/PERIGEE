@@ -117,15 +117,22 @@ class IQuadPts
       return 0.0;
     }
 
+    // ------------------------------------------------------------------------
+    // get_qp : access the quadrature point's comp-th component
+    //          This function is designed for classes storing a single
+    //          quadrature point
+    //          0 <= comp < get_dim()
+    // ------------------------------------------------------------------------
+    virtual double get_qp(const int &comp) const
+    {
+      SYS_T::print_fatal("Error: IQuadPts::get_qp is not implemented.\n");
+      return 0.0;
+    }
+    
     // For User-defined QuadPts
-    virtual void set_qp(unsigned int ii, const std::vector<double> &value)
+    virtual void set_qp(const double &xi, const double &eta)
     {
       SYS_T::print_fatal("Error: IQuadPts::set_qp is not implemented.\n");
-    }
-
-    virtual void set_qw(unsigned int ii, const double &value)
-    {
-      SYS_T::print_fatal("Error: IQuadPts::set_qw is not implemented. \n");
     }
 
     virtual void reset()
@@ -133,7 +140,7 @@ class IQuadPts
       SYS_T::print_fatal("Error: IQuadPts::reset is not implemented. \n");
     }
 
-    virtual bool check_qp_bound(const int &ii)
+    virtual bool check_qp_bound()
     {
       SYS_T::print_fatal("Error: IQuadPts::check_qp_bound is not implemented. \n");
       return false;
