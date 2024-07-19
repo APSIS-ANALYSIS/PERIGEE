@@ -80,7 +80,7 @@ class Interface_Partition
     std::vector<std::vector<std::vector<int>>> rotated_lien;
 
     // stores the rotated layer nodes indices, converted by get_old2new()
-    std::vector<std::vector<int>> rotated_layer_global_node;
+    std::vector<std::vector<int>> rotated_global_node;
 
     // stores the rotated layer nodes ID array
     std::vector<std::vector<int>> rotated_layer_node_ID;
