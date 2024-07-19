@@ -91,7 +91,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
     
     // Read the partion tag from the .h5 file
-    fixed_part_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
+    fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
 
     for(int ee=0; ee<num_fixed_ele; ++ee)
     {
@@ -144,7 +144,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8();
 
     // Read the partion tag from the .h5 file
-    fixed_part_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
+    fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
 
     for(int ee=0; ee<num_fixed_ele; ++ee)
     {

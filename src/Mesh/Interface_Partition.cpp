@@ -83,7 +83,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       PERIGEE_OMP_FOR
       for(int ee=0; ee < interfaces[ii].get_num_fixed_ele(); ++ee)
       {
-        const int sur_part_tag = interfaces[ii].get_fixed_part_cpu_rank(ee);
+        const int sur_part_tag = interfaces[ii].get_fixed_cpu_rank(ee);
         if(sur_part_tag == cpu_rank)
         {
           temp_ele_face_id.push_back(interfaces[ii].get_fixed_faceID(ee));
