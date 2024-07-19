@@ -134,7 +134,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       }
     }
 
-    rotated_layer_pt_xyz[ii] = interfaces[ii].get_RLN_xyz();
+    rotated_layer_pt_xyz[ii] = interfaces[ii].get_rotated_pt_xyz();
 
     rotated_interval_tag[ii] = interfaces[ii].get_RIT();
 

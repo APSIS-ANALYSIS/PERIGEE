@@ -82,8 +82,8 @@ class Interface_pair
     virtual std::vector<int> get_rotated_global_node() const
     {return rotated_global_node;}
 
-    virtual std::vector<double> get_RLN_xyz() const
-    {return rotated_layer_pt_xyz;}
+    virtual std::vector<double> get_rotated_pt_xyz() const
+    {return rotated_pt_xyz;}
 
     virtual std::vector<int> get_RIT() const
     {return rotated_interval_tag;}
@@ -138,7 +138,7 @@ class Interface_pair
     std::vector<int> rotated_global_node;
 
     // the xyz-coordinate of nodes, corresponding to the rotated_global_node
-    std::vector<double> rotated_layer_pt_xyz;
+    std::vector<double> rotated_pt_xyz;
 
     // the interval tag of the rotated layer elements
     std::vector<int> rotated_interval_tag;
