@@ -659,18 +659,15 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
     const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_a = new double [nlgn * dof_sol];
-  double * array_b = new double [nlgn * dof_sol];
-  double * local_as = new double [dof_sol * snLocBas];
-  double * local_bs = new double [dof_sol * snLocBas];
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [dof_sol * snLocBas];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
-  dot_sol->GetLocalArray( array_a );
-  sol->GetLocalArray( array_b );
+  sol->GetLocalArray( array );
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -682,10 +679,9 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+      GetLocal(array, LSIEN, snLocBas, local);
 
-      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
+      lassem_ptr->Assem_Residual_BackFlowStab( local,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
@@ -700,10 +696,8 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_G(
     }
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_as; local_as = nullptr;
-  delete [] local_bs; local_bs = nullptr;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
   delete [] LSIEN; LSIEN = nullptr;
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
@@ -721,18 +715,15 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     const ALocal_RingBC * const &ringnbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_a = new double [nlgn * dof_sol];
-  double * array_b = new double [nlgn * dof_sol];
-  double * local_as = new double [dof_sol * snLocBas];
-  double * local_bs = new double [dof_sol * snLocBas];
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
-  dot_sol->GetLocalArray( array_a );
-  sol->GetLocalArray( array_b );
+  sol->GetLocalArray( array );
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -744,10 +735,9 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+      GetLocal(array, LSIEN, snLocBas, local);
 
-      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
+      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
@@ -766,10 +756,8 @@ void PGAssem_Tet_CMM_GenAlpha::BackFlow_KG( const double &dt,
     }
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_as; local_as = nullptr;
-  delete [] local_bs; local_bs = nullptr;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
   delete [] LSIEN; LSIEN = nullptr;
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
