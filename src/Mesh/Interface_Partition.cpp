@@ -13,7 +13,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   fixed_ele_face_id.resize(num_pair);
   fixed_lien.resize(num_pair);
   fixed_global_node.resize(num_pair);
-  fixed_layer_node_ID.resize(num_pair);
+  fixed_LID.resize(num_pair);
   fixed_layer_pt_xyz.resize(num_pair);
   fixed_interval_tag.resize(num_pair);
 
@@ -46,7 +46,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     const int num_fixed_node = VEC_T::get_size(fixed_global_node[ii]);
     fixed_layer_node_vol_part_tag[ii].resize(num_fixed_node);
     fixed_layer_node_loc_pos[ii].resize(num_fixed_node);
-    fixed_layer_node_ID[ii].resize(dof * num_fixed_node);
+    fixed_LID[ii].resize(dof * num_fixed_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
     PERIGEE_OMP_PARALLEL_FOR
@@ -57,7 +57,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
       fixed_global_node[ii][jj] = new_gid;
 
       for(int kk=0; kk<dof; ++kk)
-        fixed_layer_node_ID[ii][kk * num_fixed_node + jj] = mnindex->get_old2new(nbc_list[kk]->get_ID(old_gid));
+        fixed_LID[ii][kk * num_fixed_node + jj] = mnindex->get_old2new(nbc_list[kk]->get_ID(old_gid));
 
       if(part->isNodeInPart( new_gid ))
       {
@@ -203,7 +203,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "fixed_node_map", fixed_global_node[ii] );
 
-    h5w -> write_intVector( group_id, "fixed_ID", fixed_layer_node_ID[ii] );
+    h5w -> write_intVector( group_id, "fixed_ID", fixed_LID[ii] );
 
     h5w -> write_doubleVector( group_id, "fixed_node_xyz", fixed_layer_pt_xyz[ii] );
 

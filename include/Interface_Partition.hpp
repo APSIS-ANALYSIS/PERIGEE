@@ -60,7 +60,7 @@ class Interface_Partition
     std::vector<std::vector<int>> fixed_global_node;
 
     // stores the fixed layer nodes ID array
-    std::vector<std::vector<int>> fixed_layer_node_ID;
+    std::vector<std::vector<int>> fixed_LID;
 
     // stores the fixed layer nodes' coordinates
     std::vector<std::vector<double>> fixed_layer_pt_xyz;
