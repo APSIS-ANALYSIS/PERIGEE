@@ -850,7 +850,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_EBC_Resistance(
 }
 
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -895,7 +894,6 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual_BackFlowStab(
 
 void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
