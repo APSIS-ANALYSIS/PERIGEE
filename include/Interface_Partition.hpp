@@ -48,7 +48,7 @@ class Interface_Partition
     std::vector<int> num_tag;
 
     // the number of the local elements of the fixed interfaces
-    std::vector<int> num_fixed_localele;
+    std::vector<int> fixed_nlocalele;
 
     // stores the face id of the volume element of the fixed interface in this part
     std::vector<std::vector<int>> fixed_ele_face_id;
