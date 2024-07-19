@@ -22,8 +22,12 @@ class ALocal_WeakBC
 
     virtual int get_num_ele() const { return num_sur_ele; }
 
+    // Return the local volume element index
+    // 0 <= ee < get_num_ele()
     virtual int get_part_vol_ele_id( const int &ee ) const { return part_vol_ele_id[ee]; }
 
+    // Return the face id of the surface with respect to its volumetric element
+    // 0 <= ee < get_num_ele()
     virtual int get_ele_face_id( const int &ee ) const { return ele_face_id[ee]; }
 
     virtual void print_info() const;

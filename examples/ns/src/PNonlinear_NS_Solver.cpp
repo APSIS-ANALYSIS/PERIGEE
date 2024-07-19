@@ -234,7 +234,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   else conv_flag = false;
 }
 
-
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
     const ICVFlowRate * const &flrate,
@@ -247,7 +246,8 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
   {
     const int numnode = infbc -> get_Num_LD( nbc_id );
 
-    const double factor = flrate -> get_flow_rate( nbc_id, stime );
+    const double factor  = flrate -> get_flow_rate( nbc_id, stime );
+    const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
 
     for(int ii=0; ii<numnode; ++ii)
     {
@@ -259,8 +259,13 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 
       VecGetValues(sol_base->solution, 3, base_idx, base_vals);
 
-      const double vals[3] = { base_vals[0] * factor, base_vals[1] * factor,
-          base_vals[2] * factor };
+      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
+      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
+      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
+
+      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
+        base_vals[1] * factor * (1.0 + perturb_y),
+        base_vals[2] * factor * (1.0 + perturb_z) };
 
       VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
     }

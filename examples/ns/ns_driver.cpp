@@ -291,7 +291,8 @@ int main(int argc, char *argv[])
   // if( SYS_T::file_exist( inflow_file ) )
   //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   // else
-  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
+  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
+      inflow_file );
 
   inflow_rate_ptr->print_info();
 
@@ -582,7 +583,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, inflow_TI_perturbation, base, dot_sol, sol,
+  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);

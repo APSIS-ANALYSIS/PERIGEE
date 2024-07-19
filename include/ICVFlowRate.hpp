@@ -20,7 +20,12 @@ class ICVFlowRate
 
     virtual ~ICVFlowRate() = default;
 
+    // Return the flow rate
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
+
+    // Return the flow turbulence intensity represented by the standard
+    // deviation
+    virtual double get_flow_TI_std_dev( const int &nbc_id ) const { return 0.0; }
 
     virtual int get_num_nbc() const = 0;
 
