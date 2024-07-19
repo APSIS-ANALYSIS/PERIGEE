@@ -85,7 +85,7 @@ class Interface_pair
     virtual std::vector<double> get_rotated_pt_xyz() const
     {return rotated_pt_xyz;}
 
-    virtual std::vector<int> get_RIT() const
+    virtual std::vector<int> get_rotated_interval_tag() const
     {return rotated_interval_tag;}
 
     virtual ~Interface_pair(){};

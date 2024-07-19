@@ -136,7 +136,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
     rotated_layer_pt_xyz[ii] = interfaces[ii].get_rotated_pt_xyz();
 
-    rotated_interval_tag[ii] = interfaces[ii].get_RIT();
+    rotated_interval_tag[ii] = interfaces[ii].get_rotated_interval_tag();
 
     std::vector<int> tag = rotated_interval_tag[ii];
     VEC_T::sort_unique_resize(tag);
