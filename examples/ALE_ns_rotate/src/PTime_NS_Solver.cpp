@@ -70,7 +70,6 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    const double &TI_std_dev,
     PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
@@ -143,9 +142,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
 
-    // If add perturbation at the inlet with given turbulence intensity
-    // sol_base->randomly_perturbed_parabolic_inflow(TI_std_dev, pNode_ptr, feanode_ptr, infnbc_part);
-     
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
