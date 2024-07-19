@@ -244,7 +244,7 @@ namespace FE_T
 
       virtual int get_num_quadPts() const {return lower_rule->get_num_quadPts();}
 
-      virtual double get_qp(unsigned int ii, unsigned int comp) const
+      virtual double get_qp(const int &ii, const int &comp) const
       {return qp[dim * ii + comp];}
 
     private:

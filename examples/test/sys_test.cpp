@@ -16,9 +16,9 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_wall_turbulence.hpp"
+#include "ElemBC_3D_turbulence_wall_model.hpp"
 #include "EBC_Partition_outflow.hpp"
-#include "EBC_Partition_wall_turbulence.hpp"
+#include "EBC_Partition_turbulence_wall_model.hpp"
 #include "ALocal_IEN.hpp"
 #include "ALocal_EBC.hpp"
 #include "ALocal_EBC_outflow.hpp"
@@ -37,7 +37,7 @@
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
 
 
   PetscFinalize();
