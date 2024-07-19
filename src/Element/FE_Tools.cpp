@@ -197,8 +197,6 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
 
   const double eps = 1.0e-6;
 
-  const double dist_tol = 1.0e-3;
-
   while(iter_counter < 20)
   {
     // SYS_T::commPrint("      iter = %d\n",iter_counter);

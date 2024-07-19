@@ -1305,7 +1305,7 @@ void PGAssem_NS_FEM::Interface_KG(
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
 
-        free_quad->set_qp(0, rotated_xi);
+        free_quad->set_qp( rotated_xi[0], rotated_xi[1] );
 
         rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 
@@ -1416,7 +1416,7 @@ void PGAssem_NS_FEM::Interface_G(
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
 
-        free_quad->set_qp(0, rotated_xi);
+        free_quad->set_qp( rotated_xi[0], rotated_xi[1] );
 
         rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 

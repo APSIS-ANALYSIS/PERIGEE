@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
     elementvs_rotated = new FEAElement_Tet4( 1 );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
-    free_quad = new QuadPts_UserDefined_Triangle( 1 );
+    free_quad = new QuadPts_UserDefined_Triangle();
   }
   else if( GMIptr->get_elemType() == 502 )
   {
@@ -616,7 +616,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, inflow_TI_perturbation, base, dot_sol, sol, disp_mesh,
+  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, locitf, pmat, elementv, elements, elementvs, elementvs_rotated,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
