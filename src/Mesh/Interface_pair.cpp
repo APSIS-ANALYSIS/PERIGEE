@@ -84,15 +84,15 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
   rotated_face_id.resize(num_rotated_ele);
   rotated_vien.resize(v_nLocBas * num_rotated_ele);
+    
+  // Read the partion tag from the .h5 file
+  fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
 
   // Generate the face id and layer's ien array
   if(elemtype_in == 501 || elemtype_in == 502)
   {
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
     
-    // Read the partion tag from the .h5 file
-    fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
-
     for(int ee=0; ee<num_fixed_ele; ++ee)
     {
       const int node_t[3] {fixed_sur_ien[ee * s_nLocBas + 0],
@@ -142,9 +142,6 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   else if(elemtype_in == 601 || elemtype_in == 602)
   {
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8();
-
-    // Read the partion tag from the .h5 file
-    fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
 
     for(int ee=0; ee<num_fixed_ele; ++ee)
     {
@@ -208,7 +205,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   // Generate the global node id and xyz
   fixed_global_node = fixed_vien;
   VEC_T::sort_unique_resize(fixed_global_node);
-  const int num_fixed_layer_node = VEC_T::get_size(fixed_global_node);
+  const int num_fixed_node = VEC_T::get_size(fixed_global_node);
 
   // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : fixed_vien)
@@ -217,9 +214,10 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     nodeid = local_id;
   }
 
-  fixed_pt_xyz.resize(3 * num_fixed_layer_node);
+  fixed_pt_xyz.resize(3 * num_fixed_node);
+  
   PERIGEE_OMP_PARALLEL_FOR
-  for(int nn=0; nn<num_fixed_layer_node; ++nn)
+  for(int nn=0; nn<num_fixed_node; ++nn)
   {
     const int GID = fixed_global_node[nn];
     fixed_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
@@ -229,7 +227,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
   rotated_global_node = rotated_vien;
   VEC_T::sort_unique_resize(rotated_global_node);
-  const int num_rotated_layer_node = VEC_T::get_size(rotated_global_node);
+  const int num_rotated_node = VEC_T::get_size(rotated_global_node);
 
   // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : rotated_vien)
@@ -238,9 +236,10 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     nodeid = local_id;
   }
 
-  rotated_pt_xyz.resize(3 * num_rotated_layer_node);
+  rotated_pt_xyz.resize(3 * num_rotated_node);
+  
   PERIGEE_OMP_PARALLEL_FOR
-  for(int nn=0; nn<num_rotated_layer_node; ++nn)
+  for(int nn=0; nn<num_rotated_node; ++nn)
   {
     const int GID = rotated_global_node[nn];
     rotated_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
