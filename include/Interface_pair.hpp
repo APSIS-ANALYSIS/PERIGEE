@@ -52,6 +52,8 @@ class Interface_pair
                     const std::vector<double> &intervals_in,
                     const Vector_3 &centroid_in );
 
+    virtual ~Interface_pair(){};
+
     virtual int get_num_fixed_ele() const
     {return  num_fixed_ele;}
 
@@ -87,8 +89,6 @@ class Interface_pair
 
     virtual std::vector<int> get_rotated_interval_tag() const
     {return rotated_interval_tag;}
-
-    virtual ~Interface_pair(){};
 
   private:
     // 0: Lofted along an axis
