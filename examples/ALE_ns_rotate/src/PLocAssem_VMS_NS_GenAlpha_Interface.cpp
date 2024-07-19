@@ -183,7 +183,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
     // y-dir -- s
     Residual_s[A4+2] += gwts * (0.5 * ( NAs * (ps * nsy - vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      - pr * nry + vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nsy + (vr_z + wr_y) * nrz))
+      - pr * nry + vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
       - NAs_x * nsy * vis_mu * velo_jump.x()
       - (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.y()
       - NAs_z * nsy * vis_mu * velo_jump.z() )
@@ -191,7 +191,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
     // z-dir -- s
     Residual_s[A4+3] += gwts * (0.5 * ( NAs * (ps * nsz - vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      - pr * nrz + vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nsy + 2 * wr_z * nsz))
+      - pr * nrz + vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
       - NAs_x * nsz * vis_mu * velo_jump.x()
       - NAs_y * nsz * vis_mu * velo_jump.y()
       - (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * vis_mu * velo_jump.z() )
@@ -211,7 +211,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
     // y-dir -- r
     Residual_r[A4+2] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsy + vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nsy + (vr_z + wr_y) * nrz))
+      + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
       + NAr_x * nry * vis_mu * velo_jump.x()
       + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
       + NAr_z * nrz * vis_mu * velo_jump.z() )
@@ -219,7 +219,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
     // z-dir -- r
     Residual_r[A4+3] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsz + vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      + pr * nrz - vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nsy + 2 * wr_z * nsz))
+      + pr * nrz - vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
       + NAr_x * nrz * vis_mu * velo_jump.x()
       + NAr_y * nrz * vis_mu * velo_jump.y()
       + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * vis_mu * velo_jump.z() )
@@ -346,23 +346,23 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       - (2 * NAs_x * nsx + NAs_y * nsy + NAs_z + nsz) * vis_mu * velo_jump.x()
       - NAs_y * nsx * vis_mu * velo_jump.y()
       - NAs_z * nsx * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - inflow_s) * velo_jump.x());
+      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.x());
 
     // y-dir -- s
     Residual_s[A4+2] += gwts * (0.5 * ( NAs * (ps * nsy - vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      - pr * nry + vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nsy + (vr_z + wr_y) * nrz))
+      - pr * nry + vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
       - NAs_x * nsy * vis_mu * velo_jump.x()
       - (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.y()
       - NAs_z * nsy * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - inflow_s) * velo_jump.y());
+      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.y());
 
     // z-dir -- s
     Residual_s[A4+3] += gwts * (0.5 * ( NAs * (ps * nsz - vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      - pr * nrz + vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nsy + 2 * wr_z * nsz))
+      - pr * nrz + vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
       - NAs_x * nsz * vis_mu * velo_jump.x()
       - NAs_y * nsz * vis_mu * velo_jump.y()
       - (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - inflow_s) * velo_jump.z());
+      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.z());
 
 
     // Mass -- r
@@ -374,23 +374,23 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.x()
       + NAr_y * nrx * vis_mu * velo_jump.y()
       + NAr_z * nrx * vis_mu * velo_jump.z() )
-      + NAr * (inflow_r - tau_I) * velo_jump.x());
+      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.x());
 
     // y-dir -- r
     Residual_r[A4+2] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsy + vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nsy + (vr_z + wr_y) * nrz))
+      + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
       + NAr_x * nry * vis_mu * velo_jump.x()
       + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
       + NAr_z * nrz * vis_mu * velo_jump.z() )
-      + NAr * (inflow_r - tau_I) * velo_jump.y());
+      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.y());
 
     // z-dir -- r
     Residual_r[A4+3] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsz + vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      + pr * nrz - vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nsy + 2 * wr_z * nsz))
+      + pr * nrz - vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
       + NAr_x * nrz * vis_mu * velo_jump.x()
       + NAr_y * nrz * vis_mu * velo_jump.y()
       + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * vis_mu * velo_jump.z() )
-      + NAr * (inflow_r - tau_I) * velo_jump.z());
+      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.z());
 
     for(int B{0}; B<nLocBas; ++B)
     {
@@ -420,49 +420,49 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_ss[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
         -0.5 * vis_mu * (NAs * (2 * NBs_x * nsx + NBs_y * nsy + NBs_z * nsz)
                       + (2 * NAs_x * nsx + NAs_y * nsy + NAs_z * nsz) * NBs)
-        + NAsNBs * (tau_I - delta_s * velo_jump.x() * nsx - inflow_s) );
+        + NAsNBs * (tau_I - rho0 * (delta_s * velo_jump.x() * nsx + inflow_s)) );
 
       // Ks2s3
       Tangent_ss[nLocBas4 * (A4 + 1) + B4 + 2] += common_coef * (
-        -0.5 * vis_mu * (NAs * NBs_x * nsy + NAs_y * nsx * NBs) - NAsNBs * delta_s * velo_jump.x() * nsy );
+        -0.5 * vis_mu * (NAs * NBs_x * nsy + NAs_y * nsx * NBs) - NAsNBs * rho0 * delta_s * velo_jump.x() * nsy );
 
       // Ks2s4
       Tangent_ss[nLocBas4 * (A4 + 1) + B4 + 3] += common_coef * (
-        -0.5 * vis_mu * (NAs * NBs_x * nsz + NAs_z * nsx * NBs) - NAsNBs * delta_s * velo_jump.x() * nsz );
+        -0.5 * vis_mu * (NAs * NBs_x * nsz + NAs_z * nsx * NBs) - NAsNBs * rho0 * delta_s * velo_jump.x() * nsz );
 
       // Ks3s1
       Tangent_ss[nLocBas4 * (A4 + 2) + B4] += 0.5 * common_coef * NAsNBs * nsy;
 
       // Ks3s2
       Tangent_ss[nLocBas4 * (A4 + 2) + B4 + 1] += common_coef * (
-        -0.5 * vis_mu * (NAs * NBs_y * nsx + NAs_x * nsy * NBs) - NAsNBs * delta_s * velo_jump.y() * nsx );
+        -0.5 * vis_mu * (NAs * NBs_y * nsx + NAs_x * nsy * NBs) - NAsNBs * rho0 * delta_s * velo_jump.y() * nsx );
 
       // Ks3s3
       Tangent_ss[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * (
         -0.5 * vis_mu * (NAs * (NBs_x * nsx + 2 * NBs_y * nsy + NBs_z * nsz)
                       + (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * NBs)
-        + NAsNBs * (tau_I - delta_s * velo_jump.y() * nsy - inflow_s) );
+        + NAsNBs * (tau_I - rho0 * (delta_s * velo_jump.y() * nsy + inflow_s)) );
 
       // Ks3s4
       Tangent_ss[nLocBas4 * (A4 + 2) + B4 + 3] += common_coef * (
-        -0.5 * vis_mu * (NAs * NBs_y * nsz + NAs_z * nsy * NBs) - NAsNBs * delta_s * velo_jump.y() * nsz );
+        -0.5 * vis_mu * (NAs * NBs_y * nsz + NAs_z * nsy * NBs) - NAsNBs * rho0 * delta_s * velo_jump.y() * nsz );
 
       // Ks4s1
       Tangent_ss[nLocBas4 * (A4 + 3) + B4] += 0.5 * common_coef * NAsNBs * nsz;
 
       // Ks4s2
       Tangent_ss[nLocBas4 * (A4 + 3) + B4 + 1] += common_coef * (
-        -0.5 * vis_mu * (NAs * NBs_z * nsx + NAs_x * nsz * NBs) - NAsNBs * delta_s * velo_jump.z() * nsx );
+        -0.5 * vis_mu * (NAs * NBs_z * nsx + NAs_x * nsz * NBs) - NAsNBs * rho0 * delta_s * velo_jump.z() * nsx );
 
       // Ks4s3
       Tangent_ss[nLocBas4 * (A4 + 3) + B4 + 2] += common_coef * (
-        -0.5 * vis_mu * (NAs * NBs_z * nsy + NAs_y * nsz * NBs) - NAsNBs * delta_s * velo_jump.z() * nsy );
+        -0.5 * vis_mu * (NAs * NBs_z * nsy + NAs_y * nsz * NBs) - NAsNBs * rho0 * delta_s * velo_jump.z() * nsy );
 
       // Ks4s4
       Tangent_ss[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * (
         -0.5 * vis_mu * (NAs * (NBs_x * nsx + NBs_y * nsy + 2 * NBs_z * nsz)
                       + (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * NBs)
-        + NAsNBs * (tau_I - delta_s * velo_jump.z() * nsz - inflow_s) );
+        + NAsNBs * (tau_I - rho0 * (delta_s * velo_jump.z() * nsz + inflow_s)) );
 
       // Ks1r1
       // Tangent_sr[nLocBas4 * A4 + B4] += 0;
@@ -483,7 +483,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_sr[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
         0.5 * vis_mu * (NAs * (2 * NBr_x * nrx + NBr_y * nry + NBr_z * nrz)
                      + (2 * NAs_x * nsx + NAs_y * nsy + NAs_z * nsz) * NBr)
-        + NAsNBr * (inflow_s - tau_I) );
+        + NAsNBr * (rho0 * inflow_s - tau_I) );
 
       // Ks2r3
       Tangent_sr[nLocBas4 * (A4 + 1) + B4 + 2] += 0.5 * common_coef * vis_mu * (
@@ -504,7 +504,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_sr[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * (
         0.5 * vis_mu * (NAs * (NBr_x * nrx + 2 * NBr_y * nry + NBr_z * nrz)
                      + (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * NBr)
-        + NAsNBr * (inflow_s - tau_I) );
+        + NAsNBr * (rho0 * inflow_s - tau_I) );
 
       // Ks3r4
       Tangent_sr[nLocBas4 * (A4 + 2) + B4 + 3] += 0.5 * common_coef * vis_mu * (
@@ -525,7 +525,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_sr[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * (
         0.5 * vis_mu * (NAs * (NBr_x * nrx + NBr_y * nry + 2 * NBr_z * nrz)
                      + (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * NBr)
-        + NAsNBr * (inflow_s - tau_I) );
+        + NAsNBr * (rho0 * inflow_s - tau_I) );
 
       // Kr1s1
       // Tangent_rs[nLocBas4 * A4 + B4] += 0;
@@ -546,7 +546,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
         0.5 * vis_mu * (NAr * (2 * NBs_x * nsx + NBs_y * nsy + NBs_z * nsx)
                      + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * NBs)
-        + NArNBs * (inflow_r - tau_I) );
+        + NArNBs * (rho0 * inflow_r - tau_I) );
 
       // Kr2s3
       Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 2] += 0.5 * common_coef * vis_mu * (
@@ -567,7 +567,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * (
         0.5 * vis_mu * (NAr * (NBs_x * nsx + 2 * NBs_y * nsy + NBs_z * nsz)
                      + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * NBs)
-        + NArNBs * (inflow_r - tau_I) );
+        + NArNBs * (rho0 * inflow_r - tau_I) );
       
       // Kr3s4
       Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 3] += 0.5 * common_coef * vis_mu * (
@@ -588,7 +588,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 2] += common_coef * (
         0.5 * vis_mu * (NAr * (NBs_x * nsx + NBs_y * nsy + 2 * NBs_z * nsz)
                      + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBs)
-        + NArNBs * (inflow_r - tau_I) );
+        + NArNBs * (rho0 * inflow_r - tau_I) );
 
       // Kr1r1
       // Tangent_rr[nLocBas4 * A4 + B4] += 0;
@@ -609,50 +609,50 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_rr[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
         -0.5 * vis_mu * (NAr * (2 * NBr_x * nrx + NBr_y * nry + NBr_z * nrz)
                       + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * NBr)
-        + NArNBr * (tau_I + delta_r * velo_jump.x() * nrx - inflow_r) );
+        + NArNBr * (tau_I + rho0 * (delta_r * velo_jump.x() * nrx - inflow_r)) );
       // velo_jump is Us - Ur, so here is 'tau_I + ...'
 
       // Kr2r3
       Tangent_rr[nLocBas4 * (A4 + 1) + B4 + 2] += common_coef * (
-        -0.5 * vis_mu * (NAr * NBr_x * nry + NAr_y * nrx * NBr) + NArNBr * delta_r * velo_jump.x() * nry );
+        -0.5 * vis_mu * (NAr * NBr_x * nry + NAr_y * nrx * NBr) + NArNBr * rho0 * delta_r * velo_jump.x() * nry );
 
       // Kr2r4
       Tangent_rr[nLocBas4 * (A4 + 1) + B4 + 3] += common_coef * (
-        -0.5 * vis_mu * (NAr * NBr_x * nrz + NAr_z * nrx * NBr) + NArNBr * delta_r * velo_jump.x() * nrz );
+        -0.5 * vis_mu * (NAr * NBr_x * nrz + NAr_z * nrx * NBr) + NArNBr * rho0 * delta_r * velo_jump.x() * nrz );
 
       // Kr3r1
       Tangent_rr[nLocBas4 * (A4 + 2) + B4] += 0.5 * common_coef * NArNBr * nry;
 
       // Kr3r2
       Tangent_rr[nLocBas4 * (A4 + 2) + B4 + 1] += common_coef * (
-        -0.5 * vis_mu * (NAr * NBr_y * nrx + NAr_x * nry * NBr) + NArNBr * delta_r * velo_jump.y() * nrx );
+        -0.5 * vis_mu * (NAr * NBr_y * nrx + NAr_x * nry * NBr) + NArNBr * rho0 * delta_r * velo_jump.y() * nrx );
 
       // Kr3r3
       Tangent_rr[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * (
         -0.5 * vis_mu * (NAr * (NBr_x * nrx + 2 * NBr_y * nry + NBr_z * nrz)
                       + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * NBr)
-        + NArNBr * (tau_I + delta_r * velo_jump.y() * nry - inflow_r) );
+        + NArNBr * (tau_I + rho0 * (delta_r * velo_jump.y() * nry - inflow_r)) );
 
       // Kr3r4
       Tangent_rr[nLocBas4 * (A4 + 2) + B4 + 3] += common_coef * (
-        -0.5 * vis_mu * (NAr * NBr_y * nrz + NAr_z * nry * NBr) + NArNBr * delta_r * velo_jump.y() * nrz );
+        -0.5 * vis_mu * (NAr * NBr_y * nrz + NAr_z * nry * NBr) + NArNBr * rho0 * delta_r * velo_jump.y() * nrz );
 
       // Kr4r1
       Tangent_rr[nLocBas4 * (A4 + 3) + B4] += 0.5 * common_coef * NArNBr * nrz;
 
       // Kr4r2
       Tangent_rr[nLocBas4 * (A4 + 3) + B4 + 1] += common_coef * (
-        -0.5 * vis_mu * (NAr * NBr_z * nrx + NAr_x * nrz * NBr) + NArNBr * delta_r * velo_jump.z() * nrx );
+        -0.5 * vis_mu * (NAr * NBr_z * nrx + NAr_x * nrz * NBr) + NArNBr * rho0 * delta_r * velo_jump.z() * nrx );
 
       // Kr4r3
       Tangent_rr[nLocBas4 * (A4 + 3) + B4 + 2] += common_coef * (
-        -0.5 * vis_mu * (NAr * NBr_z * nry + NAr_y * nrz * NBr) + NArNBr * delta_r * velo_jump.z() * nry );
+        -0.5 * vis_mu * (NAr * NBr_z * nry + NAr_y * nrz * NBr) + NArNBr * rho0 * delta_r * velo_jump.z() * nry );
 
       // Kr4r4
       Tangent_rr[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * (
         -0.5 * vis_mu * (NAr * (NBr_x * nrx + NBr_y * nry + 2 * NBr_z * nrz)
                       + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBr)
-        + NArNBr * (tau_I + delta_r * velo_jump.z() * nrz - inflow_r) );
+        + NArNBr * (tau_I + rho0 * (delta_r * velo_jump.z() * nrz - inflow_r)) );
     }
   }
 }
