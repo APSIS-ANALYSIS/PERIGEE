@@ -236,7 +236,7 @@ namespace FE_T
       QuadPts_on_face(const int &vol_elemType, const int &face_id, 
           const IQuadPts * const lower_quad_rule);
 
-      ~QuadPts_on_face();
+      ~QuadPts_on_face() = default;
 
       virtual void print_info() const;
 

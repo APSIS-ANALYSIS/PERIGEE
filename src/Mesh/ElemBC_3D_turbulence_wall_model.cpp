@@ -72,9 +72,4 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
     ; // The weak_list is empty and the wall file was put in the dir_list. Strongly enforced Dirichlet BC will be appiled.
 }
 
-ElemBC_3D_turbulence_wall_model::~ElemBC_3D_turbulence_wall_model()
-{
-  face_id.clear();
-}
-
 // EOF

@@ -693,11 +693,6 @@ namespace FE_T
       SYS_T::print_fatal("Error: FE_T::QuadPts_on_face, unknown element type.\n");
   }
 
-  QuadPts_on_face::~QuadPts_on_face()
-  {
-    VEC_T::clean(qp);
-  }
-
   void QuadPts_on_face::print_info() const
   {
     SYS_T::commPrint("====== Gauss Points on Face =======\n");
