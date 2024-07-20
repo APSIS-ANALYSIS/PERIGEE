@@ -187,12 +187,16 @@ namespace HEX_T
 
       virtual ~Hex8();
       
-      // Changes the gindex array only. It is used to determine the face index, 
+      // Update the gindex array only. It is used to determine the face index, 
       // e.g. in ElemBC_3D::resetSurIEN_outwardnormal function.
       void reset( const int &ien0, const int &ien1,
           const int &ien2, const int &ien3, const int &ien4,
           const int &ien5, const int &ien6, const int &ien7 );
 
+      void reset( const std::array<int,8> &ienval )
+      { reset(ienval[0], ienval[1], ienval[2],ienval[3], ienval[4], ienval[5], ienval[6], ienval[7]); }
+
+      // Update the value of gindex and pts
       void reset( const std::vector<double> &ctrlPts,
           const IIEN * const &ien_ptr, const int &ee );
 
@@ -208,6 +212,9 @@ namespace HEX_T
 
       // Given the face node IEN indices, determine the face id
       int get_face_id(const int &n0, const int &n1, const int &n2, const int &n3) const;
+
+      int get_face_id( const std::array<int,4> &nn ) const
+      { get_face_id(nn[0], nn[1], nn[2], nn[3]); }
 
     private:
       std::array<Vector_3, 8> pts;
