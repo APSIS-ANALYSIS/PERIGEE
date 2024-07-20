@@ -844,7 +844,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
   {
     const std::vector<double> R = element->get_R(qua);
 
-    double surface_area, factor;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -859,8 +859,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
     const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
 
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
+    const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -892,7 +891,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
   {
     const std::vector<double> R = element->get_R(qua);
 
-    double surface_area, factor;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
@@ -906,8 +905,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
     const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
 
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
+    const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
     const double gwts = surface_area * quad -> get_qw(qua);
 
@@ -951,15 +949,15 @@ double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += sol[ii*4+1] * R[ii];
-      v += sol[ii*4+2] * R[ii];
-      w += sol[ii*4+3] * R[ii];
+      velo.x() += sol[ii*4+1] * R[ii];
+      velo.y() += sol[ii*4+2] * R[ii];
+      velo.z() += sol[ii*4+3] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
+    flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
   }
 
   return flrate;
