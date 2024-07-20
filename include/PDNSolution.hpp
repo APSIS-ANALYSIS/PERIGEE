@@ -168,14 +168,6 @@ class PDNSolution
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
 
-    virtual void randomly_perturbed_parabolic_inflow( const double &std_dev,
-        const APart_Node * const &pNode,
-        const FEANode * const &fNode,
-        const ALocal_InflowBC * const &infbc )
-    {
-      SYS_T::print_fatal("Error: PDNSolution::randomly_perturbed_parabolic_inflow is not implemented.\n");
-    } 
-
   protected:
     // ------------------------------------------------------------------------
     // dof_num default value is apart_node -> get_dof, but user may reset its value.
