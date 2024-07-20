@@ -27,8 +27,7 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
 
         const int cell_gi = get_global_cell(0, ee);
 
-        const std::array<int,4> tet_n {{ VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                             VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) }};
+        const std::array<int,4> tet_n = VIEN->get_IEN_array4( cell_gi );
         
         tetcell->reset( tet_n );
 
@@ -53,10 +52,7 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
         
         const int cell_gi = get_global_cell(0, ee);
 
-        const std::array<int,8> hex_n {{ VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                                         VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3),
-                                         VIEN->get_IEN(cell_gi, 4), VIEN->get_IEN(cell_gi, 5),
-                                         VIEN->get_IEN(cell_gi, 6), VIEN->get_IEN(cell_gi, 7) }};
+        const std::array<int,8> hex_n = VIEN->get_IEN_array8( cell_gi );
         
         hexcell->reset( hex_n );
 
