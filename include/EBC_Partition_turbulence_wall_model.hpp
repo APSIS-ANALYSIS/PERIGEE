@@ -19,7 +19,7 @@ class EBC_Partition_turbulence_wall_model : public EBC_Partition
         const Map_Node_Index * const &mnidex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_turbulence_wall_model();
+    virtual ~EBC_Partition_turbulence_wall_model() = default;
 
     // write the data to hdf5 file in folder /weak
     virtual void write_hdf5( const std::string &FileName ) const;

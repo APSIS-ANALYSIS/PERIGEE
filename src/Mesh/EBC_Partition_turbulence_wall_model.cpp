@@ -38,12 +38,6 @@ EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const I
   SYS_T::print_fatal_if( num_local_cell[0] != VEC_T::get_size(part_vol_ele_id), "Error: EBC_Partition_turbulence_wall_model the part_vol_ele_id vector size does not match with the number of local cell given in EBC_Partition.\n" ); 
 }
 
-EBC_Partition_turbulence_wall_model::~EBC_Partition_turbulence_wall_model()
-{
-  part_vol_ele_id.clear();
-  ele_face_id.clear();
-}
-
 void EBC_Partition_turbulence_wall_model::write_hdf5(const std::string &FileName) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
