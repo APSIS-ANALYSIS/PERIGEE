@@ -69,7 +69,8 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
       SYS_T::print_fatal("Error: ElemBC_3D_turbulence_wall_model, unknown element type.\n");
   }
   else
-    ; // The weak_list is empty and the wall file was put in the dir_list. Strongly enforced Dirichlet BC will be appiled.
+    SYS_T::commPrint("Warning: there is no geometry file provided for the ElemBC_3D_turbulence_wall_model class. \n" );
+
 }
 
 // EOF
