@@ -765,7 +765,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -787,9 +787,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
+      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
+      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
+      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
     }
   }
 }
@@ -809,7 +809,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
   double surface_area;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -819,9 +819,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
-      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
-      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
+      sur_Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
+      sur_Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
+      sur_Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }
