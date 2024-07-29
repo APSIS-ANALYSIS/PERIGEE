@@ -827,7 +827,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -845,36 +844,34 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
   {
     const std::vector<double> R = element->get_R(qua);
 
-    double surface_area, factor;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
       const int ii4 = ii * 4;
-      u += sol[ii4+1] * R[ii];
-      v += sol[ii4+2] * R[ii];
-      w += sol[ii4+3] * R[ii];
+      velo.x() += sol[ii4+1] * R[ii];
+      velo.y() += sol[ii4+2] * R[ii];
+      velo.z() += sol[ii4+3] * R[ii];
     }
 
-    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
+    const double temp = Vec3::dot_product( velo, n_out );
 
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
+    const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
-      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
-      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
+      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.x();
+      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.y();
+      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.z();
     }
   }
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -894,22 +891,21 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
   {
     const std::vector<double> R = element->get_R(qua);
 
-    double surface_area, factor;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += sol[ii*4+1] * R[ii];
-      v += sol[ii*4+2] * R[ii];
-      w += sol[ii*4+3] * R[ii];
+      velo.x() += sol[ii*4+1] * R[ii];
+      velo.y() += sol[ii*4+2] * R[ii];
+      velo.z() += sol[ii*4+3] * R[ii];
     }
 
-    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
+    const double temp = Vec3::dot_product( velo, n_out );
 
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
+    const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
     const double gwts = surface_area * quad -> get_qw(qua);
 
@@ -917,9 +913,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     //            6 for quadratic tri element
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
-      sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
-      sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
+      sur_Residual[4*A+1] -= gwts * R[A] * factor * velo.x();
+      sur_Residual[4*A+2] -= gwts * R[A] * factor * velo.y();
+      sur_Residual[4*A+3] -= gwts * R[A] * factor * velo.z();
 
       for(int B=0; B<snLocBas; ++B)
       {
@@ -953,15 +949,15 @@ double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += sol[ii*4+1] * R[ii];
-      v += sol[ii*4+2] * R[ii];
-      w += sol[ii*4+3] * R[ii];
+      velo.x() += sol[ii*4+1] * R[ii];
+      velo.y() += sol[ii*4+2] * R[ii];
+      velo.z() += sol[ii*4+3] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
+    flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
   }
 
   return flrate;
