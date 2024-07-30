@@ -31,11 +31,11 @@ EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const I
         VEC_T::insert_end(ele_face_id, temp_ele_face_id);
       }
     }
+
+    SYS_T::print_fatal_if( num_local_cell[0] != VEC_T::get_size(part_vol_ele_id), "Error: EBC_Partition_turbulence_wall_model the part_vol_ele_id vector size does not match with the number of local cell given in EBC_Partition.\n" ); 
   }
   else
     SYS_T::print_fatal("Error: EBC_Partition_turbulence_wall_model, unknown wall model type.\n");
-
-  SYS_T::print_fatal_if( num_local_cell[0] != VEC_T::get_size(part_vol_ele_id), "Error: EBC_Partition_turbulence_wall_model the part_vol_ele_id vector size does not match with the number of local cell given in EBC_Partition.\n" ); 
 }
 
 EBC_Partition_turbulence_wall_model::~EBC_Partition_turbulence_wall_model()
