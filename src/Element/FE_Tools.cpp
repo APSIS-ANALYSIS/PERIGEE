@@ -121,7 +121,7 @@ void FE_T::get_tet_sphere_info( const double &x0, const double &x1,
   r = std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
 }
 
-double FE_T::get_tet_sphere_info( const double &x0, const double &x1,
+double FE_T::get_tet_sphere_radius( const double &x0, const double &x1,
     const double &x2, const double &x3, const double &y0,
     const double &y1, const double &y2, const double &y3,
     const double &z0, const double &z1, const double &z2,
@@ -135,14 +135,14 @@ double FE_T::get_tet_sphere_info( const double &x0, const double &x1,
   AA.LU_fac();
 
   const double xyz2 = x0*x0 + y0*y0 + z0*z0;
-  double x {0}, y {0}, z {0};
+  double xx {0}, yy {0}, zz {0};
 
   AA.LU_solve( x1*x1 + y1*y1 + z1*z1 - xyz2,
       x2*x2 + y2*y2 + z2*z2 - xyz2,
       x3*x3 + y3*y3 + z3*z3 - xyz2,
-      x, y, z );
+      xx, yy, zz );
 
-  return std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
+  return std::sqrt( (xx-x0)*(xx-x0) + (yy-y0)*(yy-y0) + (zz-z0)*(zz-z0) );
 }
 
 
