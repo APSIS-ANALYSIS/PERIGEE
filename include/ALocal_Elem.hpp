@@ -59,7 +59,7 @@ class ALocal_Elem
     {
       // if( isTagged ) return elem_tag[ee];
       // else return 0;
-	  ASSERT(isTagged, "Error: get_elem_tag function 'isTagged' is faluse.\n");
+	  ASSERT(isTagged, "Error: get_elem_tag function 'isTagged' is false.\n");
       return elem_tag[ee];
     }
 
