@@ -27,7 +27,7 @@ int main( int argc, char * argv[] )
 
   Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
 
-  if( isFSI ) GIO -> check_FSI_ordering();
+  // if( isFSI ) GIO -> check_FSI_ordering();
 
   GIO -> print_info();
 

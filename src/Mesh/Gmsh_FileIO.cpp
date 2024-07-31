@@ -795,7 +795,6 @@ void Gmsh_FileIO::write_solid_vtu( const std::string &in_fname,
     for(int ee=0; ee<phy_3d_nElem[ii]; ++ee)
       local_cell_idx[ee] = start_eindex + ee;
     VEC_T::insert_end( solid_cell_idx, local_cell_idx );
-    std::cout << "Number of elements of solid " << ii << " : " << phy_3d_nElem[ii] <<  std::endl;
     snElem += phy_3d_nElem[ii];
 
     // generate physics tag
@@ -805,7 +804,6 @@ void Gmsh_FileIO::write_solid_vtu( const std::string &in_fname,
     const int domain_index = phy_3d_index[ii];
     std::vector<int> local_node_idx = eIEN[ domain_index ];
     VEC_T::sort_unique_resize( local_node_idx );
-    std::cout << "Number of nodes of solid " << ii << " : " << VEC_T::get_size(local_node_idx) <<  std::endl;
     VEC_T::insert_end( solid_node_idx, local_node_idx );
 
     VEC_T::insert_end(sIEN, eIEN[domain_index]);
@@ -834,12 +832,6 @@ void Gmsh_FileIO::write_solid_vtu( const std::string &in_fname,
       domain_IEN[ ee * nloc + jj ] = VEC_T::get_pos( solid_node_idx, target );
     }
   }
-
-  std::cout << "Number of solid elements : " << snElem << std::endl;
-  std::cout << "Number of solid nodes : " << num_solid_node << std::endl;
-  std::vector<int> temp = domain_IEN;
-  VEC_T::sort_unique_resize(temp);
-  std::cout << "Number of solid IEN : " << VEC_T::get_size(temp) << std::endl;
 
   // write the solid domain's vtk/vtu file
   // the subdomain element index start with the start_eindex
