@@ -14,8 +14,14 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
 
   isTagged = h5r -> check_data("/Local_Elem/elem_phy_tag");
 
-  if( isTagged )
+  int elem_tag_length {0};
+
+  if( isTagged ){
     elem_tag = h5r->read_intVector("/Local_Elem", "elem_phy_tag");
+
+	elem_tag_length = VEC_T::get_size( elem_tag );
+    SYS_T::print_fatal_if( elem_tag_length != nlocalele, "Error: ALocal_Elem::ALocal_Elem function elem_tag_length is not equal to nlocalele.\n");
+  }
   else
     elem_tag.clear();
     
