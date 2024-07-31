@@ -728,7 +728,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
     const double &sol_time,
     const std::string &outputBName,
     const std::string &outputName,
-    const bool &isXML
+    const bool &isXML,
     const int &num_layer )
 {
   if(nLocBas == 4)  // elemType 501

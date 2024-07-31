@@ -584,7 +584,7 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_file_list = geo_s_file_in;
-  VEC_T::insert_end( meshdir_file_list, geo_ilt_file );
+  geo_s_file_in.push_back( geo_ilt_file );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 

@@ -113,7 +113,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check( sur_ilt_file_interior_wall );
   std::cout<<sur_ilt_file_interior_wall<<" found. \n";
   wall_node_id[num_layer] = VTK_T::read_int_PointData( sur_ilt_file_interior_wall, "GlobalNodeID" );
-  nFunc_interface[num_layer] = static_cast<int>( wall_node_id[ii].size() );
+  nFunc_interface[num_layer] = static_cast<int>( wall_node_id[num_layer].size() );
   nFunc_p += nFunc_interface[num_layer];
   layer_offset[0] = 0;
   for(int ii=1; ii<num_layer+1; ++ii)

@@ -460,14 +460,14 @@ int main( int argc, char *argv[] )
       
     if( ilt_nu == 0.5 )
     {
-      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
-      matmodel[num_layer] = new MaterialModel_GOH06_ST91_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
