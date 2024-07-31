@@ -101,11 +101,9 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( lien_p -> get_LIEN(ee,ii) );
 
-    int phy_tag = alelem_ptr->get_elem_tag(ee);
-    if( phy_tag > 0 )
+    const int phy_tag = alelem_ptr->get_elem_tag(ee) - 1;
+    if( phy_tag > -1 )
     {
-      --phy_tag;
-
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Tangent00, ADD_VALUES);
 
       MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr[phy_tag]->Tangent01, ADD_VALUES);
@@ -347,13 +345,12 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
 
-    int phy_tag = alelem_ptr->get_elem_tag(ee);
+    const int phy_tag = alelem_ptr->get_elem_tag(ee) - 1;
 
-    if( phy_tag>0 )
+    if( phy_tag>-1 )
     {
       if( phy_tag == num_layer )
       {
-        --phy_tag;
         const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
         lassem_s_ptr[phy_tag] -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], 
@@ -362,7 +359,6 @@ void PGAssem_Wall_Prestress::Assem_Residual(
       }
       else
       {
-        --phy_tag;
         const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
         // For solid element, the direction basis includes 3 Vector_3 for each node.
@@ -470,13 +466,12 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
 
 
-    int phy_tag = alelem_ptr->get_elem_tag(ee);
+    const int phy_tag = alelem_ptr->get_elem_tag(ee) - 1;
 
-    if( phy_tag>0 )
+    if( phy_tag>-1 )
     {
       if( phy_tag == num_layer )
       {
-        --phy_tag;
         const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
         lassem_s_ptr[phy_tag] -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
@@ -485,7 +480,6 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
       }
       else
       {
-        --phy_tag;
         const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
         // For solid element, the direction basis includes 3 Vector_3 for each node.
@@ -559,11 +553,10 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
 
   for( int ee =0; ee < nElem; ++ee )
   {
-    int phy_tag = alelem_ptr->get_elem_tag(ee);
+    const int phy_tag = alelem_ptr->get_elem_tag(ee) - 1;
 
-    if( phy_tag>0 )
+    if( phy_tag>-1 )
     {
-      --phy_tag;
       const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
       const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
