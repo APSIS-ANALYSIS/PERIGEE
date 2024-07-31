@@ -117,7 +117,7 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   const int nElem = alelem_ptr->get_nlocalele();
 
   lassem_f_ptr->Assem_Estimate();
-  for (int ii=0; ii<num_layer; ++ii)
+  for (int ii=0; ii<num_layer+1; ++ii)
     lassem_s_ptr[ii]->Assem_Estimate();
 
   PetscInt * row_id_v = new PetscInt [3*nLocBas];

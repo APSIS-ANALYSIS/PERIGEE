@@ -580,7 +580,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("Material model of solid %d :\n", num_layer);
   if( ilt_nu == 0.5 )
   {
-    matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+    matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
 
     locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
         matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
