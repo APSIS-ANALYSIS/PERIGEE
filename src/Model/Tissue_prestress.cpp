@@ -13,7 +13,7 @@ Tissue_prestress::Tissue_prestress(
   for(int ee=0; ee<nlocalele; ++ee)
   {
     if( locelem->get_elem_tag(ee) == 0 ) qua_prestress[ee].clear();
-    else if( locelem->get_elem_tag(ee) > 0 && locelem->get_elem_tag(ee) <= num_layer )
+    else if( locelem->get_elem_tag(ee) > 0 && locelem->get_elem_tag(ee) <= num_layer+1 )
     {
       qua_prestress[ee].resize(nqp * 6);
       counter_elem_s += 1;
