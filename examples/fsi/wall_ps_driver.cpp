@@ -225,7 +225,7 @@ int main( int argc, char *argv[] )
   if( is_read_material )
   {
     SYS_T::commPrint(    "-is_read_material: true \n");
-    for (int ii=0; ii<num_layer; ++ii)
+    for (int ii=0; ii<num_layer+1; ++ii)
     {
       std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";
       SYS_T::file_check( matmodel_file_name.c_str() );
@@ -580,7 +580,7 @@ int main( int argc, char *argv[] )
   delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
   delete timeinfo; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  for (int ii = 0; ii<num_layer; ++ii)
+  for (int ii = 0; ii<num_layer+1; ++ii)
   {
     delete locAssem_solid_ptr[ii];
     delete matmodel[ii];

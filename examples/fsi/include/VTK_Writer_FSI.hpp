@@ -79,7 +79,8 @@ class VTK_Writer_FSI
     	const double &sol_time,
     	const std::string &outputBName,
     	const std::string &outputName,
-    	const bool &isXML );
+    	const bool &isXML
+        const int &num_layer );
    
     void writeOutput_solid_ref(
     	const FEANode * const &fnode_ptr,
@@ -132,6 +133,13 @@ class VTK_Writer_FSI
         IMaterialModel * const &model,
         vtkDoubleArray * const &vtkData );
     
+    void interpolateVonStress( const int &ptoffset,
+        const std::vector<double> &inputDisp,
+        const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
+        vtkDoubleArray * const &vtkData );
+    
     // --------------------------------------------------------------
     // Interpolate Cauchy stress at elements
     // --------------------------------------------------------------
@@ -139,6 +147,13 @@ class VTK_Writer_FSI
 	    const std::vector<Vector_3> &eleBasis_r,
         const std::vector<Vector_3> &eleBasis_c,
         const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<double> &inputDisp,
+        const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
+        vtkDoubleArray * const &vtkData );
+    
+    void interpolateCauchyStress( const int &ptoffset,
         const std::vector<double> &inputDisp,
         const std::vector<double> &inputPres,
         const FEAElement * const &elem,
