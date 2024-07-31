@@ -121,6 +121,31 @@ void FE_T::get_tet_sphere_info( const double &x0, const double &x1,
   r = std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
 }
 
+double FE_T::get_tet_sphere_info( const double &x0, const double &x1,
+    const double &x2, const double &x3, const double &y0,
+    const double &y1, const double &y2, const double &y3,
+    const double &z0, const double &z1, const double &z2,
+    const double &z3 )
+{
+  FE_T::Matrix_double_3by3_Array AA(
+      2.0 * (x1-x0), 2.0 * (y1-y0), 2.0 * (z1-z0),
+      2.0 * (x2-x0), 2.0 * (y2-y0), 2.0 * (z2-z0),
+      2.0 * (x3-x0), 2.0 * (y3-y0), 2.0 * (z3-z0) );
+
+  AA.LU_fac();
+
+  const double xyz2 = x0*x0 + y0*y0 + z0*z0;
+  double x {0}, y {0}, z {0};
+
+  AA.LU_solve( x1*x1 + y1*y1 + z1*z1 - xyz2,
+      x2*x2 + y2*y2 + z2*z2 - xyz2,
+      x3*x3 + y3*y3 + z3*z3 - xyz2,
+      x, y, z );
+
+  return std::sqrt( (x-x0)*(x-x0) + (y-y0)*(y-y0) + (z-z0)*(z-z0) );
+}
+
+
 Vector_3 FE_T::get_tet_sphere_info( const Vector_3 &pt0,
     const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3, 
     double &radius ) 

@@ -34,6 +34,13 @@ namespace FE_T
       const double &z0, const double &z1, const double &z2, 
       const double &z3, double &x, double &y, double &z, double &r );
 
+   double get_tet_sphere_info( const double &x0, const double &x1,
+      const double &x2, const double &x3, const double &y0,
+      const double &y1, const double &y2, const double &y3,
+      const double &z0, const double &z1, const double &z2,
+      const double &z3 );
+
+
   Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
 
