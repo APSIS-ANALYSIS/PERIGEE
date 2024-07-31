@@ -63,6 +63,21 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const std::vector<Vector_3> &eleBasis_r,
         const std::vector<Vector_3> &eleBasis_c,
         const std::vector<Vector_3> &eleBasis_l );
+    
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -81,6 +96,21 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const std::vector<Vector_3> &eleBasis_r,
         const std::vector<Vector_3> &eleBasis_c,
         const std::vector<Vector_3> &eleBasis_l );
+    
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad );
  
     virtual void Assem_Mass_Residual(
         const double * const &disp,
@@ -95,6 +125,17 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const std::vector<Vector_3> &eleBasis_r,
         const std::vector<Vector_3> &eleBasis_c,
         const std::vector<Vector_3> &eleBasis_l );
+    
+     virtual void Assem_Mass_Residual(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
+        const IQuadPts * const &quad );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
@@ -129,6 +170,15 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const std::vector<Vector_3> &eleBasis_r,
         const std::vector<Vector_3> &eleBasis_c,
         const std::vector<Vector_3> &eleBasis_l ) const;
+
+    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
+        const double * const &disp,
+        const double * const &pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad ) const;
 
   private:
     const double rho0, alpha_f, alpha_m, gamma;

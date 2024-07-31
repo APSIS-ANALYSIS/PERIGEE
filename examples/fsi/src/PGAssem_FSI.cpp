@@ -245,6 +245,22 @@ void PGAssem_FSI::Assem_mass_residual(
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
     }
+    else if( phy_tag == num_layer)
+    {
+      --phy_tag;
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+
+      lassem_s_ptr[phy_tag]->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
+
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Tangent00, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr[phy_tag]->Tangent11, ADD_VALUES);
+
+      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Residual0, ADD_VALUES);
+    }
     else
     {
       --phy_tag;
@@ -369,6 +385,19 @@ void PGAssem_FSI::Assem_Residual(
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
+    }
+    else if( phy_tag == num_layer )
+    {
+      --phy_tag;
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+
+      lassem_s_ptr[phy_tag] -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+
+      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr[phy_tag]->Residual1, ADD_VALUES);
     }
     else
     {
@@ -505,6 +534,27 @@ void PGAssem_FSI::Assem_Tangent_Residual(
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
+    }
+    else if( phy_tag == num_layer )
+    {
+      --phy_tag;
+      // For solid element, quaprestress will return a vector of length nqp x 6
+      // for the prestress values at the quadrature points
+      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+
+      lassem_s_ptr[phy_tag] -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v);
+
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Tangent00, ADD_VALUES);
+
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr[phy_tag]->Tangent01, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Tangent10, ADD_VALUES);
+
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr[phy_tag]->Tangent11, ADD_VALUES);
+
+      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr[phy_tag]->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr[phy_tag]->Residual1, ADD_VALUES);
     }
     else
     {
