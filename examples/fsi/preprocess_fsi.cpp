@@ -59,6 +59,7 @@ int main( int argc, char * argv[] )
   const std::string geo_file                  = paras["geo_file"].as<std::string>();
   const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
   const std::string geo_ws_file               = paras["geo_ws_file"].as<std::string>();
+  const std::string geo_ilt_file              = paras["geo_ilt_file"].as<std::string>();
   const std::string geo_s_file_base           = paras["geo_s_file_base"].as<std::string>();
 
   const std::string sur_f_file_wall           = paras["sur_f_file_wall"].as<std::string>();
@@ -69,6 +70,7 @@ int main( int argc, char * argv[] )
   const std::string sur_s_file_wall_base             = paras["sur_s_file_wall_base"].as<std::string>();
   const std::vector<std::string> sur_s_file_in_base  = paras["sur_s_file_in_base"].as<std::vector<std::string>>();
   const std::vector<std::string> sur_s_file_out_base = paras["sur_s_file_out_base"].as<std::vector<std::string>>();
+  const std::string sur_ilt_file_interior_wall       = paras["sur_ilt_file_interior_wall"].as<std::string>();
 
   const std::string part_file_p               = paras["part_file_p"].as<std::string>();
   const std::string part_file_v               = paras["part_file_v"].as<std::string>();
@@ -104,6 +106,9 @@ int main( int argc, char * argv[] )
     std::cout<<" -sur_s_file_in_base: "  << "layer " << ii << " : " <<sur_s_file_in_base[ii]  <<std::endl;
     std::cout<<" -sur_s_file_out_base: " << "layer " << ii << " : " <<sur_s_file_out_base[ii] <<std::endl;
   }
+  std::cout<<" -isILT: true \n";
+  std::cout<<" -geo_ilt_file: "     <<geo_ilt_file       <<std::endl;
+  std::cout<<" -sur_ilt_file_interior_wall" << sur_ilt_file_interior_wall << std::endl;
   std::cout<<" -cpu_size: "           <<cpu_size           <<std::endl;
   std::cout<<" -in_ncommon: "         <<in_ncommon         <<std::endl;
   if(isDualGraph) std::cout<<" -isDualGraph: true \n";
@@ -182,6 +187,11 @@ int main( int argc, char * argv[] )
     }
   }
 
+  SYS_T::file_check( geo_ilt_file );
+  std::cout<<geo_ilt_file<<" found. \n";
+  SYS_T::file_check( sur_ilt_file_interior_wall );
+  std::cout<<sur_ilt_file_interior_wall<<" found. \n";
+
   // If we can still detect additional files on disk, throw an warning
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) )
     cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
@@ -228,6 +238,8 @@ int main( int argc, char * argv[] )
   }
   cmdh5w->write_string("sur_s_file_wall_base",           sur_s_file_wall_base);
   cmdh5w->write_string("sur_s_file_interior_wall_base",  sur_s_file_interior_wall_base);
+  cmdh5w->write_string("geo_ilt_file",                geo_ilt_file);
+  cmdh5w->write_string("sur_ilt_file_interior_wall",  sur_ilt_file_interior_wall);
   cmdh5w->write_string("part_file_p",         part_file_p);
   cmdh5w->write_string("part_file_v",         part_file_v);
   cmdh5w->write_string("date",                SYS_T::get_date() );
@@ -249,11 +261,11 @@ int main( int argc, char * argv[] )
   for(unsigned int ii=0; ii<phy_tag.size(); ++ii)
   {
     bool isRightTag = false;
-    for(int jj=0; jj<=num_layer; ++jj)
+    for(int jj=0; jj<=num_layer+1; ++jj)
     {
       if(phy_tag[ii] == jj) isRightTag = true;
     }
-    if(!isRightTag) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 (fluid domain) or 1 (solid1 domain) or 2 (solid2 domain).\n");
+    if(!isRightTag) SYS_T::print_fatal("Error: FSI problem, the physical tag is wrong\n");
   }
 
   // Generate IEN
@@ -264,9 +276,9 @@ int main( int argc, char * argv[] )
   // mapped to a new value by the following rule. The ii-th node in the
   // interface wall node will be assgiend to nFunc_v + ii. 
   // Read the F-S interface vtp file
-  std::vector<std::vector<int>> wall_node_id( num_layer );
-  std::vector<int> nFunc_interface( num_layer );
-  std::vector<int> layer_offset( num_layer );
+  std::vector<std::vector<int>> wall_node_id( num_layer+1 );
+  std::vector<int> nFunc_interface( num_layer+1 );
+  std::vector<int> layer_offset( num_layer+1 );
   int nFunc_p = nFunc_v;
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -274,8 +286,11 @@ int main( int argc, char * argv[] )
     nFunc_interface[ii] = static_cast<int>( wall_node_id[ii].size() );
     nFunc_p += nFunc_interface[ii];
   }
+  wall_node_id[num_layer] = VTK_T::read_int_PointData( sur_ilt_file_interior_wall, "GlobalNodeID" );
+  nFunc_interface[num_layer] = static_cast<int>( wall_node_id[num_layer].size() );
+  nFunc_p += nFunc_interface[num_layer];
   layer_offset[0] = 0;
-  for(int ii=1; ii<num_layer; ++ii)
+  for(int ii=1; ii<num_layer+1; ++ii)
   {
     layer_offset[ii] = layer_offset[ii-1] + nFunc_interface[ii-1];
   }
@@ -456,7 +471,7 @@ int main( int argc, char * argv[] )
   std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface[0]<<" nodes.\n";
-  for(int ii=1; ii<num_layer; ++ii)
+  for(int ii=1; ii<num_layer+1; ++ii)
     std::cout<<"Solid"<<ii<<"-Solid"<<ii+1<<" interface: "<<nFunc_interface[ii]<<" nodes.\n";
 
   // --------------------------------------------------------------------------
@@ -569,6 +584,7 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_file_list = geo_s_file_in;
+  VEC_T::insert_end( meshdir_file_list, geo_ilt_file );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
