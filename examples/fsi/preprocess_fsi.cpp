@@ -59,6 +59,7 @@ int main( int argc, char * argv[] )
   const std::string geo_file                  = paras["geo_file"].as<std::string>();
   const std::string geo_f_file                = paras["geo_f_file"].as<std::string>();
   const std::string geo_ws_file               = paras["geo_ws_file"].as<std::string>();
+  const std::string geo_t_file                = paras["geo_t_file"].as<std::string>();
   const std::string geo_ilt_file              = paras["geo_ilt_file"].as<std::string>();
   const std::string geo_s_file_base           = paras["geo_s_file_base"].as<std::string>();
 
@@ -95,6 +96,7 @@ int main( int argc, char * argv[] )
   std::cout<<" -geo_file: "           <<geo_file           <<std::endl;
   std::cout<<" -geo_f_file: "         <<geo_f_file         <<std::endl;
   std::cout<<" -geo_ws_file: "        <<geo_ws_file        <<std::endl;
+  std::cout<<" -geo_t_file: "         <<geo_t_file         <<std::endl;
   std::cout<<" -geo_s_file_base: "    <<geo_s_file_base    <<std::endl;
   std::cout<<" -sur_f_file_wall: "    <<sur_f_file_wall    <<std::endl;
   std::cout<<" -sur_s_file_wall_base: " <<sur_s_file_wall_base <<std::endl;
@@ -130,6 +132,8 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(geo_f_file); std::cout<<geo_f_file<<" found. \n";
 
   SYS_T::file_check(geo_ws_file); std::cout<<geo_ws_file<<" found. \n";
+
+  SYS_T::file_check(geo_t_file); std::cout<<geo_t_file<<" found. \n";
 
   std::vector< std::string > geo_s_file_in( num_layer );
 
@@ -225,6 +229,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("geo_file",            geo_file);
   cmdh5w->write_string("geo_f_file",          geo_f_file);
   cmdh5w->write_string("geo_ws_file",         geo_ws_file);
+  cmdh5w->write_string("geo_t_file",          geo_t_file);
   cmdh5w->write_string("geo_s_file_base",     geo_s_file_base);
   cmdh5w->write_string("sur_f_file_in_base",  sur_f_file_in_base);
   for(int ii=0; ii<num_layer; ++ii)
@@ -479,15 +484,43 @@ int main( int argc, char * argv[] )
   // basis vectors of the nodes. The list includes radial, longitudinal, and
   // circumferential basis, denoting by r, l, and c, respectively.
   const std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_ws_file, "GlobalNodeID");
-  const std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_ws_file, "radial_normal");
-  const std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_ws_file, "circumferential_normal");
-  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_ws_file, "longitudinal_normal");
+  std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_ws_file, "radial_normal");
+  std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_ws_file, "circumferential_normal");
+  std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_ws_file, "longitudinal_normal");
 
   SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_c.size(), "ERROR: circumferential_basis is not matched.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_l.size(), "ERROR: longitudinal_basis is not matched.");
   std::cout<<"=== Direction basis vectors generated.\n";
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+  // Read the geometry file for the tissue domain, generate the list of direction
+  // basis vectors of the nodes. The list includes radial, longitudinal, and
+  // circumferential basis, denoting by r, l, and c, respectively.
+  const std::vector<int> solid_node_id_t = VTK_T::read_int_PointData(geo_t_file, "GlobalNodeID");
+  const std::vector<Vector_3> basis_r_t  = VTK_T::read_Vector_3_PointData(geo_t_file, "radial_normal");
+  const std::vector<Vector_3> basis_c_t  = VTK_T::read_Vector_3_PointData(geo_t_file, "circumferential_normal");
+  const std::vector<Vector_3> basis_l_t  = VTK_T::read_Vector_3_PointData(geo_t_file, "longitudinal_normal");
+
+  SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
+  SYS_T::print_fatal_if(solid_node_id_t.size() != basis_r_t.size(), "ERROR: radial_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id_t.size() != basis_c_t.size(), "ERROR: circumferential_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id_t.size() != basis_l_t.size(), "ERROR: longitudinal_basis is not matched.");
+  std::cout<<"=== Direction basis vectors of the tissue domain generated.\n";
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+  // Update the local basis
+  std::cout << "=== Update the local basis. \n";
+  for(unsigned int ii=0; ii<solid_node_id_t.size(); ++ii)
+  {
+    int pos = VEC_T::get_pos(solid_node_id, solid_node_id_t[ii]);
+    basis_r[pos] = basis_r_t[ii];
+    basis_c[pos] = basis_c_t[ii];
+    basis_l[pos] = basis_l_t[ii];
+  }
   // --------------------------------------------------------------------------
 
   std::vector<IIEN const *> ienlist;
