@@ -179,7 +179,7 @@ class Gmsh_FileIO
     // a physical tag will be added to distinguish the physical problem
     // domain.
     // --------------------------------------------------------------
-    void write_solid_vtu( const std::string &in_fname, const bool &isXML ) const;
+    void write_solid_vtu( const std::string &in_fname, const bool &isXML, const bool &isILT ) const;
 
     // --------------------------------------------------------------
     // Write a separate vtu file for each physical volumetric domain.

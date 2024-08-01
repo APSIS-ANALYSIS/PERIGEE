@@ -769,7 +769,7 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 }
 
 void Gmsh_FileIO::write_solid_vtu( const std::string &in_fname, 
-    const bool &isXML ) const
+    const bool &isXML, const bool &isILT ) const
 {
   std::cout<<"=== Gmsh_FileIO::write_solid_vtu.\n";
   std::cout<<"--- There are "<<num_phy_domain_3d-1<<" 3D solid physical domains.\n";
@@ -787,7 +787,10 @@ void Gmsh_FileIO::write_solid_vtu( const std::string &in_fname,
   std::vector<int> sIEN {};
   std::vector<int> solid_cell_idx {};
 
-  for(int ii=1; ii<num_phy_domain_3d; ++ii)
+  int end_phy_domain_3d = num_phy_domain_3d;
+  if(isILT) --end_phy_domain_3d;
+
+  for(int ii=1; ii<end_phy_domain_3d; ++ii)
   {
     const int start_eindex = phy_3d_start_index[ii];
     std::vector<int> local_cell_idx( phy_3d_nElem[ii], 0 );
