@@ -25,6 +25,7 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
   loc_basis_l.clear();
 
   int index = 0;
+  nlocghonode_s = 0;
   for(int ii=0; ii<nlocghonode; ++ii)
   {
     int aux_index = local_to_global[ii]; // new global index
@@ -40,11 +41,11 @@ Part_FEM_FSI_Tissue::Part_FEM_FSI_Tissue( const IMesh * const &mesh,
       loc_basis_r.push_back( basis_r[pos] );
       loc_basis_c.push_back( basis_c[pos] );
       loc_basis_l.push_back( basis_l[pos] );
+      ++nlocghonode_s;
     }
     else node_locgho_solid[ii] = -1;
   }
 
-  nlocghonode_s = VEC_T::get_size( node_locgho_solid );
   std::cout<<"-- proc "<<cpu_rank<<" Local direction basis vectors generated. \n";
 }
 

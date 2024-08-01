@@ -10,10 +10,13 @@ Tissue_property::Tissue_property( const std::string &fileBaseName, const int &ra
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
 
   nlocghonode_s = h5r -> read_intScalar("directionBasis_loc", "nlocghonode_s");
-  node_locgho_solid = h5r -> read_intVector("directionBasis_loc", "node_locgho_solid");
-  basis_r = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_r");
-  basis_c = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_c");
-  basis_l = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_l");
+  if(nlocghonode_s>0)
+  {
+    node_locgho_solid = h5r -> read_intVector("directionBasis_loc", "node_locgho_solid");
+    basis_r = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_r");
+    basis_c = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_c");
+    basis_l = h5r -> read_Vector_3_Vector("directionBasis_loc", "loc_basis_l");
+  }
 
   delete h5r; H5Fclose( file_id );
 }
