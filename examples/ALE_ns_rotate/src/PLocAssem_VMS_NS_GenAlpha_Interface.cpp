@@ -540,11 +540,11 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
       Tangent_rs[nLocBas4 * A4 + B4 + 3] += 0.5 * common_coef * NArNBs * nrz;
 
       // Kr2s1
-      Tangent_rs[nLocBas4 * (A4 + 1) + B4] += -0.5 * common_coef * NArNBs * nrx;
+      Tangent_rs[nLocBas4 * (A4 + 1) + B4] += -0.5 * common_coef * NArNBs * nsx;
 
       // Kr2s2
       Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
-        0.5 * vis_mu * (NAr * (2 * NBs_x * nsx + NBs_y * nsy + NBs_z * nsx)
+        0.5 * vis_mu * (NAr * (2 * NBs_x * nsx + NBs_y * nsy + NBs_z * nsz)
                      + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * NBs)
         + NArNBs * (rho0 * inflow_r - tau_I) );
 
@@ -585,7 +585,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
         NAr * NBs_z * nsy + NAr_y * nrz * NBs );
 
       // Kr4s4
-      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 2] += common_coef * (
+      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * (
         0.5 * vis_mu * (NAr * (NBs_x * nsx + NBs_y * nsy + 2 * NBs_z * nsz)
                      + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBs)
         + NArNBs * (rho0 * inflow_r - tau_I) );
