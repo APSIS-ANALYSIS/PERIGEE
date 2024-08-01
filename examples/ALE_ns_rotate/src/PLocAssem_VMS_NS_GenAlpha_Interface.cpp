@@ -154,7 +154,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
-  const double nrx {normal_r.x()}, nry {normal_s.y()}, nrz {normal_r.z()};
+  const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
 
@@ -316,7 +316,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
-  const double nrx {normal_r.x()}, nry {normal_s.y()}, nrz {normal_r.z()};
+  const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
   double delta_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? 1.0 : 0.0);
