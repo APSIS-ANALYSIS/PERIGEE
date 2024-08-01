@@ -214,7 +214,7 @@ namespace HEX_T
       int get_face_id(const int &n0, const int &n1, const int &n2, const int &n3) const;
 
       int get_face_id( const std::array<int,4> &nn ) const
-      { get_face_id(nn[0], nn[1], nn[2], nn[3]); }
+      { return get_face_id(nn[0], nn[1], nn[2], nn[3]); }
 
     private:
       std::array<Vector_3, 8> pts;
