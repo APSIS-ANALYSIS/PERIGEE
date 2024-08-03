@@ -582,7 +582,6 @@ int main(int argc, char *argv[])
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
-  /*
   if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
     gbc = new GenBC_Resistance( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
@@ -600,8 +599,7 @@ int main(int argc, char *argv[])
 
   SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc_v->get_num_ebc(),
       "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
-  */
-  
+
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_FSI( locAssem_fluid_ptr,
