@@ -357,7 +357,7 @@ int main(int argc, char *argv[])
   
   APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
 
-  ALocal_InflowBC * locinfnbc = nullptr; //new ALocal_InflowBC(part_v_file, rank);
+  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_v_file, rank);
 
   ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
   
@@ -397,7 +397,6 @@ int main(int argc, char *argv[])
 
   ICVFlowRate * inflow_rate_ptr = nullptr;
 
-  /*
   if( inflow_type == 0 )
     inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
   else if( inflow_type == 1 )
@@ -411,7 +410,6 @@ int main(int argc, char *argv[])
 
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
       "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
-  */
 
   // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
@@ -523,7 +521,7 @@ int main(int argc, char *argv[])
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
   
   // ===== Initial condition =====
-  PDNSolution * base = nullptr; //new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
+  PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
   
   PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
   PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
@@ -706,7 +704,7 @@ int main(int argc, char *argv[])
       sol_record_freq, ttan_renew_freq, final_time );
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
-  /*
+
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
   {
@@ -777,7 +775,7 @@ int main(int argc, char *argv[])
       ofile.close();
     }
   }
-  */
+
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====
