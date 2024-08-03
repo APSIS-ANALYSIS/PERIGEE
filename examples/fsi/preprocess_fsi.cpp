@@ -277,7 +277,7 @@ int main( int argc, char * argv[] )
   layer_offset[0] = 0;
   for(int ii=1; ii<num_layer; ++ii)
   {
-    layer_offset[ii] = nFunc_interface[ii-1];
+    layer_offset[ii] = layer_offset[ii-1] + nFunc_interface[ii-1];
   }
 
   // We will generate a new IEN array for the pressure variable by updating the
