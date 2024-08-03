@@ -607,6 +607,7 @@ int main( int argc, char * argv[] )
   // that in the velocity mesh.
   NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
 
+  geo_s_file_in.push_back( geo_ilt_file );
   for( int ii=0; ii<3; ++ii )
     NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file_in, sur_f_file_wall, 
         sur_s_file_wall_in, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
@@ -617,7 +618,6 @@ int main( int argc, char * argv[] )
   std::vector<INodalBC *> meshBC_list( 3, nullptr );
 
   std::vector<std::string> meshdir_file_list = geo_s_file_in;
-  geo_s_file_in.push_back( geo_ilt_file );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
