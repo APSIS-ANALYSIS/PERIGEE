@@ -146,7 +146,6 @@ double FE_T::get_tet_sphere_radius (
   return std::sqrt( (xx-x0)*(xx-x0) + (yy-y0)*(yy-y0) + (zz-z0)*(zz-z0) );
 }
 
-
 Vector_3 FE_T::get_tet_sphere_info( const Vector_3 &pt0,
     const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3, 
     double &radius ) 
