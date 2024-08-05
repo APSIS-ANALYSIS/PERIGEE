@@ -108,6 +108,7 @@ int main(int argc, char *argv[])
   double restart_time = 0.0; // restart time
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
+  std::string restart_disp_name = "DISP_"; // restart displacement name
 
   // Info of rotation axis
   Vector_3 point_rotated (0.5, 0.0, 0.0);
@@ -179,6 +180,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-restart_time", restart_time);
   SYS_T::GetOptionReal("-restart_step", restart_step);
   SYS_T::GetOptionString("-restart_name", restart_name);
+  SYS_T::GetOptionString("-restart_disp_name", restart_disp_name);
   SYS_T::GetOptionReal("-C_bI", C_bI);
 
   // ===== Print Command Line Arguments =====
@@ -227,6 +229,7 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
     SYS_T::cmdPrint("-restart_name:", restart_name);
+    SYS_T::cmdPrint("-restart_disp_name:", restart_disp_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
@@ -434,6 +437,10 @@ int main(int argc, char *argv[])
     SYS_T::file_check(restart_name);
     sol->ReadBinary(restart_name);
 
+    // Read disp file
+    SYS_T::file_check(restart_disp_name);
+    disp_mesh->ReadBinary(restart_disp_name);
+
     // generate the corresponding dot_sol file name
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
@@ -445,6 +452,7 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
     SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_disp_name: %s \n", restart_disp_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
@@ -481,6 +489,7 @@ int main(int argc, char *argv[])
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  locitf->restore_node_sol(sol);
   gloAssem_ptr->search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, locitf);
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
       elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, gbc );
