@@ -217,15 +217,10 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z ) const
 {
-  double x,y,z,r;
-
-  FE_T::get_tet_sphere_info(
+  return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
-      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3],
-      x, y, z, r );
-
-  return 2.0 * r;
+      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );  
 }
 
 void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
@@ -270,7 +265,7 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
       break;
   }
 
-  // use the triangle element routine to determien the outward normal vector and
+  // use the triangle element routine to determine the outward normal vector and
   // the surface Jacobian.
   triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
 }

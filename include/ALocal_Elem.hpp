@@ -63,8 +63,8 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     virtual int get_elem_tag(const int &ee) const
     {
-      if( isTagged ) return elem_tag[ee];
-      else return 0;
+      ASSERT(isTagged, "Error: get_elem_tag function 'isTagged' is false.\n");
+      return elem_tag[ee];
     }
 
     // ------------------------------------------------------------------------

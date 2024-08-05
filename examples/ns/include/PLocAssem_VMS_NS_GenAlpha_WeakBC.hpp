@@ -24,7 +24,7 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
         const double &in_ct = 4.0, const double &in_ctauc = 1.0,
         const double &in_C_bI = 4.0 );
 
-    virtual ~PLocAssem_VMS_NS_GenAlpha_WeakBC();
+    virtual ~PLocAssem_VMS_NS_GenAlpha_WeakBC() = default;
 
     virtual void print_info() const;
 

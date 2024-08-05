@@ -34,15 +34,6 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName,
   delete h5r; H5Fclose( file_id );
 }
 
-ALocal_WeakBC::~ALocal_WeakBC()
-{
-  if(wall_model_type > 0)
-  {
-    VEC_T::clean( part_vol_ele_id );
-    VEC_T::clean( ele_face_id );
-  }
-}
-
 void ALocal_WeakBC::print_info() const
 {
   SYS_T::commPrint("Weakly enforced wall boundary condition:\n");

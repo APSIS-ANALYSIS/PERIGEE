@@ -15,7 +15,7 @@ class ALocal_WeakBC
   public:
     ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank );
 
-    virtual ~ALocal_WeakBC();
+    virtual ~ALocal_WeakBC() = default;
 
     // Get the type of weak enforced Dirichlet BC
     virtual int get_wall_model_type() const { return wall_model_type; }

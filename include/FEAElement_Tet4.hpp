@@ -9,7 +9,6 @@
 //
 // Date Created: Jan 19 2017
 // ==================================================================
-#include "FEAElement.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
@@ -147,6 +146,8 @@ class FEAElement_Tet4 : public FEAElement
         const double * const &ctrl_z );
 
     // Get the outwardnormal on faces
+    // This function requires the buildBasis with face_id provided, so that the
+    // proper triangle face element is constructed
     // The node numbering of the face element guarantees the get_2d_normal_out
     // returns the outward normal vector
     // See FE_T::QuadPts_on_face function for more details.

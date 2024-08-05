@@ -30,7 +30,7 @@ class Part_FEM_FSI : public Part_FEM
         const int &in_start_idx,
         const Field_Property &in_fp );
 
-    virtual ~Part_FEM_FSI();
+    virtual ~Part_FEM_FSI() = default;
 
     virtual void write( const std::string &inputFileName ) const;
 

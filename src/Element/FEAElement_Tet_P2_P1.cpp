@@ -48,15 +48,10 @@ double FEAElement_Tet_P2_P1::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z ) const
 {
-  double x,y,z,r;
-
-  FE_T::get_tet_sphere_info(
+  return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
-      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3],
-      x, y, z, r );
-
-  return 2.0 * r;
+      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );  
 }
 
 

@@ -213,8 +213,7 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     // Backflow integral on outlet surfaces
-    void BackFlow_G( const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
+    void BackFlow_G( const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
@@ -223,7 +222,6 @@ class PGAssem_Tet_CMM_GenAlpha : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
-        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
