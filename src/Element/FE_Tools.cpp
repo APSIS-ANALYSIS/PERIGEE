@@ -134,9 +134,7 @@ double FE_T::get_tet_sphere_radius (
   AA.LU_fac();
 
   const double xyz2 = x0*x0 + y0*y0 + z0*z0;
-  double xx = 0;
-  double yy = 0;
-  double zz = 0;
+  double xx {0.0}, yy {0.0}, zz {0.0};
 
   AA.LU_solve( x1*x1 + y1*y1 + z1*z1 - xyz2,
       x2*x2 + y2*y2 + z2*z2 - xyz2,
