@@ -217,6 +217,11 @@ namespace TET_T
       void reset( const int &ien0, const int &ien1,
           const int &ien2, const int &ien3 );
 
+      void reset( const std::array<int,4> &ienval )
+      { reset(ienval[0], ienval[1], ienval[2], ienval[3]); }
+
+      // Reset the object content includign the global index and the point
+      // coordindates
       void reset( const std::vector<double> &ctrlPts,
           const IIEN * const &ien_pt, const int &ee );
 
@@ -231,6 +236,9 @@ namespace TET_T
       // Given the face node IEN indices, determine the face id is determined by
       // its opposite node number.
       int get_face_id(const int &n0, const int &n1, const int &n2) const;
+
+      int get_face_id( const std::array<int,3> &nn ) const
+      { return get_face_id(nn[0], nn[1], nn[2]); }
 
       void print_info() const;
 

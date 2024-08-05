@@ -38,12 +38,6 @@ EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const I
     SYS_T::print_fatal("Error: EBC_Partition_turbulence_wall_model, unknown wall model type.\n");
 }
 
-EBC_Partition_turbulence_wall_model::~EBC_Partition_turbulence_wall_model()
-{
-  part_vol_ele_id.clear();
-  ele_face_id.clear();
-}
-
 void EBC_Partition_turbulence_wall_model::write_hdf5(const std::string &FileName) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );

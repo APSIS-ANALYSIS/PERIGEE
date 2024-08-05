@@ -34,13 +34,10 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include <iomanip>
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
-
-
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 

@@ -33,7 +33,7 @@ class ElemBC_3D_turbulence_wall_model : public ElemBC_3D
         const IIEN * const &VIEN,
         const int &elemtype );
 
-    virtual ~ElemBC_3D_turbulence_wall_model();
+    virtual ~ElemBC_3D_turbulence_wall_model() = default;
 
     virtual int get_wall_model_type() const { return wall_model_type; };
 

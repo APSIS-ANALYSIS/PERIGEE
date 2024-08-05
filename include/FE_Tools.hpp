@@ -28,11 +28,17 @@ namespace FE_T
   // Calculate the circumscribing sphere's centre point and radius
   // of four given points
   // ----------------------------------------------------------------
-  void get_tet_sphere_info( const double &x0, const double &x1,
-      const double &x2, const double &x3, const double &y0, 
-      const double &y1, const double &y2, const double &y3,
-      const double &z0, const double &z1, const double &z2, 
-      const double &z3, double &x, double &y, double &z, double &r );
+  void get_tet_sphere_info(
+      const double &x0, const double &x1, const double &x2, const double &x3, 
+      const double &y0, const double &y1, const double &y2, const double &y3,
+      const double &z0, const double &z1, const double &z2, const double &z3,
+      double &xx, double &yy, double &zz, double &rr );
+
+  double get_tet_sphere_radius( 
+      const double &x0, const double &x1, const double &x2, const double &x3, 
+      const double &y0, const double &y1, const double &y2, const double &y3,
+      const double &z0, const double &z1, const double &z2, const double &z3 );
+
 
   Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
@@ -236,7 +242,7 @@ namespace FE_T
       QuadPts_on_face(const int &vol_elemType, const int &face_id, 
           const IQuadPts * const lower_quad_rule);
 
-      ~QuadPts_on_face();
+      ~QuadPts_on_face() = default;
 
       virtual void print_info() const;
 

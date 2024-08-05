@@ -13,14 +13,11 @@ void Interpolater::interpolateFE( const double * const &inputVal,
     const FEAElement * const &elem, std::vector<double> &output )
 {
   const int nqp = elem->get_numQuapts();
-  output.resize( nqp );
 
-  std::vector<double> R (nLocBas, 0.0);
-
+  output.assign( nqp, 0.0 );
   for(int ii=0; ii<nqp; ++ii)
   {
-    output[ii] = 0.0;
-    elem->get_R( ii, &R[0] );
+    const auto R = elem->get_R( ii );
     for(int jj=0; jj<nLocBas; ++jj) output[ii] += inputVal[jj] * R[jj];
   }
 }
@@ -32,16 +29,12 @@ void Interpolater::interpolateFE( const double * const &inputVal_1,
 {
   const int nqp = elem->get_numQuapts();
 
-  output_1.resize( nqp );
-  output_2.resize( nqp );
-
-  std::vector<double> R (nLocBas, 0.0);
+  output_1.assign( nqp, 0.0 );
+  output_2.assign( nqp, 0.0 );
 
   for(int ii=0; ii<nqp; ++ii)
   {
-    output_1[ii] = 0.0;
-    output_2[ii] = 0.0;
-    elem->get_R( ii, &R[0] );
+    const auto R = elem->get_R( ii );
     for(int jj=0; jj<nLocBas; ++jj)
     {
       output_1[ii] += inputVal_1[jj] * R[jj];
@@ -59,18 +52,13 @@ void Interpolater::interpolateFE( const double * const &inputVal_1,
 {
   const int nqp = elem->get_numQuapts();
 
-  output_1.resize( nqp );
-  output_2.resize( nqp );
-  output_3.resize( nqp );
-
-  std::vector<double> R (nLocBas, 0.0);
+  output_1.assign( nqp, 0.0 );
+  output_2.assign( nqp, 0.0 );
+  output_3.assign( nqp, 0.0 );
 
   for(int ii=0; ii<nqp; ++ii)
   {
-    output_1[ii] = 0.0;
-    output_2[ii] = 0.0;
-    output_3[ii] = 0.0;
-    elem->get_R( ii, &R[0] );
+    const auto R = elem->get_R( ii );
     for(int jj=0; jj<nLocBas; ++jj)
     {
       output_1[ii] += inputVal_1[jj] * R[jj];
@@ -86,9 +74,9 @@ void Interpolater::interpolateFE_Grad( const double * const &inputVal,
 {
   const int nqp = elem->get_numQuapts();
 
-  output_dx.resize( nqp );
-  output_dy.resize( nqp );
-  output_dz.resize( nqp );
+  output_dx.assign( nqp, 0.0 );
+  output_dy.assign( nqp, 0.0 );
+  output_dz.assign( nqp, 0.0 );
 
   std::vector<double> dR_dx (nLocBas, 0.0);
   std::vector<double> dR_dy (nLocBas, 0.0);
@@ -96,10 +84,6 @@ void Interpolater::interpolateFE_Grad( const double * const &inputVal,
 
   for( int ii=0; ii<nqp; ++ii )
   {
-    output_dx[ii] = 0.0;
-    output_dy[ii] = 0.0;
-    output_dz[ii] = 0.0;
-
     elem->get_gradR(ii, &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     for( int jj=0; jj<nLocBas; ++jj )

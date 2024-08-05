@@ -46,9 +46,6 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
   nlocalnode_solid = VEC_T::get_size( node_loc_solid );
 }
 
-Part_FEM_FSI::~Part_FEM_FSI()
-{}
-
 void Part_FEM_FSI::write( const std::string &inputFileName ) const
 {
   // ------------------------------------------------------

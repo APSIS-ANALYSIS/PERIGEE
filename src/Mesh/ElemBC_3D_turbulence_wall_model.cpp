@@ -2,11 +2,12 @@
 
 ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model( 
     const std::vector<std::string> &vtkfileList,
-    const int &in_wall_model_type, const IIEN * const &VIEN, const int &elemtype )
-: ElemBC_3D ( vtkfileList, elemtype ), wall_model_type {in_wall_model_type}
+    const int &in_wall_model_type, const IIEN * const &VIEN, 
+    const int &elemtype )
+: ElemBC_3D ( vtkfileList, elemtype ), 
+  wall_model_type {in_wall_model_type}
 {
-  SYS_T::print_fatal_if(VEC_T::get_size(vtkfileList) > 1,
-    "Error, ElemBC_3D_turbulence_wall_model: The number of wall file should not be more than 1.\n");
+  SYS_T::print_fatal_if(VEC_T::get_size(vtkfileList) > 1, "Error, ElemBC_3D_turbulence_wall_model: The number of wall file should not be more than 1.\n");
 
   if(VEC_T::get_size(vtkfileList) == 1)
   {
@@ -20,18 +21,15 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
       {
         const int node_t[3] { get_ien(0, ee, 0), get_ien(0, ee, 1), get_ien(0, ee, 2) };
 
-        const int node_t_gi[3] { get_global_node(0, node_t[0]),
-                                 get_global_node(0, node_t[1]),
-                                 get_global_node(0, node_t[2]) };
+        const std::array<int,3> node_t_gi {{ get_global_node(0, node_t[0]),
+                                             get_global_node(0, node_t[1]),
+                                             get_global_node(0, node_t[2]) }};
 
         const int cell_gi = get_global_cell(0, ee);
 
-        const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                             VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) };
-        
-        tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
+        tetcell->reset( VIEN->get_IEN_array4( cell_gi ) );
 
-        face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
+        face_id[ee] = tetcell->get_face_id( node_t_gi );
       }
 
       delete tetcell;
@@ -45,22 +43,16 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
         const int node_q[4] { get_ien(0, ee, 0), get_ien(0, ee, 1),
                               get_ien(0, ee, 2), get_ien(0, ee, 3) };
         
-        const int node_q_gi[4] { get_global_node(0, node_q[0]),
-                                 get_global_node(0, node_q[1]),
-                                 get_global_node(0, node_q[2]),
-                                 get_global_node(0, node_q[3]) };
+        const std::array<int,4> node_q_gi {{ get_global_node(0, node_q[0]),
+                                             get_global_node(0, node_q[1]),
+                                             get_global_node(0, node_q[2]),
+                                             get_global_node(0, node_q[3]) }};
         
         const int cell_gi = get_global_cell(0, ee);
 
-        const int hex_n[8] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                             VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3),
-                             VIEN->get_IEN(cell_gi, 4), VIEN->get_IEN(cell_gi, 5),
-                             VIEN->get_IEN(cell_gi, 6), VIEN->get_IEN(cell_gi, 7) };
-        
-        hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
-                       hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
+        hexcell->reset( VIEN->get_IEN_array8( cell_gi ) );
 
-        face_id[ee] = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);
+        face_id[ee] = hexcell->get_face_id( node_q_gi );
       }
 
       delete hexcell;
@@ -69,12 +61,8 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
       SYS_T::print_fatal("Error: ElemBC_3D_turbulence_wall_model, unknown element type.\n");
   }
   else
-    ; // The weak_list is empty and the wall file was put in the dir_list. Strongly enforced Dirichlet BC will be appiled.
-}
+    SYS_T::commPrint("Warning: there is no geometry file provided for the ElemBC_3D_turbulence_wall_model class. \n" );
 
-ElemBC_3D_turbulence_wall_model::~ElemBC_3D_turbulence_wall_model()
-{
-  face_id.clear();
 }
 
 // EOF
