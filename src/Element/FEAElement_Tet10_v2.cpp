@@ -212,8 +212,7 @@ double FEAElement_Tet10_v2::get_h( const double * const &ctrl_x,
   return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
-      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3]
-      );  
+      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] ); 
 }
 
 void FEAElement_Tet10_v2::get_R( const int &quaindex, double * const &basis ) const
