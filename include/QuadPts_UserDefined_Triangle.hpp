@@ -24,7 +24,7 @@ class QuadPts_UserDefined_Triangle : public IQuadPts
     {
       qp[0] = xi;
       qp[1] = eta;
-      qp[2] = 1 - qp[0] - qp[1];
+      qp[2] = 1.0 - qp[0] - qp[1];
     }
 
     virtual void reset()
@@ -36,7 +36,7 @@ class QuadPts_UserDefined_Triangle : public IQuadPts
 
     virtual bool check_qp_bound() const
     {
-      if( qp[0]>=0 && qp[0]<=1 && qp[1]>=0 && qp[1]<=1 && qp[2]>=0 )
+      if( qp[0]>=0.0 && qp[0]<=1.0 && qp[1]>=0.0 && qp[1]<=1.0 && qp[2]>=0.0 )
         return true;
       else
         return false;
