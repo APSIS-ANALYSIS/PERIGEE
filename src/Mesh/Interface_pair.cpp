@@ -99,17 +99,15 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
                             fixed_sur_ien[ee * s_nLocBas + 1],
                             fixed_sur_ien[ee * s_nLocBas + 2]};
 
-      const int node_t_gi[3] {fixed_global_node[node_t[0]],
-                              fixed_global_node[node_t[1]],
-                              fixed_global_node[node_t[2]]};
+      const std::array<int,3> node_t_gi {{ fixed_global_node[node_t[0]],
+                                           fixed_global_node[node_t[1]],
+                                           fixed_global_node[node_t[2]] }};
       
       const int cell_gi = fixed_global_cell[ee];
 
-      const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                            VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) };
-
-      tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
-      fixed_face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
+      tetcell->reset( VIEN->get_IEN_array4(cell_gi) );
+      
+      fixed_face_id[ee] = tetcell->get_face_id( node_t_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
         fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
@@ -207,7 +205,6 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   VEC_T::sort_unique_resize(fixed_global_node);
   const int num_fixed_node = VEC_T::get_size(fixed_global_node);
 
-  // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : fixed_vien)
   {
     const int local_id = VEC_T::get_pos(fixed_global_node, nodeid);
@@ -229,7 +226,6 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   VEC_T::sort_unique_resize(rotated_global_node);
   const int num_rotated_node = VEC_T::get_size(rotated_global_node);
 
-  // PERIGEE_OMP_PARALLEL_FOR
   for(int &nodeid : rotated_vien)
   {
     const int local_id = VEC_T::get_pos(rotated_global_node, nodeid);
