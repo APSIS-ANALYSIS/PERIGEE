@@ -160,10 +160,10 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
                            rotated_sur_ien[ee * s_nLocBas + 2],
                            rotated_sur_ien[ee * s_nLocBas + 3]};
 
-      const std::array<int, 4> node_q_gi[4] {{ rotated_global_node[node_q[0]] + total_num_fixed_pt,
-                                               rotated_global_node[node_q[1]] + total_num_fixed_pt,
-                                               rotated_global_node[node_q[2]] + total_num_fixed_pt,
-                                               rotated_global_node[node_q[3]] + total_num_fixed_pt }};
+      const std::array<int, 4> node_q_gi {{ rotated_global_node[node_q[0]] + total_num_fixed_pt,
+                                            rotated_global_node[node_q[1]] + total_num_fixed_pt,
+                                            rotated_global_node[node_q[2]] + total_num_fixed_pt,
+                                            rotated_global_node[node_q[3]] + total_num_fixed_pt }};
 
       const int cell_gi = rotated_global_cell[ee] + total_num_fixed_elem;
 

@@ -159,7 +159,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     {
       int ee_tag = rotated_interval_tag[ii][ee];
       for(int jj=0; jj<part->get_nLocBas(); ++jj)
-        rotated_lien[ii][ee_tag].push_back(total_rotated_layer_ien[ee * part->get_nLocBas() + jj]);
+        rotated_lien[ii][ee_tag].push_back(total_rotated_lien[ee * part->get_nLocBas() + jj]);
 
       rotated_ele_face_id[ii][ee_tag].push_back(total_rotated_ele_face_id[ee]);
     }
