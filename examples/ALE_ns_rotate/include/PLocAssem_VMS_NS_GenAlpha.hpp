@@ -144,7 +144,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -154,7 +153,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -180,7 +178,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     // Info of rotation axis
     const Vector_3 direction_rotated;    
-    
+
     // M matrix for tau_m
     //             mm[0], mm[1], mm[2]
     // M = coef *  mm[3], mm[4], mm[5]
