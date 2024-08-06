@@ -777,8 +777,8 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
   int ptOffset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    int phy_tag = lelem_ptr->get_elem_tag(ee);
-    if( phy_tag >= 1 )
+    int phy_tag = lelem_ptr->get_elem_tag(ee) - 1;
+    if( phy_tag >= 0 )
     {
       const std::vector<int> IEN_v = lien_v -> get_LIEN(ee);
       const std::vector<int> IEN_p = lien_p -> get_LIEN(ee);
@@ -838,7 +838,6 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       
       if( phy_tag == num_layer )
       {
-        --phy_tag;
         // Interpolate von Mises stress
         interpolateVonStress( ptOffset, inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
 
@@ -847,7 +846,6 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       }
       else
       {
-        --phy_tag;
         // Interpolate von Mises stress
         interpolateVonStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
             inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
