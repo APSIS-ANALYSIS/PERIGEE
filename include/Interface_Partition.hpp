@@ -1,6 +1,5 @@
 #ifndef INTERFACE_PARTITION_HPP
 #define INTERFACE_PARTITION_HPP
-
 // ============================================================================
 // Interface_Partition.hpp
 // 
@@ -9,10 +8,8 @@
 // Author: Xuanming Huag
 // Date: Jun 24 2024
 // ============================================================================
-
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
-#include "HDF5_Writer.hpp"
 #include "Interface_pair.hpp"
 #include "INodalBC.hpp"
 
@@ -51,22 +48,22 @@ class Interface_Partition
     std::vector<int> num_tag;
 
     // the number of the local elements of the fixed interfaces
-    std::vector<int> num_fixed_part_ele;
+    std::vector<int> fixed_nlocalele;
 
     // stores the face id of the volume element of the fixed interface in this part
     std::vector<std::vector<int>> fixed_ele_face_id;
 
     // stores ien of the volume element of the fixed layer in this part
-    std::vector<std::vector<int>> fixed_layer_ien;
+    std::vector<std::vector<int>> fixed_lien;
 
     // stores the fixed layer nodes indices, converted by get_old2new()
-    std::vector<std::vector<int>> fixed_layer_global_node;
+    std::vector<std::vector<int>> fixed_global_node;
 
     // stores the fixed layer nodes ID array
-    std::vector<std::vector<int>> fixed_layer_node_ID;
+    std::vector<std::vector<int>> fixed_LID;
 
     // stores the fixed layer nodes' coordinates
-    std::vector<std::vector<double>> fixed_layer_pt_xyz;
+    std::vector<std::vector<double>> fixed_pt_xyz;
 
     // stores the fixed layer nodes' volume partition tag & local position
     std::vector<std::vector<int>> fixed_layer_node_vol_part_tag;
@@ -80,16 +77,16 @@ class Interface_Partition
     std::vector<std::vector<std::vector<int>>> rotated_ele_face_id;
 
     // stores ien of all the volume element of the rotated layer
-    std::vector<std::vector<std::vector<int>>> rotated_layer_ien;
+    std::vector<std::vector<std::vector<int>>> rotated_lien;
 
     // stores the rotated layer nodes indices, converted by get_old2new()
-    std::vector<std::vector<int>> rotated_layer_global_node;
+    std::vector<std::vector<int>> rotated_global_node;
 
     // stores the rotated layer nodes ID array
-    std::vector<std::vector<int>> rotated_layer_node_ID;
+    std::vector<std::vector<int>> rotated_LID;
 
     // stores the rotated layer nodes' coordinates
-    std::vector<std::vector<double>> rotated_layer_pt_xyz;
+    std::vector<std::vector<double>> rotated_pt_xyz;
 
     // stores the rotated layer nodes' volume partition tag & local position
     std::vector<std::vector<int>> rotated_layer_node_vol_part_tag;

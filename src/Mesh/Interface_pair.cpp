@@ -51,27 +51,19 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   switch (elemtype_in)
   {
     case 501:
-    {
       s_nLocBas = 3; v_nLocBas = 4;
-    }
     break;
 
     case 502:
-    {
       s_nLocBas = 6; v_nLocBas = 10;
-    }
     break;
 
     case 601:
-    {
       s_nLocBas = 6; v_nLocBas = 8;
-    }
     break;
 
     case 602:
-    {
       s_nLocBas = 9; v_nLocBas = 27;
-    }
     break;
     
     default:
@@ -80,61 +72,57 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   }
 
   fixed_face_id.resize(num_fixed_ele);
-  fixed_layer_vien.resize(v_nLocBas * num_fixed_ele);
+  fixed_vien.resize(v_nLocBas * num_fixed_ele);
 
   rotated_face_id.resize(num_rotated_ele);
-  rotated_layer_vien.resize(v_nLocBas * num_rotated_ele);
+  rotated_vien.resize(v_nLocBas * num_rotated_ele);
+    
+  // Read the partion tag from the .h5 file
+  fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
 
   // Generate the face id and layer's ien array
   if(elemtype_in == 501 || elemtype_in == 502)
   {
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
     
-    // Read the partion tag from the .h5 file
-    fixed_part_tag = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
-
     for(int ee=0; ee<num_fixed_ele; ++ee)
     {
       const int node_t[3] {fixed_sur_ien[ee * s_nLocBas + 0],
-                            fixed_sur_ien[ee * s_nLocBas + 1],
-                            fixed_sur_ien[ee * s_nLocBas + 2]};
+                           fixed_sur_ien[ee * s_nLocBas + 1],
+                           fixed_sur_ien[ee * s_nLocBas + 2]};
 
-      const int node_t_gi[3] {fixed_global_node[node_t[0]],
-                              fixed_global_node[node_t[1]],
-                              fixed_global_node[node_t[2]]};
+      const std::array<int,3> node_t_gi {{ fixed_global_node[node_t[0]],
+                                           fixed_global_node[node_t[1]],
+                                           fixed_global_node[node_t[2]] }};
       
       const int cell_gi = fixed_global_cell[ee];
 
-      const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                            VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) };
-
-      tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
-      fixed_face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
+      tetcell->reset( VIEN->get_IEN_array4(cell_gi) );
+      
+      fixed_face_id[ee] = tetcell->get_face_id( node_t_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        fixed_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     for(int ee=0; ee<num_rotated_ele; ++ee)
     {
       const int node_t[3] {rotated_sur_ien[ee * s_nLocBas + 0],
-                            rotated_sur_ien[ee * s_nLocBas + 1],
-                            rotated_sur_ien[ee * s_nLocBas + 2]};
+                           rotated_sur_ien[ee * s_nLocBas + 1],
+                           rotated_sur_ien[ee * s_nLocBas + 2]};
 
-      const int node_t_gi[3] {rotated_global_node[node_t[0]] + total_num_fixed_pt,
-                              rotated_global_node[node_t[1]] + total_num_fixed_pt,
-                              rotated_global_node[node_t[2]] + total_num_fixed_pt};
+      const std::array<int, 3> node_t_gi {{ rotated_global_node[node_t[0]] + total_num_fixed_pt,
+                                            rotated_global_node[node_t[1]] + total_num_fixed_pt,
+                                            rotated_global_node[node_t[2]] + total_num_fixed_pt }};
 
       const int cell_gi = rotated_global_cell[ee] + total_num_fixed_elem;
 
-      const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                            VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) };
+      tetcell->reset( VIEN->get_IEN_array4(cell_gi) );
 
-      tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
-      rotated_face_id[ee] = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
+      rotated_face_id[ee] = tetcell->get_face_id( node_t_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        rotated_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        rotated_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     delete tetcell;
@@ -143,9 +131,6 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   {
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8();
 
-    // Read the partion tag from the .h5 file
-    fixed_part_tag = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
-
     for(int ee=0; ee<num_fixed_ele; ++ee)
     {
       const int node_q[4] {fixed_sur_ien[ee * s_nLocBas + 0],
@@ -153,51 +138,41 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
                            fixed_sur_ien[ee * s_nLocBas + 2],
                            fixed_sur_ien[ee * s_nLocBas + 3]};
 
-      const int node_q_gi[4] {fixed_global_node[node_q[0]],
-                              fixed_global_node[node_q[1]],
-                              fixed_global_node[node_q[2]],
-                              fixed_global_node[node_q[3]]};
+      const std::array<int, 4> node_q_gi {{ fixed_global_node[node_q[0]],
+                                            fixed_global_node[node_q[1]],
+                                            fixed_global_node[node_q[2]],
+                                            fixed_global_node[node_q[3]] }};
       
       const int cell_gi = fixed_global_cell[ee];
 
-      const int hex_n[8] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                           VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3),
-                           VIEN->get_IEN(cell_gi, 5), VIEN->get_IEN(cell_gi, 6),
-                           VIEN->get_IEN(cell_gi, 7), VIEN->get_IEN(cell_gi, 8), };
+      hexcell->reset( VIEN->get_IEN_array8(cell_gi) );
 
-      hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
-                      hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
-      fixed_face_id[ee] = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);
+      fixed_face_id[ee] = hexcell->get_face_id( node_q_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        fixed_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     for(int ee=0; ee<num_rotated_ele; ++ee)
     {
       const int node_q[4] {rotated_sur_ien[ee * s_nLocBas + 0],
-                            rotated_sur_ien[ee * s_nLocBas + 1],
-                            rotated_sur_ien[ee * s_nLocBas + 2],
-                            rotated_sur_ien[ee * s_nLocBas + 3]};
+                           rotated_sur_ien[ee * s_nLocBas + 1],
+                           rotated_sur_ien[ee * s_nLocBas + 2],
+                           rotated_sur_ien[ee * s_nLocBas + 3]};
 
-      const int node_q_gi[4] {rotated_global_node[node_q[0]] + total_num_fixed_pt,
-                              rotated_global_node[node_q[1]] + total_num_fixed_pt,
-                              rotated_global_node[node_q[2]] + total_num_fixed_pt,
-                              rotated_global_node[node_q[3]] + total_num_fixed_pt};
+      const std::array<int, 4> node_q_gi {{ rotated_global_node[node_q[0]] + total_num_fixed_pt,
+                                            rotated_global_node[node_q[1]] + total_num_fixed_pt,
+                                            rotated_global_node[node_q[2]] + total_num_fixed_pt,
+                                            rotated_global_node[node_q[3]] + total_num_fixed_pt }};
 
       const int cell_gi = rotated_global_cell[ee] + total_num_fixed_elem;
 
-      const int hex_n[8] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
-                            VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3),
-                            VIEN->get_IEN(cell_gi, 5), VIEN->get_IEN(cell_gi, 6),
-                            VIEN->get_IEN(cell_gi, 7), VIEN->get_IEN(cell_gi, 8), };
+      hexcell->reset( VIEN->get_IEN_array8(cell_gi) );
 
-      hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
-                      hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
-      rotated_face_id[ee] = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);
+      rotated_face_id[ee] = hexcell->get_face_id( node_q_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
-        rotated_layer_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+        rotated_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
     }
 
     delete hexcell;
@@ -206,46 +181,46 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
     SYS_T::print_fatal("Error: Interface_pair, unknown element type.\n");
 
   // Generate the global node id and xyz
-  fixed_layer_global_node = fixed_layer_vien;
-  VEC_T::sort_unique_resize(fixed_layer_global_node);
-  const int num_fixed_layer_node = VEC_T::get_size(fixed_layer_global_node);
+  fixed_global_node = fixed_vien;
+  VEC_T::sort_unique_resize(fixed_global_node);
+  const int num_fixed_node = VEC_T::get_size(fixed_global_node);
 
-  // PERIGEE_OMP_PARALLEL_FOR
-  for(int &nodeid : fixed_layer_vien)
+  for(int &nodeid : fixed_vien)
   {
-    const int local_id = VEC_T::get_pos(fixed_layer_global_node, nodeid);
+    const int local_id = VEC_T::get_pos(fixed_global_node, nodeid);
     nodeid = local_id;
   }
 
-  fixed_layer_pt_xyz.resize(3 * num_fixed_layer_node);
+  fixed_pt_xyz.resize(3 * num_fixed_node);
+  
   PERIGEE_OMP_PARALLEL_FOR
-  for(int nn=0; nn<num_fixed_layer_node; ++nn)
+  for(int nn=0; nn<num_fixed_node; ++nn)
   {
-    const int GID = fixed_layer_global_node[nn];
-    fixed_layer_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
-    fixed_layer_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
-    fixed_layer_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
+    const int GID = fixed_global_node[nn];
+    fixed_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
+    fixed_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
+    fixed_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
   }
 
-  rotated_layer_global_node = rotated_layer_vien;
-  VEC_T::sort_unique_resize(rotated_layer_global_node);
-  const int num_rotated_layer_node = VEC_T::get_size(rotated_layer_global_node);
+  rotated_global_node = rotated_vien;
+  VEC_T::sort_unique_resize(rotated_global_node);
+  const int num_rotated_node = VEC_T::get_size(rotated_global_node);
 
-  // PERIGEE_OMP_PARALLEL_FOR
-  for(int &nodeid : rotated_layer_vien)
+  for(int &nodeid : rotated_vien)
   {
-    const int local_id = VEC_T::get_pos(rotated_layer_global_node, nodeid);
+    const int local_id = VEC_T::get_pos(rotated_global_node, nodeid);
     nodeid = local_id;
   }
 
-  rotated_layer_pt_xyz.resize(3 * num_rotated_layer_node);
+  rotated_pt_xyz.resize(3 * num_rotated_node);
+  
   PERIGEE_OMP_PARALLEL_FOR
-  for(int nn=0; nn<num_rotated_layer_node; ++nn)
+  for(int nn=0; nn<num_rotated_node; ++nn)
   {
-    const int GID = rotated_layer_global_node[nn];
-    rotated_layer_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
-    rotated_layer_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
-    rotated_layer_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
+    const int GID = rotated_global_node[nn];
+    rotated_pt_xyz[3 * nn]     = all_vol_ctrlPts[3 * GID];
+    rotated_pt_xyz[3 * nn + 1] = all_vol_ctrlPts[3 * GID + 1];
+    rotated_pt_xyz[3 * nn + 2] = all_vol_ctrlPts[3 * GID + 2];
   }
 
   Check_interval(intervals_in);
@@ -287,13 +262,13 @@ void Interface_pair::Tag(const std::vector<double> &intervals, const int &num_fi
     Vector_3 ele_centroid(0.0, 0.0, 0.0);
     for(int ii=0; ii<s_nLocBas; ++ii)
     {
-      int node = fixed_sur_ien[ee * s_nLocBas + ii];
+      const int node = fixed_sur_ien[ee * s_nLocBas + ii];
       ele_centroid.x() += fixed_sur_pt_xyz[3 * node];
       ele_centroid.y() += fixed_sur_pt_xyz[3 * node + 1];
       ele_centroid.z() += fixed_sur_pt_xyz[3 * node + 2];
     }
 
-    ele_centroid *= (1.0 / (double) s_nLocBas);
+    ele_centroid *= (1.0 / static_cast<double>(s_nLocBas) );
 
     fixed_interval_tag[ee] = Group(ele_centroid, intervals);
   }
@@ -311,7 +286,7 @@ void Interface_pair::Tag(const std::vector<double> &intervals, const int &num_fi
       ele_centroid.z() += rotated_sur_pt_xyz[3 * node + 2];
     }
 
-    ele_centroid *= (1.0 / (double) s_nLocBas);
+    ele_centroid *= (1.0 / static_cast<double>(s_nLocBas) );
 
     rotated_interval_tag[ee] = Group(ele_centroid, intervals);
   }
@@ -351,11 +326,11 @@ int Interface_pair::Group(const Vector_3 &ele_centroid, const std::vector<double
     break;
     
     default:
-      {
+    {
       SYS_T::print_fatal("Error, Interface_pair: wrong interface type.\n");
       return -1;
-      }
-      break;
+    }
+    break;
   }
   return -1;
 }

@@ -22,14 +22,7 @@
 // Author: Xuanming Huag
 // Date: Jun 24 2024
 // ============================================================================
-
-#include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
-#include "Vector_3.hpp"
-#include "VTK_Tools.hpp"
 #include "HDF5_Tools.hpp"
-#include "IIEN.hpp"
-#include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 
 class Interface_pair
@@ -59,43 +52,43 @@ class Interface_pair
                     const std::vector<double> &intervals_in,
                     const Vector_3 &centroid_in );
 
+    virtual ~Interface_pair(){};
+
     virtual int get_num_fixed_ele() const
     {return  num_fixed_ele;}
 
-    virtual int get_fixed_part_tag(const int &cell_index) const
-    {return fixed_part_tag[cell_index];}
+    virtual int get_fixed_cpu_rank(const int &cell_index) const
+    {return fixed_cpu_rank[cell_index];}
 
     virtual int get_fixed_faceID(const int &cell_index) const
     {return fixed_face_id[cell_index];}
 
-    virtual std::vector<int> get_FL_vien() const
-    {return fixed_layer_vien;}
+    virtual std::vector<int> get_fixed_vien() const
+    {return fixed_vien;}
 
-    virtual std::vector<int> get_FLN_GID() const
-    {return fixed_layer_global_node;}
+    virtual std::vector<int> get_fixed_global_node() const
+    {return fixed_global_node;}
 
-    virtual std::vector<double> get_FLN_xyz() const
-    {return fixed_layer_pt_xyz;}
+    virtual std::vector<double> get_fixed_pt_xyz() const
+    {return fixed_pt_xyz;}
 
-    virtual std::vector<int> get_FIT() const
+    virtual std::vector<int> get_fixed_interval_tag() const
     {return fixed_interval_tag;}
 
     virtual std::vector<int> get_rotated_faceID() const
     {return rotated_face_id;}
 
-    virtual std::vector<int> get_RL_vien() const
-    {return rotated_layer_vien;}
+    virtual std::vector<int> get_rotated_vien() const
+    {return rotated_vien;}
 
-    virtual std::vector<int> get_RLN_GID() const
-    {return rotated_layer_global_node;}
+    virtual std::vector<int> get_rotated_global_node() const
+    {return rotated_global_node;}
 
-    virtual std::vector<double> get_RLN_xyz() const
-    {return rotated_layer_pt_xyz;}
+    virtual std::vector<double> get_rotated_pt_xyz() const
+    {return rotated_pt_xyz;}
 
-    virtual std::vector<int> get_RIT() const
+    virtual std::vector<int> get_rotated_interval_tag() const
     {return rotated_interval_tag;}
-
-    virtual ~Interface_pair(){};
 
   private:
     // 0: Lofted along an axis
@@ -103,8 +96,7 @@ class Interface_pair
     const int interface_type;
 
     // the number of local basis function in a surface/volume element
-    int s_nLocBas;
-    int v_nLocBas;
+    int s_nLocBas, v_nLocBas;
 
     // the axial direction of type 0 interface-pair
     const int T0_axial_direction;
@@ -116,19 +108,19 @@ class Interface_pair
     int num_fixed_ele;
 
     // the partition tag of the fixed layer elements
-    std::vector<int> fixed_part_tag;
+    std::vector<int> fixed_cpu_rank;
 
     // the face id of the fixed layer elements
     std::vector<int> fixed_face_id;
 
     // the ien array of the fixed layer
-    std::vector<int> fixed_layer_vien;
+    std::vector<int> fixed_vien;
 
     // the GlobalNodeID of the fixed layer nodes
-    std::vector<int> fixed_layer_global_node;
+    std::vector<int> fixed_global_node;
 
-    // the xyz-coordinate of nodes, corresponding to the fixed_layer_global_node
-    std::vector<double> fixed_layer_pt_xyz;
+    // the xyz-coordinate of nodes, corresponding to the fixed_global_node
+    std::vector<double> fixed_pt_xyz;
 
     // the interval tag of the fixed layer elements
     std::vector<int> fixed_interval_tag;
@@ -140,13 +132,13 @@ class Interface_pair
     std::vector<int> rotated_face_id;
 
     // the ien array of the rotated layer
-    std::vector<int> rotated_layer_vien;
+    std::vector<int> rotated_vien;
 
     // the GlobalNodeID of the rotated layer nodes
-    std::vector<int> rotated_layer_global_node;
+    std::vector<int> rotated_global_node;
 
-    // the xyz-coordinate of nodes, corresponding to the rotated_layer_global_node
-    std::vector<double> rotated_layer_pt_xyz;
+    // the xyz-coordinate of nodes, corresponding to the rotated_global_node
+    std::vector<double> rotated_pt_xyz;
 
     // the interval tag of the rotated layer elements
     std::vector<int> rotated_interval_tag;
@@ -177,7 +169,6 @@ class Interface_pair
     virtual int Group(const Vector_3 &ele_centroid, const std::vector<double> &intervals);
 
     Interface_pair() = delete;
-
 };
 
 #endif

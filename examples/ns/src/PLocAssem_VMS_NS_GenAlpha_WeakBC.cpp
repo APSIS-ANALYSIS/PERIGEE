@@ -12,9 +12,6 @@ PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
   in_rho, in_vis_mu, in_beta, elemtype, in_ct, in_ctauc), C_bI(in_C_bI)
 { }
 
-PLocAssem_VMS_NS_GenAlpha_WeakBC::~PLocAssem_VMS_NS_GenAlpha_WeakBC()
-{ }
-
 void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");

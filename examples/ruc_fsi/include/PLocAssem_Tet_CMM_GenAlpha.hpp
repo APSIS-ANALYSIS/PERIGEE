@@ -120,7 +120,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
         const IQuadPts * const &quad );
 
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
@@ -130,7 +129,6 @@ class PLocAssem_Tet_CMM_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &dot_sol,
         const double * const &sol,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,

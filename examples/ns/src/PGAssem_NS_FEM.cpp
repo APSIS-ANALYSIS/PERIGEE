@@ -319,7 +319,7 @@ void PGAssem_NS_FEM::Assem_residual(
   delete [] row_index; row_index = nullptr;
   
   // Backflow stabilization residual contribution
-  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
@@ -410,7 +410,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Resistance type boundary condition
   NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
@@ -464,7 +464,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
 
@@ -476,7 +476,6 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 void PGAssem_NS_FEM::BackFlow_G( 
-    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -484,18 +483,15 @@ void PGAssem_NS_FEM::BackFlow_G(
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_a = new double [nlgn * dof_sol];
-  double * array_b = new double [nlgn * dof_sol];
-  double * local_as = new double [dof_sol * snLocBas];
-  double * local_bs = new double [dof_sol * snLocBas];
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
-  dot_sol->GetLocalArray( array_a );
-  sol->GetLocalArray( array_b );
+  sol->GetLocalArray( array );
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -507,11 +503,10 @@ void PGAssem_NS_FEM::BackFlow_G(
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+      GetLocal(array, LSIEN, snLocBas, local);
 
-      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+      lassem_ptr->Assem_Residual_BackFlowStab( local, element_s, 
+          sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -523,10 +518,8 @@ void PGAssem_NS_FEM::BackFlow_G(
     }
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_as; local_as = nullptr;
-  delete [] local_bs; local_bs = nullptr;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
   delete [] LSIEN; LSIEN = nullptr;
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
@@ -535,7 +528,6 @@ void PGAssem_NS_FEM::BackFlow_G(
 }
 
 void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
-    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -543,18 +535,15 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_a = new double [nlgn * dof_sol];
-  double * array_b = new double [nlgn * dof_sol];
-  double * local_as = new double [dof_sol * snLocBas];
-  double * local_bs = new double [dof_sol * snLocBas];
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [snLocBas * dof_sol];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
-  dot_sol->GetLocalArray( array_a );
-  sol->GetLocalArray( array_b );
+  sol->GetLocalArray( array );
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -566,11 +555,10 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+      GetLocal(array, LSIEN, snLocBas, local);
 
-      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local, element_s, 
+          sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -585,10 +573,8 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     }
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_as; local_as = nullptr;
-  delete [] local_bs; local_bs = nullptr;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
   delete [] LSIEN; LSIEN = nullptr;
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
@@ -857,9 +843,9 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        Res[3*ii+0] = lassem_ptr->Residual[4*ii+1];
-        Res[3*ii+1] = lassem_ptr->Residual[4*ii+2];
-        Res[3*ii+2] = lassem_ptr->Residual[4*ii+3];
+        Res[3*ii+0] = lassem_ptr->sur_Residual[4*ii+1];
+        Res[3*ii+1] = lassem_ptr->sur_Residual[4*ii+2];
+        Res[3*ii+2] = lassem_ptr->sur_Residual[4*ii+3];
 
         srow_idx[3*ii+0] = dof_mat * nbc_part->get_LID(1, LSIEN[ii]) + 1;
         srow_idx[3*ii+1] = dof_mat * nbc_part->get_LID(2, LSIEN[ii]) + 2;
@@ -964,9 +950,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
       // Residual vector is scaled by the resistance value
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        Res[3*ii+0] = resis_val * lassem_ptr->Residual[4*ii+1];
-        Res[3*ii+1] = resis_val * lassem_ptr->Residual[4*ii+2];
-        Res[3*ii+2] = resis_val * lassem_ptr->Residual[4*ii+3];
+        Res[3*ii+0] = resis_val * lassem_ptr->sur_Residual[4*ii+1];
+        Res[3*ii+1] = resis_val * lassem_ptr->sur_Residual[4*ii+2];
+        Res[3*ii+2] = resis_val * lassem_ptr->sur_Residual[4*ii+3];
       }
 
       for(int A=0; A<snLocBas; ++A)
@@ -977,9 +963,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
           for(int B=0; B<num_face_nodes; ++B)
           {
             // Residual[4*A+ii+1] is intNB[A]*out_n[ii]
-            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.x();
-            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.y();
-            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.z();
+            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->sur_Residual[4*A+ii+1] * intNB[B] * out_n.x();
+            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->sur_Residual[4*A+ii+1] * intNB[B] * out_n.y();
+            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->sur_Residual[4*A+ii+1] * intNB[B] * out_n.z();
           }
         }
       }

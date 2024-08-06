@@ -297,8 +297,7 @@ class IPLocAssem
     // for the residual only.
     // ------------------------------------------------------------------------
     virtual void Assem_Residual_BackFlowStab(
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -312,8 +311,7 @@ class IPLocAssem
     // ------------------------------------------------------------------------
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
-        const double * const &vec_a,
-        const double * const &vec_b,
+        const double * const &vec,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
