@@ -225,9 +225,9 @@ namespace VEC_T
 
   // --------------------------------------------------------------------------
   // ! cast_to_unsigned_int
-  //   Convert a std::vector<int> to std::vector<unsigned int>.
+  //   Convert a std::vector<T> to std::vector<unsigned int>.
   // --------------------------------------------------------------------------
-  inline std::vector<unsigned int> cast_to_unsigned_int( const std::vector<int> &vec )
+  template<typename T> std::vector<unsigned int> cast_to_unsigned_int( const std::vector<T> &vec )
   {
     std::vector<unsigned int> output( vec.size() );
 
