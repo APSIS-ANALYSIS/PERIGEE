@@ -78,6 +78,10 @@ int main( int argc, char * argv[] )
   cout<<"elemType: "<<elemType<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
+  SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
+  SYS_T::file_check(geo_ws_file); std::cout<<geo_ws_file<<" found. \n";
+  SYS_T::file_check(geo_t_file); std::cout<<geo_t_file<<" found. \n";
+
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
   int nFunc_v, nElem;
@@ -268,9 +272,9 @@ int main( int argc, char * argv[] )
   // basis vectors of the nodes. The list includes radial, longitudinal, and
   // circumferential basis, denoting by r, l, and c, respectively.
   const std::vector<int> solid_node_id = VTK_T::read_int_PointData(geo_ws_file, "GlobalNodeID");
-  const std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_ws_file, "radial_normal");
-  const std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_ws_file, "circumferential_normal");
-  const std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_ws_file, "longitudinal_normal");
+  std::vector<Vector_3> basis_r  = VTK_T::read_Vector_3_PointData(geo_ws_file, "radial_normal");
+  std::vector<Vector_3> basis_c  = VTK_T::read_Vector_3_PointData(geo_ws_file, "circumferential_normal");
+  std::vector<Vector_3> basis_l  = VTK_T::read_Vector_3_PointData(geo_ws_file, "longitudinal_normal");
 
   SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_r.size(), "ERROR: radial_basis is not matched.");
