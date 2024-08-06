@@ -178,6 +178,25 @@ namespace MATH_T
     }
   }
 
+  // ----------------------------------------------------------------
+  // Get the angle of the given 2d vector to the x-axis, range [0, 2 * PI)
+  // ----------------------------------------------------------------
+  inline double get_angle_2d(const double &xx, const double &yy)
+  {
+    const double rr = std::sqrt(xx * xx + yy * yy);
+
+    // If the radius is too short, we regard the angle as 0
+    if (rr <= 1e-14) return 0.0;
+
+    const double cos_theta = xx / rr;
+    const double sin_theta = yy / rr;
+
+    double theta = std::acos(cos_theta); // range [0, PI]
+    if (sin_theta < 0) theta = 2 * MATH_T::PI - theta; // range [0, 2 * PI)
+
+    return theta;
+  }
+
   // ==========================================================================
   // Dense Matrix tool
   // This is an implementation of dense matrix in C++.

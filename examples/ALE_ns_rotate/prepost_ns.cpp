@@ -31,6 +31,8 @@ int main( int argc, char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
+  std::string rotated_geo_file = cmd_h5r -> read_string("/", "rotated_geo_file");
+
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
@@ -57,6 +59,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<"part_file: "<<part_file<<endl;
   cout<<"geo_file: "<<geo_file<<endl;
+  cout<<"rotated_geo_file: "<<rotated_geo_file<<endl;
   cout<<"elemType: "<<elemType<<endl;
   cout<<"dof_num: "<<dofNum<<endl;
 
@@ -67,9 +70,25 @@ int main( int argc, char * argv[] )
 
   // Check if the given geo file exist
   SYS_T::file_check( geo_file );
+  SYS_T::file_check( rotated_geo_file );
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
-  
+  const int fixed_nFunc = nFunc;  
+
+  int rotated_nFunc, rotated_nElem;
+  std::vector<int> rotated_vecIEN;
+  std::vector<double> rotated_ctrlPts;
+
+  VTK_T::read_vtu_grid(rotated_geo_file, rotated_nFunc, rotated_nElem, rotated_ctrlPts, rotated_vecIEN);
+  nFunc += rotated_nFunc;
+  nElem += rotated_nElem;
+
+  for (int &nodeid : rotated_vecIEN)
+    nodeid += fixed_nFunc;
+
+  VEC_T::insert_end(vecIEN, rotated_vecIEN);
+  VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
+
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
   

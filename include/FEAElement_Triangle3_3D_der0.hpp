@@ -64,6 +64,48 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     virtual double get_detJac(const int &quaindex) const {return detJac;}
 
+    // Return the derivatives of the physical coordinates with respect to the
+    // element reference coordinate.
+    // These functions are needed in the FE_T::search_closest_point function,
+    // which is called inside the sliding interface formulation.
+    virtual Vector_3 get_dx_dr( const int &quaindex,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z ) const
+    {
+      return Vector_3( - ctrl_x[0] + ctrl_x[1],
+                       - ctrl_y[0] + ctrl_y[1],
+                       - ctrl_z[0] + ctrl_z[1] );
+    }
+    
+    virtual Vector_3 get_dx_ds( const int &quaindex,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z ) const
+    {
+      return Vector_3( - ctrl_x[0] + ctrl_x[2],
+                       - ctrl_y[0] + ctrl_y[2],
+                       - ctrl_z[0] + ctrl_z[2] );
+    }
+
+    virtual Vector_3 get_d2x_drr( const int &quaindex,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z ) const
+    {return Vector_3(0.0, 0.0, 0.0);}
+
+    virtual Vector_3 get_d2x_dss( const int &quaindex,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z ) const
+    {return Vector_3(0.0, 0.0, 0.0);}
+
+    virtual Vector_3 get_d2x_drs( const int &quaindex,
+        const double * const &ctrl_x,
+        const double * const &ctrl_y,
+        const double * const &ctrl_z ) const
+    {return Vector_3(0.0, 0.0, 0.0);}
+
   private:
     const int numQuapts;
 

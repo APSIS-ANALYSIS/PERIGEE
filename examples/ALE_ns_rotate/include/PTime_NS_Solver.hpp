@@ -24,10 +24,10 @@ class PTime_NS_Solver
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-        const double &TI_std_dev,
         PDNSolution * const &sol_base,
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
+        const PDNSolution * const &init_disp,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         PDNTimeStep * const &time_info,
         const ICVFlowRate * const flr_ptr,
@@ -40,12 +40,15 @@ class PTime_NS_Solver
         const ALocal_EBC * const &ebc_part,
         IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
+        ALocal_Interface * const &itf_part,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
@@ -60,6 +63,8 @@ class PTime_NS_Solver
     std::string Name_Generator( const int &counter ) const;
     
     std::string Name_dot_Generator( const int &counter ) const;
+
+    std::string Name_disp_Generator( const int &counter ) const;
     
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;

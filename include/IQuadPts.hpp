@@ -8,6 +8,7 @@
 // Date Modified: Jan. 17 2017
 // ============================================================================
 #include "Sys_Tools.hpp"
+#include <vector>
 
 class IQuadPts
 {
@@ -114,6 +115,23 @@ class IQuadPts
     {
       SYS_T::print_fatal("Error: IQuadPts::get_qp is not implemented.\n");
       return 0.0;
+    }
+
+    // For User-defined QuadPts
+    virtual void set_qp(const double &xi, const double &eta)
+    {
+      SYS_T::print_fatal("Error: IQuadPts::set_qp is not implemented.\n");
+    }
+
+    virtual void reset()
+    {
+      SYS_T::print_fatal("Error: IQuadPts::reset is not implemented. \n");
+    }
+
+    virtual bool check_qp_bound() const
+    {
+      SYS_T::print_fatal("Error: IQuadPts::check_qp_bound is not implemented. \n");
+      return false;
     }
 };
 

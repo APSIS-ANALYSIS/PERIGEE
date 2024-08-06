@@ -19,6 +19,7 @@
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
+#include "FE_Tools.hpp"
 
 class PGAssem_NS_FEM : public IPGAssem
 {
@@ -27,13 +28,17 @@ class PGAssem_NS_FEM : public IPGAssem
     PGAssem_NS_FEM( 
         IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quads,
+        IQuadPts * const &free_quad,
         const IAGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
+        const ALocal_Interface * const &part_itf,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
@@ -45,11 +50,15 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
+        const ALocal_Interface * const &itf_part,
         const IGenBC * const &gbc );
 
     // Assem mass matrix and residual vector
@@ -60,13 +69,16 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &elementv,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const ALocal_WeakBC * const &wbc_part );
+        const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part );
 
     // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
@@ -81,14 +93,17 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &elementv,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part );
+        const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part );
 
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
@@ -104,14 +119,17 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &elementv,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part );
+        const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
@@ -147,6 +165,15 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id );
 
+    virtual void search_all_opposite_point(
+        const double &curr_time,
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        ALocal_Interface * const &itf_part );
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
@@ -168,8 +195,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     // Backflow integral on outlet surfaces
-    void BackFlow_G( const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
+    void BackFlow_G( const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
@@ -177,7 +203,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part );
 
     void BackFlow_KG( const double &dt,
-        const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
@@ -209,6 +234,7 @@ class PGAssem_NS_FEM : public IPGAssem
     // Weak imposition of no-slip boundary condition on wall
     void Weak_EssBC_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &sol,
+        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_vs,
         const IQuadPts * const &quad_s,
@@ -219,6 +245,7 @@ class PGAssem_NS_FEM : public IPGAssem
 
     void Weak_EssBC_G( const double &curr_time, const double &dt,
         const PDNSolution * const &sol,
+        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_vs,
         const IQuadPts * const &quad_s,
@@ -226,6 +253,37 @@ class PGAssem_NS_FEM : public IPGAssem
         const FEANode * const &fnode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_WeakBC * const &wbc_part);
+
+    virtual void Interface_KG(
+        const double &curr_time, const double &dt,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_Interface * const &itf_part );
+
+    virtual void Interface_G(
+        const double &curr_time, const double &dt,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_Interface * const &itf_part );
+
+    virtual void search_opposite_point(
+        const double &curr_time,
+        const Vector_3 &fixed_pt,
+        const ALocal_Interface * const &itf_part,
+        const int &itf_id,
+        FEAElement * rotated_elementv,
+        FEAElement * elements,
+        int &tag,
+        int &rotated_ee,
+        IQuadPts * const &rotated_xi );
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const

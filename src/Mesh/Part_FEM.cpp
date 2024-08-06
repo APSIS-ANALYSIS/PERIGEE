@@ -60,6 +60,71 @@ Part_FEM::Part_FEM(
   }
 }
 
+Part_FEM::Part_FEM(
+    const IMesh * const &mesh,
+    const IGlobal_Part * const &gpart,
+    const Map_Node_Index * const &mnindex,
+    const IIEN * const &IEN,
+    const std::vector<double> &ctrlPts,
+    const std::vector<int> &rotatedtag,
+    const int &in_cpu_rank, const int &in_cpu_size,
+    const int &in_elemType, const Field_Property &fp )
+: nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
+  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
+  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
+  probDim(3), elemType(in_elemType),
+  field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
+  is_geo_field( fp.get_is_geo_field() ),
+  field_name( fp.get_name() )
+{
+  // Initialize group 3 data
+  cpu_rank = in_cpu_rank;
+  cpu_size = in_cpu_size;
+
+  // Check the cpu info
+  SYS_T::print_fatal_if(cpu_size < 1, "Error: Part_FEM input cpu_size is wrong! \n");
+  SYS_T::print_fatal_if(cpu_rank >= cpu_size, "Error: Part_FEM input cpu_rank is wrong! \n");
+  SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
+
+  // Generate group 1, 2, and 5.
+  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
+
+  // Generate group 6, if the field is tagged as is_geo_field == true
+  // local copy of control points
+  if( is_geo_field == true )
+  {
+    ctrlPts_x_loc.resize(nlocghonode);
+    ctrlPts_y_loc.resize(nlocghonode);
+    ctrlPts_z_loc.resize(nlocghonode);
+
+    PERIGEE_OMP_PARALLEL_FOR
+    for(int ii=0; ii<nlocghonode; ++ii)
+    {
+      int aux_index = local_to_global[ii];         // new global index
+      aux_index = mnindex->get_new2old(aux_index); // back to old global index
+      ctrlPts_x_loc[ii] = ctrlPts[3*aux_index + 0];
+      ctrlPts_y_loc[ii] = ctrlPts[3*aux_index + 1];
+      ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
+    }
+
+    VEC_T::shrink2fit(ctrlPts_x_loc);
+    VEC_T::shrink2fit(ctrlPts_y_loc);
+    VEC_T::shrink2fit(ctrlPts_z_loc);
+
+    std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
+  }
+  else
+  {
+    ctrlPts_x_loc.clear();
+    ctrlPts_y_loc.clear();
+    ctrlPts_z_loc.clear();
+  }
+
+  // Generate the local array tagging the rotated element.
+  elem_rotated_tag.resize( nlocalele );
+  for(int ii=0; ii<nlocalele; ++ii) elem_rotated_tag[ii] = rotatedtag[ elem_loc[ii] ];
+}
+
 Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( inputfileName, in_cpu_rank );
@@ -291,6 +356,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_1, "nlocalele", nlocalele );
   h5w->write_intVector( group_id_1, "elem_loc", elem_loc );
+  h5w->write_intVector( group_id_1, "elem_rotated_tag", elem_rotated_tag );
 
   H5Gclose( group_id_1 );
 

@@ -14,6 +14,7 @@
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_V.hpp"
 
 class PNonlinear_NS_Solver
 {
@@ -55,17 +56,21 @@ class PNonlinear_NS_Solver
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
+        ALocal_Interface * const &itf_part,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
+        PDNSolution * const &disp_mesh,
         bool &conv_flag, int &nl_counter ) const;
 
   private:
