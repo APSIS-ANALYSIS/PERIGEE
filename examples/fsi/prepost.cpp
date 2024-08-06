@@ -41,6 +41,7 @@ int main( int argc, char * argv[] )
   const int num_layer = cmd_h5r -> read_intScalar("/", "num_layer");
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string geo_ws_file = cmd_h5r -> read_string("/", "geo_ws_file");
+  const std::string geo_t_file = cmd_h5r -> read_string("/", "geo_t_file");
   const std::string sur_s_file_interior_wall_base = cmd_h5r -> read_string("/", "sur_s_file_interior_wall_base");
   const std::string sur_ilt_file_interior_wall = cmd_h5r-> read_string("/", "sur_ilt_file_interior_wall");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
@@ -72,6 +73,7 @@ int main( int argc, char * argv[] )
   cout<<"num_layer: "<<num_layer<<endl;
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"geo_ws_file: "<<geo_ws_file<<endl;
+  cout<<"geo_t_file: "<<geo_t_file<<endl;
   cout<<"sur_s_file_interior_wall_base: "<<sur_s_file_interior_wall_base<<endl;
   cout<<"elemType: "<<elemType<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
@@ -275,6 +277,34 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(solid_node_id.size() != basis_c.size(), "ERROR: circumferential_basis is not matched.");
   SYS_T::print_fatal_if(solid_node_id.size() != basis_l.size(), "ERROR: longitudinal_basis is not matched.");
   std::cout<<"=== Direction basis vectors generated.\n";
+  // --------------------------------------------------------------------------
+  
+  // --------------------------------------------------------------------------
+  // Read the geometry file for the tissue domain, generate the list of direction
+  // basis vectors of the nodes. The list includes radial, longitudinal, and
+  // circumferential basis, denoting by r, l, and c, respectively.
+  const std::vector<int> solid_node_id_t = VTK_T::read_int_PointData(geo_t_file, "GlobalNodeID");
+  const std::vector<Vector_3> basis_r_t  = VTK_T::read_Vector_3_PointData(geo_t_file, "radial_normal");
+  const std::vector<Vector_3> basis_c_t  = VTK_T::read_Vector_3_PointData(geo_t_file, "circumferential_normal");
+  const std::vector<Vector_3> basis_l_t  = VTK_T::read_Vector_3_PointData(geo_t_file, "longitudinal_normal");
+
+  SYS_T::print_fatal_if(v_node_s != solid_node_id, "ERROR: GlobalNodeID for solid geometry file is not equal to the whole FSI domain.");
+  SYS_T::print_fatal_if(solid_node_id_t.size() != basis_r_t.size(), "ERROR: radial_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id_t.size() != basis_c_t.size(), "ERROR: circumferential_basis is not matched.");
+  SYS_T::print_fatal_if(solid_node_id_t.size() != basis_l_t.size(), "ERROR: longitudinal_basis is not matched.");
+  std::cout<<"=== Direction basis vectors of the tissue domain generated.\n";
+  // --------------------------------------------------------------------------
+
+  // --------------------------------------------------------------------------
+  // Update the local basis
+  std::cout << "=== Update the local basis. \n";
+  for(unsigned int ii=0; ii<solid_node_id_t.size(); ++ii)
+  {
+    int pos = VEC_T::get_pos(solid_node_id, solid_node_id_t[ii]);
+    basis_r[pos] = basis_r_t[ii];
+    basis_c[pos] = basis_c_t[ii];
+    basis_l[pos] = basis_l_t[ii];
+  }
   // --------------------------------------------------------------------------
 
   std::vector<IIEN const *> ienlist;
