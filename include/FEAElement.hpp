@@ -352,6 +352,17 @@ class FEAElement
     {
       SYS_T::commPrint("Warning: get_face_ctrlPts is not implemented. \n");
     }
+
+    virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
+        const double * const &volctrl_x,
+        const double * const &volctrl_y,
+        const double * const &volctrl_z )
+    {
+      SYS_T::commPrint("Warning: get_face_ctrlPts is not implemented. \n");
+    
+      return {{ }};
+    }
+
 };
 
 #endif
