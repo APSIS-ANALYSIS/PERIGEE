@@ -38,6 +38,29 @@
 
 int main(int argc, char *argv[])
 {
+  FEAElement * aa = new FEAElement_Tet4( 4 );
+
+  double vx[4] = {1.0, 2.0, 3.0, 4.0};
+  double vy[4] = {1.1, 2.1, 3.1, 4.1};
+  double vz[4] = {1.2, 2.2, 3.2, 4.3};
+
+  std::vector<double> fx, fy, fz;
+
+  const int id = 0;
+
+  aa -> get_face_ctrlPts( id, &vx[0], &vy[0], &vz[0], fx, fy, fz );
+
+  auto out = aa -> get_face_ctrlPts( id, &vx[0], &vy[0], &vz[0] );
+
+  if( VEC_T::is_equal(fx, out[0], 1.0e-18)) std::cout<<"YES\n";
+  else std::cout<<"NO\n"; 
+
+  if( VEC_T::is_equal(fy, out[1], 1.0e-18)) std::cout<<"YES\n";
+  else std::cout<<"NO\n"; 
+  
+  if( VEC_T::is_equal(fz, out[2], 1.0e-18)) std::cout<<"YES\n";
+  else std::cout<<"NO\n"; 
+  
   return EXIT_SUCCESS;
 }
 
