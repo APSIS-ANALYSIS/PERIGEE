@@ -162,6 +162,11 @@ class FEAElement_Tet4 : public FEAElement
         std::vector<double> &facectrl_y,
         std::vector<double> &facectrl_z );
 
+    virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
+        const double * const &volctrl_x,
+        const double * const &volctrl_y,
+        const double * const &volctrl_z );
+
   private:
     // Number of quadrature points
     const int numQuapts;
