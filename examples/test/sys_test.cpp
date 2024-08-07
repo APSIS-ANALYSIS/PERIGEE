@@ -38,6 +38,18 @@
 
 int main(int argc, char *argv[])
 {
+  std::vector<double> aa {-1.0, 1.0, -2.0, -3.14};
+
+  auto bb = VEC_T::cast_to_unsigned_int( aa );
+
+  VEC_T::print(bb); 
+
+  std::vector<int> cc {-1, 2, 3, 5, -5};
+
+  auto dd = VEC_T::cast_to_unsigned_int( cc );
+
+  VEC_T::print(dd);
+
   return EXIT_SUCCESS;
 }
 
