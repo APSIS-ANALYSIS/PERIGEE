@@ -36,6 +36,13 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include <iomanip>
 
+void test(const double * const &vv, const unsigned int len)
+{
+  for(unsigned int ii=0; ii<len; ++ii)
+    std::cout<<vv[ii]<<'\t';
+  std::cout<<"End of vector \n";
+}
+
 int main(int argc, char *argv[])
 {
   FEAElement * aa = new FEAElement_Tet4( 4 );
@@ -46,7 +53,7 @@ int main(int argc, char *argv[])
 
   std::vector<double> fx, fy, fz;
 
-  const int id = 0;
+  const int id = 2;
 
   aa -> get_face_ctrlPts( id, &vx[0], &vy[0], &vz[0], fx, fy, fz );
 
@@ -60,7 +67,11 @@ int main(int argc, char *argv[])
   
   if( VEC_T::is_equal(fz, out[2], 1.0e-18)) std::cout<<"YES\n";
   else std::cout<<"NO\n"; 
-  
+ 
+  test(&out[0][0], out[0].size());
+  test(&out[1][0], out[1].size());
+  test(&out[2][0], out[2].size());
+   
   return EXIT_SUCCESS;
 }
 
