@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 {
   std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(1.23);
 
-  IMaterialModel_new * matmodel = new MaterialModel_NeoHookean(std::move(vmodel));
+  IMaterialModel_mixed * matmodel = new MaterialModel_NeoHookean(std::move(vmodel), 1.0);
 
   std::cout<<matmodel->get_rho_0()<<'\n';
 

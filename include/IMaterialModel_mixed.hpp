@@ -1,18 +1,26 @@
-#ifndef IMATERIALMODEL_NEW_HPP
-#define IMATERIALMODEL_NEW_HPP
+#ifndef IMATERIALMODEL_MIXED_HPP
+#define IMATERIALMODEL_MIXED_HPP
 // ============================================================================
-// IMaterialModel_new.hpp
+// IMaterialModel_mixed.hpp
 // ============================================================================
 
 #include "IMaterialModel_vol.hpp"
+#include "SymmTensor4_3D.hpp"
 
-class IMaterialModel_new
+class IMaterialModel_mixed
 {
   public:
-    IMaterialModel_new( std::unique_ptr<IMaterialModel_vol> in_vmodel ) 
+    IMaterialModel_mixed( std::unique_ptr<IMaterialModel_vol> in_vmodel ) 
       : vmodel(std::move(in_vmodel)) {};
 
-    virtual ~IMaterialModel_new() = default;
+    virtual ~IMaterialModel_mixed() = default;
+
+    virtual Tensor2_3D get_PK_1st( const Tensor2_3D &F ) const
+    {
+      return F * get_PK_2nd(F);
+    }
+
+    virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const = 0;
 
     double get_rho_0() const {return vmodel->get_rho_0();}
     
