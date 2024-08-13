@@ -37,10 +37,11 @@
 #include <iomanip>
 #include "MaterialModel_NeoHookean.hpp"
 #include "MaterialModel_Vol_Incompressible.hpp"
+#include <memory>
 
 int main(int argc, char *argv[])
 {
-  std::unique_ptr<IMaterialModel_Vol> vmodel = std::make_unique<MaterialModel_Vol_Incompressible>(1.23);
+  std::unique_ptr<IMaterialModel_Vol> vmodel = SYS_T::make_unique<MaterialModel_Vol_Incompressible>(1.23);
 
   IMaterialModel_new * matmodel = new MaterialModel_NeoHookean(std::move(vmodel));
 
