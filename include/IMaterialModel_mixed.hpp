@@ -32,6 +32,8 @@ class IMaterialModel_mixed
 
     double get_dbeta_dp( const double &pp ) const {return vmodel->get_dbeta_dp(pp);}
 
+    double get_elastic_kappa() const {return vmodel->get_elastic_kappa();}
+
   protected:
     std::unique_ptr<IMaterialModel_vol> vmodel;
 };
