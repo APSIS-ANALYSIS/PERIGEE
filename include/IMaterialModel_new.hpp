@@ -20,6 +20,10 @@ class IMaterialModel_new
 
     double get_drho_dp( const double &pp ) const { return vmodel->get_drho_dp(pp);}
 
+    double get_beta( const double &pp ) const {return vmodel->get_beta(pp);}
+
+    double get_dbeta_dp( const double &pp ) const {return vmodel->get_dbeta_dp(pp);}
+
   protected:
     std::unique_ptr<IMaterialModel_vol> vmodel;
 };
