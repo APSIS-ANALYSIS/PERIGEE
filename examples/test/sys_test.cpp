@@ -35,20 +35,16 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include <iomanip>
+#include "MaterialModel_NeoHookean.hpp"
+#include "MaterialModel_Vol_Incompressible.hpp"
 
 int main(int argc, char *argv[])
 {
-  std::vector<double> aa {-1.0, 1.0, -2.0, -3.14};
+  std::unique_ptr<IMaterialModel_Vol> vmodel = std::make_unique<MaterialModel_Vol_Incompressible>(1.23);
 
-  auto bb = VEC_T::cast_to_unsigned_int( aa );
+  IMaterialModel_new * matmodel = new MaterialModel_NeoHookean(std::move(vmodel));
 
-  VEC_T::print(bb); 
-
-  std::vector<int> cc {-1, 2, 3, 5, -5};
-
-  auto dd = VEC_T::cast_to_unsigned_int( cc );
-
-  VEC_T::print(dd);
+  std::cout<<matmodel->get_rho_0()<<'\n';
 
   return EXIT_SUCCESS;
 }
