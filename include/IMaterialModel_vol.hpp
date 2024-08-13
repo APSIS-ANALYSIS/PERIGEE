@@ -1,7 +1,7 @@
 #ifndef IMATERIALMODEL_VOL_HPP
 #define IMATERIALMODEL_VOL_HPP
 // ============================================================================
-// IMaterialModel_Vol.hpp
+// IMaterialModel_vol.hpp
 //
 // Interface for material model of the volumetric behavior.
 // 
@@ -20,24 +20,24 @@
 // ============================================================================
 #include "HDF5_Writer.hpp"
 
-class IMaterialModel_Vol
+class IMaterialModel_vol
 {
   public:
-    IMaterialModel_Vol() = default;
+    IMaterialModel_vol() = default;
 
-    virtual ~IMaterialModel_Vol() = default;
+    virtual ~IMaterialModel_vol() = default;
 
     virtual void print_info() const = 0;
 
     virtual std::string get_model_name() const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_model_name() is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_model_name() is not implemented. \n");
       return std::string( "unknown" );
     }
 
     virtual void write_hdf5( const char * const &fname = "material_model.h5") const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::write_hdf5() is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::write_hdf5() is not implemented. \n");
     }
 
     // ------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_elastic_kappa() const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_elastic_kappa() is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_elastic_kappa() is not implemented. \n");
       return 0.0;
     }
 
@@ -55,7 +55,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_Gibbs_energy( const double &p ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_Gibbs_energy(p) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_Gibbs_energy(p) is not implemented. \n");
       return 0.0;
     }
 
@@ -68,7 +68,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_Helmholtz_energy( const double &J ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_Helmholtz_energy(J) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_Helmholtz_energy(J) is not implemented. \n");
       return 0.0;
     }
 
@@ -80,7 +80,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_rho( const double &p ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_rho(p) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_rho(p) is not implemented. \n");
       return 0.0;
     }
 
@@ -95,7 +95,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_drho_dp( const double &p ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_drho_dp(p) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_drho_dp(p) is not implemented. \n");
       return 0.0;
     }
 
@@ -105,7 +105,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_beta( const double &p ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_beta(p) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_beta(p) is not implemented. \n");
       return 0.0;
     }
 
@@ -115,7 +115,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_dbeta_dp( const double &p ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_dbeta_dp(p) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_dbeta_dp(p) is not implemented. \n");
       return 0.0;
     }
 
@@ -126,7 +126,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_vol_stress( const double &J ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_vol_stress(J) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_vol_stress(J) is not implemented. \n");
       return 0.0;
     }
 
@@ -139,7 +139,7 @@ class IMaterialModel_Vol
     // ------------------------------------------------------------------------
     virtual double get_dvol_stress_dJ( const double &J ) const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_Vol::get_dvol_stress_dJ(J) is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_vol::get_dvol_stress_dJ(J) is not implemented. \n");
       return 0.0;
     }
 

@@ -6,7 +6,7 @@
 class MaterialModel_NeoHookean : public IMaterialModel_new
 {
   public:
-    MaterialModel_NeoHookean( std::unique_ptr<IMaterialModel_Vol> vmodel) 
+    MaterialModel_NeoHookean( std::unique_ptr<IMaterialModel_vol> vmodel) 
       : IMaterialModel_new(std::move(vmodel)) {};
 
   private:

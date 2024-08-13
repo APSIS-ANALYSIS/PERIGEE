@@ -1,7 +1,7 @@
 #ifndef MATERIALMODEL_VOL_INCOMPRESSIBLE_HPP
 #define MATERIALMODEL_VOL_INCOMPRESSIBLE_HPP
 // ============================================================================
-// MaterialModel_Vol_Incompressible.hpp
+// MaterialModel_vol_Incompressible.hpp
 // 
 // Volumetric model for fully incompressible materials.
 //
@@ -11,18 +11,18 @@
 // Author: Ju Liu
 // Contact: liujuy@gmail.com
 // ============================================================================
-#include "IMaterialModel_Vol.hpp"
+#include "IMaterialModel_vol.hpp"
 
-class MaterialModel_Vol_Incompressible : public IMaterialModel_Vol
+class MaterialModel_vol_Incompressible : public IMaterialModel_vol
 {
   public:
-    MaterialModel_Vol_Incompressible(const double &in_rho_0) : rho_0(in_rho_0) {};
+    MaterialModel_vol_Incompressible(const double &in_rho_0) : rho_0(in_rho_0) {};
 
-    virtual ~MaterialModel_Vol_Incompressible() = default;
+    virtual ~MaterialModel_vol_Incompressible() = default;
 
     virtual void print_info() const
     {
-      SYS_T::commPrint("\t  MaterialModel_Vol_Incompressible: \n");
+      SYS_T::commPrint("\t  MaterialModel_vol_Incompressible: \n");
       SYS_T::commPrint("\t  parameter rho_0 = %e \n", rho_0);
     }
 

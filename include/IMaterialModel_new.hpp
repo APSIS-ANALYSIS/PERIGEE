@@ -4,12 +4,12 @@
 // IMaterialModel_new.hpp
 // ============================================================================
 
-#include "IMaterialModel_Vol.hpp"
+#include "IMaterialModel_vol.hpp"
 
 class IMaterialModel_new
 {
   public:
-    IMaterialModel_new( std::unique_ptr<IMaterialModel_Vol> in_vmodel ) 
+    IMaterialModel_new( std::unique_ptr<IMaterialModel_vol> in_vmodel ) 
       : vmodel(std::move(in_vmodel)) {};
 
     virtual ~IMaterialModel_new() = default;
@@ -21,7 +21,7 @@ class IMaterialModel_new
     double get_drho_dp( const double &pp ) const { return vmodel->get_drho_dp(pp);}
 
   protected:
-    std::unique_ptr<IMaterialModel_Vol> vmodel;
+    std::unique_ptr<IMaterialModel_vol> vmodel;
 };
 
 #endif
