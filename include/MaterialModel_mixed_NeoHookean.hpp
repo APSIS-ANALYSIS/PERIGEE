@@ -12,7 +12,11 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     virtual ~MaterialModel_mixed_NeoHookean() = default;
 
     virtual void print_info() const
-    {}
+    {
+      SYS_T::commPrint("\t  MaterialModel_mixed_NeoHookean: \n");
+      SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
+      vmodel->print_info();
+    }
 
     virtual double get_elastic_mu() const {return mu;}
 

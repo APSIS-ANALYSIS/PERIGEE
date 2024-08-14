@@ -45,24 +45,7 @@ int main(int argc, char *argv[])
 
   IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), 1.0);
 
-  std::cout<<matmodel->get_rho_0()<<'\n';
-
-  SymmTensor4_3D aa;
-  aa.gen_rand();
-
-  aa.print_in_mat();
-
-  const double val = 3.112589;
-
-  auto bb = aa;
-
-  bb *= val * val;
-
-  auto cc = val * val * aa;
-  
-  bb -= cc;
-  bb.print_in_mat();
-
+  matmodel->print_info();
 
   return EXIT_SUCCESS;
 }
