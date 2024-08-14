@@ -33,7 +33,15 @@ class IMaterialModel_mixed
     {
       return F * get_PK_2nd(F);
     }
-    
+   
+    virtual SymmTensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const
+    {
+      Tensor2_3D out = get_PK_1st(F);
+      out = out * Ten2::transpose(F);
+      out *= (1.0 / F.det());
+      return STen2::gen_symm_part(out);
+    }
+
     virtual Tensor4_3D get_PK_FFStiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
@@ -42,6 +50,12 @@ class IMaterialModel_mixed
       AA.MatMult_1(F);
       AA.MatMult_3(F);
       return AA;
+    }
+
+    virtual double get_elastic_mu() const
+    {
+      SYS_T::commPrint("Warning: IMaterialModel_mixed::get_elastic_mu() is not implemented. \n");
+      return 0.0;
     }
 
     double get_rho_0() const {return vmodel->get_rho_0();}
