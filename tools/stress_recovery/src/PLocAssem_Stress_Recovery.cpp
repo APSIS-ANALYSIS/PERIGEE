@@ -83,7 +83,7 @@ void PLocAssem_Stress_Recovery::Assem_Residual(
                        uy_x, uy_y, uy_z,
                        uz_x, uz_y, uz_z);
     
-    const Tensor2_3D stress = matmodel->get_Cauchy_stress( F );
+    const SymmTensor2_3D stress = get_Cauchy_stress( F );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
@@ -92,11 +92,11 @@ void PLocAssem_Stress_Recovery::Assem_Residual(
       const double NA = R[A];
 
       Residual[6*A  ] += gwts * NA * stress(0);
-      Residual[6*A+1] += gwts * NA * stress(4);
-      Residual[6*A+2] += gwts * NA * stress(8);
-      Residual[6*A+3] += gwts * NA * stress(1);
-      Residual[6*A+4] += gwts * NA * stress(5);
-      Residual[6*A+5] += gwts * NA * stress(2);
+      Residual[6*A+1] += gwts * NA * stress(1);
+      Residual[6*A+2] += gwts * NA * stress(2);
+      Residual[6*A+3] += gwts * NA * stress(5);
+      Residual[6*A+4] += gwts * NA * stress(3);
+      Residual[6*A+5] += gwts * NA * stress(4);
     }
   }
 }
