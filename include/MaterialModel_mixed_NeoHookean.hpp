@@ -27,15 +27,14 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
       const double val = elastic_mu * std::pow(F.det(), -pt67);
       const SymmTensor2_3D CC = STen2::gen_left_Cauchy_Green(F);
       const SymmTensor2_3D invCC = STen2::inverse(CC);
-      
       const SymmTensor2_3D S_iso = val * STen2::gen_symm_part( Ten4::gen_P( CC.convert_to_full() ) * Ten2::gen_id() );
-      
+     
+      // First PK stress 
       P_iso = F * S_iso;
+     
+      // Elasticity tensor 
+      SymmTensor4_3D out = pt67 * val * CC.tr() * STen4::gen_Ptilde( invCC );
       
-      SymmTensor4_3D out = STen4::gen_Ptilde( invCC );
-      
-      out *= pt67 * val * CC.tr();
-
       out.add_SymmOutProduct(-pt67, invCC, S_iso);
 
       return out;
