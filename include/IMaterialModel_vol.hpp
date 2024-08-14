@@ -35,11 +35,6 @@ class IMaterialModel_vol
       return std::string( "unknown" );
     }
 
-    virtual void write_hdf5( const char * const &fname = "material_model.h5") const
-    {
-      SYS_T::commPrint("Warning: IMaterialModel_vol::write_hdf5() is not implemented. \n");
-    }
-
     // ------------------------------------------------------------------------
     // Output: The bulk modulus used for defining the volumetric energy
     // ------------------------------------------------------------------------

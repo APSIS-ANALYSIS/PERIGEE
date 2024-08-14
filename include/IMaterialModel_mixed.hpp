@@ -23,11 +23,6 @@ class IMaterialModel_mixed
       return std::string("unknown");
     }
 
-    virtual void write_hdf5( const char * const &fname = "material_model.h5") const
-    {
-      SYS_T::commPrint("Warning: IMaterialModel_mixed::write_hdf5() is not implemented. \n");
-    }
-
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const = 0;
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,

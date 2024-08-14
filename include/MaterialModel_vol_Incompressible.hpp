@@ -31,23 +31,6 @@ class MaterialModel_vol_Incompressible : public IMaterialModel_vol
       return std::string("Incompressible");
     }
 
-    virtual void write_hdf5( const char * const &fname = "material_model.h5" ) const
-    {
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        hid_t file_id = H5Fcreate(fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-        HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-        h5w -> write_string( "model_name", get_model_name() );
-        h5w -> write_doubleScalar( "rho_0", rho_0 );
-        
-        delete h5w; H5Fclose(file_id);
-      }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
-
     virtual double get_Gibbs_energy( const double &p ) const {return p;}
 
     virtual bool is_Gibbs_supported() const {return true;}

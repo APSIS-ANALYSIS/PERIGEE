@@ -41,7 +41,7 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     }
 
   private:
-    double elastic_mu;
+    const double elastic_mu;
 };
 
 #endif
