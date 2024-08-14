@@ -17,7 +17,6 @@
 #include "PLocAssem_Stress_Recovery.hpp"
 #include "PGAssem_Stress_Recovery.hpp"
 #include "PLinear_Solver_PETSc.hpp"
-#include "MaterialModel_Linear_Elasticity.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -152,10 +151,9 @@ int main(int argc, char *argv[])
   // Material model
   const double in_module = 1.0e+5;
   const double in_nu = 0.3;
-  IMaterialModel * matmodel = new MaterialModel_Linear_Elasticity( in_module, in_nu );
   
   // Local assembly routine
-  IPLocAssem * locAssem_ptr = new PLocAssem_Stress_Recovery(matmodel, elementv->get_nLocBas());
+  IPLocAssem * locAssem_ptr = new PLocAssem_Stress_Recovery(elementv->get_nLocBas(), in_nu, in_module);
 
   // Global assembly
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");

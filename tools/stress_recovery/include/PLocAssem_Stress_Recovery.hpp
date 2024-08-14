@@ -9,13 +9,12 @@
 // Date: Jan. 16 2024
 // ============================================================================
 #include "IPLocAssem.hpp"
-#include "IMaterialModel.hpp"
 
 class PLocAssem_Stress_Recovery : public IPLocAssem
 {
   public: 
-    PLocAssem_Stress_Recovery(
-        IMaterialModel * const &in_matmodel, const int &in_nlocbas );
+    PLocAssem_Stress_Recovery( const int &in_nlocbas,
+       const double &in_nu, const double &in_E );
     
     virtual ~PLocAssem_Stress_Recovery();
 
@@ -55,7 +54,9 @@ class PLocAssem_Stress_Recovery : public IPLocAssem
     
   private:
     const int nLocBas, vec_size;
-    IMaterialModel * matmodel;
+    const double modulus_E, nu, lambda, mu, l2mu;
+
+    SymmTensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const;
 
     void print_info() const;
 };

@@ -1,11 +1,13 @@
 #include "PLocAssem_Stress_Recovery.hpp"
 
 PLocAssem_Stress_Recovery::PLocAssem_Stress_Recovery(
-    IMaterialModel * const &in_matmodel, const int &in_nlocbas )
-: nLocBas( in_nlocbas ), vec_size( 6 * nLocBas )
+    const int &in_nlocbas, const double &in_nu, const double &in_E )
+: nLocBas( in_nlocbas ), vec_size( 6 * nLocBas ),
+  modulus_E( in_E ), nu( in_nu ), 
+  lambda( nu * modulus_E / ((1.0 + nu) * (1.0 - 2.0 * nu)) ),
+  mu( 0.5 * modulus_E / (1.0 + nu) ),
+  l2mu( lambda + 2.0 * mu )
 {
-  matmodel = in_matmodel;
-
   Tangent = new PetscScalar[ vec_size * vec_size ];
   Residual = new PetscScalar[ vec_size ];
 
@@ -16,7 +18,7 @@ PLocAssem_Stress_Recovery::PLocAssem_Stress_Recovery(
 
 PLocAssem_Stress_Recovery::~PLocAssem_Stress_Recovery()
 {
-  delete [] Tangent; Tangent = nullptr;
+  delete [] Tangent;  Tangent = nullptr;
   delete [] Residual; Residual = nullptr;
 }
 
@@ -144,7 +146,7 @@ void PLocAssem_Stress_Recovery::Assem_Mass_Residual(
                        uy_x, uy_y, uy_z,
                        uz_x, uz_y, uz_z);
     
-    const Tensor2_3D stress = matmodel->get_Cauchy_stress( F );
+    const SymmTensor2_3D stress = get_Cauchy_stress( F );
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
     
@@ -153,22 +155,28 @@ void PLocAssem_Stress_Recovery::Assem_Mass_Residual(
       const double NA = R[A];
 
       Residual[6*A  ] += gwts * NA * stress(0);
-      Residual[6*A+1] += gwts * NA * stress(4);
-      Residual[6*A+2] += gwts * NA * stress(8);
-      Residual[6*A+3] += gwts * NA * stress(1);
-      Residual[6*A+4] += gwts * NA * stress(5);
-      Residual[6*A+5] += gwts * NA * stress(2);
+      Residual[6*A+1] += gwts * NA * stress(1);
+      Residual[6*A+2] += gwts * NA * stress(2);
+      Residual[6*A+3] += gwts * NA * stress(5);
+      Residual[6*A+4] += gwts * NA * stress(3);
+      Residual[6*A+5] += gwts * NA * stress(4);
 
       for(int B=0; B<nLocBas; ++B)
       {
         // Non-zero diagonal of each A-B block
         for(int C=0; C<6; ++C)
-        {
           Tangent[6*nLocBas*(6*A + C) + 6*B + C] += gwts * NA * R[B];
-        }
       }
     }
   }
+}
+
+SymmTensor2_3D PLocAssem_Stress_Recovery::get_Cauchy_stress( const Tensor2_3D &F ) const
+{
+  return SymmTensor2_3D( l2mu * F(0) + lambda * (F(4) + F(8)),
+                         l2mu * F(4) + lambda * (F(0) + F(8)),
+                         l2mu * F(8) + lambda * (F(0) + F(4)),
+                         mu * ( F(5) + F(7) ), mu * ( F(2) + F(6) ), mu * ( F(1) + F(3) ) );
 }
 
 //EOF

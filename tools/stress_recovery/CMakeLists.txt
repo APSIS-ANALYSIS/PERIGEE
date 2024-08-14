@@ -52,7 +52,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
-  ${perigee_source}/Model/MaterialModel_Linear_Elasticity.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Stress_Recovery.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Stress_Recovery.cpp
   )
