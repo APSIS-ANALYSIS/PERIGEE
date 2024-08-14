@@ -35,7 +35,7 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include <iomanip>
-#include "MaterialModel_NeoHookean.hpp"
+#include "MaterialModel_mixed_NeoHookean.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
 #include <memory>
 
@@ -43,9 +43,26 @@ int main(int argc, char *argv[])
 {
   std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(1.23);
 
-  IMaterialModel_mixed * matmodel = new MaterialModel_NeoHookean(std::move(vmodel), 1.0);
+  IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), 1.0);
 
   std::cout<<matmodel->get_rho_0()<<'\n';
+
+  SymmTensor4_3D aa;
+  aa.gen_rand();
+
+  aa.print_in_mat();
+
+  const double val = 3.112589;
+
+  auto bb = aa;
+
+  bb *= val * val;
+
+  auto cc = val * val * aa;
+  
+  bb -= cc;
+  bb.print_in_mat();
+
 
   return EXIT_SUCCESS;
 }

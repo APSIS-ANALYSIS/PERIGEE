@@ -30,7 +30,7 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
       
       const SymmTensor2_3D S_iso = val * STen2::gen_symm_part( Ten4::gen_P( CC.convert_to_full() ) * Ten2::gen_id() );
       
-      P_sio = F * S_iso;
+      P_iso = F * S_iso;
       
       SymmTensor4_3D out = STen4::gen_Ptilde( invCC );
       

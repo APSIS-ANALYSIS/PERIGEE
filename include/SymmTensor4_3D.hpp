@@ -216,6 +216,8 @@ class SymmTensor4_3D
     double ten[21];
 };
 
+SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input );
+
 // These functions behave in an identical manner to the member function of the
 // same function name.
 namespace STen4
