@@ -211,7 +211,7 @@ int main(int argc, char *argv[])
 
   delete lsolver_ptr; delete gloAssem_ptr; delete locAssem_ptr; delete disp; delete stress;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
-  delete quadv; delete elementv; delete matmodel;
+  delete quadv; delete elementv;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
