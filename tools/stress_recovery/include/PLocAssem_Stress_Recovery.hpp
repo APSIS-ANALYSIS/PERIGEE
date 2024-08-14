@@ -9,6 +9,7 @@
 // Date: Jan. 16 2024
 // ============================================================================
 #include "IPLocAssem.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class PLocAssem_Stress_Recovery : public IPLocAssem
 {
@@ -56,6 +57,7 @@ class PLocAssem_Stress_Recovery : public IPLocAssem
     const int nLocBas, vec_size;
     const double modulus_E, nu, lambda, mu, l2mu;
 
+    // Return the cauchy stress based on linear elasticity
     SymmTensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const;
 
     void print_info() const;
