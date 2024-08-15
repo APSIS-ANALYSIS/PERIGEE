@@ -11,6 +11,7 @@
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
+#include "APart_Node_Rotated.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
@@ -293,7 +294,7 @@ int main(int argc, char *argv[])
   locitf -> print_info();
 
   // Local sub-domain's nodal indices
-  APart_Node * pNode = new APart_Node(part_file, rank);
+  APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 

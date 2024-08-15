@@ -1,7 +1,7 @@
 #ifndef PART_FEM_ROTATED_HPP
 #define PART_FEM_ROTATED_HPP
 // ============================================================================
-// Part_FEM_ROTATED.hpp
+// Part_FEM_Rotated.hpp
 //
 // Object: Partition 3D tet mesh into subdomains. 
 //         The mesh is partitioned into sub-domains that are tagged with a 
@@ -13,10 +13,10 @@
 // ============================================================================
 #include "Part_FEM.hpp"
 
-class Part_FEM_ROTATED : public Part_FEM
+class Part_FEM_Rotated : public Part_FEM
 {
   public:
-    Part_FEM_ROTATED( const IMesh * const &mesh,
+    Part_FEM_Rotated( const IMesh * const &mesh,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -29,7 +29,7 @@ class Part_FEM_ROTATED : public Part_FEM
         const int &in_elemType,
         const Field_Property &in_fp );
 
-    virtual ~Part_FEM_ROTATED() = default;
+    virtual ~Part_FEM_Rotated() = default;
 
     virtual void write( const std::string &inputFileName ) const;
 

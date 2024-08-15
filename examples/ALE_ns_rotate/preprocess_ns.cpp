@@ -12,7 +12,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_FEM_ROTATED.hpp"
+#include "Part_FEM_Rotated.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
@@ -437,7 +437,7 @@ int main( int argc, char * argv[] )
     // IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
     //     ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
 
-    IPart * part = new Part_FEM_ROTATED( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM_Rotated( mesh, global_part, mnindex, IEN,
         ctrlPts, rotated_tag, node_f, node_r, proc_rank, cpu_size, elemType, 
         {0, dofNum, true, "ROTATED_NS"} );
     

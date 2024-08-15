@@ -1,6 +1,6 @@
-#include "Part_FEM_ROTATED.hpp"
+#include "Part_FEM_Rotated.hpp"
 
-Part_FEM_ROTATED::Part_FEM_ROTATED( const IMesh * const &mesh,
+Part_FEM_Rotated::Part_FEM_Rotated( const IMesh * const &mesh,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -44,7 +44,7 @@ Part_FEM_ROTATED::Part_FEM_ROTATED( const IMesh * const &mesh,
   nlocalnode_rotated = VEC_T::get_size( node_loc_rotated );
 }
 
-void Part_FEM_ROTATED::write( const std::string &inputFileName ) const
+void Part_FEM_Rotated::write( const std::string &inputFileName ) const
 {
   // ------------------------------------------------------
   // Call the base class writer to write the base class data
@@ -60,7 +60,7 @@ void Part_FEM_ROTATED::write( const std::string &inputFileName ) const
   // open group 1: local element
   hid_t group_id_1 = H5Gopen(file_id, "/Local_Elem", H5P_DEFAULT);
 
-  h5w->write_intVector( group_id_1, "elem_tag", elem_tag );
+  h5w->write_intVector( group_id_1, "elem_phy_tag", elem_tag );
 
   H5Gclose( group_id_1 );
 
