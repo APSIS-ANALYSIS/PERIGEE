@@ -37,7 +37,7 @@ class MaterialModel_vol_ST91 : public IMaterialModel_vol
     virtual double get_elastic_kappa() const {return kappa;}
 
     virtual double get_Gibbs_energy( const double &p ) const 
-    {return (p * std::sqrt(p * p + kappa * kappa) - p*p) / (2.0*kappa) - kappa / 2.0 * std::log((std::sqrt(p*p + kappa*kappa) - p) / kappa);}
+    {return (p * std::pow(p * p + kappa * kappa, 0.5) - p*p) / (2.0*kappa) - kappa / 2.0 * std::log((std::pow(p*p + kappa*kappa, 0.5) - p) / kappa);}
 
     virtual double get_Helmholtz_energy( const double &J ) const
     {return kappa / 4.0 * (J*J - 2.0 * std::log(J) - 1.0);}
@@ -46,16 +46,16 @@ class MaterialModel_vol_ST91 : public IMaterialModel_vol
     {return rho_0;}
 
     virtual double get_rho( const double &p ) const 
-    {return rho_0 * (std::sqrt(p*p + kappa*kappa) + p ) / kappa;}
+    {return rho_0 * (std::pow(p*p + kappa*kappa, 0.5) + p ) / kappa;}
 
     virtual double get_drho_dp( const double &p ) const 
-    {return (rho_0 * p) / (kappa * std::sqrt(p*p + kappa*kappa)) + rho_0 / kappa;}
+    {return (rho_0 * p) / (kappa * std::pow(p*p + kappa*kappa, 0.5)) + rho_0 / kappa;}
 
     virtual double get_beta( const double &p ) const 
-    {return 1.0/std::sqrt(p*p+kappa*kappa);}
+    {return 1.0/std::pow(p*p+kappa*kappa, 0.5);}
 
     virtual double get_dbeta_dp( const double &p ) const 
-    {return (-1.0 * p) / ( std::pow(p*p+kappa*kappa, 3.0 / 2.0) );}
+    {return (-1.0 * p) / ( std::pow(p*p+kappa*kappa, 1.5) );}
 
     virtual double get_vol_stress( const double &J ) const
     {return kappa / 2.0 *( J - (1.0/J) );}
