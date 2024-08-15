@@ -61,7 +61,7 @@ class MaterialModel_vol_ST91 : public IMaterialModel_vol
     {return kappa / 2.0 *( J - (1.0/J) );}
 
     virtual double get_dvol_stress_dJ( const double &J ) const
-    {return kappa/2.0 * (1.0 + J*J);}
+    {return kappa/2.0 * (1.0 + 1.0 / (J*J) );}
 
   private:
     const double rho_0, kappa;
