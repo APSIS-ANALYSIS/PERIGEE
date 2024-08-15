@@ -14,6 +14,7 @@ int main( int argc, char * argv[] )
   AA.add_OutProduct(3.115, dd, ff );
   BB.add_OutProduct(3.115, cc, ee );
 
+  AA.print();
   AA.AXPY(-1.0, BB);
 
   AA.print();

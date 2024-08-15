@@ -322,6 +322,10 @@ namespace Ten4
 
   Tensor4_3D gen_P( const Tensor2_3D &C );
 
+  Tensor4_3D gen_P( const SymmTensor2_3D &C, const SymmTensor2_3D &invC );
+
+  Tensor4_3D gen_P( const SymmTensor2_3D &C );
+
   // ------------------------------------------------------------------------
   // Generate Projector Pt = transpose of P = SymmId4 - 1/3 C x invC
   // P_IJKL = SymmID_IJKL - 1/3 C_IJ invC_KL
