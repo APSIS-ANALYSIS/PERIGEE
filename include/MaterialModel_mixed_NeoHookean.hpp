@@ -24,7 +24,7 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     {
       const SymmTensor2_3D CC = STen2::gen_right_Cauchy_Green(F);
       const double val = mu * std::pow(CC.det(), -1.0/3.0);
-      Tensor2_3D out = Ten4::gen_P( CC.convert_to_full() ) * Ten2::gen_id();
+      Tensor2_3D out = Ten4::gen_P( CC ) * Ten2::gen_id();
       return val * STen2::gen_symm_part(out);
     }
 
@@ -33,9 +33,9 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     {
       constexpr double pt67 = 2.0 / 3.0;
       const SymmTensor2_3D CC = STen2::gen_right_Cauchy_Green(F);
-      const double val = mu * std::pow(CC.det(), -pt67*0.5);
+      const double val = mu * std::pow(CC.det(), -1.0/3.0);
       const SymmTensor2_3D invCC = STen2::inverse(CC);
-      const SymmTensor2_3D S_iso = val * STen2::gen_symm_part( Ten4::gen_P( CC.convert_to_full() ) * Ten2::gen_id() );
+      const SymmTensor2_3D S_iso = val * STen2::gen_symm_part( Ten4::gen_P( CC ) * Ten2::gen_id() );
      
       // First PK stress 
       P_iso = F * S_iso;

@@ -37,24 +37,36 @@
 #include <iomanip>
 #include "MaterialModel_mixed_NeoHookean.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
+#include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "MaterialModel_NeoHookean_ST91_Mixed.hpp"
 #include <memory>
 
 int main(int argc, char *argv[])
 {
   const double rho0 = 1.23;
-  const double elastic_mu = 1.2555; 
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(rho0);
+  const double elastic_E = 1.2555; 
+  const double elastic_nu = 0.47;
+  IMaterialModel * oldmodel = new MaterialModel_NeoHookean_ST91_Mixed(rho0, elastic_E, elastic_nu);
+  
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
 
-  IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), elastic_mu);
+  IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), oldmodel->get_elastic_mu());
 
   //matmodel->print_info();
 
-  IMaterialModel * oldmodel = new MaterialModel_NeoHookean_Incompressible_Mixed(rho0, elastic_mu*3.0);
 
   //oldmodel->print_info();
 
   Tensor2_3D F; F.gen_rand();
+
+  if(F.det() < 0.0) F*=-1.0;
+
+  const double val = std::pow(F.det(), -1.0/3.0);
+
+  //std::cout<<val<<'\n';
+
+  F *= val; 
 
   auto P_new = matmodel->get_PK_1st(F);
   auto S_new = matmodel->get_PK_2nd(F);
@@ -66,6 +78,9 @@ int main(int argc, char *argv[])
   S_old -= S_new.convert_to_full();
 
   S_old.print();
+  
+  std::cout<<std::endl;
+
   S_new.print();
 
   return EXIT_SUCCESS;

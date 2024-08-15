@@ -334,6 +334,8 @@ namespace Ten4
   // see Holzapfel book p.229 eqn. (6.84).
   // ------------------------------------------------------------------------
   Tensor4_3D gen_Pt( const Tensor2_3D &C );
+  
+  Tensor4_3D gen_Pt( const SymmTensor2_3D &C );
 
   // ------------------------------------------------------------------------
   // Generate Projector Ptilde = invC O invC - 1/3 invC x invC

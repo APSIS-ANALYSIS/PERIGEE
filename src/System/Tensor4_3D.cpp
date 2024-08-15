@@ -635,6 +635,11 @@ Tensor4_3D Ten4::gen_Pt( const Tensor2_3D &C )
   return Ten4::gen_P( Ten2::inverse(C) );
 }
 
+Tensor4_3D Ten4::gen_Pt( const SymmTensor2_3D &C )
+{
+  return Ten4::gen_P( STen2::inverse(C) );
+}
+
 Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )
 {
   Tensor4_3D out;
