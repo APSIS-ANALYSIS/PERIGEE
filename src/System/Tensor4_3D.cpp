@@ -195,16 +195,10 @@ void Tensor4_3D::AXPY( const double &val, const Tensor4_3D &input )
 void Tensor4_3D::add_OutProduct( const double &val, const Tensor2_3D &mleft,
     const Tensor2_3D &mright )
 {
-  for(int ii=0; ii<3; ++ii)
+  for(int mm=0; mm<9; ++mm)
   {
-    for(int jj=0; jj<3; ++jj)
-    {
-      for(int kk=0; kk<3; ++kk)
-      {
-        for(int ll=0; ll<3; ++ll)
-          ten[27*ii+9*jj+3*kk+ll] += val * mleft(3*ii+jj) * mright(3*kk+ll);
-      }
-    }
+    for(int nn=0; nn<9; ++nn)
+      ten[9*mm+nn] += val * mleft(mm) * mright(nn);
   }
 }
 
