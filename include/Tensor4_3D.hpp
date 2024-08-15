@@ -164,6 +164,9 @@ class Tensor4_3D
     void add_OutProduct( const double &val, const Tensor2_3D &mleft,
         const Tensor2_3D &mright );
 
+    void add_OutProduct( const double &val, const SymmTensor2_3D &mleft,
+        const SymmTensor2_3D &mright );
+
     // ------------------------------------------------------------------------
     // add a tensor product of 4 vectors which is formed in the following way,
     //         val x vec1[i] x vec2[j] x vec3[k] x vec4[l]

@@ -23,18 +23,17 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const
     {
       const SymmTensor2_3D CC = STen2::gen_right_Cauchy_Green(F);
-      //SymmTensor2_3D out = (-mu/3.0)*CC.tr()*STen2::inverse(CC); 
-      //out.AXPI(mu);
+      const double val = mu * std::pow(CC.det(), -1.0/3.0);
       Tensor2_3D out = Ten4::gen_P( CC.convert_to_full() ) * Ten2::gen_id();
-      return mu * STen2::gen_symm_part(out);
+      return val * STen2::gen_symm_part(out);
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
       constexpr double pt67 = 2.0 / 3.0;
-      const double val = mu * std::pow(F.det(), -pt67);
       const SymmTensor2_3D CC = STen2::gen_right_Cauchy_Green(F);
+      const double val = mu * std::pow(CC.det(), -pt67*0.5);
       const SymmTensor2_3D invCC = STen2::inverse(CC);
       const SymmTensor2_3D S_iso = val * STen2::gen_symm_part( Ten4::gen_P( CC.convert_to_full() ) * Ten2::gen_id() );
      
