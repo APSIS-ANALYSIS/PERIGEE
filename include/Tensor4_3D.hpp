@@ -17,7 +17,7 @@
 // Author: Ju Liu
 // Date: July 3rd 2016
 // ============================================================================
-#include "Tensor2_3D.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class Tensor4_3D
 {
