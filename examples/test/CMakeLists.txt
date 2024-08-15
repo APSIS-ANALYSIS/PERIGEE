@@ -120,10 +120,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Inductance.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
-  ${perigee_source}/Model/MaterialModel_StVenant_Kirchhoff.cpp
-  ${perigee_source}/Model/MaterialModel_StVenant_Kirchhoff_Simo85.cpp
-  ${perigee_source}/Model/MaterialModel_NeoHookean_RWR2000.cpp
-  ${perigee_source}/Model/MaterialModel_NeoHookean_ST91.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_StVenant_Kirchhoff_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
