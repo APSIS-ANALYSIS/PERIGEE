@@ -38,7 +38,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
-  ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/Part_FEM.cpp  
+  ${perigee_source}/Mesh/Part_FEM_ROTATED.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/ElemBC_3D_turbulence_wall_model.cpp

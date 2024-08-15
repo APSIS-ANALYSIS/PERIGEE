@@ -12,7 +12,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "Part_FEM.hpp"
+#include "Part_FEM_ROTATED.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
@@ -217,7 +217,30 @@ int main( int argc, char * argv[] )
   VEC_T::clean( vecIEN ); // clean the vector
   VEC_T::clean( rotated_vecIEN );
   VEC_T::clean( rotated_ctrlPts );
+
+  // Generate the list of fixed and rotated nodes
+  std::vector<int> node_f = VTK_T::read_int_PointData( geo_file, "GlobalNodeID" );
+
+  std::vector<int> node_r = VTK_T::read_int_PointData( rotated_geo_file, "GlobalNodeID" );
   
+  for (int &nodeid : node_r)
+    nodeid += fixed_nFunc;
+
+  VEC_T::sort_unique_resize( node_f ); VEC_T::sort_unique_resize( node_r );
+
+  // std::vector<int> node_f, node_r; node_f.clear(); node_r.clear();
+  // PERIGEE_OMP_PARALLEL
+  // {
+  //   std::vector<int> temp_node_f {};
+  //   std::vector<int> temp_node_r {};
+  //   PERIGEE_OMP_FOR
+  //   for(int ee=0; ee<nElem; ++ee)
+  //   {
+
+  //   }
+
+  // }  
+
   IMesh * mesh = nullptr;
 
   switch( elemType )
@@ -371,23 +394,22 @@ int main( int argc, char * argv[] )
   ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
-  std::vector<double> intervals_0 {0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
+  std::vector<double> intervals_0 {-0.6, -0.2};
 
   Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_itf.h5",
     fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 0);
 
-  std::vector<double> intervals_12 {0.0, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09, 0.1};
+  std::vector<double> intervals_12 {0.0, 0.4};
 
   Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(1.0, 0.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.6, 0.0, 0.0));
 
   Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(0.2, 0.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.2, 0.0, 0.0));
 
   std::vector<Interface_pair> interfaces {itf_0, itf_1, itf_2};
  
   // Start partition the mesh for each cpu_rank 
-
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
 
@@ -412,8 +434,12 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
+    // IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
+    //     ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
+
+    IPart * part = new Part_FEM_ROTATED( mesh, global_part, mnindex, IEN,
+        ctrlPts, rotated_tag, node_f, node_r, proc_rank, cpu_size, elemType, 
+        {0, dofNum, true, "ROTATED_NS"} );
     
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
