@@ -37,15 +37,36 @@
 #include <iomanip>
 #include "MaterialModel_mixed_NeoHookean.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
+#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include <memory>
 
 int main(int argc, char *argv[])
 {
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(1.23);
+  const double rho0 = 1.23;
+  const double elastic_mu = 1.2555; 
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(rho0);
 
-  IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), 1.0);
+  IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), elastic_mu);
 
-  matmodel->print_info();
+  //matmodel->print_info();
+
+  IMaterialModel * oldmodel = new MaterialModel_NeoHookean_Incompressible_Mixed(rho0, elastic_mu*3.0);
+
+  //oldmodel->print_info();
+
+  Tensor2_3D F; F.gen_rand();
+
+  auto P_new = matmodel->get_PK_1st(F);
+  auto S_new = matmodel->get_PK_2nd(F);
+  
+  Tensor2_3D P_old, S_old;
+  oldmodel->get_PK(F, P_old, S_old);
+
+  //P_old -= P_new;
+  S_old -= S_new.convert_to_full();
+
+  S_old.print();
+  S_new.print();
 
   return EXIT_SUCCESS;
 }

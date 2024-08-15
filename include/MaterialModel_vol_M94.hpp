@@ -15,7 +15,7 @@ class MaterialModel_vol_M94 : public IMaterialModel_vol
 {
   public:
     MaterialModel_vol_M94(const double &in_rho_0, const double &in_kappa)
-      : rho_0(in_rho_0), kappa( in_kappa ) {};
+      : rho_0( in_rho_0 ), kappa( in_kappa ) {};
 
     virtual ~MaterialModel_vol_M94() = default;
 
@@ -23,6 +23,7 @@ class MaterialModel_vol_M94 : public IMaterialModel_vol
     {
       SYS_T::commPrint("\t  MaterialModel_vol_M94: \n");
       SYS_T::commPrint("\t  parameter rho_0 = %e \n", rho_0);
+      SYS_T::commPrint("\t  parameter kappa = %e \n", kappa);
     }
 
     virtual std::string get_model_name() const
