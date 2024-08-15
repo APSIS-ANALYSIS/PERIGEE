@@ -138,6 +138,18 @@ class SymmTensor2_3D
     
     double MatContraction( const SymmTensor2_3D &source ) const;
 
+    // Obtain the Voigt notation for a regular matrix index
+    // 0 <= index < 9
+    int Voigt_notation( const int &index ) const
+    {
+      // This map is used to transform the natural indices of a 3x3 symmetric matrix
+      // to Voigt notation
+      constexpr int map[9] = { 0, 5, 4,
+        5, 1, 3,
+        4, 3, 2 };
+      return map[index];
+    }
+
     // print the matrix
     void print() const;
 

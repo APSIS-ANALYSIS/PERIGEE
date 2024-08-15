@@ -2,39 +2,22 @@
 
 int main( int argc, char * argv[] )
 {
-#if PETSC_VERSION_LT(3,19,0)
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-#else
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
-#endif
+  Tensor4_3D AA = Ten4::gen_zero();
+  auto BB = AA;
 
-  IMaterialModel * model = new MaterialModel_Guccione_Incompressible_Mixed(
-      2.1, 3.3, 22.0, -11.2, 15.2, 0.5, 0.3, 0.2, -0.2, 0.3, 0.6 );
+  SymmTensor2_3D cc; cc.gen_rand();
+  Tensor2_3D dd = cc.convert_to_full();
   
-  model -> print_info();
+  SymmTensor2_3D ee; ee.gen_rand();
+  Tensor2_3D ff = ee.convert_to_full();
 
-  Tensor2_3D F, P, S;
-  Tensor4_3D CC;
+  AA.add_OutProduct(3.115, dd, ff );
+  BB.add_OutProduct(3.115, cc, ee );
 
-  F.xx() = 1.0; F.xy() = 0.3; F.xz() = 0.0;
-  F.yx() = 0.0; F.yy() = 1.0; F.yz() = -0.05;
-  F.zx() = 0.0; F.zy() = 0.1; F.zz() = 1.0;
+  AA.AXPY(-1.0, BB);
 
-  model -> get_PK_Stiffness(F, P, S, CC);
+  AA.print();
 
-  P.print_in_row();
-  S.print_in_row();
-  CC.print();
-
-  model -> get_PK( F, P, S );
-
-  P.print_in_row();
-  S.print_in_row();
- 
-  std::cout<<model -> get_strain_energy( F )<<std::endl; 
-  
-  delete model;
-  PetscFinalize();
   return EXIT_SUCCESS;
 }
 

@@ -208,6 +208,24 @@ void Tensor4_3D::add_OutProduct( const double &val, const Tensor2_3D &mleft,
   }
 }
 
+void Tensor4_3D::add_OutProduct( const double &val, const SymmTensor2_3D &mleft,
+    const SymmTensor2_3D &mright )
+{
+  for(int mm=0; mm<9; ++mm)
+  {
+    const int id = mleft.Voigt_notation(mm);
+    ten[9*mm+0] += val * mleft( id ) * mright(0);
+    ten[9*mm+1] += val * mleft( id ) * mright(5);
+    ten[9*mm+2] += val * mleft( id ) * mright(4);
+    ten[9*mm+3] += val * mleft( id ) * mright(5);
+    ten[9*mm+4] += val * mleft( id ) * mright(1);
+    ten[9*mm+5] += val * mleft( id ) * mright(3);
+    ten[9*mm+6] += val * mleft( id ) * mright(4);
+    ten[9*mm+7] += val * mleft( id ) * mright(3);
+    ten[9*mm+8] += val * mleft( id ) * mright(2);
+  }
+}
+
 void Tensor4_3D::add_OutProduct( const double &val, const Vector_3 &vec1, 
     const Vector_3 &vec2, const Vector_3 &vec3, const Vector_3 &vec4 )
 {

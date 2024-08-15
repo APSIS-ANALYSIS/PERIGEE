@@ -17,7 +17,7 @@
 // Author: Ju Liu
 // Date: July 3rd 2016
 // ============================================================================
-#include "Tensor2_3D.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class Tensor4_3D
 {
@@ -163,6 +163,9 @@ class Tensor4_3D
     // ------------------------------------------------------------------------
     void add_OutProduct( const double &val, const Tensor2_3D &mleft,
         const Tensor2_3D &mright );
+
+    void add_OutProduct( const double &val, const SymmTensor2_3D &mleft,
+        const SymmTensor2_3D &mright );
 
     // ------------------------------------------------------------------------
     // add a tensor product of 4 vectors which is formed in the following way,
