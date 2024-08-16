@@ -29,6 +29,9 @@ int main( int argc, char * argv[] )
 
   S_iso_2.print_in_row();
 
+  cc = STen2::gen_zero();
+  cc.print_in_row();
+
   return EXIT_SUCCESS;
 }
 

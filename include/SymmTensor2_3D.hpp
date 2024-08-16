@@ -219,6 +219,9 @@ namespace STen2
   // Generate an identity tensor
   SymmTensor2_3D gen_id();
 
+  // Generate a zero tensor
+  SymmTensor2_3D gen_zero();
+
   // Return the inverse of the input matrix
   SymmTensor2_3D inverse( const SymmTensor2_3D &input );
 
