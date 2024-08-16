@@ -1,24 +1,22 @@
-#ifndef IMATERIALMODEL_MIXED_HPP
-#define IMATERIALMODEL_MIXED_HPP
+#ifndef IMATERIALMODEL_ICH_HPP
+#define IMATERIALMODEL_ICH_HPP
 // ============================================================================
-// IMaterialModel_mixed.hpp
+// IMaterialModel_ich.hpp
 // ============================================================================
-#include "IMaterialModel_vol.hpp"
 #include "SymmTensor4_3D.hpp"
 
-class IMaterialModel_mixed
+class IMaterialModel_ich
 {
   public:
-    IMaterialModel_mixed( std::unique_ptr<IMaterialModel_vol> in_vmodel ) 
-      : vmodel(std::move(in_vmodel)) {};
+    IMaterialModel_ich() = default; 
 
-    virtual ~IMaterialModel_mixed() = default;
+    virtual ~IMaterialModel_ich() = default;
 
     virtual void print_info() const = 0;
 
     virtual std::string get_model_name() const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_mixed::get_model_name() is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_ich::get_model_name() is not implemented. \n");
       return std::string("unknown");
     }
 
@@ -51,24 +49,9 @@ class IMaterialModel_mixed
 
     virtual double get_elastic_mu() const
     {
-      SYS_T::commPrint("Warning: IMaterialModel_mixed::get_elastic_mu() is not implemented. \n");
+      SYS_T::commPrint("Warning: IMaterialModel_ich::get_elastic_mu() is not implemented. \n");
       return 0.0;
     }
-
-    double get_rho_0() const {return vmodel->get_rho_0();}
-    
-    double get_rho( const double &pp ) const {return vmodel->get_rho(pp);}
-
-    double get_drho_dp( const double &pp ) const { return vmodel->get_drho_dp(pp);}
-
-    double get_beta( const double &pp ) const {return vmodel->get_beta(pp);}
-
-    double get_dbeta_dp( const double &pp ) const {return vmodel->get_dbeta_dp(pp);}
-
-    double get_elastic_kappa() const {return vmodel->get_elastic_kappa();}
-
-  protected:
-    std::unique_ptr<IMaterialModel_vol> vmodel;
 };
 
 #endif
