@@ -55,8 +55,9 @@ int main(int argc, char *argv[])
 
   MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
 
-  //matmodel->print_info();
+  matmodel->print_info();
 
+  std::cout<<matmodel->get_model_name()<<'\n';
 
   //oldmodel->print_info();
 
