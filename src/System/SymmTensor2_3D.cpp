@@ -19,7 +19,7 @@ SymmTensor2_3D::SymmTensor2_3D( const double &m0, const double &m1,
   mat[3] = m3; mat[4] = m4; mat[5] = m5;
 }
 
-Tensor2_3D SymmTensor2_3D::convert_to_full() const
+Tensor2_3D SymmTensor2_3D::full() const
 {
   return Tensor2_3D( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
 }

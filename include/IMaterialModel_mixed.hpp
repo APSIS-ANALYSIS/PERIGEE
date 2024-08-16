@@ -3,7 +3,6 @@
 // ============================================================================
 // IMaterialModel_mixed.hpp
 // ============================================================================
-
 #include "IMaterialModel_vol.hpp"
 #include "SymmTensor4_3D.hpp"
 
@@ -46,7 +45,7 @@ class IMaterialModel_mixed
        Tensor2_3D &P_iso ) const
     {
       const auto CC = get_PK_Stiffness(F, P_iso);
-      auto AA = CC.convert_to_full();
+      auto AA = CC.full();
       AA.MatMult_1(F);
       AA.MatMult_3(F);
       return AA;

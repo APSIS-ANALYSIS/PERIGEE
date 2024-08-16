@@ -33,7 +33,7 @@ class SymmTensor2_3D
     // Assignment operator
     SymmTensor2_3D& operator= (const SymmTensor2_3D &source);
 
-    Tensor2_3D convert_to_full() const;
+    Tensor2_3D full() const;
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     double& operator()(const int &index) {return mat[index];}

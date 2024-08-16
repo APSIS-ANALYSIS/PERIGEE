@@ -6,10 +6,10 @@ int main( int argc, char * argv[] )
   auto BB = AA;
 
   SymmTensor2_3D cc; cc.gen_rand();
-  Tensor2_3D dd = cc.convert_to_full();
+  Tensor2_3D dd = cc.full();
   
   SymmTensor2_3D ee; ee.gen_rand();
-  Tensor2_3D ff = ee.convert_to_full();
+  Tensor2_3D ff = ee.full();
 
   AA.add_OutProduct(3.115, dd, ff );
   BB.add_OutProduct(3.115, cc, ee );

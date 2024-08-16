@@ -18,7 +18,6 @@
 // Author: Ju Liu
 // Contact: liujuy@gmail.com
 // ============================================================================
-#include "HDF5_Writer.hpp"
 
 class IMaterialModel_vol
 {

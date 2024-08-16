@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   oldmodel->get_PK(F, P_old, S_old);
 
   //P_old -= P_new;
-  S_old -= S_new.convert_to_full();
+  S_old -= S_new.full();
 
   S_old.print();
   
