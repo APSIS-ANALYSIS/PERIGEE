@@ -14,11 +14,7 @@ class IMaterialModel_ich
 
     virtual void print_info() const = 0;
 
-    virtual std::string get_model_name() const
-    {
-      SYS_T::commPrint("Warning: IMaterialModel_ich::get_model_name() is not implemented. \n");
-      return std::string("unknown");
-    }
+    virtual std::string get_model_name() const = 0;
 
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const = 0;
 

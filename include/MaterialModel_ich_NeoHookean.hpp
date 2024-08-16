@@ -1,23 +1,22 @@
-#ifndef MATERIALMODEL_MIXED_NEOHOOKEAN_HPP
-#define MATERIALMODEL_MIXED_NEOHOOKEAN_HPP
+#ifndef MATERIALMODEL_ICH_NEOHOOKEAN_HPP
+#define MATERIALMODEL_ICH_NEOHOOKEAN_HPP
 
-#include "IMaterialModel_mixed.hpp"
+#include "IMaterialModel_ich.hpp"
 
-class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
+class MaterialModel_ich_NeoHookean : public IMaterialModel_ich
 {
   public:
-    MaterialModel_mixed_NeoHookean( std::unique_ptr<IMaterialModel_vol> vmodel,
-        const double &in_mu ) : IMaterialModel_mixed(std::move(vmodel)), mu( in_mu ) {}
+    MaterialModel_ich_NeoHookean( const double &in_mu ) : mu( in_mu ) {}
 
-    virtual ~MaterialModel_mixed_NeoHookean() = default;
+    virtual ~MaterialModel_ich_NeoHookean() = default;
 
     virtual void print_info() const
     {
-      SYS_T::commPrint("\t  MaterialModel_mixed_NeoHookean: \n");
+      SYS_T::commPrint("\t  MaterialModel_ich_NeoHookean: \n");
       SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
-      SYS_T::commPrint("\t  Volumetric part: \n");
-      vmodel->print_info();
     }
+
+    virtual std::string get_model_name() const {return std::string("Neo-Hookean");}
 
     virtual double get_elastic_mu() const {return mu;}
 

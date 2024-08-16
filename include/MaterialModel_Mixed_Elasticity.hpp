@@ -24,7 +24,7 @@ class MaterialModel_Mixed_Elasticity
     }
 
     std::string get_model_name() const
-    {return imodel->get_model_name() + vmodel->get_model_name();}
+    {return imodel->get_model_name() + '-' + vmodel->get_model_name();}
 
     SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const 
     {return imodel->get_PK_2nd(F);}

@@ -35,7 +35,8 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include <iomanip>
-#include "MaterialModel_mixed_NeoHookean.hpp"
+#include "MaterialModel_Mixed_Elasticity.hpp"
+#include "MaterialModel_ich_NeoHookean.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
@@ -50,8 +51,9 @@ int main(int argc, char *argv[])
   IMaterialModel * oldmodel = new MaterialModel_NeoHookean_ST91_Mixed(rho0, elastic_E, elastic_nu);
   
   std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
+  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(oldmodel->get_elastic_mu());
 
-  IMaterialModel_mixed * matmodel = new MaterialModel_mixed_NeoHookean(std::move(vmodel), oldmodel->get_elastic_mu());
+  MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
 
   //matmodel->print_info();
 
