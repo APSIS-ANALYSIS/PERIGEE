@@ -23,9 +23,8 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const
     {
       const SymmTensor2_3D CC = STen2::gen_right_Cauchy_Green(F);
-      const double val = mu * std::pow(CC.det(), -1.0/3.0);
-      Tensor2_3D out = Ten4::gen_P( CC ) * Ten2::gen_id();
-      return val * STen2::gen_symm_part(out);
+      SymmTensor2_3D out = STen2::gen_DEV_part( STen2::gen_id(), CC );
+      return mu * std::pow(CC.det(), -1.0/3.0) * out;
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
@@ -33,14 +32,15 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     {
       constexpr double pt67 = 2.0 / 3.0;
       const SymmTensor2_3D CC = STen2::gen_right_Cauchy_Green(F);
-      const double val = mu * std::pow(CC.det(), -1.0/3.0);
-      const SymmTensor2_3D invCC = STen2::inverse(CC);
-      const SymmTensor2_3D S_iso = val * STen2::gen_symm_part( Ten4::gen_P( CC ) * Ten2::gen_id() );
+      const double val = mu * std::pow(CC.det(), -pt67 * 0.5);
+      
+      const SymmTensor2_3D S_iso = val * STen2::gen_DEV_part( STen2::gen_id(), CC );
      
       // First PK stress 
       P_iso = F * S_iso;
      
       // Elasticity tensor 
+      const auto invCC = STen2::inverse(CC);
       SymmTensor4_3D out = pt67 * val * CC.tr() * STen4::gen_Ptilde( invCC );
       
       out.add_SymmOutProduct(-pt67, invCC, S_iso);

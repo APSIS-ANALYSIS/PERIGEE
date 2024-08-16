@@ -213,6 +213,9 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input );
 
 namespace STen2
 {
+  // Generate an identity tensor
+  SymmTensor2_3D gen_id();
+
   // Return the inverse of the input matrix
   SymmTensor2_3D inverse( const SymmTensor2_3D &input );
 
@@ -225,6 +228,10 @@ namespace STen2
   // Convert a regular matrix to its symmetric part
   // output = 0.5 x ( source + source_transpose )
   SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
+  
+  // Apply the projector P := I - 1/3 invC x C on a symmetric tensor to obtain
+  // its Dev part in the Lagrangian setting
+  SymmTensor2_3D gen_DEV_part( const SymmTensor2_3D &input, const SymmTensor2_3D &CC );
 }
 
 #endif

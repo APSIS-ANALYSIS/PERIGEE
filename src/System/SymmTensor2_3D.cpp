@@ -461,6 +461,11 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input )
    val * input(3), val * input(4), val * input(5) );
 }
 
+SymmTensor2_3D STen2::gen_id()
+{
+  return SymmTensor2_3D(1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
+}
+
 SymmTensor2_3D STen2::inverse( const SymmTensor2_3D &input )
 {
   const double invdetA = 1.0 / input.det();
@@ -502,6 +507,18 @@ SymmTensor2_3D STen2::gen_symm_part( const Tensor2_3D &input )
                         0.5 * ( input(5) + input(7) ),
                         0.5 * ( input(2) + input(6) ),
                         0.5 * ( input(1) + input(3) ) );
+}
+
+SymmTensor2_3D STen2::gen_DEV_part( const SymmTensor2_3D &input, const SymmTensor2_3D &CC )
+{
+  const double val = input.MatContraction(CC) / 3.0;
+  const auto invC  = inverse(CC);
+  return SymmTensor2_3D( input(0) - val * invC(0), 
+                         input(1) - val * invC(1), 
+                         input(2) - val * invC(2), 
+                         input(3) - val * invC(3), 
+                         input(4) - val * invC(4), 
+                         input(5) - val * invC(5) );
 }
 
 // EOF
