@@ -132,6 +132,10 @@ class SymmTensor2_3D
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Tensor2_3D &Q );
 
+    // Push-forward for contravariant tensor (like stress)
+    // defined as F (object) Ft, see Holzapfel book p. 83
+    void push_forward_stress( const Tensor2_3D &F );
+
     // Matrix contraction
     // return mat_ij source_ij
     double MatContraction( const Tensor2_3D &source ) const;

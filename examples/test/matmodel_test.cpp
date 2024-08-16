@@ -2,22 +2,19 @@
 
 int main( int argc, char * argv[] )
 {
-  Tensor4_3D AA = Ten4::gen_zero();
-  auto BB = AA;
-
   SymmTensor2_3D cc; cc.gen_rand();
-  Tensor2_3D dd = cc.full();
   
-  SymmTensor2_3D ee; ee.gen_rand();
-  Tensor2_3D ff = ee.full();
+  Tensor2_3D F; F.gen_rand(-10, 10);
 
-  AA.add_OutProduct(3.115, dd, ff );
-  BB.add_OutProduct(3.115, cc, ee );
+  Tensor2_3D out = F * cc * Ten2::transpose(F);
 
-  AA.print();
-  AA.AXPY(-1.0, BB);
+  cc.push_forward_stress(F);
 
-  AA.print();
+  out.print_in_row();
+
+  out += -cc.full();
+  
+  out.print_in_row();
 
   return EXIT_SUCCESS;
 }

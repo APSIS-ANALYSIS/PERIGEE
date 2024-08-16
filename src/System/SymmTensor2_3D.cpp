@@ -167,6 +167,23 @@ void SymmTensor2_3D::MatRot( const Tensor2_3D &Q )
   mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
 }
 
+void SymmTensor2_3D::push_forward_stress( const Tensor2_3D &F )
+{
+  double temp[9] = {0.0};
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=ii; jj<3; ++jj)
+    {
+      temp[ii*3+jj] = F(ii,0) * ( mat[0]*F(jj,0) + mat[5]*F(jj,1) + mat[4]*F(jj,2) )
+                    + F(ii,1) * ( mat[5]*F(jj,0) + mat[1]*F(jj,1) + mat[3]*F(jj,2) )
+                    + F(ii,2) * ( mat[4]*F(jj,0) + mat[3]*F(jj,1) + mat[2]*F(jj,2) );
+    }
+  }
+  
+  mat[0] = temp[0]; mat[5] = temp[1]; mat[4] = temp[2];
+  mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
+}
+
 double SymmTensor2_3D::MatContraction( const Tensor2_3D &source ) const
 {
   return mat[0] * source(0) + mat[5] * source(1) + mat[4] * source(2) + mat[5] * source(3)
