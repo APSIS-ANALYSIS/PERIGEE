@@ -3,10 +3,10 @@
 // ============================================================================
 // MaterialModel_vol_ST91.hpp
 // 
-// Volumetric model from C.Miehe. IJNME 37:1981-2004, 1994. 
+// Volumetric model from J.C.Simo & R.L.Taylor. CMAME 85:273-310, 1991. 
 //
-// Date: Aug. 14 2024
-// Author: Ju Liu
+// Date: Aug. 16 2024
+// Author: Ju Liu, Jiawei Luo
 // Contact: liujuy@gmail.com
 // ============================================================================
 #include "IMaterialModel_vol.hpp"
@@ -23,6 +23,7 @@ class MaterialModel_vol_ST91 : public IMaterialModel_vol
     {
       SYS_T::commPrint("\t  MaterialModel_vol_ST91: \n");
       SYS_T::commPrint("\t  parameter rho_0 = %e \n", rho_0);
+      SYS_T::commPrint("\t  parameter kappa = %e \n", kappa);
     }
 
     virtual std::string get_model_name() const
@@ -37,7 +38,7 @@ class MaterialModel_vol_ST91 : public IMaterialModel_vol
     virtual double get_elastic_kappa() const {return kappa;}
 
     virtual double get_Gibbs_energy( const double &p ) const 
-    {return (p * std::pow(p * p + kappa * kappa, 0.5) - p*p) / (2.0*kappa) - kappa / 2.0 * std::log((std::pow(p*p + kappa*kappa, 0.5) - p) / kappa);}
+    {return (p * std::sqrt(p * p + kappa * kappa) - p*p) / (2.0*kappa) - kappa / 2.0 * std::log((std::sqrt(p*p + kappa*kappa) - p) / kappa);}
 
     virtual double get_Helmholtz_energy( const double &J ) const
     {return kappa / 4.0 * (J*J - 2.0 * std::log(J) - 1.0);}
@@ -46,13 +47,13 @@ class MaterialModel_vol_ST91 : public IMaterialModel_vol
     {return rho_0;}
 
     virtual double get_rho( const double &p ) const 
-    {return rho_0 * (std::pow(p*p + kappa*kappa, 0.5) + p ) / kappa;}
+    {return rho_0 * (std::sqrt(p*p + kappa*kappa) + p ) / kappa;}
 
     virtual double get_drho_dp( const double &p ) const 
-    {return (rho_0 * p) / (kappa * std::pow(p*p + kappa*kappa, 0.5)) + rho_0 / kappa;}
+    {return (rho_0 * p) / (kappa * std::sqrt(p*p + kappa*kappa)) + rho_0 / kappa;}
 
     virtual double get_beta( const double &p ) const 
-    {return 1.0/std::pow(p*p+kappa*kappa, 0.5);}
+    {return 1.0/std::sqrt(p*p+kappa*kappa);}
 
     virtual double get_dbeta_dp( const double &p ) const 
     {return (-1.0 * p) / ( std::pow(p*p+kappa*kappa, 1.5) );}
