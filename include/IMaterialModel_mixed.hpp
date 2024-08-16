@@ -44,8 +44,7 @@ class IMaterialModel_mixed
     virtual Tensor4_3D get_PK_FFStiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
-      const auto CC = get_PK_Stiffness(F, P_iso);
-      auto AA = CC.full();
+      auto AA = get_PK_Stiffness(F, P_iso).full();
       AA.MatMult_1(F);
       AA.MatMult_3(F);
       return AA;
