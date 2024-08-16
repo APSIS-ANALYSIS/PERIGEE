@@ -15,6 +15,7 @@ class MaterialModel_mixed_NeoHookean : public IMaterialModel_mixed
     {
       SYS_T::commPrint("\t  MaterialModel_mixed_NeoHookean: \n");
       SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
+      SYS_T::commPrint("\t  Volumetric part: \n");
       vmodel->print_info();
     }
 

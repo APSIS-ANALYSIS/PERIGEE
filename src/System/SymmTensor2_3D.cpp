@@ -64,6 +64,11 @@ SymmTensor2_3D& SymmTensor2_3D::operator*=( const double &val )
   return *this;
 }
 
+SymmTensor2_3D SymmTensor2_3D::operator- () const
+{
+  return SymmTensor2_3D( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4], -mat[5] );
+}
+
 bool SymmTensor2_3D::is_identical( const SymmTensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<6; ++ii)

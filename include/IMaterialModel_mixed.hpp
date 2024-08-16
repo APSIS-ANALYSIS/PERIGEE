@@ -35,10 +35,7 @@ class IMaterialModel_mixed
    
     virtual SymmTensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const
     {
-      SymmTensor2_3D out = get_PK_2nd(F);
-      out.push_forward_stress(F);
-      out *= (1.0 / F.det());
-      return out;
+      return (1.0/F.det()) * get_PK_2nd(F).push_forward_stress(F);
     }
 
     virtual Tensor4_3D get_PK_FFStiffness( const Tensor2_3D &F,

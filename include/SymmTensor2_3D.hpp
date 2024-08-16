@@ -83,6 +83,9 @@ class SymmTensor2_3D
     // Scalar product
     SymmTensor2_3D& operator*=( const double &val );
 
+    // unary minus operator
+    SymmTensor2_3D operator-() const;
+
     // Return true if the input matrix is identical to the mat
     bool is_identical( const SymmTensor2_3D &source, const double &tol = 1.0e-12 ) const;
 
