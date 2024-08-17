@@ -1,5 +1,7 @@
 #include "SymmTensor2_3D.hpp"
 
+constexpr std::array<int, 9> SymmTensor2_3D::VoigtMap;
+
 SymmTensor2_3D::SymmTensor2_3D()
 {
   mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
