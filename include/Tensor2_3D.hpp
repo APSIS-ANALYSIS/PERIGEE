@@ -237,7 +237,7 @@ class Tensor2_3D
        Vector_3 &v1, Vector_3 &v2, Vector_3 &v3 ) const;
 
   private:
-    double mat[9];
+    std::array<double,9> mat;
 
     // ------------------------------------------------------------------------
     // Find the eignevector correspond to a eigenvalue

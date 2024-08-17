@@ -36,37 +36,37 @@ class SymmTensor2_3D
     Tensor2_3D full() const;
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
-    double& operator()(const int &index) {return mat[index];}
+    inline double& operator()(const int &index) {return mat[index];}
 
-    const double& operator()(const int &index) const {return mat[index];}
+    inline const double& operator()(const int &index) const {return mat[index];}
 
     // Get-functions that access components directly
-    const double& xx() const {return mat[0];}
-    double& xx() {return mat[0];}
+    inline const double& xx() const {return mat[0];}
+    inline double& xx() {return mat[0];}
 
-    const double& xy() const {return mat[5];}
-    double& xy() {return mat[5];}
+    inline const double& xy() const {return mat[5];}
+    inline double& xy() {return mat[5];}
 
-    const double& xz() const {return mat[4];}
-    double& xz() {return mat[4];}
+    inline const double& xz() const {return mat[4];}
+    inline double& xz() {return mat[4];}
 
-    const double& yx() const {return mat[5];}
-    double& yx() {return mat[5];}
+    inline const double& yx() const {return mat[5];}
+    inline double& yx() {return mat[5];}
 
-    const double& yy() const {return mat[1];}
-    double& yy() {return mat[1];}
+    inline const double& yy() const {return mat[1];}
+    inline double& yy() {return mat[1];}
 
-    const double& yz() const {return mat[3];}
-    double& yz() {return mat[3];}
+    inline const double& yz() const {return mat[3];}
+    inline double& yz() {return mat[3];}
 
-    const double& zx() const {return mat[4];}
-    double& zx() {return mat[4];}
+    inline const double& zx() const {return mat[4];}
+    inline double& zx() {return mat[4];}
 
-    const double& zy() const {return mat[3];}
-    double& zy() {return mat[3];}
+    inline const double& zy() const {return mat[3];}
+    inline double& zy() {return mat[3];}
 
-    const double& zz() const {return mat[2];}
-    double& zz() {return mat[2];}
+    inline const double& zz() const {return mat[2];}
+    inline double& zz() {return mat[2];}
     
     // Addition operator : return left + right
     friend SymmTensor2_3D operator+( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
@@ -112,10 +112,10 @@ class SymmTensor2_3D
     double det() const;
 
     // Get the trace of the matrix
-    double tr() const {return mat[0] + mat[1] + mat[2];}
+    inline double tr() const {return mat[0] + mat[1] + mat[2];}
 
     // Get the invariants
-    double I1() const {return tr();}
+    inline double I1() const {return tr();}
 
     double I2() const;
 
@@ -147,13 +147,8 @@ class SymmTensor2_3D
 
     // Obtain the Voigt notation for a regular matrix index
     // 0 <= index < 9
-    int Voigt_notation( const int &index ) const
-    {
-      // This map is used to transform the natural indices of a 3x3 symmetric matrix
-      // to Voigt notation
-      constexpr int map[9] = { 0, 5, 4, 5, 1, 3, 4, 3, 2 };
-      return map[index];
-    }
+    inline int Voigt_notation( const int &index ) const
+    {return VoigtMap[index];}
 
     // print the matrix
     void print() const;
@@ -189,7 +184,10 @@ class SymmTensor2_3D
         Vector_3 &s1, Vector_3 &s2 ) const;
 
   private:
-    double mat[6];
+    std::array<double,6> mat;
+
+    // Define the Voigt map
+    static constexpr std::array<int, 9> VoigtMap {{ 0, 5, 4, 5, 1, 3, 4, 3, 2 }};
 
     // ------------------------------------------------------------------------
     // Return the deviatoric component's contraction scaled by 0.5.
