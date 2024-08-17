@@ -232,13 +232,11 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
   const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
 
-  std::vector<double> face_ctrl_x( 3, 0.0 ), face_ctrl_y( 3, 0.0 ), face_ctrl_z( 3, 0.0 );
-
-  get_face_ctrlPts( face_id, ctrl_x, ctrl_y, ctrl_z, face_ctrl_x, face_ctrl_y, face_ctrl_z );
+  const auto face_ctrl = get_face_ctrlPts( face_id, ctrl_x, ctrl_y, ctrl_z );
 
   // use the triangle element routine to determine the outward normal vector and
   // the surface Jacobian.
-  triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
+  triangle_face->buildBasis( quad_s, face_ctrl[0].data(), face_ctrl[1].data(), face_ctrl[2].data() );
 }
 
 void FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
