@@ -2,25 +2,6 @@
 
 constexpr std::array<int, 9> SymmTensor2_3D::VoigtMap;
 
-SymmTensor2_3D::SymmTensor2_3D()
-{
-  mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
-  mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0;
-}
-
-SymmTensor2_3D::SymmTensor2_3D( const SymmTensor2_3D &source )
-{
-  mat[0] = source(0); mat[1] = source(1); mat[2] = source(2);
-  mat[3] = source(3); mat[4] = source(4); mat[5] = source(5);
-}
-
-SymmTensor2_3D::SymmTensor2_3D( const double &m0, const double &m1, 
-    const double &m2, const double &m3, const double &m4, const double &m5 )
-{
-  mat[0] = m0; mat[1] = m1; mat[2] = m2;
-  mat[3] = m3; mat[4] = m4; mat[5] = m5;
-}
-
 Tensor2_3D SymmTensor2_3D::full() const
 {
   return Tensor2_3D( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
@@ -28,9 +9,8 @@ Tensor2_3D SymmTensor2_3D::full() const
 
 SymmTensor2_3D& SymmTensor2_3D::operator= (const SymmTensor2_3D &source)
 {
-  if (this == &source) return *this;
-
-  for(int ii=0; ii<6; ++ii) mat[ii] = source(ii);
+  if (this != &source) mat = source.mat; // use std::array assignment operator
+  
   return *this;
 }
 
@@ -76,17 +56,6 @@ bool SymmTensor2_3D::is_identical( const SymmTensor2_3D &source, const double &t
   for(int ii=0; ii<6; ++ii)
     if( std::abs( source(ii) - mat[ii]) > tol ) return false;
   return true;  
-}
-
-void SymmTensor2_3D::gen_zero()
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] = 0.0;
-}
-
-void SymmTensor2_3D::gen_id()
-{
-  mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
-  mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0; 
 }
 
 void SymmTensor2_3D::gen_rand(const double &left, const double &right)
