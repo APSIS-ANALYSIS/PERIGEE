@@ -48,6 +48,12 @@ class MaterialModel_ich_NeoHookean : public IMaterialModel_ich
       return out;
     }
 
+    virtual double get_energy( const Tensor2_3D &F ) const
+    {
+      const auto CC = STen2::gen_right_Cauchy_Green(F);
+      return 0.5 * mu * ( std::pow(F.det(), -2.0/3.0) * CC.tr() - 3.0 );
+    }
+
   private:
     const double mu;
 };
