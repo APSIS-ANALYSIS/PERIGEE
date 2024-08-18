@@ -65,6 +65,10 @@ int main(int argc, char *argv[])
 
   if(F.det() < 0.0) F*=-1.0;
 
+  std::cout<<"F:"<<std::endl; 
+  F.print();
+  std::cout<<std::endl; 
+
   const double val = std::pow(F.det(), -1.0/3.0);
 
   //std::cout<<val<<'\n';
@@ -83,30 +87,25 @@ int main(int argc, char *argv[])
 
   //S_old -= S_new;
   S_old -= S_new.full();
-
   S_old.print();
-  
   std::cout<<std::endl;
-
   S_new.print();
+  std::cout<<std::endl; 
+
 
   //P_old -= P_new
-  P_old -= P_new.full();
-
+  P_old -= P_new;
   P_old.print();
-
   std::cout<<std::endl;
-
   P_new.print();
+  std::cout<<std::endl; 
 
   //CC_old -= CC_new
   CC_old -= CC_new.full();
-
   CC_old.print();
-
   std::cout<<std::endl;
-
   CC_new.print();
+  std::cout<<std::endl; 
 
   
 
