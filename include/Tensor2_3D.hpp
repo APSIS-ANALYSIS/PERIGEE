@@ -24,18 +24,21 @@ class Tensor2_3D
 {
   public:
     // Constructor (default an identity 3-by-3 matrix)
-    Tensor2_3D();
+    Tensor2_3D() : mat{{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}} {}
 
     // Copy constructor
-    Tensor2_3D( const Tensor2_3D &source );
+    Tensor2_3D( const Tensor2_3D &source ) : mat(source.mat) {}
 
     // Explicit Defintion of all 9 entries
     Tensor2_3D( const double &a11, const double &a12, const double &a13,
         const double &a21, const double &a22, const double &a23,
-        const double &a31, const double &a32, const double &a33 );
+        const double &a31, const double &a32, const double &a33 )
+      : mat{{a11, a12, a13, a21, a22, a23, a31, a32, a33}} {}
 
     // Generate a matrix made by 3 column vectors [ vec1 | vec2 | vec3 ]
-    Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 );
+    Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
+      : mat{{ vec1(0), vec2(0), vec3(0), vec1(1), vec2(1), vec3(1),
+        vec1(2), vec2(2), vec3(2) }} {}
     
     // Destructor
     ~Tensor2_3D() = default;
@@ -47,44 +50,47 @@ class Tensor2_3D
     Tensor2_3D& operator= (const Tensor2_3D &source);
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
-    double& operator()(const int &index) {return mat[index];}
+    inline double& operator()(const int &index) 
+    {return mat[index];}
 
-    const double& operator()(const int &index) const {return mat[index];}
+    inline const double& operator()(const int &index) const 
+    {return mat[index];}
 
     // Parenthesis operator. Access through row and col index: ii jj
     // Note: We do not check that ii , jj = 0, 1, 2.
-    double& operator()(const int &ii, const int &jj) {return mat[3*ii+jj];}
+    inline double& operator()(const int &ii, const int &jj) 
+    {return mat[3*ii+jj];}
 
-    const double& operator()(const int &ii, const int &jj) const
+    inline const double& operator()(const int &ii, const int &jj) const
     {return mat[3*ii+jj];}
 
     // Get-functions that access components directly via the get-function's name
-    const double& xx() const {return mat[0];}
-    double& xx() {return mat[0];}
+    inline const double& xx() const {return mat[0];}
+    inline double& xx() {return mat[0];}
     
-    const double& xy() const {return mat[1];}
-    double& xy() {return mat[1];}
+    inline const double& xy() const {return mat[1];}
+    inline double& xy() {return mat[1];}
     
-    const double& xz() const {return mat[2];}
-    double& xz() {return mat[2];}
+    inline const double& xz() const {return mat[2];}
+    inline double& xz() {return mat[2];}
 
-    const double& yx() const {return mat[3];}
-    double& yx() {return mat[3];}
+    inline const double& yx() const {return mat[3];}
+    inline double& yx() {return mat[3];}
     
-    const double& yy() const {return mat[4];}
-    double& yy() {return mat[4];}
+    inline const double& yy() const {return mat[4];}
+    inline double& yy() {return mat[4];}
     
-    const double& yz() const {return mat[5];}
-    double& yz() {return mat[5];}
+    inline const double& yz() const {return mat[5];}
+    inline double& yz() {return mat[5];}
 
-    const double& zx() const {return mat[6];}
-    double& zx() {return mat[6];}
+    inline const double& zx() const {return mat[6];}
+    inline double& zx() {return mat[6];}
     
-    const double& zy() const {return mat[7];}
-    double& zy() {return mat[7];}
+    inline const double& zy() const {return mat[7];}
+    inline double& zy() {return mat[7];}
     
-    const double& zz() const {return mat[8];}
-    double& zz() {return mat[8];}
+    inline const double& zz() const {return mat[8];}
+    inline double& zz() {return mat[8];}
 
     // Addition operator : return left + right
     friend Tensor2_3D operator+( const Tensor2_3D &left, const Tensor2_3D &right);
@@ -108,10 +114,10 @@ class Tensor2_3D
     bool is_identical( const Tensor2_3D &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
-    void gen_zero();
+    inline void gen_zero() {mat.fill(0.0);}
 
     // Set an identity matrix
-    void gen_id();
+    void gen_id() {mat = {{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}};}
 
     // Set components a random value
     void gen_rand(const double &left = -1.0, const double &right = 1.0);
@@ -150,10 +156,10 @@ class Tensor2_3D
     double det() const;
 
     // Get the trace of the matrix
-    double tr() const {return mat[0] + mat[4] + mat[8];}
+    inline double tr() const {return mat[0] + mat[4] + mat[8];}
 
     // Get the invariants
-    double I1() const {return tr();}
+    inline double I1() const {return tr();}
 
     double I2() const;
 
