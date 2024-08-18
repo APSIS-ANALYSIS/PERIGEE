@@ -7,11 +7,6 @@ bool Tensor2_3D::is_identical( const Tensor2_3D &source, const double &tol ) con
   return true;
 }
 
-void Tensor2_3D::copy( const Tensor2_3D &source )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
-}
-
 Tensor2_3D& Tensor2_3D::operator= (const Tensor2_3D &source)
 {
   if(this != &source) mat = source.mat; // use std::array assignment operator

@@ -44,7 +44,7 @@ class Tensor2_3D
     ~Tensor2_3D() = default;
 
     // Copy
-    void copy( const Tensor2_3D &source );    
+    void copy( const Tensor2_3D &source ) {mat = source.mat;} 
     
     // Assignment operator
     Tensor2_3D& operator= (const Tensor2_3D &source);
