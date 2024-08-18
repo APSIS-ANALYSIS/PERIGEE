@@ -239,46 +239,6 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
   triangle_face->buildBasis( quad_s, face_ctrl[0].data(), face_ctrl[1].data(), face_ctrl[2].data() );
 }
 
-void FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
-    const double * const &vol_ctrl_x,
-    const double * const &vol_ctrl_y,
-    const double * const &vol_ctrl_z,
-    std::vector<double> &face_ctrl_x,
-    std::vector<double> &face_ctrl_y,
-    std::vector<double> &face_ctrl_z )
-{
-  switch( face_id )
-  {
-    case 0:
-      face_ctrl_x = std::vector<double> { vol_ctrl_x[1], vol_ctrl_x[2], vol_ctrl_x[3] };
-      face_ctrl_y = std::vector<double> { vol_ctrl_y[1], vol_ctrl_y[2], vol_ctrl_y[3] };
-      face_ctrl_z = std::vector<double> { vol_ctrl_z[1], vol_ctrl_z[2], vol_ctrl_z[3] };
-      break;
-
-    case 1:
-      face_ctrl_x = std::vector<double> { vol_ctrl_x[0], vol_ctrl_x[3], vol_ctrl_x[2] };
-      face_ctrl_y = std::vector<double> { vol_ctrl_y[0], vol_ctrl_y[3], vol_ctrl_y[2] };
-      face_ctrl_z = std::vector<double> { vol_ctrl_z[0], vol_ctrl_z[3], vol_ctrl_z[2] };
-      break;
-
-    case 2:
-      face_ctrl_x = std::vector<double> { vol_ctrl_x[0], vol_ctrl_x[1], vol_ctrl_x[3] };
-      face_ctrl_y = std::vector<double> { vol_ctrl_y[0], vol_ctrl_y[1], vol_ctrl_y[3] };
-      face_ctrl_z = std::vector<double> { vol_ctrl_z[0], vol_ctrl_z[1], vol_ctrl_z[3] };
-      break;
-
-    case 3:
-      face_ctrl_x = std::vector<double> { vol_ctrl_x[0], vol_ctrl_x[2], vol_ctrl_x[1] };
-      face_ctrl_y = std::vector<double> { vol_ctrl_y[0], vol_ctrl_y[2], vol_ctrl_y[1] };
-      face_ctrl_z = std::vector<double> { vol_ctrl_z[0], vol_ctrl_z[2], vol_ctrl_z[1] };
-      break;
-
-    default:
-      SYS_T::print_fatal("Error: FEAElement_Tet4::get_face_ctrlPts, wrong face id.\n");
-      break;
-  }
-}
-
 std::array<std::vector<double>, 3> FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
     const double * const &vol_ctrl_x,
     const double * const &vol_ctrl_y,

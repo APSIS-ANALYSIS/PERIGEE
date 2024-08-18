@@ -342,17 +342,6 @@ class FEAElement
       return Vector_3();
     }
 
-    virtual void get_face_ctrlPts( const int &face_id,
-        const double * const &vol_ctrl_x,
-        const double * const &vol_ctrl_y,
-        const double * const &vol_ctrl_z,
-        std::vector<double> &face_ctrl_x,
-        std::vector<double> &face_ctrl_y,
-        std::vector<double> &face_ctrl_z )
-    {
-      SYS_T::commPrint("Warning: get_face_ctrlPts is not implemented. \n");
-    }
-
     virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
         const double * const &volctrl_x,
         const double * const &volctrl_y,
