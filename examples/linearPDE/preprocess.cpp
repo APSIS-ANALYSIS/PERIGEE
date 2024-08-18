@@ -175,7 +175,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
     
     IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "linearPDE"} );
+        ctrlPts, proc_rank, cpu_size, elemType, {0, dofMat, true, "linearPDE"} );
 
     part -> print_part_loadbalance_edgecut();
 
