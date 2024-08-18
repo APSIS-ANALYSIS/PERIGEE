@@ -73,11 +73,15 @@ int main(int argc, char *argv[])
 
   auto P_new = matmodel->get_PK_1st(F);
   auto S_new = matmodel->get_PK_2nd(F);
+  auto CC_new = matmodel->get_PK_Stiffness(F, P_new);
   
   Tensor2_3D P_old, S_old;
   oldmodel->get_PK(F, P_old, S_old);
 
-  //P_old -= P_new;
+  Tensor4_3D CC_old;
+  oldmodel->get_PK_Stiffness(F, P_old, S_old, CC_old);
+
+  //S_old -= S_new;
   S_old -= S_new.full();
 
   S_old.print();
@@ -85,6 +89,26 @@ int main(int argc, char *argv[])
   std::cout<<std::endl;
 
   S_new.print();
+
+  //P_old -= P_new
+  P_old -= P_new.full();
+
+  P_old.print();
+
+  std::cout<<std::endl;
+
+  P_new.print();
+
+  //CC_old -= CC_new
+  CC_old -= CC_new.full();
+
+  CC_old.print();
+
+  std::cout<<std::endl;
+
+  CC_new.print();
+
+  
 
   return EXIT_SUCCESS;
 }
