@@ -1540,10 +1540,6 @@ void PGAssem_NS_FEM::search_opposite_point(
 
     const int snlocbas = elements->get_nLocBas();
 
-    std::vector<double> facectrl_x(snlocbas, 0.0);
-    std::vector<double> facectrl_y(snlocbas, 0.0);
-    std::vector<double> facectrl_z(snlocbas, 0.0);
-
     int rotated_face_id = -1;
     int rotated_tag = tag;
     int num_rotated_ele = itf_part->get_num_rotated_ele(itf_id, rotated_tag);
@@ -1556,13 +1552,12 @@ void PGAssem_NS_FEM::search_opposite_point(
       
       rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
-      rotated_elementv->get_face_ctrlPts(rotated_face_id,
-        volctrl_x, volctrl_y, volctrl_z,
-        facectrl_x, facectrl_y, facectrl_z);
+      const auto facectrl = rotated_elementv->get_face_ctrlPts( rotated_face_id,
+        volctrl_x, volctrl_y, volctrl_z );
 
       rotated_xi->reset();
       is_found = FE_T::search_closest_point(fixed_pt, elements,
-        &facectrl_x[0], &facectrl_y[0], &facectrl_z[0], rotated_xi);
+        facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), rotated_xi);
 
       if(is_found)
       {
@@ -1587,13 +1582,12 @@ void PGAssem_NS_FEM::search_opposite_point(
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
-        rotated_elementv->get_face_ctrlPts(rotated_face_id,
-          volctrl_x, volctrl_y, volctrl_z,
-          facectrl_x, facectrl_y, facectrl_z);
+        const auto facectrl = rotated_elementv->get_face_ctrlPts(rotated_face_id,
+          volctrl_x, volctrl_y, volctrl_z);
 
         rotated_xi->reset();
         is_found = FE_T::search_closest_point(fixed_pt, elements,
-          &facectrl_x[0], &facectrl_y[0], &facectrl_z[0], rotated_xi);
+          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), rotated_xi);
 
         if(is_found)
         {
@@ -1619,13 +1613,12 @@ void PGAssem_NS_FEM::search_opposite_point(
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
-        rotated_elementv->get_face_ctrlPts(rotated_face_id,
-          volctrl_x, volctrl_y, volctrl_z,
-          facectrl_x, facectrl_y, facectrl_z);
+        const auto facectrl = rotated_elementv->get_face_ctrlPts(rotated_face_id,
+          volctrl_x, volctrl_y, volctrl_z);
 
         rotated_xi->reset();
         is_found = FE_T::search_closest_point(fixed_pt, elements,
-          &facectrl_x[0], &facectrl_y[0], &facectrl_z[0], rotated_xi);
+          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), rotated_xi);
 
         if(is_found)
         {
