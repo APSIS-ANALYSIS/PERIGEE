@@ -60,6 +60,44 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const
     {
       const auto CC = STen2::gen_right_Cauchy_Green(F);
+      const double Inva1 = CC.tr();
+      const double detFm0d67 = std::pow(F.det(), -2.0/3.0);
+
+      // dPsi_iso/dC_tilde = dPsi_tilde_iso/dInva1_tilde * dInva1_tilde / dC_tilde = (0.5 * mu) * I
+      // S_sio = 2*dPsi_iso/dC = 2*dPsi_iso/dC_tilde : dC_tilde/dC= mu * J^(-2/3) * P:I
+      const auto S_iso = mu * detFm0d67 * STen2::gen_DEV_part(STen2::gen_id(), CC );
+
+      const double Inva4_1 = CC.VecMatVec(a1, a1);
+      const double Inva4_2 = CC.VecMatVec(a2, a2);
+
+      const double fE1 = detFm0d67 * (fkd*Inva1 + (1.0 -3.0*fkd)*Inva4_1) - 1.0;
+      const double fE2 = detFm0d67 * (fkd*Inva1 + (1.0 -3.0*fkd)*Inva4_2) - 1.0;
+
+      const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1);
+      const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2);
+
+      Tensor2_3D a1xa1, a2xa2;
+      a1xa1.gen_outprod(a1);
+      a2xa2.gen_outprod(a2);
+
+      auto H_f1 = fkd * Ten2::gen_id() + (1 - 3*fkd) * a1xa1;
+      auto H_f2 = fkd * Ten2::gen_id() + (1 - 3*fkd) * a2xa2;
+
+      // dPsi_fi/dC_tilde = dPsi_fi/dEi_tilde * H_fi
+      // S_fi = 2 * dPsi_fi/dC = 2 * dPsi_fi/dC_tilde : dC_tilde/dC = 2 * J^(-2/3) *dPsi_fi/dEi_tilde *  P: H_fi
+      const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(STen2::gen_symm_part(H_f1), CC );
+      const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(STen2::gen_symm_part(H_f2), CC );
+
+      return S_iso + S_fi1 + S_fi2;
+
+
+
+
+
+
+
+
+
       auto out = STen2::gen_DEV_part( STen2::gen_id(), CC );
       return mu * std::pow(CC.det(), -1.0/3.0) * out;
     }
@@ -88,7 +126,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     virtual double get_energy( const Tensor2_3D &F ) const
     {
       const auto CC = STen2::gen_right_Cauchy_Green(F);
-      const double Inva1 = C.tr();
+      const double Inva1 = CC.tr();
       const double detFm0d67 = std::pow(F.det(), -2.0/3.0);
 
       const double Inva4_1 = CC.VecMatVec(a1, a1);
