@@ -84,6 +84,8 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp, 
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -110,6 +112,8 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -305,6 +309,18 @@ class PGAssem_NS_FEM : public IPGAssem
         const int offset1 = ii * dof_sol;
         const int offset2 = IEN[ii] * dof_sol;
         for(int jj=0; jj<dof_sol; ++jj)
+          local_array[offset1 + jj] = array[offset2 + jj];
+      }
+    }
+
+    void GetLocal(const double * const &array, const int &in_dof, 
+        const int * const &IEN, double * const &local_array) const
+    {
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const int offset1 = ii * in_dof;
+        const int offset2 = IEN[ii] * in_dof;
+        for(int jj=0; jj<in_dof; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }

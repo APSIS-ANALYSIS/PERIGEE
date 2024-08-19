@@ -116,12 +116,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
-  // PDNSolution * disp_mesh = new PDNSolution(*init_disp);
   PDNSolution * pre_disp_mesh = new PDNSolution(*init_disp);
   PDNSolution * cur_disp_mesh = new PDNSolution(*init_disp);
   PDNSolution * pre_velo_mesh = new PDNSolution(*init_disp);
   PDNSolution * cur_velo_mesh = new PDNSolution(*init_disp);
-  // PDNSolution * disp_mesh = new PDNSolution(*init_disp);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -288,7 +286,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     pre_velo_mesh->Copy(*cur_velo_mesh);
   }
 
-  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
+  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol; 
+  delete pre_velo_mesh; delete cur_velo_mesh; delete pre_disp_mesh; delete cur_disp_mesh;
 }
 
 // EOF

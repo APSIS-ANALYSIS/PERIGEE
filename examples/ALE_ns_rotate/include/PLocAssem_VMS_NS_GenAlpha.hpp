@@ -63,30 +63,12 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 1.0;
     }
 
-    virtual void Assem_Residual_Rotated(
-        const double &time, const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
     virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_Rotated(
-        const double &time, const double &dt,
-        const double * const &dot_sol,
-        const double * const &sol,
+        const double * const &mvelo,
+        const double * const &mdisp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -97,6 +79,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
+        const double * const &mvelo,
+        const double * const &mdisp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -325,6 +309,24 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       // The vector from the projection point to the input point
       return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z());
     } 
+
+    // Get the current point coordinates
+    void get_currPts( const double * const &ept_x,
+        const double * const &ept_y,
+        const double * const &ept_z,
+        const double * const &sol,
+        const int &len,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z ) const
+    {
+      for(int ii=0; ii<len; ++ii)
+      {
+        currPt_x[ii] = ept_x[ii] + sol[3*ii];
+        currPt_y[ii] = ept_y[ii] + sol[3*ii+1];
+        currPt_z[ii] = ept_z[ii] + sol[3*ii+2];
+      }
+    }
 
     // Get the current point coordinates for the case of rotation around x/y/z-axis
     virtual void get_currPts( const double * const &ept_x,
