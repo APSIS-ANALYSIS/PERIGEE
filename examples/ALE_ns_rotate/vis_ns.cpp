@@ -69,7 +69,7 @@ int main( int argc, char * argv[] )
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);
   SYS_T::cmdPrint("-disp_bname:", disp_bname);
-  SYS_T::cmdPrint("mvelo_bname", mvelo_bname);
+  SYS_T::cmdPrint("-mvelo_bname", mvelo_bname);
   SYS_T::cmdPrint("-time_start:", time_start);
   SYS_T::cmdPrint("-time_step:", time_step);
   SYS_T::cmdPrint("-time_end:", time_end);
