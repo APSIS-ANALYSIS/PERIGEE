@@ -1,15 +1,15 @@
-#ifndef SL_ROTATION_HPP
-#define SL_ROTATION_HPP
+#ifndef SI_ROTATION_INFO_HPP
+#define SI_ROTATION_INFO_HPP
 
 #include "Vector_3.hpp"
 
-class Sl_rotation_info
+class SI_rotation_info
 {
   public:
-    Sl_rotation_info(const double &angular,const Vector_3 &point_xyz, const Vector_3 &angular_direc)
+    SI_rotation_info(const double &angular,const Vector_3 &point_xyz, const Vector_3 &angular_direc)
     : angular_velo(angular), point_rotated(point_xyz), direction_rotated(angular_direc) {}
 
-    ~Sl_rotation_info() = default;
+    ~SI_rotation_info() = default;
 
     double get_angular_velo() const {return angular_velo;}
 

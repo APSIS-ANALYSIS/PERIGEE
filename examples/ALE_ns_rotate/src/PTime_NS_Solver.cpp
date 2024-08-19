@@ -98,7 +98,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     ALocal_Interface * const &itf_part,
-    const Sl_rotation_info * const &sl_ptr,
+    const SI_rotation_info * const &si_ptr,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -161,10 +161,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     { 
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
-      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time(), sl_ptr, 0); //get_currPts() may be writtern into Sl_tools
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time(), si_ptr, 0); //get_currPts() may be writtern into Sl_tools
 
-      const Vector_3 radius_curr = get_radius(curr_pt_xyz, sl_ptr); //get_radius() may be writtern into Sl_tools
-      const Vector_3 velo_mesh_curr = Vec3::cross_product(sl_ptr->get_angular_velo()*sl_ptr->get_direction_rotated(), radius_curr);
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, si_ptr); //get_radius() may be writtern into Sl_tools
+      const Vector_3 velo_mesh_curr = Vec3::cross_product(si_ptr->get_angular_velo()*si_ptr->get_direction_rotated(), radius_curr);
 
       const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
 

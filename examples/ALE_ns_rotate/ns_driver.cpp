@@ -42,7 +42,7 @@
 #include "PLocAssem_VMS_NS_GenAlpha_Interface.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
-#include "Sl_rotation_info.hpp"
+#include "SI_rotation_info.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -298,7 +298,7 @@ int main(int argc, char *argv[])
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
 
-  Sl_rotation_info * slinfo = new Sl_rotation_info(angular_velo, point_rotated, angular_direction);
+  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, point_rotated, angular_direction);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
@@ -627,14 +627,14 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, slinfo, pmat, elementv, elements, elementvs, elementvs_rotated,
+      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, pmat, elementv, elements, elementvs, elementvs_rotated,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete slinfo;
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
