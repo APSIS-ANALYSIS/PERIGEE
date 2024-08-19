@@ -45,6 +45,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
+    const PDNSolution * const &pre_velo_mesh,    
+    const PDNSolution * const &pre_disp_mesh,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -69,7 +71,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
-    PDNSolution * const &disp_mesh,
+    const PDNSolution * const &velo_mesh,    
+    const PDNSolution * const &disp_mesh,
     bool &conv_flag, int &nl_counter ) const
 {
 #ifdef PETSC_USE_LOG
@@ -168,7 +171,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
   // Mesh disp solution
-  disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
+  // disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
 
   // Now do consistent Newton-Raphson iteration
   do

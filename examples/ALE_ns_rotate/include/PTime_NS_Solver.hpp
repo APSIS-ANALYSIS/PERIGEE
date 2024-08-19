@@ -67,6 +67,8 @@ class PTime_NS_Solver
     std::string Name_dot_Generator( const int &counter ) const;
 
     std::string Name_disp_Generator( const int &counter ) const;
+
+    std::string Name_mvelo_Generator( const int &counter ) const;
     
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
@@ -91,8 +93,7 @@ class PTime_NS_Solver
     } 
 
     // Get the current point coordinates for the case of rotation around x/y/z-axis
-    Vector_3 get_currPts( 
-        const Vector_3 init_pt_xyz,
+    Vector_3 get_currPts( const Vector_3 init_pt_xyz,
         const double &tt,
         const Sl_rotation_info * const &sl_ptr,
         const int &type) const
@@ -140,6 +141,50 @@ class PTime_NS_Solver
           SYS_T::print_fatal("Error: PTime_NS_Solver::get_currPts: No such type of rotation axis. \n");
           break;        
       }
+
+      return curr_pt_xyz;
+    }
+
+    // Get the current point coordinates for the case of rotation around any axis (i.e., unit rotation vector (a, b, c))
+    // Rodrigues's Formula, theta is the rotation angle
+    // [ cos(theta) + a*a(1-cos(theta)),    a*b(1-cos(theta)) - c*sin(theta), b*sin(theta) + a*c(1-cos(theta))  ]
+    // [ c*sin(theta) + a*b(1-cos(theta)),  cos(theta) + b*b(1-cos(theta)),   -a*sin(theta) + b*c(1-cos(theta)) ]
+    // [ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
+    Vector_3 get_currPts(const Vector_3 init_pt_xyz,
+        const double &tt,
+        const Sl_rotation_info * const &sl_ptr) const
+    {
+      const double angular_velo = sl_ptr->get_angular_velo();
+      const Vector_3 direction_rotated = sl_ptr->get_direction_rotated();
+      const Vector_3 point_rotated = sl_ptr->get_point_rotated(); 
+
+      const double aa = direction_rotated.x();
+      const double bb = direction_rotated.y();       
+      const double cc = direction_rotated.z();
+
+      const double theta = angular_velo * tt; 
+        
+      const double m00 = std::cos(theta) + aa*aa*(1-std::cos(theta)); 
+      const double m01 = aa*bb*(1-std::cos(theta)) - cc*std::sin(theta);
+      const double m02 = bb*std::sin(theta) + aa*cc*(1-std::cos(theta));
+
+      const double m10 = cc*std::sin(theta) + aa*bb*(1-std::cos(theta));        
+      const double m11 = std::cos(theta) + bb*bb*(1-std::cos(theta)); 
+      const double m12 = -aa*std::sin(theta) + bb*cc*(1-std::cos(theta));         
+
+      const double m20 = -bb*std::sin(theta) + aa*cc*(1-std::cos(theta));
+      const double m21 = aa*std::sin(theta) + bb*cc*(1-std::cos(theta));
+      const double m22 = std::cos(theta) + cc*cc*(1-std::cos(theta));
+
+      const Tensor2_3D mat_rotation (m00, m01, m02, m10, m11, m12, m20, m21, m22);
+      
+      Vector_3 temp_pt_xyz = init_pt_xyz;    
+
+      temp_pt_xyz -= point_rotated;
+
+      Vector_3 curr_pt_xyz = mat_rotation.VecMult(temp_pt_xyz);
+
+      curr_pt_xyz += point_rotated;
 
       return curr_pt_xyz;
     }
