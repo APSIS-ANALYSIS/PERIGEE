@@ -87,6 +87,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     ALocal_Interface * const &itf_part,
+    const Sl_rotation_info * const &sl_ptr,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -104,7 +105,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * disp_mesh = new PDNSolution(*init_disp);
+  // PDNSolution * disp_mesh = new PDNSolution(*init_disp);
+  PDNSolution * pre_disp_mesh = new PDNSolution(*init_disp);
+  PDNSolution * cur_disp_mesh = new PDNSolution(*init_disp);
+  PDNSolution * pre_velo_mesh = new PDNSolution(*init_disp);
+  PDNSolution * cur_velo_mesh = new PDNSolution(*init_disp);
+  // PDNSolution * disp_mesh = new PDNSolution(*init_disp);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -116,7 +122,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     cur_dot_sol->WriteBinary(sol_dot_name);
   
     const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
-    disp_mesh->WriteBinary(sol_disp_name);
+    cur_disp_mesh->WriteBinary(sol_disp_name);
   }
 
   bool conv_flag, renew_flag;
@@ -128,9 +134,36 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
 
+
+
   // Enter into time integration
   while( time_info->get_time() < final_time )
   {
+//+++++++ modify cur_velo_mesh
+    Vec lsol;
+    double * array_cur_velo_mesh;
+    VecGhostGetLocalForm(cur_velo_mesh->solution, &lsol);
+    VecGetArray(lsol, &array_cur_velo_mesh);
+    for( int ii=0; ii<pNode_ptr->get_nlocalnode_rotated(); ++ii )
+    { 
+      // Update the coordinates of the rotated nodes
+      const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time(), sl_ptr, 0); //get_currPts() may be writtern into Sl_tools
+
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, sl_ptr);
+      const Vector_3 velo_mesh_curr = Vec3::cross_product(sl_ptr->get_angular_velo()*sl_ptr->get_direction_rotated(), radius_curr);
+
+      const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
+
+      for(int jj=0; jj<3; ++jj)
+        array_cur_velo_mesh[offset + jj] = velo_mesh_curr(jj); 
+    }
+
+    VecRestoreArray(lsol, &array_cur_velo_mesh);
+    VecGhostRestoreLocalForm(cur_velo_mesh->solution, &lsol);
+
+    cur_velo_mesh->GhostUpdate();
+  //+++++++
     if(time_info->get_index() % renew_tang_freq == 0 || rest_flag )
     {
       renew_flag = true;
@@ -230,6 +263,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
+    pre_velo_mesh->Copy(*cur_velo_mesh);
   }
 
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;

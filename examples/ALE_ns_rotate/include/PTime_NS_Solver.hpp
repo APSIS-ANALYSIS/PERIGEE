@@ -10,6 +10,7 @@
 // ==================================================================
 #include "PDNTimeStep.hpp"
 #include "PNonlinear_NS_Solver.hpp"
+#include "Sl_rotation_info.hpp"
 
 class PTime_NS_Solver
 {
@@ -41,6 +42,7 @@ class PTime_NS_Solver
         IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
         ALocal_Interface * const &itf_part,
+        const Sl_rotation_info * const &sl_ptr,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -68,6 +70,79 @@ class PTime_NS_Solver
     
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
+    
+    //This func may be written into the Sl_tools?
+    Vector_3 get_radius(const Vector_3 &coor, const Sl_rotation_info * const &sl_ptr) const 
+    { 
+      const Vector_3 direction_rotated = sl_ptr->get_direction_rotated();
+      
+      const Vector_3 point_rotated = sl_ptr->get_point_rotated();  
+
+      // The vector from the rotation point to the input point
+      const Vector_3 point_rotated_to_coor (coor.x() - point_rotated.x(), coor.y() - point_rotated.y(), coor.z() - point_rotated.z());
+
+      const double projectd_length = Vec3::dot_product(point_rotated_to_coor, direction_rotated);
+      
+      // The projection point of the input point on the rotation axis
+      const Vector_3 point_projected (point_rotated.x() +  projectd_length * direction_rotated.x(), point_rotated.y() +  projectd_length * direction_rotated.y(), point_rotated.z() +  projectd_length * direction_rotated.z());
+      
+      // The vector from the projection point to the input point
+      return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z());
+    } 
+
+    // Get the current point coordinates for the case of rotation around x/y/z-axis
+    Vector_3 get_currPts( 
+        const Vector_3 init_pt_xyz,
+        const double &tt,
+        const Sl_rotation_info * const &sl_ptr,
+        const int &type) const
+    {
+      double mag_angular_velo = 0.0; // (rad/s)
+      const double angular_velo = sl_ptr->get_angular_velo();
+      const Vector_3 direction_rotated = sl_ptr->get_direction_rotated();
+
+      Vector_3 curr_pt_xyz(0, 0, 0);
+
+      const Vector_3 radius_pt = get_radius(init_pt_xyz, sl_ptr);
+
+      const double rr = radius_pt.norm2();
+      
+      double angle = 0.0;
+
+      //case 0: x-axis, case 1: y-axis, case 2: z-axis
+      switch(type) 
+      {
+        case 0:
+          mag_angular_velo = angular_velo * direction_rotated.x();
+          angle = MATH_T::get_angle_2d(init_pt_xyz.y(), init_pt_xyz.z());      
+          angle += mag_angular_velo * tt;
+          curr_pt_xyz.x() = init_pt_xyz.x();
+          curr_pt_xyz.y() = std::cos(angle) * rr;
+          curr_pt_xyz.z() = std::sin(angle) * rr;       
+          break;
+        case 1: 
+          mag_angular_velo = angular_velo * direction_rotated.y();
+          angle = MATH_T::get_angle_2d(init_pt_xyz.z(), init_pt_xyz.x());        
+          angle += mag_angular_velo * tt;
+          curr_pt_xyz.x() = std::sin(angle) * rr;
+          curr_pt_xyz.y() = init_pt_xyz.y();
+          curr_pt_xyz.z() = std::cos(angle) * rr;            
+          break;            
+        case 2: 
+          mag_angular_velo = angular_velo * direction_rotated.z();
+          angle = MATH_T::get_angle_2d(init_pt_xyz.x(), init_pt_xyz.y());        
+          angle += mag_angular_velo * tt;
+          curr_pt_xyz.x() = std::cos(angle) * rr;
+          curr_pt_xyz.y() = std::sin(angle) * rr;
+          curr_pt_xyz.z() = init_pt_xyz.z();            
+          break;            
+        default:
+          SYS_T::print_fatal("Error: PTime_NS_Solver::get_currPts: No such type of rotation axis. \n");
+          break;        
+      }
+
+      return curr_pt_xyz;
+    }
 };
 
 #endif
