@@ -41,6 +41,8 @@ class PTime_NS_Solver
         IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
         ALocal_Interface * const &itf_part,
+        SI_T::SI_solution * const &SI_sol,
+        SI_T::SI_quad_point * const &SI_qp,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
         FEAElement * const &elements,

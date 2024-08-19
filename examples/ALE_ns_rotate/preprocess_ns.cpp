@@ -395,17 +395,17 @@ int main( int argc, char * argv[] )
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
-  std::vector<std::vector<std::vector<int>>> distributed_fixed_layer_node_vol_part_tag;
-  distributed_fixed_layer_node_vol_part_tag.resize(cpu_size);
+  std::vector<std::vector<std::vector<int>>> distributed_fixed_node_vol_part_tag;
+  distributed_fixed_node_vol_part_tag.resize(cpu_size);
 
-  std::vector<std::vector<std::vector<int>>> distributed_fixed_layer_node_loc_pos;
-  distributed_fixed_layer_node_loc_pos.resize(cpu_size);
+  std::vector<std::vector<std::vector<int>>> distributed_fixed_node_loc_pos;
+  distributed_fixed_node_loc_pos.resize(cpu_size);
 
-  std::vector<std::vector<std::vector<int>>> distributed_rotated_layer_node_vol_part_tag;
-  distributed_rotated_layer_node_vol_part_tag.resize(cpu_size);
+  std::vector<std::vector<std::vector<int>>> distributed_rotated_node_vol_part_tag;
+  distributed_rotated_node_vol_part_tag.resize(cpu_size);
 
-  std::vector<std::vector<std::vector<int>>> distributed_rotated_layer_node_loc_pos;
-  distributed_rotated_layer_node_loc_pos.resize(cpu_size);
+  std::vector<std::vector<std::vector<int>>> distributed_rotated_node_loc_pos;
+  distributed_rotated_node_loc_pos.resize(cpu_size);
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
@@ -446,11 +446,11 @@ int main( int argc, char * argv[] )
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);
 
-    distributed_fixed_layer_node_vol_part_tag[proc_rank] = itfpart -> get_fixed_layer_node_vol_part_tag();
-    distributed_fixed_layer_node_loc_pos[proc_rank] = itfpart -> get_fixed_layer_node_loc_pos();
+    distributed_fixed_node_vol_part_tag[proc_rank] = itfpart -> get_fixed_node_vol_part_tag();
+    distributed_fixed_node_loc_pos[proc_rank] = itfpart -> get_fixed_node_loc_pos();
 
-    distributed_rotated_layer_node_vol_part_tag[proc_rank] = itfpart -> get_rotated_layer_node_vol_part_tag();
-    distributed_rotated_layer_node_loc_pos[proc_rank] = itfpart -> get_rotated_layer_node_loc_pos();
+    distributed_rotated_node_vol_part_tag[proc_rank] = itfpart -> get_rotated_node_vol_part_tag();
+    distributed_rotated_node_loc_pos[proc_rank] = itfpart -> get_rotated_node_loc_pos();
 
     itfpart -> write_hdf5( part_file );
 
@@ -465,43 +465,43 @@ int main( int argc, char * argv[] )
     delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; delete itfpart;
   }
 
-  // Combine the fixed/rotated_layer_node_vol_part_tag and rotated_layer_node_loc_pos
-  std::vector<std::vector<int>> fixed_layer_node_vol_part_tag, fixed_layer_node_loc_pos;
-  fixed_layer_node_vol_part_tag.resize(VEC_T::get_size(interfaces));
-  fixed_layer_node_loc_pos.resize(VEC_T::get_size(interfaces));
+  // Combine the fixed/rotated_node_vol_part_tag and rotated_node_loc_pos
+  std::vector<std::vector<int>> fixed_node_vol_part_tag, fixed_node_loc_pos;
+  fixed_node_vol_part_tag.resize(VEC_T::get_size(interfaces));
+  fixed_node_loc_pos.resize(VEC_T::get_size(interfaces));
 
-  std::vector<std::vector<int>> rotated_layer_node_vol_part_tag, rotated_layer_node_loc_pos;
-  rotated_layer_node_vol_part_tag.resize(VEC_T::get_size(interfaces));
-  rotated_layer_node_loc_pos.resize(VEC_T::get_size(interfaces));
+  std::vector<std::vector<int>> rotated_node_vol_part_tag, rotated_node_loc_pos;
+  rotated_node_vol_part_tag.resize(VEC_T::get_size(interfaces));
+  rotated_node_loc_pos.resize(VEC_T::get_size(interfaces));
 
   for(int ii = 0; ii < VEC_T::get_size(interfaces); ++ii)
   { 
     // just a initialization
-    fixed_layer_node_vol_part_tag[ii] = distributed_fixed_layer_node_vol_part_tag[0][ii];
-    fixed_layer_node_loc_pos[ii] = distributed_fixed_layer_node_loc_pos[0][ii];
+    fixed_node_vol_part_tag[ii] = distributed_fixed_node_vol_part_tag[0][ii];
+    fixed_node_loc_pos[ii] = distributed_fixed_node_loc_pos[0][ii];
 
-    rotated_layer_node_vol_part_tag[ii] = distributed_rotated_layer_node_vol_part_tag[0][ii];
-    rotated_layer_node_loc_pos[ii] = distributed_rotated_layer_node_loc_pos[0][ii];
+    rotated_node_vol_part_tag[ii] = distributed_rotated_node_vol_part_tag[0][ii];
+    rotated_node_loc_pos[ii] = distributed_rotated_node_loc_pos[0][ii];
 
     for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
     {
       PERIGEE_OMP_FOR
-      for(int jj = 0; jj < VEC_T::get_size(fixed_layer_node_vol_part_tag[ii]); ++jj)
+      for(int jj = 0; jj < VEC_T::get_size(fixed_node_vol_part_tag[ii]); ++jj)
       {
-        if(distributed_fixed_layer_node_vol_part_tag[proc_rank][ii][jj] != -1)
+        if(distributed_fixed_node_vol_part_tag[proc_rank][ii][jj] != -1)
         {
-          fixed_layer_node_vol_part_tag[ii][jj] = distributed_fixed_layer_node_vol_part_tag[proc_rank][ii][jj];
-          fixed_layer_node_loc_pos[ii][jj] = distributed_fixed_layer_node_loc_pos[proc_rank][ii][jj];
+          fixed_node_vol_part_tag[ii][jj] = distributed_fixed_node_vol_part_tag[proc_rank][ii][jj];
+          fixed_node_loc_pos[ii][jj] = distributed_fixed_node_loc_pos[proc_rank][ii][jj];
         }
       }
 
       PERIGEE_OMP_FOR
-      for(int jj = 0; jj < VEC_T::get_size(rotated_layer_node_vol_part_tag[ii]); ++jj)
+      for(int jj = 0; jj < VEC_T::get_size(rotated_node_vol_part_tag[ii]); ++jj)
       {
-        if(distributed_rotated_layer_node_vol_part_tag[proc_rank][ii][jj] != -1)
+        if(distributed_rotated_node_vol_part_tag[proc_rank][ii][jj] != -1)
         {
-          rotated_layer_node_vol_part_tag[ii][jj] = distributed_rotated_layer_node_vol_part_tag[proc_rank][ii][jj];
-          rotated_layer_node_loc_pos[ii][jj] = distributed_rotated_layer_node_loc_pos[proc_rank][ii][jj];
+          rotated_node_vol_part_tag[ii][jj] = distributed_rotated_node_vol_part_tag[proc_rank][ii][jj];
+          rotated_node_loc_pos[ii][jj] = distributed_rotated_node_loc_pos[proc_rank][ii][jj];
         }
       }
     }
@@ -529,13 +529,13 @@ int main( int argc, char * argv[] )
 
       hid_t group_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT);
 
-      h5w -> write_intVector( group_id, "fixed_node_part_tag", fixed_layer_node_vol_part_tag[ii] );
+      h5w -> write_intVector( group_id, "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "fixed_node_loc_pos", fixed_layer_node_loc_pos[ii] );
+      h5w -> write_intVector( group_id, "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
 
-      h5w -> write_intVector( group_id, "rotated_node_part_tag", rotated_layer_node_vol_part_tag[ii] );
+      h5w -> write_intVector( group_id, "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "rotated_node_loc_pos", rotated_layer_node_loc_pos[ii] );
+      h5w -> write_intVector( group_id, "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
 
       H5Gclose( group_id );
     }

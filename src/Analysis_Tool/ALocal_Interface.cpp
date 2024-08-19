@@ -27,31 +27,19 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
   fixed_ele_face_id.resize(num_itf);
   fixed_ele_tag.resize(num_itf);
-  fixed_layer_ien.resize(num_itf);
-  fixed_node_xyz.resize(num_itf);
-  fixed_node_sol.resize(num_itf);
-  fixed_node_part_tag.resize(num_itf);
-  fixed_node_loc_pos.resize(num_itf);
+  fixed_lien.resize(num_itf);
+  fixed_pt_xyz.resize(num_itf);
   fixed_node_id.resize(num_itf);
-  fixed_ID.resize(num_itf);
+  fixed_LID.resize(num_itf);
 
-  rotated_layer_ien.resize(num_itf);
-  rotated_layer_face_id.resize(num_itf);
-  init_rotated_node_xyz.resize(num_itf);
-  rotated_node_sol.resize(num_itf);
-  rotated_node_part_tag.resize(num_itf);
-  rotated_node_loc_pos.resize(num_itf);
+  rotated_lien.resize(num_itf);
+  rotated_ele_face_id.resize(num_itf);
+  rotated_pt_xyz.resize(num_itf);
   rotated_node_id.resize(num_itf);
-  rotated_ID.resize(num_itf);
+  rotated_LID.resize(num_itf);
 
   const std::string mesh_info("/Global_Mesh_Info");
   nLocBas = h5r -> read_intScalar(mesh_info.c_str(), "nLocBas");
-  dof_sol = h5r -> read_intScalar(mesh_info.c_str(), "dofNum");
-
-  const std::string part_node("/Local_Node");
-  nlgn = h5r -> read_intScalar(part_node.c_str(), "nlocghonode");
-
-  cpu = cpu_rank;
 
   for(int ii=0; ii<num_itf; ++ii)
   {
@@ -62,24 +50,18 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
     fixed_ele_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_tag" );
 
-    fixed_layer_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_ien" );
+    fixed_lien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_ien" );
 
-    fixed_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "fixed_node_xyz" );
+    fixed_pt_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "fixed_pt_xyz" );
 
     fixed_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_map" );
 
-    fixed_ID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "fixed_ID" );
+    fixed_LID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "fixed_LID" );
 
     num_fixed_node[ii] = VEC_T::get_size(fixed_node_id[ii]);
 
-    fixed_node_sol[ii] = std::vector<double> (dof_sol * num_fixed_node[ii], 0.0);
-
-    fixed_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_part_tag" );
-
-    fixed_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_loc_pos" );
-
-    rotated_layer_ien[ii].resize(num_tag[ii]);
-    rotated_layer_face_id[ii].resize(num_tag[ii]);
+    rotated_lien[ii].resize(num_tag[ii]);
+    rotated_ele_face_id[ii].resize(num_tag[ii]);
     num_rotated_ele[ii].resize(num_tag[ii]);
     
     std::string subsubgroupbase(subgroup_name);
@@ -94,25 +76,19 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
       if(num_rotated_ele[ii][jj] > 0)
       {
-        rotated_layer_ien[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_ien" );
+        rotated_lien[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_ien" );
 
-        rotated_layer_face_id[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_face_id" );
+        rotated_ele_face_id[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_face_id" );
       }
     }
 
-    init_rotated_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "rotated_node_xyz" );
+    rotated_pt_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "rotated_pt_xyz" );
 
     rotated_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" );
 
-    rotated_ID[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_ID" );
+    rotated_LID[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_LID" );
 
     num_rotated_node[ii] = VEC_T::get_size(rotated_node_id[ii]);
-
-    rotated_node_sol[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
-
-    rotated_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_part_tag" );
-
-    rotated_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_loc_pos" );
   }
 
   delete h5r; H5Fclose( file_id );
@@ -128,27 +104,6 @@ void ALocal_Interface::print_info() const
 {
   SYS_T::commPrint("Interfaces: %d\n", num_itf);
 }
-
-// Vector_3 ALocal_Interface::get_curr_xyz(const int &ii, const int &node, const double &tt) const
-// {
-//   Vector_3 xyz (get_init_rotated_node_xyz(ii, 3 * node),
-//                 get_init_rotated_node_xyz(ii, 3 * node + 1),
-//                 get_init_rotated_node_xyz(ii, 3 * node + 2));
-
-//   // rotation around z-axis
-//   const double angular_velo = MATH_T::PI / 60;  // (rad/s)
-
-//   const double rr = std::sqrt(xyz(1) * xyz(1) + xyz(2) * xyz(2));
-
-//   double angle = MATH_T::get_angle_2d(xyz(1), xyz(2));
-
-//   angle += angular_velo * tt;
-
-//   xyz(1) = std::cos(angle) * rr;
-//   xyz(2) = std::sin(angle) * rr;
-
-//   return xyz;
-// }
 
 // Get the radius of rotation
 Vector_3 ALocal_Interface::get_radius (const Vector_3 &coor) const
@@ -224,11 +179,11 @@ void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &ee,
 {
   for(int nn{0}; nn < nLocBas; ++nn)
   {
-    int node = get_fixed_layer_ien(ii, nLocBas * ee + nn);
+    int node = get_fixed_lien(ii, nLocBas * ee + nn);
 
-    volctrl_x[nn] = get_fixed_node_xyz(ii, 3 * node);
-    volctrl_y[nn] = get_fixed_node_xyz(ii, 3 * node + 1);
-    volctrl_z[nn] = get_fixed_node_xyz(ii, 3 * node + 2);
+    volctrl_x[nn] = get_fixed_pt_xyz(ii, 3 * node);
+    volctrl_y[nn] = get_fixed_pt_xyz(ii, 3 * node + 1);
+    volctrl_z[nn] = get_fixed_pt_xyz(ii, 3 * node + 2);
   }
 }
 
@@ -239,93 +194,17 @@ void ALocal_Interface::get_rotated_ele_ctrlPts(const int &ii, const int &tag, co
 
   for(int nn{0}; nn < nLocBas; ++nn)
   {
-    int node = get_rotated_layer_ien(ii, tag, nLocBas * ee + nn);
+    int node = get_rotated_lien(ii, tag, nLocBas * ee + nn);
 
-    // initPt_x[nn] = get_init_rotated_node_xyz(ii, 3 * node);
-    // initPt_y[nn] = get_init_rotated_node_xyz(ii, 3 * node + 1);
-    // initPt_z[nn] = get_init_rotated_node_xyz(ii, 3 * node + 2);
-    volctrl_x[nn] = get_init_rotated_node_xyz(ii, 3 * node);
-    volctrl_y[nn] = get_init_rotated_node_xyz(ii, 3 * node + 1);
-    volctrl_z[nn] = get_init_rotated_node_xyz(ii, 3 * node + 2);
+    // initPt_x[nn] = rotated_pt_xyz[ii][3 * node];
+    // initPt_y[nn] = rotated_pt_xyz[ii][3 * node + 1];
+    // initPt_z[nn] = rotated_pt_xyz[ii], [3 * node + 2];
+    volctrl_x[nn] = rotated_pt_xyz[ii][3 * node];
+    volctrl_y[nn] = rotated_pt_xyz[ii][3 * node + 1];
+    volctrl_z[nn] = rotated_pt_xyz[ii][3 * node + 2];
   }
 
   // get_currPts(&initPt_x[0], &initPt_y[0], &initPt_z[0], tt, volctrl_x, volctrl_y, volctrl_z, 0);
-}
-
-void ALocal_Interface::restore_node_sol(const PDNSolution * const &sol)
-{
-  double * array = new double [nlgn * dof_sol];
-
-  sol->GetLocalArray( array );
-
-  Zero_node_sol();
-
-  for(int ii = 0; ii < num_itf; ++ii)
-  { 
-    std::vector<double> temp_fixed_node_sol = fixed_node_sol[ii];
-    for(int nn = 0; nn < num_fixed_node[ii]; ++nn)
-    {
-      // Pick out the solution of nodes in each part
-      if(fixed_node_part_tag[ii][nn] == cpu)
-      {  
-        // Like GetLocal in PGAssem
-        const int loc_pos = fixed_node_loc_pos[ii][nn];
-        for(int dd = 0; dd < dof_sol; ++dd)
-          temp_fixed_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
-      }
-    }
-
-    std::vector<double> temp_rotated_node_sol = rotated_node_sol[ii];
-    for(int nn = 0; nn < num_rotated_node[ii]; ++nn)
-    {
-      // Pick out the solution of nodes in each part
-      if(rotated_node_part_tag[ii][nn] == cpu)
-      { 
-        // Like GetLocal in PGAssem
-        const int loc_pos = rotated_node_loc_pos[ii][nn];
-        for(int dd = 0; dd < dof_sol; ++dd)
-          temp_rotated_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
-      }
-    }
-
-    // Summation from each part
-    MPI_Allreduce(&temp_fixed_node_sol[0], &fixed_node_sol[ii][0], dof_sol * num_fixed_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-    MPI_Allreduce(&temp_rotated_node_sol[0], &rotated_node_sol[ii][0], dof_sol * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
-  }
-
-  delete [] array;
-}
-
-void ALocal_Interface::init_curr(const int &nqp_sur_in)
-{
-  nqp_sur = nqp_sur_in;
-  curr_tag.resize(num_itf);
-  curr_ee.resize(num_itf);
-  curr_xi.resize(num_itf);
-
-  for(int ii = 0; ii < num_itf; ++ii)
-  {
-    curr_tag[ii].assign(num_fixed_ele[ii] * nqp_sur, -1);
-    curr_ee[ii].assign(num_fixed_ele[ii] * nqp_sur, -1);
-    curr_xi[ii].assign(num_fixed_ele[ii] * nqp_sur, std::vector<double>(2, 0.0));
-  }
-}
-
-void ALocal_Interface::set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-  const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi)
-{
-  curr_tag[itf_id][fixed_ee * nqp_sur + qua] = ele_tag;
-  curr_ee[itf_id][fixed_ee * nqp_sur + qua] = rotated_ee;
-  curr_xi[itf_id][fixed_ee * nqp_sur + qua][0] = xi[0];
-  curr_xi[itf_id][fixed_ee * nqp_sur + qua][1] = xi[1];
-}
-
-void ALocal_Interface::get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-  int &ele_tag, int &rotated_ee, std::vector<double> &xi) const
-{
-  ele_tag = curr_tag[itf_id][fixed_ee * nqp_sur + qua];
-  rotated_ee = curr_ee[itf_id][fixed_ee * nqp_sur + qua];
-  xi = curr_xi[itf_id][fixed_ee * nqp_sur + qua];
 }
 
 // EOF

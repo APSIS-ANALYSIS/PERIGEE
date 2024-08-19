@@ -26,6 +26,7 @@
 #include "ALocal_EBC.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_Interface.hpp"
+#include "Sliding_Interface_Tools.hpp"
 #include "IGenBC.hpp"
 #include "Tissue_prestress.hpp"
 
@@ -182,6 +183,8 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
@@ -376,7 +379,9 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part )
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -667,7 +672,9 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part )
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -965,7 +972,9 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part )
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
@@ -1123,17 +1132,6 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
-
-    // search the all the interface quadrature point at each time step
-    virtual void search_all_opposite_point(
-        const double &curr_time,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        ALocal_Interface * const &itf_part )
-    {SYS_T::commPrint("Warning: search_all_opposite_point() is not implemented. \n");}
 };
 
 #endif

@@ -56,6 +56,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     ALocal_Interface * const &itf_part,
+    SI_T::SI_solution * const &SI_sol,
+    SI_T::SI_quad_point * const &SI_qp,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -115,9 +117,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
-  itf_part->restore_node_sol(&sol_alpha);
-  // gassem_ptr->search_all_opposite_point(curr_time+alpha_f*dt, elementvs, elementvs_rotated, elements,
-  //   quad_s, free_quad, itf_part);
+  SI_sol->update_node_sol(&sol_alpha);
+  SI_qp->search_all_opposite_point(curr_time+alpha_f*dt, elementvs, elementvs_rotated, elements,
+    quad_s, free_quad, itf_part);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -133,7 +135,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part );
+        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -157,7 +159,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part );
+        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -194,7 +196,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
-    itf_part->restore_node_sol(&sol_alpha);
+    SI_sol->update_node_sol(&sol_alpha);
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
@@ -207,7 +209,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part );
+          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -226,7 +228,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part);
+          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);

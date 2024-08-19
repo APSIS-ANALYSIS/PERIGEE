@@ -13,9 +13,9 @@
 #include <ctime>
 #include <sys/stat.h>
 #include "petsc.h"
-#ifdef USE_OPENMP
+// #ifdef USE_OPENMP
 #include "omp.h"
-#endif
+// #endif
 #ifdef _OPENMP
 #define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
 #define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")

@@ -17,8 +17,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   fixed_pt_xyz.resize(num_pair);
   fixed_interval_tag.resize(num_pair);
 
-  fixed_layer_node_vol_part_tag.resize(num_pair);
-  fixed_layer_node_loc_pos.resize(num_pair);
+  fixed_node_vol_part_tag.resize(num_pair);
+  fixed_node_loc_pos.resize(num_pair);
 
   rotated_ele_face_id.resize(num_pair);
   rotated_lien.resize(num_pair);
@@ -27,8 +27,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   rotated_pt_xyz.resize(num_pair);
   rotated_interval_tag.resize(num_pair);
 
-  rotated_layer_node_vol_part_tag.resize(num_pair);
-  rotated_layer_node_loc_pos.resize(num_pair);
+  rotated_node_vol_part_tag.resize(num_pair);
+  rotated_node_loc_pos.resize(num_pair);
 
   const int dof = 4;
 
@@ -44,8 +44,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     fixed_interval_tag[ii] = std::vector<int> {};
 
     const int num_fixed_node = VEC_T::get_size(fixed_global_node[ii]);
-    fixed_layer_node_vol_part_tag[ii].resize(num_fixed_node);
-    fixed_layer_node_loc_pos[ii].resize(num_fixed_node);
+    fixed_node_vol_part_tag[ii].resize(num_fixed_node);
+    fixed_node_loc_pos[ii].resize(num_fixed_node);
     fixed_LID[ii].resize(dof * num_fixed_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
@@ -61,13 +61,13 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
       if(part->isNodeInPart( new_gid ))
       {
-        fixed_layer_node_vol_part_tag[ii][jj] = cpu_rank;
-        fixed_layer_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
+        fixed_node_vol_part_tag[ii][jj] = cpu_rank;
+        fixed_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
       }
       else
       {
-        fixed_layer_node_vol_part_tag[ii][jj] = -1;
-        fixed_layer_node_loc_pos[ii][jj] = -1;
+        fixed_node_vol_part_tag[ii][jj] = -1;
+        fixed_node_loc_pos[ii][jj] = -1;
       }
     }
 
@@ -107,8 +107,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     rotated_global_node[ii] = interfaces[ii].get_rotated_global_node();
 
     const int num_rotated_node = VEC_T::get_size(rotated_global_node[ii]);
-    rotated_layer_node_vol_part_tag[ii].resize(num_rotated_node);
-    rotated_layer_node_loc_pos[ii].resize(num_rotated_node);
+    rotated_node_vol_part_tag[ii].resize(num_rotated_node);
+    rotated_node_loc_pos[ii].resize(num_rotated_node);
     rotated_LID[ii].resize(dof * num_rotated_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
@@ -124,13 +124,13 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
       if(part->isNodeInPart( new_gid ))
       {
-        rotated_layer_node_vol_part_tag[ii][jj] = cpu_rank;
-        rotated_layer_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
+        rotated_node_vol_part_tag[ii][jj] = cpu_rank;
+        rotated_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
       }
       else
       {
-        rotated_layer_node_vol_part_tag[ii][jj] = -1;
-        rotated_layer_node_loc_pos[ii][jj] = -1;
+        rotated_node_vol_part_tag[ii][jj] = -1;
+        rotated_node_loc_pos[ii][jj] = -1;
       }
     }
 
@@ -203,17 +203,17 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "fixed_node_map", fixed_global_node[ii] );
 
-    h5w -> write_intVector( group_id, "fixed_ID", fixed_LID[ii] );
+    h5w -> write_intVector( group_id, "fixed_LID", fixed_LID[ii] );
 
-    h5w -> write_doubleVector( group_id, "fixed_node_xyz", fixed_pt_xyz[ii] );
+    h5w -> write_doubleVector( group_id, "fixed_pt_xyz", fixed_pt_xyz[ii] );
 
     h5w -> write_intScalar( group_id, "num_rotated_node", VEC_T::get_size(rotated_global_node[ii]) );
 
     h5w -> write_intVector( group_id, "rotated_node_map", rotated_global_node[ii] );
 
-    h5w -> write_intVector( group_id, "rotated_ID", rotated_LID[ii] );
+    h5w -> write_intVector( group_id, "rotated_LID", rotated_LID[ii] );
 
-    h5w -> write_doubleVector( group_id, "rotated_node_xyz", rotated_pt_xyz[ii] );
+    h5w -> write_doubleVector( group_id, "rotated_pt_xyz", rotated_pt_xyz[ii] );
 
     const std::string subgroupbase("tag_");
 
