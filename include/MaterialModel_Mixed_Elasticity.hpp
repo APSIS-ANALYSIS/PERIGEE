@@ -56,6 +56,13 @@ class MaterialModel_Mixed_Elasticity
 
     double get_elastic_kappa() const {return vmodel->get_elastic_kappa();}
 
+    // Strain energy: the isochoric, volumetric (in Gibbs/Helmholtz form)
+    double get_ich_energy(const Tensor2_3D &F) {return imodel->get_energy(F);}
+
+    double get_vol_Gibbs_energy(const double &p) {return vmodel->get_Gibbs_energy(p);}
+
+    double get_vol_Helmholtz_energy(const double &J) {return vmodel->get_Helmholtz_energy(J);}
+
   private:
     const std::unique_ptr<IMaterialModel_vol> vmodel;
     const std::unique_ptr<IMaterialModel_ich> imodel;

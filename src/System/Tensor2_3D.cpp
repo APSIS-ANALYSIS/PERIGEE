@@ -1,35 +1,5 @@
 #include "Tensor2_3D.hpp"
 
-Tensor2_3D::Tensor2_3D()
-{
-  mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
-  mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
-  mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
-}
-
-Tensor2_3D::Tensor2_3D( const Tensor2_3D &source )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
-}
-
-Tensor2_3D::Tensor2_3D( 
-    const double &a11, const double &a12, const double &a13,
-    const double &a21, const double &a22, const double &a23,
-    const double &a31, const double &a32, const double &a33 )
-{
-  mat[0] = a11; mat[1] = a12; mat[2] = a13;
-  mat[3] = a21; mat[4] = a22; mat[5] = a23;
-  mat[6] = a31; mat[7] = a32; mat[8] = a33;
-}
-
-Tensor2_3D::Tensor2_3D(
-    const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
-{
-  mat[0] = vec1(0); mat[1] = vec2(0); mat[2] = vec3(0);
-  mat[3] = vec1(1); mat[4] = vec2(1); mat[5] = vec3(1);
-  mat[6] = vec1(2); mat[7] = vec2(2); mat[8] = vec3(2);
-}
-
 bool Tensor2_3D::is_identical( const Tensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<9; ++ii) 
@@ -37,16 +7,10 @@ bool Tensor2_3D::is_identical( const Tensor2_3D &source, const double &tol ) con
   return true;
 }
 
-void Tensor2_3D::copy( const Tensor2_3D &source )
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
-}
-
 Tensor2_3D& Tensor2_3D::operator= (const Tensor2_3D &source)
 {
-  if(this == &source) return *this;
+  if(this != &source) mat = source.mat; // use std::array assignment operator
 
-  for(int ii=0; ii<9; ++ii) mat[ii] = source(ii);
   return *this; 
 }
 
@@ -88,18 +52,6 @@ Tensor2_3D Tensor2_3D::operator- () const
 {
   return Tensor2_3D( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4],
       -mat[5], -mat[6], -mat[7], -mat[8] );
-}
-
-void Tensor2_3D::gen_zero()
-{
-  for(int ii=0; ii<9; ++ii) mat[ii] = 0.0; 
-}
-
-void Tensor2_3D::gen_id()
-{
-  mat[0] = 1.0; mat[1] = 0.0; mat[2] = 0.0;
-  mat[3] = 0.0; mat[4] = 1.0; mat[5] = 0.0;
-  mat[6] = 0.0; mat[7] = 0.0; mat[8] = 1.0;
 }
 
 void Tensor2_3D::gen_rand(const double &left, const double &right)

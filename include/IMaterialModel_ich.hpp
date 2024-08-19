@@ -18,6 +18,8 @@ class IMaterialModel_ich
 
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const = 0;
 
+    virtual double get_energy( const Tensor2_3D &F ) const = 0;
+
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const = 0;
 
