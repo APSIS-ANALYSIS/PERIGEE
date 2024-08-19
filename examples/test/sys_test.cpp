@@ -129,7 +129,15 @@ int main(int argc, char *argv[])
   drho_dp_old -= drho_dp_new;
   std::cout<<drho_dp_old<<std::endl;
   std::cout<<drho_dp_new<<std::endl;
+
+  // dbeta_dp
+  auto dbeta_dp_old = oldmodel->get_dbeta_dp(p);
+  auto dbeta_dp_new = matmodel->get_dbeta_dp(p);
+  dbeta_dp_old -= dbeta_dp_new;
+  std::cout<<dbeta_dp_old<<std::endl;
+  std::cout<<dbeta_dp_new<<std::endl;
   
+
 
 
 
