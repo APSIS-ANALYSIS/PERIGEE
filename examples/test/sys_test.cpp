@@ -74,18 +74,15 @@ int main(int argc, char *argv[])
   //std::cout<<val<<'\n';
 
   F *= val; 
+  
+  
 
-  auto P_new = matmodel->get_PK_1st(F);
-  auto S_new = matmodel->get_PK_2nd(F);
-  auto CC_new = matmodel->get_PK_Stiffness(F, P_new);
   
   Tensor2_3D P_old, S_old;
   oldmodel->get_PK(F, P_old, S_old);
-
-  Tensor4_3D CC_old;
-  oldmodel->get_PK_Stiffness(F, P_old, S_old, CC_old);
-
+  // S
   //S_old -= S_new;
+  auto S_new = matmodel->get_PK_2nd(F);
   S_old -= S_new.full();
   S_old.print();
   std::cout<<std::endl;
@@ -94,6 +91,7 @@ int main(int argc, char *argv[])
 
 
   //P_old -= P_new
+  auto P_new = matmodel->get_PK_1st(F);
   P_old -= P_new;
   P_old.print();
   std::cout<<std::endl;
@@ -101,11 +99,26 @@ int main(int argc, char *argv[])
   std::cout<<std::endl; 
 
   //CC_old -= CC_new
+  Tensor4_3D CC_old;
+  oldmodel->get_PK_Stiffness(F, P_old, S_old, CC_old);
+  auto CC_new = matmodel->get_PK_Stiffness(F, P_new);
   CC_old -= CC_new.full();
   CC_old.print();
   std::cout<<std::endl;
   CC_new.print();
   std::cout<<std::endl; 
+
+  // rho
+  double p = MATH_T::gen_double_rand(-1.0,1.0);
+  auto rho_old = oldmodel->get_rho(p);
+  auto rho_new = matmodel->get_rho(p);
+  rho_old -= rho_new;
+  std::cout<<rho_old<<std::endl;
+  std::cout<<rho_new<<std::endl;
+
+  // beta
+  
+
 
   
 
