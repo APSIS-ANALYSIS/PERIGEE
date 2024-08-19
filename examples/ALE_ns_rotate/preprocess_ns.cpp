@@ -82,8 +82,7 @@ int main( int argc, char * argv[] )
 
   // Info of rotation axis
   Vector_3 point_rotated (vec_point_rotated[0], vec_point_rotated[1], vec_point_rotated[2]);
-
-  Vector_3 angular_direction (vec_point_rotated[0], vec_point_rotated[1], vec_point_rotated[2]);
+  Vector_3 angular_direction (vec_angular_direction[0], vec_angular_direction[1], vec_angular_direction[2]);
 
   SYS_T::print_fatal_if(std::abs(angular_direction.norm2() - 0.0) < 1e-15, "Error: the direction vector of rotation axis cannot be zero vector. \n" );
 
