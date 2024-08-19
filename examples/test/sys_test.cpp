@@ -75,9 +75,6 @@ int main(int argc, char *argv[])
 
   F *= val; 
   
-  
-
-  
   Tensor2_3D P_old, S_old;
   oldmodel->get_PK(F, P_old, S_old);
   // S
@@ -136,7 +133,20 @@ int main(int argc, char *argv[])
   dbeta_dp_old -= dbeta_dp_new;
   std::cout<<dbeta_dp_old<<std::endl;
   std::cout<<dbeta_dp_new<<std::endl;
-  
+
+  // strain_energy
+  auto strain_energy_old = oldmodel->get_strain_energy(F);
+  auto strain_energy_Gibbs_new = matmodel->get_ich_energy(F) + matmodel->get_vol_Gibbs_energy(p);
+  auto strain_energy_Helm_new = matmodel->get_ich_energy(F) + matmodel->get_vol_Helmholtz_energy(F.det());
+  auto strain_energy_diff_Gibbs = strain_energy_old - strain_energy_Gibbs_new;
+  auto strain_energy_diff_Helm = strain_energy_old - strain_energy_Helm_new;
+  std::cout<<strain_energy_diff_Gibbs<<std::endl;
+  std::cout<<strain_energy_Gibbs_new<<std::endl;
+  std::cout<<strain_energy_diff_Helm<<std::endl;
+  std::cout<<strain_energy_Helm_new<<std::endl;
+
+
+
 
 
 
