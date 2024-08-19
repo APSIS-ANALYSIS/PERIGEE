@@ -73,6 +73,22 @@ int main( int argc, char * argv[] )
   //                  2 strongly enforced in wall-normal direction,
   //                   and weakly enforced in wall-tangent direction
 
+  // Rotated paras:
+  const std::vector<double> vec_point_rotated     = paras["point_rotated"].as<std::vector<double>>();
+  const std::vector<double> vec_angular_direction = paras["angular_direction"].as<std::vector<double>>();
+
+  SYS_T::print_fatal_if(VEC_T::get_size(vec_point_rotated) != 3, "Error: the size of the point_rotated vector is not equal to 3. \n");
+  SYS_T::print_fatal_if(VEC_T::get_size(vec_angular_direction) != 3, "Error: the size of the angular_direction vector is not equal to 3. \n");
+
+  // Info of rotation axis
+  Vector_3 point_rotated (vec_point_rotated[0], vec_point_rotated[1], vec_point_rotated[2]);
+
+  Vector_3 angular_direction (vec_point_rotated[0], vec_point_rotated[1], vec_point_rotated[2]);
+
+  SYS_T::print_fatal_if(std::abs(angular_direction.norm2() - 0.0) < 1e-15, "Error: the direction vector of rotation axis cannot be zero vector. \n" );
+
+  angular_direction.normalize();
+
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 
   // Print the command line arguments
@@ -468,6 +484,16 @@ int main( int argc, char * argv[] )
     EBC_Partition * wbcpart = new EBC_Partition_turbulence_wall_model(part, mnindex, wbc);
 
     wbcpart -> write_hdf5( part_file );
+
+    // Writed the info of rotation axis into h5 file
+    const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
+    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+    hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * h5w = new HDF5_Writer( file_id );
+    h5w -> write_Vector_3( g_id, "point_rotated", point_rotated );
+    h5w -> write_Vector_3( g_id, "angular_direction", angular_direction );
+
+    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);

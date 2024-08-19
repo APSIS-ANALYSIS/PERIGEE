@@ -221,6 +221,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
       const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
       cur_disp_mesh->WriteBinary(sol_disp_name);
+
+      const auto sol_velo_name = Name_mvelo_Generator(time_info->get_index());
+      cur_velo_mesh->WriteBinary(sol_velo_name);
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
