@@ -108,8 +108,8 @@ int main(int argc, char *argv[])
   CC_new.print();
   std::cout<<std::endl; 
 
-  // rho
   double p = MATH_T::gen_double_rand(-1.0,1.0);
+  // rho
   auto rho_old = oldmodel->get_rho(p);
   auto rho_new = matmodel->get_rho(p);
   rho_old -= rho_new;
@@ -117,7 +117,20 @@ int main(int argc, char *argv[])
   std::cout<<rho_new<<std::endl;
 
   // beta
+  auto beta_old = oldmodel->get_beta(p);
+  auto beta_new = matmodel->get_beta(p);
+  beta_old -= beta_new;
+  std::cout<<beta_old<<std::endl;
+  std::cout<<beta_new<<std::endl;
+
+  // drho_dp
+  auto drho_dp_old = oldmodel->get_drho_dp(p);
+  auto drho_dp_new = matmodel->get_drho_dp(p);
+  drho_dp_old -= drho_dp_new;
+  std::cout<<drho_dp_old<<std::endl;
+  std::cout<<drho_dp_new<<std::endl;
   
+
 
 
   
