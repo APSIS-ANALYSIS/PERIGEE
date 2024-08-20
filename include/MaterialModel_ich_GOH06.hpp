@@ -38,8 +38,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       SYS_T::commPrint("\t  MaterialModel_ich_GOH06: \n");
       SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
       SYS_T::commPrint("\t  Dispersion parameter kappa   = %e \n", fkd);
-      SYS_T::commPrint("\t  Dimensionless parameter k1   = %e \n", fk1);
-      SYS_T::commPrint("\t  Stress-like parameter k2   = %e \n", fk2);
+      SYS_T::commPrint("\t  Stress-like parameter k1   = %e \n", fk1);
+      SYS_T::commPrint("\t  Dimensionless parameter k2   = %e \n", fk2);
       SYS_T::commPrint("\t  Mean angle Theta_1 (deg) of the 1st family of fibres = %e \n", f1_the*180/MATH_T::PI);
       SYS_T::commPrint("\t  Mean angle Phi_1 (deg) of the 1st family of fibres = %e \n", f1_phi*180/MATH_T::PI);
       SYS_T::commPrint("\t  Mean angle Theta_1 (rad) of the 1st family of fibres = %e \n", f1_the);
@@ -106,7 +106,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       // PKstiff_tilde = 4J^(-4/3) * d^2Psi_sio/dC_tilde^2 = 4J^(-4/3) * d ((0.5 * mu) * I)/ dC_tilde = 0
       // P_tilde = C^(-1)odot C^(-1) - 1/3 * C^(-1) otimes C^(-1)
       // 2/3*J^(-2/3)*S_tilde:C = 2/3*J^(-2/3)*0.5*mu*I:C=1/3*J^(-2/3)*mu*trC
-      auto PKstiff_iso = 2.0 / 3.0 * detFm0d67 * CC.tr() * STen4::gen_Ptilde( invCC );
+      auto PKstiff_iso = 2.0 / 3.0 * detFm0d67 * mu * CC.tr() * STen4::gen_Ptilde( invCC );
 
       // -2/3 * (C^(-1) otimes S_iso + S_iso otimes C^(-1) )
       PKstiff_iso.add_SymmOutProduct( -2.0/3.0, invCC, S_iso );
@@ -140,20 +140,17 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       // 2(P:H_fi) otimes d(2J^(-2/3)dPsi_fi/dEi_tilde) /dC = -4/3*J^(-2/3) *dPsi_fi/dEi_tilde * (P:H_fi) otimes C^(-1) + 4J^(-4/3)d^2Psi_fi/dEi_tilde^2* (P:H_fi) otimes (P:H_fi)
       // 4J^(-2/3) dPsi_fi/dEi_tilde * d(P:H_fi)/dC = -4/3*J^(-2/3)* dPsi_fi/dEi_tilde * C^(-1)otimes H_fi:P^T + 4/3*J^(-2/3)* dPsi_fi/dEi_tilde* (H_fi:C)C^(-1) odot C^(-1):P^T
 
-      SymmTensor4_3D PKstiff_fi1, PKstiff_fi2;
+      const double val1 = 4.0 / 3.0 * detFm0d67 * dfpsi1_dfE1 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_1);
+      const double val2 = 4.0 / 3.0 * detFm0d67 * dfpsi2_dfE2 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_2);
+
+      auto PKstiff_fi1 = val1 * STen4::gen_Ptilde( invCC );
+      auto PKstiff_fi2 = val2 * STen4::gen_Ptilde( invCC );
+
       const double val = 4.0 * detFm0d67 * detFm0d67;
 
-      PKstiff_fi1.add_OutProduct(val, STen2::gen_DEV_part(H_f1, CC));
-      PKstiff_fi2.add_OutProduct(val, STen2::gen_DEV_part(H_f2, CC));
+      PKstiff_fi1.add_OutProduct(val * d2fpsi1_dfE1, STen2::gen_DEV_part(H_f1, CC));
+      PKstiff_fi2.add_OutProduct(val * d2fpsi2_dfE2, STen2::gen_DEV_part(H_f2, CC));
 
-      const double val1 = 4.0 / 3.0 * detFm0d67 * dfpsi1_dfE1 * (fkd + (1.0-3.0*fkd)*Inva4_1);
-      const double val2 = 4.0 / 3.0 * detFm0d67 * dfpsi2_dfE2 * (fkd + (1.0-3.0*fkd)*Inva4_2);
-
-      PKstiff_fi1.add_SymmProduct(-0.5 * val1, invCC, invCC);
-      PKstiff_fi2.add_SymmProduct(-0.5 * val2, invCC, invCC);
-
-      PKstiff_fi1.add_OutProduct(-1.0/3.0 * val1, invCC, invCC);
-      PKstiff_fi2.add_OutProduct(-1.0/3.0 * val2, invCC, invCC);
 
       PKstiff_fi1.add_SymmOutProduct(-2.0/3.0, invCC, S_fi1);
       PKstiff_fi2.add_SymmOutProduct(-2.0/3.0, invCC, S_fi2);
@@ -180,7 +177,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       return Psi_iso + Psi_fi1 + Psi_fi2;
     }
 
-    virtual Vector_3 get_fibre_dir(const int &dir) const
+    Vector_3 get_fibre_dir(const int &dir) const
     {
       if (dir == 0) return a1;
       else if (dir == 1) return a2;

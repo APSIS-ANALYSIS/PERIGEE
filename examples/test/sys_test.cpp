@@ -41,6 +41,8 @@
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "MaterialModel_NeoHookean_ST91_Mixed.hpp"
+#include "MaterialModel_GOH06_ST91_Mixed.hpp"
+#include "MaterialModel_ich_GOH06.hpp"
 #include <memory>
 
 int main(int argc, char *argv[])
@@ -142,10 +144,102 @@ int main(int argc, char *argv[])
   std::cout<<strain_energy_new<<std::endl;
 
   // GOH06
-  
-  // std::unique_ptr<IMaterialModel_ich> imodel_GOH06 = SYS_T::make_unique<MaterialModel_ich_GOH06>(oldmodel->get_elastic_mu());
+  const double f1_the=49.98, f1_phi=49.98, f2_the=-49.98, f2_phi=-49.98;
+  const double fk1=996.6, fk2=0.1, fkd=1.0 /3.0; 
 
-  // MaterialModel_Mixed_Elasticity * matmodel_GOH06_ST91 = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel_GOH06));
+  IMaterialModel * oldmodel_GOH06_ST91 = new MaterialModel_GOH06_ST91_Mixed(rho0, elastic_E, elastic_nu, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+
+  std::unique_ptr<IMaterialModel_ich> imodel_GOH06 = SYS_T::make_unique<MaterialModel_ich_GOH06>(oldmodel->get_elastic_mu(), f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+
+  std::unique_ptr<IMaterialModel_vol> vmodel_ST91 = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
+
+  MaterialModel_Mixed_Elasticity * matmodel_GOH06_ST91 = new MaterialModel_Mixed_Elasticity(std::move(vmodel_ST91), std::move(imodel_GOH06));
+
+  matmodel_GOH06_ST91->print_info();
+
+  std::cout<<matmodel_GOH06_ST91->get_model_name()<<'\n';
+
+  //oldmodel->print_info();
+
+  F.gen_rand();
+
+  if(F.det() < 0.0) F*=-1.0;
+
+  std::cout<<"F:"<<std::endl; 
+  F.print();
+  std::cout<<std::endl; 
+
+  // F *= val; 
+
+  P_old.gen_id();
+  S_old.gen_id();
+  oldmodel_GOH06_ST91->get_PK(F, P_old, S_old);
+  // S
+  //S_old -= S_new;
+  S_new = matmodel_GOH06_ST91->get_PK_2nd(F);
+  S_old -= S_new.full();
+  S_old.print();
+  std::cout<<std::endl;
+  S_new.print();
+  std::cout<<std::endl; 
+
+
+  //P_old -= P_new
+  P_new = matmodel_GOH06_ST91->get_PK_1st(F);
+  P_old -= P_new;
+  P_old.print();
+  std::cout<<std::endl;
+  P_new.print();
+  std::cout<<std::endl; 
+
+  //CC_old -= CC_new
+  oldmodel_GOH06_ST91->get_PK_Stiffness(F, P_old, S_old, CC_old);
+  CC_new = matmodel_GOH06_ST91->get_PK_Stiffness(F, P_new);
+  CC_old -= CC_new.full();
+  CC_old.print();
+  std::cout<<std::endl;
+  CC_new.print();
+  std::cout<<std::endl;
+
+  p = MATH_T::gen_double_rand(-1.0,1.0);
+  // rho
+  rho_old = oldmodel_GOH06_ST91->get_rho(p);
+  rho_new = matmodel_GOH06_ST91->get_rho(p);
+  rho_old -= rho_new;
+  std::cout<<rho_old<<std::endl;
+  std::cout<<rho_new<<std::endl;
+
+  // beta
+  beta_old = oldmodel_GOH06_ST91->get_beta(p);
+  beta_new = matmodel_GOH06_ST91->get_beta(p);
+  beta_old -= beta_new;
+  std::cout<<beta_old<<std::endl;
+  std::cout<<beta_new<<std::endl;
+
+  // drho_dp
+  drho_dp_old = oldmodel_GOH06_ST91->get_drho_dp(p);
+  drho_dp_new = matmodel_GOH06_ST91->get_drho_dp(p);
+  drho_dp_old -= drho_dp_new;
+  std::cout<<drho_dp_old<<std::endl;
+  std::cout<<drho_dp_new<<std::endl;
+
+  // dbeta_dp
+  dbeta_dp_old = oldmodel_GOH06_ST91->get_dbeta_dp(p);
+  dbeta_dp_new = matmodel_GOH06_ST91->get_dbeta_dp(p);
+  dbeta_dp_old -= dbeta_dp_new;
+  std::cout<<dbeta_dp_old<<std::endl;
+  std::cout<<dbeta_dp_new<<std::endl;
+
+  // strain_energy
+  strain_energy_old = oldmodel_GOH06_ST91->get_strain_energy(F);
+  strain_energy_new = matmodel_GOH06_ST91->get_ich_energy(F);
+  strain_energy_old -= strain_energy_new;
+  std::cout<<strain_energy_old<<std::endl;
+  std::cout<<strain_energy_new<<std::endl;
+
+
+
+
 
 
 
