@@ -141,6 +141,13 @@ int main(int argc, char *argv[])
   std::cout<<strain_energy_old<<std::endl;
   std::cout<<strain_energy_new<<std::endl;
 
+  // GOH06
+  
+  // std::unique_ptr<IMaterialModel_ich> imodel_GOH06 = SYS_T::make_unique<MaterialModel_ich_GOH06>(oldmodel->get_elastic_mu());
+
+  // MaterialModel_Mixed_Elasticity * matmodel_GOH06_ST91 = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel_GOH06));
+
+
 
   return EXIT_SUCCESS;
 }

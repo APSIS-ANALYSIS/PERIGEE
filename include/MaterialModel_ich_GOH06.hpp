@@ -76,30 +76,18 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1);
       const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2);
 
-      Tensor2_3D a1xa1, a2xa2;
-      a1xa1.gen_outprod(a1);
-      a2xa2.gen_outprod(a2);
+      auto a1xa1 = STen2::gen_dyad(a1);
+      auto a2xa2 = STen2::gen_dyad(a2);
 
-      auto H_f1 = fkd * Ten2::gen_id() + (1 - 3*fkd) * a1xa1;
-      auto H_f2 = fkd * Ten2::gen_id() + (1 - 3*fkd) * a2xa2;
+      auto H_f1 = fkd * STen2::gen_id() + (1 - 3*fkd) * a1xa1;
+      auto H_f2 = fkd * STen2::gen_id() + (1 - 3*fkd) * a2xa2;
 
       // dPsi_fi/dC_tilde = dPsi_fi/dEi_tilde * H_fi
       // S_fi = 2 * dPsi_fi/dC = 2 * dPsi_fi/dC_tilde : dC_tilde/dC = 2 * J^(-2/3) *dPsi_fi/dEi_tilde *  P: H_fi
-      const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(STen2::gen_symm_part(H_f1), CC );
-      const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(STen2::gen_symm_part(H_f2), CC );
+      const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(H_f1, CC );
+      const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(H_f2, CC );
 
       return S_iso + S_fi1 + S_fi2;
-
-
-
-
-
-
-
-
-
-      auto out = STen2::gen_DEV_part( STen2::gen_id(), CC );
-      return mu * std::pow(CC.det(), -1.0/3.0) * out;
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
