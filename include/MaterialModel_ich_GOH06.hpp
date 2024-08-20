@@ -93,22 +93,72 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
-      constexpr double pt67 = 2.0 / 3.0;
       const auto CC = STen2::gen_right_Cauchy_Green(F);
-      const double val = mu * std::pow(CC.det(), -pt67 * 0.5);
-      
-      const auto S_iso = val * STen2::gen_DEV_part( STen2::gen_id(), CC );
-     
-      // First PK stress 
-      P_iso = F * S_iso;
-     
-      // Elasticity tensor 
+      const double Inva1 = CC.tr();
       const auto invCC = STen2::inverse(CC);
-      auto out = pt67 * val * CC.tr() * STen4::gen_Ptilde( invCC );
-      
-      out.add_SymmOutProduct(-pt67, invCC, S_iso);
+      const double detFm0d67 = std::pow(F.det(), -2.0/3.0);
 
-      return out;
+      const auto S_iso = mu * detFm0d67 * STen2::gen_DEV_part(STen2::gen_id(), CC );
+
+      P_iso = F * S_iso;  // Tensor2_3D
+
+      // Holzapfel p255. eqn(6.168)
+      // PKstiff_tilde = 4J^(-4/3) * d^2Psi_sio/dC_tilde^2 = 4J^(-4/3) * d ((0.5 * mu) * I)/ dC_tilde = 0
+      // P_tilde = C^(-1)odot C^(-1) - 1/3 * C^(-1) otimes C^(-1)
+      // 2/3*J^(-2/3)*S_tilde:C = 2/3*J^(-2/3)*0.5*mu*I:C=1/3*J^(-2/3)*mu*trC
+      auto PKstiff_iso = 2.0 / 3.0 * detFm0d67 * CC.tr() * STen4::gen_Ptilde( invCC );
+
+      // -2/3 * (C^(-1) otimes S_iso + S_iso otimes C^(-1) )
+      PKstiff_iso.add_SymmOutProduct( -2.0/3.0, invCC, S_iso );
+
+      const double Inva4_1 = CC.VecMatVec(a1, a1);
+      const double Inva4_2 = CC.VecMatVec(a2, a2);
+
+      const double fE1 = detFm0d67 * (fkd*Inva1 + (1.0 -3.0*fkd)*Inva4_1) - 1.0;
+      const double fE2 = detFm0d67 * (fkd*Inva1 + (1.0 -3.0*fkd)*Inva4_2) - 1.0;
+
+      const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1);
+      const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2);
+
+      auto a1xa1 = STen2::gen_dyad(a1);
+      auto a2xa2 = STen2::gen_dyad(a2);
+
+      auto H_f1 = fkd * STen2::gen_id() + (1 - 3*fkd) * a1xa1;
+      auto H_f2 = fkd * STen2::gen_id() + (1 - 3*fkd) * a2xa2;
+
+      const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(H_f1, CC );
+      const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(H_f2, CC );
+
+      const auto S = S_iso + S_fi1 + S_fi2;
+
+      //  dPsi_fi/dC_tilde = dPsi_fi/dEi_tilde * H_fi
+      // d^2Psi_fi/dC_tilde^2 = d(dPsi_fi/dEi_tilde * H_fi) / dC_tilde = d^2Psi_fi / dEi_tilde^2 * H_fi otimes H_fi + 0
+      const double d2fpsi1_dfE1 = fk1 * (1.0 + 2.0*fk2*fE1*fE1) * std::exp(fk2*fE1*fE1);
+      const double d2fpsi2_dfE2 = fk1 * (1.0 + 2.0*fk2*fE2*fE2) * std::exp(fk2*fE2*fE2);
+
+      // PKstiff_fi = 2 dS_fi / dC = 2d(2 * J^(-2/3) *dPsi_fi/dEi_tilde *  P: H_fi) / dC = 2(P:H_fi) otimes d(2J^(-2/3)dPsi_fi/dEi_tilde) /dC + 4J^(-2/3) dPsi_fi/dEi_tilde *d(P:H_fi) /dC
+      // 2(P:H_fi) otimes d(2J^(-2/3)dPsi_fi/dEi_tilde) /dC = -4/3*J^(-2/3) *dPsi_fi/dEi_tilde * (P:H_fi) otimes C^(-1) + 4J^(-4/3)d^2Psi_fi/dEi_tilde^2* (P:H_fi) otimes (P:H_fi)
+      // 4J^(-2/3) dPsi_fi/dEi_tilde * d(P:H_fi)/dC = -4/3*J^(-2/3)* dPsi_fi/dEi_tilde * C^(-1)otimes H_fi:P^T + 4/3*J^(-2/3)* dPsi_fi/dEi_tilde* (H_fi:C)C^(-1) odot C^(-1):P^T
+
+      SymmTensor4_3D PKstiff_fi1, PKstiff_fi2;
+      const double val = 4.0 * detFm0d67 * detFm0d67;
+
+      PKstiff_fi1.add_OutProduct(val, STen2::gen_DEV_part(H_f1, CC));
+      PKstiff_fi2.add_OutProduct(val, STen2::gen_DEV_part(H_f2, CC));
+
+      const double val1 = 4.0 / 3.0 * detFm0d67 * dfpsi1_dfE1 * (fkd + (1.0-3.0*fkd)*Inva4_1);
+      const double val2 = 4.0 / 3.0 * detFm0d67 * dfpsi2_dfE2 * (fkd + (1.0-3.0*fkd)*Inva4_2);
+
+      PKstiff_fi1.add_SymmProduct(-0.5 * val1, invCC, invCC);
+      PKstiff_fi2.add_SymmProduct(-0.5 * val2, invCC, invCC);
+
+      PKstiff_fi1.add_OutProduct(-1.0/3.0 * val1, invCC, invCC);
+      PKstiff_fi2.add_OutProduct(-1.0/3.0 * val2, invCC, invCC);
+
+      PKstiff_fi1.add_SymmOutProduct(-2.0/3.0, invCC, S_fi1);
+      PKstiff_fi2.add_SymmOutProduct(-2.0/3.0, invCC, S_fi2);
+
+      return PKstiff_iso + PKstiff_fi1 + PKstiff_fi2;
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const
