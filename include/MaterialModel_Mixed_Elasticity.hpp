@@ -63,6 +63,8 @@ class MaterialModel_Mixed_Elasticity
 
     double get_vol_Helmholtz_energy(const double &J) {return vmodel->get_Helmholtz_energy(J);}
 
+    Vector_3 get_fibre_dir (const int &dir) {return imodel->get_fibre_dir(dir);}
+
   private:
     const std::unique_ptr<IMaterialModel_vol> vmodel;
     const std::unique_ptr<IMaterialModel_ich> imodel;

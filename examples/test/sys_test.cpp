@@ -237,9 +237,13 @@ int main(int argc, char *argv[])
   std::cout<<strain_energy_old<<std::endl;
   std::cout<<strain_energy_new<<std::endl;
 
-
-
-
+  // fibre_dir
+  const int dir = MATH_T::gen_int_rand(0,1);
+  auto a_old = oldmodel_GOH06_ST91->get_fibre_dir(dir);
+  auto a_new = matmodel_GOH06_ST91->get_fibre_dir(dir);
+  a_old -= a_new;
+  a_old.print();
+  a_new.print();
 
 
 

@@ -54,6 +54,11 @@ class MaterialModel_ich_NeoHookean : public IMaterialModel_ich
       return 0.5 * mu * ( std::pow(F.det(), -2.0/3.0) * CC.tr() - 3.0 );
     }
 
+    virtual Vector_3 get_fibre_dir (const int &dir) const
+    {
+      return Vector_3();
+    }
+
   private:
     const double mu;
 };
