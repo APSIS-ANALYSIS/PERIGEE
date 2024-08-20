@@ -126,9 +126,6 @@ class SymmTensor4_3D
     // ------------------------------------------------------------------------
     void add_OutProduct( const double &val, const SymmTensor2_3D &mmat );
 
-    void add_OutProduct( const double &val, const SymmTensor2_3D &mleft,
-        const SymmTensor2_3D &mright );
-
     // ------------------------------------------------------------------------
     // add a symmetric tensor product of 2 vectors which is defined the
     // following way,
