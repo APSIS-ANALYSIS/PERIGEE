@@ -180,6 +180,17 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       return Psi_iso + Psi_fi1 + Psi_fi2;
     }
 
+    virtual Vector_3 get_fibre_dir(const int &dir) const
+    {
+      if (dir == 0) return a1;
+      else if (dir == 1) return a2;
+      else
+      {
+        SYS_T::print_fatal("Error:MaterialModel_ich_GOH06, wrong fibre direction.");
+        return Vector_3();
+      }
+    }
+
   private:
     const double mu;
     double f1_the, f1_phi, f2_the, f2_phi;
