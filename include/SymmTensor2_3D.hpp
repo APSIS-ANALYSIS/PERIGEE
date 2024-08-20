@@ -221,6 +221,10 @@ namespace STen2
   // Generate a zero tensor
   SymmTensor2_3D gen_zero();
 
+  // Generate a dyad with a unit vector
+  // Note: we do not check the unit length of input
+  SymmTensor2_3D gen_dyad(const Vector_3 &input);
+
   // Return the inverse of the input matrix
   SymmTensor2_3D inverse( const SymmTensor2_3D &input );
 
