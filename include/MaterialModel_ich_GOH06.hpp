@@ -98,10 +98,10 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       // PKstiff_tilde = 4J^(-4/3) * d^2Psi_sio/dC_tilde^2 = 4J^(-4/3) * d ((0.5 * mu) * I)/ dC_tilde = 0
       // P_tilde = C^(-1)odot C^(-1) - 1/3 * C^(-1) otimes C^(-1)
       // 2/3*J^(-2/3)*S_tilde:C = 2/3*J^(-2/3)*0.5*mu*I:C=1/3*J^(-2/3)*mu*trC
-      auto PKstiff_iso = pt67 * detFm0d67 * mu * CC.tr() * STen4::gen_Ptilde( invCC );
+      auto PKstiff = pt67 * detFm0d67 * mu * CC.tr() * STen4::gen_Ptilde( invCC );
 
       // -2/3 * (C^(-1) otimes S_iso + S_iso otimes C^(-1) )
-      PKstiff_iso.add_SymmOutProduct( -pt67, invCC, S_iso );
+      PKstiff.add_SymmOutProduct( -pt67, invCC, S_iso );
 
       const double Inva4_1 = CC.VecMatVec(a1, a1);
       const double Inva4_2 = CC.VecMatVec(a2, a2);
@@ -134,19 +134,17 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const double val1 = 2.0 * pt67 * detFm0d67 * dfpsi1_dfE1 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_1);
       const double val2 = 2.0 * pt67 * detFm0d67 * dfpsi2_dfE2 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_2);
 
-      auto PKstiff_fi1 = val1 * STen4::gen_Ptilde( invCC );
-      auto PKstiff_fi2 = val2 * STen4::gen_Ptilde( invCC );
+      PKstiff += (val1 + val2) * STen4::gen_Ptilde( invCC );
 
       const double val = 4.0 * detFm0d67 * detFm0d67;
 
-      PKstiff_fi1.add_OutProduct(val * d2fpsi1_dfE1, STen2::gen_DEV_part(H_f1, CC));
-      PKstiff_fi2.add_OutProduct(val * d2fpsi2_dfE2, STen2::gen_DEV_part(H_f2, CC));
+      PKstiff.add_OutProduct(val * d2fpsi1_dfE1, STen2::gen_DEV_part(H_f1, CC));
+      PKstiff.add_OutProduct(val * d2fpsi2_dfE2, STen2::gen_DEV_part(H_f2, CC));
 
+      PKstiff.add_SymmOutProduct(-pt67, invCC, S_fi1);
+      PKstiff.add_SymmOutProduct(-pt67, invCC, S_fi2);
 
-      PKstiff_fi1.add_SymmOutProduct(-pt67, invCC, S_fi1);
-      PKstiff_fi2.add_SymmOutProduct(-pt67, invCC, S_fi2);
-
-      return PKstiff_iso + PKstiff_fi1 + PKstiff_fi2;
+      return PKstiff;
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const
@@ -183,7 +181,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     const double mu;
     const double f1_the, f1_phi, f2_the, f2_phi;
     const double fk1, fk2, fkd;
-    Vector_3 a1, a2;
+    const Vector_3 a1, a2;
 };
 
 #endif

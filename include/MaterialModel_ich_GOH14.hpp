@@ -153,8 +153,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
   private:
     const double mu, f1_the, f1_phi, f2_the, f2_phi;
     const double fk1, fk2, fkd;
-
-    Vector_3 a1, a2;
+    const Vector_3 a1, a2;
 };
 
 #endif

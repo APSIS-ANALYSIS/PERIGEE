@@ -21,9 +21,9 @@ class IMaterialModel_ich
     virtual double get_energy( const Tensor2_3D &F ) const = 0;
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_iso ) const = 0;
+       Tensor2_3D &P_ich ) const = 0;
 
-    // P_iso := F S_iso
+    // P_ich := F S_ich
     virtual Tensor2_3D get_PK_1st( const Tensor2_3D &F ) const
     {
       return F * get_PK_2nd(F);
@@ -37,9 +37,9 @@ class IMaterialModel_ich
     }
 
     virtual Tensor4_3D get_PK_FFStiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_iso ) const
+       Tensor2_3D &P_ich ) const
     {
-      auto AA = get_PK_Stiffness(F, P_iso).full();
+      auto AA = get_PK_Stiffness(F, P_ich).full();
       AA.MatMult_1(F);
       AA.MatMult_3(F);
       return AA;
