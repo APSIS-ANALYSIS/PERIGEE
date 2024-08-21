@@ -90,6 +90,17 @@ int main(int argc, char *argv[])
   S_new.print_in_row();
   std::cout<<std::endl; 
 
+  // Cauchy
+  std::cout<<"get_Cauchy_stress \n";
+
+  Tensor2_3D sigma_old = oldmodel->get_Cauchy_stress(F);
+  
+  auto sigma_new = matmodel->get_Cauchy_stress(F);
+  sigma_old -= sigma_new.full();
+  sigma_old.print_in_row();
+  std::cout<<'\n';
+  sigma_new.print_in_row();
+
   //P_old -= P_new
   std::cout<<"get_PK_1st:"<<std::endl; 
   auto P_new = matmodel->get_PK_1st(F);
