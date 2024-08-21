@@ -91,12 +91,12 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_iso ) const
+       Tensor2_3D &P_ich ) const
     {
-      const auto S_iso = get_PK_2nd( F );
+      const auto S_ich = get_PK_2nd( F );
 
       // First PK stress
-      P_iso = F * S_iso;
+      P_ich = F * S_ich;
 
       const auto C = STen2::gen_right_Cauchy_Green( F );
 
@@ -119,14 +119,16 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       constexpr double pt67 = 2.0 / 3.0;
 
       // Elasticity tensor
-      auto CC_iso = pt67 * mu * std::pow( F.det(), -pt67 ) * I1 * STen4::gen_Ptilde( STen2::inverse(C) );
+      auto CC_ich = pt67 * mu * std::pow( F.det(), -pt67 ) * I1 * STen4::gen_Ptilde( STen2::inverse(C) );
 
-      CC_iso.add_SymmOutProduct( -2.0/3.0, STen2::inverse(C), S_iso );
-      
-      CC_iso.add_OutProduct( 4.0 * d2fpsi1_dfE1, H_f1 );
-      CC_iso.add_OutProduct( 4.0 * d2fpsi2_dfE2, H_f2 );
+      const auto S_iso = mu * std::pow( F.det(), -pt67 ) * STen2::gen_DEV_part(STen2::gen_id(), C );
 
-      return CC_iso;
+      CC_ich.add_SymmOutProduct( -2.0/3.0, STen2::inverse(C), S_iso );
+
+      CC_ich.add_OutProduct( 4.0 * d2fpsi1_dfE1, H_f1 );
+      CC_ich.add_OutProduct( 4.0 * d2fpsi2_dfE2, H_f2 );
+
+      return CC_ich;
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const
