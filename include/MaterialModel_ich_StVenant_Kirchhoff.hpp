@@ -6,7 +6,7 @@
 class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 {
   public:
-    MaterialModel_ich_StVenant_Kirchhoff( const double &in_mu ) mu( in_mu ) {};
+    MaterialModel_ich_StVenant_Kirchhoff( const double &in_mu ) : mu( in_mu ) {};
 
     virtual ~MaterialModel_ich_StVenant_Kirchhoff() = default;
 
@@ -22,7 +22,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const
     {
-      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0; );
+      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0 );
 
       const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
@@ -39,20 +39,20 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
       const auto S_iso = get_PK_2nd( F );
 
       // First PK stress
-      const auto P_iso = F * S_iso;
+      P_iso = F * S_iso;
 
       const double detFm0d67 = std::pow( F.det(), -pt67 );
 
       const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
-      const auto CC_tilde = 4.0 * detFm0d67 * detFm0d67 * mu * STen4::gen_symm_id();
+      auto CC_tilde = 4.0 * detFm0d67 * detFm0d67 * mu * STen4::gen_symm_id();
 
       Tensor4_3D PP = Ten4::gen_P( C );
 
       CC_tilde.TenPMult( PP );
 
       // Elasticity tensor
-      const auto CC_iso = CC_tilde;
+      auto CC_iso = CC_tilde;
 
       const auto PP_tilde = STen4::gen_Ptilde( STen2::inverse(C) );
 
@@ -60,12 +60,14 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
       CC_iso += pt67 * S_tilde.MatContraction( C ) * PP_tilde;
 
-      return CC_iso.add_SymmOutProduct( -pt67, STen2::inverse(C), S_iso );
+      CC_iso.add_SymmOutProduct( -pt67, STen2::inverse(C), S_iso );
+
+      return CC_iso;
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const
     {
-      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0; );
+      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0 );
 
       const auto C_tilde = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
