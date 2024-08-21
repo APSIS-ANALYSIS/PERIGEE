@@ -40,22 +40,22 @@
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_vol_M94.hpp"
-#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
+#include "MaterialModel_StVenant_Kirchhoff_M94_Mixed.hpp"
 #include "MaterialModel_GOH06_ST91_Mixed.hpp"
 #include "MaterialModel_ich_GOH06.hpp"
 #include "MaterialModel_ich_GOH14.hpp"
+#include "MaterialModel_ich_StVenant_Kirchhoff.hpp"
 #include <memory>
 
 int main(int argc, char *argv[])
 {
-  const double rho0 = 5.23;
-  const double elastic_E = 3.3555; 
-  const double elastic_nu = 0.47;
-  IMaterialModel * oldmodel = new MaterialModel_NeoHookean_Incompressible_Mixed(rho0, elastic_E);
+  const double rho0 = 2.23;
+  const double elastic_E = 1.2533e0; 
+  const double elastic_nu = 0.433333338;
+  IMaterialModel * oldmodel = new MaterialModel_StVenant_Kirchhoff_M94_Mixed(rho0, elastic_E, elastic_nu);
   
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(rho0);
-  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(oldmodel->get_elastic_mu());
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(rho0, oldmodel->get_elastic_kappa());
+  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_StVenant_Kirchhoff>(oldmodel->get_elastic_mu());
 
   MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
 
@@ -71,13 +71,12 @@ int main(int argc, char *argv[])
 
   std::cout<<"F:"; 
   F.print_in_row();
-  std::cout<<std::endl; 
 
   const double val = std::pow(F.det(), -1.0/3.0);
 
-  std::cout<<val<<'\n';
+  std::cout<<"detF = "<<val<<"\n\n";
 
-  F *= val; 
+  //F *= val; 
   
   std::cout<<"get_PK_2nd: "; 
   Tensor2_3D P_old, S_old;
