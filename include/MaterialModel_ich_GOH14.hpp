@@ -26,16 +26,9 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     const double &in_fkd)
     : mu( in_mu ), f1_the(in_f1the* MATH_T::PI / 180.0),
     f1_phi(in_f1phi*MATH_T::PI / 180.0), f2_the(in_f2the * MATH_T::PI / 180.0),
-    f2_phi(in_f2phi*MATH_T::PI / 180.0), fk1(in_fk1), fk2(in_fk2), fkd(in_fkd)
-    {
-      a1(0) = sin(f1_the) * cos(f1_phi);
-      a1(1) = sin(f1_the) * sin(f1_phi);
-      a1(2) = cos(f1_the);
-
-      a2(0) = sin(f2_the) * cos(f2_phi);
-      a2(1) = sin(f2_the) * sin(f2_phi);
-      a2(2) = cos(f2_the);
-    }
+    f2_phi(in_f2phi*MATH_T::PI / 180.0), fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
+    a1( sin(f1_the) * cos(f1_phi), sin(f1_the) * sin(f1_phi), cos(f1_the) ),
+    a2( sin(f2_the) * cos(f2_phi), sin(f2_the) * sin(f2_phi), cos(f2_the) ) {}
 
     virtual ~MaterialModel_ich_GOH14() = default;
 
@@ -76,11 +69,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
       const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
-      const auto a1xa1 = STen2::gen_dyad( a1 );
-      const auto a2xa2 = STen2::gen_dyad( a2 );
-
-      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a1xa1;
-      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a2xa2;
+      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a1 );
+      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a2 );
 
       return mu * std::pow( F.det(), - 2.0/3.0 ) * STen2::gen_DEV_part( STen2::gen_id(), C ) +
              2.0  * dfpsi1_dfE1 * H_f1 +
@@ -104,11 +94,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
       const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
 
-      const auto a1xa1 = STen2::gen_dyad( a1 );
-      const auto a2xa2 = STen2::gen_dyad( a2 );
-
-      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a1xa1;
-      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a2xa2;
+      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a1 );
+      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a2 );
 
       const double d2fpsi1_dfE1 = fk1 * ( 1.0 + 2.0 * fk2 * fE1 * fE1 ) * std::exp( fk2 * fE1 * fE1 );
       const double d2fpsi2_dfE2 = fk1 * ( 1.0 + 2.0 * fk2 * fE2 * fE2 ) * std::exp( fk2 * fE2 * fE2 );
@@ -120,7 +107,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 
       const auto S_iso = mu * std::pow( F.det(), -pt67 ) * STen2::gen_DEV_part(STen2::gen_id(), C );
 
-      CC_ich.add_SymmOutProduct( -2.0/3.0, STen2::inverse(C), S_iso );
+      CC_ich.add_SymmOutProduct( -pt67, STen2::inverse(C), S_iso );
 
       CC_ich.add_OutProduct( 4.0 * d2fpsi1_dfE1, H_f1 );
       CC_ich.add_OutProduct( 4.0 * d2fpsi2_dfE2, H_f2 );
