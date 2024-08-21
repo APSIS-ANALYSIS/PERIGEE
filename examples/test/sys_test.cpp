@@ -41,7 +41,7 @@
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_vol_M94.hpp"
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
-#include "MaterialModel_GOH06_ST91_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Mixed.hpp"
 #include "MaterialModel_ich_GOH06.hpp"
 #include "MaterialModel_ich_GOH14.hpp"
 #include "MaterialModel_ich_StVenant_Kirchhoff.hpp"
@@ -50,17 +50,17 @@
 int main(int argc, char *argv[])
 {
   const double rho0 = 1.52333;
-  const double elastic_E = 1.2533e0; 
-  const double elastic_nu = 0.48;
+  const double elastic_E = 1.2533e1; 
+  const double elastic_nu = 0.2832;
 
-  const double f1_the=32.18, f1_phi=10.98, f2_the=-39.98, f2_phi=-69.98;
+  const double f1_the=52.28, f1_phi=-10.98, f2_the=-39.98, f2_phi=-69.98;
   const double fk1=1.6, fk2=0.533, fkd=0.1225; 
 
-  IMaterialModel * oldmodel = new MaterialModel_GOH06_Incompressible_Mixed(rho0, elastic_E, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+  IMaterialModel * oldmodel = new MaterialModel_GOH14_ST91_Mixed(rho0, elastic_E, elastic_nu, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
 
-  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_GOH06>(oldmodel->get_elastic_mu(), f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_GOH14>(oldmodel->get_elastic_mu(), f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
 
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(rho0);
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
 
   MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
   
@@ -94,6 +94,8 @@ int main(int argc, char *argv[])
   S_old -= S_new.full();
   std::cout<<"PK_2d diff:"<<std::sqrt(S_old.MatContraction(S_old))<<'\n';
   std::cout<<"PK_2d value:"<<std::sqrt(S_new.MatContraction(S_new))<<'\n';
+
+  S_old.print_in_row();
 
   // Cauchy
   Tensor2_3D sigma_old = oldmodel->get_Cauchy_stress(F);

@@ -73,8 +73,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a2 );
 
       return mu * std::pow( F.det(), - 2.0/3.0 ) * STen2::gen_DEV_part( STen2::gen_id(), C ) +
-             2.0  * dfpsi1_dfE1 * H_f1 +
-             2.0  * dfpsi2_dfE2 * H_f2;
+             2.0  * dfpsi1_dfE1 * H_f1 + 2.0  * dfpsi2_dfE2 * H_f2;
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
