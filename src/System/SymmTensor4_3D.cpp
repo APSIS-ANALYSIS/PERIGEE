@@ -122,7 +122,7 @@ void SymmTensor4_3D::print() const
 
 void SymmTensor4_3D::print_in_mat() const
 {
-  std::cout<<"SymmTensor4_3D: \n\n";
+  std::cout<<"SymmTensor4_3D:\n";
   for ( int ii=0; ii<3; ++ii )
   {
     for( int jj=0; jj<3; ++jj )
