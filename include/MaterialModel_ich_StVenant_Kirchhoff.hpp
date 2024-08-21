@@ -24,7 +24,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
     {
       const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0 );
 
-      const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
+      const auto C = STen2::gen_right_Cauchy_Green( F );
 
     	const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );
 
@@ -32,12 +32,12 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_iso ) const
+       Tensor2_3D &P_ich ) const
     {
-      const auto S_iso = get_PK_2nd( F );
+      const auto S_ich = get_PK_2nd( F );
 
       // First PK stress
-      P_iso = F * S_iso;
+      P_ich = F * S_ich;
 
       constexpr double pt67 = 2.0 / 3.0;
       const double detFm0d67 = std::pow( F.det(), -pt67 );
@@ -51,24 +51,22 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
       CC_tilde.TenPMult( PP );
 
       // Elasticity tensor
-      auto CC_iso = CC_tilde;
+      auto CC_ich = CC_tilde;
 
       const auto PP_tilde = STen4::gen_Ptilde( STen2::inverse(C) );
 
       const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );
 
-      CC_iso += pt67 * S_tilde.MatContraction( C ) * PP_tilde;
+      CC_ich += pt67 * detFm0d67 * S_tilde.MatContraction( C ) * PP_tilde;
 
-      CC_iso.add_SymmOutProduct( -pt67, STen2::inverse(C), S_iso );
+      CC_ich.add_SymmOutProduct( -pt67, STen2::inverse(C), S_ich );
 
-      return CC_iso;
+      return CC_ich;
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const
     {
-      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0 );
-
-      const auto C_tilde = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
+      const auto C_tilde = std::pow( F.det(), -2.0 / 3.0 ) * STen2::gen_right_Cauchy_Green( F );
 
       const auto E_tilde = 0.5 * ( C_tilde - STen2::gen_id() );
 
