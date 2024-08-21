@@ -26,7 +26,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
       const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
-    	const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );    
+    	const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );
 
       return detFm0d67 * STen2::gen_DEV_part( S_tilde, C );
     }
@@ -38,7 +38,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
       const auto S_iso = get_PK_2nd( F );
 
-      // First PK stress 
+      // First PK stress
       const auto P_iso = F * S_iso;
 
       const double detFm0d67 = std::pow( F.det(), -pt67 );
@@ -66,7 +66,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
     virtual double get_energy( const Tensor2_3D &F ) const
     {
       const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0; );
-     
+
       const auto C_tilde = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
       const auto E_tilde = 0.5 * ( C_tilde - STen2::gen_id() );
