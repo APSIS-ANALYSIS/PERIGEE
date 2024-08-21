@@ -42,9 +42,9 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
       constexpr double pt67 = 2.0 / 3.0;
       const double detFm0d67 = std::pow( F.det(), -pt67 );
 
-      const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
+      const auto C = STen2::gen_right_Cauchy_Green( F );
 
-      auto CC_tilde = 4.0 * detFm0d67 * detFm0d67 * mu * STen4::gen_symm_id();
+      auto CC_tilde = 2.0 * std::pow( F.det(), -2.0*pt67 ) * mu * STen4::gen_symm_id();
 
       Tensor4_3D PP = Ten4::gen_P( C );
 
