@@ -3,7 +3,6 @@
 // ============================================================================
 // MaterialModel_ich_GOH14.hpp
 //
-// MaterialModel_GOH14_ST91_Mixed.hpp
 // Quasi-incompressible Gasser-Odgen-Holzapfel model. The model's volumetric
 // part is based on the Simo-Taylor91 penalization. The isochoric isotropic
 // part is the same as the GOH06_Incompressible. The anisotropic part is
@@ -79,7 +78,22 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 
     virtual double get_energy( const Tensor2_3D &F ) const
     {
+      const auto C = STen2::gen_right_Cauchy_Green( F );
+      
+      const double trC = C.tr();
+      const double detFm0d67 = std::pow( F.det(), -2.0/3.0 );
 
+      const double a1Ca1 = C.VecMatVec( a1, a1 );
+      const double a2Ca2 = C.VecMatVec( a2, a2 );
+
+      const double fE1 = fkd * trC + ( 1.0 - 3.0 * fkd ) * a1Ca1 - 1.0;
+      const double fE2 = fkd * trC + ( 1.0 - 3.0 * fkd ) * a2Ca2 - 1.0;
+
+      const double Psi_iso = 0.5 * mu *( detFm0d67 * trC - 3.0);
+      const double Psi_fi1 = 0.5 * ( fk1 / fk2 ) * ( std::exp( fk2 * fE1 * fE1 ) - 1.0 );
+      const double Psi_fi2 = 0.5 * ( fk1 / fk2 ) * ( std::exp( fk2 * fE2 * fE2 ) - 1.0 );
+
+      return Psi_iso + Psi_fi1 + Psi_fi2;
     }
 
     virtual Vector_3 get_fibre_dir (const int &dir) const
@@ -88,7 +102,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       else if (dir == 1) return a2;
       else
       {
-        SYS_T::print_fatal("Error:MaterialModel_ich_GOH06, wrong fibre direction.");
+        SYS_T::print_fatal("Error:MaterialModel_ich_GOH14, wrong fibre direction.");
         return Vector_3();
       }
     }
