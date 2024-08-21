@@ -44,7 +44,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
       const auto C = STen2::gen_right_Cauchy_Green( F );
 
-    	const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );
+      const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );
 
       const auto S_ich = detFm0d67 * STen2::gen_DEV_part( S_tilde, C );
 
