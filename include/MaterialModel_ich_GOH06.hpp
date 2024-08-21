@@ -86,7 +86,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
         Tensor2_3D &P_ich ) const
     {
-      constexpr pt67 = 2.0 / 3.0;
+      constexpr double pt67 = 2.0 / 3.0;
       const auto CC = STen2::gen_right_Cauchy_Green(F);
       const double Inva1 = CC.tr();
       const auto invCC = STen2::inverse(CC);
