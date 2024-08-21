@@ -121,6 +121,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       // Elasticity tensor
       auto CC_iso = pt67 * mu * std::pow( F.det(), -pt67 ) * I1 * STen4::gen_Ptilde( STen2::inverse(C) );
 
+      CC_iso.add_SymmOutProduct( -2.0/3.0, STen2::inverse(C), S_iso );
+      
       CC_iso.add_OutProduct( 4.0 * d2fpsi1_dfE1, H_f1 );
       CC_iso.add_OutProduct( 4.0 * d2fpsi2_dfE2, H_f2 );
 
