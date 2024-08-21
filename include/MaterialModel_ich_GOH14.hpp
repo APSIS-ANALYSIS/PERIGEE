@@ -75,15 +75,15 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 
 		  const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
 		  const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
-		  
+
 		  const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
 		  const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
       const auto a1xa1 = STen2::gen_dyad(a1);
       const auto a2xa2 = STen2::gen_dyad(a2);
 
-      auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a1xa1;
-      auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a2xa2;
+      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a1xa1;
+      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a2xa2;
 
       return mu * std::pow( F.det(), - 2.0/3.0 ) * STen2::gen_DEV_part( STen2::gen_id(), C ) +
              2.0  * dfpsi1_dfE1 * H_f1 +
@@ -99,7 +99,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     virtual double get_energy( const Tensor2_3D &F ) const
     {
       const auto C = STen2::gen_right_Cauchy_Green( F );
-      
+
       const double I1 = C.tr();
       const double detFm0d67 = std::pow( F.det(), -2.0/3.0 );
 
