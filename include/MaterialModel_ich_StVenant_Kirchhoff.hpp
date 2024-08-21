@@ -22,6 +22,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const
     {
+    
 
     }
 
@@ -33,7 +34,14 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
     virtual double get_energy( const Tensor2_3D &F ) const
     {
+      constexpr double mpt67 = -2.0 / 3.0;
+      const double detFm0d67 = std::pow( F.det(), mpt67 );
+     
+      const auto C_tilde = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
+      const auto E = 0.5 * ( C_tilde - STen2::gen_id() );
+
+      return mu * E.MatContraction( E );
     }
 
     virtual Vector_3 get_fibre_dir (const int &dir) const
