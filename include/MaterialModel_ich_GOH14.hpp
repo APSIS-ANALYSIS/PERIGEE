@@ -70,17 +70,17 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const auto C = STen2::gen_right_Cauchy_Green( F );
 
       const double I1 = C.tr();
-      const double I4 = C.VecMatVec(a1, a1);
-      const double I6 = C.VecMatVec(a2, a2);
+      const double I4 = C.VecMatVec( a1, a1 );
+      const double I6 = C.VecMatVec( a2, a2 );
 
       const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
       const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
 
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
-      const double dfpsi1_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
+      const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
-      const auto a1xa1 = STen2::gen_dyad(a1);
-      const auto a2xa2 = STen2::gen_dyad(a2);
+      const auto a1xa1 = STen2::gen_dyad( a1 );
+      const auto a2xa2 = STen2::gen_dyad( a2 );
 
       const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a1xa1;
       const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a2xa2;
@@ -93,7 +93,38 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
+      const auto S_iso = get_PK_2nd( F );
 
+      // First PK stress
+      P_iso = F * S_iso;
+
+      const auto C = STen2::gen_right_Cauchy_Green( F );
+
+      const double I1 = C.tr();
+      const double I4 = C.VecMatVec( a1, a1 );
+      const double I6 = C.VecMatVec( a2, a2 );
+
+      const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
+      const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
+
+      const auto a1xa1 = STen2::gen_dyad( a1 );
+      const auto a2xa2 = STen2::gen_dyad( a2 );
+
+      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a1xa1;
+      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * a2xa2;
+
+      const double d2fpsi1_dfE1 = fk1 * ( 1.0 + 2.0 * fk2 * fE1 * fE1 ) * std::exp( fk2 * fE1 * fE1 );
+      const double d2fpsi2_dfE2 = fk1 * ( 1.0 + 2.0 * fk2 * fE2 * fE2 ) * std::exp( fk2 * fE2 * fE2 );
+
+      constexpr double pt67 = 2.0 / 3.0;
+
+      // Elasticity tensor
+      auto CC_iso = pt67 * mu * std::pow( F.det(), -pt67 ) * I1 * STen4::gen_Ptilde( STen2::inverse(C) );
+
+      CC_iso.add_OutProduct( 4.0 * d2fpsi1_dfE1, H_f1 );
+      CC_iso.add_OutProduct( 4.0 * d2fpsi2_dfE2, H_f2 );
+
+      return CC_iso;
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const

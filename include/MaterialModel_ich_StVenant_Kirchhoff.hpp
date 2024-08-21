@@ -34,13 +34,12 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
-      constexpr double pt67 = 2.0 / 3.0;
-
       const auto S_iso = get_PK_2nd( F );
 
       // First PK stress
       P_iso = F * S_iso;
 
+      constexpr double pt67 = 2.0 / 3.0;
       const double detFm0d67 = std::pow( F.det(), -pt67 );
 
       const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
