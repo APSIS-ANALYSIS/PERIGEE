@@ -3,11 +3,9 @@
 // ============================================================================
 // MaterialModel_ich_GOH14.hpp
 //
-// Quasi-incompressible Gasser-Odgen-Holzapfel model. The model's volumetric
-// part is based on the Simo-Taylor91 penalization. The isochoric isotropic
-// part is the same as the GOH06_Incompressible. The anisotropic part is
-// modified by replacing the modified right Cauchy-Green tensor by the right
-// Cauchy-Green tensor.
+// The isochoric isotropic part is the same as the GOH06_Incompressible. The 
+// anisotropic part is modified by replacing the modified right Cauchy-Green 
+// tensor by the right Cauchy-Green tensor.
 //
 // Ref: Nolan et al. J Mech Behav Biomed Mater 39 (2014) 48-60
 //
@@ -144,11 +142,9 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
       const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
 
-      const double Psi_iso = 0.5 * mu *( detFm0d67 * I1 - 3.0);
-      const double Psi_fi1 = 0.5 * ( fk1 / fk2 ) * ( std::exp( fk2 * fE1 * fE1 ) - 1.0 );
-      const double Psi_fi2 = 0.5 * ( fk1 / fk2 ) * ( std::exp( fk2 * fE2 * fE2 ) - 1.0 );
-
-      return Psi_iso + Psi_fi1 + Psi_fi2;
+      return 0.5 * mu *( detFm0d67 * I1 - 3.0) + 
+             0.5 * ( fk1 / fk2 ) * ( std::exp( fk2 * fE1 * fE1 ) - 1.0 ) + 
+             0.5 * ( fk1 / fk2 ) * ( std::exp( fk2 * fE2 * fE2 ) - 1.0 );
     }
 
     virtual Vector_3 get_fibre_dir (const int &dir) const

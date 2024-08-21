@@ -1,6 +1,11 @@
 #ifndef MATERIALMODEL_ICH_STVENANT_KIRCHHOF_HPP
 #define MATERIALMODEL_ICH_STVENANT_KIRCHHOF_HPP
-
+// ==================================================================
+// MaterialModel_ich_StVenant_Kirchhoff.hpp
+//
+// Date: Aug. 14 2024
+// Author: Ju Liu
+// ==================================================================
 #include "IMaterialModel_ich.hpp"
 
 class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
@@ -13,7 +18,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
     virtual void print_info() const
     {
       SYS_T::commPrint("\t  MaterialModel_ich_StVenant_Kirchhoff: \n");
-      SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
+      SYS_T::commPrint("\t  Shear modulus mu = %e \n", mu);
     }
 
     virtual std::string get_model_name() const {return std::string("StVenant_Kirchhoff");}
@@ -73,7 +78,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
       return mu * E_tilde.MatContraction( E_tilde );
     }
 
-    virtual Vector_3 get_fibre_dir (const int &dir) const
+    virtual Vector_3 get_fibre_dir( const int &dir ) const
     {
       return Vector_3();
     }

@@ -24,6 +24,8 @@ int main( int argc, char * argv[] )
 
   const auto CC1_ich = mat1.get_PK_Stiffness( F, P1_ich );
 
+  const double energy1 = mat1.get_energy( F );
+
   MaterialModel_StVenant_Kirchhoff_M94_Mixed mat2( E, nu );
 
   Tensor2_3D P2_ich, S2_ich;
@@ -35,7 +37,11 @@ int main( int argc, char * argv[] )
     S2_ich(0, 0), S2_ich(1, 1), S2_ich(2, 2),
     S2_ich(1, 2), S2_ich(0, 2), S2_ich(0, 1) );
 
+  const double energy2 = mat2.get_strain_energy( F );  
+
   std::cout << "StVenant: \n";
+
+  std::cout << "error for energy: " << energy1 - energy2 << "\n";
 
   std::cout << "error for S_ich: \n"; 
   ( S1_ich - Sym_S2iso ).print();
@@ -61,6 +67,8 @@ int main( int argc, char * argv[] )
 
   const auto CC3_ich = mat3.get_PK_Stiffness( F, P3_ich );
 
+  const double energy3 = mat3.get_energy( F );  
+
   MaterialModel_GOH14_ST91_Mixed mat4( 1.0, E, nu, f1_the, f1_phi, f2_the, f2_phi,
     fk1, fk2, fkd );
 
@@ -73,7 +81,11 @@ int main( int argc, char * argv[] )
     S4_ich(0, 0), S4_ich(1, 1), S4_ich(2, 2),
     S4_ich(1, 2), S4_ich(0, 2), S4_ich(0, 1) );
 
+  const double energy4 = mat4.get_strain_energy( F );    
+
   std::cout << "\nGOH14: \n";
+
+  std::cout << "error for energy: " << energy3 - energy4 << "\n";
 
   std::cout << "error for S_ich: \n"; 
   ( S3_ich - Sym_S4iso ).print();
@@ -83,13 +95,6 @@ int main( int argc, char * argv[] )
 
   std::cout << "error for CC_ich: \n"; 
   ( CC3_ich.full() - CC4_ich ).print_in_mat();
-
-
-
-
-
-
-
 
   return EXIT_SUCCESS;
 }
