@@ -56,11 +56,11 @@ int main(int argc, char *argv[])
   const double f1_the=32.18, f1_phi=10.98, f2_the=-39.98, f2_phi=-69.98;
   const double fk1=1.6, fk2=0.533, fkd=0.1225; 
 
-  IMaterialModel * oldmodel = new MaterialModel_GOH06_ST91_Mixed(rho0, elastic_E, elastic_nu, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+  IMaterialModel * oldmodel = new MaterialModel_GOH06_Incompressible_Mixed(rho0, elastic_E, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
 
   std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_GOH06>(oldmodel->get_elastic_mu(), f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
 
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(rho0);
 
   MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
   
