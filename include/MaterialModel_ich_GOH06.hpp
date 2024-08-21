@@ -3,7 +3,8 @@
 // ============================================================================
 // MaterialModel_ich_GOH06.hpp
 // 
-// Anisotropic model from T.C.Gasser & R.W.Ogden & G.A.Holzapfel. Journal of the Royal Society Interface 3:15-35, 2006. 
+// Anisotropic model from T.C.Gasser & R.W.Ogden & G.A.Holzapfel.
+// Journal of the Royal Society Interface 3:15-35, 2006. 
 //
 // Date: Aug. 19 2024
 // Author: Ju Liu, Jiawei Luo
@@ -83,7 +84,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-        Tensor2_3D &P_iso ) const
+        Tensor2_3D &P_ich ) const
     {
       constexpr pt67 = 2.0 / 3.0;
       const auto CC = STen2::gen_right_Cauchy_Green(F);
@@ -92,8 +93,6 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const double detFm0d67 = std::pow(F.det(), -pt67);
 
       const auto S_iso = mu * detFm0d67 * STen2::gen_DEV_part(STen2::gen_id(), CC );
-
-      P_iso = F * S_iso;  // Tensor2_3D
 
       // Holzapfel p255. eqn(6.168)
       // PKstiff_tilde = 4J^(-4/3) * d^2Psi_sio/dC_tilde^2 = 4J^(-4/3) * d ((0.5 * mu) * I)/ dC_tilde = 0
@@ -119,7 +118,9 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(H_f1, CC );
       const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(H_f2, CC );
 
-      const auto S = S_iso + S_fi1 + S_fi2;
+      const auto S_ich = S_iso + S_fi1 + S_fi2;
+      
+      P_ich = F * S_ich;
 
       //  dPsi_fi/dC_tilde = dPsi_fi/dEi_tilde * H_fi
       // d^2Psi_fi/dC_tilde^2 = d(dPsi_fi/dEi_tilde * H_fi) / dC_tilde = d^2Psi_fi / dEi_tilde^2 * H_fi otimes H_fi + 0
