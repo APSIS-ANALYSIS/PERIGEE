@@ -46,10 +46,10 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     virtual void print_info() const
     {
       SYS_T::commPrint("\t  MaterialModel_ich_GOH14: \n");
-      SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
-      SYS_T::commPrint("\t  Dispersion parameter kappa   = %e \n", fkd);
-      SYS_T::commPrint("\t  Stress-like parameter k1   = %e \n",   fk1);
-      SYS_T::commPrint("\t  Dimensionless parameter k2   = %e \n", fk2);
+      SYS_T::commPrint("\t  Shear modulus mu = %e \n", mu);
+      SYS_T::commPrint("\t  Dispersion parameter kappa = %e \n", fkd);
+      SYS_T::commPrint("\t  Stress-like parameter k1 = %e \n",   fk1);
+      SYS_T::commPrint("\t  Dimensionless parameter k2 = %e \n", fk2);
       SYS_T::commPrint("\t  Mean angle Theta_1 (deg) of the 1st family of fibres = %e \n", f1_the*180/MATH_T::PI);
       SYS_T::commPrint("\t  Mean angle Phi_1 (deg) of the 1st family of fibres = %e \n",   f1_phi*180/MATH_T::PI);
       SYS_T::commPrint("\t  Mean angle Theta_1 (rad) of the 1st family of fibres = %e \n", f1_the);
@@ -88,7 +88,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       else if (dir == 1) return a2;
       else
       {
-        SYS_T::print_fatal("Error:MaterialModel_ich_GOH14, wrong fibre direction.");
+        SYS_T::print_fatal("Error:MaterialModel_ich_GOH06, wrong fibre direction.");
         return Vector_3();
       }
     }
@@ -97,7 +97,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     const double mu, f1_the, f1_phi, f2_the, f2_phi;
     const double fk1, fk2, fkd;
 
-    const Vector_3 a1, a2;
+    Vector_3 a1, a2;
 };
 
 #endif
