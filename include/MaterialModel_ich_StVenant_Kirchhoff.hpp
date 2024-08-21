@@ -78,11 +78,6 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
       return mu * E_tilde.MatContraction( E_tilde );
     }
 
-    virtual Vector_3 get_fibre_dir( const int &dir ) const
-    {
-      return Vector_3();
-    }
-
   private:
     const double mu;
 };

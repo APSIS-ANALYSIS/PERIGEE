@@ -13,7 +13,6 @@
 // Author: Ju Liu
 // Contact: liujuy@gmail.com
 // ============================================================================
-
 #include "IMaterialModel_ich.hpp"
 #include "Math_Tools.hpp"
 

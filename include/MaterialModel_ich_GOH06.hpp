@@ -9,7 +9,6 @@
 // Author: Ju Liu, Jiawei Luo
 // Contact: liujuy@gmail.com
 // ============================================================================
-
 #include "IMaterialModel_ich.hpp"
 #include "Math_Tools.hpp"
 
@@ -17,19 +16,15 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
 {
   public:
     MaterialModel_ich_GOH06( const double &in_mu, 
-    const double &in_f1the, const double &in_f1phi,
-    const double &in_f2the, const double &in_f2phi,
-    const double &in_fk1, const double &in_fk2,
-    const double &in_fkd) : mu( in_mu ), f1_the(in_f1the* MATH_T::PI / 180.0), f1_phi(in_f1phi*MATH_T::PI / 180.0), f2_the(in_f2the * MATH_T::PI / 180.0), f2_phi(in_f2phi*MATH_T::PI / 180.0) , fk1(in_fk1), fk2(in_fk2), fkd(in_fkd) 
-    {
-      a1(0) = sin(f1_the) * cos(f1_phi);
-      a1(1) = sin(f1_the) * sin(f1_phi);
-      a1(2) = cos(f1_the);
-
-      a2(0) = sin(f2_the) * cos(f2_phi);
-      a2(1) = sin(f2_the) * sin(f2_phi);
-      a2(2) = cos(f2_the);
-    }
+        const double &in_f1the, const double &in_f1phi,
+        const double &in_f2the, const double &in_f2phi,
+        const double &in_fk1, const double &in_fk2,
+        const double &in_fkd) : mu( in_mu ), 
+    f1_the(in_f1the * MATH_T::PI / 180.0), f1_phi(in_f1phi * MATH_T::PI / 180.0), 
+    f2_the(in_f2the * MATH_T::PI / 180.0), f2_phi(in_f2phi * MATH_T::PI / 180.0) , 
+    fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
+    a1( sin(f1_the) * cos(f1_phi), sin(f1_the) * sin(f1_phi), cos(f1_the) ),
+    a2( sin(f2_the) * cos(f2_phi), sin(f2_the) * sin(f2_phi), cos(f2_the) ) {}
 
     virtual ~MaterialModel_ich_GOH06() = default;
 
@@ -76,11 +71,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1);
       const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2);
 
-      auto a1xa1 = STen2::gen_dyad(a1);
-      auto a2xa2 = STen2::gen_dyad(a2);
-
-      auto H_f1 = fkd * STen2::gen_id() + (1 - 3*fkd) * a1xa1;
-      auto H_f2 = fkd * STen2::gen_id() + (1 - 3*fkd) * a2xa2;
+      const auto H_f1 = fkd * STen2::gen_id() + (1 - 3*fkd) * STen2::gen_dyad(a1);
+      const auto H_f2 = fkd * STen2::gen_id() + (1 - 3*fkd) * STen2::gen_dyad(a2);
 
       // dPsi_fi/dC_tilde = dPsi_fi/dEi_tilde * H_fi
       // S_fi = 2 * dPsi_fi/dC = 2 * dPsi_fi/dC_tilde : dC_tilde/dC = 2 * J^(-2/3) *dPsi_fi/dEi_tilde *  P: H_fi
@@ -91,12 +83,13 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_iso ) const
+        Tensor2_3D &P_iso ) const
     {
+      constexpr pt67 = 2.0 / 3.0;
       const auto CC = STen2::gen_right_Cauchy_Green(F);
       const double Inva1 = CC.tr();
       const auto invCC = STen2::inverse(CC);
-      const double detFm0d67 = std::pow(F.det(), -2.0/3.0);
+      const double detFm0d67 = std::pow(F.det(), -pt67);
 
       const auto S_iso = mu * detFm0d67 * STen2::gen_DEV_part(STen2::gen_id(), CC );
 
@@ -106,10 +99,10 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       // PKstiff_tilde = 4J^(-4/3) * d^2Psi_sio/dC_tilde^2 = 4J^(-4/3) * d ((0.5 * mu) * I)/ dC_tilde = 0
       // P_tilde = C^(-1)odot C^(-1) - 1/3 * C^(-1) otimes C^(-1)
       // 2/3*J^(-2/3)*S_tilde:C = 2/3*J^(-2/3)*0.5*mu*I:C=1/3*J^(-2/3)*mu*trC
-      auto PKstiff_iso = 2.0 / 3.0 * detFm0d67 * mu * CC.tr() * STen4::gen_Ptilde( invCC );
+      auto PKstiff_iso = pt67 * detFm0d67 * mu * CC.tr() * STen4::gen_Ptilde( invCC );
 
       // -2/3 * (C^(-1) otimes S_iso + S_iso otimes C^(-1) )
-      PKstiff_iso.add_SymmOutProduct( -2.0/3.0, invCC, S_iso );
+      PKstiff_iso.add_SymmOutProduct( -pt67, invCC, S_iso );
 
       const double Inva4_1 = CC.VecMatVec(a1, a1);
       const double Inva4_2 = CC.VecMatVec(a2, a2);
@@ -120,11 +113,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1);
       const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2);
 
-      auto a1xa1 = STen2::gen_dyad(a1);
-      auto a2xa2 = STen2::gen_dyad(a2);
-
-      auto H_f1 = fkd * STen2::gen_id() + (1 - 3*fkd) * a1xa1;
-      auto H_f2 = fkd * STen2::gen_id() + (1 - 3*fkd) * a2xa2;
+      const auto H_f1 = fkd * STen2::gen_id() + (1 - 3*fkd) * STen2::gen_dyad(a1);
+      const auto H_f2 = fkd * STen2::gen_id() + (1 - 3*fkd) * STen2::gen_dyad(a2);
 
       const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(H_f1, CC );
       const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(H_f2, CC );
@@ -140,8 +130,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       // 2(P:H_fi) otimes d(2J^(-2/3)dPsi_fi/dEi_tilde) /dC = -4/3*J^(-2/3) *dPsi_fi/dEi_tilde * (P:H_fi) otimes C^(-1) + 4J^(-4/3)d^2Psi_fi/dEi_tilde^2* (P:H_fi) otimes (P:H_fi)
       // 4J^(-2/3) dPsi_fi/dEi_tilde * d(P:H_fi)/dC = -4/3*J^(-2/3)* dPsi_fi/dEi_tilde * C^(-1)otimes H_fi:P^T + 4/3*J^(-2/3)* dPsi_fi/dEi_tilde* (H_fi:C)C^(-1) odot C^(-1):P^T
 
-      const double val1 = 4.0 / 3.0 * detFm0d67 * dfpsi1_dfE1 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_1);
-      const double val2 = 4.0 / 3.0 * detFm0d67 * dfpsi2_dfE2 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_2);
+      const double val1 = 2.0 * pt67 * detFm0d67 * dfpsi1_dfE1 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_1);
+      const double val2 = 2.0 * pt67 * detFm0d67 * dfpsi2_dfE2 * (fkd * Inva1 + (1.0-3.0*fkd)*Inva4_2);
 
       auto PKstiff_fi1 = val1 * STen4::gen_Ptilde( invCC );
       auto PKstiff_fi2 = val2 * STen4::gen_Ptilde( invCC );
@@ -152,8 +142,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       PKstiff_fi2.add_OutProduct(val * d2fpsi2_dfE2, STen2::gen_DEV_part(H_f2, CC));
 
 
-      PKstiff_fi1.add_SymmOutProduct(-2.0/3.0, invCC, S_fi1);
-      PKstiff_fi2.add_SymmOutProduct(-2.0/3.0, invCC, S_fi2);
+      PKstiff_fi1.add_SymmOutProduct(-pt67, invCC, S_fi1);
+      PKstiff_fi2.add_SymmOutProduct(-pt67, invCC, S_fi2);
 
       return PKstiff_iso + PKstiff_fi1 + PKstiff_fi2;
     }
@@ -190,8 +180,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
 
   private:
     const double mu;
-    double f1_the, f1_phi, f2_the, f2_phi;
-    double fk1, fk2, fkd;
+    const double f1_the, f1_phi, f2_the, f2_phi;
+    const double fk1, fk2, fkd;
     Vector_3 a1, a2;
 };
 
