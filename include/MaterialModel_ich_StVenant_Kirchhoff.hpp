@@ -22,26 +22,32 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
     virtual SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const
     {
-    
+      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0; );
 
+      const auto C = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
+
+      const auto E_tilde = 0.5 * ( detFm0d67 * C - STen2::gen_id() );
+
+      const auto S_tilde = 2.0 * mu * E_tilde;
+
+      return detFm0d67 * STen2::gen_DEV_part( S_tilde, C );
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
        Tensor2_3D &P_iso ) const
     {
-
+      
     }
 
     virtual double get_energy( const Tensor2_3D &F ) const
     {
-      constexpr double mpt67 = -2.0 / 3.0;
-      const double detFm0d67 = std::pow( F.det(), mpt67 );
+      const double detFm0d67 = std::pow( F.det(), -2.0 / 3.0; );
      
       const auto C_tilde = detFm0d67 * STen2::gen_right_Cauchy_Green( F );
 
-      const auto E = 0.5 * ( C_tilde - STen2::gen_id() );
+      const auto E_tilde = 0.5 * ( C_tilde - STen2::gen_id() );
 
-      return mu * E.MatContraction( E );
+      return mu * E_tilde.MatContraction( E_tilde );
     }
 
     virtual Vector_3 get_fibre_dir (const int &dir) const
