@@ -125,7 +125,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH06_ST91_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH14_ST91_Mixed.cpp
-  ${perigee_source}/Model/MaterialModel_NeoHookean_ST91_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_Guccione_Incompressible_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH06_Incompressible_Mixed.cpp
   ${perigee_source}/Solver/PDNSolution.cpp

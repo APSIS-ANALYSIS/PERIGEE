@@ -39,8 +39,9 @@
 #include "MaterialModel_ich_NeoHookean.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_vol_ST91.hpp"
+#include "MaterialModel_vol_M94.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
-#include "MaterialModel_NeoHookean_ST91_Mixed.hpp"
+#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_GOH06_ST91_Mixed.hpp"
 #include "MaterialModel_ich_GOH06.hpp"
 #include "MaterialModel_ich_GOH14.hpp"
@@ -48,12 +49,12 @@
 
 int main(int argc, char *argv[])
 {
-  const double rho0 = 1.23;
-  const double elastic_E = 1.2555; 
+  const double rho0 = 5.23;
+  const double elastic_E = 3.3555; 
   const double elastic_nu = 0.47;
-  IMaterialModel * oldmodel = new MaterialModel_NeoHookean_ST91_Mixed(rho0, elastic_E, elastic_nu);
+  IMaterialModel * oldmodel = new MaterialModel_NeoHookean_M94_Mixed(rho0, elastic_E, elastic_nu);
   
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(rho0, oldmodel->get_elastic_kappa());
   std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(oldmodel->get_elastic_mu());
 
   MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
@@ -69,14 +70,14 @@ int main(int argc, char *argv[])
   if(F.det() < 0.0) F*=-1.0;
 
   std::cout<<"F:"<<std::endl; 
-  F.print();
+  F.print_in_row();
   std::cout<<std::endl; 
 
   const double val = std::pow(F.det(), -1.0/3.0);
 
-  //std::cout<<val<<'\n';
+  std::cout<<val<<'\n';
 
-  F *= val; 
+  //F *= val; 
   
   std::cout<<"get_PK_2nd:"<<std::endl; 
   Tensor2_3D P_old, S_old;
@@ -86,32 +87,26 @@ int main(int argc, char *argv[])
   auto S_new = matmodel->get_PK_2nd(F);
   S_old -= S_new.full();
   S_old.print_in_row();
-  std::cout<<std::endl;
+  std::cout<<'\n';
   S_new.print_in_row();
-  std::cout<<std::endl; 
 
   // Cauchy
-  std::cout<<"get_Cauchy_stress \n";
+  std::cout<<"\nget_Cauchy_stress \n";
 
   Tensor2_3D sigma_old = oldmodel->get_Cauchy_stress(F);
   
   auto sigma_new = matmodel->get_Cauchy_stress(F);
   sigma_old -= sigma_new.full();
   sigma_old.print_in_row();
-  std::cout<<'\n';
-  sigma_new.print_in_row();
 
   //P_old -= P_new
-  std::cout<<"get_PK_1st:"<<std::endl; 
+  std::cout<<"\nget_PK_1st:"<<std::endl; 
   auto P_new = matmodel->get_PK_1st(F);
   P_old -= P_new;
   P_old.print_in_row();
-  std::cout<<std::endl;
-  P_new.print_in_row();
-  std::cout<<std::endl; 
 
   //CC_old -= CC_new
-  std::cout<<"get_PK_Stiffness:"<<std::endl; 
+  std::cout<<"\nget_PK_Stiffness:"<<std::endl; 
   Tensor4_3D CC_old;
   oldmodel->get_PK_Stiffness(F, P_old, S_old, CC_old);
   auto CC_new = matmodel->get_PK_Stiffness(F, P_new);
@@ -123,8 +118,6 @@ int main(int argc, char *argv[])
   P_old -= P_new;
   P_old.print_in_row();
   std::cout<<std::endl;
-  P_new.print_in_row();
-  std::cout<<std::endl;
 
   std::cout<<"get_PK_FFStiffness:"<<std::endl; 
   oldmodel->get_PK_FFStiffness(F, P_old, S_old, CC_old);
@@ -132,12 +125,10 @@ int main(int argc, char *argv[])
   CC_old -= CC_n;
   CC_old.print_in_mat();
   std::cout<<std::endl;
-  CC_n.print_in_mat();
-  std::cout<<std::endl; 
+  //CC_n.print_in_mat();
+  //std::cout<<std::endl; 
   P_old -= P_new;
   P_old.print_in_row();
-  std::cout<<std::endl;
-  P_new.print_in_row();
   std::cout<<std::endl;
   S_old -= S_new.full();
   S_old.print_in_row();
@@ -148,40 +139,35 @@ int main(int argc, char *argv[])
   auto rho_old = oldmodel->get_rho(p);
   auto rho_new = matmodel->get_rho(p);
   rho_old -= rho_new;
-  std::cout<<rho_old<<std::endl;
-  std::cout<<rho_new<<std::endl;
+  std::cout<<rho_old<<'\t'<<rho_new<<std::endl;
 
   // beta
   std::cout<<"get_beta:"<<std::endl; 
   auto beta_old = oldmodel->get_beta(p);
   auto beta_new = matmodel->get_beta(p);
   beta_old -= beta_new;
-  std::cout<<beta_old<<std::endl;
-  std::cout<<beta_new<<std::endl;
+  std::cout<<beta_old<<'\t'<<beta_new<<std::endl;
 
   // drho_dp
   std::cout<<"get_drho_dp:"<<std::endl; 
   auto drho_dp_old = oldmodel->get_drho_dp(p);
   auto drho_dp_new = matmodel->get_drho_dp(p);
   drho_dp_old -= drho_dp_new;
-  std::cout<<drho_dp_old<<std::endl;
-  std::cout<<drho_dp_new<<std::endl;
+  std::cout<<drho_dp_old<<'\t'<<drho_dp_new<<std::endl;
 
   // dbeta_dp
   std::cout<<"get_dbeta_dp:"<<std::endl; 
   auto dbeta_dp_old = oldmodel->get_dbeta_dp(p);
   auto dbeta_dp_new = matmodel->get_dbeta_dp(p);
   dbeta_dp_old -= dbeta_dp_new;
-  std::cout<<dbeta_dp_old<<std::endl;
-  std::cout<<dbeta_dp_new<<std::endl;
+  std::cout<<dbeta_dp_old<<'\t'<<dbeta_dp_new<<std::endl;
 
   // strain_energy
   std::cout<<"get_strain_energy:"<<std::endl; 
   auto strain_energy_old = oldmodel->get_strain_energy(F);
   auto strain_energy_new = matmodel->get_ich_energy(F);
   strain_energy_old -= strain_energy_new;
-  std::cout<<strain_energy_old<<std::endl;
-  std::cout<<strain_energy_new<<std::endl;
+  std::cout<<strain_energy_old<<'\t'<<strain_energy_new<<std::endl;
 
   /*
   // GOH06
