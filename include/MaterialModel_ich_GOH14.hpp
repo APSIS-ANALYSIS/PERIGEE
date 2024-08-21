@@ -73,11 +73,11 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double I4 = C.VecMatVec(a1, a1);
       const double I6 = C.VecMatVec(a2, a2);
 
-		  const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
-		  const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
+      const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
+      const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
 
-		  const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
-		  const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
+      const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
+      const double dfpsi1_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
       const auto a1xa1 = STen2::gen_dyad(a1);
       const auto a2xa2 = STen2::gen_dyad(a2);
