@@ -35,18 +35,18 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     virtual void print_info() const
     {
       SYS_T::commPrint("\t  MaterialModel_ich_GOH14: \n");
-      SYS_T::commPrint("\t  Shear modulus mu = %e \n", mu);
+      SYS_T::commPrint("\t  Shear modulus mu           = %e \n", mu);
       SYS_T::commPrint("\t  Dispersion parameter kappa = %e \n", fkd);
-      SYS_T::commPrint("\t  Stress-like parameter k1 = %e \n",   fk1);
+      SYS_T::commPrint("\t  Stress-like parameter k1   = %e \n", fk1);
       SYS_T::commPrint("\t  Dimensionless parameter k2 = %e \n", fk2);
-      SYS_T::commPrint("\t  Mean angle Theta_1 (deg) of the 1st family of fibres = %e \n", f1_the*180/MATH_T::PI);
-      SYS_T::commPrint("\t  Mean angle Phi_1 (deg) of the 1st family of fibres = %e \n",   f1_phi*180/MATH_T::PI);
-      SYS_T::commPrint("\t  Mean angle Theta_1 (rad) of the 1st family of fibres = %e \n", f1_the);
-      SYS_T::commPrint("\t  Mean angle Phi_1 (rad) of the 1st family of fibres = %e \n",   f1_phi);
-      SYS_T::commPrint("\t  Mean angle Theta_2 (deg) of 2nd family of fibres = %e \n",     f2_the*180/MATH_T::PI);
-      SYS_T::commPrint("\t  Mean angle Phi_2 (deg) of the 2nd family of fibres = %e \n",   f2_phi*180/MATH_T::PI);
-      SYS_T::commPrint("\t  Mean angle Theta_2 (rad) of 2nd family of fibres = %e \n",     f2_the);
-      SYS_T::commPrint("\t  Mean angle Phi_2 (rad) of the 2nd family of fibres = %e \n",   f2_phi);
+      SYS_T::commPrint("\t  Mean angle theta_1 (deg)   = %e \n", f1_the*180/static_cast<double>(MATH_T::PI));
+      SYS_T::commPrint("\t  Mean angle phi_1   (deg)   = %e \n", f1_phi*180/static_cast<double>(MATH_T::PI));
+      SYS_T::commPrint("\t  Mean angle theta_1 (rad)   = %e \n", f1_the);
+      SYS_T::commPrint("\t  Mean angle phi_1   (rad)   = %e \n", f1_phi);
+      SYS_T::commPrint("\t  Mean angle theta_2 (deg)   = %e \n", f2_the*180/static_cast<double>(MATH_T::PI));
+      SYS_T::commPrint("\t  Mean angle phi_2   (deg)   = %e \n", f2_phi*180/static_cast<double>(MATH_T::PI));
+      SYS_T::commPrint("\t  Mean angle theta_2 (rad)   = %e \n", f2_the);
+      SYS_T::commPrint("\t  Mean angle phi_2   (rad)   = %e \n", f2_phi);
       SYS_T::commPrint("\t  Mean direction a1 of the 1st family of fibres = [%e, %e, %e] \n", a1(0), a1(1), a1(2));
       SYS_T::commPrint("\t  Mean direction a2 of the 2nd family of fibres = [%e, %e, %e] \n", a2(0), a2(1), a2(2));
     }

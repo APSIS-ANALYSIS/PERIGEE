@@ -66,12 +66,12 @@ void MaterialModel_GOH14_ST91_Mixed::print_info() const
   SYS_T::commPrint("\t  Lame coeff lambda  = %e \n", lambda);
   SYS_T::commPrint("\t  Bulk modulus kappa = %e \n", kappa);
   SYS_T::commPrint("\t  Fibre Fung: \n");
-  SYS_T::commPrint("\t  Angle theta_1 (deg)= %e \n", f1_the*180/MATH_T::PI);
-  SYS_T::commPrint("\t  Angle phi_1 (deg)  = %e \n", f1_phi*180/MATH_T::PI);
+  SYS_T::commPrint("\t  Angle theta_1 (deg)= %e \n", f1_the*180/static_cast<double>(MATH_T::PI));
+  SYS_T::commPrint("\t  Angle phi_1 (deg)  = %e \n", f1_phi*180/static_cast<double>(MATH_T::PI));
   SYS_T::commPrint("\t  Angle theta_1 (rad)= %e \n", f1_the);
   SYS_T::commPrint("\t  Angle phi_1 (rad)  = %e \n", f1_phi);
-  SYS_T::commPrint("\t  Angle theta_2 (deg)= %e \n", f2_the*180/MATH_T::PI);
-  SYS_T::commPrint("\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/MATH_T::PI);
+  SYS_T::commPrint("\t  Angle theta_2 (deg)= %e \n", f2_the*180/static_cast<double>(MATH_T::PI));
+  SYS_T::commPrint("\t  Angle phi_2 (deg)  = %e \n", f2_phi*180/static_cast<double>(MATH_T::PI));
   SYS_T::commPrint("\t  Angle theta_2 (rad)= %e \n", f2_the);
   SYS_T::commPrint("\t  Angle phi_2 (rad)  = %e \n", f2_phi);
   SYS_T::commPrint("\t  a1: [ %e , %e , %e ] \n", a1(0), a1(1), a1(2));
