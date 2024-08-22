@@ -136,7 +136,6 @@ class IMaterialModel_vol
       SYS_T::commPrint("Warning: IMaterialModel_vol::get_dvol_stress_dJ(J) is not implemented. \n");
       return 0.0;
     }
-
 };
 
 #endif
