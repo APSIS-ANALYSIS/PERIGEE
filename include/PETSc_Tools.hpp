@@ -168,6 +168,9 @@ namespace PETSc_T
 
   std::vector<double> GetLocalArray( const Vec &vv );
 
+  // Scatter from a global vector
+  void Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * &values );
+
   // Write a vector to disk with file_name
   void WriteBinary( const Vec &a, const std::string &file_name );
 
