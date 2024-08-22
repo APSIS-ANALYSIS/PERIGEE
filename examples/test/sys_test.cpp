@@ -41,6 +41,7 @@
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_vol_M94.hpp"
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH06_ST91_Mixed.hpp"
 #include "MaterialModel_GOH14_ST91_Mixed.hpp"
 #include "MaterialModel_ich_GOH06.hpp"
 #include "MaterialModel_ich_GOH14.hpp"
@@ -50,17 +51,17 @@
 int main(int argc, char *argv[])
 {
   const double rho0 = 1.52333;
-  const double elastic_E = 1.2533e1; 
-  const double elastic_nu = 0.2832;
+  const double elastic_E = 1.2533e2; 
+  const double elastic_nu = 0.2833;
 
-  const double f1_the=52.28, f1_phi=-10.98, f2_the=-39.98, f2_phi=-69.98;
-  const double fk1=1.6, fk2=0.533, fkd=0.1225; 
+  const double f1_the=52.28, f1_phi=-20.98, f2_the=-39.98, f2_phi=-69.98;
+  const double fk1=9.6, fk2=0.133, fkd=0.2225; 
 
-  IMaterialModel * oldmodel = new MaterialModel_GOH14_ST91_Mixed(rho0, elastic_E, elastic_nu, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+  IMaterialModel * oldmodel = new MaterialModel_GOH06_Incompressible_Mixed(rho0, elastic_E, f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
 
-  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_GOH14>(oldmodel->get_elastic_mu(), f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
+  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_GOH06>(oldmodel->get_elastic_mu(), f1_the, f1_phi, f2_the, f2_phi, fk1, fk2, fkd);
 
-  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_ST91>(rho0, oldmodel->get_elastic_kappa());
+  std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(rho0); //, oldmodel->get_elastic_kappa());
 
   MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
   
