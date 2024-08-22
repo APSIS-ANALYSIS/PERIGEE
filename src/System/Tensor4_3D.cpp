@@ -65,7 +65,7 @@ void Tensor4_3D::print() const
 
 void Tensor4_3D::print_in_mat() const
 {
-  std::cout<<"Tensor4_3D: \n\n";
+  std::cout<<"Tensor4_3D:\n";
   for ( int ii=0; ii<3; ii++ )
   {
     for( int jj=0; jj<3; jj++ )
@@ -195,16 +195,28 @@ void Tensor4_3D::AXPY( const double &val, const Tensor4_3D &input )
 void Tensor4_3D::add_OutProduct( const double &val, const Tensor2_3D &mleft,
     const Tensor2_3D &mright )
 {
-  for(int ii=0; ii<3; ++ii)
+  for(int mm=0; mm<9; ++mm)
   {
-    for(int jj=0; jj<3; ++jj)
-    {
-      for(int kk=0; kk<3; ++kk)
-      {
-        for(int ll=0; ll<3; ++ll)
-          ten[27*ii+9*jj+3*kk+ll] += val * mleft(3*ii+jj) * mright(3*kk+ll);
-      }
-    }
+    for(int nn=0; nn<9; ++nn)
+      ten[9*mm+nn] += val * mleft(mm) * mright(nn);
+  }
+}
+
+void Tensor4_3D::add_OutProduct( const double &val, const SymmTensor2_3D &mleft,
+    const SymmTensor2_3D &mright )
+{
+  for(int mm=0; mm<9; ++mm)
+  {
+    const int id = mleft.Voigt_notation(mm);
+    ten[9*mm+0] += val * mleft( id ) * mright(0);
+    ten[9*mm+1] += val * mleft( id ) * mright(5);
+    ten[9*mm+2] += val * mleft( id ) * mright(4);
+    ten[9*mm+3] += val * mleft( id ) * mright(5);
+    ten[9*mm+4] += val * mleft( id ) * mright(1);
+    ten[9*mm+5] += val * mleft( id ) * mright(3);
+    ten[9*mm+6] += val * mleft( id ) * mright(4);
+    ten[9*mm+7] += val * mleft( id ) * mright(3);
+    ten[9*mm+8] += val * mleft( id ) * mright(2);
   }
 }
 
@@ -603,9 +615,29 @@ Tensor4_3D Ten4::gen_P( const Tensor2_3D &C )
   return Ten4::gen_P( C, Ten2::inverse(C) );
 }
 
+Tensor4_3D Ten4::gen_P( const SymmTensor2_3D &C, const SymmTensor2_3D &invC )
+{
+  Tensor4_3D out = Ten4::gen_symm_id();
+  
+  out.add_OutProduct( -1.0 / 3.0, invC, C );
+
+  return out;
+}
+
+Tensor4_3D Ten4::gen_P( const SymmTensor2_3D &C )
+{
+  return Ten4::gen_P( C, STen2::inverse(C) );
+}
+
+
 Tensor4_3D Ten4::gen_Pt( const Tensor2_3D &C )
 {
   return Ten4::gen_P( Ten2::inverse(C) );
+}
+
+Tensor4_3D Ten4::gen_Pt( const SymmTensor2_3D &C )
+{
+  return Ten4::gen_P( STen2::inverse(C) );
 }
 
 Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )

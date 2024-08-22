@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include <memory>
 #include <sys/stat.h>
 #include "petsc.h"
 #ifdef USE_OPENMP
@@ -53,6 +54,12 @@
 
 namespace SYS_T
 {
+  // Implementation of make_unique for C++11
+  template <typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args)
+  {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+  }
+
   // Return the OS environmental variable
   inline std::string get_Env_Var( const std::string &key )
   {

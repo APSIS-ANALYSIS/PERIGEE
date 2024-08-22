@@ -18,14 +18,15 @@ class SymmTensor2_3D
 {
   public:
     // Constructor (default an identity 3-by-3 matrix)
-    SymmTensor2_3D();
+    SymmTensor2_3D() : mat{{1.0, 1.0, 1.0, 0.0, 0.0, 0.0}} {}
 
     // Copy constructor
-    SymmTensor2_3D( const SymmTensor2_3D &source );
+    SymmTensor2_3D( const SymmTensor2_3D &source ) : mat(source.mat) {}
 
     // Constructor by six numbers in Voigt numbering
     SymmTensor2_3D( const double &m0, const double &m1, const double &m2,
-        const double &m3, const double &m4, const double &m5 );
+        const double &m3, const double &m4, const double &m5 ) 
+      : mat{{m0, m1, m2, m3, m4, m5}} {}
 
     // Destructor
     ~SymmTensor2_3D() = default;
@@ -33,40 +34,45 @@ class SymmTensor2_3D
     // Assignment operator
     SymmTensor2_3D& operator= (const SymmTensor2_3D &source);
 
-    Tensor2_3D convert_to_full() const;
+    Tensor2_3D full() const;
+
+    std::vector<double> to_std_vector() const 
+    {
+      return std::vector<double>(std::begin(mat), std::end(mat));
+    }
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
-    double& operator()(const int &index) {return mat[index];}
+    inline double& operator()(const int &index) {return mat[index];}
 
-    const double& operator()(const int &index) const {return mat[index];}
+    inline const double& operator()(const int &index) const {return mat[index];}
 
     // Get-functions that access components directly
-    const double& xx() const {return mat[0];}
-    double& xx() {return mat[0];}
+    inline const double& xx() const {return mat[0];}
+    inline double& xx() {return mat[0];}
 
-    const double& xy() const {return mat[5];}
-    double& xy() {return mat[5];}
+    inline const double& xy() const {return mat[5];}
+    inline double& xy() {return mat[5];}
 
-    const double& xz() const {return mat[4];}
-    double& xz() {return mat[4];}
+    inline const double& xz() const {return mat[4];}
+    inline double& xz() {return mat[4];}
 
-    const double& yx() const {return mat[5];}
-    double& yx() {return mat[5];}
+    inline const double& yx() const {return mat[5];}
+    inline double& yx() {return mat[5];}
 
-    const double& yy() const {return mat[1];}
-    double& yy() {return mat[1];}
+    inline const double& yy() const {return mat[1];}
+    inline double& yy() {return mat[1];}
 
-    const double& yz() const {return mat[3];}
-    double& yz() {return mat[3];}
+    inline const double& yz() const {return mat[3];}
+    inline double& yz() {return mat[3];}
 
-    const double& zx() const {return mat[4];}
-    double& zx() {return mat[4];}
+    inline const double& zx() const {return mat[4];}
+    inline double& zx() {return mat[4];}
 
-    const double& zy() const {return mat[3];}
-    double& zy() {return mat[3];}
+    inline const double& zy() const {return mat[3];}
+    inline double& zy() {return mat[3];}
 
-    const double& zz() const {return mat[2];}
-    double& zz() {return mat[2];}
+    inline const double& zz() const {return mat[2];}
+    inline double& zz() {return mat[2];}
     
     // Addition operator : return left + right
     friend SymmTensor2_3D operator+( const SymmTensor2_3D &left, const SymmTensor2_3D &right );
@@ -83,14 +89,17 @@ class SymmTensor2_3D
     // Scalar product
     SymmTensor2_3D& operator*=( const double &val );
 
+    // unary minus operator
+    SymmTensor2_3D operator-() const;
+
     // Return true if the input matrix is identical to the mat
     bool is_identical( const SymmTensor2_3D &source, const double &tol = 1.0e-12 ) const;
 
     // Set all components to zero
-    void gen_zero();
+    inline void gen_zero() {mat.fill(0.0);}
 
     // Set an identity matrix
-    void gen_id();
+    inline void gen_id() {mat = {{1.0, 1.0, 1.0, 0.0, 0.0, 0.0}};}
 
     // Set components a random value
     void gen_rand(const double &left = -1.0, const double &right = 1.0);
@@ -109,10 +118,10 @@ class SymmTensor2_3D
     double det() const;
 
     // Get the trace of the matrix
-    double tr() const {return mat[0] + mat[1] + mat[2];}
+    inline double tr() const {return mat[0] + mat[1] + mat[2];}
 
     // Get the invariants
-    double I1() const {return tr();}
+    inline double I1() const {return tr();}
 
     double I2() const;
 
@@ -132,11 +141,20 @@ class SymmTensor2_3D
     // Q^T M Q = Q_ki M_kl Q_lj = output_matrix_ij
     void MatRot( const Tensor2_3D &Q );
 
+    // Push-forward for contravariant tensor (like stress)
+    // defined as F (object) Ft, see Holzapfel book p. 83
+    void push_forward_stress( const Tensor2_3D &F );
+
     // Matrix contraction
     // return mat_ij source_ij
     double MatContraction( const Tensor2_3D &source ) const;
     
     double MatContraction( const SymmTensor2_3D &source ) const;
+
+    // Obtain the Voigt notation for a regular matrix index
+    // 0 <= index < 9
+    inline int Voigt_notation( const int &index ) const
+    {return VoigtMap[index];}
 
     // print the matrix
     void print() const;
@@ -172,7 +190,10 @@ class SymmTensor2_3D
         Vector_3 &s1, Vector_3 &s2 ) const;
 
   private:
-    double mat[6];
+    std::array<double,6> mat;
+
+    // Define the Voigt map
+    static constexpr std::array<int, 9> VoigtMap {{ 0, 5, 4, 5, 1, 3, 4, 3, 2 }};
 
     // ------------------------------------------------------------------------
     // Return the deviatoric component's contraction scaled by 0.5.
@@ -199,6 +220,16 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input );
 
 namespace STen2
 {
+  // Generate an identity tensor
+  SymmTensor2_3D gen_id();
+
+  // Generate a zero tensor
+  SymmTensor2_3D gen_zero();
+
+  // Generate a dyad with a unit vector
+  // Note: we do not check the unit length of input
+  SymmTensor2_3D gen_dyad(const Vector_3 &input);
+
   // Return the inverse of the input matrix
   SymmTensor2_3D inverse( const SymmTensor2_3D &input );
 
@@ -211,6 +242,10 @@ namespace STen2
   // Convert a regular matrix to its symmetric part
   // output = 0.5 x ( source + source_transpose )
   SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
+  
+  // Apply the projector P := I - 1/3 invC x C on a symmetric tensor to obtain
+  // its Dev part in the Lagrangian setting
+  SymmTensor2_3D gen_DEV_part( const SymmTensor2_3D &input, const SymmTensor2_3D &CC );
 }
 
 #endif

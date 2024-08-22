@@ -76,6 +76,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
+  ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -99,8 +100,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
-  ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
-  ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp

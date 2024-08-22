@@ -10,7 +10,7 @@ SymmTensor4_3D::SymmTensor4_3D( const std::array<double,21> &source )
   for( int ii=0; ii<21; ++ii ) ten[ii] = source[ii];
 }
 
-Tensor4_3D SymmTensor4_3D::convert_to_full() const
+Tensor4_3D SymmTensor4_3D::full() const
 {
   Tensor4_3D out;
   for(int ii=0; ii<3; ++ii)
@@ -122,7 +122,7 @@ void SymmTensor4_3D::print() const
 
 void SymmTensor4_3D::print_in_mat() const
 {
-  std::cout<<"SymmTensor4_3D: \n\n";
+  std::cout<<"SymmTensor4_3D:\n";
   for ( int ii=0; ii<3; ++ii )
   {
     for( int jj=0; jj<3; ++jj )
@@ -395,6 +395,18 @@ void SymmTensor4_3D::TenPMult( const Tensor4_3D &P )
   }
 
   for(int ii=0; ii<21; ++ii) ten[ii] = temp[ii];
+}
+
+SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input )
+{
+  return SymmTensor4_3D( std::array<double,21>{{ 
+      val * input(0),  val * input(1),  val * input(2),  
+      val * input(3),  val * input(4),  val * input(5),
+      val * input(6),  val * input(7),  val * input(8),
+      val * input(9),  val * input(10), val * input(11), 
+      val * input(12), val * input(13), val * input(14),
+      val * input(15), val * input(16), val * input(17), 
+      val * input(18), val * input(19), val * input(20) }});
 }
 
 SymmTensor4_3D STen4::gen_zero()

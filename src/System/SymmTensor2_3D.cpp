@@ -1,34 +1,16 @@
 #include "SymmTensor2_3D.hpp"
 
-SymmTensor2_3D::SymmTensor2_3D()
-{
-  mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
-  mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0;
-}
+constexpr std::array<int, 9> SymmTensor2_3D::VoigtMap;
 
-SymmTensor2_3D::SymmTensor2_3D( const SymmTensor2_3D &source )
-{
-  mat[0] = source(0); mat[1] = source(1); mat[2] = source(2);
-  mat[3] = source(3); mat[4] = source(4); mat[5] = source(5);
-}
-
-SymmTensor2_3D::SymmTensor2_3D( const double &m0, const double &m1, 
-    const double &m2, const double &m3, const double &m4, const double &m5 )
-{
-  mat[0] = m0; mat[1] = m1; mat[2] = m2;
-  mat[3] = m3; mat[4] = m4; mat[5] = m5;
-}
-
-Tensor2_3D SymmTensor2_3D::convert_to_full() const
+Tensor2_3D SymmTensor2_3D::full() const
 {
   return Tensor2_3D( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
 }
 
 SymmTensor2_3D& SymmTensor2_3D::operator= (const SymmTensor2_3D &source)
 {
-  if (this == &source) return *this;
-
-  for(int ii=0; ii<6; ++ii) mat[ii] = source(ii);
+  if (this != &source) mat = source.mat; // use std::array assignment operator
+  
   return *this;
 }
 
@@ -64,22 +46,16 @@ SymmTensor2_3D& SymmTensor2_3D::operator*=( const double &val )
   return *this;
 }
 
+SymmTensor2_3D SymmTensor2_3D::operator- () const
+{
+  return SymmTensor2_3D( -mat[0], -mat[1], -mat[2], -mat[3], -mat[4], -mat[5] );
+}
+
 bool SymmTensor2_3D::is_identical( const SymmTensor2_3D &source, const double &tol ) const
 {
   for(int ii=0; ii<6; ++ii)
     if( std::abs( source(ii) - mat[ii]) > tol ) return false;
   return true;  
-}
-
-void SymmTensor2_3D::gen_zero()
-{
-  for(int ii=0; ii<6; ++ii) mat[ii] = 0.0;
-}
-
-void SymmTensor2_3D::gen_id()
-{
-  mat[0] = 1.0; mat[1] = 1.0; mat[2] = 1.0;
-  mat[3] = 0.0; mat[4] = 0.0; mat[5] = 0.0; 
 }
 
 void SymmTensor2_3D::gen_rand(const double &left, const double &right)
@@ -160,6 +136,23 @@ void SymmTensor2_3D::MatRot( const Tensor2_3D &Q )
       temp[ii*3+jj] = Q(0,ii) * ( mat[0]*Q(0,jj) + mat[5]*Q(1,jj) + mat[4]*Q(2,jj) )
                     + Q(1,ii) * ( mat[5]*Q(0,jj) + mat[1]*Q(1,jj) + mat[3]*Q(2,jj) )
                     + Q(2,ii) * ( mat[4]*Q(0,jj) + mat[3]*Q(1,jj) + mat[2]*Q(2,jj) );
+    }
+  }
+  
+  mat[0] = temp[0]; mat[5] = temp[1]; mat[4] = temp[2];
+  mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
+}
+
+void SymmTensor2_3D::push_forward_stress( const Tensor2_3D &F )
+{
+  double temp[9] = {0.0};
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=ii; jj<3; ++jj)
+    {
+      temp[ii*3+jj] = F(ii,0) * ( mat[0]*F(jj,0) + mat[5]*F(jj,1) + mat[4]*F(jj,2) )
+                    + F(ii,1) * ( mat[5]*F(jj,0) + mat[1]*F(jj,1) + mat[3]*F(jj,2) )
+                    + F(ii,2) * ( mat[4]*F(jj,0) + mat[3]*F(jj,1) + mat[2]*F(jj,2) );
     }
   }
   
@@ -444,6 +437,23 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input )
    val * input(3), val * input(4), val * input(5) );
 }
 
+SymmTensor2_3D STen2::gen_id()
+{
+  return SymmTensor2_3D(1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
+}
+
+SymmTensor2_3D STen2::gen_zero()
+{
+  return SymmTensor2_3D(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
+SymmTensor2_3D STen2::gen_dyad( const Vector_3 &input )
+{
+  return SymmTensor2_3D( input(0) * input(0), input(1) * input(1),
+      input(2) * input(2), input(1) * input(2), input(0) * input(2),
+      input(0) * input(1) );
+}
+
 SymmTensor2_3D STen2::inverse( const SymmTensor2_3D &input )
 {
   const double invdetA = 1.0 / input.det();
@@ -485,6 +495,18 @@ SymmTensor2_3D STen2::gen_symm_part( const Tensor2_3D &input )
                         0.5 * ( input(5) + input(7) ),
                         0.5 * ( input(2) + input(6) ),
                         0.5 * ( input(1) + input(3) ) );
+}
+
+SymmTensor2_3D STen2::gen_DEV_part( const SymmTensor2_3D &input, const SymmTensor2_3D &CC )
+{
+  const double val = input.MatContraction(CC) / 3.0;
+  const auto invC  = inverse(CC);
+  return SymmTensor2_3D( input(0) - val * invC(0), 
+                         input(1) - val * invC(1), 
+                         input(2) - val * invC(2), 
+                         input(3) - val * invC(3), 
+                         input(4) - val * invC(4), 
+                         input(5) - val * invC(5) );
 }
 
 // EOF

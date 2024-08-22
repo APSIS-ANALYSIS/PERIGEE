@@ -503,7 +503,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
-      const std::vector<Tensor2_3D> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
+      const std::vector<SymmTensor2_3D> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
           &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
 
       for( int qua = 0; qua < nqp; ++qua )

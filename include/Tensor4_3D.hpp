@@ -17,7 +17,7 @@
 // Author: Ju Liu
 // Date: July 3rd 2016
 // ============================================================================
-#include "Tensor2_3D.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class Tensor4_3D
 {
@@ -163,6 +163,9 @@ class Tensor4_3D
     // ------------------------------------------------------------------------
     void add_OutProduct( const double &val, const Tensor2_3D &mleft,
         const Tensor2_3D &mright );
+
+    void add_OutProduct( const double &val, const SymmTensor2_3D &mleft,
+        const SymmTensor2_3D &mright );
 
     // ------------------------------------------------------------------------
     // add a tensor product of 4 vectors which is formed in the following way,
@@ -319,6 +322,10 @@ namespace Ten4
 
   Tensor4_3D gen_P( const Tensor2_3D &C );
 
+  Tensor4_3D gen_P( const SymmTensor2_3D &C, const SymmTensor2_3D &invC );
+
+  Tensor4_3D gen_P( const SymmTensor2_3D &C );
+
   // ------------------------------------------------------------------------
   // Generate Projector Pt = transpose of P = SymmId4 - 1/3 C x invC
   // P_IJKL = SymmID_IJKL - 1/3 C_IJ invC_KL
@@ -327,6 +334,8 @@ namespace Ten4
   // see Holzapfel book p.229 eqn. (6.84).
   // ------------------------------------------------------------------------
   Tensor4_3D gen_Pt( const Tensor2_3D &C );
+  
+  Tensor4_3D gen_Pt( const SymmTensor2_3D &C );
 
   // ------------------------------------------------------------------------
   // Generate Projector Ptilde = invC O invC - 1/3 invC x invC

@@ -18,8 +18,11 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Hex8.hpp"
-#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
-#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "MaterialModel_vol_Incompressible.hpp"
+#include "MaterialModel_vol_ST91.hpp"
+#include "MaterialModel_vol_M94.hpp"
+#include "MaterialModel_ich_NeoHookean.hpp"
+#include "MaterialModel_ich_GOH14.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 #include "PTime_FSI_Solver.hpp"
@@ -60,7 +63,6 @@ int main( int argc, char *argv[] )
   int    sol_record_freq = 1;        // frequency for recording the solution
 
   // Solid properties
-  bool   is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
   double solid_density = 1.0;
   double solid_E = 2.0e6;
   double solid_nu = 0.5;
@@ -75,7 +77,6 @@ int main( int argc, char *argv[] )
   const int nqp_tri     = cmd_h5r -> read_intScalar(    "/", "nqp_tri");
   const int nqp_vol_1D  = cmd_h5r -> read_intScalar(    "/", "nqp_vol_1d");
   const int nqp_sur_1D  = cmd_h5r -> read_intScalar(    "/", "nqp_sur_1d");
-  const double sl_nu    = cmd_h5r -> read_doubleScalar( "/", "sl_nu");
 
   delete cmd_h5r; H5Fclose(solver_cmd_file);
 
@@ -139,7 +140,6 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionInt(   "-ttan_freq",           ttan_renew_freq);
   SYS_T::GetOptionBool(  "-is_record_sol",       is_record_sol);
   SYS_T::GetOptionInt(   "-sol_rec_freq",        sol_record_freq);
-  SYS_T::GetOptionBool(  "-is_read_material",    is_read_material);
   SYS_T::GetOptionReal(  "-sl_density",          solid_density);
   SYS_T::GetOptionReal(  "-sl_E",                solid_E);
   SYS_T::GetOptionReal(  "-sl_nu",               solid_nu);
@@ -171,19 +171,9 @@ int main( int argc, char *argv[] )
   else
     SYS_T::commPrint(    "-is_record_sol: false \n");
 
-  if( is_read_material )
-  {
-    SYS_T::commPrint(    "-is_read_material: true \n");
-    SYS_T::file_check(   "material_model.h5" );
-    SYS_T::commPrint(    "material_model.h5 found. \n");
-  }
-  else
-  {
-    SYS_T::commPrint(    "-is_read_material: false \n");
-    SYS_T::cmdPrint(     "-sl_density:",         solid_density);
-    SYS_T::cmdPrint(     "-sl_E:",               solid_E);
-    SYS_T::cmdPrint(     "-sl_nu:",              solid_nu);
-  }
+  SYS_T::cmdPrint(     "-sl_density:",         solid_density);
+  SYS_T::cmdPrint(     "-sl_E:",               solid_E);
+  SYS_T::cmdPrint(     "-sl_nu:",              solid_nu);
 
   // ====== Record important parameters ======
   if(rank == 0)
@@ -310,42 +300,28 @@ int main( int argc, char *argv[] )
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
 
-  if( is_read_material )
+  const double solid_mu = solid_E/(2.0+2.0*solid_nu);
+  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
+
+  if( solid_nu == 0.5 )
   {
-    if( sl_nu == 0.5 )
-    {
-      matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( "material_model.h5" );
+    std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
+    std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
-          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-    }
-    else
-    {
-      matmodel = new MaterialModel_NeoHookean_M94_Mixed( "material_model.h5" );
-
-      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-    }
+    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
+        std::move(matmodel), tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
-    if( solid_nu == 0.5 )
-    {
-      matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+    const double solid_lambda = solid_nu * solid_E / ((1+solid_nu) * (1-2.0*solid_nu));
+    const double solid_kappa  = solid_lambda + 2.0 * solid_mu / 3.0;
+    std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
+    std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
 
-      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
-          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-    }
-    else
-    {
-      matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
-
-      locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-          matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-    }
+    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+        std::move(matmodel), tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
 
   // ===== Initial conditions =====
@@ -433,7 +409,7 @@ int main( int argc, char *argv[] )
   delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; 
   delete locnbc_v; delete locnbc_p;
   delete ps_data; delete quadv; delete quads; delete elementv; delete elements;
-  delete pmat; delete tm_galpha_ptr; delete matmodel; delete locAssem_solid_ptr;
+  delete pmat; delete tm_galpha_ptr; delete locAssem_solid_ptr;
   delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
   delete timeinfo; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
   ISDestroy(&is_velo); ISDestroy(&is_pres);

@@ -10,14 +10,14 @@
 // Date: Jan 1 2022
 // ============================================================================
 #include "IPLocAssem_2x2Block.hpp"
-#include "IMaterialModel.hpp"
+#include "MaterialModel_Mixed_Elasticity.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 
 class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
 {
   public:
     PLocAssem_2x2Block_VMS_Incompressible( 
-        IMaterialModel * const &in_matmodel,
+        std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas );
 
@@ -109,7 +109,7 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
     // This function will calculate the Cauchy stress at every quadrature points
     // within this element. The output stress has length quad -> get_num_quadPts()
     // ------------------------------------------------------------------------
-    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
+    virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         const double * const &pres,
         FEAElement * const &element,
@@ -126,7 +126,7 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
     const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0;
 
     // useful tensors for the material model
-    const IMaterialModel * const matmodel;
+    const std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel;
 
     void print_info() const;
 
