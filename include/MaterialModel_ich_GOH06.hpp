@@ -89,8 +89,6 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
 
       const auto S_iso = mu * detFm0d67 * STen2::gen_DEV_part(STen2::gen_id(), CC );
 
-      auto PKstiff = pt67 * detFm0d67 * mu * I1 * STen4::gen_Ptilde( invCC );
-
       const double I4 = CC.VecMatVec(a1, a1);
       const double I6 = CC.VecMatVec(a2, a2);
 
@@ -109,6 +107,8 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       S_ich = S_iso + S_fi1 + S_fi2;
 
       P_ich = F * S_ich;
+
+      auto PKstiff = pt67 * detFm0d67 * mu * I1 * STen4::gen_Ptilde( invCC );
 
       const double d2fpsi1_dfE1 = fk1 * (1.0 + 2.0*fk2*fE1*fE1) * std::exp(fk2*fE1*fE1);
       const double d2fpsi2_dfE2 = fk1 * (1.0 + 2.0*fk2*fE2*fE2) * std::exp(fk2*fE2*fE2);

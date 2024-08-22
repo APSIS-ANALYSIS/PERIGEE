@@ -75,7 +75,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[1] );
 
       return mu * std::pow( F.det(), - 2.0/3.0 ) * STen2::gen_DEV_part( STen2::gen_id(), C ) +
-             2.0  * ( dfpsi1_dfE1 * H_f1 + dfpsi2_dfE2 * H_f2 );
+             2.0 * dfpsi1_dfE1 * H_f1 + 2.0 * dfpsi2_dfE2 * H_f2;
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
@@ -99,9 +99,10 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 
       const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[0] );
       const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[1] );
+      
+      const auto S_iso = val * STen2::gen_DEV_part(STen2::gen_id(), C );
 
-      S_ich =  val * STen2::gen_DEV_part( STen2::gen_id(), C ) +
-        2.0 * ( dfpsi1_dfE1 * H_f1 + dfpsi2_dfE2 * H_f2 );
+      S_ich = S_iso + 2.0 * dfpsi1_dfE1 * H_f1 + 2.0 * dfpsi2_dfE2 * H_f2;
 
       // First PK stress
       P_ich = F * S_ich;
@@ -111,8 +112,6 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 
       // Elasticity tensor
       auto CC_ich = pt67 * val * I1 * STen4::gen_Ptilde( STen2::inverse(C) );
-
-      const auto S_iso = val * STen2::gen_DEV_part(STen2::gen_id(), C );
 
       CC_ich.add_SymmOutProduct( -pt67, STen2::inverse(C), S_iso );
 

@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   std::cout<<"\nget_PK_Stiffness:"<<std::endl; 
   Tensor4_3D CC_old;
   oldmodel->get_PK_Stiffness(F, P_old, S_old, CC_old);
-  auto CC_new = matmodel->get_PK_Stiffness(F, P_new);
+  auto CC_new = matmodel->get_PK_Stiffness(F, P_new, S_new);
   CC_old -= CC_new.full();
   std::cout<<"CC diff:\t"<<std::sqrt(CC_old.Ten4Contraction(CC_old))<<'\n';
   std::cout<<"CC new: \t"<<std::sqrt(CC_new.full().Ten4Contraction(CC_new.full()))<<"\n\n";
@@ -126,9 +126,13 @@ int main(int argc, char *argv[])
   std::cout<<"PK_1s diff: \t"<<std::sqrt(P_old.MatContraction(P_old))<<'\n';
   std::cout<<"PK_1s valu: \t"<<std::sqrt(P_new.MatContraction(P_new))<<'\n';
 
+  S_old -= S_new.full();
+  std::cout<<"PK_2n diff: \t"<<std::sqrt(S_old.MatContraction(S_old))<<'\n';
+  std::cout<<"PK_2n valu: \t"<<std::sqrt(S_new.MatContraction(S_new))<<'\n';
+
   std::cout<<"\nget_PK_FFStiffness:"<<std::endl; 
   oldmodel->get_PK_FFStiffness(F, P_old, S_old, CC_old);
-  auto CC_n = matmodel->get_PK_FFStiffness(F, P_new);
+  auto CC_n = matmodel->get_PK_FFStiffness(F, P_new, S_new);
   CC_old -= CC_n;
   //CC_old.print_in_mat();
   //CC_n.print_in_mat();
