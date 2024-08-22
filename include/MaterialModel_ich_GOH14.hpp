@@ -27,8 +27,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     : mu( in_mu ), f1_the(in_f1the* MATH_T::PI / 180.0),
     f1_phi(in_f1phi*MATH_T::PI / 180.0), f2_the(in_f2the * MATH_T::PI / 180.0),
     f2_phi(in_f2phi*MATH_T::PI / 180.0), fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
-    a1( sin(f1_the) * cos(f1_phi), sin(f1_the) * sin(f1_phi), cos(f1_the) ),
-    a2( sin(f2_the) * cos(f2_phi), sin(f2_the) * sin(f2_phi), cos(f2_the) ) {}
+    dir_a{{ Vector_3( sin(f1_the) * cos(f1_phi), sin(f1_the) * sin(f1_phi), cos(f1_the) ),
+    Vector_3( sin(f2_the) * cos(f2_phi), sin(f2_the) * sin(f2_phi), cos(f2_the) ) }} {}
 
     virtual ~MaterialModel_ich_GOH14() = default;
 
@@ -47,8 +47,10 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       SYS_T::commPrint("\t  Mean angle phi_2   (deg)   = %e \n", f2_phi*180/static_cast<double>(MATH_T::PI));
       SYS_T::commPrint("\t  Mean angle theta_2 (rad)   = %e \n", f2_the);
       SYS_T::commPrint("\t  Mean angle phi_2   (rad)   = %e \n", f2_phi);
-      SYS_T::commPrint("\t  Mean direction a1 of the 1st family of fibres = [%e, %e, %e] \n", a1(0), a1(1), a1(2));
-      SYS_T::commPrint("\t  Mean direction a2 of the 2nd family of fibres = [%e, %e, %e] \n", a2(0), a2(1), a2(2));
+      SYS_T::commPrint("\t  Mean direction a1 of the 1st family of fibres = [%e, %e, %e] \n",
+          dir_a[0](0), dir_a[0](1), dir_a[0](2));
+      SYS_T::commPrint("\t  Mean direction a2 of the 2nd family of fibres = [%e, %e, %e] \n", 
+          dir_a[1](0), dir_a[1](1), dir_a[1](2));
     }
 
     virtual std::string get_model_name() const {return std::string("GOH14");}
@@ -60,8 +62,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const auto C = STen2::gen_right_Cauchy_Green( F );
 
       const double I1 = C.tr();
-      const double I4 = C.VecMatVec( a1, a1 );
-      const double I6 = C.VecMatVec( a2, a2 );
+      const double I4 = C.VecMatVec( dir_a[0], dir_a[0] );
+      const double I6 = C.VecMatVec( dir_a[1], dir_a[1] );
 
       const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
       const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
@@ -69,11 +71,11 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
       const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
-      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a1 );
-      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a2 );
+      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[0] );
+      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[1] );
 
       return mu * std::pow( F.det(), - 2.0/3.0 ) * STen2::gen_DEV_part( STen2::gen_id(), C ) +
-             2.0  * dfpsi1_dfE1 * H_f1 + 2.0  * dfpsi2_dfE2 * H_f2;
+             2.0  * ( dfpsi1_dfE1 * H_f1 + dfpsi2_dfE2 * H_f2 );
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
@@ -86,8 +88,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double val = mu * std::pow( F.det(), -pt67 );
 
       const double I1 = C.tr();
-      const double I4 = C.VecMatVec( a1, a1 );
-      const double I6 = C.VecMatVec( a2, a2 );
+      const double I4 = C.VecMatVec( dir_a[0], dir_a[0] );
+      const double I6 = C.VecMatVec( dir_a[1], dir_a[1] );
 
       const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
       const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
@@ -95,11 +97,11 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double dfpsi1_dfE1 = fk1 * fE1 * std::exp( fk2 * fE1 * fE1 );
       const double dfpsi2_dfE2 = fk1 * fE2 * std::exp( fk2 * fE2 * fE2 );
 
-      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a1 );
-      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( a2 );
+      const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[0] );
+      const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[1] );
 
       const auto S_ich =  val * STen2::gen_DEV_part( STen2::gen_id(), C ) +
-             2.0  * dfpsi1_dfE1 * H_f1 + 2.0  * dfpsi2_dfE2 * H_f2;
+             2.0 * ( dfpsi1_dfE1 * H_f1 + dfpsi2_dfE2 * H_f2 );
 
       // First PK stress
       P_ich = F * S_ich;
@@ -127,8 +129,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const double I1 = C.tr();
       const double detFm0d67 = std::pow( F.det(), -2.0/3.0 );
 
-      const double I4 = C.VecMatVec( a1, a1 );
-      const double I6 = C.VecMatVec( a2, a2 );
+      const double I4 = C.VecMatVec( dir_a[0], dir_a[0] );
+      const double I6 = C.VecMatVec( dir_a[1], dir_a[1] );
 
       const double fE1 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I4 - 1.0;
       const double fE2 = fkd * I1 + ( 1.0 - 3.0 * fkd ) * I6 - 1.0;
@@ -140,19 +142,14 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 
     virtual Vector_3 get_fibre_dir (const int &dir) const
     {
-      if (dir == 0) return a1;
-      else if (dir == 1) return a2;
-      else
-      {
-        SYS_T::print_fatal("Error:MaterialModel_ich_GOH14, wrong fibre direction.");
-        return Vector_3();
-      }
+      ASSERT(dir==0 || dir==1, "Error: MaterialModel_ich_GOH14::get_fibre_dir function dir value out of range.\n");
+      return dir_a.at(dir);
     }
 
   private:
     const double mu, f1_the, f1_phi, f2_the, f2_phi;
     const double fk1, fk2, fkd;
-    const Vector_3 a1, a2;
+    const std::array<Vector_3,2> dir_a;
 };
 
 #endif

@@ -72,6 +72,9 @@ int main(int argc, char *argv[])
   std::cout<<matmodel->get_model_name()<<'\n';
 
   //oldmodel->print_info();
+  
+  matmodel->get_fibre_dir(0).print();
+  matmodel->get_fibre_dir(2).print();
 
   Tensor2_3D F; F.gen_rand();
 
@@ -92,10 +95,10 @@ int main(int argc, char *argv[])
   //S_old -= S_new;
   auto S_new = matmodel->get_PK_2nd(F);
   S_old -= S_new.full();
-  std::cout<<"PK_2d diff:"<<std::sqrt(S_old.MatContraction(S_old))<<'\n';
-  std::cout<<"PK_2d value:"<<std::sqrt(S_new.MatContraction(S_new))<<'\n';
+  std::cout<<"PK_2d diff: "<<std::sqrt(S_old.MatContraction(S_old))<<'\n';
+  std::cout<<"PK_2d valu: "<<std::sqrt(S_new.MatContraction(S_new))<<'\n';
 
-  S_old.print_in_row();
+  //S_old.print_in_row();
 
   // Cauchy
   Tensor2_3D sigma_old = oldmodel->get_Cauchy_stress(F);
