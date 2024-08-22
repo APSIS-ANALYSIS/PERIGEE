@@ -79,7 +79,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-        Tensor2_3D &P_ich ) const
+        Tensor2_3D &P_ich, SymmTensor2_3D &S_ich ) const
     {
       constexpr double pt67 = 2.0 / 3.0;
       const auto CC = STen2::gen_right_Cauchy_Green(F);
@@ -90,8 +90,6 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const auto S_iso = mu * detFm0d67 * STen2::gen_DEV_part(STen2::gen_id(), CC );
 
       auto PKstiff = pt67 * detFm0d67 * mu * I1 * STen4::gen_Ptilde( invCC );
-
-      PKstiff.add_SymmOutProduct( -pt67, invCC, S_iso );
 
       const double I4 = CC.VecMatVec(a1, a1);
       const double I6 = CC.VecMatVec(a2, a2);
@@ -108,7 +106,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       const auto S_fi1 = 2.0 * detFm0d67 * dfpsi1_dfE1 * STen2::gen_DEV_part(H_f1, CC );
       const auto S_fi2 = 2.0 * detFm0d67 * dfpsi2_dfE2 * STen2::gen_DEV_part(H_f2, CC );
 
-      const auto S_ich = S_iso + S_fi1 + S_fi2;
+      S_ich = S_iso + S_fi1 + S_fi2;
 
       P_ich = F * S_ich;
 
@@ -125,8 +123,7 @@ class MaterialModel_ich_GOH06 : public IMaterialModel_ich
       PKstiff.add_OutProduct(val * d2fpsi1_dfE1, STen2::gen_DEV_part(H_f1, CC));
       PKstiff.add_OutProduct(val * d2fpsi2_dfE2, STen2::gen_DEV_part(H_f2, CC));
 
-      PKstiff.add_SymmOutProduct(-pt67, invCC, S_fi1);
-      PKstiff.add_SymmOutProduct(-pt67, invCC, S_fi2);
+      PKstiff.add_SymmOutProduct(-pt67, invCC, S_ich);
 
       return PKstiff;
     }

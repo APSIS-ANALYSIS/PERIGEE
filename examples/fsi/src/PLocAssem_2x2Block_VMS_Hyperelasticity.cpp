@@ -1,10 +1,10 @@
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 
 PLocAssem_2x2Block_VMS_Hyperelasticity::PLocAssem_2x2Block_VMS_Hyperelasticity(
-    const std::unique_ptr<MaterialModel_Mixed_Elasticity> &in_matmodel,
+    std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas )
-: rho0( in_matmodel->get_rho0() ),
+: rho0( in_matmodel->get_rho_0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
@@ -189,7 +189,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
-    const Tensor2_3D P_iso = matmodel->get_PK_1st( F );
+    Tensor2_3D P_iso = matmodel->get_PK_1st( F );
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
@@ -352,7 +352,8 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
     Tensor2_3D P_iso;
-    const Tensor4_3D AA_iso = matmodel->get_PK_FFStiffness(F, P_iso);
+    SymmTensor2_3D S_iso;
+    const Tensor4_3D AA_iso = matmodel->get_PK_FFStiffness(F, P_iso, S_iso);
     
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
@@ -510,9 +511,9 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
           + gwts * dd_dv * tau_c * detF * GradNA_invF[2] * GradNB_invF[2];
 
         const double geo_stiff = gwts * ddvm * (
-            NA_x * ( S_iso(0) * NB_x + S_iso(1) * NB_y + S_iso(2) * NB_z )
-            + NA_y * ( S_iso(3) * NB_x + S_iso(4) * NB_y + S_iso(5) * NB_z )
-            + NA_z * ( S_iso(6) * NB_x + S_iso(7) * NB_y + S_iso(8) * NB_z) );
+            NA_x * ( S_iso.xx() * NB_x + S_iso.xy() * NB_y + S_iso.xz() * NB_z )
+            + NA_y * ( S_iso.yx() * NB_x + S_iso.yy() * NB_y + S_iso.yz() * NB_z )
+            + NA_z * ( S_iso.zx() * NB_x + S_iso.zy() * NB_y + S_iso.zz() * NB_z) );
 
         Tangent00[3*nLocBas*(3*A+0)+3*B+0] += geo_stiff;
 
@@ -638,7 +639,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     // invF_Ii DV_i,I = v_i,i = div v
     const double invFDV_t = invF.MatTContraction(DVelo);
 
-    const Tensor2_3D P_iso = matmodel->get_PK_1st( F );
+    Tensor2_3D P_iso = matmodel->get_PK_1st( F );
     
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress

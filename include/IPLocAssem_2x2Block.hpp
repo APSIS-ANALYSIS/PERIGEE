@@ -337,7 +337,7 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
 
-    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
+    virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         const double * const &pres,
         FEAElement * const &element,
@@ -347,7 +347,7 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad ) const
     {
       SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
-      std::vector<Tensor2_3D> output; output.clear();
+      std::vector<SymmTensor2_3D> output; output.clear();
       return output;
     }
 

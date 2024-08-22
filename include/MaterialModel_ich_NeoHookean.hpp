@@ -28,13 +28,13 @@ class MaterialModel_ich_NeoHookean : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_ich ) const
+       Tensor2_3D &P_ich, SymmTensor2_3D &S_ich ) const
     {
       constexpr double pt67 = 2.0 / 3.0;
       const auto CC = STen2::gen_right_Cauchy_Green(F);
       const double val = mu * std::pow(CC.det(), -pt67 * 0.5);
       
-      const auto S_ich = val * STen2::gen_DEV_part( STen2::gen_id(), CC );
+      S_ich = val * STen2::gen_DEV_part( STen2::gen_id(), CC );
      
       // First PK stress 
       P_ich = F * S_ich;

@@ -29,8 +29,9 @@ class MaterialModel_Mixed_Elasticity
     SymmTensor2_3D get_PK_2nd( const Tensor2_3D &F ) const 
     {return imodel->get_PK_2nd(F);}
 
-    SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F, Tensor2_3D &P_iso ) const
-    {return imodel->get_PK_Stiffness(F, P_iso);}
+    SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F, Tensor2_3D &P_ich,
+        SymmTensor2_3D &S_ich ) const
+    {return imodel->get_PK_Stiffness(F, P_ich, S_ich);}
 
     // P_iso := F S_iso
     Tensor2_3D get_PK_1st( const Tensor2_3D &F ) const
@@ -39,8 +40,9 @@ class MaterialModel_Mixed_Elasticity
     SymmTensor2_3D get_Cauchy_stress( const Tensor2_3D &F ) const
     {return imodel->get_Cauchy_stress(F);}
 
-    Tensor4_3D get_PK_FFStiffness( const Tensor2_3D &F, Tensor2_3D &P_iso ) const
-    {return imodel->get_PK_FFStiffness(F, P_iso);}
+    Tensor4_3D get_PK_FFStiffness( const Tensor2_3D &F, Tensor2_3D &P_ich,
+        SymmTensor2_3D &S_ich ) const
+    {return imodel->get_PK_FFStiffness(F, P_ich, S_ich);}
 
     double get_elastic_mu() const {return imodel->get_elastic_mu();}
 

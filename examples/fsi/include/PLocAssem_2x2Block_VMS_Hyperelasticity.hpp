@@ -17,7 +17,7 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
 {
   public:
     PLocAssem_2x2Block_VMS_Hyperelasticity(
-        const std::unique_ptr<MaterialModel_Mixed_Elasticity> &in_matmodel,
+        std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_snlocbas );
 
@@ -109,7 +109,7 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
     // This function will calculate the Cauchy stress at every quadrature points
     // within this element. The output stress has length quad -> get_num_quadPts()
     // ------------------------------------------------------------------------
-    virtual std::vector<Tensor2_3D> get_Wall_CauchyStress(
+    virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         const double * const &pres,
         FEAElement * const &element,

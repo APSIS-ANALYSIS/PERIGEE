@@ -37,7 +37,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_ich ) const
+       Tensor2_3D &P_ich, SymmTensor2_3D &S_ich ) const
     {
       constexpr double pt67 = 2.0 / 3.0;
       const double detFm0d67 = std::pow( F.det(), -pt67 );
@@ -46,7 +46,7 @@ class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 
       const auto S_tilde = mu * ( detFm0d67 * C - STen2::gen_id() );
 
-      const auto S_ich = detFm0d67 * STen2::gen_DEV_part( S_tilde, C );
+      S_ich = detFm0d67 * STen2::gen_DEV_part( S_tilde, C );
 
       // First PK stress
       P_ich = F * S_ich;

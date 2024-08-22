@@ -25,8 +25,11 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
-#include "MaterialModel_NeoHookean_M94_Mixed.hpp"
-#include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
+#include "MaterialModel_vol_Incompressible.hpp"
+#include "MaterialModel_vol_ST91.hpp"
+#include "MaterialModel_vol_M94.hpp"
+#include "MaterialModel_ich_NeoHookean.hpp"
+#include "MaterialModel_ich_GOH14.hpp"
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
@@ -444,24 +447,24 @@ int main(int argc, char *argv[])
 
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
 
-  const double elastic_mu = solid_E/(2.0+2.0*solid_nu);
+  const double solid_mu = solid_E/(2.0+2.0*solid_nu);
   std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
 
   if( solid_nu == 0.5 )
   {
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
-    MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
+    std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
     locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
-        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+        std::move(matmodel), tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
     const double solid_lambda = solid_nu * solid_E / ((1+solid_nu) * (1-2.0*solid_nu));
     const double solid_kappa  = solid_lambda + 2.0 * solid_mu / 3.0;
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
-    MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
+    std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
     locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-        matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+        std::move(matmodel), tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
 
   // Pseudo elastic mesh motion

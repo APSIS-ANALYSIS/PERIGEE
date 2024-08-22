@@ -79,7 +79,7 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
     }
 
     virtual SymmTensor4_3D get_PK_Stiffness( const Tensor2_3D &F,
-       Tensor2_3D &P_ich ) const
+       Tensor2_3D &P_ich, SymmTensor2_3D &S_ich ) const
     {
       constexpr double pt67 = 2.0 / 3.0;
 
@@ -100,8 +100,8 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
       const auto H_f1 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[0] );
       const auto H_f2 = fkd * STen2::gen_id() + ( 1.0 - 3.0 * fkd ) * STen2::gen_dyad( dir_a[1] );
 
-      const auto S_ich =  val * STen2::gen_DEV_part( STen2::gen_id(), C ) +
-             2.0 * ( dfpsi1_dfE1 * H_f1 + dfpsi2_dfE2 * H_f2 );
+      S_ich =  val * STen2::gen_DEV_part( STen2::gen_id(), C ) +
+        2.0 * ( dfpsi1_dfE1 * H_f1 + dfpsi2_dfE2 * H_f2 );
 
       // First PK stress
       P_ich = F * S_ich;
