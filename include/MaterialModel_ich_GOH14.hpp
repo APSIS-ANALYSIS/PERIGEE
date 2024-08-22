@@ -20,15 +20,15 @@ class MaterialModel_ich_GOH14 : public IMaterialModel_ich
 {
   public:
     MaterialModel_ich_GOH14( const double &in_mu,
-    const double &in_f1the, const double &in_f1phi,
-    const double &in_f2the, const double &in_f2phi,
-    const double &in_fk1, const double &in_fk2,
-    const double &in_fkd)
-    : mu( in_mu ), f1_the(in_f1the* MATH_T::PI / 180.0),
-    f1_phi(in_f1phi*MATH_T::PI / 180.0), f2_the(in_f2the * MATH_T::PI / 180.0),
-    f2_phi(in_f2phi*MATH_T::PI / 180.0), fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
-    dir_a{{ Vector_3( sin(f1_the) * cos(f1_phi), sin(f1_the) * sin(f1_phi), cos(f1_the) ),
-    Vector_3( sin(f2_the) * cos(f2_phi), sin(f2_the) * sin(f2_phi), cos(f2_the) ) }} {}
+        const double &in_f1the, const double &in_f1phi,
+        const double &in_f2the, const double &in_f2phi,
+        const double &in_fk1, const double &in_fk2,
+        const double &in_fkd)
+      : mu( in_mu ), f1_the(in_f1the* MATH_T::PI / 180.0),
+      f1_phi(in_f1phi*MATH_T::PI / 180.0), f2_the(in_f2the * MATH_T::PI / 180.0),
+      f2_phi(in_f2phi*MATH_T::PI / 180.0), fk1(in_fk1), fk2(in_fk2), fkd(in_fkd),
+      dir_a{{ Vector_3( sin(f1_the) * cos(f1_phi), sin(f1_the) * sin(f1_phi), cos(f1_the) ),
+        Vector_3( sin(f2_the) * cos(f2_phi), sin(f2_the) * sin(f2_phi), cos(f2_the) ) }} {}
 
     virtual ~MaterialModel_ich_GOH14() = default;
 
