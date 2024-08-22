@@ -4,13 +4,13 @@ PLocAssem_2x2Block_VMS_Incompressible::PLocAssem_2x2Block_VMS_Incompressible(
     IMaterialModel * const &in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas )
-: rho0( in_matmodel->get_elastic_rho0() ),
+: rho0( in_matmodel->get_rho0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
   sur_size_0( snLocBas * 3 ),
-  matmodel( in_matmodel )
+  matmodel( std::move(in_matmodel) )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
   Tangent01 = new PetscScalar[vec_size_0 * vec_size_1];
@@ -77,8 +77,6 @@ std::array<double, 2> PLocAssem_2x2Block_VMS_Incompressible::get_tau(
     const double &dt, const double &Jin, const double &dx ) const
 {
   const double mu = matmodel->get_elastic_mu();
-  //const double ka = matmodel->get_elastic_kappa();
-  //const double c_max = std::pow( rho0 / (ka + 4*mu/3.0), -0.5);
 
   const double c_max = std::pow( rho0 / mu, -0.5); // Fully incompressible case
 
@@ -192,8 +190,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
-    Tensor2_3D P_iso, S_iso;
-    matmodel->get_PK(F, P_iso, S_iso);
+    const auto P_iso = matmodel->get_PK_1st( F );
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
@@ -354,9 +351,8 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
 
     const double invFDV_t = invF.MatTContraction(DVelo); // invF_Ii V_i,I
 
-    Tensor2_3D P_iso, S_iso;
-    Tensor4_3D AA_iso;
-    matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
+    Tensor2_3D P_iso;
+    const Tensor4_3D AA_iso = matmodel->get_PK_FFStiffness(F, P_iso);
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
@@ -616,8 +612,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
     // invF_Ii DV_i,I = v_i,i = div v
     const double invFDV_t = invF.MatTContraction(DVelo);
 
-    Tensor2_3D P_iso, S_iso;
-    matmodel->get_PK(F, P_iso, S_iso);
+    const Tensor2_3D P_iso = matmodel->get_PK_1st( F );
 
     // ------------------------------------------------------------------------
     // 1st PK stress corrected by prestress
@@ -744,7 +739,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual_Interior_Wall_EBC(
   }
 }
 
-std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Incompressible::get_Wall_CauchyStress(
+std::vector<SymmTensor2_3D> PLocAssem_2x2Block_VMS_Incompressible::get_Wall_CauchyStress(
     const double * const &disp,
     const double * const &pres,
     FEAElement * const &element,
@@ -757,7 +752,7 @@ std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Incompressible::get_Wall_CauchySt
 
   const int nqp = quad -> get_num_quadPts();
 
-  std::vector<Tensor2_3D> stress( nqp );
+  std::vector<SymmTensor2_3D> stress( nqp );
 
   for( int qua = 0; qua < nqp; ++qua )
   {
