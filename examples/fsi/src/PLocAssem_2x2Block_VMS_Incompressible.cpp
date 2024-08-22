@@ -1,7 +1,7 @@
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 
 PLocAssem_2x2Block_VMS_Incompressible::PLocAssem_2x2Block_VMS_Incompressible(
-    IMaterialModel * const &in_matmodel,
+    const std::unique_ptr<MaterialModel_Mixed_Elasticity> &in_matmodel,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
     const int &in_nlocbas, const int &in_snlocbas )
 : rho0( in_matmodel->get_rho0() ),
