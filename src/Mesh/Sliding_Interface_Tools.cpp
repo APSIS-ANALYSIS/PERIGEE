@@ -2,7 +2,8 @@
 
 namespace SI_T
 {
-  SI_solution::SI_solution(const std::string &fileBaseName, const int &cpu_rank)
+  SI_solution::SI_solution(const std::string &fileBaseName, const int &in_cpu_rank)
+    : cpu_rank( in_cpu_rank )
   {
     const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -28,13 +29,8 @@ namespace SI_T
     nLocBas = h5r -> read_intScalar(mesh_info.c_str(), "nLocBas");
     dof_sol = h5r -> read_intScalar(mesh_info.c_str(), "dofNum");
 
-    const std::string part_node("/Local_Node");
-    nlgn = h5r -> read_intScalar(part_node.c_str(), "nlocghonode");
-
     std::string groupbase(gname);
     groupbase.append("/interfaceid_");
-
-    cpu = cpu_rank;
 
     for(int ii=0; ii<num_itf; ++ii)
     {
@@ -63,7 +59,8 @@ namespace SI_T
 
   void SI_solution::update_node_sol(const PDNSolution * const &sol)
   {
-    double * array = new double [nlgn * dof_sol];
+    const int nlgn = sol->get_nlgn();
+    double * array = new double [nlgn];
 
     sol->GetLocalArray( array );
 
@@ -75,12 +72,12 @@ namespace SI_T
       for(int nn = 0; nn < num_fixed_node[ii]; ++nn)
       {
         // Pick out the solution of nodes in each part
-        if(fixed_node_part_tag[ii][nn] == cpu)
+        if(fixed_node_part_tag[ii][nn] == cpu_rank)
         {  
           // Like GetLocal in PGAssem
           const int loc_pos = fixed_node_loc_pos[ii][nn];
           for(int dd = 0; dd < dof_sol; ++dd)
-          temp_fixed_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
+            temp_fixed_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
         }
       }
 
@@ -88,12 +85,12 @@ namespace SI_T
       for(int nn = 0; nn < num_rotated_node[ii]; ++nn)
       {
         // Pick out the solution of nodes in each part
-        if(rotated_node_part_tag[ii][nn] == cpu)
+        if(rotated_node_part_tag[ii][nn] == cpu_rank)
         { 
           // Like GetLocal in PGAssem
           const int loc_pos = rotated_node_loc_pos[ii][nn];
           for(int dd = 0; dd < dof_sol; ++dd)
-          temp_rotated_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
+            temp_rotated_node_sol[dof_sol * nn + dd] = array[dof_sol * loc_pos + dd];
         }
       }
 
@@ -102,7 +99,7 @@ namespace SI_T
       MPI_Allreduce(&temp_rotated_node_sol[0], &rotated_node_sol[ii][0], dof_sol * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
     }
 
-    delete [] array;
+    delete [] array; array = nullptr;
   }
 
 

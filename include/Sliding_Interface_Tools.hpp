@@ -6,7 +6,6 @@
 //
 // Date Created: Aug. 16 2024
 // ============================================================================
-
 #include "ALocal_Interface.hpp"
 #include "FE_Tools.hpp"
 
@@ -25,11 +24,10 @@ namespace SI_T
       {
         for(int nn = 0; nn < nLocBas; ++nn)
         {
-          const int node = itf->get_fixed_lien(ii, ee * nLocBas + nn);
-          local_ien[nn] = node;
+          local_ien[nn] = itf->get_fixed_lien(ii, ee * nLocBas + nn);
 
           for(int dd = 0; dd < dof_sol; ++dd)
-            local_sol[dof_sol * nn + dd] = fixed_node_sol[ii][dof_sol * node + dd];
+            local_sol[dof_sol * nn + dd] = fixed_node_sol[ii][dof_sol * local_ien[nn] + dd];
         }
       }
 
@@ -39,11 +37,10 @@ namespace SI_T
       {
         for(int nn = 0; nn < nLocBas; ++nn)
         {
-          const int node = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
-          local_ien[nn] = node;
+          local_ien[nn] = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
 
           for(int dd = 0; dd < dof_sol; ++dd)
-            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * node + dd];
+            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
         }
       }
 
@@ -62,13 +59,8 @@ namespace SI_T
       }
 
     private:
-      int nLocBas;
-
-      int dof_sol;
-
-      int nlgn;
-
-      int cpu;
+      const int cpu_rank;
+      int nLocBas, dof_sol;
 
       // the number of the nodes from the fixed volume elements
       // size: num_itf
