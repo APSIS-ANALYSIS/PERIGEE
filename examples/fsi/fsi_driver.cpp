@@ -442,25 +442,27 @@ int main(int argc, char *argv[])
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
-  IMaterialModel * matmodel = nullptr;
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
+
+  const double elastic_mu = solid_E/(2.0+2.0*solid_nu);
+  std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
 
   if( solid_nu == 0.5 )
   {
-    matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
-
+    std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
+    MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
     locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
-    matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
-
+    const double solid_lambda = solid_nu * solid_E / ((1+solid_nu) * (1-2.0*solid_nu));
+    const double solid_kappa  = solid_lambda + 2.0 * solid_mu / 3.0;
+    std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
+    MaterialModel_Mixed_Elasticity * matmodel = new MaterialModel_Mixed_Elasticity(std::move(vmodel), std::move(imodel));
     locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
         matmodel, tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
-
-  matmodel -> write_hdf5(); // record model parameter on disk
 
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
@@ -760,7 +762,7 @@ int main(int argc, char *argv[])
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
   delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
-  delete locAssem_mesh_ptr; delete matmodel; delete locAssem_fluid_ptr;
+  delete locAssem_mesh_ptr; delete locAssem_fluid_ptr;
   delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
