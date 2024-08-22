@@ -104,10 +104,10 @@ namespace SI_T
       ~SI_quad_point() = default;
 
       void set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-          const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi);
+          const int &ele_tag, const int &rotated_ee, const double &xi, const double &eta);
 
       void get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-          int &ele_tag, int &rotated_ee, std::vector<double> &xi) const;
+          int &ele_tag, int &rotated_ee, double &xi, double &eta) const;
 
       void search_all_opposite_point(
           const double &curr_time,
@@ -142,7 +142,8 @@ namespace SI_T
 
       // stores the current rotated element xi = (r, s) for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface) x 2
-      std::vector<std::vector<std::vector<double>>> curr_xi;
+      std::vector<std::vector<double>> curr_xi;
+      std::vector<std::vector<double>> curr_eta;
   };
 }
 

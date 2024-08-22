@@ -109,30 +109,33 @@ namespace SI_T
     curr_tag.resize(itf->get_num_itf());
     curr_ee.resize(itf->get_num_itf());
     curr_xi.resize(itf->get_num_itf());
+    curr_eta.resize(itf->get_num_itf());
 
     for(int ii = 0; ii < itf->get_num_itf(); ++ii)
     {
       curr_tag[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, -1);
       curr_ee[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, -1);
-      curr_xi[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, std::vector<double>(2, 0.0));
+      curr_xi[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, 0.0);
+      curr_eta[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, 0.0);
     }
   }
 
   void SI_quad_point::set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-    const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi)
+    const int &ele_tag, const int &rotated_ee, const double &xi, const double &eta)
   {
     curr_tag[itf_id][fixed_ee * nqp_sur + qua]   = ele_tag;
     curr_ee[itf_id][fixed_ee * nqp_sur + qua]    = rotated_ee;
-    curr_xi[itf_id][fixed_ee * nqp_sur + qua][0] = xi[0];
-    curr_xi[itf_id][fixed_ee * nqp_sur + qua][1] = xi[1];
+    curr_xi[itf_id][fixed_ee * nqp_sur + qua] = xi;
+    curr_eta[itf_id][fixed_ee * nqp_sur + qua] = eta;
   }
 
   void SI_quad_point::get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-    int &ele_tag, int &rotated_ee, std::vector<double> &xi) const
+    int &ele_tag, int &rotated_ee, double &xi, double &eta) const
   {
     ele_tag = curr_tag[itf_id][fixed_ee * nqp_sur + qua];
     rotated_ee = curr_ee[itf_id][fixed_ee * nqp_sur + qua];
     xi = curr_xi[itf_id][fixed_ee * nqp_sur + qua];
+    eta = curr_eta[itf_id][fixed_ee * nqp_sur + qua];
   }
 
   void SI_quad_point::search_all_opposite_point(
@@ -188,9 +191,7 @@ namespace SI_T
           int rotated_ee {0};
           search_opposite_point(curr_time, coor, itf_part, itf_id, rotated_elementv, elements, ele_tag, rotated_ee, free_quad);
 
-          std::vector<double> rotated_xi = {free_quad->get_qp(0, 0), free_quad->get_qp(0, 1)};
-
-          set_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi);
+          set_curr(itf_id, ee, qua, ele_tag, rotated_ee, free_quad->get_qp(0, 0), free_quad->get_qp(0, 1));
         }
       }
     }

@@ -1268,7 +1268,8 @@ void PGAssem_NS_FEM::Interface_KG(
 
   int ele_tag {-1};
   int rotated_ee {-1};
-  std::vector<double> rotated_xi {1.0 / 3.0, 1.0 / 3.0};
+  double rotated_xi {1.0 / 3.0};
+  double rotated_eta {1.0 / 3.0};
 
   for(int itf_id{0}; itf_id<num_itf; ++itf_id)
   {
@@ -1297,13 +1298,13 @@ void PGAssem_NS_FEM::Interface_KG(
       {
         fixed_elementv->get_R(qua, &R[0]);
 
-        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi);
+        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi, rotated_eta);
 
         const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
 
-        free_quad->set_qp( rotated_xi[0], rotated_xi[1] );
+        free_quad->set_qp( rotated_xi, rotated_eta );
 
         rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 
@@ -1381,7 +1382,8 @@ void PGAssem_NS_FEM::Interface_G(
 
   int ele_tag {-1};
   int rotated_ee {-1};
-  std::vector<double> rotated_xi {1.0 / 3.0, 1.0 / 3.0};
+  double rotated_xi {1.0 / 3.0};
+  double rotated_eta {1.0 / 3.0};
 
   for(int itf_id{0}; itf_id<num_itf; ++itf_id)
   {
@@ -1410,13 +1412,13 @@ void PGAssem_NS_FEM::Interface_G(
       {
         fixed_elementv->get_R(qua, &R[0]);
 
-        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi);
+        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi, rotated_eta);
 
         const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
 
-        free_quad->set_qp( rotated_xi[0], rotated_xi[1] );
+        free_quad->set_qp( rotated_xi, rotated_eta );
 
         rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 
