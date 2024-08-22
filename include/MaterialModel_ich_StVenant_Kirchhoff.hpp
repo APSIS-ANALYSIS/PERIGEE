@@ -11,7 +11,7 @@
 class MaterialModel_ich_StVenant_Kirchhoff : public IMaterialModel_ich
 {
   public:
-    MaterialModel_ich_StVenant_Kirchhoff( const double &in_mu ) : mu( in_mu ) {};
+    MaterialModel_ich_StVenant_Kirchhoff( const double &in_mu ) : mu( in_mu ) {}
 
     virtual ~MaterialModel_ich_StVenant_Kirchhoff() = default;
 
