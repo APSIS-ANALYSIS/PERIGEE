@@ -104,8 +104,8 @@ namespace SI_T
 
 
   SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in)
+    : nqp_sur( nqp_sur_in )
   {
-    nqp_sur = nqp_sur_in;
     curr_tag.resize(itf->get_num_itf());
     curr_ee.resize(itf->get_num_itf());
     curr_xi.resize(itf->get_num_itf());
@@ -121,8 +121,8 @@ namespace SI_T
   void SI_quad_point::set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
     const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi)
   {
-    curr_tag[itf_id][fixed_ee * nqp_sur + qua] = ele_tag;
-    curr_ee[itf_id][fixed_ee * nqp_sur + qua] = rotated_ee;
+    curr_tag[itf_id][fixed_ee * nqp_sur + qua]   = ele_tag;
+    curr_ee[itf_id][fixed_ee * nqp_sur + qua]    = rotated_ee;
     curr_xi[itf_id][fixed_ee * nqp_sur + qua][0] = xi[0];
     curr_xi[itf_id][fixed_ee * nqp_sur + qua][1] = xi[1];
   }
@@ -142,16 +142,12 @@ namespace SI_T
     FEAElement * const &elements,
     const IQuadPts * const &quad_s,
     IQuadPts * const &free_quad,
-    ALocal_Interface * const &itf_part )
+    const ALocal_Interface * const &itf_part )
   {
     const int nLocBas = itf_part->get_nLocBas();
     double * ctrl_x = new double [nLocBas];
     double * ctrl_y = new double [nLocBas];
     double * ctrl_z = new double [nLocBas];
-
-    int * fixed_local_ien = new int [nLocBas];
-
-    int * rotated_local_ien = new int [nLocBas];
 
     const int num_itf {itf_part->get_num_itf()};
 
@@ -169,17 +165,13 @@ namespace SI_T
 
         const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
 
-        int ele_tag {itf_part->get_fixed_ele_tag(itf_id, ee)};
-
         fixed_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
 
         const int fixed_face_nqp {quad_s->get_num_quadPts()};
 
-        std::vector<double> R(nLocBas, 0.0);
-
         for(int qua{0}; qua<fixed_face_nqp; ++qua)
         {
-          fixed_elementv->get_R(qua, &R[0]);
+          auto R = fixed_elementv->get_R(qua);
 
           // The xyz-coordinates of the quadrature point
           Vector_3 coor(0.0, 0.0, 0.0);
@@ -192,6 +184,7 @@ namespace SI_T
 
           // SYS_T::commPrint("    point %d:\n", qua);
 
+          int ele_tag {itf_part->get_fixed_ele_tag(itf_id, ee)};
           int rotated_ee {0};
           search_opposite_point(curr_time, coor, itf_part, itf_id, rotated_elementv, elements, ele_tag, rotated_ee, free_quad);
 
@@ -201,9 +194,6 @@ namespace SI_T
         }
       }
     }
-
-    delete [] fixed_local_ien; fixed_local_ien = nullptr;
-    delete [] rotated_local_ien; rotated_local_ien = nullptr;
 
     delete [] ctrl_x; ctrl_x = nullptr;
     delete [] ctrl_y; ctrl_y = nullptr;

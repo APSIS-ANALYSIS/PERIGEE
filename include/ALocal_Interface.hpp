@@ -83,15 +83,15 @@ class ALocal_Interface
 
     // Get the current point coordinates for the case of rotation around x/y/z-axis
     virtual void get_currPts( const double * const &ept_x, const double * const &ept_y,
-      const double * const &ept_z, const double &tt,
-      double * const &currPt_x, double * const &currPt_y, double * const &currPt_z,
-      const int &type) const;
+        const double * const &ept_z, const double &tt,
+        double * const &currPt_x, double * const &currPt_y, double * const &currPt_z,
+        const int &type) const;
 
     virtual void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
-      double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
+        double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
     virtual void get_rotated_ele_ctrlPts(const int &ii, const int &tag,const int &ee, const double &tt,
-      double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
+        double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
   protected:
     // the number of interfaces

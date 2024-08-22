@@ -101,36 +101,36 @@ namespace SI_T
     public:
       SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in);
 
-      void set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-        const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi);
-
-      void get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-        int &ele_tag, int &rotated_ee, std::vector<double> &xi) const;
-
-      void search_all_opposite_point(
-        const double &curr_time,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        ALocal_Interface * const &itf_part );
-
-      void search_opposite_point(
-        const double &curr_time,
-        const Vector_3 &fixed_pt,
-        const ALocal_Interface * const &itf_part,
-        const int &itf_id,
-        FEAElement * rotated_elementv,
-        FEAElement * elements,
-        int &tag,
-        int &rotated_ee,
-        IQuadPts * const &rotated_xi );
-
       ~SI_quad_point() = default;
 
+      void set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
+          const int &ele_tag, const int &rotated_ee, const std::vector<double> &xi);
+
+      void get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
+          int &ele_tag, int &rotated_ee, std::vector<double> &xi) const;
+
+      void search_all_opposite_point(
+          const double &curr_time,
+          FEAElement * const &fixed_elementv,
+          FEAElement * const &rotated_elementv,
+          FEAElement * const &elements,
+          const IQuadPts * const &quad_s,
+          IQuadPts * const &free_quad,
+          const ALocal_Interface * const &itf_part );
+
+      void search_opposite_point(
+          const double &curr_time,
+          const Vector_3 &fixed_pt,
+          const ALocal_Interface * const &itf_part,
+          const int &itf_id,
+          FEAElement * rotated_elementv,
+          FEAElement * elements,
+          int &tag,
+          int &rotated_ee,
+          IQuadPts * const &rotated_xi );
+
     private:
-      int nqp_sur;
+      const int nqp_sur;
 
       // stores the current rotated element tag for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface)
@@ -143,7 +143,6 @@ namespace SI_T
       // stores the current rotated element xi = (r, s) for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface) x 2
       std::vector<std::vector<std::vector<double>>> curr_xi;
-
   };
 }
 
