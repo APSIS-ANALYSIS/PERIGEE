@@ -102,6 +102,14 @@ namespace Vec3
 
   inline Vector_3 gen_val(const double &val) { return Vector_3(val, val, val); }
 
+  inline Vector_3 gen_rand( const double &left =-1.0, const double &right = 1.0 )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(left, right);
+    return Vector_3( dis(gen), dis(gen), dis(gen) );
+  }
+
   // calculate the distance between two vector by L2 norm
   double dist( const Vector_3 &a, const Vector_3 &b );
 

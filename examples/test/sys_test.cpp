@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
   all.clear();
   for(int ii=0; ii<10000; ++ii)
   {
-    Tensor2_3D v = Ten2::gen_rand(-2, 2);
+    auto v = Vec3::gen_rand(-2, 2);
     VEC_T::insert_end(all, v.to_std_vector());
   }
   

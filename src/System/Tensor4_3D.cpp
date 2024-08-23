@@ -164,7 +164,8 @@ void Tensor4_3D::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 
 void Tensor4_3D::gen_Ptilde( const Tensor2_3D &invC )
 {
-  gen_zero();
+  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
+  
   add_SymmProduct(1.0, invC, invC);
   add_OutProduct( -1.0 / 3.0, invC, invC );
 }
@@ -175,11 +176,6 @@ void Tensor4_3D::gen_rand(const double &left, const double &right)
   std::mt19937_64 gen( rd() );
   std::uniform_real_distribution<double> dis(left, right);
   for(int ii=0; ii<81; ++ii) ten[ii] = dis(gen);
-}
-
-void Tensor4_3D::gen_zero()
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
 }
 
 void Tensor4_3D::scale( const double &val )
@@ -744,8 +740,7 @@ Tensor4_3D Ten4::gen_Pt( const SymmTensor2_3D &C )
 
 Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )
 {
-  Tensor4_3D out;
-  out.gen_zero();
+  Tensor4_3D out = Ten4::gen_zero();
   out.add_SymmProduct(1.0, invC, invC);
   out.add_OutProduct( -1.0 / 3.0, invC, invC );
   return out;
