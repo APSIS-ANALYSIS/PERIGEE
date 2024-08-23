@@ -36,9 +36,9 @@ class Vector_3
     Vector_3& operator= (const Vector_3 &source);
 
     // Parenthesis operator gives access to components
-    double& operator()(const int &index) {return vec[index];}
+    inline double& operator()(const int &index) {return vec[index];}
 
-    const double& operator()(const int &index) const {return vec[index];}
+    inline const double& operator()(const int &index) const {return vec[index];}
 
     // Addition and substraction operators
     friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right );
@@ -56,20 +56,20 @@ class Vector_3
 
     std::array<double, 3> to_std_array() const {return vec;}
 
-    const double& x() const {return vec[0];}
-    double& x() {return vec[0];}
+    inline const double& x() const {return vec[0];}
+    inline double& x() {return vec[0];}
 
-    const double& y() const {return vec[1];}
-    double& y() {return vec[1];}
+    inline const double& y() const {return vec[1];}
+    inline double& y() {return vec[1];}
 
-    const double& z() const {return vec[2];}
-    double& z() {return vec[2];}
+    inline const double& z() const {return vec[2];}
+    inline double& z() {return vec[2];}
 
     void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
-    void gen_zero() {vec.fill(0.0);}
+    inline void gen_zero() {vec.fill(0.0);}
 
-    void gen_val(const double &val) {vec.fill(val);}
+    inline void gen_val(const double &val) {vec.fill(val);}
 
     void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
@@ -79,9 +79,9 @@ class Vector_3
     
     void gen_e3() {vec[0]=0.0; vec[1]=0.0; vec[2]=1.0;}
 
-    double sum() const {return vec[0]+vec[1]+vec[2];}
+    inline double sum() const {return vec[0]+vec[1]+vec[2];}
 
-    double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
+    inline double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
     
     // rescale vec to be norm one and return its length
     double normalize();
