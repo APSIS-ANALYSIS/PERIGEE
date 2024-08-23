@@ -67,10 +67,6 @@ class Vector_3
 
     void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
-    inline void gen_zero() {vec.fill(0.0);}
-
-    inline void gen_val(const double &val) {vec.fill(val);}
-
     void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
     inline double sum() const {return vec[0]+vec[1]+vec[2];}
@@ -101,6 +97,10 @@ namespace Vec3
   inline Vector_3 gen_e2() { return Vector_3(0.0, 1.0, 0.0); }
     
   inline Vector_3 gen_e3() { return Vector_3(0.0, 0.0, 1.0); }
+  
+  inline Vector_3 gen_zero() { return Vector_3(0.0, 0.0, 0.0); }
+
+  inline Vector_3 gen_val(const double &val) { return Vector_3(val, val, val); }
 
   // calculate the distance between two vector by L2 norm
   double dist( const Vector_3 &a, const Vector_3 &b );
