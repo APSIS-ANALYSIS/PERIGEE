@@ -69,9 +69,10 @@ int main(int argc, char *argv[])
 
   PetscInt * idx_from = new PetscInt[4];
   idx_from[0] = 1;
-  idx_from[1] = 3;
+  idx_from[1] = -1;
   idx_from[2] = 5;
   idx_from[3] = 7;
+  VecSetOption(GG, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
   double * sca = new double [4];
   PETSc_T::Scatter(GG, idx_from, 4, sca);
 

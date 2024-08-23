@@ -193,11 +193,18 @@ void PETSc_T::Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, d
   VecScatter scatter;
   IS from, to;
   PetscInt * idx_to = new PetscInt[length]; 
+  PetscInt * temp_idx_from = new PetscInt[length];
   for(int ii=0; ii<length; ++ii)
+  {
     idx_to[ii] = ii;
+    if(idx_from[ii] >= 0)
+      temp_idx_from[ii] = idx_from[ii];
+    else
+      temp_idx_from[ii] = 0;
+  }
 
   VecCreateSeq(PETSC_COMM_SELF, length, &vv);
-  ISCreateGeneral(PETSC_COMM_SELF, length, idx_from, PETSC_COPY_VALUES, &from);
+  ISCreateGeneral(PETSC_COMM_SELF, length, temp_idx_from, PETSC_COPY_VALUES, &from);
   ISCreateGeneral(PETSC_COMM_SELF, length, idx_to, PETSC_COPY_VALUES, &to);
   VecScatterCreate(gg, from, vv, to, &scatter);
   VecScatterBegin(scatter, gg, vv, INSERT_VALUES, SCATTER_FORWARD);
@@ -206,7 +213,12 @@ void PETSc_T::Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, d
   double * array;
   VecGetArray(vv, &array);
   for(int ii=0; ii<length; ++ii)
-    values[ii] = array[ii];
+  {
+    if(idx_from[ii] >= 0)
+      values[ii] = array[ii];
+    else
+      values[ii] = 0.0;
+  }
 
   ISDestroy(&from);
   ISDestroy(&to);
@@ -214,6 +226,7 @@ void PETSc_T::Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, d
   VecDestroy(&vv);
 
   delete [] idx_to; idx_to = nullptr;
+  delete [] temp_idx_from; temp_idx_from = nullptr;
 }
 
 void PETSc_T::WriteBinary( const Vec &a, const std::string &file_name )

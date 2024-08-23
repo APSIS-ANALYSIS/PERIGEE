@@ -1,12 +1,13 @@
 #ifndef SLIDING_INTERFACE_TOOLS
 #define SLIDING_INTERFACE_TOOLS
 // ============================================================================
-// FE_Tools.hpp
+// Sliding_Interface_Tools.hpp
 // This file defines help functions for the sliding-interface technique.
 //
 // Date Created: Aug. 16 2024
 // ============================================================================
 #include "ALocal_Interface.hpp"
+#include "IPLocAssem.hpp"
 #include "FE_Tools.hpp"
 
 namespace SI_T
@@ -144,6 +145,71 @@ namespace SI_T
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface) x 2
       std::vector<std::vector<double>> curr_xi;
       std::vector<std::vector<double>> curr_eta;
+  };
+
+  // ancillary parameters for PGAssem_NS_FEM
+  class SI_ancillary
+  {
+    public:
+      SI_ancillary(
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        ALocal_Interface * const &itf_part,
+        SI_T::SI_solution * const &SI_sol,
+        SI_T::SI_quad_point * const &SI_qp )
+      {
+        A_curr_time = 0.0; A_dt = 0.0;
+        A_lassemptr = lassem_ptr;
+        A_fixed_elementv = fixed_elementv;
+        A_rotated_elementv = rotated_elementv;
+        A_elements = elements;
+        A_quad_s = quad_s;
+        A_free_quad = free_quad;
+        A_itf_part = itf_part;
+        A_SI_sol = SI_sol;
+        A_SI_qp = SI_qp;
+      }
+
+      ~SI_ancillary()
+      {
+        A_curr_time = 0.0; A_dt = 0.0;
+        A_lassemptr = nullptr;
+        A_fixed_elementv = nullptr;
+        A_rotated_elementv = nullptr;
+        A_elements = nullptr;
+        A_quad_s = nullptr;
+        A_free_quad = nullptr;
+        A_itf_part = nullptr;
+        A_SI_sol = nullptr;
+        A_SI_qp = nullptr;
+      }
+
+      double A_curr_time;
+
+      double A_dt;
+
+      IPLocAssem * A_lassemptr;
+
+      FEAElement * A_fixed_elementv;
+
+      FEAElement * A_rotated_elementv;
+
+      FEAElement * A_elements;
+
+      IQuadPts * A_quad_s;
+
+      IQuadPts * A_free_quad;
+
+      ALocal_Interface * A_itf_part;
+
+      SI_T::SI_solution * A_SI_sol;
+
+      SI_T::SI_quad_point * A_SI_qp;
+
   };
 }
 
