@@ -192,6 +192,26 @@ void Tensor4_3D::AXPY( const double &val, const Tensor4_3D &input )
   for(int ii=0; ii<81; ++ii) ten[ii] += val * input(ii);
 }
 
+void Tensor4_3D::transpose()
+{
+  std::array<double,81> temp;
+
+  for(int mm=0; mm<9; ++mm)
+  {
+    temp[   mm] = ten[9*mm];
+    temp[ 9+mm] = ten[9*mm+1];
+    temp[18+mm] = ten[9*mm+2];
+    temp[27+mm] = ten[9*mm+3];
+    temp[36+mm] = ten[9*mm+4];
+    temp[45+mm] = ten[9*mm+5];
+    temp[54+mm] = ten[9*mm+6];
+    temp[63+mm] = ten[9*mm+7];
+    temp[72+mm] = ten[9*mm+8];
+  }
+
+  for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
+}
+
 void Tensor4_3D::add_OutProduct( const double &val, const Tensor2_3D &mleft,
     const Tensor2_3D &mright )
 {

@@ -360,6 +360,10 @@ namespace Ten4
   // see Holzapfel book p. 255, eqn. (6.170).
   // ------------------------------------------------------------------------
   Tensor4_3D gen_Ptilde( const Tensor2_3D &invC );
+
+  // Generate a transpose of a rank-four tensor, refered to the equation (1.160) 
+  // in Holzapfel book, p. 23.
+  Tensor4_3D transpose( const Tensor4_3D &input );  
 }
 
 #endif
