@@ -210,7 +210,7 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
   if( mJ2 <= 1.0e-14 )
   {
     eta1 = frac13_tr; eta2 = eta1; eta3 = eta1;
-    v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
+    v1 = Vec3::gen_e1(); v2 = Vec3::gen_e2(); v3 = Vec3::gen_e3();
     return 1;
   }
   else

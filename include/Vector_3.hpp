@@ -73,12 +73,6 @@ class Vector_3
 
     void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
-    void gen_e1() {vec[0]=1.0; vec[1]=0.0; vec[2]=0.0;}
-    
-    void gen_e2() {vec[0]=0.0; vec[1]=1.0; vec[2]=0.0;}
-    
-    void gen_e3() {vec[0]=0.0; vec[1]=0.0; vec[2]=1.0;}
-
     inline double sum() const {return vec[0]+vec[1]+vec[2];}
 
     inline double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
@@ -102,6 +96,12 @@ Vector_3 operator*( const double &val, const Vector_3 &source );
 
 namespace Vec3
 {
+  inline constexpr Vector_3 gen_e1() { return Vector_3(1.0, 0.0, 0.0); }
+
+  inline constexpr Vector_3 gen_e2() { return Vector_3(0.0, 1.0, 0.0); }
+    
+  inline constexpr Vector_3 gen_e3() { return Vector_3(0.0, 0.0, 1.0); }
+
   // calculate the distance between two vector by L2 norm
   double dist( const Vector_3 &a, const Vector_3 &b );
 
