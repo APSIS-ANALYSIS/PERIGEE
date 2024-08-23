@@ -298,6 +298,18 @@ namespace Ten2
       0.0, 0.0, 0.0 );
   }
 
+  // Return a random matrix
+  inline Tensor2_3D gen_rand(double left = -1.0, double right = 1.0) 
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(left, right);
+    
+    return Tensor2_3D( dis(gen), dis(gen), dis(gen),
+        dis(gen), dis(gen), dis(gen),
+        dis(gen), dis(gen), dis(gen) );
+    }
+
   // Return the exponential of the input matrix
   // exp(X) = sum_{k=0}^{infty} 1/(k!) X^k
   // The algorithm can be found on page 749 of Computational Methods for Plasticity
