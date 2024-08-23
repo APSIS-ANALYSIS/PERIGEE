@@ -16,6 +16,7 @@
 #include "ALocal_InflowBC.hpp"
 #include "ALocal_Interface.hpp"
 #include "Sliding_Interface_Tools.hpp"
+#include "Matrix_Free_Tools.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -500,6 +501,16 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
 
+  // ===== Initialize the shell matrix =====
+  Mat shell_mat;
+  PetscInt local_row_size, local_col_size;
+  MatGetLocalSize( gloAssem_ptr->K, &local_row_size, &local_col_size );
+  
+  MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
+    PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem_ptr, &shell_mat);
+
+  MatShellSetOperation(shell_mat, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
+
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )
   {
@@ -630,10 +641,12 @@ int main(int argc, char *argv[])
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, locitf, SI_sol, SI_qp, pmat, elementv, elements, elementvs, elementvs_rotated,
-      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
+
+  MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
