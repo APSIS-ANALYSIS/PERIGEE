@@ -18,6 +18,7 @@
 // Date: July 3rd 2016
 // ============================================================================
 #include "SymmTensor2_3D.hpp"
+#include "Math_Tools.hpp"
 
 class Tensor4_3D
 {
