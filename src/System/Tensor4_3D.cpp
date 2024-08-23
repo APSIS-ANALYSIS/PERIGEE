@@ -550,7 +550,7 @@ bool Tensor4_3D::is_minor_sym( const double &tol ) const
 
 Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B )
 {
-  ASSERT( is_minor_sym(), "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
+  ASSERT( is_minor_sym() == true, "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
 
   MATH_T::Matrix_Dense<6> AA_mat;
 
