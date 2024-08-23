@@ -528,6 +528,104 @@ bool Tensor4_3D::is_minor_sym( const double &tol ) const
   return true;
 }
 
+Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B )
+{
+  ASSERT( is_minor_sym(), "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
+
+  MATH_T::Matrix_Dense<6> AA_mat;
+
+  AA_mat(0, 0) = ten[0];
+  AA_mat(0, 5) = ten[1];
+  AA_mat(0, 4) = ten[2];
+  AA_mat(0, 1) = ten[4];
+  AA_mat(0, 3) = ten[5];
+  AA_mat(0, 2) = ten[8];
+
+  AA_mat(5, 0) = ten[9];
+  AA_mat(5, 5) = ten[10];
+  AA_mat(5, 4) = ten[11];
+  AA_mat(5, 1) = ten[13];
+  AA_mat(5, 3) = ten[14];
+  AA_mat(5, 2) = ten[17];
+
+  AA_mat(4, 0) = ten[18];
+  AA_mat(4, 5) = ten[19];
+  AA_mat(4, 4) = ten[20];
+  AA_mat(4, 1) = ten[22];
+  AA_mat(4, 3) = ten[23];
+  AA_mat(4, 2) = ten[26];
+
+  AA_mat(1, 0) = ten[36];
+  AA_mat(1, 5) = ten[37];
+  AA_mat(1, 4) = ten[38];
+  AA_mat(1, 1) = ten[40];
+  AA_mat(1, 3) = ten[41];
+  AA_mat(1, 2) = ten[44];
+
+  AA_mat(3, 0) = ten[45];
+  AA_mat(3, 5) = ten[46];
+  AA_mat(3, 4) = ten[47];
+  AA_mat(3, 1) = ten[49];
+  AA_mat(3, 3) = ten[50];
+  AA_mat(3, 2) = ten[53];
+
+  AA_mat(2, 0) = ten[72];
+  AA_mat(2, 5) = ten[73];
+  AA_mat(2, 4) = ten[74];
+  AA_mat(2, 1) = ten[76];
+  AA_mat(2, 3) = ten[77];
+  AA_mat(2, 2) = ten[80];
+
+  AA_mat.LU_fac();
+
+  const auto out_array = AA_mat.LU_solve(
+    {{ B(0),
+       B(4),
+       B(8),
+       B(5),
+       B(2),
+       B(1) }} );
+
+  return Tensor2_3D( 
+          out_array[0], 
+      0.5*out_array[5], 
+      0.5*out_array[4],
+      0.5*out_array[5], 
+          out_array[1],
+      0.5*out_array[3],
+      0.5*out_array[4],
+      0.5*out_array[3],
+          out_array[2] );
+}
+
+Tensor4_3D Tensor4_3D::solve( const Tensor4_3D &BB )
+{
+  Tensor4_3D out = Ten4::gen_zero();
+
+  for( int cc=0; cc<9; ++cc )
+  {
+    const Tensor2_3D B( BB( cc ), BB( 9  + cc ), BB( 18 + cc ),
+     BB( 27 + cc ), BB( 36 + cc ), BB( 45 + cc ),
+     BB( 54 + cc ), BB( 63 + cc ), BB( 72 + cc ) );
+
+    const Tensor2_3D temp = solve( B );
+
+    out(      cc ) = temp( 0 );
+    out( 9  + cc ) = temp( 1 );
+    out( 18 + cc ) = temp( 2 );
+
+    out( 27 + cc ) = temp( 3 );
+    out( 36 + cc ) = temp( 4 );
+    out( 45 + cc ) = temp( 5 );
+
+    out( 54 + cc ) = temp( 6 );
+    out( 63 + cc ) = temp( 7 );
+    out( 72 + cc ) = temp( 8 );
+  }
+
+  return out;
+}
+
 Tensor2_3D operator*( const Tensor4_3D &input, const Tensor2_3D &aa )
 {
   Tensor2_3D out;

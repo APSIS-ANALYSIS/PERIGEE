@@ -289,6 +289,19 @@ class Tensor4_3D
     // minor symmetry: CC_ijkl = CC_ijlk and CC_ijkl = CC_jikl
     bool is_minor_sym( const double &tol = 1.0e-12 ) const;
 
+    // This function calculates AA_IJKL X_KL = B_IJ. In this function, the 
+    // rank-four tensor AA needs to satisfy the minor symmetry, and the 
+    // rank-two tensor B need to be symmetric. Then, using the Voigt notation,
+    // we calculate a matrix problem AA_6x6 X_6 = B_6. Finally, again using 
+    // Voigt notation, we map the solution X_6 into the tensor X_KL. 
+    Tensor2_3D solve( const Tensor2_3D &B );
+
+    // This function calculates AA_IJKL XX_KLMN = BB_IJMN. In this function,
+    // the rank-four tensor BB will be divided into nine rank-two tensor B,
+    // and the above function will be called to solve AA_IJKL X_KL = B_IJ.
+    // Finally, nine resulted solutions X will be assembled into solution XX.
+    Tensor4_3D solve( const Tensor4_3D &BB );
+
   private:
     double ten[81];
 };
