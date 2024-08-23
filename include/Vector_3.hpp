@@ -54,7 +54,7 @@ class Vector_3
     std::vector<double> to_std_vector() const 
     {return std::vector<double>(std::begin(vec), std::end(vec));}
 
-    std::array<double, 3> to_std_array() const {return vec;}
+    std::array<double,3> to_std_array() const {return vec;}
 
     inline const double& x() const {return vec[0];}
     inline double& x() {return vec[0];}

@@ -46,8 +46,17 @@
 
 int main(int argc, char *argv[])
 {
-  constexpr Tensor2_3D v;
-  v.print();
+  std::vector<double> all;
+
+  all.clear();
+  for(int ii=0; ii<10000; ++ii)
+  {
+    Tensor2_3D v = Ten2::gen_rand(-2, 2);
+    VEC_T::insert_end(all, v.to_std_vector());
+  }
+  
+  MATH_T::print_Histogram(all);
+
   return EXIT_SUCCESS;
 }
 

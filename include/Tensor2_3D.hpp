@@ -59,6 +59,11 @@ class Tensor2_3D
     inline const double& operator()(const int &ii, const int &jj) const
     {return mat[3*ii+jj];}
 
+    std::vector<double> to_std_vector() const
+    {return std::vector<double>(std::begin(mat), std::end(mat));}
+
+    std::array<double,9> to_std_array() const {return mat;}
+
     // Get-functions that access components directly via the get-function's name
     inline const double& xx() const {return mat[0];}
     inline double& xx() {return mat[0];}
