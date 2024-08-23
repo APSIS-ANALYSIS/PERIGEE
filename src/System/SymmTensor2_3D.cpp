@@ -255,7 +255,7 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
       v2 = (*this) * v2;
       v2 -= (frac13_tr + eta2) * temp;
 
-      temp.copy(v3);
+      temp = v3;
       v3 = (*this) * v3;
       v3 -= (frac13_tr + eta2) * temp;
 

@@ -12,10 +12,8 @@
 // Author: Ju Liu
 // Date: June 24 2020
 // ============================================================================
-#include <cstdlib>
 #include <iomanip>
 #include <iostream>
-#include <ctime>
 #include <cmath>
 #include <vector>
 #include <array>
@@ -25,18 +23,14 @@ class Vector_3
 {
   public:
     // Default constructor generates a zero vector
-    Vector_3();
+    constexpr Vector_3() : vec{{ 0.0, 0.0, 0.0}} {}
 
-    Vector_3( const Vector_3 &source );
+    Vector_3( const Vector_3 &source ) : vec(source.vec) {}
 
-    Vector_3( const double &v0, const double &v1, const double &v2 );
+    constexpr Vector_3( const double &v0, const double &v1, const double &v2 ) 
+      : vec{{ v0, v1, v2 }} {}
 
     ~Vector_3() = default;
-
-    // Copy
-    void copy( const Vector_3 &source );
-
-    void copy( const double source[3] );
 
     // Assignment operator
     Vector_3& operator= (const Vector_3 &source);
@@ -57,9 +51,10 @@ class Vector_3
 
     Vector_3& operator*=( const double &val );
 
-    std::vector<double> to_std_vec() const;
+    std::vector<double> to_std_vector() const 
+    {return std::vector<double>(std::begin(vec), std::end(vec));}
 
-    std::array<double, 3> to_std_array() const;
+    std::array<double, 3> to_std_array() const {return vec;}
 
     const double& x() const {return vec[0];}
     double& x() {return vec[0];}
@@ -70,11 +65,11 @@ class Vector_3
     const double& z() const {return vec[2];}
     double& z() {return vec[2];}
 
-    void print() const;
+    void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
-    void gen_zero();
+    void gen_zero() {vec.fill(0.0);}
 
-    void gen_val(const double &val);
+    void gen_val(const double &val) {vec.fill(val);}
 
     void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
@@ -99,7 +94,7 @@ class Vector_3
     int get_dominant_comp() const;
 
   private:
-    double vec[3];
+    std::array<double,3> vec;
 };
 
 // calculate a scalar product of a input vector
