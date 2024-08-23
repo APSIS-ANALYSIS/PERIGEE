@@ -37,9 +37,9 @@ class SymmTensor2_3D
     Tensor2_3D full() const;
 
     std::vector<double> to_std_vector() const 
-    {
-      return std::vector<double>(std::begin(mat), std::end(mat));
-    }
+    { return std::vector<double>(std::begin(mat), std::end(mat)); }
+
+    std::array<double,6> to_std_array() const {return mat;}
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
     inline double& operator()(const int &index) {return mat[index];}
