@@ -46,7 +46,7 @@
 
 int main(int argc, char *argv[])
 {
-  constexpr Vector_3 v(1,2,3);
+  constexpr Tensor2_3D v;
   v.print();
   return EXIT_SUCCESS;
 }

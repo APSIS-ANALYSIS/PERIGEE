@@ -24,37 +24,32 @@ class Tensor2_3D
 {
   public:
     // Constructor (default an identity 3-by-3 matrix)
-    Tensor2_3D() : mat{{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}} {}
+    constexpr Tensor2_3D() : mat{{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}} {}
 
     // Copy constructor
     Tensor2_3D( const Tensor2_3D &source ) : mat(source.mat) {}
 
     // Explicit Defintion of all 9 entries
-    Tensor2_3D( const double &a11, const double &a12, const double &a13,
+    constexpr Tensor2_3D( const double &a11, const double &a12, const double &a13,
         const double &a21, const double &a22, const double &a23,
         const double &a31, const double &a32, const double &a33 )
       : mat{{a11, a12, a13, a21, a22, a23, a31, a32, a33}} {}
 
     // Generate a matrix made by 3 column vectors [ vec1 | vec2 | vec3 ]
-    Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
+    constexpr Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
       : mat{{ vec1(0), vec2(0), vec3(0), vec1(1), vec2(1), vec3(1),
         vec1(2), vec2(2), vec3(2) }} {}
     
     // Destructor
     ~Tensor2_3D() = default;
 
-    // Copy
-    void copy( const Tensor2_3D &source ) {mat = source.mat;} 
-    
     // Assignment operator
     Tensor2_3D& operator= (const Tensor2_3D &source);
 
     // Parenthesis operator. It allows accessing and assigning the matrix entries.
-    inline double& operator()(const int &index) 
-    {return mat[index];}
+    inline double& operator()(const int &index) {return mat[index];}
 
-    inline const double& operator()(const int &index) const 
-    {return mat[index];}
+    inline const double& operator()(const int &index) const {return mat[index];}
 
     // Parenthesis operator. Access through row and col index: ii jj
     // Note: We do not check that ii , jj = 0, 1, 2.
@@ -112,12 +107,6 @@ class Tensor2_3D
 
     // Return true if the input matrix is identical to the mat
     bool is_identical( const Tensor2_3D &source, const double &tol = 1.0e-12 ) const;
-
-    // Set all components to zero
-    inline void gen_zero() {mat.fill(0.0);}
-
-    // Set an identity matrix
-    void gen_id() {mat = {{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0}};}
 
     // Set components a random value
     void gen_rand(const double &left = -1.0, const double &right = 1.0);
@@ -219,7 +208,7 @@ class Tensor2_3D
     double MatTContraction( const Tensor2_3D &source ) const;
 
     // print the matrix
-    void print() const;
+    void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
     // print the matrix in a row
     void print_in_row() const;
@@ -286,13 +275,28 @@ namespace Ten2
   Tensor2_3D cofactor( const Tensor2_3D &input );
 
   // Return the transpose of input matrix
-  Tensor2_3D transpose( const Tensor2_3D &input );
+  inline Tensor2_3D transpose( const Tensor2_3D &input )
+  {
+    return Tensor2_3D( input(0), input(3), input(6),
+      input(1), input(4), input(7),
+      input(2), input(5), input(8) );
+  }
 
   // Return an identity matrix
-  Tensor2_3D gen_id();
+  inline Tensor2_3D gen_id()
+  {
+    return Tensor2_3D( 1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.0, 0.0, 1.0 );
+  }
 
   // Return a zero matrix
-  Tensor2_3D gen_zero();
+  inline Tensor2_3D gen_zero()
+  {
+    return Tensor2_3D( 0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0,
+      0.0, 0.0, 0.0 );
+  }
 
   // Return the exponential of the input matrix
   // exp(X) = sum_{k=0}^{infty} 1/(k!) X^k

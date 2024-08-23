@@ -209,8 +209,8 @@ int main(int argc, char *argv[])
       t_n_pt[jj] = *(tissue_wall_normal->GetTuple3(id_tissue_closest_solid_pt) + jj);
     }
 
-    lumen_nor_vec.copy(l_n_pt);
-    tissue_nor_vec.copy(t_n_pt);
+    lumen_nor_vec = l_n_pt;
+    tissue_nor_vec = t_n_pt;
 
     lumen_nor_vec.normalize();
     tissue_nor_vec.normalize();
@@ -295,7 +295,7 @@ int main(int argc, char *argv[])
 
         spline->Evaluate(u, centerline_closest_solid_pt, du);
         Vector_3 temp(du[0],du[1],du[2]); 
-        temp_l_vec.copy(temp);
+        temp_l_vec = temp;
       }
     }
 
@@ -303,11 +303,11 @@ int main(int argc, char *argv[])
     Vector_3 loc_c_vec;
 
     // ===== Computes the circumferential direction vecters ===== 
-    loc_c_vec.copy(Vec3::cross_product(temp_l_vec, loc_r_vec));
+    loc_c_vec = Vec3::cross_product(temp_l_vec, loc_r_vec);
     loc_c_vec.normalize();
 
     // ===== Computes the correct longitudinal direction vecters ===== 
-    loc_l_vec.copy(Vec3::cross_product(loc_r_vec, loc_c_vec));
+    loc_l_vec = Vec3::cross_product(loc_r_vec, loc_c_vec);
     loc_l_vec.normalize();
 
     loc_l_vec_array->InsertTuple3(ii, loc_l_vec.x(), loc_l_vec.y(), loc_l_vec.z());
