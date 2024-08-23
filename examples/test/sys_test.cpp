@@ -46,6 +46,8 @@
 
 int main(int argc, char *argv[])
 {
+  constexpr Vector_3 v(1,2,3);
+  v.print();
   return EXIT_SUCCESS;
 }
 
