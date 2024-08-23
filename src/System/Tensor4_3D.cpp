@@ -747,4 +747,24 @@ Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )
   return out;
 }
 
+Tensor4_3D Ten4::transpose( const Tensor4_3D &input )
+{
+  std::array<double,81> temp;
+
+  for(int mm=0; mm<9; ++mm)
+  {
+    temp[   mm] = input(9*mm);
+    temp[ 9+mm] = input(9*mm+1);
+    temp[18+mm] = input(9*mm+2);
+    temp[27+mm] = input(9*mm+3);
+    temp[36+mm] = input(9*mm+4);
+    temp[45+mm] = input(9*mm+5);
+    temp[54+mm] = input(9*mm+6);
+    temp[63+mm] = input(9*mm+7);
+    temp[72+mm] = input(9*mm+8);
+  }
+
+  return Tensor4_3D(temp);
+}
+
 // EOF

@@ -156,6 +156,10 @@ class Tensor4_3D
     // ten += val * input
     void AXPY( const double &val, const Tensor4_3D &input );
 
+    // Transpose a rank-four tensor ten_ijkl to be ten_klij, refered to the 
+    // equation (1.160 ) in Holzapfel book, p.23.
+    void transpose();    
+
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
     //            ten_ijkl += val * mleft_ij  * mright_kl
