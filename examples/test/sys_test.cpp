@@ -46,14 +46,6 @@
 
 int main(int argc, char *argv[])
 {
-  SymmTensor4_3D A;
-  
-  auto B = STen4::gen_symm_id();
-
-  B -= A;
-
-  B.print();
-
   return EXIT_SUCCESS;
 }
 
