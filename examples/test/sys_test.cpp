@@ -46,7 +46,16 @@
 
 int main(int argc, char *argv[])
 {
-  auto v = Ten4::gen_rand(-3,2);
+  auto v1 = Ten4::gen_rand(-3,2);
+  
+  auto v2 = Ten4::gen_rand(-8,1.23);
+
+  auto v3 = v2;
+
+  v2 -= v1;
+
+  for(int ii=0; ii<81; ++ii)
+    std::cout<<v3(ii) - v1(ii) - v2(ii)<<'\n';
 
   return EXIT_SUCCESS;
 }
