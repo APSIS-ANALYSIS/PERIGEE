@@ -49,7 +49,10 @@ class SymmTensor4_3D
     // 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
     // with A = A^T.
     // ------------------------------------------------------------------------
-    SymmTensor4_3D() {gen_symm_id();}
+    SymmTensor4_3D() 
+    {
+      ten = {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5 }};
+    }
 
     SymmTensor4_3D( const SymmTensor4_3D &source ) : ten(source.ten) {}
 
@@ -196,18 +199,6 @@ class SymmTensor4_3D
       3, 8,  12, 15, 16, 17,
       4, 9,  13, 16, 18, 19,
       5, 10, 14, 17, 19, 20 }};
-
-    // ------------------------------------------------------------------------
-    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
-    // with A = A^T.
-    // Note: this is the derivative for symmetric 2nd-order tensor. In
-    // principle, the derivative for symmetric tensor is nonunique, since the
-    // derivative is acting on a symmetric tensor for the linearization and adding
-    // a skew-symmetric tensor will not changing the effect. Hence, we define
-    // the symmetric part of the 4th-order tensor be the derivative for the
-    // 2nd-order tensor.
-    // ------------------------------------------------------------------------
-    void gen_symm_id();
 };
 
 SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input );
@@ -218,8 +209,18 @@ namespace STen4
 {
   SymmTensor4_3D gen_zero();
 
+  // ------------------------------------------------------------------------
+  // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
+  // with A = A^T.
+  // Note: this is the derivative for symmetric 2nd-order tensor. In
+  // principle, the derivative for symmetric tensor is nonunique, since the
+  // derivative is acting on a symmetric tensor for the linearization and adding
+  // a skew-symmetric tensor will not changing the effect. Hence, we define
+  // the symmetric part of the 4th-order tensor be the derivative for the
+  // 2nd-order tensor.
+  // ------------------------------------------------------------------------
   SymmTensor4_3D gen_symm_id();
-    
+
   SymmTensor4_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
 
   // ------------------------------------------------------------------------
