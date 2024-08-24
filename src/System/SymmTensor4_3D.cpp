@@ -1,14 +1,8 @@
 #include "SymmTensor4_3D.hpp"
 
-SymmTensor4_3D::SymmTensor4_3D()
-{
-  gen_symm_id();
-}
+constexpr std::array<int,9> SymmTensor4_3D::map;
 
-SymmTensor4_3D::SymmTensor4_3D( const std::array<double,21> &source )
-{
-  for( int ii=0; ii<21; ++ii ) ten[ii] = source[ii];
-}
+constexpr std::array<int,36> SymmTensor4_3D::mapper;
 
 Tensor4_3D SymmTensor4_3D::full() const
 {
@@ -26,16 +20,6 @@ Tensor4_3D SymmTensor4_3D::full() const
     }
   }
   return out;
-}
-
-double& SymmTensor4_3D::operator()(const int &ii, const int &jj, const int &kk, const int &ll)
-{
-  return ten[ Voigt_notation(ii,jj,kk,ll) ];
-}
-
-const double& SymmTensor4_3D::operator()(const int &ii, const int &jj, const int &kk, const int &ll) const
-{
-  return ten[ Voigt_notation(ii,jj,kk,ll) ];
 }
 
 bool SymmTensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
@@ -62,60 +46,31 @@ bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &to
   return true;
 }
 
-void SymmTensor4_3D::gen_rand(const double &left, const double &right)
-{
-  std::random_device rd;
-  std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<double> dis(left, right);
-  for(int ii=0; ii<21; ++ii) ten[ii] = dis(gen);
-}
-
-void SymmTensor4_3D::gen_zero()
-{
-  for(int ii=0; ii<21; ++ii) ten[ii] = 0.0;
-}
-
-void SymmTensor4_3D::gen_symm_id()
-{
-  gen_zero();
-  ten[0] = 1.0; ten[6] = 1.0; ten[11] = 1.0;
-  ten[15] = 0.5; ten[18] = 0.5; ten[20] = 0.5;
-}
-
 SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
 {
-  if(this == &source) return *this;
-
-  for(int ii=0; ii<21; ++ii) ten[ii] = source(ii);
+  if(this != &source) ten = source.ten;
 
   return *this;
 }
 
-void SymmTensor4_3D::gen_Ptilde( const SymmTensor2_3D &invC )
+void SymmTensor4_3D::print(std::ostream& os, const std::string& delimiter) const
 {
-  gen_zero();
-  add_SymmProduct( 1.0, invC, invC );
-  add_OutProduct( -1.0/3.0, invC );
-}
-
-void SymmTensor4_3D::print() const
-{
-  std::cout<<"SymmTensor4_3D: \n";
+  os<<"SymmTensor4_3D: \n";
   for(int kk=0; kk<3; ++kk)
   {
     for(int ll=0; ll<3; ++ll)
     {
-      std::cout<<"k = "<<kk<<"\tl = "<<ll<<'\n';
+      os<<"k = "<<kk<<"\tl = "<<ll<<'\n';
       for(int ii=0; ii<3; ++ii)
       {
         for(int jj=0; jj<3; ++jj)
         {
-          std::cout<<"i = "<<ii<<'\t'<<"j = "<<jj<<'\t'
-            <<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<'\t';
+          os<<"i = "<<ii<<delimiter<<"j = "<<jj<<delimiter;
+          os<<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<delimiter;
         }
-        std::cout<<'\n';
+        os<<'\n';
       }
-      std::cout<<'\n';
+      os<<'\n';
     }
   }  
 }
@@ -160,13 +115,13 @@ SymmTensor4_3D operator-( const SymmTensor4_3D &left, const SymmTensor4_3D &righ
 
 SymmTensor4_3D& SymmTensor4_3D::operator+=( const SymmTensor4_3D &source )
 {
-  for(int ii=0; ii<21; ++ii) ten[ii] += source(ii);
+  for(int ii=0; ii<21; ++ii) ten[ii] += source.ten[ii];
   return *this;
 }
 
 SymmTensor4_3D& SymmTensor4_3D::operator-=( const SymmTensor4_3D &source )
 {
-  for(int ii=0; ii<21; ++ii) ten[ii] -= source(ii);
+  for(int ii=0; ii<21; ++ii) ten[ii] -= source.ten[ii];
   return *this;
 }
 
@@ -418,6 +373,17 @@ SymmTensor4_3D STen4::gen_zero()
 SymmTensor4_3D STen4::gen_symm_id()
 {
   constexpr std::array<double,21> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5 }};
+  return SymmTensor4_3D(temp);
+}
+
+SymmTensor4_3D STen4::gen_rand(const double &left, const double &right)
+{
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  const std::array<double,21> temp {{ dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen),
+    dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen),
+    dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen) }};
   return SymmTensor4_3D(temp);
 }
 

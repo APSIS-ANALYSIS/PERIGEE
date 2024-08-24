@@ -1,25 +1,5 @@
 #include "Tensor4_3D.hpp"
 
-Tensor4_3D::Tensor4_3D()
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
-
-  for(int aa=0; aa<3; ++aa)
-  {
-    for(int bb=0; bb<3; ++bb) ten[ 27 * aa + 9 * bb + 3 * aa + bb ] = 1.0;
-  }
-}
-
-Tensor4_3D::Tensor4_3D( const Tensor4_3D &source )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
-}
-
-Tensor4_3D::Tensor4_3D( const std::array<double,81> &source )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = source[ii];
-}
-
 bool Tensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
 {
   for(int ii=0; ii<81; ++ii)
@@ -27,38 +7,31 @@ bool Tensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
   return true;
 }
 
-void Tensor4_3D::copy( const Tensor4_3D &source )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
-}
-
 Tensor4_3D& Tensor4_3D::operator= (const Tensor4_3D &source)
 {
-  if(this == &source) return *this;
+  if(this != &source) ten = source.ten;
 
-  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
-  
   return *this;
 }
 
-void Tensor4_3D::print() const
+void Tensor4_3D::print(std::ostream &os, const std::string &delimiter) const
 {
-  std::cout<<"Tensor4_3D: \n";
+  os<<"Tensor4_3D: \n";
   for(int kk=0; kk<3; ++kk)
   {
     for(int ll=0; ll<3; ++ll)
     {
-      std::cout<<"k = "<<kk<<"\tl = "<<ll<<'\n';
+      os<<"k = "<<kk<<delimiter<<"l = "<<ll<<'\n';
       for(int ii=0; ii<3; ++ii)
       {
         for(int jj=0; jj<3; ++jj)
         {
-          std::cout<<"i = "<<ii<<'\t'<<"j = "<<jj<<'\t'
-            <<std::setprecision(6)<<ten[27*ii+9*jj+3*kk+ll]<<'\t';
+          os<<"i = "<<ii<<delimiter<<"j = "<<jj<<delimiter;
+          os<<std::left<<std::setw(12)<<std::setprecision(6)<<ten[27*ii+9*jj+3*kk+ll]<<delimiter;
         }
-        std::cout<<'\n';
+        os<<'\n';
       }
-      std::cout<<'\n';
+      os<<'\n';
     }
   }
 }
@@ -103,13 +76,13 @@ Tensor4_3D operator-( const Tensor4_3D &left, const Tensor4_3D &right)
 
 Tensor4_3D& Tensor4_3D::operator+=( const Tensor4_3D &source )
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] += source(ii);
+  for(int ii=0; ii<81; ++ii) ten[ii] += source.ten[ii];
   return *this;
 }
 
 Tensor4_3D& Tensor4_3D::operator-=( const Tensor4_3D &source )
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] -= source(ii);
+  for(int ii=0; ii<81; ++ii) ten[ii] -= source.ten[ii];
   return *this;
 }
 
@@ -121,24 +94,10 @@ Tensor4_3D& Tensor4_3D::operator*=( const double &val )
 
 void Tensor4_3D::gen_id()
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
-
+  ten.fill(0.0);
   for(int aa=0; aa<3; ++aa)
   {
     for(int bb=0; bb<3; ++bb) ten[ 27 * aa + 9 * bb + 3 * aa + bb ] = 1.0;
-  }
-}
-
-void Tensor4_3D::gen_symm_id()
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
-  for(int aa=0; aa<3; ++aa)
-  {
-    for(int bb=0; bb<3; ++bb) 
-    {
-      ten[ 27 * aa + 9 * bb + 3 * aa + bb ] += 0.5;
-      ten[ 27 * aa + 9 * bb + 3 * bb + aa ] += 0.5; 
-    }
   }
 }
 
@@ -156,30 +115,12 @@ void Tensor4_3D::gen_proj_dev()
   }
 }
 
-void Tensor4_3D::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
-{
-  gen_symm_id();
-  add_OutProduct( -1.0 / 3.0, invC, C );
-}
-
-void Tensor4_3D::gen_Ptilde( const Tensor2_3D &invC )
-{
-  gen_zero();
-  add_SymmProduct(1.0, invC, invC);
-  add_OutProduct( -1.0 / 3.0, invC, invC );
-}
-
 void Tensor4_3D::gen_rand(const double &left, const double &right)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
   std::uniform_real_distribution<double> dis(left, right);
   for(int ii=0; ii<81; ++ii) ten[ii] = dis(gen);
-}
-
-void Tensor4_3D::gen_zero()
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
 }
 
 void Tensor4_3D::scale( const double &val )
@@ -190,6 +131,26 @@ void Tensor4_3D::scale( const double &val )
 void Tensor4_3D::AXPY( const double &val, const Tensor4_3D &input )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] += val * input(ii);
+}
+
+void Tensor4_3D::transpose()
+{
+  std::array<double,81> temp;
+
+  for(int mm=0; mm<9; ++mm)
+  {
+    temp[   mm] = ten[9*mm];
+    temp[ 9+mm] = ten[9*mm+1];
+    temp[18+mm] = ten[9*mm+2];
+    temp[27+mm] = ten[9*mm+3];
+    temp[36+mm] = ten[9*mm+4];
+    temp[45+mm] = ten[9*mm+5];
+    temp[54+mm] = ten[9*mm+6];
+    temp[63+mm] = ten[9*mm+7];
+    temp[72+mm] = ten[9*mm+8];
+  }
+
+  for(int ii=0; ii<81; ++ii) ten[ii] = temp[ii];
 }
 
 void Tensor4_3D::add_OutProduct( const double &val, const Tensor2_3D &mleft,
@@ -312,7 +273,7 @@ void Tensor4_3D::MatMult_1( const Tensor2_3D &source )
 void Tensor4_3D::MatMult_2( const Tensor2_3D &source )
 {
   // 27 I + 3 K + L ranges from 0 - 8, 27 - 35, 54 - 62
-  const int index[27] { 0, 1, 2, 3, 4, 5, 6, 7, 8,
+  constexpr int index[27] { 0, 1, 2, 3, 4, 5, 6, 7, 8,
     27, 28, 29, 30, 31, 32, 33, 34, 35,
     54, 55, 56, 57, 58, 59, 60, 61, 62 };
 
@@ -334,7 +295,7 @@ void Tensor4_3D::MatMult_3( const Tensor2_3D &source )
   // 27 I + 9 J + L: ranges from [0-2], [0-2] + 9, [0-2] + 18
   // [0-2] + 27, [0-2] + 36, [0-2] + 45
   // [0-2] + 54, [0-2] + 63, [0-2] + 72
-  const int index[27] { 0, 1, 2, 9, 10, 11, 18, 19, 20,
+  constexpr int index[27] { 0, 1, 2, 9, 10, 11, 18, 19, 20,
     27, 28, 29, 36, 37, 38, 45, 46, 47,
     54, 55, 56, 63, 64, 65, 72, 73, 74 };
 
@@ -528,6 +489,118 @@ bool Tensor4_3D::is_minor_sym( const double &tol ) const
   return true;
 }
 
+Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B ) const
+{
+  ASSERT( is_minor_sym() == true, "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
+
+  MATH_T::Matrix_Dense<6> AA_mat;
+
+  AA_mat(0, 0) = ten[0];
+  AA_mat(0, 5) = ten[1];
+  AA_mat(0, 4) = ten[2];
+  AA_mat(0, 1) = ten[4];
+  AA_mat(0, 3) = ten[5];
+  AA_mat(0, 2) = ten[8];
+
+  AA_mat(5, 0) = ten[9];
+  AA_mat(5, 5) = ten[10];
+  AA_mat(5, 4) = ten[11];
+  AA_mat(5, 1) = ten[13];
+  AA_mat(5, 3) = ten[14];
+  AA_mat(5, 2) = ten[17];
+
+  AA_mat(4, 0) = ten[18];
+  AA_mat(4, 5) = ten[19];
+  AA_mat(4, 4) = ten[20];
+  AA_mat(4, 1) = ten[22];
+  AA_mat(4, 3) = ten[23];
+  AA_mat(4, 2) = ten[26];
+
+  AA_mat(1, 0) = ten[36];
+  AA_mat(1, 5) = ten[37];
+  AA_mat(1, 4) = ten[38];
+  AA_mat(1, 1) = ten[40];
+  AA_mat(1, 3) = ten[41];
+  AA_mat(1, 2) = ten[44];
+
+  AA_mat(3, 0) = ten[45];
+  AA_mat(3, 5) = ten[46];
+  AA_mat(3, 4) = ten[47];
+  AA_mat(3, 1) = ten[49];
+  AA_mat(3, 3) = ten[50];
+  AA_mat(3, 2) = ten[53];
+
+  AA_mat(2, 0) = ten[72];
+  AA_mat(2, 5) = ten[73];
+  AA_mat(2, 4) = ten[74];
+  AA_mat(2, 1) = ten[76];
+  AA_mat(2, 3) = ten[77];
+  AA_mat(2, 2) = ten[80];
+
+  AA_mat.LU_fac();
+
+  const auto out_array = AA_mat.LU_solve(
+    {{ B(0), B(4), B(8), B(5), B(2), B(1) }} );
+
+  return Tensor2_3D( 
+          out_array[0], 
+      0.5*out_array[5], 
+      0.5*out_array[4],
+      0.5*out_array[5], 
+          out_array[1],
+      0.5*out_array[3],
+      0.5*out_array[4],
+      0.5*out_array[3],
+          out_array[2] );
+}
+
+SymmTensor2_3D Tensor4_3D::solve( const SymmTensor2_3D &B ) const
+{
+  ASSERT( is_minor_sym() == true, "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
+
+  MATH_T::Matrix_Dense<6> AA_mat( std::array<double,36>{{ ten[0], ten[4], ten[8], ten[5], ten[2], ten[1],
+   ten[36], ten[40], ten[44], ten[41], ten[38], ten[37],
+   ten[72], ten[76], ten[80], ten[77], ten[74], ten[73],
+   ten[45], ten[49], ten[53], ten[50], ten[47], ten[46],
+   ten[18], ten[22], ten[26], ten[23], ten[20], ten[19],
+   ten[9], ten[13], ten[17], ten[14], ten[11], ten[10] }} );
+
+  AA_mat.LU_fac();
+
+  const auto out_array = AA_mat.LU_solve( B.to_std_array() );
+
+  return SymmTensor2_3D( out_array[0], out_array[1], out_array[2],
+      0.5*out_array[3], 0.5*out_array[4], 0.5*out_array[5] );
+}
+
+Tensor4_3D Tensor4_3D::solve( const Tensor4_3D &BB ) const
+{
+  Tensor4_3D out = Ten4::gen_zero();
+
+  for( int cc=0; cc<9; ++cc )
+  {
+    const Tensor2_3D B( BB( cc ), BB( 9  + cc ), BB( 18 + cc ),
+     BB( 27 + cc ), BB( 36 + cc ), BB( 45 + cc ),
+     BB( 54 + cc ), BB( 63 + cc ), BB( 72 + cc ) );
+
+    const Tensor2_3D temp = solve( B );
+
+    out(      cc ) = temp( 0 );
+    out( 9  + cc ) = temp( 1 );
+    out( 18 + cc ) = temp( 2 );
+
+    out( 27 + cc ) = temp( 3 );
+    out( 36 + cc ) = temp( 4 );
+    out( 45 + cc ) = temp( 5 );
+
+    out( 54 + cc ) = temp( 6 );
+    out( 63 + cc ) = temp( 7 );
+    out( 72 + cc ) = temp( 8 );
+  }
+
+  return out;
+}
+
 Tensor2_3D operator*( const Tensor4_3D &input, const Tensor2_3D &aa )
 {
   Tensor2_3D out;
@@ -579,33 +652,29 @@ Tensor4_3D operator*( const double &val, const Tensor4_3D &input )
   return out;
 }
 
-Tensor4_3D Ten4::gen_zero()
-{
-  constexpr std::array<double,81> temp{{
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-    0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 }};
-
-  return Tensor4_3D(temp);
-}
-
 Tensor4_3D Ten4::gen_symm_id()
 {
   constexpr std::array<double,81> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0 }};
   return Tensor4_3D(temp);
 }
 
+Tensor4_3D Ten4::gen_rand(const double &left, const double &right)
+{
+  Tensor4_3D output;
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  for(int ii=0; ii<81; ++ii) output(ii) = dis(gen);
+
+  return output;
+}
+
 Tensor4_3D Ten4::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 {
   Tensor4_3D out = Ten4::gen_symm_id();
   
-  out.add_OutProduct( -1.0 / 3.0, invC, C );
+  constexpr double factor = -1.0 / 3.0;
+  out.add_OutProduct( factor, invC, C );
 
   return out;
 }
@@ -619,7 +688,8 @@ Tensor4_3D Ten4::gen_P( const SymmTensor2_3D &C, const SymmTensor2_3D &invC )
 {
   Tensor4_3D out = Ten4::gen_symm_id();
   
-  out.add_OutProduct( -1.0 / 3.0, invC, C );
+  constexpr double factor = -1.0 / 3.0;
+  out.add_OutProduct( factor, invC, C );
 
   return out;
 }
@@ -642,11 +712,31 @@ Tensor4_3D Ten4::gen_Pt( const SymmTensor2_3D &C )
 
 Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )
 {
-  Tensor4_3D out;
-  out.gen_zero();
+  Tensor4_3D out = Ten4::gen_zero();
   out.add_SymmProduct(1.0, invC, invC);
-  out.add_OutProduct( -1.0 / 3.0, invC, invC );
+  constexpr double factor = -1.0 / 3.0;
+  out.add_OutProduct( factor, invC, invC );
   return out;
+}
+
+Tensor4_3D Ten4::transpose( const Tensor4_3D &input )
+{
+  std::array<double,81> temp;
+
+  for(int mm=0; mm<9; ++mm)
+  {
+    temp[   mm] = input(9*mm);
+    temp[ 9+mm] = input(9*mm+1);
+    temp[18+mm] = input(9*mm+2);
+    temp[27+mm] = input(9*mm+3);
+    temp[36+mm] = input(9*mm+4);
+    temp[45+mm] = input(9*mm+5);
+    temp[54+mm] = input(9*mm+6);
+    temp[63+mm] = input(9*mm+7);
+    temp[72+mm] = input(9*mm+8);
+  }
+
+  return Tensor4_3D(temp);
 }
 
 // EOF

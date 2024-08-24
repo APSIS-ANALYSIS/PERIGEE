@@ -58,14 +58,6 @@ bool SymmTensor2_3D::is_identical( const SymmTensor2_3D &source, const double &t
   return true;  
 }
 
-void SymmTensor2_3D::gen_rand(const double &left, const double &right)
-{
-  std::random_device rd;
-  std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<double> dis(left, right);
-  for(int ii=0; ii<6; ++ii) mat[ii] = dis(gen);
-}
-
 void SymmTensor2_3D::inverse()
 {
   const double invdetA = 1.0 / det();
@@ -210,7 +202,7 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
   if( mJ2 <= 1.0e-14 )
   {
     eta1 = frac13_tr; eta2 = eta1; eta3 = eta1;
-    v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
+    v1 = Vec3::gen_e1(); v2 = Vec3::gen_e2(); v3 = Vec3::gen_e3();
     return 1;
   }
   else
@@ -255,7 +247,7 @@ int SymmTensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
       v2 = (*this) * v2;
       v2 -= (frac13_tr + eta2) * temp;
 
-      temp.copy(v3);
+      temp = v3;
       v3 = (*this) * v3;
       v3 -= (frac13_tr + eta2) * temp;
 
@@ -445,6 +437,14 @@ SymmTensor2_3D STen2::gen_id()
 SymmTensor2_3D STen2::gen_zero()
 {
   return SymmTensor2_3D(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+}
+
+SymmTensor2_3D STen2::gen_rand(const double &left, const double &right)
+{
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  return SymmTensor2_3D( dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen) );
 }
 
 SymmTensor2_3D STen2::gen_dyad( const Vector_3 &input )

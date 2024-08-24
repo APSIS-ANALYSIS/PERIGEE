@@ -12,10 +12,8 @@
 // Author: Ju Liu
 // Date: June 24 2020
 // ============================================================================
-#include <cstdlib>
 #include <iomanip>
 #include <iostream>
-#include <ctime>
 #include <cmath>
 #include <vector>
 #include <array>
@@ -25,26 +23,22 @@ class Vector_3
 {
   public:
     // Default constructor generates a zero vector
-    Vector_3();
+    constexpr Vector_3() : vec{{ 0.0, 0.0, 0.0}} {}
 
-    Vector_3( const Vector_3 &source );
+    Vector_3( const Vector_3 &source ) : vec(source.vec) {}
 
-    Vector_3( const double &v0, const double &v1, const double &v2 );
+    constexpr Vector_3( const double &v0, const double &v1, const double &v2 ) 
+      : vec{{ v0, v1, v2 }} {}
 
     ~Vector_3() = default;
-
-    // Copy
-    void copy( const Vector_3 &source );
-
-    void copy( const double source[3] );
 
     // Assignment operator
     Vector_3& operator= (const Vector_3 &source);
 
     // Parenthesis operator gives access to components
-    double& operator()(const int &index) {return vec[index];}
+    inline double& operator()(const int &index) {return vec[index];}
 
-    const double& operator()(const int &index) const {return vec[index];}
+    inline const double& operator()(const int &index) const {return vec[index];}
 
     // Addition and substraction operators
     friend Vector_3 operator+( const Vector_3 &left, const Vector_3 &right );
@@ -57,36 +51,27 @@ class Vector_3
 
     Vector_3& operator*=( const double &val );
 
-    std::vector<double> to_std_vec() const;
+    std::vector<double> to_std_vector() const 
+    {return std::vector<double>(std::begin(vec), std::end(vec));}
 
-    std::array<double, 3> to_std_array() const;
+    std::array<double,3> to_std_array() const {return vec;}
 
-    const double& x() const {return vec[0];}
-    double& x() {return vec[0];}
+    inline const double& x() const {return vec[0];}
+    inline double& x() {return vec[0];}
 
-    const double& y() const {return vec[1];}
-    double& y() {return vec[1];}
+    inline const double& y() const {return vec[1];}
+    inline double& y() {return vec[1];}
 
-    const double& z() const {return vec[2];}
-    double& z() {return vec[2];}
+    inline const double& z() const {return vec[2];}
+    inline double& z() {return vec[2];}
 
-    void print() const;
-
-    void gen_zero();
-
-    void gen_val(const double &val);
+    void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
     void gen_rand(const double &left =-1.0, const double &right = 1.0);
 
-    void gen_e1() {vec[0]=1.0; vec[1]=0.0; vec[2]=0.0;}
-    
-    void gen_e2() {vec[0]=0.0; vec[1]=1.0; vec[2]=0.0;}
-    
-    void gen_e3() {vec[0]=0.0; vec[1]=0.0; vec[2]=1.0;}
+    inline double sum() const {return vec[0]+vec[1]+vec[2];}
 
-    double sum() const {return vec[0]+vec[1]+vec[2];}
-
-    double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
+    inline double norm2() const {return std::sqrt(vec[0]*vec[0]+vec[1]*vec[1]+vec[2]*vec[2]);}
     
     // rescale vec to be norm one and return its length
     double normalize();
@@ -99,7 +84,7 @@ class Vector_3
     int get_dominant_comp() const;
 
   private:
-    double vec[3];
+    std::array<double,3> vec;
 };
 
 // calculate a scalar product of a input vector
@@ -107,6 +92,24 @@ Vector_3 operator*( const double &val, const Vector_3 &source );
 
 namespace Vec3
 {
+  inline Vector_3 gen_e1() { return Vector_3(1.0, 0.0, 0.0); }
+
+  inline Vector_3 gen_e2() { return Vector_3(0.0, 1.0, 0.0); }
+    
+  inline Vector_3 gen_e3() { return Vector_3(0.0, 0.0, 1.0); }
+  
+  inline Vector_3 gen_zero() { return Vector_3(0.0, 0.0, 0.0); }
+
+  inline Vector_3 gen_val(const double &val) { return Vector_3(val, val, val); }
+
+  inline Vector_3 gen_rand( const double &left =-1.0, const double &right = 1.0 )
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(left, right);
+    return Vector_3( dis(gen), dis(gen), dis(gen) );
+  }
+
   // calculate the distance between two vector by L2 norm
   double dist( const Vector_3 &a, const Vector_3 &b );
 

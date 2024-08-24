@@ -88,7 +88,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     num_dir_nodes_on_inlet[ii] = dir_nodes_on_inlet[ii].size();
 
     // Calculate the centroid of the surface
-    centroid[ii].gen_zero();
+    centroid[ii] = Vec3::gen_zero();
     for(int jj=0; jj<num_node[ii]; ++jj)
     {
       centroid[ii](0) += pt_xyz[ii][3*jj+0];

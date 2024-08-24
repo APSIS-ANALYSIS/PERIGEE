@@ -249,11 +249,12 @@ void Tensor2_3D::MatMultTransposeRight( const Tensor2_3D &in )
   for(int ii=0; ii<9; ++ii) mat[ii] = temp[ii];
 }
 
-void Tensor2_3D::print() const
+void Tensor2_3D::print(std::ostream& os, const std::string& delimiter) const
 {
-  std::cout<<std::setprecision(9)<<mat[0]<<'\t'<<mat[1]<<'\t'<<mat[2]<<std::endl;
-  std::cout<<std::setprecision(9)<<mat[3]<<'\t'<<mat[4]<<'\t'<<mat[5]<<std::endl;
-  std::cout<<std::setprecision(9)<<mat[6]<<'\t'<<mat[7]<<'\t'<<mat[8]<<std::endl;
+  os << std::setprecision(12);
+  os<<mat[0]<<delimiter<<mat[1]<<delimiter<<mat[2]<<'\n';
+  os<<mat[3]<<delimiter<<mat[4]<<delimiter<<mat[5]<<'\n';
+  os<<mat[6]<<delimiter<<mat[7]<<delimiter<<mat[8]<<std::endl;
 }
 
 void Tensor2_3D::print_in_row() const
@@ -393,7 +394,7 @@ int Tensor2_3D::eigen_decomp( double &eta1, double &eta2, double &eta3,
   if( mJ2 <= 1.0e-14 )
   {
     eta1 = frac13_tr; eta2 = eta1; eta3 = eta1;
-    v1.gen_e1(); v2.gen_e2(); v3.gen_e3();
+    v1 = Vec3::gen_e1(); v2 = Vec3::gen_e2(); v3 = Vec3::gen_e3();
     return 1;
   }
   else
@@ -522,27 +523,6 @@ Tensor2_3D Ten2::cofactor( const Tensor2_3D &input )
       (input(1) * input(5) - input(2) * input(4)),
       (input(2) * input(3) - input(0) * input(5)),
       (input(0) * input(4) - input(1) * input(3)) );
-}
-
-Tensor2_3D Ten2::transpose( const Tensor2_3D &input )
-{
-  return Tensor2_3D( input(0), input(3), input(6),
-      input(1), input(4), input(7),
-      input(2), input(5), input(8) );
-}
-
-Tensor2_3D Ten2::gen_id()
-{
-  return Tensor2_3D( 1.0, 0.0, 0.0,
-      0.0, 1.0, 0.0,
-      0.0, 0.0, 1.0 );
-}
-
-Tensor2_3D Ten2::gen_zero()
-{
-  return Tensor2_3D( 0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0,
-      0.0, 0.0, 0.0 );
 }
 
 Tensor2_3D Ten2::exp( const Tensor2_3D &input )

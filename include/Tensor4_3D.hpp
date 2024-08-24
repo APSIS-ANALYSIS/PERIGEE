@@ -18,6 +18,7 @@
 // Date: July 3rd 2016
 // ============================================================================
 #include "SymmTensor2_3D.hpp"
+#include "Math_Tools.hpp"
 
 class Tensor4_3D
 {
@@ -29,12 +30,12 @@ class Tensor4_3D
     // The intuition is that the A_{ijkl} b_{kl} = b_{ij}
     // This definition also comes from Holzapfel book, pp 23.
     // ------------------------------------------------------------------------
-    Tensor4_3D();
+    Tensor4_3D() { gen_id(); }
 
     // Copy constructor
-    Tensor4_3D( const Tensor4_3D &source );
+    Tensor4_3D( const Tensor4_3D &source ) : ten(source.ten) {}
 
-    Tensor4_3D( const std::array<double, 81> &source );
+    Tensor4_3D( const std::array<double, 81> &source ) : ten(source) {}
 
     // Destructor
     ~Tensor4_3D() = default;
@@ -43,20 +44,25 @@ class Tensor4_3D
     Tensor4_3D& operator= (const Tensor4_3D &source);
 
     // Parenthesis operator: access through single index with 0 <= index < 81
-    double& operator()(const int &index) {return ten[index];}
+    inline double& operator()(const int &index) {return ten[index];}
 
-    const double& operator()(const int &index) const {return ten[index];}
+    inline const double& operator()(const int &index) const {return ten[index];}
 
     // Parenthesis operator: access through ii jj kk ll component index
-    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll)
+    inline double& operator()(const int &ii, const int &jj, const int &kk, const int &ll)
     {return ten[27 * ii + 9 * jj + 3 * kk + ll];}
 
-    const double& operator()(const int &ii, const int &jj, const int &kk, 
+    inline const double& operator()(const int &ii, const int &jj, const int &kk, 
         const int &ll) const {return ten[27 * ii + 9 * jj + 3 * kk + ll];}
+
+    inline std::vector<double> to_std_vector() const
+    {return std::vector<double>(std::begin(ten), std::end(ten));}
+
+    inline std::array<double,81> to_std_array() const {return ten;}
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
 
-    void print() const;
+    void print(std::ostream &os = std::cout, const std::string &delimiter = "\t") const;
 
     // ------------------------------------------------------------------------
     // print the fourth-order tensor in the following matrix form:
@@ -75,9 +81,6 @@ class Tensor4_3D
     //                  j2  k0 k1 k2  k0 k1 k2  k0 k1 k2  ]
     // ------------------------------------------------------------------------
     void print_in_mat() const;
-
-    // Copy operator
-    void copy( const Tensor4_3D &source );
 
     // Addition operator : return left + right
     friend Tensor4_3D operator+( const Tensor4_3D &left, const Tensor4_3D &right);
@@ -101,18 +104,6 @@ class Tensor4_3D
     void gen_id();
 
     // ------------------------------------------------------------------------
-    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
-    // with A = A^T.
-    // Note: this is the derivative for symmetric 2nd-order tensor. In
-    // principle, the derivative for symmetric tensor is nonunique, since the
-    // derivative is acting on a symmetric tensor for the linearization and adding
-    // a skew-symmetric tensor will not changing the effect. Hence, we define
-    // the symmetric part of the 4th-order tensor be the derivative for the
-    // 2nd-order tensor.
-    // ------------------------------------------------------------------------
-    void gen_symm_id();
-
-    // ------------------------------------------------------------------------
     // Generate devaitoric projector
     // P_dev = Id4 - id2 corss id2 = delta_ik delta_jl - 1/3 delta_ij delta_kl
     // Holzapfel book, p. 24.
@@ -120,32 +111,9 @@ class Tensor4_3D
     void gen_proj_dev();
 
     // ------------------------------------------------------------------------
-    // Generate Projector P = SymmId4 - 1/3 invC x C
-    // P_IJKL = SymmID_IJKL - 1/3 invC_IJ C_KL
-    // C is assumed to be the right Cauchy-Green tensor
-    // invC is the inverse of C
-    // see Holzapfel book p.229 eqn. (6.84).
-    // ------------------------------------------------------------------------
-    void gen_P( const Tensor2_3D &C, const Tensor2_3D &invC );
-
-    void gen_P( const Tensor2_3D &C ) { gen_P( C, Ten2::inverse(C) ); }
-
-    // ------------------------------------------------------------------------
-    // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
-    // invC is assumed to be the right Cauchy-Green tensor 
-    // see Holzapfel book p. 255, eqn. (6.170).
-    // ------------------------------------------------------------------------
-    void gen_Ptilde( const Tensor2_3D &invC );
-
-    // ------------------------------------------------------------------------
     // generate a random 4th-order tensor (mainly used for debuggin)
     // ------------------------------------------------------------------------
     void gen_rand(const double &left = -1.0, const double &right = 1.0);
-
-    // ------------------------------------------------------------------------
-    // generate a zero 4th-order tensor
-    // ------------------------------------------------------------------------
-    void gen_zero();
 
     // ------------------------------------------------------------------------
     // Tensor algebraic manipulations: 
@@ -155,6 +123,10 @@ class Tensor4_3D
 
     // ten += val * input
     void AXPY( const double &val, const Tensor4_3D &input );
+
+    // Transpose a rank-four tensor ten_ijkl to be ten_klij, refered to the 
+    // equation (1.160 ) in Holzapfel book, p.23.
+    void transpose();    
 
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
@@ -174,7 +146,8 @@ class Tensor4_3D
     // stretch-based models, such as the Ogden model.
     // See, Holzapfel book p. 257. 
     // ------------------------------------------------------------------------
-    void add_OutProduct( const double &val, const Vector_3 &vec1, const Vector_3 &vec2,
+    void add_OutProduct( const double &val,
+        const Vector_3 &vec1, const Vector_3 &vec2,
         const Vector_3 &vec3, const Vector_3 &vec4 );
 
     // ------------------------------------------------------------------------
@@ -289,8 +262,27 @@ class Tensor4_3D
     // minor symmetry: CC_ijkl = CC_ijlk and CC_ijkl = CC_jikl
     bool is_minor_sym( const double &tol = 1.0e-12 ) const;
 
+    // ------------------------------------------------------------------------
+    // This function calculates AA_IJKL X_KL = B_IJ. In this function, the 
+    // rank-four tensor AA needs to satisfy the minor symmetry, and the 
+    // rank-two tensor B need to be symmetric. Then, using the Voigt notation,
+    // we calculate a matrix problem AA_6x6 X_6 = B_6, and we then map the 
+    // solution X_6 into the tensor X_KL. 
+    // ------------------------------------------------------------------------
+    Tensor2_3D solve( const Tensor2_3D &B ) const;
+    
+    SymmTensor2_3D solve( const SymmTensor2_3D &B ) const;
+
+    // ------------------------------------------------------------------------
+    // This function calculates AA_IJKL XX_KLMN = BB_IJMN. In this function,
+    // the rank-four tensor BB will be divided into nine rank-two tensor B,
+    // and the above function will be called to solve AA_IJKL X_KL = B_IJ.
+    // The nine solutions X will be put together to form the solution XX.
+    // ------------------------------------------------------------------------
+    Tensor4_3D solve( const Tensor4_3D &BB ) const;
+
   private:
-    double ten[81];
+    std::array<double,81> ten;
 };
 
 // Right contraction: return ten_ijkl source_kl
@@ -307,9 +299,29 @@ Tensor4_3D operator*( const double &val, const Tensor4_3D &input );
 
 namespace Ten4
 {
-  Tensor4_3D gen_zero();
+  inline Tensor4_3D gen_zero()
+  {
+    std::array<double,81> out {};
+    out.fill(0.0);
+    return Tensor4_3D(out);
+  }
 
+  // ------------------------------------------------------------------------
+  // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
+  // with A = A^T.
+  // Note: this is the derivative for symmetric 2nd-order tensor. In
+  // principle, the derivative for symmetric tensor is nonunique, since the
+  // derivative is acting on a symmetric tensor for the linearization and adding
+  // a skew-symmetric tensor will not changing the effect. Hence, we define
+  // the symmetric part of the 4th-order tensor be the derivative for the
+  // 2nd-order tensor.
+  // ------------------------------------------------------------------------
   Tensor4_3D gen_symm_id();
+    
+  // ------------------------------------------------------------------------
+  // generate a random 4th-order tensor (mainly used for debuggin)
+  // ------------------------------------------------------------------------
+  Tensor4_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
 
   // ------------------------------------------------------------------------
   // Generate Projector P = SymmId4 - 1/3 invC x C
@@ -343,6 +355,12 @@ namespace Ten4
   // see Holzapfel book p. 255, eqn. (6.170).
   // ------------------------------------------------------------------------
   Tensor4_3D gen_Ptilde( const Tensor2_3D &invC );
+
+  // ------------------------------------------------------------------------
+  // Generate a transpose of a rank-four tensor, refered to the equation (1.160) 
+  // in Holzapfel book, p. 23.
+  // ------------------------------------------------------------------------
+  Tensor4_3D transpose( const Tensor4_3D &input );  
 }
 
 #endif

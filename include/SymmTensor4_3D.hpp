@@ -39,7 +39,6 @@
 // Date: Aug. 3rd 2023
 // ============================================================================
 #include "Tensor4_3D.hpp"
-#include "SymmTensor2_3D.hpp"
 
 class SymmTensor4_3D
 {
@@ -50,9 +49,14 @@ class SymmTensor4_3D
     // 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
     // with A = A^T.
     // ------------------------------------------------------------------------
-    SymmTensor4_3D();
+    SymmTensor4_3D() 
+    {
+      ten = {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5 }};
+    }
 
-    SymmTensor4_3D( const std::array<double,21> &source );
+    SymmTensor4_3D( const SymmTensor4_3D &source ) : ten(source.ten) {}
+
+    SymmTensor4_3D( const std::array<double,21> &source ) : ten(source) {}
 
     ~SymmTensor4_3D() = default;
 
@@ -62,21 +66,29 @@ class SymmTensor4_3D
     // Assignment operator
     SymmTensor4_3D& operator= (const SymmTensor4_3D &source);
 
-    // Parenthesis operator: access through single index with 0 <= index < 21
-    double& operator()(const int &index) {return ten[index];}
+    // Convert to STL container
+    inline std::vector<double> to_std_vector() const
+    { return std::vector<double>(std::begin(ten), std::end(ten)); }
 
-    const double& operator()(const int &index) const {return ten[index];}
+    inline std::array<double,21> to_std_array() const {return ten;}
+
+    // Parenthesis operator: access through single index with 0 <= index < 21
+    inline double& operator()(const int &index) {return ten[index];}
+
+    inline const double& operator()(const int &index) const {return ten[index];}
 
     // Parenthesis operator: access through 0 <= ii jj kk ll < 3 component index
-    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll);
+    inline double& operator()(const int &ii, const int &jj, const int &kk, const int &ll)
+    {return ten[ Voigt_notation(ii,jj,kk,ll) ];}
 
-    const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const; 
+    inline const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const
+    {return ten[ Voigt_notation(ii,jj,kk,ll) ];} 
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
     
     bool is_identical(const SymmTensor4_3D &source, const double &tol = 1.0e-12) const;
 
-    void print() const;
+    void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
     void print_in_mat() const;
 
@@ -94,30 +106,6 @@ class SymmTensor4_3D
 
     // Scalar multiplication
     SymmTensor4_3D& operator*=( const double &val );
-
-    void gen_rand(const double &left = -1.0, const double &right = 1.0);
-
-    void gen_zero();
-    
-    // ------------------------------------------------------------------------
-    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
-    // with A = A^T.
-    // Note: this is the derivative for symmetric 2nd-order tensor. In
-    // principle, the derivative for symmetric tensor is nonunique, since the
-    // derivative is acting on a symmetric tensor for the linearization and adding
-    // a skew-symmetric tensor will not changing the effect. Hence, we define
-    // the symmetric part of the 4th-order tensor be the derivative for the
-    // 2nd-order tensor.
-    // ------------------------------------------------------------------------
-    void gen_symm_id();
-
-    // ------------------------------------------------------------------------
-    // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
-    // here, invC is assumed to be the right Cauchy-Green tensor
-    // O represents a SymmProduct and x represents an outproduct 
-    // see Holzapfel book p. 255, eqn. (6.170).
-    // ------------------------------------------------------------------------
-    void gen_Ptilde( const SymmTensor2_3D &invC );
 
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
@@ -194,26 +182,23 @@ class SymmTensor4_3D
     // major symmetry requires ij_kl / ij_lk / ji_kl / ji_lk: 6x6 -> 21,
     // for more information, check the diagram above.
     // ------------------------------------------------------------------------
-    int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
+    inline int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
     {
-      // This map is used to transform the natural indices of a 3x3 symmetric matrix
-      // to Voigt notation
-      constexpr int map[9] = { 0, 5, 4, 
-        5, 1, 3, 
-        4, 3, 2 };
-
-      constexpr int mapper[36] = { 0, 1,  2,  3,  4,  5,
-        1, 6,  7,  8,  9,  10,
-        2, 7,  11, 12, 13, 14,
-        3, 8,  12, 15, 16, 17,
-        4, 9,  13, 16, 18, 19,
-        5, 10, 14, 17, 19, 20 };
-
       return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
     }
 
   private:
-    double ten[21];
+    std::array<double,21> ten;
+    
+    // Define the Voigt mapping 
+    static constexpr std::array<int,9> map {{ 0, 5, 4, 5, 1, 3, 4, 3, 2 }};
+
+    static constexpr std::array<int,36> mapper {{ 0, 1,  2,  3,  4,  5,
+      1, 6,  7,  8,  9,  10,
+      2, 7,  11, 12, 13, 14,
+      3, 8,  12, 15, 16, 17,
+      4, 9,  13, 16, 18, 19,
+      5, 10, 14, 17, 19, 20 }};
 };
 
 SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input );
@@ -224,8 +209,26 @@ namespace STen4
 {
   SymmTensor4_3D gen_zero();
 
+  // ------------------------------------------------------------------------
+  // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
+  // with A = A^T.
+  // Note: this is the derivative for symmetric 2nd-order tensor. In
+  // principle, the derivative for symmetric tensor is nonunique, since the
+  // derivative is acting on a symmetric tensor for the linearization and adding
+  // a skew-symmetric tensor will not changing the effect. Hence, we define
+  // the symmetric part of the 4th-order tensor be the derivative for the
+  // 2nd-order tensor.
+  // ------------------------------------------------------------------------
   SymmTensor4_3D gen_symm_id();
 
+  SymmTensor4_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
+
+  // ------------------------------------------------------------------------
+  // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
+  // here, invC is assumed to be the right Cauchy-Green tensor
+  // O represents a SymmProduct and x represents an outproduct 
+  // see Holzapfel book p. 255, eqn. (6.170).
+  // ------------------------------------------------------------------------
   SymmTensor4_3D gen_Ptilde( const SymmTensor2_3D &invC );
 }
 
