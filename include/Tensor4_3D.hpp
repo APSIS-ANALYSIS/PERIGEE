@@ -55,6 +55,11 @@ class Tensor4_3D
     const double& operator()(const int &ii, const int &jj, const int &kk, 
         const int &ll) const {return ten[27 * ii + 9 * jj + 3 * kk + ll];}
 
+    std::vector<double> to_std_vector() const
+    {return std::vector<double>(std::begin(ten), std::end(ten));}
+
+    std::array<double,81> to_std_array() const {return ten;}
+
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
 
     void print(std::ostream &os = std::cout, const std::string &delimiter = "\t") const;
@@ -292,7 +297,12 @@ Tensor4_3D operator*( const double &val, const Tensor4_3D &input );
 
 namespace Ten4
 {
-  Tensor4_3D gen_zero();
+  inline Tensor4_3D gen_zero()
+  {
+    std::array<double,81> out {};
+    out.fill(0.0);
+    return Tensor4_3D(out);
+  }
 
   // ------------------------------------------------------------------------
   // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
@@ -305,6 +315,11 @@ namespace Ten4
   // 2nd-order tensor.
   // ------------------------------------------------------------------------
   Tensor4_3D gen_symm_id();
+    
+  // ------------------------------------------------------------------------
+  // generate a random 4th-order tensor (mainly used for debuggin)
+  // ------------------------------------------------------------------------
+  Tensor4_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
 
   // ------------------------------------------------------------------------
   // Generate Projector P = SymmId4 - 1/3 invC x C

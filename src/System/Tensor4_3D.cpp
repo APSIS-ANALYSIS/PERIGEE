@@ -638,6 +638,17 @@ Tensor4_3D Ten4::gen_symm_id()
   return Tensor4_3D(temp);
 }
 
+Tensor4_3D Ten4::gen_rand(const double &left, const double &right)
+{
+  Tensor4_3D output;
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  for(int ii=0; ii<81; ++ii) output(ii) = dis(gen);
+
+  return output;
+}
+
 Tensor4_3D Ten4::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 {
   Tensor4_3D out = Ten4::gen_symm_id();

@@ -51,11 +51,13 @@ int main(int argc, char *argv[])
   all.clear();
   for(int ii=0; ii<10000; ++ii)
   {
-    auto v = Vec3::gen_rand(-2, 2);
+    auto v = Ten4::gen_rand(-1, 3);
     VEC_T::insert_end(all, v.to_std_vector());
   }
   
   MATH_T::print_Histogram(all);
+
+  std::cout<<all.size()<<'\n';
 
   return EXIT_SUCCESS;
 }
