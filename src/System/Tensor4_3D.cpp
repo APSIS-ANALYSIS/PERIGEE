@@ -2,22 +2,12 @@
 
 Tensor4_3D::Tensor4_3D()
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
+  ten.fill(0.0);
 
   for(int aa=0; aa<3; ++aa)
   {
     for(int bb=0; bb<3; ++bb) ten[ 27 * aa + 9 * bb + 3 * aa + bb ] = 1.0;
   }
-}
-
-Tensor4_3D::Tensor4_3D( const Tensor4_3D &source )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
-}
-
-Tensor4_3D::Tensor4_3D( const std::array<double,81> &source )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = source[ii];
 }
 
 bool Tensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
@@ -27,17 +17,10 @@ bool Tensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
   return true;
 }
 
-void Tensor4_3D::copy( const Tensor4_3D &source )
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
-}
-
 Tensor4_3D& Tensor4_3D::operator= (const Tensor4_3D &source)
 {
-  if(this == &source) return *this;
+  if(this != &source) ten = source.ten;
 
-  for(int ii=0; ii<81; ++ii) ten[ii] = source(ii);
-  
   return *this;
 }
 
@@ -103,13 +86,13 @@ Tensor4_3D operator-( const Tensor4_3D &left, const Tensor4_3D &right)
 
 Tensor4_3D& Tensor4_3D::operator+=( const Tensor4_3D &source )
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] += source(ii);
+  std::transform(ten.begin(), ten.end(), source.ten.begin(), ten.begin(), std::plus<double>());
   return *this;
 }
 
 Tensor4_3D& Tensor4_3D::operator-=( const Tensor4_3D &source )
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] -= source(ii);
+  std::transform(ten.begin(), ten.end(), source.ten.begin(), ten.begin(), std::minus<double>());
   return *this;
 }
 
@@ -159,15 +142,17 @@ void Tensor4_3D::gen_proj_dev()
 void Tensor4_3D::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 {
   gen_symm_id();
-  add_OutProduct( -1.0 / 3.0, invC, C );
+  constexpr double factor = -1.0 / 3.0;
+  add_OutProduct( factor, invC, C );
 }
 
 void Tensor4_3D::gen_Ptilde( const Tensor2_3D &invC )
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
-  
+  ten.fill(0.0);
+
   add_SymmProduct(1.0, invC, invC);
-  add_OutProduct( -1.0 / 3.0, invC, invC );
+  constexpr double factor = -1.0 / 3.0;
+  add_OutProduct( factor, invC, invC );
 }
 
 void Tensor4_3D::gen_rand(const double &left, const double &right)
@@ -328,7 +313,7 @@ void Tensor4_3D::MatMult_1( const Tensor2_3D &source )
 void Tensor4_3D::MatMult_2( const Tensor2_3D &source )
 {
   // 27 I + 3 K + L ranges from 0 - 8, 27 - 35, 54 - 62
-  const int index[27] { 0, 1, 2, 3, 4, 5, 6, 7, 8,
+  constexpr int index[27] { 0, 1, 2, 3, 4, 5, 6, 7, 8,
     27, 28, 29, 30, 31, 32, 33, 34, 35,
     54, 55, 56, 57, 58, 59, 60, 61, 62 };
 
@@ -350,7 +335,7 @@ void Tensor4_3D::MatMult_3( const Tensor2_3D &source )
   // 27 I + 9 J + L: ranges from [0-2], [0-2] + 9, [0-2] + 18
   // [0-2] + 27, [0-2] + 36, [0-2] + 45
   // [0-2] + 54, [0-2] + 63, [0-2] + 72
-  const int index[27] { 0, 1, 2, 9, 10, 11, 18, 19, 20,
+  constexpr int index[27] { 0, 1, 2, 9, 10, 11, 18, 19, 20,
     27, 28, 29, 36, 37, 38, 45, 46, 47,
     54, 55, 56, 63, 64, 65, 72, 73, 74 };
 
@@ -595,12 +580,7 @@ Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B )
   AA_mat.LU_fac();
 
   const auto out_array = AA_mat.LU_solve(
-    {{ B(0),
-       B(4),
-       B(8),
-       B(5),
-       B(2),
-       B(1) }} );
+    {{ B(0), B(4), B(8), B(5), B(2), B(1) }} );
 
   return Tensor2_3D( 
           out_array[0], 
@@ -703,7 +683,8 @@ Tensor4_3D Ten4::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
 {
   Tensor4_3D out = Ten4::gen_symm_id();
   
-  out.add_OutProduct( -1.0 / 3.0, invC, C );
+  constexpr double factor = -1.0 / 3.0;
+  out.add_OutProduct( factor, invC, C );
 
   return out;
 }
@@ -717,7 +698,8 @@ Tensor4_3D Ten4::gen_P( const SymmTensor2_3D &C, const SymmTensor2_3D &invC )
 {
   Tensor4_3D out = Ten4::gen_symm_id();
   
-  out.add_OutProduct( -1.0 / 3.0, invC, C );
+  constexpr double factor = -1.0 / 3.0;
+  out.add_OutProduct( factor, invC, C );
 
   return out;
 }
@@ -742,7 +724,8 @@ Tensor4_3D Ten4::gen_Ptilde( const Tensor2_3D &invC )
 {
   Tensor4_3D out = Ten4::gen_zero();
   out.add_SymmProduct(1.0, invC, invC);
-  out.add_OutProduct( -1.0 / 3.0, invC, invC );
+  constexpr double factor = -1.0 / 3.0;
+  out.add_OutProduct( factor, invC, invC );
   return out;
 }
 

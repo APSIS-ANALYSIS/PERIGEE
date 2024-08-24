@@ -33,9 +33,9 @@ class Tensor4_3D
     Tensor4_3D();
 
     // Copy constructor
-    Tensor4_3D( const Tensor4_3D &source );
+    Tensor4_3D( const Tensor4_3D &source ) : ten(source.ten) {}
 
-    Tensor4_3D( const std::array<double, 81> &source );
+    Tensor4_3D( const std::array<double, 81> &source ) ten(source) {}
 
     // Destructor
     ~Tensor4_3D() = default;
@@ -76,9 +76,6 @@ class Tensor4_3D
     //                  j2  k0 k1 k2  k0 k1 k2  k0 k1 k2  ]
     // ------------------------------------------------------------------------
     void print_in_mat() const;
-
-    // Copy operator
-    void copy( const Tensor4_3D &source );
 
     // Addition operator : return left + right
     friend Tensor4_3D operator+( const Tensor4_3D &left, const Tensor4_3D &right);
