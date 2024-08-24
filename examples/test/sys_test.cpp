@@ -46,6 +46,28 @@
 
 int main(int argc, char *argv[])
 {
+  // Set number of threads and  print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
+  std::vector<int> a {};
+
+  PERIGEE_OMP_PARALLEL
+  {
+    std::vector<int> temp {};
+    
+    PERIGEE_OMP_FOR 
+    for(int ii=0; ii<81; ++ii)
+    {
+      if(ii % 3 == 0) temp.push_back(ii);
+    }
+  
+    PERIGEE_OMP_CRITICAL
+    VEC_T::insert_end(a, temp);
+  }
+  
+  VEC_T::print(a);
+
   return EXIT_SUCCESS;
 }
 

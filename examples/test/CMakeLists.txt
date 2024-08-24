@@ -162,4 +162,12 @@ ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 
+if(OPENMP_CXX_FOUND)
+  SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( sys_test PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( sys_test PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_LINK_LIBRARIES( perigee_preprocess ${OpenMP_CXX_LIBRARIES} )
+endif()
+
 # EOF
