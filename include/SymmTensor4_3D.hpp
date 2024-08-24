@@ -96,30 +96,6 @@ class SymmTensor4_3D
     // Scalar multiplication
     SymmTensor4_3D& operator*=( const double &val );
 
-    void gen_rand(const double &left = -1.0, const double &right = 1.0);
-
-    void gen_zero();
-    
-    // ------------------------------------------------------------------------
-    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
-    // with A = A^T.
-    // Note: this is the derivative for symmetric 2nd-order tensor. In
-    // principle, the derivative for symmetric tensor is nonunique, since the
-    // derivative is acting on a symmetric tensor for the linearization and adding
-    // a skew-symmetric tensor will not changing the effect. Hence, we define
-    // the symmetric part of the 4th-order tensor be the derivative for the
-    // 2nd-order tensor.
-    // ------------------------------------------------------------------------
-    void gen_symm_id();
-
-    // ------------------------------------------------------------------------
-    // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
-    // here, invC is assumed to be the right Cauchy-Green tensor
-    // O represents a SymmProduct and x represents an outproduct 
-    // see Holzapfel book p. 255, eqn. (6.170).
-    // ------------------------------------------------------------------------
-    void gen_Ptilde( const SymmTensor2_3D &invC );
-
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
     //            ten_ijkl += val * mmat_ij  * mmat_kl
@@ -215,6 +191,18 @@ class SymmTensor4_3D
 
   private:
     std::array<double,21> ten;
+    
+    // ------------------------------------------------------------------------
+    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
+    // with A = A^T.
+    // Note: this is the derivative for symmetric 2nd-order tensor. In
+    // principle, the derivative for symmetric tensor is nonunique, since the
+    // derivative is acting on a symmetric tensor for the linearization and adding
+    // a skew-symmetric tensor will not changing the effect. Hence, we define
+    // the symmetric part of the 4th-order tensor be the derivative for the
+    // 2nd-order tensor.
+    // ------------------------------------------------------------------------
+    void gen_symm_id();
 };
 
 SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input );
@@ -226,7 +214,15 @@ namespace STen4
   SymmTensor4_3D gen_zero();
 
   SymmTensor4_3D gen_symm_id();
+    
+  SymmTensor4_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
 
+  // ------------------------------------------------------------------------
+  // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
+  // here, invC is assumed to be the right Cauchy-Green tensor
+  // O represents a SymmProduct and x represents an outproduct 
+  // see Holzapfel book p. 255, eqn. (6.170).
+  // ------------------------------------------------------------------------
   SymmTensor4_3D gen_Ptilde( const SymmTensor2_3D &invC );
 }
 

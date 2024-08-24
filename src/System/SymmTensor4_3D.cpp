@@ -52,19 +52,6 @@ bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &to
   return true;
 }
 
-void SymmTensor4_3D::gen_rand(const double &left, const double &right)
-{
-  std::random_device rd;
-  std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<double> dis(left, right);
-  for(int ii=0; ii<21; ++ii) ten[ii] = dis(gen);
-}
-
-void SymmTensor4_3D::gen_zero()
-{
-  for(int ii=0; ii<21; ++ii) ten[ii] = 0.0;
-}
-
 void SymmTensor4_3D::gen_symm_id()
 {
   gen_zero();
@@ -79,13 +66,6 @@ SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
   for(int ii=0; ii<21; ++ii) ten[ii] = source(ii);
 
   return *this;
-}
-
-void SymmTensor4_3D::gen_Ptilde( const SymmTensor2_3D &invC )
-{
-  gen_zero();
-  add_SymmProduct( 1.0, invC, invC );
-  add_OutProduct( -1.0/3.0, invC );
 }
 
 void SymmTensor4_3D::print() const
@@ -150,13 +130,13 @@ SymmTensor4_3D operator-( const SymmTensor4_3D &left, const SymmTensor4_3D &righ
 
 SymmTensor4_3D& SymmTensor4_3D::operator+=( const SymmTensor4_3D &source )
 {
-  for(int ii=0; ii<21; ++ii) ten[ii] += source(ii);
+  for(int ii=0; ii<21; ++ii) ten[ii] += source.ten[ii];
   return *this;
 }
 
 SymmTensor4_3D& SymmTensor4_3D::operator-=( const SymmTensor4_3D &source )
 {
-  for(int ii=0; ii<21; ++ii) ten[ii] -= source(ii);
+  for(int ii=0; ii<21; ++ii) ten[ii] -= source.ten[ii];
   return *this;
 }
 
@@ -408,6 +388,17 @@ SymmTensor4_3D STen4::gen_zero()
 SymmTensor4_3D STen4::gen_symm_id()
 {
   constexpr std::array<double,21> temp {{ 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.5, 0.0, 0.0, 0.5, 0.0, 0.5 }};
+  return SymmTensor4_3D(temp);
+}
+
+SymmTensor4_3D STen4::gen_rand(const double &left, const double &right)
+{
+  std::random_device rd;
+  std::mt19937_64 gen( rd() );
+  std::uniform_real_distribution<double> dis(left, right);
+  const std::array<double,21> temp {{ dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen),
+    dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen),
+    dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen) }};
   return SymmTensor4_3D(temp);
 }
 
