@@ -14,24 +14,23 @@ Tensor4_3D& Tensor4_3D::operator= (const Tensor4_3D &source)
   return *this;
 }
 
-void Tensor4_3D::print() const
+void Tensor4_3D::print(std::ostream &os, const std::string &delimiter) const
 {
-  std::cout<<"Tensor4_3D: \n";
+  os<<"Tensor4_3D: \n";
   for(int kk=0; kk<3; ++kk)
   {
     for(int ll=0; ll<3; ++ll)
     {
-      std::cout<<"k = "<<kk<<"\tl = "<<ll<<'\n';
+      os<<"k = "<<kk<<delimiter<<"l = "<<ll<<'\n';
       for(int ii=0; ii<3; ++ii)
       {
         for(int jj=0; jj<3; ++jj)
         {
-          std::cout<<"i = "<<ii<<'\t'<<"j = "<<jj<<'\t'
-            <<std::setprecision(6)<<ten[27*ii+9*jj+3*kk+ll]<<'\t';
+          os<<"i = "<<ii<<delimiter<<"j = "<<jj<<delimiter<<std::setprecision(6)<<ten[27*ii+9*jj+3*kk+ll]<<delimiter;
         }
-        std::cout<<'\n';
+        os<<'\n';
       }
-      std::cout<<'\n';
+      os<<'\n';
     }
   }
 }

@@ -35,7 +35,7 @@ class Tensor4_3D
     // Copy constructor
     Tensor4_3D( const Tensor4_3D &source ) : ten(source.ten) {}
 
-    Tensor4_3D( const std::array<double, 81> &source ) ten(source) {}
+    Tensor4_3D( const std::array<double, 81> &source ) : ten(source) {}
 
     // Destructor
     ~Tensor4_3D() = default;
@@ -57,7 +57,7 @@ class Tensor4_3D
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
 
-    void print() const;
+    void print(std::ostream &os = std::cout, const std::string &delimiter = "\t") const;
 
     // ------------------------------------------------------------------------
     // print the fourth-order tensor in the following matrix form:
