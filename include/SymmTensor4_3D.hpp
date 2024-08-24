@@ -88,7 +88,7 @@ class SymmTensor4_3D
     
     bool is_identical(const SymmTensor4_3D &source, const double &tol = 1.0e-12) const;
 
-    void print() const;
+    void print(std::ostream& os = std::cout, const std::string& delimiter = "\t") const;
 
     void print_in_mat() const;
 

@@ -48,31 +48,29 @@ bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &to
 
 SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
 {
-  if(this == &source) return *this;
-
-  for(int ii=0; ii<21; ++ii) ten[ii] = source(ii);
+  if(this != &source) ten = source.ten;
 
   return *this;
 }
 
-void SymmTensor4_3D::print() const
+void SymmTensor4_3D::print(std::ostream& os, const std::string& delimiter) const
 {
-  std::cout<<"SymmTensor4_3D: \n";
+  os<<"SymmTensor4_3D: \n";
   for(int kk=0; kk<3; ++kk)
   {
     for(int ll=0; ll<3; ++ll)
     {
-      std::cout<<"k = "<<kk<<"\tl = "<<ll<<'\n';
+      os<<"k = "<<kk<<"\tl = "<<ll<<'\n';
       for(int ii=0; ii<3; ++ii)
       {
         for(int jj=0; jj<3; ++jj)
         {
-          std::cout<<"i = "<<ii<<'\t'<<"j = "<<jj<<'\t'
-            <<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<'\t';
+          os<<"i = "<<ii<<delimiter<<"j = "<<jj<<delimiter;
+          os<<std::setprecision(6)<<ten[ Voigt_notation(ii, jj, kk, ll) ]<<delimiter;
         }
-        std::cout<<'\n';
+        os<<'\n';
       }
-      std::cout<<'\n';
+      os<<'\n';
     }
   }  
 }
