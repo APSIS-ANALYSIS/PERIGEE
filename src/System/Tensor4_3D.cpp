@@ -26,7 +26,8 @@ void Tensor4_3D::print(std::ostream &os, const std::string &delimiter) const
       {
         for(int jj=0; jj<3; ++jj)
         {
-          os<<"i = "<<ii<<delimiter<<"j = "<<jj<<delimiter<<std::setprecision(6)<<ten[27*ii+9*jj+3*kk+ll]<<delimiter;
+          os<<"i = "<<ii<<delimiter<<"j = "<<jj<<delimiter;
+          os<<std::left<<std::setw(12)<<std::setprecision(6)<<ten[27*ii+9*jj+3*kk+ll]<<delimiter;
         }
         os<<'\n';
       }

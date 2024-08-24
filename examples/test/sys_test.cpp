@@ -46,18 +46,7 @@
 
 int main(int argc, char *argv[])
 {
-  std::vector<double> all;
-
-  all.clear();
-  for(int ii=0; ii<10000; ++ii)
-  {
-    auto v = Ten4::gen_rand(-1, 3);
-    VEC_T::insert_end(all, v.to_std_vector());
-  }
-  
-  MATH_T::print_Histogram(all);
-
-  std::cout<<all.size()<<'\n';
+  auto v = Ten4::gen_rand(-3,2);
 
   return EXIT_SUCCESS;
 }
