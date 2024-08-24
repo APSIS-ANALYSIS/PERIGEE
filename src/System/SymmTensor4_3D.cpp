@@ -1,5 +1,9 @@
 #include "SymmTensor4_3D.hpp"
 
+constexpr std::array<int,9> SymmTensor4_3D::map;
+
+constexpr std::array<int,36> SymmTensor4_3D::mapper;
+
 Tensor4_3D SymmTensor4_3D::full() const
 {
   Tensor4_3D out;

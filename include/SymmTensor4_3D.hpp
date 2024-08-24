@@ -179,25 +179,22 @@ class SymmTensor4_3D
     // ------------------------------------------------------------------------
     int Voigt_notation( const int &ii, const int &jj, const int &kk, const int &ll ) const
     {
-      // This map is used to transform the natural indices of a 3x3 symmetric matrix
-      // to Voigt notation
-      constexpr int map[9] = { 0, 5, 4, 
-        5, 1, 3, 
-        4, 3, 2 };
-
-      constexpr int mapper[36] = { 0, 1,  2,  3,  4,  5,
-        1, 6,  7,  8,  9,  10,
-        2, 7,  11, 12, 13, 14,
-        3, 8,  12, 15, 16, 17,
-        4, 9,  13, 16, 18, 19,
-        5, 10, 14, 17, 19, 20 };
-
       return mapper[ 6 * map[ 3*ii + jj ] + map[ 3*kk + ll ] ];
     }
 
   private:
     std::array<double,21> ten;
     
+    // Define the Voigt mapping 
+    static constexpr std::array<int,9> map {{ 0, 5, 4, 5, 1, 3, 4, 3, 2 }};
+
+    static constexpr std::array<int,36> mapper {{ 0, 1,  2,  3,  4,  5,
+      1, 6,  7,  8,  9,  10,
+      2, 7,  11, 12, 13, 14,
+      3, 8,  12, 15, 16, 17,
+      4, 9,  13, 16, 18, 19,
+      5, 10, 14, 17, 19, 20 }};
+
     // ------------------------------------------------------------------------
     // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
     // with A = A^T.
