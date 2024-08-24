@@ -24,22 +24,11 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
   node_loc_fluid.clear();
   node_loc_solid.clear();
 
-  PERIGEE_OMP_PARALLEL
+  for(int ii=0; ii<nlocalnode; ++ii)
   {
-    std::vector<int> temp_node_loc_fluid {};
-    std::vector<int> temp_node_loc_solid {};
-    PERIGEE_OMP_FOR
-    for(int ii=0; ii<nlocalnode; ++ii)
-    {
-      if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) temp_node_loc_fluid.push_back(ii);
+    if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) node_loc_fluid.push_back(ii);
 
-      if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) temp_node_loc_solid.push_back(ii);
-    }
-    PERIGEE_OMP_CRITICAL
-    {
-      VEC_T::insert_end(node_loc_fluid, temp_node_loc_fluid);
-      VEC_T::insert_end(node_loc_solid, temp_node_loc_solid);
-    }
+    if( VEC_T::is_invec(node_s, node_loc_original[ii]) ) node_loc_solid.push_back(ii);
   }
 
   nlocalnode_fluid = VEC_T::get_size( node_loc_fluid );
