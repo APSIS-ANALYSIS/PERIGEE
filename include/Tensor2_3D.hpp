@@ -36,7 +36,7 @@ class Tensor2_3D
       : mat{{a11, a12, a13, a21, a22, a23, a31, a32, a33}} {}
 
     // Generate a matrix made by 3 column vectors [ vec1 | vec2 | vec3 ]
-    constexpr Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
+    Tensor2_3D ( const Vector_3 &vec1, const Vector_3 &vec2, const Vector_3 &vec3 )
       : mat{{ vec1(0), vec2(0), vec3(0), vec1(1), vec2(1), vec3(1),
         vec1(2), vec2(2), vec3(2) }} {}
     

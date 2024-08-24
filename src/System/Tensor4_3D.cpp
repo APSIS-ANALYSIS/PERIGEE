@@ -76,13 +76,13 @@ Tensor4_3D operator-( const Tensor4_3D &left, const Tensor4_3D &right)
 
 Tensor4_3D& Tensor4_3D::operator+=( const Tensor4_3D &source )
 {
-  std::transform(ten.begin(), ten.end(), source.ten.begin(), ten.begin(), std::plus<double>());
+  for(int ii=0; ii<81; ++ii) ten[ii] += source.ten[ii];
   return *this;
 }
 
 Tensor4_3D& Tensor4_3D::operator-=( const Tensor4_3D &source )
 {
-  std::transform(ten.begin(), ten.end(), source.ten.begin(), ten.begin(), std::minus<double>());
+  for(int ii=0; ii<81; ++ii) ten[ii] -= source.ten[ii];
   return *this;
 }
 
