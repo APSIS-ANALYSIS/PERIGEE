@@ -46,13 +46,6 @@ bool SymmTensor4_3D::is_identical(const SymmTensor4_3D &source, const double &to
   return true;
 }
 
-void SymmTensor4_3D::gen_symm_id()
-{
-  ten.fill(0.0);
-  ten[0] = 1.0; ten[6] = 1.0; ten[11] = 1.0;
-  ten[15] = 0.5; ten[18] = 0.5; ten[20] = 0.5;
-}
-
 SymmTensor4_3D& SymmTensor4_3D::operator= (const SymmTensor4_3D &source)
 {
   if(this == &source) return *this;
