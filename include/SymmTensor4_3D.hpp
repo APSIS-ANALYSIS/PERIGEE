@@ -38,7 +38,6 @@
 // Author: Chongran Zhao, Ju Liu
 // Date: Aug. 3rd 2023
 // ============================================================================
-#include "Tensor4_3D.hpp"
 #include "SymmTensor2_3D.hpp"
 
 class SymmTensor4_3D
@@ -50,9 +49,11 @@ class SymmTensor4_3D
     // 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
     // with A = A^T.
     // ------------------------------------------------------------------------
-    SymmTensor4_3D();
+    SymmTensor4_3D() {gen_symm_id();}
 
-    SymmTensor4_3D( const std::array<double,21> &source );
+    SymmTensor4_3D( const SymmTensor4_3D &source ) : ten(source.ten) {}
+
+    SymmTensor4_3D( const std::array<double,21> &source ) : ten(source) {}
 
     ~SymmTensor4_3D() = default;
 
@@ -213,7 +214,7 @@ class SymmTensor4_3D
     }
 
   private:
-    double ten[21];
+    std::array<double,21> ten;
 };
 
 SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input );
