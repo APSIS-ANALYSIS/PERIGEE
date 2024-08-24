@@ -52,20 +52,14 @@ int main(int argc, char *argv[])
 
   std::vector<int> a {};
 
-  PERIGEE_OMP_PARALLEL
-  {
-    std::vector<int> temp {};
-    
-    PERIGEE_OMP_FOR 
-    for(int ii=0; ii<81; ++ii)
-    {
-      if(ii % 3 == 0) temp.push_back(ii);
+#pragma omp parallel for ordered
+  for(int ii = 0; ii < 81; ++ii) {
+    if(ii % 3 == 0) {
+#pragma omp ordered
+      a.push_back(ii);  // Directly insert into 'a' in the correct order
     }
-  
-    PERIGEE_OMP_CRITICAL
-    VEC_T::insert_end(a, temp);
   }
-  
+
   VEC_T::print(a);
 
   return EXIT_SUCCESS;
