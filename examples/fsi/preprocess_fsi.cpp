@@ -257,88 +257,66 @@ int main( int argc, char * argv[] )
 
   // Generate the list of nodes for fluid and solid
   std::vector<int> v_node_f, v_node_s; v_node_f.clear(); v_node_s.clear();
-  PERIGEE_OMP_PARALLEL
+  for(int ee=0; ee<nElem; ++ee)
   {
-    std::vector<int> temp_v_node_f {};
-    std::vector<int> temp_v_node_s {};
-    PERIGEE_OMP_FOR
-    for(int ee=0; ee<nElem; ++ee)
+    if( phy_tag[ee] == 0 )
     {
-      if( phy_tag[ee] == 0 )
+      if(elemType == 501)
       {
-        if(elemType == 501)
-        {
-          for(int ii=0; ii<4; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
-        }
-        else if(elemType == 601)
-        {
-          for(int ii=0; ii<8; ++ii) temp_v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
-        }
-        else
-          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the preprocessing. \n", elemType);
+        for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
       }
       else
-      {
-        if(elemType == 501)
-        {
-          for(int ii=0; ii<4; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
-        }
-        else if(elemType == 601)
-        {
-          for(int ii=0; ii<8; ++ii) temp_v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
-        }
-        else
-          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the preprocessing. \n", elemType);
-      }
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the preprocessing. \n", elemType);
     }
-    PERIGEE_OMP_CRITICAL
+    else
     {
-      VEC_T::insert_end(v_node_f, temp_v_node_f);
-      VEC_T::insert_end(v_node_s, temp_v_node_s);
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the preprocessing. \n", elemType);
     }
   }
 
   VEC_T::sort_unique_resize( v_node_f ); VEC_T::sort_unique_resize( v_node_s );
 
   std::vector<int> p_node_f, p_node_s; p_node_f.clear(); p_node_s.clear();
-  PERIGEE_OMP_PARALLEL
+  for(int ee=0; ee<nElem; ++ee)
   {
-    std::vector<int> temp_p_node_f {};
-    std::vector<int> temp_p_node_s {};
-    PERIGEE_OMP_FOR
-    for(int ee=0; ee<nElem; ++ee)
+    if( phy_tag[ee] == 0 )
     {
-      if( phy_tag[ee] == 0 )
+      if(elemType == 501)
       {
-        if(elemType == 501)
-        {
-          for(int ii=0; ii<4; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
-        }
-        else if(elemType == 601)
-        {
-          for(int ii=0; ii<8; ++ii) temp_p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
-        }
-        else
-          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the preprocessing. \n", elemType);
+        for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
       }
       else
-      {
-        if(elemType == 501)
-        {
-          for(int ii=0; ii<4; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
-        }
-        else if(elemType == 601)
-        {
-          for(int ii=0; ii<8; ++ii) temp_p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
-        }
-        else
-          SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the preprocessing. \n", elemType);
-      }
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the preprocessing. \n", elemType);
     }
-    PERIGEE_OMP_CRITICAL
+    else
     {
-      VEC_T::insert_end(p_node_f, temp_p_node_f);
-      VEC_T::insert_end(p_node_s, temp_p_node_s);
+      if(elemType == 501)
+      {
+        for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+      }
+      else if(elemType == 601)
+      {
+        for(int ii=0; ii<8; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
+      }
+      else
+        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the preprocessing. \n", elemType);
     }
   }
 

@@ -44,36 +44,21 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
 
     local_cell_vol_id[ii].clear();
 
-    PERIGEE_OMP_PARALLEL
+    for(int jj=0; jj<num_global_bccell; ++jj)
     {
-      std::vector<int> temp_local_elem {};
-      std::vector<int> temp_local_cell_vol_id {};
-      std::vector<int> temp_local_cell_node {};
+      const int elem_index = ebc -> get_global_cell(ii, jj);
 
-      PERIGEE_OMP_FOR
-      for(int jj=0; jj<num_global_bccell; ++jj)
+      // If the element belongs to the partitioned subdomain, record it
+      if( part -> get_elemLocIndex( elem_index ) != -1 )
       {
-        const int elem_index = ebc -> get_global_cell(ii, jj);
+        local_elem.push_back( jj );
 
-        // If the element belongs to the partitioned subdomain, record it
-        if( part -> get_elemLocIndex( elem_index ) != -1 )
-        {
-          temp_local_elem.push_back( jj );
+        // record the cell's global (volumetric) element index
+        local_cell_vol_id[ii].push_back( elem_index );
 
-          // record the cell's global (volumetric) element index
-          temp_local_cell_vol_id.push_back( elem_index );
-
-          // now put this cell's nodes into local_cell_node list
-          for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
-            temp_local_cell_node.push_back( ebc->get_ien(ii, jj, kk) );
-        }
-      }
-
-      PERIGEE_OMP_CRITICAL
-      {
-        VEC_T::insert_end(local_elem, temp_local_elem);
-        VEC_T::insert_end(local_cell_vol_id[ii], temp_local_cell_vol_id);
-        VEC_T::insert_end(local_cell_node[ii], temp_local_cell_node);
+        // now put this cell's nodes into local_cell_node list
+        for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
+          local_cell_node[ii].push_back( ebc->get_ien(ii, jj, kk) );
       }
     }
 
