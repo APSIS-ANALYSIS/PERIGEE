@@ -75,9 +75,11 @@ class SymmTensor4_3D
     const double& operator()(const int &index) const {return ten[index];}
 
     // Parenthesis operator: access through 0 <= ii jj kk ll < 3 component index
-    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll);
+    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll)
+    {return ten[ Voigt_notation(ii,jj,kk,ll) ];}
 
-    const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const; 
+    const double& operator()(const int &ii, const int &jj, const int &kk, const int &ll) const
+    {return ten[ Voigt_notation(ii,jj,kk,ll) ];} 
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
     

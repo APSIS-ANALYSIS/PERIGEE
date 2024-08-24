@@ -22,16 +22,6 @@ Tensor4_3D SymmTensor4_3D::full() const
   return out;
 }
 
-double& SymmTensor4_3D::operator()(const int &ii, const int &jj, const int &kk, const int &ll)
-{
-  return ten[ Voigt_notation(ii,jj,kk,ll) ];
-}
-
-const double& SymmTensor4_3D::operator()(const int &ii, const int &jj, const int &kk, const int &ll) const
-{
-  return ten[ Voigt_notation(ii,jj,kk,ll) ];
-}
-
 bool SymmTensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
 {
   for(int ii=0; ii<3; ++ii)
