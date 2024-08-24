@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   all.clear();
   for(int ii=0; ii<10000; ++ii)
   {
-    auto v = STen2::gen_rand(-1, 3);
+    auto v = STen4::gen_rand(0, 5);
     VEC_T::insert_end(all, v.to_std_vector());
   }
 

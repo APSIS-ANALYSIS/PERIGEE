@@ -38,7 +38,7 @@
 // Author: Chongran Zhao, Ju Liu
 // Date: Aug. 3rd 2023
 // ============================================================================
-#include "SymmTensor2_3D.hpp"
+#include "Tensor4_3D.hpp"
 
 class SymmTensor4_3D
 {
@@ -62,6 +62,12 @@ class SymmTensor4_3D
 
     // Assignment operator
     SymmTensor4_3D& operator= (const SymmTensor4_3D &source);
+
+    // Convert to STL container
+    std::vector<double> to_std_vector() const
+    { return std::vector<double>(std::begin(ten), std::end(ten)); }
+
+    std::array<double,21> to_std_array() const {return ten;}
 
     // Parenthesis operator: access through single index with 0 <= index < 21
     double& operator()(const int &index) {return ten[index];}
