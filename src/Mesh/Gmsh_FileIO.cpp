@@ -484,20 +484,13 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     // use the bcmap to obtain the vol element that has its face on this surface
     std::vector<int> gelem {};
 
-    PERIGEE_OMP_PARALLEL
+    for( int ee=0; ee<numcel; ++ee )
     {
-      std::vector<int> temp_gelem {};
-      PERIGEE_OMP_FOR
-      for( int ee=0; ee<numcel; ++ee )
-      {
-        int total = 0;
-        for (int jj=0; jj < nlocbas_3d; ++jj)
-          total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
-        if(total >= nlocbas_2d)
-          temp_gelem.push_back(ee);
-      }
-      PERIGEE_OMP_CRITICAL
-      VEC_T::insert_end(gelem, temp_gelem);
+      int total = 0;
+      for (int jj=0; jj < nlocbas_3d; ++jj)
+        total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
+      if(total >= nlocbas_2d)
+        gelem.push_back(ee);
     }
 
     delete [] bcmap; bcmap = nullptr;
@@ -1540,20 +1533,13 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 
     std::vector<int> gelem {};
 
-    PERIGEE_OMP_PARALLEL
+    for( int ee=0; ee<numcel; ++ee )
     {
-      std::vector<int> temp_gelem {};
-      PERIGEE_OMP_FOR
-      for( int ee=0; ee<numcel; ++ee )
-      {
-        int total = 0;
-        for (int jj{0}; jj < nVertex_3d; ++jj)
-          total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
-        if(total >= nVertex_2d) 
-          temp_gelem.push_back(ee);
-      }
-      PERIGEE_OMP_CRITICAL
-      VEC_T::insert_end(gelem, temp_gelem);
+      int total = 0;
+      for (int jj{0}; jj < nVertex_3d; ++jj)
+        total += bcmap[ vol_IEN[nlocbas_3d * ee + jj] ];
+      if(total >= nVertex_2d) 
+        gelem.push_back(ee);
     }
 
     delete [] bcmap; bcmap = nullptr;

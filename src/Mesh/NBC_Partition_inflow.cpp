@@ -23,27 +23,15 @@ NBC_Partition_inflow::NBC_Partition_inflow(
   {
     // Collect the Dirichlet nodes on the ii-th inlet surface
     Num_LD[ii] = 0;
-    PERIGEE_OMP_PARALLEL
+
+    for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_inlet(ii); ++jj)
     {
-      std::vector<int> temp_LDN {};
-      int temp_num_LD = 0;
-
-      PERIGEE_OMP_FOR
-      for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_inlet(ii); ++jj)
+      int node_index = static_cast<int>( nbc -> get_dir_nodes_on_inlet(ii, jj) );
+      node_index = mnindex -> get_old2new(node_index);
+      if(part->isNodeInPart(node_index))
       {
-        int node_index = static_cast<int>( nbc -> get_dir_nodes_on_inlet(ii, jj) );
-        node_index = mnindex -> get_old2new(node_index);
-        if(part->isNodeInPart(node_index))
-        {
-          temp_LDN.push_back(node_index);
-          temp_num_LD += 1;
-        }
-      }
-
-      PERIGEE_OMP_CRITICAL
-      {
-        VEC_T::insert_end(LDN[ii], temp_LDN);
-        Num_LD[ii] += temp_num_LD;
+        LDN.push_back(node_index);
+        num_LD += 1;
       }
     }
 
@@ -72,31 +60,18 @@ NBC_Partition_inflow::NBC_Partition_inflow(
     local_global_cell[ii].clear();
 
     // Loop over all cells on inlet cap surface
-    PERIGEE_OMP_PARALLEL
+    for(int jj=0; jj < nbc->get_num_cell(ii); ++jj)
     {
-      std::vector<int> temp_local_elem {}, temp_local_node {}, temp_local_global_cell {};
+      const int elem_index = nbc -> get_global_cell(ii, jj); // cell vol id
 
-      PERIGEE_OMP_FOR
-      for(int jj=0; jj < nbc->get_num_cell(ii); ++jj)
+      if( part -> get_elemLocIndex( elem_index ) != -1  )
       {
-        const int elem_index = nbc -> get_global_cell(ii, jj); // cell vol id
+        local_elem.push_back( jj );
 
-        if( part -> get_elemLocIndex( elem_index ) != -1  )
-        {
-          temp_local_elem.push_back( jj );
+        local_global_cell[ii].push_back( elem_index );
 
-          temp_local_global_cell.push_back( elem_index );
-
-          for( int kk=0; kk<cell_nLocBas[ii]; ++kk )
-            temp_local_node.push_back( nbc->get_ien(ii, jj, kk) );
-        }
-      }
-
-      PERIGEE_OMP_CRITICAL
-      {
-        VEC_T::insert_end(local_elem, temp_local_elem);
-        VEC_T::insert_end(local_node, temp_local_node);
-        VEC_T::insert_end(local_global_cell[ii], temp_local_global_cell);
+        for( int kk=0; kk<cell_nLocBas[ii]; ++kk )
+          local_node.push_back( nbc->get_ien(ii, jj, kk) );
       }
     }
 
