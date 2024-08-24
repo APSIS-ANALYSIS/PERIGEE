@@ -44,21 +44,21 @@ class Tensor4_3D
     Tensor4_3D& operator= (const Tensor4_3D &source);
 
     // Parenthesis operator: access through single index with 0 <= index < 81
-    double& operator()(const int &index) {return ten[index];}
+    inline double& operator()(const int &index) {return ten[index];}
 
-    const double& operator()(const int &index) const {return ten[index];}
+    inline const double& operator()(const int &index) const {return ten[index];}
 
     // Parenthesis operator: access through ii jj kk ll component index
-    double& operator()(const int &ii, const int &jj, const int &kk, const int &ll)
+    inline double& operator()(const int &ii, const int &jj, const int &kk, const int &ll)
     {return ten[27 * ii + 9 * jj + 3 * kk + ll];}
 
-    const double& operator()(const int &ii, const int &jj, const int &kk, 
+    inline const double& operator()(const int &ii, const int &jj, const int &kk, 
         const int &ll) const {return ten[27 * ii + 9 * jj + 3 * kk + ll];}
 
-    std::vector<double> to_std_vector() const
+    inline std::vector<double> to_std_vector() const
     {return std::vector<double>(std::begin(ten), std::end(ten));}
 
-    std::array<double,81> to_std_array() const {return ten;}
+    inline std::array<double,81> to_std_array() const {return ten;}
 
     bool is_identical(const Tensor4_3D &source, const double &tol = 1.0e-12) const;
 
