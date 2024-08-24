@@ -23,7 +23,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
       if(part->isNodeInPart(node_index))
       {
         LDN.push_back(node_index);
-        num_LD += 1;
+        Num_LD[ii] += 1;
       }
     } // end jj-loop
 
@@ -41,14 +41,14 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
       {
         LPSN.push_back(node_ps);
         LPMN.push_back(node_pm);
-        num_LPS += 1;
+        Num_LPS[ii] += 1;
       }
 
       if(part->isNodeInPart(node_pm))
       {
         LocalMaster.push_back(node_pm);
         LocalMasterSlave.push_back(node_ps);
-        num_LPM += 1;
+        Num_LPM[ii] += 1;
       }
     } // end jj-loop
   } // end ii-loop over dof

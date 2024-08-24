@@ -30,8 +30,8 @@ NBC_Partition_inflow::NBC_Partition_inflow(
       node_index = mnindex -> get_old2new(node_index);
       if(part->isNodeInPart(node_index))
       {
-        LDN.push_back(node_index);
-        num_LD += 1;
+        LDN[ii].push_back(node_index);
+        Num_LD[ii] += 1;
       }
     }
 
