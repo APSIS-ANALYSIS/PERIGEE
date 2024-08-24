@@ -30,7 +30,7 @@ class Tensor4_3D
     // The intuition is that the A_{ijkl} b_{kl} = b_{ij}
     // This definition also comes from Holzapfel book, pp 23.
     // ------------------------------------------------------------------------
-    Tensor4_3D();
+    Tensor4_3D() { gen_id(); }
 
     // Copy constructor
     Tensor4_3D( const Tensor4_3D &source ) : ten(source.ten) {}
@@ -99,41 +99,11 @@ class Tensor4_3D
     void gen_id();
 
     // ------------------------------------------------------------------------
-    // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
-    // with A = A^T.
-    // Note: this is the derivative for symmetric 2nd-order tensor. In
-    // principle, the derivative for symmetric tensor is nonunique, since the
-    // derivative is acting on a symmetric tensor for the linearization and adding
-    // a skew-symmetric tensor will not changing the effect. Hence, we define
-    // the symmetric part of the 4th-order tensor be the derivative for the
-    // 2nd-order tensor.
-    // ------------------------------------------------------------------------
-    void gen_symm_id();
-
-    // ------------------------------------------------------------------------
     // Generate devaitoric projector
     // P_dev = Id4 - id2 corss id2 = delta_ik delta_jl - 1/3 delta_ij delta_kl
     // Holzapfel book, p. 24.
     // ------------------------------------------------------------------------
     void gen_proj_dev();
-
-    // ------------------------------------------------------------------------
-    // Generate Projector P = SymmId4 - 1/3 invC x C
-    // P_IJKL = SymmID_IJKL - 1/3 invC_IJ C_KL
-    // C is assumed to be the right Cauchy-Green tensor
-    // invC is the inverse of C
-    // see Holzapfel book p.229 eqn. (6.84).
-    // ------------------------------------------------------------------------
-    void gen_P( const Tensor2_3D &C, const Tensor2_3D &invC );
-
-    void gen_P( const Tensor2_3D &C ) { gen_P( C, Ten2::inverse(C) ); }
-
-    // ------------------------------------------------------------------------
-    // Generate Projector Ptilde = invC O invC - 1/3 invC x invC
-    // invC is assumed to be the right Cauchy-Green tensor 
-    // see Holzapfel book p. 255, eqn. (6.170).
-    // ------------------------------------------------------------------------
-    void gen_Ptilde( const Tensor2_3D &invC );
 
     // ------------------------------------------------------------------------
     // generate a random 4th-order tensor (mainly used for debuggin)
@@ -171,7 +141,8 @@ class Tensor4_3D
     // stretch-based models, such as the Ogden model.
     // See, Holzapfel book p. 257. 
     // ------------------------------------------------------------------------
-    void add_OutProduct( const double &val, const Vector_3 &vec1, const Vector_3 &vec2,
+    void add_OutProduct( const double &val,
+        const Vector_3 &vec1, const Vector_3 &vec2,
         const Vector_3 &vec3, const Vector_3 &vec4 );
 
     // ------------------------------------------------------------------------
@@ -323,6 +294,16 @@ namespace Ten4
 {
   Tensor4_3D gen_zero();
 
+  // ------------------------------------------------------------------------
+  // Generate 0.5 * (delta_ik delta_jl + delta_il delta_jk) = dA_ij / dA_kl
+  // with A = A^T.
+  // Note: this is the derivative for symmetric 2nd-order tensor. In
+  // principle, the derivative for symmetric tensor is nonunique, since the
+  // derivative is acting on a symmetric tensor for the linearization and adding
+  // a skew-symmetric tensor will not changing the effect. Hence, we define
+  // the symmetric part of the 4th-order tensor be the derivative for the
+  // 2nd-order tensor.
+  // ------------------------------------------------------------------------
   Tensor4_3D gen_symm_id();
 
   // ------------------------------------------------------------------------
@@ -358,8 +339,10 @@ namespace Ten4
   // ------------------------------------------------------------------------
   Tensor4_3D gen_Ptilde( const Tensor2_3D &invC );
 
+  // ------------------------------------------------------------------------
   // Generate a transpose of a rank-four tensor, refered to the equation (1.160) 
   // in Holzapfel book, p. 23.
+  // ------------------------------------------------------------------------
   Tensor4_3D transpose( const Tensor4_3D &input );  
 }
 

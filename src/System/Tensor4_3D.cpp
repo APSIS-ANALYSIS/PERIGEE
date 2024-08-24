@@ -1,15 +1,5 @@
 #include "Tensor4_3D.hpp"
 
-Tensor4_3D::Tensor4_3D()
-{
-  ten.fill(0.0);
-
-  for(int aa=0; aa<3; ++aa)
-  {
-    for(int bb=0; bb<3; ++bb) ten[ 27 * aa + 9 * bb + 3 * aa + bb ] = 1.0;
-  }
-}
-
 bool Tensor4_3D::is_identical(const Tensor4_3D &source, const double &tol) const
 {
   for(int ii=0; ii<81; ++ii)
@@ -104,24 +94,10 @@ Tensor4_3D& Tensor4_3D::operator*=( const double &val )
 
 void Tensor4_3D::gen_id()
 {
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
-
+  ten.fill(0.0);
   for(int aa=0; aa<3; ++aa)
   {
     for(int bb=0; bb<3; ++bb) ten[ 27 * aa + 9 * bb + 3 * aa + bb ] = 1.0;
-  }
-}
-
-void Tensor4_3D::gen_symm_id()
-{
-  for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
-  for(int aa=0; aa<3; ++aa)
-  {
-    for(int bb=0; bb<3; ++bb) 
-    {
-      ten[ 27 * aa + 9 * bb + 3 * aa + bb ] += 0.5;
-      ten[ 27 * aa + 9 * bb + 3 * bb + aa ] += 0.5; 
-    }
   }
 }
 
@@ -137,22 +113,6 @@ void Tensor4_3D::gen_proj_dev()
       ten[ 27*ii + 9*ii + 3*jj + jj] -= pt33;
     }
   }
-}
-
-void Tensor4_3D::gen_P( const Tensor2_3D &C, const Tensor2_3D &invC )
-{
-  gen_symm_id();
-  constexpr double factor = -1.0 / 3.0;
-  add_OutProduct( factor, invC, C );
-}
-
-void Tensor4_3D::gen_Ptilde( const Tensor2_3D &invC )
-{
-  ten.fill(0.0);
-
-  add_SymmProduct(1.0, invC, invC);
-  constexpr double factor = -1.0 / 3.0;
-  add_OutProduct( factor, invC, invC );
 }
 
 void Tensor4_3D::gen_rand(const double &left, const double &right)
