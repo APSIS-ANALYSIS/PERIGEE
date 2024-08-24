@@ -269,7 +269,9 @@ class Tensor4_3D
     // we calculate a matrix problem AA_6x6 X_6 = B_6, and we then map the 
     // solution X_6 into the tensor X_KL. 
     // ------------------------------------------------------------------------
-    Tensor2_3D solve( const Tensor2_3D &B );
+    Tensor2_3D solve( const Tensor2_3D &B ) const;
+    
+    SymmTensor2_3D solve( const SymmTensor2_3D &B ) const;
 
     // ------------------------------------------------------------------------
     // This function calculates AA_IJKL XX_KLMN = BB_IJMN. In this function,
@@ -277,7 +279,7 @@ class Tensor4_3D
     // and the above function will be called to solve AA_IJKL X_KL = B_IJ.
     // The nine solutions X will be put together to form the solution XX.
     // ------------------------------------------------------------------------
-    Tensor4_3D solve( const Tensor4_3D &BB );
+    Tensor4_3D solve( const Tensor4_3D &BB ) const;
 
   private:
     std::array<double,81> ten;

@@ -489,7 +489,7 @@ bool Tensor4_3D::is_minor_sym( const double &tol ) const
   return true;
 }
 
-Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B )
+Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B ) const
 {
   ASSERT( is_minor_sym() == true, "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
 
@@ -554,7 +554,26 @@ Tensor2_3D Tensor4_3D::solve( const Tensor2_3D &B )
           out_array[2] );
 }
 
-Tensor4_3D Tensor4_3D::solve( const Tensor4_3D &BB )
+SymmTensor2_3D Tensor4_3D::solve( const SymmTensor2_3D &B ) const
+{
+  ASSERT( is_minor_sym() == true, "The rank-four tensor needs to satisfy the minor symmetry.\n" );  
+
+  MATH_T::Matrix_Dense<6> AA_mat( std::array<double,36>{{ ten[0], ten[4], ten[8], ten[5], ten[2], ten[1],
+   ten[36], ten[40], ten[44], ten[41], ten[38], ten[37],
+   ten[72], ten[76], ten[80], ten[77], ten[74], ten[73],
+   ten[45], ten[49], ten[53], ten[50], ten[47], ten[46],
+   ten[18], ten[22], ten[26], ten[23], ten[20], ten[19],
+   ten[9], ten[13], ten[17], ten[14], ten[11], ten[10] }} );
+
+  AA_mat.LU_fac();
+
+  const auto out_array = AA_mat.LU_solve( B.to_std_array() );
+
+  return SymmTensor2_3D( out_array[0], out_array[1], out_array[2],
+      0.5*out_array[3], 0.5*out_array[4], 0.5*out_array[5] );
+}
+
+Tensor4_3D Tensor4_3D::solve( const Tensor4_3D &BB ) const
 {
   Tensor4_3D out = Ten4::gen_zero();
 

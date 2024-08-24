@@ -46,17 +46,51 @@
 
 int main(int argc, char *argv[])
 {
-  auto v1 = Ten4::gen_rand(-3,2);
+  std::vector<double> all;
+  all.clear();
+  for(int ii=0; ii<10000; ++ii)
+  {
+    auto v = STen2::gen_rand(-1, 3);
+    VEC_T::insert_end(all, v.to_std_vector());
+  }
+
+  MATH_T::print_Histogram(all);
+
+  std::cout<<all.size()<<'\n';
+
+  auto AA = Ten4::gen_rand(-8,11);
+  auto A = AA;
+  auto B = AA;
+
+  for(int ii=0; ii<3; ++ii)
+    for(int jj=0; jj<3; ++jj)
+      for(int kk=0; kk<3; ++kk)
+        for(int ll=0; ll<3; ++ll)
+          B(27*ii+9*jj+3*kk+ll) = 0.5*(AA(27*ii+9*jj+3*kk+ll) + AA(27*ii+9*jj+3*ll+kk));
+
+  for(int ii=0; ii<3; ++ii)
+    for(int jj=0; jj<3; ++jj)
+      for(int kk=0; kk<3; ++kk)
+        for(int ll=0; ll<3; ++ll)
+          A(27*ii+9*jj+3*kk+ll) = 0.5*(B(27*ii+9*jj+3*kk+ll) + B(27*jj+9*ii+3*kk+ll));
+
+  if(A.is_major_sym()) std::cout<<"Yes\n";
+  else std::cout<<"No\n";
+
+  if(A.is_minor_sym()) std::cout<<"Yes\n";
+  else std::cout<<"No\n";
+
+  auto LHS = STen2::gen_rand(1.0, 2.5);
+
+  auto sol1 = A.solve(LHS.full());
+  auto sol2 = A.solve(LHS);
+
+  sol1.print();
+
+  sol1 -= sol2.full();
+
+  sol1.print();
   
-  auto v2 = Ten4::gen_rand(-8,1.23);
-
-  auto v3 = v2;
-
-  v2 -= v1;
-
-  for(int ii=0; ii<81; ++ii)
-    std::cout<<v3(ii) - v1(ii) - v2(ii)<<'\n';
-
   return EXIT_SUCCESS;
 }
 

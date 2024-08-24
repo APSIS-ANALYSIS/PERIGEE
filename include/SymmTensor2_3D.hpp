@@ -95,15 +95,6 @@ class SymmTensor2_3D
     // Return true if the input matrix is identical to the mat
     bool is_identical( const SymmTensor2_3D &source, const double &tol = 1.0e-12 ) const;
 
-    // Set all components to zero
-    inline void gen_zero() {mat.fill(0.0);}
-
-    // Set an identity matrix
-    inline void gen_id() {mat = {{1.0, 1.0, 1.0, 0.0, 0.0, 0.0}};}
-
-    // Set components a random value
-    void gen_rand(const double &left = -1.0, const double &right = 1.0);
-
     // Invert the matrix
     void inverse();
 
@@ -225,6 +216,9 @@ namespace STen2
 
   // Generate a zero tensor
   SymmTensor2_3D gen_zero();
+
+  // Set components a random value
+  SymmTensor2_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
 
   // Generate a dyad with a unit vector
   // Note: we do not check the unit length of input
