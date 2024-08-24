@@ -20,6 +20,9 @@ class QuadPts_UserDefined_Triangle : public IQuadPts
     virtual double get_qp(const int &comp) const
     {return qp[comp];}
 
+    virtual double get_qp(const int &ii, const int &comp) const
+    {return qp[3 * ii + comp];}
+
     virtual void set_qp(const double &xi, const double &eta)
     {
       qp[0] = xi;
@@ -36,7 +39,9 @@ class QuadPts_UserDefined_Triangle : public IQuadPts
 
     virtual bool check_qp_bound() const
     {
-      if( qp[0]>=0.0 && qp[0]<=1.0 && qp[1]>=0.0 && qp[1]<=1.0 && qp[2]>=0.0 )
+      const double epsilon = 2.0e-3;
+
+      if( qp[0]>=(0-epsilon) && qp[0]<=(1+epsilon) && qp[1]>=(0-epsilon) && qp[1]<=(1+epsilon) && qp[2]>=(0-epsilon) )
         return true;
       else
         return false;

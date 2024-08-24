@@ -69,6 +69,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
+  const double * const &rotated_local_mvelo,
   const double * const &rotatedCtrlPts_x, const double * const &rotatedCtrlPts_y,
   const double * const &rotatedCtrlPts_z)
 {
@@ -83,6 +84,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   double ur {0.0}, ur_x {0.0}, ur_y {0.0}, ur_z {0.0};
   double vr {0.0}, vr_x {0.0}, vr_y {0.0}, vr_z {0.0};
   double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
+  double mur {0.0}, mvr {0.0}, mwr{0.0};
 
   Vector_3 opposite_xyz(0.0, 0.0, 0.0);
 
@@ -108,6 +110,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   for(int ii{0}; ii<nLocBas; ++ii)
   {
     const int ii4{4 * ii};
+    const int ii3{3 * ii};
 
     ps += fixed_local_sol[ii4 + 0] * Ns[ii];
     us += fixed_local_sol[ii4 + 1] * Ns[ii];
@@ -131,6 +134,10 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
     vr += rotated_local_sol[ii4 + 2] * Nr[ii];
     wr += rotated_local_sol[ii4 + 3] * Nr[ii];
 
+    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
+    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
+    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
+
     ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
     ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
     ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
@@ -150,7 +157,8 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
   // Mesh velocity in the quadrature point
   const Vector_3 radius_qua = get_radius(opposite_xyz);
-  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
+  //const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
+  const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
@@ -231,6 +239,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
+  const double * const &rotated_local_mvelo,
   const double * const &rotatedCtrlPts_x, const double * const &rotatedCtrlPts_y,
   const double * const &rotatedCtrlPts_z )
 {
@@ -245,6 +254,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   double ur {0.0}, ur_x {0.0}, ur_y {0.0}, ur_z {0.0};
   double vr {0.0}, vr_x {0.0}, vr_y {0.0}, vr_z {0.0};
   double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
+  double mur {0.0}, mvr {0.0}, mwr{0.0};
 
   Vector_3 opposite_xyz(0.0, 0.0, 0.0);
 
@@ -270,6 +280,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   for(int ii{0}; ii<nLocBas; ++ii)
   {
     const int ii4{4 * ii};
+    const int ii3{3 * ii};
 
     ps += fixed_local_sol[ii4 + 0] * Ns[ii];
     us += fixed_local_sol[ii4 + 1] * Ns[ii];
@@ -293,6 +304,10 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
     vr += rotated_local_sol[ii4 + 2] * Nr[ii];
     wr += rotated_local_sol[ii4 + 3] * Nr[ii];
 
+    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
+    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
+    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
+
     ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
     ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
     ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
@@ -312,7 +327,8 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
 
   // Mesh velocity in the quadrature point
   const Vector_3 radius_qua = get_radius(opposite_xyz);
-  const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
+  //const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
+  const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};

@@ -562,6 +562,7 @@ class IPLocAssem
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
       const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo,
       const double * const &rotatedCtrlPts_x,
       const double * const &rotatedCtrlPts_y,
       const double * const &rotatedCtrlPts_z )
@@ -575,6 +576,7 @@ class IPLocAssem
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol,
       const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo,
       const double * const &rotatedCtrlPts_x,
       const double * const &rotatedCtrlPts_y,
       const double * const &rotatedCtrlPts_z )

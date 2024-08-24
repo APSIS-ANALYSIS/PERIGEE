@@ -1260,6 +1260,7 @@ void PGAssem_NS_FEM::Interface_KG(
 
   int * rotated_local_ien = new int [nLocBas];
   double * rotated_local_sol = new double [nLocBas * dof_sol];
+  double * rotated_local_mvelo = new double [nLocBas * 3];
 
   PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
   PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
@@ -1308,10 +1309,11 @@ void PGAssem_NS_FEM::Interface_KG(
         rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 
         itf_part->get_rotated_local(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
+        itf_part->get_rotated_mvelo(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
 
         const double qw = quad_s->get_qw(qua);
 
-        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, ctrl_x, ctrl_y, ctrl_z);
+        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, ctrl_x, ctrl_y, ctrl_z);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1342,6 +1344,7 @@ void PGAssem_NS_FEM::Interface_KG(
   delete [] fixed_local_sol; fixed_local_sol = nullptr;
   delete [] rotated_local_ien; rotated_local_ien = nullptr;
   delete [] rotated_local_sol; rotated_local_sol = nullptr;
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
 
   delete [] fixed_row_index; fixed_row_index = nullptr;
   delete [] rotated_row_index; rotated_row_index = nullptr;
@@ -1371,6 +1374,7 @@ void PGAssem_NS_FEM::Interface_G(
 
   int * rotated_local_ien = new int [nLocBas];
   double * rotated_local_sol = new double [nLocBas * dof_sol];
+  double * rotated_local_mvelo = new double [nLocBas * 3];
 
   PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
   PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
@@ -1422,7 +1426,7 @@ void PGAssem_NS_FEM::Interface_G(
 
         const double qw = quad_s->get_qw(qua);
 
-        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, ctrl_x, ctrl_y, ctrl_z);
+        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, ctrl_x, ctrl_y, ctrl_z);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1446,6 +1450,7 @@ void PGAssem_NS_FEM::Interface_G(
   delete [] fixed_local_sol; fixed_local_sol = nullptr;
   delete [] rotated_local_ien; rotated_local_ien = nullptr;
   delete [] rotated_local_sol; rotated_local_sol = nullptr;
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
 
   delete [] fixed_row_index; fixed_row_index = nullptr;
   delete [] rotated_row_index; rotated_row_index = nullptr;
