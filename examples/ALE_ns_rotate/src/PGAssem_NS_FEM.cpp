@@ -1423,6 +1423,7 @@ void PGAssem_NS_FEM::Interface_G(
         rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 
         itf_part->get_rotated_local(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
+        itf_part->get_rotated_mvelo(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
 
         const double qw = quad_s->get_qw(qua);
 
