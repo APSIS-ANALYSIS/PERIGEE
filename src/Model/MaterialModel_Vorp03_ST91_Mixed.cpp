@@ -1,12 +1,15 @@
-#include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
+#include "MaterialModel_Vorp03_ST91_Mixed.hpp"
 
-MaterialModel_Vorp03_Incompressible_Mixed::MaterialModel_Vorp03_Incompressible_Mixed( const double &in_rho,
+MaterialModel_Vorp03_ST91_Mixed::MaterialModel_Vorp03_ST91_Mixed( const double &in_rho,
+        const double &in_E, const double &in_nu,
         const double &in_c1, const double &in_c2 )
 : pt33( 1.0/3.0 ), mpt67( -2.0 * pt33 ), rho0(in_rho),
-  c1(in_c1), c2(in_c2)
+  E(in_E), nu(in_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
+  mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
+  c1( in_c1 ), c2( in_c2 )
 {}
 
-MaterialModel_Vorp03_Incompressible_Mixed::MaterialModel_Vorp03_Incompressible_Mixed(
+MaterialModel_Vorp03_ST91_Mixed::MaterialModel_Vorp03_ST91_Mixed(
     const char * const &fname )
 : pt33( 1.0/3.0 ), mpt67( -2.0 * pt33 )
 {
@@ -15,27 +18,37 @@ MaterialModel_Vorp03_Incompressible_Mixed::MaterialModel_Vorp03_Incompressible_M
   HDF5_Reader * h5r = new HDF5_Reader( h5file );
 
   SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
-     "Error: MaterialModel_Vorp03_Incompressible_Mixed constructor does not match h5 file.\n" );
+     "Error: MaterialModel_Vorp03_ST91_Mixed constructor does not match h5 file.\n" );
 
   rho0 = h5r -> read_doubleScalar("/", "rho0");
+  E    = h5r -> read_doubleScalar("/", "E");
+  nu   = h5r -> read_doubleScalar("/", "nu");
+  mu   = h5r -> read_doubleScalar("/", "mu");
+  lambda = h5r -> read_doubleScalar("/", "lambda");
+  kappa = h5r -> read_doubleScalar("/", "kappa");
   c1   = h5r -> read_doubleScalar("/", "c1");
   c2   = h5r -> read_doubleScalar("/", "c2");
 
   delete h5r; H5Fclose(h5file);
 }
 
-MaterialModel_Vorp03_Incompressible_Mixed::~MaterialModel_Vorp03_Incompressible_Mixed()
+MaterialModel_Vorp03_ST91_Mixed::~MaterialModel_Vorp03_ST91_Mixed()
 {}
 
-void MaterialModel_Vorp03_Incompressible_Mixed::print_info() const
+void MaterialModel_Vorp03_ST91_Mixed::print_info() const
 {
-  SYS_T::commPrint("\t  MaterialModel_Vorp03_Incompressible_Mixed: \n");
+  SYS_T::commPrint("\t  MaterialModel_Vorp03_ST91_Mixed: \n");
   SYS_T::commPrint("\t  Density rho  = %e \n", rho0);
+  SYS_T::commPrint("\t  Young's Modulus E  = %e \n", E);
+  SYS_T::commPrint("\t  Possion's ratio nu = %e \n", nu);
+  SYS_T::commPrint("\t  Shear modulus mu   = %e \n", mu);
+  SYS_T::commPrint("\t  Lame coeff lambda  = %e \n", lambda);
+  SYS_T::commPrint("\t  Bulk modulus kappa = %e \n", kappa);
   SYS_T::commPrint("\t  Material constant 1 = %e \n", c1);
   SYS_T::commPrint("\t  Material constant 2 = %e \n", c2);
 }
 
-void MaterialModel_Vorp03_Incompressible_Mixed::write_hdf5( const char * const &fname ) const
+void MaterialModel_Vorp03_ST91_Mixed::write_hdf5( const char * const &fname ) const
 {
   if( SYS_T::get_MPI_rank() == 0 )
   {
@@ -44,6 +57,11 @@ void MaterialModel_Vorp03_Incompressible_Mixed::write_hdf5( const char * const &
 
     h5w -> write_string("model_name", get_model_name());
     h5w -> write_doubleScalar( "rho0", rho0 );
+    h5w -> write_doubleScalar("E", E);
+    h5w -> write_doubleScalar("nu", nu);
+    h5w -> write_doubleScalar("lambda", lambda);
+    h5w -> write_doubleScalar("mu", mu);
+    h5w -> write_doubleScalar("kappa", kappa);
     h5w -> write_doubleScalar("c1", c1);
     h5w -> write_doubleScalar("c2", c2);
 
@@ -53,7 +71,7 @@ void MaterialModel_Vorp03_Incompressible_Mixed::write_hdf5( const char * const &
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-void MaterialModel_Vorp03_Incompressible_Mixed::get_PK(
+void MaterialModel_Vorp03_ST91_Mixed::get_PK(
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
@@ -69,7 +87,7 @@ void MaterialModel_Vorp03_Incompressible_Mixed::get_PK(
   P.MatMult(F,S);
 }
 
-void MaterialModel_Vorp03_Incompressible_Mixed::get_PK_Stiffness( 
+void MaterialModel_Vorp03_ST91_Mixed::get_PK_Stiffness( 
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
@@ -105,13 +123,37 @@ void MaterialModel_Vorp03_Incompressible_Mixed::get_PK_Stiffness(
   CC.AXPY(- val3, II);
 }
 
-double MaterialModel_Vorp03_Incompressible_Mixed::get_strain_energy( 
+double MaterialModel_Vorp03_ST91_Mixed::get_strain_energy( 
     const Tensor2_3D &F ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
   const double detCm0d67 = std::pow(F.det(), 2.0 * mpt67);
   const double I2_iso = detCm0d67 * C.I2();
   return c1 * (I2_iso - 3.0) + c2 * (I2_iso - 3) * (I2_iso - 3);
+}
+
+double MaterialModel_Vorp03_ST91_Mixed::get_rho( const double &p ) const
+{
+  const double pk = p / kappa;
+  return rho0 * (std::pow(pk*pk+1.0, 0.5) + pk);
+}
+
+double MaterialModel_Vorp03_ST91_Mixed::get_drho_dp( const double &p ) const
+{
+  const double pk = p / kappa;
+  return (rho0 / kappa) * (1 + pk * std::pow(pk*pk+1.0, -0.5));
+}
+
+double MaterialModel_Vorp03_ST91_Mixed::get_beta( const double &p ) const
+{
+  const double pk = p / kappa;
+  return 1.0 / (kappa * std::pow(pk*pk+1.0, 0.5));
+}
+
+double MaterialModel_Vorp03_ST91_Mixed::get_dbeta_dp( const double &p ) const
+{
+  const double pk = p / kappa;
+  return -pk / ( kappa*kappa*std::pow(pk*pk+1.0, 1.5) );
 }
 
 // EOF

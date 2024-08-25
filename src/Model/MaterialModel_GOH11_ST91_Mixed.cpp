@@ -1,6 +1,6 @@
-#include "MaterialModel_GOH06_ST91_Mixed.hpp"
+#include "MaterialModel_GOH11_ST91_Mixed.hpp"
 
-MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
+MaterialModel_GOH11_ST91_Mixed::MaterialModel_GOH11_ST91_Mixed(
     const double &in_rho, const double &in_E, const double &in_nu,
     const double &in_f1the, const double &in_f1phi,
     const double &in_f2the, const double &in_f2phi,
@@ -29,7 +29,7 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a02(2) = cos(f2_the);
 }
 
-MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
+MaterialModel_GOH11_ST91_Mixed::MaterialModel_GOH11_ST91_Mixed(
 		const char * const &fname )
 : pt33( 1.0 / 3.0 ), mpt67( -2.0 * pt33 ), pi( MATH_T::PI )
 {
@@ -38,7 +38,7 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   HDF5_Reader * h5r = new HDF5_Reader( h5file );
 
   SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
-     "Error: MaterialModel_GOH06_ST91_Mixed constructor does not match h5 file.\n" );
+     "Error: MaterialModel_GOH11_ST91_Mixed constructor does not match h5 file.\n" );
 
   rho0   = h5r -> read_doubleScalar("/", "rho0");
   E      = h5r -> read_doubleScalar("/", "E");
@@ -72,12 +72,12 @@ MaterialModel_GOH06_ST91_Mixed::MaterialModel_GOH06_ST91_Mixed(
   a02(2) = cos(f2_the);
 }
 
-MaterialModel_GOH06_ST91_Mixed::~MaterialModel_GOH06_ST91_Mixed()
+MaterialModel_GOH11_ST91_Mixed::~MaterialModel_GOH11_ST91_Mixed()
 {}
 
-void MaterialModel_GOH06_ST91_Mixed::print_info() const
+void MaterialModel_GOH11_ST91_Mixed::print_info() const
 {
-  SYS_T::commPrint( "\t  MaterialModel_GOH06_ST91_Mixed: \n");
+  SYS_T::commPrint( "\t  MaterialModel_GOH11_ST91_Mixed: \n");
   SYS_T::commPrint( "\t  Ground Matrix Neo-Hookean: \n");
   SYS_T::commPrint( "\t  Young's Modulus E  = %e \n", E);
   SYS_T::commPrint( "\t  Possion's ratio nu = %e \n", nu);
@@ -99,7 +99,7 @@ void MaterialModel_GOH06_ST91_Mixed::print_info() const
   SYS_T::commPrint( "\t  Fibre k_dispersion = %e \n", fkd);
 }
 
-void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) const
+void MaterialModel_GOH11_ST91_Mixed::write_hdf5( const char * const &fname ) const
 {
   if( SYS_T::get_MPI_rank() == 0 )
   {
@@ -126,7 +126,7 @@ void MaterialModel_GOH06_ST91_Mixed::write_hdf5( const char * const &fname ) con
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-void MaterialModel_GOH06_ST91_Mixed::get_PK( 
+void MaterialModel_GOH11_ST91_Mixed::get_PK( 
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
@@ -136,9 +136,6 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
 
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
-
-  const double fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
-  const double fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
 
   // P : I = I - 1/3 trC C^-1
   Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
@@ -171,7 +168,7 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK(
   P.MatMult(F,S);
 }
 
-void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness( 
+void MaterialModel_GOH11_ST91_Mixed::get_PK_Stiffness( 
     const Tensor2_3D &F, Tensor2_3D &P, Tensor2_3D &S, Tensor4_3D &CC ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
@@ -233,10 +230,9 @@ void MaterialModel_GOH06_ST91_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(mpt67, S, Cinv);
 }
 
-double MaterialModel_GOH06_ST91_Mixed::get_strain_energy( const Tensor2_3D &F ) const
+double MaterialModel_GOH11_ST91_Mixed::get_strain_energy( const Tensor2_3D &F ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
@@ -253,7 +249,7 @@ double MaterialModel_GOH06_ST91_Mixed::get_strain_energy( const Tensor2_3D &F ) 
   return PSI_iso + PSI_fi1 + PSI_fi2;
 }
 
-Vector_3 MaterialModel_GOH06_ST91_Mixed::get_fibre_dir( const int &dir ) const
+Vector_3 MaterialModel_GOH11_ST91_Mixed::get_fibre_dir( const int &dir ) const
 {
   if(dir == 0)
     return a1;
@@ -261,36 +257,36 @@ Vector_3 MaterialModel_GOH06_ST91_Mixed::get_fibre_dir( const int &dir ) const
     return a2;
   else
   {
-    SYS_T::print_fatal("Error: MaterialModel_GOH06_ST91_Mixed, wrong fibre direction. \n");
+    SYS_T::print_fatal("Error: MaterialModel_GOH11_ST91_Mixed, wrong fibre direction. \n");
     return Vector_3();
   }
 }
 
-double MaterialModel_GOH06_ST91_Mixed::get_rho( const double &p ) const
+double MaterialModel_GOH11_ST91_Mixed::get_rho( const double &p ) const
 {
   const double pk = p / kappa;
   return rho0 * (std::pow(pk*pk+1.0, 0.5) + pk);
 }
 
-double MaterialModel_GOH06_ST91_Mixed::get_drho_dp( const double &p ) const
+double MaterialModel_GOH11_ST91_Mixed::get_drho_dp( const double &p ) const
 {
   const double pk = p / kappa;
   return (rho0 / kappa) * (1 + pk * std::pow(pk*pk+1.0, -0.5));
 }
 
-double MaterialModel_GOH06_ST91_Mixed::get_beta( const double &p ) const
+double MaterialModel_GOH11_ST91_Mixed::get_beta( const double &p ) const
 {
   const double pk = p / kappa;
   return 1.0 / (kappa * std::pow(pk*pk+1.0, 0.5));
 }
 
-double MaterialModel_GOH06_ST91_Mixed::get_dbeta_dp( const double &p ) const
+double MaterialModel_GOH11_ST91_Mixed::get_dbeta_dp( const double &p ) const
 {
   const double pk = p / kappa;
   return -pk / ( kappa*kappa*std::pow(pk*pk+1.0, 1.5) );
 }
 
-void MaterialModel_GOH06_ST91_Mixed::update_fibre_dir( const Vector_3 &basis_r,
+void MaterialModel_GOH11_ST91_Mixed::update_fibre_dir( const Vector_3 &basis_r,
   const Vector_3 &basis_c, const Vector_3 &basis_l )
 {
   a1 = a01(0) * basis_r + a01(1) * basis_c + a01(2) * basis_l;
