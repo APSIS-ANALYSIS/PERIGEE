@@ -29,6 +29,10 @@
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH06_ST91_Mixed.hpp"
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH11_ST91_Mixed.hpp"
+#include "MaterialModel_GOH11_Incompressible_Mixed.hpp"
+#include "MaterialModel_Vorp03_ST91_Mixed.hpp"
+#include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
@@ -550,7 +554,31 @@ int main(int argc, char *argv[])
   IMaterialModel ** matmodel = new IMaterialModel* [num_layer+1];
   IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer+1];
   
-  for (int ii=0; ii<num_layer; ++ii)
+  SYS_T::commPrint("Material model of solid %d :\n", 0);
+  if( solid_nu[0] == 0.5 )
+  {
+    matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( solid_density[0], solid_mu[0],
+        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
+  
+    //matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+
+    locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Incompressible(
+        matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+  }
+  else
+  {
+    matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( solid_density[0], solid_E[0], solid_nu[0],
+        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
+
+    //matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+
+    locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+        matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+  }
+
+  std::string matmodel_file_name = "material_model_" + std::to_string(0) + ".h5";
+  matmodel[0] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
+  for (int ii=1; ii<num_layer; ++ii)
   {
     SYS_T::commPrint("Material model of solid %d :\n", ii);
     if( solid_nu[ii] == 0.5 )

@@ -104,8 +104,12 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_M94_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_NeoHookean_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_Vorp03_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_Vorp03_ST91_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH06_Incompressible_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH06_ST91_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH11_Incompressible_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH11_ST91_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH14_ST91_Mixed.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
   ${perigee_source}/Model/Tissue_property.cpp

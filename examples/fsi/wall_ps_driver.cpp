@@ -22,6 +22,10 @@
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH06_ST91_Mixed.hpp"
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH11_ST91_Mixed.hpp"
+#include "MaterialModel_GOH11_Incompressible_Mixed.hpp"
+#include "MaterialModel_Vorp03_ST91_Mixed.hpp"
+#include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 #include "PTime_FSI_Solver.hpp"
@@ -397,7 +401,53 @@ int main( int argc, char *argv[] )
   IMaterialModel ** matmodel = new IMaterialModel* [num_layer+1];
   IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer+1];
 
-  for(int ii=0; ii<num_layer; ++ii)
+  if( is_read_material )
+  {
+    std::string matmodel_file_name = "material_model_" + std::to_string(0) + ".h5";
+      
+    hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+    HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
+
+    solid_nu[0] = model_h5r -> read_doubleScalar("/", "nu");
+
+    delete model_h5r; H5Fclose(model_file);
+      
+    if( solid_nu[0] == 0.5 )
+    {
+      matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( matmodel_file_name.c_str() );
+
+      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Incompressible(
+          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( matmodel_file_name.c_str() );
+
+      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+  }
+  else
+  {
+    if( solid_nu[0] == 0.5 )
+    {
+      matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( solid_density[0], solid_mu[0],
+        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
+
+      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Incompressible(
+          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( solid_density[0], solid_E[0], solid_nu[0],
+        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
+
+      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+  }
+  for(int ii=1; ii<num_layer; ++ii)
   {
     if( is_read_material )
     {
