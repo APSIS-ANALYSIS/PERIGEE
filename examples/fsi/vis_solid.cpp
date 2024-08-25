@@ -276,16 +276,10 @@ int main ( int argc , char * argv[] )
     if( solid_nu[0] == 0.5 )
     {
       matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( matmodel_file_name.c_str() );
-
-      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Incompressible(
-          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
       matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( matmodel_file_name.c_str() );
-
-      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }
   else
@@ -294,17 +288,11 @@ int main ( int argc , char * argv[] )
     {
       matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( solid_density[0], solid_mu[0],
         solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
-
-      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Incompressible(
-          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
       matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( solid_density[0], solid_E[0], solid_nu[0],
         solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
-
-      locAssem_solid_ptr[0] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-          matmodel[0], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }
   for(int ii=0; ii<num_layer; ++ii)

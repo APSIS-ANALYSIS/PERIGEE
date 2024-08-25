@@ -620,8 +620,8 @@ int main(int argc, char *argv[])
     locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
         matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
-  std::string matmodel_file_name = "material_model_" + std::to_string(num_layer) + ".h5";
-  matmodel[num_layer] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
+  std::string matmodel_file_name_ILT = "material_model_" + std::to_string(num_layer) + ".h5";
+  matmodel[num_layer] -> write_hdf5(matmodel_file_name_ILT.c_str()); // record model parameter on disk
   
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );

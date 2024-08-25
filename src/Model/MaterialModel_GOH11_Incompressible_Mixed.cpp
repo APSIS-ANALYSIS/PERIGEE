@@ -131,9 +131,6 @@ void MaterialModel_GOH11_Incompressible_Mixed::get_PK(
   const double a1Ca1 = C.VecMatVec(a1, a1);
   const double a2Ca2 = C.VecMatVec(a2, a2);
 
-  const double fE1 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a1Ca1) - 1.0;
-  const double fE2 = detFm0d67 * (fkd*trC + (1.0-3.0*fkd)*a2Ca2) - 1.0;
-
   // PxI = P : I = I - 1/3 trC C^-1
   Tensor2_3D PxI(Cinv); PxI.scale( (-1.0) * pt33 * trC );
   PxI.AXPI( 1.0 );
@@ -231,7 +228,6 @@ double MaterialModel_GOH11_Incompressible_Mixed::get_strain_energy(
     const Tensor2_3D &F ) const
 {
   Tensor2_3D C; C.MatMultTransposeLeft(F);
-  Tensor2_3D Cinv = Ten2::inverse(C);
   const double trC = C.tr();
   const double detFm0d67 = std::pow(F.det(), mpt67);
 
