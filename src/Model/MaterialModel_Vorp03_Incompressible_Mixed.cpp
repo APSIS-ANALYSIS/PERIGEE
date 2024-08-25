@@ -64,8 +64,8 @@ void MaterialModel_Vorp03_Incompressible_Mixed::get_PK(
   S.copy(Cinv);
   S.scale( mpt67 * I2 );
   S.AXPI( C.tr() );
-  S.AXPY( 1.0, C );
-  S.scale( coe * detCm0d67 * detCm0d67 );
+  S.AXPY( -1.0, C );
+  S.scale( coe * detCm0d67 );
   P.MatMult(F,S);
 }
 
@@ -83,9 +83,9 @@ void MaterialModel_Vorp03_Incompressible_Mixed::get_PK_Stiffness(
   S.copy(Cinv);
   S.scale( mpt67 * I2 );
   S.AXPI( C.tr() );
-  S.AXPY( 1.0, C );
+  S.AXPY( -1.0, C );
   C1.copy(S);
-  S.scale( coe * detCm0d67 * detCm0d67 );
+  S.scale( coe * detCm0d67 );
   P.MatMult(F,S);
   
   C2.copy(C);
@@ -100,9 +100,9 @@ void MaterialModel_Vorp03_Incompressible_Mixed::get_PK_Stiffness(
   CC.add_OutProduct(val2, C2, Cinv);
   CC.add_OutProduct(val2, Cinv, C2);
   CC.add_OutProduct(val3 * 4.0 * I2 / 9.0, Cinv, Cinv);
-  CC.add_SymmProduct(val3 * mpt67 * I2, Cinv, Cinv);
+  CC.add_SymmProduct(2.0 * val3 * pt33 * I2, Cinv, Cinv);
   CC.add_OutProduct(val3, I, I);
-  CC.AXPY(- val3, II);
+  CC.AXPY(-val3, II);
 }
 
 double MaterialModel_Vorp03_Incompressible_Mixed::get_strain_energy( 
