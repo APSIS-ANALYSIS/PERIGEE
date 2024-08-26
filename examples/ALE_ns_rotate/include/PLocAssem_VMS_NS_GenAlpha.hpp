@@ -333,51 +333,48 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         double * const &currPt_z,
         const int &type) const
     {
-      // double mag_angular_velo = 0.0; // (rad/s)
+      double mag_angular_velo = 0.0; // (rad/s)
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
-        // const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
-        // const Vector_3 radius_ept = get_radius(ept_xyz);
+        const Vector_3 ept_xyz (ept_x[ii], ept_y[ii], ept_z[ii]);
+        const Vector_3 radius_ept = get_radius(ept_xyz);
 
-        // const double rr = radius_ept.norm2();
+        const double rr = radius_ept.norm2();
         
-        // double angle = 0.0;
+        double angle = 0.0;
 
-        // //case 0: x-axis, case 1: y-axis, case 2: z-axis
-        // switch(type) 
-        // {
-        //   case 0:
-        //     mag_angular_velo = angular_velo * direction_rotated.x();
-        //     angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
-        //     angle += mag_angular_velo * tt;
-        //     currPt_x[ii] = ept_x[ii];
-        //     currPt_y[ii] = std::cos(angle) * rr;
-        //     currPt_z[ii] = std::sin(angle) * rr;            
-        //     break;
-        //   case 1: 
-        //     mag_angular_velo = angular_velo * direction_rotated.y();
-        //     angle = MATH_T::get_angle_2d(ept_xyz(2), ept_xyz(0));        
-        //     angle += mag_angular_velo * tt;
-        //     currPt_x[ii] = std::sin(angle) * rr;
-        //     currPt_y[ii] = ept_y[ii];
-        //     currPt_z[ii] = std::cos(angle) * rr;            
-        //     break;            
-        //   case 2: 
-        //     mag_angular_velo = angular_velo * direction_rotated.z();
-        //     angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
-        //     angle += mag_angular_velo * tt;
-        //     currPt_x[ii] = std::cos(angle) * rr;
-        //     currPt_y[ii] = std::sin(angle) * rr;
-        //     currPt_z[ii] = ept_z[ii];            
-        //     break;            
-        //   default:
-        //     SYS_T::print_fatal("Error: PLocAssem_VMS_NS_GenAlpha::get_currPts: No such type of rotation axis. \n");
-        //     break;        
-        // }
-        currPt_x[ii] = ept_x[ii];
-        currPt_y[ii] = ept_y[ii];
-        currPt_z[ii] = ept_z[ii];
+        //case 0: x-axis, case 1: y-axis, case 2: z-axis
+        switch(type) 
+        {
+          case 0:
+            mag_angular_velo = angular_velo * direction_rotated.x();
+            angle = MATH_T::get_angle_2d(ept_xyz(1), ept_xyz(2));        
+            angle += mag_angular_velo * tt;
+            currPt_x[ii] = ept_x[ii];
+            currPt_y[ii] = std::cos(angle) * rr;
+            currPt_z[ii] = std::sin(angle) * rr;            
+            break;
+          case 1: 
+            mag_angular_velo = angular_velo * direction_rotated.y();
+            angle = MATH_T::get_angle_2d(ept_xyz(2), ept_xyz(0));        
+            angle += mag_angular_velo * tt;
+            currPt_x[ii] = std::sin(angle) * rr;
+            currPt_y[ii] = ept_y[ii];
+            currPt_z[ii] = std::cos(angle) * rr;            
+            break;            
+          case 2: 
+            mag_angular_velo = angular_velo * direction_rotated.z();
+            angle = MATH_T::get_angle_2d(ept_xyz(0), ept_xyz(1));        
+            angle += mag_angular_velo * tt;
+            currPt_x[ii] = std::cos(angle) * rr;
+            currPt_y[ii] = std::sin(angle) * rr;
+            currPt_z[ii] = ept_z[ii];            
+            break;            
+          default:
+            SYS_T::print_fatal("Error: PLocAssem_VMS_NS_GenAlpha::get_currPts: No such type of rotation axis. \n");
+            break;        
+        }
       }
     }
 
