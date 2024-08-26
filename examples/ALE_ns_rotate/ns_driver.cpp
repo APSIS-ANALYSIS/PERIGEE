@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Angular velocity
-  double angular_velo = 2* MATH_T::PI; //(rad/s)
+  double angular_velo = 2.0 * MATH_T::PI; //(rad/s)
 
   // Yaml options
   bool is_loadYaml = true;
