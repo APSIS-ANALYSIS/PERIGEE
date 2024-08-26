@@ -424,31 +424,6 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input )
    val * input(3), val * input(4), val * input(5) );
 }
 
-SymmTensor2_3D STen2::gen_id()
-{
-  return SymmTensor2_3D(1.0, 1.0, 1.0, 0.0, 0.0, 0.0);
-}
-
-SymmTensor2_3D STen2::gen_zero()
-{
-  return SymmTensor2_3D(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-}
-
-SymmTensor2_3D STen2::gen_rand(const double &left, const double &right)
-{
-  std::random_device rd;
-  std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<double> dis(left, right);
-  return SymmTensor2_3D( dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen) );
-}
-
-SymmTensor2_3D STen2::gen_dyad( const Vector_3 &input )
-{
-  return SymmTensor2_3D( input(0) * input(0), input(1) * input(1),
-      input(2) * input(2), input(1) * input(2), input(0) * input(2),
-      input(0) * input(1) );
-}
-
 SymmTensor2_3D STen2::inverse( const SymmTensor2_3D &input )
 {
   const double invdetA = 1.0 / input.det();

@@ -215,17 +215,30 @@ SymmTensor2_3D operator*( const double &val, const SymmTensor2_3D &input );
 namespace STen2
 {
   // Generate an identity tensor
-  SymmTensor2_3D gen_id();
+  inline SymmTensor2_3D gen_id()
+  { return SymmTensor2_3D(1.0, 1.0, 1.0, 0.0, 0.0, 0.0); }
 
   // Generate a zero tensor
-  SymmTensor2_3D gen_zero();
+  inline SymmTensor2_3D gen_zero()
+  { return SymmTensor2_3D(0.0, 0.0, 0.0, 0.0, 0.0, 0.0); }
 
   // Set components a random value
-  SymmTensor2_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
+  inline SymmTensor2_3D gen_rand(const double &left = -1.0, const double &right = 1.0)
+  {
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(left, right);
+    return SymmTensor2_3D( dis(gen), dis(gen), dis(gen), dis(gen), dis(gen), dis(gen) );
+  }
 
   // Generate a dyad with a unit vector
   // Note: we do not check the unit length of input
-  SymmTensor2_3D gen_dyad(const Vector_3 &input);
+  inline SymmTensor2_3D gen_dyad(const Vector_3 &input)
+  {
+    return SymmTensor2_3D( input(0) * input(0), input(1) * input(1),
+        input(2) * input(2), input(1) * input(2), input(0) * input(2),
+        input(0) * input(1) );
+  }
 
   // Return the inverse of the input matrix
   SymmTensor2_3D inverse( const SymmTensor2_3D &input );
@@ -239,7 +252,7 @@ namespace STen2
   // Convert a regular matrix to its symmetric part
   // output = 0.5 x ( source + source_transpose )
   SymmTensor2_3D gen_symm_part( const Tensor2_3D &input );
-  
+
   // Apply the projector P := I - 1/3 invC x C on a symmetric tensor to obtain
   // its Dev part in the Lagrangian setting
   SymmTensor2_3D gen_DEV_part( const SymmTensor2_3D &input, const SymmTensor2_3D &CC );
