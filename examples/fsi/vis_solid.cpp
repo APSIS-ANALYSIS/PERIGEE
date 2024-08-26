@@ -84,6 +84,8 @@ int main ( int argc , char * argv[] )
   double ilt_density = -1;
   double ilt_E = -1;
   double ilt_nu = -1;
+  double ilt_c1 = -1;
+  double ilt_c2 = -1;
 
   // Load analysis code parameter from solver_cmd.h5 file
   prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -146,6 +148,8 @@ int main ( int argc , char * argv[] )
   SYS_T::GetOptionReal(  "-ilt_density",       ilt_density);
   SYS_T::GetOptionReal(  "-ilt_E",             ilt_E);
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
+  SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
+  SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
 
   // Correct time_step if it does not match with sol_rec_freq
   if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
@@ -217,6 +221,8 @@ int main ( int argc , char * argv[] )
     SYS_T::cmdPrint("-ilt_density", ilt_density);
     SYS_T::cmdPrint("-ilt_E", ilt_E);
     SYS_T::cmdPrint("-ilt_nu", ilt_nu);
+    SYS_T::cmdPrint("-ilt_c1", ilt_c1);
+    SYS_T::cmdPrint("-ilt_c2", ilt_c2);
   }
   
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
@@ -349,22 +355,27 @@ int main ( int argc , char * argv[] )
       
     if( ilt_nu == 0.5 )
     {
-      matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
+     // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed( matmodel_file_name.c_str() );
     }
     else
     {
-      matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed( matmodel_file_name.c_str() );
     }
   }
   else
   {
     if( ilt_nu == 0.5 )
     {
-      matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
+      matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed(ilt_density, ilt_c1, ilt_c2);
     }
     else
     {
-      matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
+      matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed(ilt_density, ilt_E, ilt_nu,
+        ilt_c1, ilt_c2);
     }
   }
 

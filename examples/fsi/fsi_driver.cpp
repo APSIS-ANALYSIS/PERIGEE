@@ -96,6 +96,8 @@ int main(int argc, char *argv[])
   double ilt_density = -1;
   double ilt_E = -1;
   double ilt_nu = -1;
+  double ilt_c1 = -1;
+  double ilt_c2 = -1;
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;
@@ -287,6 +289,8 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-ilt_density", ilt_density);
   SYS_T::cmdPrint("-ilt_E", ilt_E);
   SYS_T::cmdPrint("-ilt_nu", ilt_nu);
+  SYS_T::cmdPrint("-ilt_c1", ilt_c1);
+  SYS_T::cmdPrint("-ilt_c2", ilt_c2);
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
 
@@ -371,6 +375,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "ilt_density",     ilt_density);
     cmdh5w->write_doubleScalar(  "ilt_E",           ilt_E);
     cmdh5w->write_doubleScalar(  "ilt_nu",          ilt_nu);
+    cmdh5w->write_doubleScalar(  "ilt_c1",          ilt_c1);
+    cmdh5w->write_doubleScalar(  "ilt_c2",          ilt_c2);
     cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
@@ -608,14 +614,17 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("Material model of solid %d :\n", num_layer);
   if( ilt_nu == 0.5 )
   {
-    matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
+    // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
+    matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed( ilt_density, ilt_c1, ilt_c2 );
 
     locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
         matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
-    matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
+    // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
+    matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed( ilt_density, ilt_E, ilt_nu,
+      ilt_c1, ilt_c2);
 
     locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
         matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
