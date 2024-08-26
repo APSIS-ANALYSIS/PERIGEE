@@ -46,22 +46,6 @@
 
 int main(int argc, char *argv[])
 {
-  // Set number of threads and  print info of OpenMP
-  SYS_T::print_omp_info();
-  SYS_T::set_omp_num_threads();
-
-  std::vector<int> a {};
-
-#pragma omp parallel for ordered
-  for(int ii = 0; ii < 81; ++ii) {
-    if(ii % 3 == 0) {
-#pragma omp ordered
-      a.push_back(ii);  // Directly insert into 'a' in the correct order
-    }
-  }
-
-  VEC_T::print(a);
-
   return EXIT_SUCCESS;
 }
 
