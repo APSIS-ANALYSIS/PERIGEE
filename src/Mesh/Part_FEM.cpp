@@ -182,22 +182,16 @@ void Part_FEM::Generate_Partition( const IMesh * const &mesh,
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
   std::vector<int> node_tot {};
-  PERIGEE_OMP_PARALLEL
+  for( int e=0; e<nlocalele; ++e )
   {
-    std::vector<int> temp_node_tot {};
-    PERIGEE_OMP_FOR
-    for( int e=0; e<nlocalele; ++e )
+    for( int ii=0; ii<nLocBas; ++ii )
     {
-      for( int ii=0; ii<nLocBas; ++ii )
-      {
-        int temp_node = IEN->get_IEN(elem_loc[e], ii);
-        temp_node = mnindex->get_old2new(temp_node);
-        temp_node_tot.push_back( temp_node );
-      }
+      int temp_node = IEN->get_IEN(elem_loc[e], ii);
+      temp_node = mnindex->get_old2new(temp_node);
+      node_tot.push_back( temp_node );
     }
-    PERIGEE_OMP_CRITICAL
-    VEC_T::insert_end(node_tot, temp_node_tot);
   }
+  
   VEC_T::sort_unique_resize( node_tot );
 
   ntotalnode = VEC_T::get_size( node_tot );
