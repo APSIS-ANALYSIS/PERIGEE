@@ -292,31 +292,26 @@ class PGAssem_NS_FEM : public IPGAssem
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
     {
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        const int offset1 = ii * dof_sol;
-        const int offset2 = IEN[ii] * dof_sol;
-        for(int jj=0; jj<dof_sol; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
+      GetLocalImpl( array, nLocBas, dof_sol, IEN, local_array );
     }
 
     void GetLocal( const double * const &array, const int * const &IEN,
         const int &in_locbas, double * const &local_array) const
     {
-      for(int ii=0; ii<in_locbas; ++ii)
-      {
-        const int offset1 = ii * dof_sol;
-        const int offset2 = IEN[ii] * dof_sol;
-        for(int jj=0; jj<dof_sol; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
+      GetLocalImpl( array, in_locbas, dof_sol, IEN, local_array );
     }
 
     void GetLocal(const double * const &array, const int &in_dof, 
         const int * const &IEN, double * const &local_array) const
     {
-      for(int ii=0; ii<nLocBas; ++ii)
+      GetLocalImpl( array, nLocBas, in_dof, IEN, local_array );
+    }
+
+    void GetLocalImpl( const double * const &array, 
+        const int &in_locbas, const int &in_dof,
+        const int * const &IEN, double * const &local_array ) const
+    {
+      for(int ii=0; ii<in_locbas; ++ii)
       {
         const int offset1 = ii * in_dof;
         const int offset2 = IEN[ii] * in_dof;
