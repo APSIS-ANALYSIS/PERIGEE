@@ -69,9 +69,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
-  const double * const &rotated_local_mvelo,
-  const double * const &rotatedCtrlPts_x, const double * const &rotatedCtrlPts_y,
-  const double * const &rotatedCtrlPts_z)
+  const double * const &rotated_local_mvelo)
 {
   Zero_Residual_itf();
 
@@ -149,15 +147,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
     wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
     wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
     wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
-
-    opposite_xyz.x() += rotatedCtrlPts_x[ii] * Nr[ii];
-    opposite_xyz.y() += rotatedCtrlPts_y[ii] * Nr[ii];
-    opposite_xyz.z() += rotatedCtrlPts_z[ii] * Nr[ii];
   }
 
   // Mesh velocity in the quadrature point
-  const Vector_3 radius_qua = get_radius(opposite_xyz);
-  //const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
   const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
@@ -239,9 +231,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
-  const double * const &rotated_local_mvelo,
-  const double * const &rotatedCtrlPts_x, const double * const &rotatedCtrlPts_y,
-  const double * const &rotatedCtrlPts_z )
+  const double * const &rotated_local_mvelo)
 {
   Zero_Tangent_Residual_itf();
 
@@ -319,15 +309,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
     wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
     wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
     wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
-
-    opposite_xyz.x() += rotatedCtrlPts_x[ii] * Nr[ii];
-    opposite_xyz.y() += rotatedCtrlPts_y[ii] * Nr[ii];
-    opposite_xyz.z() += rotatedCtrlPts_z[ii] * Nr[ii];
   }
 
   // Mesh velocity in the quadrature point
-  const Vector_3 radius_qua = get_radius(opposite_xyz);
-  //const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo*direction_rotated, radius_qua);
   const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
 
   const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);

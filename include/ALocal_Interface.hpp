@@ -26,8 +26,7 @@
 class ALocal_Interface
 {
   public:
-    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
-        const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc );
+    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
 
     virtual ~ALocal_Interface() = default;
 
@@ -142,15 +141,6 @@ class ALocal_Interface
     // // Get the current rotated nodes' xyz with given rotation rule and time
     // virtual Vector_3 get_curr_xyz(const int &ii, const int &node, const double &tt) const;
 
-    // Get the radius of rotation
-    virtual Vector_3 get_radius (const Vector_3 &coor) const;
-
-    // Get the current point coordinates for the case of rotation around x/y/z-axis
-    virtual void get_currPts( const double * const &ept_x, const double * const &ept_y,
-      const double * const &ept_z, const double &tt,
-      double * const &currPt_x, double * const &currPt_y, double * const &currPt_z,
-      const int &type) const;
-
     virtual void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
       double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
@@ -221,13 +211,6 @@ class ALocal_Interface
     int cpu;
 
     int nqp_sur;
-
-    double angular_velo;
-
-    // Info of rotation axis
-    Vector_3 direction_rotated;
-
-    Vector_3 point_rotated;
 
     // the number of fixed volume elements in this part
     // size: num_itf

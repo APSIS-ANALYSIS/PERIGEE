@@ -1325,7 +1325,7 @@ void PGAssem_NS_FEM::Interface_KG(
 
         const double qw = quad_s->get_qw(qua);
 
-        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, curPt_x, curPt_y, curPt_z);
+        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1452,7 +1452,7 @@ void PGAssem_NS_FEM::Interface_G(
 
         const double qw = quad_s->get_qw(qua);
 
-        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, curPt_x, curPt_y, curPt_z);
+        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {

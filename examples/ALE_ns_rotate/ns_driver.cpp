@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
   locwbc -> print_info();
 
   // Interfaces info
-  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank, angular_velo, point_rotated, angular_direction);
+  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
   locitf -> print_info();
 
   // Local sub-domain's nodal indices
