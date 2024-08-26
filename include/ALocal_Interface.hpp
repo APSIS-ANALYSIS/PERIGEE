@@ -138,9 +138,6 @@ class ALocal_Interface
     virtual int get_rotated_ID(const int &ii, const int &dof_index, const int &node) const
     {return rotated_ID[ii][dof_index * num_rotated_node[ii] + node];}
 
-    // // Get the current rotated nodes' xyz with given rotation rule and time
-    // virtual Vector_3 get_curr_xyz(const int &ii, const int &node, const double &tt) const;
-
     virtual void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
       double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 

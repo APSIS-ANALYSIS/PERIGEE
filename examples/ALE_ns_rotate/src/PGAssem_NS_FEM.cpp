@@ -339,26 +339,7 @@ void PGAssem_NS_FEM::Assem_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    // for(int ii=0; ii<nLocBas; ++ii)
-    // {
-    //   for(int mm=0; mm<3; ++mm)
-    //     row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(0, IEN_e[ii]) + mm;
-    // }    
-    
-    // if( alelem_ptr->get_elem_tag(ee) == 0 )
-    // {
-    //   lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
-    //       elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    // }
-    // else
-    // {
-    //   lassem_ptr->Assem_Residual_Rotated(curr_time, dt, local_a, local_b,
-    //       elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    // }
-
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
-    
-    // VecSetValues(Disp, 3 * nLocBas, row_disp_index, lassem_ptr->disp_mesh, INSERT_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -471,23 +452,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
         row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
     }
 
-    // for(int ii=0; ii<nLocBas; ++ii)
-    // {
-    //   for(int mm=0; mm<3; ++mm)
-    //     row_disp_index[3*ii+mm] = 3 * nbc_part -> get_LID(0, IEN_e[ii]) + mm;
-    // }
-
-    // if( alelem_ptr->get_elem_tag(ee) == 0 )
-    // {
-    //   lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
-    //     elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    // }
-    // else
-    // {
-    //   lassem_ptr->Assem_Tangent_Residual_Rotated(curr_time, dt, local_a, local_b,
-    //     elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
-    // }
-      
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
       lassem_ptr->Tangent, ADD_VALUES);
 
@@ -1345,9 +1309,6 @@ void PGAssem_NS_FEM::Interface_KG(
 
         VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
         VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
-        
-        // VecAssemblyBegin(G);
-        // VecAssemblyEnd(G);
       }
     }
   }
@@ -1465,9 +1426,6 @@ void PGAssem_NS_FEM::Interface_G(
 
         VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
         VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
-        
-        // VecAssemblyBegin(G);
-        // VecAssemblyEnd(G);
       }
     }
   }

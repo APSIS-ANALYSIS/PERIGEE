@@ -27,11 +27,6 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   sur_Tangent = new PetscScalar[sur_size * sur_size];
   sur_Residual = new PetscScalar[sur_size];
 
-  // const int disp_size = nLocBas * 3;
-  // disp_mesh = new PetscScalar[disp_size];
-
-  // for(int ii=0; ii<disp_size; ++ii) disp_mesh[ii] = 0.0;
-
   Zero_Tangent_Residual();
 
   Zero_sur_Tangent_Residual();
