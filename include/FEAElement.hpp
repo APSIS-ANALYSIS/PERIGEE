@@ -14,6 +14,13 @@
 #include "IQuadPts.hpp"
 #include "FEANode.hpp"
 
+enum class ElemType {
+    TET4     = 501,
+    TET10_V2 = 502,
+    HEX8     = 601,
+    HEX27    = 602
+};
+
 class FEAElement
 {
   public:
