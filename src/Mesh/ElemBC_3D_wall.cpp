@@ -199,7 +199,7 @@ ElemBC_3D_wall::ElemBC_3D_wall(
       {
         const int idx = std::distance(global_node[ebc_id].begin(), it);
 
-        const double pp[3] {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
+        double pp[3] {pt_xyz[ebc_id][3*idx], pt_xyz[ebc_id][3*idx+1], pt_xyz[ebc_id][3*idx+2]};
 
         double cl_pt[3];
         vtkIdType cellId; int subId; double dist;
