@@ -34,7 +34,10 @@ class SymmTensor2_3D
     // Assignment operator
     SymmTensor2_3D& operator= (const SymmTensor2_3D &source);
 
-    Tensor2_3D full() const;
+    inline Tensor2_3D full() const
+    {
+      return Tensor2_3D( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
+    }
 
     std::vector<double> to_std_vector() const 
     { return std::vector<double>(std::begin(mat), std::end(mat)); }

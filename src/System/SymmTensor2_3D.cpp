@@ -2,11 +2,6 @@
 
 constexpr std::array<int, 9> SymmTensor2_3D::VoigtMap;
 
-Tensor2_3D SymmTensor2_3D::full() const
-{
-  return Tensor2_3D( mat[0], mat[5], mat[4], mat[5], mat[1], mat[3], mat[4], mat[3], mat[2] );
-}
-
 SymmTensor2_3D& SymmTensor2_3D::operator= (const SymmTensor2_3D &source)
 {
   if (this != &source) mat = source.mat; // use std::array assignment operator
