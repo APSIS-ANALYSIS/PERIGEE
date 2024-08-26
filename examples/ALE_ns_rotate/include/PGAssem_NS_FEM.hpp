@@ -319,6 +319,23 @@ class PGAssem_NS_FEM : public IPGAssem
           local_array[offset1 + jj] = array[offset2 + jj];
       }
     }
+
+    void get_currPts( const double * const &ept_x,
+        const double * const &ept_y,
+        const double * const &ept_z,
+        const double * const &disp,
+        const int &len,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z ) const
+    {
+      for(int ii=0; ii<len; ++ii)
+      {
+        currPt_x[ii] = ept_x[ii] + disp[3*ii];
+        currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
+        currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
+      }
+    }
 };
 
 #endif

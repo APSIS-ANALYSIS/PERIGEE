@@ -113,6 +113,8 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
     rotated_node_mvelo[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
 
+    rotated_node_disp[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0); 
+
     rotated_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_part_tag" );
 
     rotated_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_loc_pos" );
@@ -324,6 +326,36 @@ void ALocal_Interface::restore_node_mvelo(const PDNSolution * const &mvelo)
 
     // Summation from each part
     MPI_Allreduce(&temp_rotated_node_mvelo[0], &rotated_node_mvelo[ii][0], 3 * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+  }
+
+  delete [] array;  
+}
+
+void ALocal_Interface::restore_node_disp(const PDNSolution * const &disp)
+{
+  double * array = new double [nlgn * 3];
+
+  disp->GetLocalArray( array );
+
+  Zero_node_disp();
+
+  for(int ii = 0; ii < num_itf; ++ii)
+  { 
+    std::vector<double> temp_rotated_node_disp = rotated_node_disp[ii];
+    for(int nn = 0; nn < num_rotated_node[ii]; ++nn)
+    {
+      // Pick out the solution of nodes in each part
+      if(rotated_node_part_tag[ii][nn] == cpu)
+      { 
+        // Like GetLocal in PGAssem
+        const int loc_pos = rotated_node_loc_pos[ii][nn];
+        for(int dd = 0; dd < 3; ++dd)
+          temp_rotated_node_disp[3 * nn + dd] = array[3 * loc_pos + dd];
+      }
+    }
+
+    // Summation from each part
+    MPI_Allreduce(&temp_rotated_node_disp[0], &rotated_node_disp[ii][0], 3 * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   }
 
   delete [] array;  

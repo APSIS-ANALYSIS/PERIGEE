@@ -1255,12 +1255,17 @@ void PGAssem_NS_FEM::Interface_KG(
   double * ctrl_y = new double [nLocBas];
   double * ctrl_z = new double [nLocBas];
 
+  double * curPt_x = new double [nLocBas];
+  double * curPt_y = new double [nLocBas];
+  double * curPt_z = new double [nLocBas];
+
   int * fixed_local_ien = new int [nLocBas];
   double * fixed_local_sol = new double [nLocBas * dof_sol];
 
   int * rotated_local_ien = new int [nLocBas];
   double * rotated_local_sol = new double [nLocBas * dof_sol];
   double * rotated_local_mvelo = new double [nLocBas * 3];
+  double * rotated_local_disp = new double [nLocBas * 3];
 
   PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
   PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
@@ -1303,17 +1308,20 @@ void PGAssem_NS_FEM::Interface_KG(
         const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
+        
+        itf_part->get_rotated_disp(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
         free_quad->set_qp( rotated_xi[0], rotated_xi[1] );
 
-        rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
+        rotated_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
 
         itf_part->get_rotated_local(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
         itf_part->get_rotated_mvelo(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
 
         const double qw = quad_s->get_qw(qua);
 
-        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, ctrl_x, ctrl_y, ctrl_z);
+        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, curPt_x, curPt_y, curPt_z);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1345,6 +1353,7 @@ void PGAssem_NS_FEM::Interface_KG(
   delete [] rotated_local_ien; rotated_local_ien = nullptr;
   delete [] rotated_local_sol; rotated_local_sol = nullptr;
   delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
 
   delete [] fixed_row_index; fixed_row_index = nullptr;
   delete [] rotated_row_index; rotated_row_index = nullptr;
@@ -1352,6 +1361,10 @@ void PGAssem_NS_FEM::Interface_KG(
   delete [] ctrl_x; ctrl_x = nullptr;
   delete [] ctrl_y; ctrl_y = nullptr;
   delete [] ctrl_z; ctrl_z = nullptr;
+
+  delete [] curPt_x; curPt_x = nullptr;
+  delete [] curPt_y; curPt_y = nullptr;
+  delete [] curPt_z; curPt_z = nullptr;
 }
 
 void PGAssem_NS_FEM::Interface_G(
@@ -1369,12 +1382,17 @@ void PGAssem_NS_FEM::Interface_G(
   double * ctrl_y = new double [nLocBas];
   double * ctrl_z = new double [nLocBas];
 
+  double * curPt_x = new double [nLocBas];
+  double * curPt_y = new double [nLocBas];
+  double * curPt_z = new double [nLocBas];
+
   int * fixed_local_ien = new int [nLocBas];
   double * fixed_local_sol = new double [nLocBas * dof_sol];
 
   int * rotated_local_ien = new int [nLocBas];
   double * rotated_local_sol = new double [nLocBas * dof_sol];
   double * rotated_local_mvelo = new double [nLocBas * 3];
+  double * rotated_local_disp = new double [nLocBas * 3];
 
   PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
   PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
@@ -1418,16 +1436,19 @@ void PGAssem_NS_FEM::Interface_G(
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, curr_time, ctrl_x, ctrl_y, ctrl_z);
 
+        itf_part->get_rotated_disp(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
         free_quad->set_qp( rotated_xi[0], rotated_xi[1] );
 
-        rotated_elementv->buildBasis(rotated_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
+        rotated_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
 
         itf_part->get_rotated_local(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
         itf_part->get_rotated_mvelo(itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
 
         const double qw = quad_s->get_qw(qua);
 
-        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, ctrl_x, ctrl_y, ctrl_z);
+        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo, curPt_x, curPt_y, curPt_z);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1452,6 +1473,7 @@ void PGAssem_NS_FEM::Interface_G(
   delete [] rotated_local_ien; rotated_local_ien = nullptr;
   delete [] rotated_local_sol; rotated_local_sol = nullptr;
   delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
 
   delete [] fixed_row_index; fixed_row_index = nullptr;
   delete [] rotated_row_index; rotated_row_index = nullptr;
@@ -1459,6 +1481,10 @@ void PGAssem_NS_FEM::Interface_G(
   delete [] ctrl_x; ctrl_x = nullptr;
   delete [] ctrl_y; ctrl_y = nullptr;
   delete [] ctrl_z; ctrl_z = nullptr;
+
+  delete [] curPt_x; curPt_x = nullptr;
+  delete [] curPt_y; curPt_y = nullptr;
+  delete [] curPt_z; curPt_z = nullptr;
 }
 
 void PGAssem_NS_FEM::search_all_opposite_point(
@@ -1552,9 +1578,16 @@ void PGAssem_NS_FEM::search_opposite_point(
   {
     bool is_found = false;
 
+    double * inictrl_x = new double [nLocBas];
+    double * inictrl_y = new double [nLocBas];
+    double * inictrl_z = new double [nLocBas];
+
     double * volctrl_x = new double [nLocBas];
     double * volctrl_y = new double [nLocBas];
     double * volctrl_z = new double [nLocBas];
+
+    int * rotated_local_ien = new int [nLocBas];
+    double * rotated_local_disp = new double [nLocBas * 3];
 
     const int snlocbas = elements->get_nLocBas();
 
@@ -1570,7 +1603,9 @@ void PGAssem_NS_FEM::search_opposite_point(
     for(int ee{0}; ee<num_rotated_ele; ++ee)
     {
       // SYS_T::commPrint("    search rotated ee = %d\n", ee);
-      itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, volctrl_x, volctrl_y, volctrl_z);
+      itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, inictrl_x, inictrl_y, inictrl_z);
+      itf_part->get_rotated_disp(itf_id, rotated_tag, ee, rotated_local_ien, rotated_local_disp);
+      get_currPts(inictrl_x, inictrl_y, inictrl_z, rotated_local_disp, nLocBas, volctrl_x, volctrl_y, volctrl_z);
       
       rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
@@ -1601,7 +1636,9 @@ void PGAssem_NS_FEM::search_opposite_point(
       for(int ee{0}; ee<num_rotated_ele; ++ee)
       {
         // SYS_T::commPrint("    search rotated ee = %d\n", ee);
-        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, volctrl_x, volctrl_y, volctrl_z);
+        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, inictrl_x, inictrl_y, inictrl_z);
+        itf_part->get_rotated_disp(itf_id, rotated_tag, ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(inictrl_x, inictrl_y, inictrl_z, rotated_local_disp, nLocBas, volctrl_x, volctrl_y, volctrl_z);  
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
@@ -1633,7 +1670,9 @@ void PGAssem_NS_FEM::search_opposite_point(
       for(int ee{0}; ee<num_rotated_ele; ++ee)
       {
         // SYS_T::commPrint("    search rotated ee = %d\n", ee);
-        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, volctrl_x, volctrl_y, volctrl_z);
+        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, inictrl_x, inictrl_y, inictrl_z);
+        itf_part->get_rotated_disp(itf_id, rotated_tag, ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(inictrl_x, inictrl_y, inictrl_z, rotated_local_disp, nLocBas, volctrl_x, volctrl_y, volctrl_z);
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
@@ -1653,10 +1692,16 @@ void PGAssem_NS_FEM::search_opposite_point(
         }
       }
     }
+    delete [] inictrl_x; inictrl_x = nullptr;
+    delete [] inictrl_y; inictrl_y = nullptr;
+    delete [] inictrl_z; inictrl_z = nullptr;
 
     delete [] volctrl_x; volctrl_x = nullptr;
     delete [] volctrl_y; volctrl_y = nullptr;
     delete [] volctrl_z; volctrl_z = nullptr;
+
+    delete [] rotated_local_ien; rotated_local_ien = nullptr;
+    delete [] rotated_local_disp; rotated_local_disp = nullptr;
 
     SYS_T::print_fatal_if(is_found == false,
       "Error, PGAssem_NS_GEM::search_opposite_point: cannot find opposite point.\n");

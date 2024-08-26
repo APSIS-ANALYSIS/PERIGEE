@@ -129,6 +129,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // ------------------------------------------------- 
 
   itf_part->restore_node_mvelo(&mvelo_alpha);
+  itf_part->restore_node_disp(&mdisp_alpha);
   itf_part->restore_node_sol(&sol_alpha);
   // gassem_ptr->search_all_opposite_point(curr_time+alpha_f*dt, elementvs, elementvs_rotated, elements,
   //   quad_s, free_quad, itf_part);

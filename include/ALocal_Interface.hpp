@@ -112,6 +112,21 @@ class ALocal_Interface
       }
     }
 
+    // Return the local ien array and the local mdisp array of a rotated layer element
+    virtual void get_rotated_disp(const int &ii, const int &tag, const int &ee,
+      int * const &local_ien, double * const &local_disp) const
+    {
+      for(int nn = 0; nn < nLocBas; ++nn)
+      {
+        local_ien[nn] = get_rotated_layer_ien(ii, tag, ee * nLocBas + nn);
+
+        for(int dd = 0; dd < 3; ++dd)
+          {
+            local_disp[3 * nn + dd] = rotated_node_disp[ii][3 * local_ien[nn] + dd];
+          }
+      }
+    }
+
     virtual int get_rotated_face_id(const int &ii, const int &tag, const int &jj) const
     {return rotated_layer_face_id[ii][tag][jj];}
 
@@ -166,9 +181,20 @@ class ALocal_Interface
       }
     }
 
+    virtual void Zero_node_disp()
+    {
+      for(int ii = 0; ii < num_itf; ++ii)
+      {
+        for(int jj = 0; jj < 3 * num_rotated_node[ii]; ++jj)
+          rotated_node_disp[ii][jj] = 0.0;
+      }
+    }
+
     virtual void restore_node_sol(const PDNSolution * const &sol);
 
     virtual void restore_node_mvelo(const PDNSolution * const &mvelo);
+
+    virtual void restore_node_disp(const PDNSolution * const &disp);
 
     virtual void init_curr(const int &nqp_sur);
 
@@ -274,10 +300,14 @@ class ALocal_Interface
     // stores the pressure and velocity info of the nodes from the rotated volume elements
     // size: num_itf x (4 x num_rotated_node[ii])
     std::vector<std::vector<double>> rotated_node_sol;
- 
+
     // stores the mesh velocity info of the nodes from the rotated volume elements
-    // size: num_itf x (3 x num_fixed_node[ii])    
-    std::vector<std::vector<double>> rotated_node_mvelo;
+    // size: num_itf x (3 x num_rotated_node[ii])    
+    std::vector<std::vector<double>> rotated_node_mvelo;    
+
+    // stores the mesh displacement info of the nodes from the rotated volume elements
+    // size: num_itf x (3 x num_rotated_node[ii])    
+    std::vector<std::vector<double>> rotated_node_disp;  
 
     // stores the partition tag of the nodes from the rotated volume elements
     // size: num_itf x num_rotated_node[ii]
