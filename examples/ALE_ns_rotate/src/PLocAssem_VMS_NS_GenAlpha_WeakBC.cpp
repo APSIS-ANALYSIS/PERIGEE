@@ -460,7 +460,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak_Rotated(
 
     // Mesh velocity in the quadrature point
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
+    const Vector_3 velo_mesh = Vector_3(0, 0, 0); //Vec3::cross_product(angular_velo, radius_qua);
 
     // v - hat(v)
     const Vector_3 c_vec = u_vec - velo_mesh;
@@ -598,7 +598,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak_Rotated(
 
     // Mesh velocity in the quadrature point
     const Vector_3 radius_qua = get_radius(coor);
-    const Vector_3 velo_mesh = Vec3::cross_product(angular_velo, radius_qua);
+    const Vector_3 velo_mesh = Vector_3(0, 0, 0); // Vec3::cross_product(angular_velo, radius_qua);
 
     // v - hat(v)
     const Vector_3 c_vec = u_vec - velo_mesh;
