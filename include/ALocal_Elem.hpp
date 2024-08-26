@@ -67,18 +67,6 @@ class ALocal_Elem
       return elem_tag[ee];
     }
 
-    // ------------------------------------------------------------------------
-    // This is a virtual function for rotated ALE simulations. A tag
-    // is attached to each element to denote different domains,
-    // such as fixed vs. rotated subdomains. For a single domain problem,
-    // this function is NOT needed, and returns a default value of 0.
-    // ------------------------------------------------------------------------
-    // virtual int get_elem_rotated(const int &ee) const
-    // {
-    //   if( isRotated ) return elem_rotated[ee];
-    //   else return 0;
-    // }    
-
   private:
     // ------------------------------------------------------------------------
     // The number of elements that belong to the CPU, which equals the length 

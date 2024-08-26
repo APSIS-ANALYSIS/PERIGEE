@@ -313,7 +313,6 @@ void PGAssem_NS_FEM::Assem_residual(
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
-  // PetscInt * row_disp_index = new PetscInt [nLocBas * 3];
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
@@ -355,7 +354,6 @@ void PGAssem_NS_FEM::Assem_residual(
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
-  // delete [] row_disp_index; row_disp_index = nullptr;
    
   // Backflow stabilization residual contribution
   // BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
@@ -426,7 +424,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
-  // PetscInt * row_disp_index = new PetscInt [nLocBas * 3];
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
@@ -456,8 +453,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
       lassem_ptr->Tangent, ADD_VALUES);
 
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
-
-    // VecSetValues(Disp, 3 * nLocBas, row_disp_index, lassem_ptr->disp_mesh, INSERT_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -473,7 +468,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
-  // delete [] row_disp_index; row_disp_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
   // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
