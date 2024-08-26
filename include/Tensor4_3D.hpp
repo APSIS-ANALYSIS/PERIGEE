@@ -111,11 +111,6 @@ class Tensor4_3D
     void gen_proj_dev();
 
     // ------------------------------------------------------------------------
-    // generate a random 4th-order tensor (mainly used for debuggin)
-    // ------------------------------------------------------------------------
-    void gen_rand(const double &left = -1.0, const double &right = 1.0);
-
-    // ------------------------------------------------------------------------
     // Tensor algebraic manipulations: 
     // ------------------------------------------------------------------------
     // Scale the tensor by a scalar

@@ -115,14 +115,6 @@ void Tensor4_3D::gen_proj_dev()
   }
 }
 
-void Tensor4_3D::gen_rand(const double &left, const double &right)
-{
-  std::random_device rd;
-  std::mt19937_64 gen( rd() );
-  std::uniform_real_distribution<double> dis(left, right);
-  for(int ii=0; ii<81; ++ii) ten[ii] = dis(gen);
-}
-
 void Tensor4_3D::scale( const double &val )
 {
   for(int ii=0; ii<81; ++ii) ten[ii] *= val;
