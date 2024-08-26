@@ -210,20 +210,13 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
     }
 
-    Vector_3 get_Poiseuille_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
+    Vector_3 get_Poiseuille_traction1(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {
-      const double delta_P = 153.6; // pressure
-      const double Length = 1.2; // tube length
-      const double fl_mu = 4.0e-2; // viscosity
+      const double delta_P = 1; // pressure
+      const double Length = 1; // tube length
+      const double fl_mu = 1; // viscosity
 
-      // double time_ratio = 0.0;
-      // if(tt < 0.5)  // -inflow_thd_time
-      //   time_ratio = tt / 0.5;  // linearly increasing inflow
-      // else
-      //   time_ratio = 1.0;
-
-      // ux = 2Q * (R^2 - y^2 - z^2) / (pi * R^4), uy = 0, uz = 0;
-      const double z = pt.x(), y = pt.y();
+      const double z = pt.z(), y = pt.y();
 
       Tensor2_3D velo_grad ( 0.0, -delta_P * y / (2 * fl_mu * Length), -delta_P * z / (2 * fl_mu * Length),
                              0.0, 0.0, 0.0, 
@@ -231,40 +224,42 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
       // velo_grad *= time_ratio;
 
+
+      Tensor2_3D pp ( 1.0, 0.0, 0.0,
+                      0.0, 1.0, 0.0, 
+                      0.0, 0.0, 1.0 );
+
       Tensor2_3D velo_grad_T = velo_grad;
       velo_grad_T.transpose();
 
-      Tensor2_3D S = velo_grad + velo_grad_T;
-
-      S *= fl_mu;
+      Tensor2_3D S = - pp + fl_mu * (velo_grad + velo_grad_T);
 
       return S * n_out;
     }
-    
-    // Vector_3 get_Poiseuille_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
-    // {
-    //   const double delta_P = 153.6; // pressure
-    //   const double Length = 1.2; // tube length
-    //   const double fl_mu = 4.0e-2; // viscosity
 
-    //   // ux = 0, uy = 0, uz = delta_P * (R^2 - x^2 - y^2) / (4 * fl_mu * L);
-    //   const double x = pt.x(), y = pt.y();
+    Vector_3 get_Poiseuille_traction0(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
+    {
+      const double delta_P = 1; // pressure
+      const double Length = 1; // tube length
+      const double fl_mu = 1; // viscosity
 
-    //   Tensor2_3D velo_grad ( 0.0, 0.0, 0.0,
-    //                          0.0, 0.0, 0.0, 
-    //                          -delta_P * x / (2 * fl_mu * Length),
-    //                          -delta_P * y / (2 * fl_mu * Length),
-    //                          0.0);
+      const double z = pt.z(), y = pt.y();
 
-    //   Tensor2_3D velo_grad_T = velo_grad;
-    //   velo_grad_T.transpose();
+      Tensor2_3D velo_grad ( 0.0, -delta_P * y / (2 * fl_mu * Length), -delta_P * z / (2 * fl_mu * Length),
+                             0.0, 0.0, 0.0, 
+                             0.0, 0.0, 0.0 );
 
-    //   Tensor2_3D S = velo_grad + velo_grad_T;
+      Tensor2_3D pp ( 0.0, 0.0, 0.0,
+                      0.0, 0.0, 0.0, 
+                      0.0, 0.0, 0.0 );
 
-    //   S *= fl_mu;
-      
-    //   return S * n_out;
-    // }
+      Tensor2_3D velo_grad_T = velo_grad;
+      velo_grad_T.transpose();
+
+      Tensor2_3D S = - pp + fl_mu * (velo_grad + velo_grad_T);
+
+      return S * n_out;
+    }
 
     Vector_3 get_cubic_velo_traction(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {

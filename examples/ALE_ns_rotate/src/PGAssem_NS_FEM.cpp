@@ -13,7 +13,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
-    const ALocal_Interface * const &part_itf,
+    ALocal_Interface * const &part_itf,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -42,8 +42,10 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
 
   // Allocate the sparse matrix K
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &K);
+  // MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+  //     PETSC_DETERMINE, dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &K);
+  MatCreateDense(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, NULL, &K);
 
   // Allocate the vector G
   VecCreate(PETSC_COMM_WORLD, &G);
@@ -56,6 +58,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
+  search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, part_itf);
+
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
       elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, gbc );
 
@@ -63,11 +67,11 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   std::vector<int> Kdnz, Konz;
   PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
 
-  MatDestroy(&K); // Destroy the K with rough preallocation
+  // MatDestroy(&K); // Destroy the K with rough preallocation
  
-  // Create Mat with precise preallocation 
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+  // // Create Mat with precise preallocation 
+  // MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+  //     PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
 PGAssem_NS_FEM::~PGAssem_NS_FEM()
@@ -373,7 +377,7 @@ void PGAssem_NS_FEM::Assem_residual(
   // delete [] row_disp_index; row_disp_index = nullptr;
    
   // Backflow stabilization residual contribution
-  BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // // Resistance type boundary condition
   // NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
@@ -508,7 +512,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // delete [] row_disp_index; row_disp_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // // Resistance type boundary condition
   // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 

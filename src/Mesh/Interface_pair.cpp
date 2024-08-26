@@ -37,7 +37,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
   VTK_T::read_grid(fixed_vtkfile, num_fixed_sur_node, num_fixed_ele, fixed_sur_pt_xyz, fixed_sur_ien);
 
-  std::vector<int> fixed_global_node = VTK_T::read_int_PointData(fixed_vtkfile, "GlobalNodeID");
+  fixed_global_node = VTK_T::read_int_PointData(fixed_vtkfile, "GlobalNodeID");
   std::vector<int> fixed_global_cell = VTK_T::read_int_CellData(fixed_vtkfile, "GlobalElementID");
 
   int num_rotated_sur_node {0};
@@ -45,7 +45,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   std::vector<int> rotated_sur_ien {};
   VTK_T::read_grid(rotated_vtkfile, num_rotated_sur_node, num_rotated_ele, rotated_sur_pt_xyz, rotated_sur_ien);
 
-  std::vector<int> rotated_global_node = VTK_T::read_int_PointData(rotated_vtkfile, "GlobalNodeID");
+  rotated_global_node = VTK_T::read_int_PointData(rotated_vtkfile, "GlobalNodeID");
   std::vector<int> rotated_global_cell = VTK_T::read_int_CellData(rotated_vtkfile, "GlobalElementID");
 
   switch (elemtype_in)

@@ -40,6 +40,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
   init_rotated_node_xyz.resize(num_itf);
   rotated_node_sol.resize(num_itf);
   rotated_node_mvelo.resize(num_itf);
+  rotated_node_disp.resize(num_itf); 
   rotated_node_part_tag.resize(num_itf);
   rotated_node_loc_pos.resize(num_itf);
   rotated_node_id.resize(num_itf);
@@ -240,21 +241,14 @@ void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &ee,
 void ALocal_Interface::get_rotated_ele_ctrlPts(const int &ii, const int &tag, const int &ee, const double &tt,
   double * const volctrl_x, double * const volctrl_y, double * const volctrl_z) const
 {
-  // std::vector<double> initPt_x(nLocBas, 0.0), initPt_y(nLocBas, 0.0), initPt_z(nLocBas, 0.0);
-
   for(int nn{0}; nn < nLocBas; ++nn)
   {
     int node = get_rotated_layer_ien(ii, tag, nLocBas * ee + nn);
 
-    // initPt_x[nn] = get_init_rotated_node_xyz(ii, 3 * node);
-    // initPt_y[nn] = get_init_rotated_node_xyz(ii, 3 * node + 1);
-    // initPt_z[nn] = get_init_rotated_node_xyz(ii, 3 * node + 2);
     volctrl_x[nn] = get_init_rotated_node_xyz(ii, 3 * node);
     volctrl_y[nn] = get_init_rotated_node_xyz(ii, 3 * node + 1);
     volctrl_z[nn] = get_init_rotated_node_xyz(ii, 3 * node + 2);
   }
-
-  // get_currPts(&initPt_x[0], &initPt_y[0], &initPt_z[0], tt, volctrl_x, volctrl_y, volctrl_z, 0);
 }
 
 void ALocal_Interface::restore_node_sol(const PDNSolution * const &sol)

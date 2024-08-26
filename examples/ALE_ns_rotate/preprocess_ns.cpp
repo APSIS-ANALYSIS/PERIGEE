@@ -243,19 +243,6 @@ int main( int argc, char * argv[] )
 
   VEC_T::sort_unique_resize( node_f ); VEC_T::sort_unique_resize( node_r );
 
-  // std::vector<int> node_f, node_r; node_f.clear(); node_r.clear();
-  // PERIGEE_OMP_PARALLEL
-  // {
-  //   std::vector<int> temp_node_f {};
-  //   std::vector<int> temp_node_r {};
-  //   PERIGEE_OMP_FOR
-  //   for(int ee=0; ee<nElem; ++ee)
-  //   {
-
-  //   }
-
-  // }  
-
   IMesh * mesh = nullptr;
 
   switch( elemType )

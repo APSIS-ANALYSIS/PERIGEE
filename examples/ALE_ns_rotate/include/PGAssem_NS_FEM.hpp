@@ -38,7 +38,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
-        const ALocal_Interface * const &part_itf,
+        ALocal_Interface * const &part_itf,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
