@@ -103,7 +103,7 @@ void Tensor4_3D::gen_id()
 
 void Tensor4_3D::gen_proj_dev()
 {
-  const double pt33 = 1.0 / 3.0;
+  constexpr double pt33 = 1.0 / 3.0;
   for(int ii=0; ii<81; ++ii) ten[ii] = 0.0;
   for(int ii=0; ii<3; ++ii)
   {

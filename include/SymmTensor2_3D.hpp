@@ -18,14 +18,14 @@ class SymmTensor2_3D
 {
   public:
     // Constructor (default an identity 3-by-3 matrix)
-    SymmTensor2_3D() : mat{{1.0, 1.0, 1.0, 0.0, 0.0, 0.0}} {}
+    constexpr SymmTensor2_3D() : mat{{1.0, 1.0, 1.0, 0.0, 0.0, 0.0}} {}
 
     // Copy constructor
     SymmTensor2_3D( const SymmTensor2_3D &source ) : mat(source.mat) {}
 
     // Constructor by six numbers in Voigt numbering
-    SymmTensor2_3D( const double &m0, const double &m1, const double &m2,
-        const double &m3, const double &m4, const double &m5 ) 
+    constexpr SymmTensor2_3D( const double &m0, const double &m1, 
+        const double &m2, const double &m3, const double &m4, const double &m5 ) 
       : mat{{m0, m1, m2, m3, m4, m5}} {}
 
     // Destructor
