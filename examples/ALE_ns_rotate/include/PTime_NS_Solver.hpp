@@ -16,8 +16,12 @@ class PTime_NS_Solver
 {
   public:
     PTime_NS_Solver( const std::string &input_name, 
-        const int &input_record_freq, const int &input_renew_tang_freq, 
-        const double &input_final_time );
+        const int &input_record_freq, 
+        const int &input_renew_tang_freq, 
+        const double &input_final_time ) : final_time(input_final_time), 
+    sol_record_freq(input_record_freq), 
+    renew_tang_freq(input_renew_tang_freq), 
+    pb_name(input_name) {}
 
     ~PTime_NS_Solver() = default;
 
@@ -62,13 +66,20 @@ class PTime_NS_Solver
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
 
-    std::string Name_Generator( const int &counter ) const;
+    std::string generateNumericSuffix(const int &counter) const 
+    { return std::to_string(900000000 + counter); }
+
+    std::string Name_Generator( const int &counter ) const
+    { return pb_name + generateNumericSuffix(counter); }
     
-    std::string Name_dot_Generator( const int &counter ) const;
+    std::string Name_dot_Generator( const int &counter ) const
+    { return "dot_" + pb_name + generateNumericSuffix(counter); }
 
-    std::string Name_disp_Generator( const int &counter ) const;
+    std::string Name_disp_Generator( const int &counter ) const
+    { return "DISP_" + generateNumericSuffix(counter); }
 
-    std::string Name_mvelo_Generator( const int &counter ) const;
+    std::string Name_mvelo_Generator( const int &counter ) const
+    { return "MVELO_" + generateNumericSuffix(counter); }
     
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;

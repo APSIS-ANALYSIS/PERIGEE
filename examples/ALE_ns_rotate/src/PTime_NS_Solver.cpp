@@ -1,57 +1,5 @@
 #include "PTime_NS_Solver.hpp"
 
-PTime_NS_Solver::PTime_NS_Solver(
-    const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time )
-: final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
-{}
-
-std::string PTime_NS_Solver::Name_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  std::string out_name(pb_name);
-  out_name.append(temp.str());
-  return out_name;
-}
-
-std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  std::string out_name("dot_");
-  out_name.append(pb_name);
-  out_name.append(temp.str());
-  return out_name;
-}
-
-std::string PTime_NS_Solver::Name_disp_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  std::string out_name("DISP_");
-  out_name.append(temp.str());
-  return out_name;
-}
-
-std::string PTime_NS_Solver::Name_mvelo_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  std::string out_name("MVELO_");
-  out_name.append(temp.str());
-  return out_name;
-}
-
 void PTime_NS_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
