@@ -90,7 +90,7 @@ ElemBC_3D_wall::ElemBC_3D_wall(
 
   for(int ii=0; ii<num_node[ebc_id]; ++ii)
   {
-    const double pt[3] {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
+    double pt[3] {pt_xyz[ebc_id][3*ii], pt_xyz[ebc_id][3*ii+1], pt_xyz[ebc_id][3*ii+2]};
 
     double cl_pt[3];
     vtkIdType cellId; int subId; double dist;
