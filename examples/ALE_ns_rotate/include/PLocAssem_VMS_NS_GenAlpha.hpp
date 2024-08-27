@@ -212,18 +212,15 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     Vector_3 get_Poiseuille_traction1(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {
-      const double delta_P = 1; // pressure
-      const double Length = 1; // tube length
-      const double fl_mu = 1; // viscosity
+      const double delta_P = 1.0; // pressure
+      const double Length = 1.0; // tube length
+      const double fl_mu = 1.0; // viscosity
 
       const double z = pt.z(), y = pt.y();
 
       Tensor2_3D velo_grad ( 0.0, -delta_P * y / (2 * fl_mu * Length), -delta_P * z / (2 * fl_mu * Length),
                              0.0, 0.0, 0.0, 
                              0.0, 0.0, 0.0 );
-
-      // velo_grad *= time_ratio;
-
 
       Tensor2_3D pp ( 1.0, 0.0, 0.0,
                       0.0, 1.0, 0.0, 
@@ -239,9 +236,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     Vector_3 get_Poiseuille_traction0(const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
     {
-      const double delta_P = 1; // pressure
-      const double Length = 1; // tube length
-      const double fl_mu = 1; // viscosity
+      const double delta_P = 1.0; // pressure
+      const double Length = 1.0; // tube length
+      const double fl_mu = 1.0; // viscosity
 
       const double z = pt.z(), y = pt.y();
 

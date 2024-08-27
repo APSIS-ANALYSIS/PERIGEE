@@ -154,13 +154,10 @@ class FEAElement_Tet4 : public FEAElement
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
-    virtual void get_face_ctrlPts( const int &face_id,
+    virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
         const double * const &volctrl_x,
         const double * const &volctrl_y,
-        const double * const &volctrl_z,
-        std::vector<double> &facectrl_x,
-        std::vector<double> &facectrl_y,
-        std::vector<double> &facectrl_z );
+        const double * const &volctrl_z );
 
   private:
     // Number of quadrature points

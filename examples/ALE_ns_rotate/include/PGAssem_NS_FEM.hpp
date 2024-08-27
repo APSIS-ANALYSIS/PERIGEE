@@ -38,7 +38,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const APart_Node * const &pnode_ptr,
         const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
-        ALocal_Interface * const &part_itf,
+        const ALocal_Interface * const &part_itf,
+        const SI_T::SI_solution * const &SI_sol,
+        SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
@@ -59,6 +61,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc );
 
     // Assem mass matrix and residual vector
@@ -78,7 +82,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
         const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part );
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp );
 
     // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
@@ -105,7 +111,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part );
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp );
 
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
@@ -133,7 +141,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part );
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
@@ -168,15 +178,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id );
-
-    virtual void search_all_opposite_point(
-        const double &curr_time,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        ALocal_Interface * const &itf_part );
 
   private:
     // Private data
@@ -266,7 +267,9 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_Interface * const &itf_part );
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp );
 
     virtual void Interface_G(
         const double &curr_time, const double &dt,
@@ -276,18 +279,9 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_Interface * const &itf_part );
-
-    virtual void search_opposite_point(
-        const double &curr_time,
-        const Vector_3 &fixed_pt,
         const ALocal_Interface * const &itf_part,
-        const int &itf_id,
-        FEAElement * rotated_elementv,
-        FEAElement * elements,
-        int &tag,
-        int &rotated_ee,
-        IQuadPts * const &rotated_xi );
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp );
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
