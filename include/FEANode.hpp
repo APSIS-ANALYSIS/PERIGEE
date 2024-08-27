@@ -77,23 +77,6 @@ class FEANode
         double * const &ctrl_z, double * const &ctrl_w ) const;
    
     // ------------------------------------------------------------------------
-    // ! Get n control points' x-y-w in a batch
-    //   NOTE: Users are responsible for allocating and deallocating memory
-    //         for index and ctrl_(x/y/w).
-    // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyw( const int &num, const int * const &index,
-        double * const &ctrl_x, double * const &ctrl_y,
-        double * const &ctrl_w ) const;
-
-    // ------------------------------------------------------------------------
-    // ! Get n contrl points' x-y in a batch
-    //   NOTE: Users are responsible for allocating and deallocating memory
-    //         for index and ctrl_(x/y).
-    // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xy( const int &num, const int * const &index,
-        double * const &ctrl_x, double * const &ctrl_y ) const;
-
-    // ------------------------------------------------------------------------
     // ! Print the info for this class.
     // ------------------------------------------------------------------------
     virtual void print_info() const;
