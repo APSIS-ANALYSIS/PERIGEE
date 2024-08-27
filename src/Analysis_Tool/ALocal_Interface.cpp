@@ -225,7 +225,7 @@ void ALocal_Interface::restore_node_mvelo(const PDNSolution * const &mvelo)
     MPI_Allreduce(&temp_rotated_node_mvelo[0], &rotated_node_mvelo[ii][0], 3 * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   }
 
-  delete [] array;  
+  delete [] array; array = nullptr;
 }
 
 void ALocal_Interface::restore_node_disp(const PDNSolution * const &disp)
@@ -255,7 +255,7 @@ void ALocal_Interface::restore_node_disp(const PDNSolution * const &disp)
     MPI_Allreduce(&temp_rotated_node_disp[0], &rotated_node_disp[ii][0], 3 * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   }
 
-  delete [] array;  
+  delete [] array; array = nullptr; 
 }
 
 void ALocal_Interface::init_curr(const int &nqp_sur_in)
