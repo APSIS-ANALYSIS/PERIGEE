@@ -22,22 +22,11 @@ Part_FEM_Rotated::Part_FEM_Rotated( const IMesh * const &mesh,
   node_loc_fixed.clear();
   node_loc_rotated.clear();
 
-  PERIGEE_OMP_PARALLEL
+  for(int ii=0; ii<nlocalnode; ++ii)
   {
-    std::vector<int> temp_node_loc_fixed {};
-    std::vector<int> temp_node_loc_rotated {};
-    PERIGEE_OMP_FOR
-    for(int ii=0; ii<nlocalnode; ++ii)
-    {
-      if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) temp_node_loc_fixed.push_back(ii);
+    if( VEC_T::is_invec(node_f, node_loc_original[ii]) ) node_loc_fixed.push_back(ii);
 
-      if( VEC_T::is_invec(node_r, node_loc_original[ii]) ) temp_node_loc_rotated.push_back(ii);
-    }
-    PERIGEE_OMP_CRITICAL
-    {
-      VEC_T::insert_end(node_loc_fixed, temp_node_loc_fixed);
-      VEC_T::insert_end(node_loc_rotated, temp_node_loc_rotated);
-    }
+    if( VEC_T::is_invec(node_r, node_loc_original[ii]) ) node_loc_rotated.push_back(ii);
   }
 
   nlocalnode_fixed = VEC_T::get_size( node_loc_fixed );

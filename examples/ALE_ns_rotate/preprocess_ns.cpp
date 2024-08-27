@@ -77,16 +77,14 @@ int main( int argc, char * argv[] )
   const std::vector<double> vec_point_rotated     = paras["point_rotated"].as<std::vector<double>>();
   const std::vector<double> vec_angular_direction = paras["angular_direction"].as<std::vector<double>>();
 
-  SYS_T::print_fatal_if(VEC_T::get_size(vec_point_rotated) != 3, "Error: the size of the point_rotated vector is not equal to 3. \n");
-  SYS_T::print_fatal_if(VEC_T::get_size(vec_angular_direction) != 3, "Error: the size of the angular_direction vector is not equal to 3. \n");
+  SYS_T::print_fatal_if(VEC_T::get_size(vec_point_rotated) != 3, "Error: the size of the input point_rotated vector is not equal to 3. \n");
+  SYS_T::print_fatal_if(VEC_T::get_size(vec_angular_direction) != 3, "Error: the size of the input angular_direction vector is not equal to 3. \n");
 
   // Info of rotation axis
-  Vector_3 point_rotated (vec_point_rotated[0], vec_point_rotated[1], vec_point_rotated[2]);
-  Vector_3 angular_direction (vec_angular_direction[0], vec_angular_direction[1], vec_angular_direction[2]);
+  const Vector_3 point_rotated (vec_point_rotated[0], vec_point_rotated[1], vec_point_rotated[2]);
+  const Vector_3 angular_direction = Vec3::normalize(Vector_3(vec_angular_direction[0], vec_angular_direction[1], vec_angular_direction[2]));
 
-  SYS_T::print_fatal_if(std::abs(angular_direction.norm2() - 0.0) < 1e-15, "Error: the direction vector of rotation axis cannot be zero vector. \n" );
-
-  angular_direction.normalize();
+  SYS_T::print_fatal_if(std::isnan(angular_direction.x()) || std::isnan(angular_direction.y()) || std::isnan(angular_direction.z()), "Error: the direction vector of rotation axis cannot be zero vector. \n" );
 
   if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
 

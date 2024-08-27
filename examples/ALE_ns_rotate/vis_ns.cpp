@@ -25,7 +25,6 @@ int main( int argc, char * argv[] )
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
   const std::string part_file="postpart";
-  const int dof = 4;
   
   std::string sol_bname("SOL_");
   std::string disp_bname("DISP_");

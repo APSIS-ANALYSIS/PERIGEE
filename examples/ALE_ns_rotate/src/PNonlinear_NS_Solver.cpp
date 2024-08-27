@@ -178,9 +178,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
-  // Mesh disp solution
-  // disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
-
   // Now do consistent Newton-Raphson iteration
   do
   {
