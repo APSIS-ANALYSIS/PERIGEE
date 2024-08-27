@@ -167,7 +167,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
-        SI_T::SI_quad_point * const &SI_qp,
+        const SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 

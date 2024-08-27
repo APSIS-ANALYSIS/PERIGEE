@@ -293,8 +293,6 @@ namespace SI_T
     int * rotated_local_ien = new int [nLocBas];
     double * rotated_local_disp = new double [nLocBas * 3];
 
-    const int snlocbas = elements->get_nLocBas();
-
     int rotated_face_id = -1;
     int rotated_tag = tag;
     int num_rotated_ele = itf_part->get_num_rotated_ele(itf_id, rotated_tag);
