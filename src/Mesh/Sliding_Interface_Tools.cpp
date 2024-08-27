@@ -22,6 +22,8 @@ namespace SI_T
 
     num_rotated_node.assign(num_itf, 0);
     rotated_node_sol.resize(num_itf);
+    rotated_node_mvelo.resize(num_itf);
+    rotated_node_mdisp.resize(num_itf);
     rotated_node_part_tag.resize(num_itf);
     rotated_node_loc_pos.resize(num_itf);
 
@@ -48,6 +50,10 @@ namespace SI_T
       num_rotated_node[ii] = VEC_T::get_size(h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" ));
 
       rotated_node_sol[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
+
+      rotated_node_mvelo[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
+
+      rotated_node_mdisp[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0); 
 
       rotated_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_part_tag" );
 
@@ -102,6 +108,67 @@ namespace SI_T
     delete [] array; array = nullptr;
   }
 
+  void SI_solution::update_node_mvelo(const PDNSolution * const &mvelo)
+  {
+    const int nlgn = mvelo->get_nlgn();    
+    double * array = new double [nlgn];
+
+    mvelo->GetLocalArray( array );
+
+    Zero_node_mvelo();
+
+    for(int ii = 0; ii < VEC_T::get_size(num_fixed_node); ++ii)
+    { 
+      std::vector<double> temp_rotated_node_mvelo = rotated_node_mvelo[ii];
+      for(int nn = 0; nn < num_rotated_node[ii]; ++nn)
+      {
+        // Pick out the solution of nodes in each part
+        if(rotated_node_part_tag[ii][nn] == cpu_rank)
+        { 
+          // Like GetLocal in PGAssem
+          const int loc_pos = rotated_node_loc_pos[ii][nn];
+          for(int dd = 0; dd < 3; ++dd)
+            temp_rotated_node_mvelo[3 * nn + dd] = array[3 * loc_pos + dd];
+        }
+      }
+
+      // Summation from each part
+      MPI_Allreduce(&temp_rotated_node_mvelo[0], &rotated_node_mvelo[ii][0], 3 * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    }
+
+    delete [] array; array = nullptr;
+  }
+
+  void SI_solution::update_node_mdisp(const PDNSolution * const &mdisp)
+  {
+    const int nlgn = mdisp->get_nlgn();    
+    double * array = new double [nlgn];
+
+    mdisp->GetLocalArray( array );
+
+    Zero_node_disp();
+
+    for(int ii = 0; ii < VEC_T::get_size(num_fixed_node); ++ii)
+    { 
+      std::vector<double> temp_rotated_node_mdisp = rotated_node_mdisp[ii];
+      for(int nn = 0; nn < num_rotated_node[ii]; ++nn)
+      {
+        // Pick out the solution of nodes in each part
+        if(rotated_node_part_tag[ii][nn] == cpu_rank)
+        { 
+          // Like GetLocal in PGAssem
+          const int loc_pos = rotated_node_loc_pos[ii][nn];
+          for(int dd = 0; dd < 3; ++dd)
+            temp_rotated_node_mdisp[3 * nn + dd] = array[3 * loc_pos + dd];
+        }
+      }
+
+      // Summation from each part
+      MPI_Allreduce(&temp_rotated_node_mdisp[0], &rotated_node_mdisp[ii][0], 3 * num_rotated_node[ii], MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
+    }
+
+    delete [] array; array = nullptr; 
+  }
 
   SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in)
     : nqp_sur( nqp_sur_in )
@@ -139,13 +206,13 @@ namespace SI_T
   }
 
   void SI_quad_point::search_all_opposite_point(
-    const double &curr_time,
     FEAElement * const &fixed_elementv,
     FEAElement * const &rotated_elementv,
     FEAElement * const &elements,
     const IQuadPts * const &quad_s,
     IQuadPts * const &free_quad,
-    const ALocal_Interface * const &itf_part )
+    const ALocal_Interface * const &itf_part,
+    const SI_solution * const &SI_sol )
   {
     const int nLocBas = itf_part->get_nLocBas();
     double * ctrl_x = new double [nLocBas];
@@ -189,7 +256,7 @@ namespace SI_T
 
           int ele_tag {itf_part->get_fixed_ele_tag(itf_id, ee)};
           int rotated_ee {0};
-          search_opposite_point(curr_time, coor, itf_part, itf_id, rotated_elementv, elements, ele_tag, rotated_ee, free_quad);
+          search_opposite_point(coor, itf_part, SI_sol, itf_id, rotated_elementv, elements, ele_tag, rotated_ee, free_quad);
 
           set_curr(itf_id, ee, qua, ele_tag, rotated_ee, free_quad->get_qp(0, 0), free_quad->get_qp(0, 1));
         }
@@ -202,9 +269,9 @@ namespace SI_T
   }
   
   void SI_quad_point::search_opposite_point(
-    const double &curr_time,
     const Vector_3 &fixed_pt,
     const ALocal_Interface * const &itf_part,
+    const SI_solution * const &SI_sol,
     const int &itf_id,
     FEAElement * rotated_elementv,
     FEAElement * elements,
@@ -215,9 +282,16 @@ namespace SI_T
     const int nLocBas = itf_part->get_nLocBas();
     bool is_found = false;
 
+    double * inictrl_x = new double [nLocBas];
+    double * inictrl_y = new double [nLocBas];
+    double * inictrl_z = new double [nLocBas];
+
     double * volctrl_x = new double [nLocBas];
     double * volctrl_y = new double [nLocBas];
     double * volctrl_z = new double [nLocBas];
+
+    int * rotated_local_ien = new int [nLocBas];
+    double * rotated_local_disp = new double [nLocBas * 3];
 
     const int snlocbas = elements->get_nLocBas();
 
@@ -229,7 +303,9 @@ namespace SI_T
     for(int ee{0}; ee<num_rotated_ele; ++ee)
     {
       // SYS_T::commPrint("    search rotated ee = %d\n", ee);
-      itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, volctrl_x, volctrl_y, volctrl_z);
+      itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, inictrl_x, inictrl_y, inictrl_z);
+      SI_sol->get_rotated_mdisp(itf_part, itf_id, rotated_tag, ee, rotated_local_ien, rotated_local_disp);
+      SI_T::get_currPts(inictrl_x, inictrl_y, inictrl_z, rotated_local_disp, nLocBas, volctrl_x, volctrl_y, volctrl_z);
       
       rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
@@ -258,8 +334,9 @@ namespace SI_T
 
       for(int ee{0}; ee<num_rotated_ele; ++ee)
       {
-        // SYS_T::commPrint("    search rotated ee = %d\n", ee);
-        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, volctrl_x, volctrl_y, volctrl_z);
+        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, inictrl_x, inictrl_y, inictrl_z);
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, rotated_tag, ee, rotated_local_ien, rotated_local_disp);
+        SI_T::get_currPts(inictrl_x, inictrl_y, inictrl_z, rotated_local_disp, nLocBas, volctrl_x, volctrl_y, volctrl_z);  
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
@@ -290,7 +367,9 @@ namespace SI_T
       for(int ee{0}; ee<num_rotated_ele; ++ee)
       {
         // SYS_T::commPrint("    search rotated ee = %d\n", ee);
-        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, curr_time, volctrl_x, volctrl_y, volctrl_z);
+        itf_part->get_rotated_ele_ctrlPts(itf_id, rotated_tag, ee, inictrl_x, inictrl_y, inictrl_z);
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, rotated_tag, ee, rotated_local_ien, rotated_local_disp);
+        SI_T::get_currPts(inictrl_x, inictrl_y, inictrl_z, rotated_local_disp, nLocBas, volctrl_x, volctrl_y, volctrl_z);  
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, rotated_tag, ee);
 
@@ -310,15 +389,39 @@ namespace SI_T
       }
     }
 
+    delete [] inictrl_x; inictrl_x = nullptr;
+    delete [] inictrl_y; inictrl_y = nullptr;
+    delete [] inictrl_z; inictrl_z = nullptr;
+
     delete [] volctrl_x; volctrl_x = nullptr;
     delete [] volctrl_y; volctrl_y = nullptr;
     delete [] volctrl_z; volctrl_z = nullptr;
+
+    delete [] rotated_local_ien; rotated_local_ien = nullptr;
+    delete [] rotated_local_disp; rotated_local_disp = nullptr;
 
     SYS_T::print_fatal_if(is_found == false,
       "Error, SI_quad_point::search_opposite_point: cannot find opposite point.\n");
 
     tag = rotated_tag;
   }
+
+  void get_currPts( const double * const &ept_x,
+    const double * const &ept_y,
+    const double * const &ept_z,
+    const double * const &disp,
+    const int &len,
+    double * const &currPt_x,
+    double * const &currPt_y,
+    double * const &currPt_z )
+    {
+      for(int ii=0; ii<len; ++ii)
+      {
+        currPt_x[ii] = ept_x[ii] + disp[3*ii];
+        currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
+        currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
+      }
+    }
 }
 
 // EOF

@@ -44,11 +44,6 @@ class IPGAssem
     // ------------------------------------------------------------------------
     Vec G;
 
-    // ------------------------------------------------------------------------
-    // Vector Disp is a mesh_disp vector object.
-    // ------------------------------------------------------------------------
-    Vec Disp;
-
     IPGAssem(){};
 
     virtual ~IPGAssem(){};
@@ -103,22 +98,10 @@ class IPGAssem
     {VecSet(G, 0.0);}
 
     // ------------------------------------------------------------------------
-    // ! Clear Disp to be zero
-    // ------------------------------------------------------------------------
-    void Clear_Disp()
-    {VecSet(Disp, 0.0);}
-
-    // ------------------------------------------------------------------------
     // ! Print the vector G on screen
     // ------------------------------------------------------------------------
     void Print_G() const
     {VecView(G, PETSC_VIEWER_STDOUT_WORLD);}
-
-    // ------------------------------------------------------------------------
-    // ! Print the vector Disp on screen
-    // ------------------------------------------------------------------------
-    void Print_Disp() const
-    {VecView(Disp, PETSC_VIEWER_STDOUT_WORLD);}
 
     // ------------------------------------------------------------------------
     // ! Assem_nonzero_estimate : Assembly nonzero estimate matrix for K.
@@ -184,7 +167,7 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp,
+        SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
@@ -653,6 +636,8 @@ class IPGAssem
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -953,6 +938,8 @@ class IPGAssem
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,

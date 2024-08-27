@@ -38,7 +38,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
-  ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/Part_FEM.cpp  
+  ${perigee_source}/Mesh/Part_FEM_Rotated.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/ElemBC_3D_turbulence_wall_model.cpp
@@ -89,6 +90,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Interface.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
+  ${perigee_source}/Analysis_Tool/APart_Node_Rotated.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp

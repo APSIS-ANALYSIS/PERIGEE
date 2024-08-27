@@ -3,7 +3,7 @@
 VisDataPrep_NS::VisDataPrep_NS()
 {
   // Data to be written
-  arrayCompSize = 3;
+  arrayCompSize = 4;
 
   arrayNames.push_back("Pressure");
   arraySizes.push_back(1);
@@ -11,10 +11,13 @@ VisDataPrep_NS::VisDataPrep_NS()
   arraySizes.push_back(3);
   arrayNames.push_back("Displacement");
   arraySizes.push_back(3);
+  arrayNames.push_back("Mesh_Velocity");
+  arraySizes.push_back(3);
 
   // Data to be read
   pt_array_len.clear();
   pt_array_len.push_back(1);
+  pt_array_len.push_back(3);
   pt_array_len.push_back(3);
   pt_array_len.push_back(3);
 }
@@ -33,6 +36,9 @@ void VisDataPrep_NS::get_pointArray(
   PostVectSolution pvsolu_disp(solution_file_names[1], analysis_node_mapping_file,
       post_node_mapping_file, nNode_ptr, input_nfunc, 3);
 
+  PostVectSolution pvsolu_mvelo(solution_file_names[2], analysis_node_mapping_file,
+      post_node_mapping_file, nNode_ptr, input_nfunc, 3);
+
   // Total number of nodes to be read from the solution vector
   const int ntotal = nNode_ptr->get_nlocghonode();
  
@@ -47,10 +53,13 @@ void VisDataPrep_NS::get_pointArray(
     solArrays[2][3*ii]   = pvsolu_disp.get_locsol(ii*3+0);
     solArrays[2][3*ii+1] = pvsolu_disp.get_locsol(ii*3+1);
     solArrays[2][3*ii+2] = pvsolu_disp.get_locsol(ii*3+2);
+    solArrays[3][3*ii]   = pvsolu_mvelo.get_locsol(ii*3+0);
+    solArrays[3][3*ii+1] = pvsolu_mvelo.get_locsol(ii*3+1);
+    solArrays[3][3*ii+2] = pvsolu_mvelo.get_locsol(ii*3+2);
   }
 
   // Check to make sure that ptarray_size gives correct output  
-  if(get_ptarray_size() != 3) SYS_T::print_fatal("Error: get_ptarray_size != 3. \n");
+  if(get_ptarray_size() != 4) SYS_T::print_fatal("Error: get_ptarray_size != 4. \n");
 }
 
 // EOF

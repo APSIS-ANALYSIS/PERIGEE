@@ -21,13 +21,6 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
   }
   else
     elem_tag.clear();
-
-  isRotated = h5r -> check_data("/Local_Elem/elem_rotated_tag");
-
-  if( isRotated )
-    elem_rotated = h5r->read_intVector("/Local_Elem", "elem_rotated_tag");
-  else
-    elem_rotated.clear();
     
   delete h5r; H5Fclose( file_id );
 }
@@ -50,24 +43,6 @@ int ALocal_Elem::get_nlocalele( const int &tag_val ) const
   }
 }
 
-int ALocal_Elem::get_nlocalele_rotated( const int &rotated_val ) const
-{
-  if( isRotated )
-  {
-    int counter = 0;
-    for(int ee=0; ee<nlocalele; ++ee)
-    {
-      if( elem_rotated[ee] == rotated_val) counter += 1;
-    }
-    return counter;
-  }
-  else
-  {
-    SYS_T::print_fatal("Error: ALocal_Elem::get_nlocalele_rotated with input rotated tag value should be called when isRotated = true. \n");
-    return -1;
-  }
-}
-
 void ALocal_Elem::print_info() const
 {
   std::cout<<"nlocalelem: "<<nlocalele<<std::endl;
@@ -76,13 +51,6 @@ void ALocal_Elem::print_info() const
     std::cout<<"elem_loc(elem_tag): \n";
     for(int ii=0; ii<get_nlocalele(); ++ii)
       std::cout<<get_elem_loc(ii)<<"("<<get_elem_tag(ii)<<")"<<'\t';
-    std::cout<<std::endl;
-  }
-  if ( isRotated )
-  {
-    std::cout<<"elem_loc(elem_rotated): \n";
-    for(int ii=0; ii<get_nlocalele(); ++ii)
-      std::cout<<get_elem_loc(ii)<<"("<<get_elem_rotated(ii)<<")"<<'\t';
     std::cout<<std::endl;
   }
   else

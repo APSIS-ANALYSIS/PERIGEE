@@ -11,6 +11,7 @@
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
+#include "APart_Node_Rotated.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
@@ -42,6 +43,7 @@
 #include "PLocAssem_VMS_NS_GenAlpha_Interface.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
+#include "SI_rotation_info.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -109,18 +111,9 @@ int main(int argc, char *argv[])
   double restart_time = 0.0; // restart time
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
-  std::string restart_disp_name = "DISP_"; // restart displacement name
 
-  // Info of rotation axis
-  Vector_3 point_rotated (0.5, 0.0, 0.0);
-
-  Vector_3 angular_direction (1.0, 0.0, 0.0);
-
-  SYS_T::print_fatal_if(std::abs(angular_direction.norm2() - 0.0) < 1e-15, "Error: the direction vector of rotation axis cannot be zero vector. \n" );
-
-  angular_direction.normalize();
-
-  double angular_velo = 0.0; //(rad/s)
+  // Angular velocity
+  double angular_velo = 2.0 * MATH_T::PI; //(rad/s)
 
   // Yaml options
   bool is_loadYaml = true;
@@ -146,6 +139,7 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
+  SYS_T::GetOptionReal("-angular_velo", angular_velo);
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
@@ -181,10 +175,10 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-restart_time", restart_time);
   SYS_T::GetOptionReal("-restart_step", restart_step);
   SYS_T::GetOptionString("-restart_name", restart_name);
-  SYS_T::GetOptionString("-restart_disp_name", restart_disp_name);
   SYS_T::GetOptionReal("-C_bI", C_bI);
 
   // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint("-angular_velo", angular_velo);
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
   SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
@@ -230,7 +224,6 @@ int main(int argc, char *argv[])
     SYS_T::cmdPrint("-restart_time:", restart_time);
     SYS_T::cmdPrint("-restart_step:", restart_step);
     SYS_T::cmdPrint("-restart_name:", restart_name);
-    SYS_T::cmdPrint("-restart_disp_name:", restart_disp_name);
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
@@ -246,6 +239,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
+    cmdh5w->write_doubleScalar("angular_velo", angular_velo);
 
     if( SYS_T::file_exist( inflow_file ) )
       cmdh5w->write_string("inflow_file", inflow_file);
@@ -261,6 +255,15 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Data from Files =====
+  // Read the info of rotation axis from h5file
+  const std::string fName = SYS_T::gen_partfile_name( part_file, rank );
+  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  const std::string gname("/rotation");
+  const Vector_3 point_rotated = h5r -> read_Vector_3( gname.c_str(), "point_rotated" );
+  const Vector_3 angular_direction = h5r -> read_Vector_3( gname.c_str(), "angular_direction" );
+  delete h5r; H5Fclose( file_id );
+
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
 
@@ -290,13 +293,15 @@ int main(int argc, char *argv[])
   locwbc -> print_info();
 
   // Interfaces info
-  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank, angular_velo, point_rotated, angular_direction);
+  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
   locitf -> print_info();
 
   SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
 
   // Local sub-domain's nodal indices
-  APart_Node * pNode = new APart_Node(part_file, rank);
+  APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
+
+  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, point_rotated, angular_direction);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
@@ -439,10 +444,6 @@ int main(int argc, char *argv[])
     SYS_T::file_check(restart_name);
     sol->ReadBinary(restart_name);
 
-    // Read disp file
-    SYS_T::file_check(restart_disp_name);
-    disp_mesh->ReadBinary(restart_disp_name);
-
     // generate the corresponding dot_sol file name
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
@@ -454,7 +455,6 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
     SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
-    SYS_T::commPrint("     restart_disp_name: %s \n", restart_disp_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   SI_sol->update_node_sol(sol);
-  SI_qp->search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, locitf);
+  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, locitf, SI_sol);
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
       elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc );
 
@@ -629,14 +629,15 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, SI_sol, SI_qp, pmat, elementv, elements, elementvs, elementvs_rotated,
+      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      pmat, elementv, elements, elementvs, elementvs_rotated,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;

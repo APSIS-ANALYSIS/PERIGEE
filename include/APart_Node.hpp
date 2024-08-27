@@ -115,6 +115,33 @@ class APart_Node
       return -1;
     }
     
+    // ------------------------------------------------------------------------
+    // Virtual functions for the _Rotated derived class
+    // ------------------------------------------------------------------------
+    virtual int get_nlocalnode_rotated() const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_rotated is not implemented.\n");
+      return -1;
+    }
+
+    virtual int get_node_loc_rotated(const int &index) const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_node_loc_rotated is not implemented.\n");
+      return -1;
+    }
+
+    virtual int get_nlocalnode_fixed() const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_fixed is not implemented.\n");
+      return -1;
+    }
+
+    virtual int get_node_loc_fixed(const int &index) const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_node_loc_fixed is not implemented.\n");
+      return -1;
+    }
+
   protected:
     // ------------------------------------------------------------------------
     // rank of the CPU that identifies the subdomain

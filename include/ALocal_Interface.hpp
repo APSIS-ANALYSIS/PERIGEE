@@ -26,8 +26,7 @@
 class ALocal_Interface
 {
   public:
-    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
-        const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc );
+    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
 
     virtual ~ALocal_Interface() = default;
 
@@ -78,19 +77,10 @@ class ALocal_Interface
     virtual int get_rotated_LID(const int &ii, const int &dof_index, const int &node) const
     {return rotated_LID[ii][dof_index * num_rotated_node[ii] + node];}
 
-    // Get the radius of rotation
-    virtual Vector_3 get_radius (const Vector_3 &coor) const;
-
-    // Get the current point coordinates for the case of rotation around x/y/z-axis
-    virtual void get_currPts( const double * const &ept_x, const double * const &ept_y,
-        const double * const &ept_z, const double &tt,
-        double * const &currPt_x, double * const &currPt_y, double * const &currPt_z,
-        const int &type) const;
-
     virtual void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
         double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
-    virtual void get_rotated_ele_ctrlPts(const int &ii, const int &tag,const int &ee, const double &tt,
+    virtual void get_rotated_ele_ctrlPts(const int &ii, const int &tag,const int &ee,
         double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
   protected:
@@ -101,13 +91,6 @@ class ALocal_Interface
     int nLocBas;
 
     int nqp_sur;
-
-    double angular_velo;
-
-    // Info of rotation axis
-    Vector_3 direction_rotated;
-
-    Vector_3 point_rotated;
 
     // the number of fixed volume elements in this part
     // size: num_itf
@@ -166,7 +149,7 @@ class ALocal_Interface
     // size: num_itf x (3 x num_rotated_node[ii])
     std::vector<std::vector<double>> rotated_pt_xyz;
 
-    // the (mapped) global node id corresponding to the rotated_pt_xyz
+    // the (mapped) global node id corresponding to the init_rotated_node_xyz
     // size: num_itf x num_rotated_node[ii]
     // just for debug
     std::vector<std::vector<int>> rotated_node_id;

@@ -40,7 +40,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &part_ebc,
         const ALocal_Interface * const &part_itf,
         const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp,
+        SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
@@ -90,6 +90,8 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp, 
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -118,6 +120,8 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp,
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
@@ -282,24 +286,48 @@ class PGAssem_NS_FEM : public IPGAssem
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
     {
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        const int offset1 = ii * dof_sol;
-        const int offset2 = IEN[ii] * dof_sol;
-        for(int jj=0; jj<dof_sol; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
+      GetLocalImpl( array, nLocBas, dof_sol, IEN, local_array );
     }
 
     void GetLocal( const double * const &array, const int * const &IEN,
         const int &in_locbas, double * const &local_array) const
     {
+      GetLocalImpl( array, in_locbas, dof_sol, IEN, local_array );
+    }
+
+    void GetLocal(const double * const &array, const int &in_dof, 
+        const int * const &IEN, double * const &local_array) const
+    {
+      GetLocalImpl( array, nLocBas, in_dof, IEN, local_array );
+    }
+
+    void GetLocalImpl( const double * const &array, 
+        const int &in_locbas, const int &in_dof,
+        const int * const &IEN, double * const &local_array ) const
+    {
       for(int ii=0; ii<in_locbas; ++ii)
       {
-        const int offset1 = ii * dof_sol;
-        const int offset2 = IEN[ii] * dof_sol;
-        for(int jj=0; jj<dof_sol; ++jj)
+        const int offset1 = ii * in_dof;
+        const int offset2 = IEN[ii] * in_dof;
+        for(int jj=0; jj<in_dof; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
+      }
+    }
+
+    void get_currPts( const double * const &ept_x,
+        const double * const &ept_y,
+        const double * const &ept_z,
+        const double * const &disp,
+        const int &len,
+        double * const &currPt_x,
+        double * const &currPt_y,
+        double * const &currPt_z ) const
+    {
+      for(int ii=0; ii<len; ++ii)
+      {
+        currPt_x[ii] = ept_x[ii] + disp[3*ii];
+        currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
+        currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
       }
     }
 };

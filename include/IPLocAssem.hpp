@@ -33,8 +33,6 @@ class IPLocAssem
       Tangent_rr = nullptr;
       Residual_r = nullptr;
       Residual_s = nullptr;
-
-      disp_mesh = nullptr;
     }
 
     virtual ~IPLocAssem(){};
@@ -68,9 +66,7 @@ class IPLocAssem
 
     PetscScalar * Residual_s;
     PetscScalar * Residual_r;
-
-    // Store the mesh disp
-    PetscScalar * disp_mesh;
+    
     // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Get degree of freedom of this problem. In segregated algorithms
@@ -178,15 +174,16 @@ class IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
+        const double * const &mvelo,
+        const double * const &mdisp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
-    virtual void Assem_Residual_Rotated(
+    virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
@@ -194,6 +191,7 @@ class IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
@@ -218,15 +216,16 @@ class IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
+        const double * const &mvelo,
+        const double * const &mdisp,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
-    virtual void Assem_Tangent_Residual_Rotated(
+    virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
@@ -234,6 +233,7 @@ class IPLocAssem
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress,
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
@@ -562,9 +562,7 @@ class IPLocAssem
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
       const double * const &rotated_local_sol,
-      const double * const &rotatedCtrlPts_x,
-      const double * const &rotatedCtrlPts_y,
-      const double * const &rotatedCtrlPts_z )
+      const double * const &rotated_local_mvelo)
       {SYS_T::commPrint("Warning: this Assem_Residual_itf is not implemented.\n");}
 
     virtual void Assem_Tangent_Residual_itf(
@@ -575,9 +573,7 @@ class IPLocAssem
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol,
       const double * const &rotated_local_sol,
-      const double * const &rotatedCtrlPts_x,
-      const double * const &rotatedCtrlPts_y,
-      const double * const &rotatedCtrlPts_z )
+      const double * const &rotated_local_mvelo)
       {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf is not implemented.\n");}
 };
 
