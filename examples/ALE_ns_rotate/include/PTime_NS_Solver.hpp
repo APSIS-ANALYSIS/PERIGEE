@@ -45,7 +45,7 @@ class PTime_NS_Solver
         const ALocal_EBC * const &ebc_part,
         IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
-        ALocal_Interface * const &itf_part,
+        const ALocal_Interface * const &itf_part,
         const SI_rotation_info * const &si_ptr,
         SI_T::SI_solution * const &SI_sol,
         SI_T::SI_quad_point * const &SI_qp,

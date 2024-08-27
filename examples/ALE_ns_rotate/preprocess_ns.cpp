@@ -521,7 +521,7 @@ int main( int argc, char * argv[] )
 
     for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
     {
-      PERIGEE_OMP_FOR
+      PERIGEE_OMP_PARALLEL_FOR
       for(int jj = 0; jj < VEC_T::get_size(fixed_node_vol_part_tag[ii]); ++jj)
       {
         if(distributed_fixed_node_vol_part_tag[proc_rank][ii][jj] != -1)
@@ -531,7 +531,7 @@ int main( int argc, char * argv[] )
         }
       }
 
-      PERIGEE_OMP_FOR
+      PERIGEE_OMP_PARALLEL_FOR
       for(int jj = 0; jj < VEC_T::get_size(rotated_node_vol_part_tag[ii]); ++jj)
       {
         if(distributed_rotated_node_vol_part_tag[proc_rank][ii][jj] != -1)
