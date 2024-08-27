@@ -77,30 +77,6 @@ void FEANode::get_ctrlPts_xyzw(
   }
 }
 
-void FEANode::get_ctrlPts_xyw( 
-    const int &num, const int * const &index,
-    double * const &ctrl_x, double * const &ctrl_y, 
-    double * const &ctrl_w ) const
-{
-  for(int ii=0; ii<num; ++ii)
-  {
-    ctrl_x[ii] = ctrlPts_x[index[ii]];
-    ctrl_y[ii] = ctrlPts_y[index[ii]];
-    ctrl_w[ii] = ctrlPts_w[index[ii]];
-  }
-}
-
-void FEANode::get_ctrlPts_xy( 
-    const int &num, const int * const &index,
-    double * const &ctrl_x, double * const &ctrl_y ) const
-{
-  for(int ii=0; ii<num; ++ii)
-  {
-    ctrl_x[ii] = ctrlPts_x[index[ii]];
-    ctrl_y[ii] = ctrlPts_y[index[ii]];
-  }
-}
-
 double FEANode::get_memory_usage() const
 {
   unsigned int total_length = 0;
