@@ -19,7 +19,7 @@ class VisDataPrep_NS : public IVisDataPrep
 
     // Return the number of physical fields to be read from solution
     // vector
-    virtual int get_ptarray_size() const {return 3;}
+    virtual int get_ptarray_size() const {return 4;}
    
     // Return the number of components for each physical field
     virtual int get_ptarray_comp_length( const int &ii ) const

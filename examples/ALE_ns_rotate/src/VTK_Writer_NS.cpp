@@ -105,6 +105,19 @@ void VTK_Writer_NS::writeOutput(
     intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo,
         elemptr, points );    
 
+    // Interpolate mesh_velocity vector
+    inputInfo.clear();
+    asize = vdata_ptr->get_arraySizes(3);
+    for(int jj=0; jj<nLocBas; ++jj)
+    {
+      int pt_index = IEN_e[jj];
+      for(int kk=0; kk<asize; ++kk)
+        inputInfo.push_back( pointArrays[3][pt_index * asize + kk] );
+    }
+
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+        elemptr, dataVecs[3] );
+
     // Set mesh connectivity
     if( elemptr->get_Type() == 501 )
       VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );

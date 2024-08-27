@@ -25,10 +25,10 @@ int main( int argc, char * argv[] )
   const std::string anode_mapping_file = "node_mapping.h5";
   const std::string pnode_mapping_file = "post_node_mapping.h5";
   const std::string part_file="postpart";
-  const int dof = 4;
   
   std::string sol_bname("SOL_");
   std::string disp_bname("DISP_");
+  std::string mvelo_bname("MVELO_");
 
   std::string out_bname = sol_bname;
   int time_start = 0, time_step = 1, time_end = 1;
@@ -60,6 +60,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionString("-out_bname", out_bname);
   SYS_T::GetOptionString("-disp_bname", disp_bname);
+  SYS_T::GetOptionString("-mvelo_bname", mvelo_bname);
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-restart", isRestart);
   
@@ -67,6 +68,7 @@ int main( int argc, char * argv[] )
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);
   SYS_T::cmdPrint("-disp_bname:", disp_bname);
+  SYS_T::cmdPrint("-mvelo_bname", mvelo_bname);
   SYS_T::cmdPrint("-time_start:", time_start);
   SYS_T::cmdPrint("-time_step:", time_step);
   SYS_T::cmdPrint("-time_end:", time_end);
@@ -151,17 +153,19 @@ int main( int argc, char * argv[] )
   {
     std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
-    std::string name_to_read_disp(disp_bname);    
+    std::string name_to_read_disp(disp_bname);
+    std::string name_to_read_mvelo(mvelo_bname);    
     time_index.str("");
     time_index<< 900000000 + time;
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
     name_to_read_disp.append(time_index.str());
+    name_to_read_mvelo.append(time_index.str());
 
-    const std::vector<std::string> name_to_read_list {name_to_read, name_to_read_disp};
+    const std::vector<std::string> name_to_read_list {name_to_read, name_to_read_disp, name_to_read_mvelo};
 
     SYS_T::commPrint("Time %d: Read %s and %s and Write %s \n",
-        time, name_to_read.c_str(), name_to_read_disp.c_str(), name_to_write.c_str() );
+        time, name_to_read.c_str(), name_to_read_disp.c_str(), name_to_read_mvelo.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read_list, anode_mapping_file, pnode_mapping_file,
         pNode, GMIptr->get_nFunc(), solArrays);

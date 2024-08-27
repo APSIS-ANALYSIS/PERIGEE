@@ -45,6 +45,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
+    const PDNSolution * const &pre_velo_mesh,    
+    const PDNSolution * const &pre_disp_mesh,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -69,7 +71,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
-    PDNSolution * const &disp_mesh,
+    const PDNSolution * const &velo_mesh,    
+    const PDNSolution * const &disp_mesh,
     bool &conv_flag, int &nl_counter ) const
 {
 #ifdef PETSC_USE_LOG
@@ -109,29 +112,39 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
 
+  // Define the velo_mesh at alpha_f: mvelo_alpha
+  PDNSolution mvelo_alpha(*pre_velo_mesh);
+  mvelo_alpha.ScaleValue( 1.0 - alpha_f );
+  mvelo_alpha.PlusAX( *velo_mesh, alpha_f );
+
+  // Define the disp_mesh at alpha_f: mdisp_alpha
+  PDNSolution mdisp_alpha(*pre_disp_mesh);
+  mdisp_alpha.ScaleValue( 1.0 - alpha_f );
+  mdisp_alpha.PlusAX( *disp_mesh, alpha_f );
+
   // ------------------------------------------------- 
   // Update the inflow boundary values
   rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
+  itf_part->restore_node_mvelo(&mvelo_alpha);
+  itf_part->restore_node_disp(&mdisp_alpha);
   itf_part->restore_node_sol(&sol_alpha);
-  // gassem_ptr->search_all_opposite_point(curr_time+alpha_f*dt, elementvs, elementvs_rotated, elements,
-  //   quad_s, free_quad, itf_part);
+  gassem_ptr->search_all_opposite_point(curr_time+alpha_f*dt, elementvs, elementvs_rotated, elements,
+    quad_s, free_quad, itf_part);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
   {
-    gassem_ptr->Clear_Disp();
-
     gassem_ptr->Clear_KG();
 
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part );
    
@@ -147,15 +160,13 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   }
   else
   {
-    gassem_ptr->Clear_Disp();
-
     gassem_ptr->Clear_G();
 
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part );
 
@@ -166,9 +177,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
-
-  // Mesh disp solution
-  disp_mesh->PlusAX( gassem_ptr->Disp, 1.0 );
 
   // Now do consistent Newton-Raphson iteration
   do
@@ -205,7 +213,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
           quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part );
 
@@ -224,7 +232,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
           quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part);
 

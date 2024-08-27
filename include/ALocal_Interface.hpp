@@ -26,8 +26,7 @@
 class ALocal_Interface
 {
   public:
-    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank,
-        const double &angular, const Vector_3 &point_xyz, const Vector_3 &angular_direc );
+    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
 
     virtual ~ALocal_Interface() = default;
 
@@ -97,6 +96,36 @@ class ALocal_Interface
       }
     }
 
+    // Return the local ien array and the local mvelo array of a rotated layer element
+    virtual void get_rotated_mvelo(const int &ii, const int &tag, const int &ee,
+      int * const &local_ien, double * const &local_mvleo) const
+    {
+      for(int nn = 0; nn < nLocBas; ++nn)
+      {
+        local_ien[nn] = get_rotated_layer_ien(ii, tag, ee * nLocBas + nn);
+
+        for(int dd = 0; dd < 3; ++dd)
+          {
+            local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
+          }
+      }
+    }
+
+    // Return the local ien array and the local mdisp array of a rotated layer element
+    virtual void get_rotated_disp(const int &ii, const int &tag, const int &ee,
+      int * const &local_ien, double * const &local_disp) const
+    {
+      for(int nn = 0; nn < nLocBas; ++nn)
+      {
+        local_ien[nn] = get_rotated_layer_ien(ii, tag, ee * nLocBas + nn);
+
+        for(int dd = 0; dd < 3; ++dd)
+          {
+            local_disp[3 * nn + dd] = rotated_node_disp[ii][3 * local_ien[nn] + dd];
+          }
+      }
+    }
+
     virtual int get_rotated_face_id(const int &ii, const int &tag, const int &jj) const
     {return rotated_layer_face_id[ii][tag][jj];}
 
@@ -108,18 +137,6 @@ class ALocal_Interface
 
     virtual int get_rotated_ID(const int &ii, const int &dof_index, const int &node) const
     {return rotated_ID[ii][dof_index * num_rotated_node[ii] + node];}
-
-    // // Get the current rotated nodes' xyz with given rotation rule and time
-    // virtual Vector_3 get_curr_xyz(const int &ii, const int &node, const double &tt) const;
-
-    // Get the radius of rotation
-    virtual Vector_3 get_radius (const Vector_3 &coor) const;
-
-    // Get the current point coordinates for the case of rotation around x/y/z-axis
-    virtual void get_currPts( const double * const &ept_x, const double * const &ept_y,
-      const double * const &ept_z, const double &tt,
-      double * const &currPt_x, double * const &currPt_y, double * const &currPt_z,
-      const int &type) const;
 
     virtual void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
       double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
@@ -142,7 +159,29 @@ class ALocal_Interface
       }
     }
 
+    virtual void Zero_node_mvelo()
+    {
+      for(int ii = 0; ii < num_itf; ++ii)
+      {
+        for(int jj = 0; jj < 3 * num_rotated_node[ii]; ++jj)
+          rotated_node_mvelo[ii][jj] = 0.0;
+      }
+    }
+
+    virtual void Zero_node_disp()
+    {
+      for(int ii = 0; ii < num_itf; ++ii)
+      {
+        for(int jj = 0; jj < 3 * num_rotated_node[ii]; ++jj)
+          rotated_node_disp[ii][jj] = 0.0;
+      }
+    }
+
     virtual void restore_node_sol(const PDNSolution * const &sol);
+
+    virtual void restore_node_mvelo(const PDNSolution * const &mvelo);
+
+    virtual void restore_node_disp(const PDNSolution * const &disp);
 
     virtual void init_curr(const int &nqp_sur);
 
@@ -169,13 +208,6 @@ class ALocal_Interface
     int cpu;
 
     int nqp_sur;
-
-    double angular_velo;
-
-    // Info of rotation axis
-    Vector_3 direction_rotated;
-
-    Vector_3 point_rotated;
 
     // the number of fixed volume elements in this part
     // size: num_itf
@@ -248,7 +280,15 @@ class ALocal_Interface
     // stores the pressure and velocity info of the nodes from the rotated volume elements
     // size: num_itf x (4 x num_rotated_node[ii])
     std::vector<std::vector<double>> rotated_node_sol;
-    
+
+    // stores the mesh velocity info of the nodes from the rotated volume elements
+    // size: num_itf x (3 x num_rotated_node[ii])    
+    std::vector<std::vector<double>> rotated_node_mvelo;    
+
+    // stores the mesh displacement info of the nodes from the rotated volume elements
+    // size: num_itf x (3 x num_rotated_node[ii])    
+    std::vector<std::vector<double>> rotated_node_disp;  
+
     // stores the partition tag of the nodes from the rotated volume elements
     // size: num_itf x num_rotated_node[ii]
     std::vector<std::vector<int>> rotated_node_part_tag;
