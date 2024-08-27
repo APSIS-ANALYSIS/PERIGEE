@@ -219,6 +219,8 @@ namespace SI_T
     double * volctrl_y = new double [nLocBas];
     double * volctrl_z = new double [nLocBas];
 
+    const int snlocbas = elements->get_nLocBas();
+
     int rotated_face_id = -1;
     int rotated_tag = tag;
     int num_rotated_ele = itf_part->get_num_rotated_ele(itf_id, rotated_tag);
