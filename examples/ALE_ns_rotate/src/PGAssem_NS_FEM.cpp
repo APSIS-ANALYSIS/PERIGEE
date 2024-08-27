@@ -60,7 +60,6 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  SI_qp->search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, part_itf);
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
       elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, SI_sol, SI_qp, gbc );
 
@@ -569,7 +568,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
     }
   }
 
@@ -1543,9 +1542,6 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
       }
     }
   }
-
-  VecAssemblyBegin(Y);
-  VecAssemblyEnd(Y);
 
   delete [] fixed_local_ien; fixed_local_ien = nullptr;
   delete [] fixed_local_sol; fixed_local_sol = nullptr;
