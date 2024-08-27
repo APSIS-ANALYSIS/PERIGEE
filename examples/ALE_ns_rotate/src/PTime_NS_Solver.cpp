@@ -100,8 +100,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr,
-    Mat &shell ) const
+    PNonlinear_NS_Solver * const &nsolver_ptr ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
@@ -152,7 +151,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, bc_mat, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
-        cur_dot_sol, cur_sol, disp_mesh, conv_flag, nl_counter, shell );
+        cur_dot_sol, cur_sol, disp_mesh, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();

@@ -73,8 +73,7 @@ class PNonlinear_NS_Solver
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
         PDNSolution * const &disp_mesh,
-        bool &conv_flag, int &nl_counter,
-        Mat &shell ) const;
+        bool &conv_flag, int &nl_counter ) const;
 
   private:
     const double nr_tol, na_tol, nd_tol;
