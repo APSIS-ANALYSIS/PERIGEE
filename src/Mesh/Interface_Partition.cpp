@@ -74,31 +74,16 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     fixed_pt_xyz[ii] = interfaces[ii].get_fixed_pt_xyz();
 
     // partition the fixed element according to the cpu_rank
-    PERIGEE_OMP_PARALLEL
+    for(int ee=0; ee<interfaces[ii].get_num_fixed_ele(); ++ee)
     {
-      std::vector<int> temp_ele_face_id {};
-      std::vector<int> temp_ien {};
-      std::vector<int> temp_interval_tag {};
-
-      PERIGEE_OMP_FOR
-      for(int ee=0; ee < interfaces[ii].get_num_fixed_ele(); ++ee)
+      if(interfaces[ii].get_fixed_cpu_rank(ee)==cpu_rank)
       {
-        const int sur_part_tag = interfaces[ii].get_fixed_cpu_rank(ee);
-        if(sur_part_tag == cpu_rank)
-        {
-          temp_ele_face_id.push_back(interfaces[ii].get_fixed_faceID(ee));
-          for(int jj=0; jj<part->get_nLocBas(); ++jj)
-            temp_ien.push_back(total_fixed_ien[ee * part->get_nLocBas() + jj]);
+        fixed_ele_face_id[ii].push_back(interfaces[ii].get_fixed_faceID(ee));
 
-          temp_interval_tag.push_back(total_fixed_interval_tag[ee]);
-        }
-      }
+        for(int jj=0; jj<part->get_nLocBas(); ++jj)
+          fixed_lien[ii].push_back(total_fixed_ien[ee * part->get_nLocBas() + jj]);
 
-      PERIGEE_OMP_CRITICAL
-      {
-        VEC_T::insert_end(fixed_ele_face_id[ii], temp_ele_face_id);
-        VEC_T::insert_end(fixed_lien[ii], temp_ien);
-        VEC_T::insert_end(fixed_interval_tag[ii], temp_interval_tag);
+        fixed_interval_tag[ii].push_back(total_fixed_interval_tag[ee]);
       }
     }
 
