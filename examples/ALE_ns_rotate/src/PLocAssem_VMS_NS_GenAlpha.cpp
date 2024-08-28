@@ -6,6 +6,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
         const double &in_beta, const int &elemtype, 
+        const double &angular,
+        const Vector_3 &point_xyz, const Vector_3 &angular_direc,
         const double &in_ct, const double &in_ctauc )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
@@ -13,7 +15,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   CI( (elemtype == 501 || elemtype == 601) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
+  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ), angular_velo(angular),
+  point_rotated(point_xyz), direction_rotated(angular_direc),
   coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365 : 1.0 ),
   mm( (elemtype == 501 || elemtype == 502) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
@@ -28,6 +31,10 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
+  flist = new locassem_vms_ns_funs[2];
+  flist[0] = &PLocAssem_VMS_NS_GenAlpha::get_Poiseuille_traction1;
+  flist[1] = &PLocAssem_VMS_NS_GenAlpha::get_Poiseuille_traction0;
+
   print_info();
 }
 
@@ -37,6 +44,8 @@ PLocAssem_VMS_NS_GenAlpha::~PLocAssem_VMS_NS_GenAlpha()
   delete [] Residual; Residual = nullptr;
   delete [] sur_Tangent; sur_Tangent = nullptr;
   delete [] sur_Residual; sur_Residual = nullptr;
+
+  delete [] flist;
 }
 
 void PLocAssem_VMS_NS_GenAlpha::print_info() const
@@ -125,13 +134,19 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
+    const double * const &mvelo,
+    const double * const &mdisp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
+
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
+
+  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -151,6 +166,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+    double mu = 0.0, mv = 0.0, mw = 0.0; // mesh velocity, i.e. hat-v
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -159,7 +175,12 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
+      const int ii3 = 3 * ii;
       const int ii4 = 4 * ii;
+
+      mu += mvelo[ii3+0] * R[ii];
+      mv += mvelo[ii3+1] * R[ii];
+      mw += mvelo[ii3+2] * R[ii];
 
       u_t += dot_sol[ii4+1] * R[ii];
       v_t += dot_sol[ii4+2] * R[ii];
@@ -197,15 +218,20 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
 
-      coor.x() += eleCtrlPts_x[ii] * R[ii];
-      coor.y() += eleCtrlPts_y[ii] * R[ii];
-      coor.z() += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += curPt_x[ii] * R[ii];
+      coor.y() += curPt_y[ii] * R[ii];
+      coor.z() += curPt_z[ii] * R[ii];
     }
+
+    // v - hat(v)
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
 
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, cu, cv, cw );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -220,9 +246,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y - vis_mu * v_lap;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -240,14 +266,14 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
       Residual[4*A+1] += gwts * ( NA * rho0 * u_t
-          + NA * rho0 * (u * u_x + v * u_y + w * u_z)
+          + NA * rho0 * (cu * u_x + cv * u_y + cw * u_z)
           - NA_x * p
           + NA_x * two_mu * u_x
           + NA_y * vis_mu * (u_y + v_x)
@@ -261,7 +287,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
           - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
-          + NA * rho0 * (u * v_x + v * v_y + w * v_z)
+          + NA * rho0 * (cu * v_x + cv * v_y + cw * v_z)
           - NA_y * p
           + NA_x * vis_mu * (u_y + v_x)
           + NA_y * two_mu * v_y
@@ -275,7 +301,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
           - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
-          + NA * rho0 * (u * w_x + v * w_y + w * w_z)
+          + NA * rho0 * (cu * w_x + cv * w_y + cw * w_z)
           - NA_z * p
           + NA_x * vis_mu * (u_z + w_x)
           + NA_y * vis_mu * (w_y + v_z)
@@ -295,13 +321,19 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
+    const double * const &mvelo,
+    const double * const &mdisp,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
+
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
+
+  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -325,6 +357,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0;
     double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0;
     double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0;
+    double mu = 0.0, mv = 0.0, mw = 0.0; // mesh velocity, i.e. hat-v
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -333,7 +366,12 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
+      const int ii3 = 3 * ii;      
       const int ii4 = 4 * ii;
+
+      mu += mvelo[ii3+0] * R[ii];
+      mv += mvelo[ii3+1] * R[ii];
+      mw += mvelo[ii3+2] * R[ii];
 
       u_t += dot_sol[ii4+1] * R[ii];
       v_t += dot_sol[ii4+2] * R[ii];
@@ -371,14 +409,19 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       w_yy += sol[ii4+3] * d2R_dyy[ii];
       w_zz += sol[ii4+3] * d2R_dzz[ii];
 
-      coor.x() += eleCtrlPts_x[ii] * R[ii];
-      coor.y() += eleCtrlPts_y[ii] * R[ii];
-      coor.z() += eleCtrlPts_z[ii] * R[ii];
+      coor.x() += curPt_x[ii] * R[ii];
+      coor.y() += curPt_y[ii] * R[ii];
+      coor.z() += curPt_z[ii] * R[ii];
     }
+
+    // v - hat(v)
+    const double cu = u - mu;
+    const double cv = v - mv;
+    const double cw = w - mw;
 
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, cu, cv, cw );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -392,9 +435,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double v_lap = v_xx + v_yy + v_zz;
     const double w_lap = w_xx + w_yy + w_zz;
 
-    const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
-    const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap ;
-    const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
+    const double rx = rho0 * ( u_t + u_x * cu + u_y * cv + u_z * cw - f_body.x() ) + p_x - vis_mu * u_lap;
+    const double ry = rho0 * ( v_t + v_x * cu + v_y * cv + v_z * cw - f_body.y() ) + p_y - vis_mu * v_lap ;
+    const double rz = rho0 * ( w_t + w_x * cu + w_y * cv + w_z * cw - f_body.z() ) + p_z - vis_mu * w_lap;
 
     const double div_vel = u_x + v_y + w_z;
 
@@ -412,14 +455,14 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      const double velo_dot_gradR = NA_x * u + NA_y * v + NA_z * w;
+      const double velo_dot_gradR = NA_x * cu + NA_y * cv + NA_z * cw;
       const double r_dot_gradR = NA_x * rx + NA_y * ry + NA_z * rz;
       const double velo_prime_dot_gradR = NA_x * u_prime + NA_y * v_prime + NA_z * w_prime;
 
       Residual[4*A] += gwts * ( NA * div_vel + tau_m * r_dot_gradR );
 
       Residual[4*A+1] += gwts * ( NA * rho0 * u_t
-          + NA * rho0 * (u * u_x + v * u_y + w * u_z)
+          + NA * rho0 * (cu * u_x + cv * u_y + cw * u_z)
           - NA_x * p
           + NA_x * two_mu * u_x
           + NA_y * vis_mu * (u_y + v_x)
@@ -433,7 +476,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * rho0 * f_body.x() );
 
       Residual[4*A+2] += gwts * ( NA * rho0 * v_t
-          + NA * rho0 * (u * v_x + v * v_y + w * v_z)
+          + NA * rho0 * (cu * v_x + cv * v_y + cw * v_z)
           - NA_y * p
           + NA_x * vis_mu * (u_y + v_x)
           + NA_y * two_mu * v_y
@@ -447,7 +490,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
           - NA * rho0 * f_body.y() );
 
       Residual[4*A+3] += gwts * (NA * rho0 * w_t
-          + NA * rho0 * (u * w_x + v * w_y + w * w_z)
+          + NA * rho0 * (cu * w_x + cv * w_y + cw * w_z)
           - NA_z * p
           + NA_x * vis_mu * (u_z + w_x)
           + NA_y * vis_mu * (w_y + v_z)
@@ -465,7 +508,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         const double NB_xx = d2R_dxx[B], NB_yy = d2R_dyy[B], NB_zz = d2R_dzz[B];
         const double NB_lap = NB_xx + NB_yy + NB_zz;
-        const double velo_dot_gradNB = u * NB_x + v * NB_y + w * NB_z;
+        const double velo_dot_gradNB = cu * NB_x + cv * NB_y + cw * NB_z;
         const double velo_prime_dot_gradNB = u_prime * NB_x + v_prime * NB_y + w_prime * NB_z;
 
         const double NANB  = NA*NB, NANBx = NA*NB_x, NANBy = NA*NB_y, NANBz = NA*NB_z;
@@ -765,7 +808,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -787,9 +830,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
-      Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
-      Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
+      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
+      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
+      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
     }
   }
 }
@@ -809,7 +852,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
   double surface_area;
 
-  Zero_Residual();
+  Zero_sur_Residual();
 
   for(int qua = 0; qua < face_nqp; ++qua)
   {
@@ -819,15 +862,14 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
-      Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
-      Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
+      sur_Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
+      sur_Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
+      sur_Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -845,36 +887,34 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
   {
     const std::vector<double> R = element->get_R(qua);
 
-    double surface_area, factor;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
       const int ii4 = ii * 4;
-      u += sol[ii4+1] * R[ii];
-      v += sol[ii4+2] * R[ii];
-      w += sol[ii4+3] * R[ii];
+      velo.x() += sol[ii4+1] * R[ii];
+      velo.y() += sol[ii4+2] * R[ii];
+      velo.z() += sol[ii4+3] * R[ii];
     }
 
-    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
+    const double temp = Vec3::dot_product( velo, n_out );
 
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
+    const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
-      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
-      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
+      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.x();
+      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.y();
+      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.z();
     }
   }
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
-    const double * const &dot_sol,
     const double * const &sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
@@ -894,22 +934,21 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
   {
     const std::vector<double> R = element->get_R(qua);
 
-    double surface_area, factor;
+    double surface_area;
 
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += sol[ii*4+1] * R[ii];
-      v += sol[ii*4+2] * R[ii];
-      w += sol[ii*4+3] * R[ii];
+      velo.x() += sol[ii*4+1] * R[ii];
+      velo.y() += sol[ii*4+2] * R[ii];
+      velo.z() += sol[ii*4+3] * R[ii];
     }
 
-    const double temp = u * n_out.x() + v * n_out.y() + w * n_out.z();
+    const double temp = Vec3::dot_product( velo, n_out );
 
-    if(temp < 0.0) factor = temp * rho0 * beta;
-    else factor = 0.0;
+    const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
     const double gwts = surface_area * quad -> get_qw(qua);
 
@@ -917,9 +956,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     //            6 for quadratic tri element
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= gwts * R[A] * factor * u;
-      sur_Residual[4*A+2] -= gwts * R[A] * factor * v;
-      sur_Residual[4*A+3] -= gwts * R[A] * factor * w;
+      sur_Residual[4*A+1] -= gwts * R[A] * factor * velo.x();
+      sur_Residual[4*A+2] -= gwts * R[A] * factor * velo.y();
+      sur_Residual[4*A+3] -= gwts * R[A] * factor * velo.z();
 
       for(int B=0; B<snLocBas; ++B)
       {
@@ -953,15 +992,15 @@ double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
     double surface_area;
     const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
 
-    double u = 0.0, v = 0.0, w = 0.0;
+    Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      u += sol[ii*4+1] * R[ii];
-      v += sol[ii*4+2] * R[ii];
-      w += sol[ii*4+3] * R[ii];
+      velo.x() += sol[ii*4+1] * R[ii];
+      velo.y() += sol[ii*4+2] * R[ii];
+      velo.z() += sol[ii*4+3] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
+    flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
   }
 
   return flrate;

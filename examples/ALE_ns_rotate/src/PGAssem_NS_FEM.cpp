@@ -3,13 +3,19 @@
 PGAssem_NS_FEM::PGAssem_NS_FEM(
     IPLocAssem * const &locassem_ptr,
     FEAElement * const &elements,
+    FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quads,
+    IQuadPts * const &free_quad,
     const IAGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
     const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
+    const ALocal_Interface * const &part_itf,
+    const SI_T::SI_solution * const &SI_sol,
+    SI_T::SI_quad_point * const &SI_qp,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
 : nLocBas( agmi_ptr->get_nLocBas() ),
@@ -38,8 +44,10 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
 
   // Allocate the sparse matrix K
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &K);
+  // MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+  //     PETSC_DETERMINE, dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &K);
+  MatCreateDense(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+      PETSC_DETERMINE, NULL, &K);
 
   // Allocate the vector G
   VecCreate(PETSC_COMM_WORLD, &G);
@@ -52,18 +60,20 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
+  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, part_itf, SI_sol);
+
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+      elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, SI_sol, SI_qp, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
   PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
 
-  MatDestroy(&K); // Destroy the K with rough preallocation
+  // MatDestroy(&K); // Destroy the K with rough preallocation
  
-  // Create Mat with precise preallocation 
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+  // // Create Mat with precise preallocation 
+  // MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+  //     PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
 PGAssem_NS_FEM::~PGAssem_NS_FEM()
@@ -127,14 +137,20 @@ void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part,
 
 void PGAssem_NS_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp,
+        const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -162,8 +178,10 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
-  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
+  // NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+
+  Interface_KG(0.0, 0.1, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   delete temp;
 
@@ -185,13 +203,18 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    IQuadPts * const &free_quad,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
-    const ALocal_WeakBC * const &wbc_part )
+    const ALocal_WeakBC * const &wbc_part,
+    const ALocal_Interface * const &itf_part,
+    const SI_T::SI_solution * const &SI_sol,
+    const SI_T::SI_quad_point * const &SI_qp )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -237,8 +260,11 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
+  Weak_EssBC_G(0, 0, sol_a, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
+  // Surface integral from Nitsche method
+  Interface_G(0, 0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -254,6 +280,8 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &mvelo,
+    const PDNSolution * const &mdisp,    
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -263,22 +291,31 @@ void PGAssem_NS_FEM::Assem_residual(
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    IQuadPts * const &free_quad,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
-    const ALocal_WeakBC * const &wbc_part )
+    const ALocal_WeakBC * const &wbc_part,
+    const ALocal_Interface * const &itf_part,
+    const SI_T::SI_solution * const &SI_sol,
+    const SI_T::SI_quad_point * const &SI_qp )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
   
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
+  double * array_mvelo = new double [nlgn * 3];
+  double * array_mdisp = new double [nlgn * 3];
   double * local_a = new double [nLocBas * dof_sol];
   double * local_b = new double [nLocBas * dof_sol];
+  double * local_mvelo = new double [nLocBas * 3];
+  double * local_mdisp = new double [nLocBas * 3];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -287,16 +324,20 @@ void PGAssem_NS_FEM::Assem_residual(
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
+  mvelo->GetLocalArray( array_mvelo );
+  mdisp->GetLocalArray( array_mdisp );
 
   for( int ee=0; ee<nElem; ++ee )
   {
     lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
+    GetLocal(array_mvelo, 3, IEN_e, local_mvelo);  // 3 is the DOFs of mvelo/mdisp
+    GetLocal(array_mdisp, 3, IEN_e, local_mdisp);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
+    lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b, local_mvelo, local_mdisp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -304,7 +345,7 @@ void PGAssem_NS_FEM::Assem_residual(
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
     }
-    
+
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
 
@@ -312,23 +353,33 @@ void PGAssem_NS_FEM::Assem_residual(
   delete [] array_b; array_b = nullptr;
   delete [] local_a; local_a = nullptr;
   delete [] local_b; local_b = nullptr;
+  delete [] array_mvelo; array_mvelo = nullptr;
+  delete [] array_mdisp; array_mdisp = nullptr;
+  delete [] local_mvelo; local_mvelo = nullptr;
+  delete [] local_mdisp; local_mdisp = nullptr;
   delete [] IEN_e; IEN_e = nullptr;
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
-  
+   
   // Backflow stabilization residual contribution
-  BackFlow_G( sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-     nbc_part, ebc_part, gbc );
+  // // Resistance type boundary condition
+  // NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+  Weak_EssBC_G(curr_time, dt, sol_b, alelem_ptr, lassem_ptr, elementvs, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
+  // For Poiseuille flow
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // Surface integral from Nitsche method
+  Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -342,6 +393,8 @@ void PGAssem_NS_FEM::Assem_residual(
 void PGAssem_NS_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &sol_b,
+    const PDNSolution * const &mvelo,
+    const PDNSolution * const &mdisp, 
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
@@ -351,22 +404,31 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    IQuadPts * const &free_quad,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
-    const ALocal_WeakBC * const &wbc_part )
+    const ALocal_WeakBC * const &wbc_part,
+    const ALocal_Interface * const &itf_part,
+    const SI_T::SI_solution * const &SI_sol,
+    const SI_T::SI_quad_point * const &SI_qp )
 {
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
   
   double * array_a = new double [nlgn * dof_sol];
   double * array_b = new double [nlgn * dof_sol];
+  double * array_mvelo = new double [nlgn * 3];
+  double * array_mdisp = new double [nlgn * 3];
   double * local_a = new double [nLocBas * dof_sol];
   double * local_b = new double [nLocBas * dof_sol];
+  double * local_mvelo = new double [nLocBas * 3];
+  double * local_mdisp = new double [nLocBas * 3];
   int * IEN_e = new int [nLocBas];
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
@@ -375,16 +437,20 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   sol_a->GetLocalArray( array_a );
   sol_b->GetLocalArray( array_b );
+  mvelo->GetLocalArray( array_mvelo );
+  mdisp->GetLocalArray( array_mdisp );
 
   for(int ee=0; ee<nElem; ++ee)
   {
     lien_ptr->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
+    GetLocal(array_mvelo, 3, IEN_e, local_mvelo);  // 3 is the DOFs of mvelo/mdisp
+    GetLocal(array_mdisp, 3, IEN_e, local_mdisp);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b, local_mvelo, local_mdisp,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -394,7 +460,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     }
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
+      lassem_ptr->Tangent, ADD_VALUES);
 
     VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
   }
@@ -403,6 +469,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] array_b; array_b = nullptr;
   delete [] local_a; local_a = nullptr;
   delete [] local_b; local_b = nullptr;
+  delete [] array_mvelo; array_mvelo = nullptr;
+  delete [] array_mdisp; array_mdisp = nullptr;
+  delete [] local_mvelo; local_mvelo = nullptr;
+  delete [] local_mdisp; local_mdisp = nullptr;
   delete [] IEN_e; IEN_e = nullptr;
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
@@ -410,16 +480,22 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_a, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
-  // Resistance type boundary condition
-  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-     nbc_part, ebc_part, gbc );
+  // // Resistance type boundary condition
+  // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+  Weak_EssBC_KG(curr_time, dt, sol_b, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
+  // For Poiseuille flow
+  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // Surface integral from Nitsche method (Only assemble G at present)
+  Interface_KG(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -464,7 +540,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
           srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
     }
   }
 
@@ -476,7 +552,6 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
 }
 
 void PGAssem_NS_FEM::BackFlow_G( 
-    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -484,18 +559,15 @@ void PGAssem_NS_FEM::BackFlow_G(
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_a = new double [nlgn * dof_sol];
-  double * array_b = new double [nlgn * dof_sol];
-  double * local_as = new double [dof_sol * snLocBas];
-  double * local_bs = new double [dof_sol * snLocBas];
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [dof_sol * snLocBas];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
-  dot_sol->GetLocalArray( array_a );
-  sol->GetLocalArray( array_b );
+  sol->GetLocalArray( array );
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -507,11 +579,10 @@ void PGAssem_NS_FEM::BackFlow_G(
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+      GetLocal(array, LSIEN, snLocBas, local);
 
-      lassem_ptr->Assem_Residual_BackFlowStab( local_as, local_bs,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+      lassem_ptr->Assem_Residual_BackFlowStab( local, element_s,
+        sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -523,10 +594,8 @@ void PGAssem_NS_FEM::BackFlow_G(
     }
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_as; local_as = nullptr;
-  delete [] local_bs; local_bs = nullptr;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
   delete [] LSIEN; LSIEN = nullptr;
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
@@ -535,7 +604,6 @@ void PGAssem_NS_FEM::BackFlow_G(
 }
 
 void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
-    const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -543,18 +611,15 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
-  double * array_a = new double [nlgn * dof_sol];
-  double * array_b = new double [nlgn * dof_sol];
-  double * local_as = new double [dof_sol * snLocBas];
-  double * local_bs = new double [dof_sol * snLocBas];
+  double * array = new double [nlgn * dof_sol];
+  double * local = new double [dof_sol * snLocBas];
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
   double * sctrl_y = new double [snLocBas];
   double * sctrl_z = new double [snLocBas];
   PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
 
-  dot_sol->GetLocalArray( array_a );
-  sol->GetLocalArray( array_b );
+  sol->GetLocalArray( array );
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
@@ -566,10 +631,9 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      GetLocal(array_a, LSIEN, snLocBas, local_as);
-      GetLocal(array_b, LSIEN, snLocBas, local_bs);
+      GetLocal(array, LSIEN, snLocBas, local);
 
-      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local_as, local_bs,
+      lassem_ptr->Assem_Tangent_Residual_BackFlowStab( dt, local,
           element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
 
       for(int ii=0; ii<snLocBas; ++ii)
@@ -585,10 +649,8 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
     }
   }
 
-  delete [] array_a; array_a = nullptr;
-  delete [] array_b; array_b = nullptr;
-  delete [] local_as; local_as = nullptr;
-  delete [] local_bs; local_bs = nullptr;
+  delete [] array; array = nullptr;
+  delete [] local; local = nullptr;
   delete [] LSIEN; LSIEN = nullptr;
   delete [] sctrl_x; sctrl_x = nullptr;
   delete [] sctrl_y; sctrl_y = nullptr;
@@ -1019,6 +1081,7 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
 void PGAssem_NS_FEM::Weak_EssBC_KG(
     const double &curr_time, const double &dt,
     const PDNSolution * const &sol,
+    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_vs,
     const IQuadPts * const &quad_s,
@@ -1052,8 +1115,16 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
-    lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, element_vs,
-      ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+    if(alelem_ptr->get_elem_tag(ee) == 0)
+    {
+      lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, element_vs,
+        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+    }
+    else
+    {
+      lassem_ptr->Assem_Tangent_Residual_Weak_Rotated(curr_time, dt, local_b, element_vs,
+        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+    }
 
     for(int ii{0}; ii < nLocBas; ++ii)
     {
@@ -1078,6 +1149,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 void PGAssem_NS_FEM::Weak_EssBC_G(
     const double &curr_time, const double &dt,
     const PDNSolution * const &sol,
+    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_vs,
     const IQuadPts * const &quad_s,
@@ -1111,8 +1183,16 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
     
-    lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, element_vs,
-      ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+    if(alelem_ptr->get_elem_tag(ee) == 0)
+    {
+      lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, element_vs,
+        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+    }
+    else
+    {
+      lassem_ptr->Assem_Residual_Weak_Rotated(curr_time, dt, local_b, element_vs,
+        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
+    }
 
     for(int ii{0}; ii < nLocBas; ++ii)
     {
@@ -1130,6 +1210,253 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   delete [] ctrl_y; ctrl_y = nullptr;
   delete [] ctrl_z; ctrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
+}
+
+void PGAssem_NS_FEM::Interface_KG(
+  const double &curr_time, const double &dt,
+  IPLocAssem * const &lassem_ptr,
+  FEAElement * const &fixed_elementv,
+  FEAElement * const &rotated_elementv,
+  FEAElement * const &elements,
+  const IQuadPts * const &quad_s,
+  IQuadPts * const &free_quad,
+  const ALocal_Interface * const &itf_part,
+  const SI_T::SI_solution * const &SI_sol,
+  const SI_T::SI_quad_point * const &SI_qp )
+{
+  const int loc_dof {dof_mat * nLocBas};
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+
+  double * curPt_x = new double [nLocBas];
+  double * curPt_y = new double [nLocBas];
+  double * curPt_z = new double [nLocBas];
+
+  int * fixed_local_ien = new int [nLocBas];
+  double * fixed_local_sol = new double [nLocBas * dof_sol];
+
+  int * rotated_local_ien = new int [nLocBas];
+  double * rotated_local_sol = new double [nLocBas * dof_sol];
+  double * rotated_local_mvelo = new double [nLocBas * 3];
+  double * rotated_local_disp = new double [nLocBas * 3];
+
+  PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
+
+  const int num_itf {itf_part->get_num_itf()};
+
+  int ele_tag {-1};
+  int rotated_ee {-1};
+  double rotated_xi {1.0 / 3.0};
+  double rotated_eta {1.0 / 3.0};
+
+  for(int itf_id{0}; itf_id<num_itf; ++itf_id)
+  {
+    // SYS_T::commPrint("itf_id = %d\n", itf_id);
+    const int num_fixed_elem = itf_part->get_num_fixed_ele(itf_id);
+
+    for(int ee{0}; ee<num_fixed_elem; ++ee)
+    {
+      // SYS_T::commPrint("  fixed_ee = %d\n", ee);
+      // const int local_ee_index{itf_part->get_fixed_ele_id(itf_id, ee)};
+
+      itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
+
+      fixed_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_nqp {quad_s->get_num_quadPts()};
+
+      std::vector<double> R(nLocBas, 0.0);
+
+      // Get the local ien and local sol of this fixed element
+      SI_sol->get_fixed_local(itf_part, itf_id, ee, fixed_local_ien, fixed_local_sol);
+
+      for(int qua{0}; qua<fixed_face_nqp; ++qua)
+      {
+        fixed_elementv->get_R(qua, &R[0]);
+
+        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi, rotated_eta);
+
+        const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
+
+        itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, ctrl_x, ctrl_y, ctrl_z);
+        
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+        free_quad->set_qp( rotated_xi, rotated_eta );
+
+        rotated_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
+
+        SI_sol->get_rotated_local(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
+        SI_sol->get_rotated_mvelo(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
+
+        const double qw = quad_s->get_qw(qua);
+
+        lassem_ptr->Assem_Tangent_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo);
+
+        for(int ii{0}; ii < nLocBas; ++ii)
+        {
+          for(int mm{0}; mm < dof_mat; ++mm)
+          {
+            fixed_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_fixed_LID(itf_id, mm, fixed_local_ien[ii]) + mm;
+            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_rotated_LID(itf_id, mm, rotated_local_ien[ii]) + mm;
+          }
+        }
+
+        MatSetValues(K, loc_dof, fixed_row_index, loc_dof, fixed_row_index, lassem_ptr->Tangent_ss, ADD_VALUES);
+        MatSetValues(K, loc_dof, rotated_row_index, loc_dof, rotated_row_index, lassem_ptr->Tangent_rr, ADD_VALUES);
+
+        // For static problem
+        MatSetValues(K, loc_dof, fixed_row_index, loc_dof, rotated_row_index, lassem_ptr->Tangent_sr, ADD_VALUES);
+        MatSetValues(K, loc_dof, rotated_row_index, loc_dof, fixed_row_index, lassem_ptr->Tangent_rs, ADD_VALUES);
+
+        VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
+        VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
+      }
+    }
+  }
+
+  delete [] fixed_local_ien; fixed_local_ien = nullptr;
+  delete [] fixed_local_sol; fixed_local_sol = nullptr;
+  delete [] rotated_local_ien; rotated_local_ien = nullptr;
+  delete [] rotated_local_sol; rotated_local_sol = nullptr;
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
+
+  delete [] fixed_row_index; fixed_row_index = nullptr;
+  delete [] rotated_row_index; rotated_row_index = nullptr;
+
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+
+  delete [] curPt_x; curPt_x = nullptr;
+  delete [] curPt_y; curPt_y = nullptr;
+  delete [] curPt_z; curPt_z = nullptr;
+}
+
+void PGAssem_NS_FEM::Interface_G(
+  const double &curr_time, const double &dt,
+  IPLocAssem * const &lassem_ptr,
+  FEAElement * const &fixed_elementv,
+  FEAElement * const &rotated_elementv,
+  FEAElement * const &elements,
+  const IQuadPts * const &quad_s,
+  IQuadPts * const &free_quad,
+  const ALocal_Interface * const &itf_part,
+  const SI_T::SI_solution * const &SI_sol,
+  const SI_T::SI_quad_point * const &SI_qp )
+{
+  const int loc_dof {dof_mat * nLocBas};
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+
+  double * curPt_x = new double [nLocBas];
+  double * curPt_y = new double [nLocBas];
+  double * curPt_z = new double [nLocBas];
+
+  int * fixed_local_ien = new int [nLocBas];
+  double * fixed_local_sol = new double [nLocBas * dof_sol];
+
+  int * rotated_local_ien = new int [nLocBas];
+  double * rotated_local_sol = new double [nLocBas * dof_sol];
+  double * rotated_local_mvelo = new double [nLocBas * 3];
+  double * rotated_local_disp = new double [nLocBas * 3];
+
+  PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
+
+  const int num_itf {itf_part->get_num_itf()};
+
+  int ele_tag {-1};
+  int rotated_ee {-1};
+  double rotated_xi {1.0 / 3.0};
+  double rotated_eta {1.0 / 3.0};
+
+  for(int itf_id{0}; itf_id<num_itf; ++itf_id)
+  {
+    // SYS_T::commPrint("itf_id = %d\n", itf_id);
+    const int num_fixed_elem = itf_part->get_num_fixed_ele(itf_id);
+
+    for(int ee{0}; ee<num_fixed_elem; ++ee)
+    {
+      // SYS_T::commPrint("  fixed_ee = %d\n", ee);
+      // const int local_ee_index{itf_part->get_fixed_ele_id(itf_id, ee)};
+
+      itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
+
+      fixed_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_nqp {quad_s->get_num_quadPts()};
+
+      std::vector<double> R(nLocBas, 0.0);
+
+      // Get the local ien and local sol of this fixed element
+      SI_sol->get_fixed_local(itf_part, itf_id, ee, fixed_local_ien, fixed_local_sol);
+
+      for(int qua{0}; qua<fixed_face_nqp; ++qua)
+      {
+        fixed_elementv->get_R(qua, &R[0]);
+
+        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi, rotated_eta);
+
+        const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
+
+        itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, ctrl_x, ctrl_y, ctrl_z);
+
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+        free_quad->set_qp( rotated_xi, rotated_eta );
+
+        rotated_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
+
+        SI_sol->get_rotated_local(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
+        SI_sol->get_rotated_mvelo(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
+
+        const double qw = quad_s->get_qw(qua);
+
+        lassem_ptr->Assem_Residual_itf(qua, qw, dt, fixed_elementv, rotated_elementv, fixed_local_sol, rotated_local_sol, rotated_local_mvelo);
+
+        for(int ii{0}; ii < nLocBas; ++ii)
+        {
+          for(int mm{0}; mm < dof_mat; ++mm)
+          {
+            fixed_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_fixed_LID(itf_id, mm, fixed_local_ien[ii]) + mm;
+            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_rotated_LID(itf_id, mm, rotated_local_ien[ii]) + mm;
+          }
+        }
+
+        VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
+        VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
+      }
+    }
+  }
+
+  delete [] fixed_local_ien; fixed_local_ien = nullptr;
+  delete [] fixed_local_sol; fixed_local_sol = nullptr;
+  delete [] rotated_local_ien; rotated_local_ien = nullptr;
+  delete [] rotated_local_sol; rotated_local_sol = nullptr;
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
+
+  delete [] fixed_row_index; fixed_row_index = nullptr;
+  delete [] rotated_row_index; rotated_row_index = nullptr;
+
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+
+  delete [] curPt_x; curPt_x = nullptr;
+  delete [] curPt_y; curPt_y = nullptr;
+  delete [] curPt_z; curPt_z = nullptr;
 }
 
 // EOF

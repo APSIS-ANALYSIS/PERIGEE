@@ -232,42 +232,52 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
   const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
   this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
 
-  std::vector<double> face_ctrl_x( 3, 0.0 ), face_ctrl_y( 3, 0.0 ), face_ctrl_z( 3, 0.0 );
+  const auto face_ctrl = get_face_ctrlPts( face_id, ctrl_x, ctrl_y, ctrl_z );
+
+  // use the triangle element routine to determine the outward normal vector and
+  // the surface Jacobian.
+  triangle_face->buildBasis( quad_s, face_ctrl[0].data(), face_ctrl[1].data(), face_ctrl[2].data() );
+}
+
+std::array<std::vector<double>, 3> FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
+    const double * const &vol_ctrl_x,
+    const double * const &vol_ctrl_y,
+    const double * const &vol_ctrl_z )
+{
+  std::array<std::vector<double>, 3> out;
 
   switch( face_id )
   {
     case 0:
-      face_ctrl_x = std::vector<double> { ctrl_x[1], ctrl_x[2], ctrl_x[3] };
-      face_ctrl_y = std::vector<double> { ctrl_y[1], ctrl_y[2], ctrl_y[3] };
-      face_ctrl_z = std::vector<double> { ctrl_z[1], ctrl_z[2], ctrl_z[3] };
+      out[0] = std::vector<double> { vol_ctrl_x[1], vol_ctrl_x[2], vol_ctrl_x[3] };
+      out[1] = std::vector<double> { vol_ctrl_y[1], vol_ctrl_y[2], vol_ctrl_y[3] };
+      out[2] = std::vector<double> { vol_ctrl_z[1], vol_ctrl_z[2], vol_ctrl_z[3] };
       break;
 
     case 1:
-      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[3], ctrl_x[2] };
-      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[3], ctrl_y[2] };
-      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[3], ctrl_z[2] };
+      out[0] = std::vector<double> { vol_ctrl_x[0], vol_ctrl_x[3], vol_ctrl_x[2] };
+      out[1] = std::vector<double> { vol_ctrl_y[0], vol_ctrl_y[3], vol_ctrl_y[2] };
+      out[2] = std::vector<double> { vol_ctrl_z[0], vol_ctrl_z[3], vol_ctrl_z[2] };
       break;
 
     case 2:
-      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[1], ctrl_x[3] };
-      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[1], ctrl_y[3] };
-      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[1], ctrl_z[3] };
+      out[0] = std::vector<double> { vol_ctrl_x[0], vol_ctrl_x[1], vol_ctrl_x[3] };
+      out[1] = std::vector<double> { vol_ctrl_y[0], vol_ctrl_y[1], vol_ctrl_y[3] };
+      out[2] = std::vector<double> { vol_ctrl_z[0], vol_ctrl_z[1], vol_ctrl_z[3] };
       break;
 
     case 3:
-      face_ctrl_x = std::vector<double> { ctrl_x[0], ctrl_x[2], ctrl_x[1] };
-      face_ctrl_y = std::vector<double> { ctrl_y[0], ctrl_y[2], ctrl_y[1] };
-      face_ctrl_z = std::vector<double> { ctrl_z[0], ctrl_z[2], ctrl_z[1] };
+      out[0] = std::vector<double> { vol_ctrl_x[0], vol_ctrl_x[2], vol_ctrl_x[1] };
+      out[1] = std::vector<double> { vol_ctrl_y[0], vol_ctrl_y[2], vol_ctrl_y[1] };
+      out[2] = std::vector<double> { vol_ctrl_z[0], vol_ctrl_z[2], vol_ctrl_z[1] };
       break;
 
     default:
-      SYS_T::print_fatal("Error: FEAElement_Tet4::buildBoundaryBasis, wrong face id.\n");
+      SYS_T::print_fatal("Error: FEAElement_Tet4::get_face_ctrlPts, wrong face id.\n");
       break;
   }
 
-  // use the triangle element routine to determine the outward normal vector and
-  // the surface Jacobian.
-  triangle_face->buildBasis( quad_s, &face_ctrl_x[0], &face_ctrl_y[0], &face_ctrl_z[0] );
+  return out;
 }
 
 // EOF

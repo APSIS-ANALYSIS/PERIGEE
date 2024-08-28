@@ -58,11 +58,8 @@ void VTK_Writer_NS::writeOutput(
     fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
     elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
-    
-    // Interpolate nodal coordinates
-    intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
-        elemptr, points );
-  
+      
+    // Interpolate data and assign to dataVecs      
     std::vector<double> inputInfo; inputInfo.clear();
     
     // Interpolating pressure
@@ -74,7 +71,7 @@ void VTK_Writer_NS::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk] );
     }
- 
+
     intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[0] ); 
 
@@ -87,8 +84,39 @@ void VTK_Writer_NS::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
     }
+    
     intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[1] );
+
+    // Interpolate displacement vector
+    inputInfo.clear();
+    asize = vdata_ptr->get_arraySizes(2);
+    for(int jj=0; jj<nLocBas; ++jj)
+    {
+      int pt_index = IEN_e[jj];
+      for(int kk=0; kk<asize; ++kk)
+        inputInfo.push_back( pointArrays[2][pt_index * asize + kk] );
+    }
+
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+        elemptr, dataVecs[2] ); 
+
+    // Use displacement to update points
+    intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo,
+        elemptr, points );    
+
+    // Interpolate mesh_velocity vector
+    inputInfo.clear();
+    asize = vdata_ptr->get_arraySizes(3);
+    for(int jj=0; jj<nLocBas; ++jj)
+    {
+      int pt_index = IEN_e[jj];
+      for(int kk=0; kk<asize; ++kk)
+        inputInfo.push_back( pointArrays[3][pt_index * asize + kk] );
+    }
+
+    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+        elemptr, dataVecs[3] );
 
     // Set mesh connectivity
     if( elemptr->get_Type() == 501 )

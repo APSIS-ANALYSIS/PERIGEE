@@ -45,6 +45,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
+    const PDNSolution * const &pre_velo_mesh,    
+    const PDNSolution * const &pre_disp_mesh,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     const ICVFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -55,17 +57,24 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
+    const ALocal_Interface * const &itf_part,
+    SI_T::SI_solution * const &SI_sol,
+    SI_T::SI_quad_point * const &SI_qp,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
+    const PDNSolution * const &velo_mesh,    
+    const PDNSolution * const &disp_mesh,
     bool &conv_flag, int &nl_counter ) const
 {
 #ifdef PETSC_USE_LOG
@@ -105,11 +114,27 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
 
+  // Define the velo_mesh at alpha_f: mvelo_alpha
+  PDNSolution mvelo_alpha(*pre_velo_mesh);
+  mvelo_alpha.ScaleValue( 1.0 - alpha_f );
+  mvelo_alpha.PlusAX( *velo_mesh, alpha_f );
+
+  // Define the disp_mesh at alpha_f: mdisp_alpha
+  PDNSolution mdisp_alpha(*pre_disp_mesh);
+  mdisp_alpha.ScaleValue( 1.0 - alpha_f );
+  mdisp_alpha.PlusAX( *disp_mesh, alpha_f );
+
   // ------------------------------------------------- 
   // Update the inflow boundary values
   rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
+
+  SI_sol->update_node_mvelo(&mvelo_alpha);
+  SI_sol->update_node_mdisp(&mdisp_alpha);
+  SI_sol->update_node_sol(&sol_alpha);
+  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements,
+    quad_s, free_quad, itf_part, SI_sol);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -121,9 +146,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
-        curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol, 
+        curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
+        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -143,9 +168,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-        curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-        quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+        curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
+        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -179,6 +204,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
+    SI_sol->update_node_sol(&sol_alpha);
+
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
@@ -188,9 +215,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-          curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+          curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
+          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -207,9 +234,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-          curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-          quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+          curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
+          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);

@@ -1,35 +1,5 @@
 #include "PTime_NS_Solver.hpp"
 
-PTime_NS_Solver::PTime_NS_Solver(
-    const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time )
-: final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
-{}
-
-std::string PTime_NS_Solver::Name_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  std::string out_name(pb_name);
-  out_name.append(temp.str());
-  return out_name;
-}
-
-std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  std::string out_name("dot_");
-  out_name.append(pb_name);
-  out_name.append(temp.str());
-  return out_name;
-}
-
 void PTime_NS_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
@@ -59,10 +29,10 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    const double &TI_std_dev,
     PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
+    const PDNSolution * const &init_disp,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
     const ICVFlowRate * const flr_ptr,
@@ -75,12 +45,18 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
+    const ALocal_Interface * const &itf_part,
+    const SI_rotation_info * const &si_ptr,
+    SI_T::SI_solution * const &SI_sol,
+    SI_T::SI_quad_point * const &SI_qp,
     const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
+    FEAElement * const &elementvs_rotated,
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
+    IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
@@ -90,6 +66,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+  PDNSolution * pre_disp_mesh = new PDNSolution(*init_disp);
+  PDNSolution * cur_disp_mesh = new PDNSolution(*init_disp);
+  PDNSolution * pre_velo_mesh = new PDNSolution(*init_disp);
+  PDNSolution * cur_velo_mesh = new PDNSolution(*init_disp);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -99,6 +79,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     
     const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name);
+  
+    const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
+    cur_disp_mesh->WriteBinary(sol_disp_name);
+
+    const auto sol_mvelo_name = Name_mvelo_Generator(time_info->get_index());
+    cur_velo_mesh->WriteBinary(sol_mvelo_name);
   }
 
   bool conv_flag, renew_flag;
@@ -113,6 +99,40 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   // Enter into time integration
   while( time_info->get_time() < final_time )
   {
+    //Calculate the cur_velo_mesh and cur_disp_mesh
+    Vec lvelo_mesh, ldisp_mesh;
+    double * array_cur_velo_mesh, *array_cur_disp_mesh;
+    VecGhostGetLocalForm(cur_velo_mesh->solution, &lvelo_mesh);
+    VecGhostGetLocalForm(cur_disp_mesh->solution, &ldisp_mesh);
+    VecGetArray(lvelo_mesh, &array_cur_velo_mesh);
+    VecGetArray(ldisp_mesh, &array_cur_disp_mesh);
+
+    for( int ii=0; ii<pNode_ptr->get_nlocalnode_rotated(); ++ii )
+    { 
+      // Update the coordinates of the rotated nodes
+      const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), si_ptr, 0); //get_currPts() may be writtern into Sl_tools
+
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, si_ptr); //get_radius() may be writtern into Sl_tools
+      const Vector_3 velo_mesh_curr = Vec3::cross_product(si_ptr->get_angular_velo()*si_ptr->get_direction_rotated(), radius_curr);
+
+      const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
+
+      for(int jj=0; jj<3; ++jj)
+      {
+        array_cur_velo_mesh[offset + jj] = velo_mesh_curr(jj);
+        array_cur_disp_mesh[offset + jj] = curr_pt_xyz(jj)-init_pt_xyz(jj);  
+      }
+    }
+
+    VecRestoreArray(lvelo_mesh, &array_cur_velo_mesh);
+    VecRestoreArray(ldisp_mesh, &array_cur_disp_mesh);
+    VecGhostRestoreLocalForm(cur_velo_mesh->solution, &lvelo_mesh);
+    VecGhostRestoreLocalForm(cur_disp_mesh->solution, &ldisp_mesh);
+
+    cur_velo_mesh->GhostUpdate();
+    cur_disp_mesh->GhostUpdate();
+
     if(time_info->get_index() % renew_tang_freq == 0 || rest_flag )
     {
       renew_flag = true;
@@ -124,16 +144,14 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // the tangent matrix
     if( nl_counter == 1 ) renew_flag = false;
 
-    // If add perturbation at the inlet with given turbulence intensity
-    sol_base->randomly_perturbed_parabolic_inflow(TI_std_dev, pNode_ptr, feanode_ptr, infnbc_part);
-
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
-        sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
+        sol_base, pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh, tmga_ptr, flr_ptr,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, bc_mat, elementv, elements, elementvs, elementvs_rotated,
+        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
+        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -150,6 +168,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
       const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name);
+
+      const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
+      cur_disp_mesh->WriteBinary(sol_disp_name);
+
+      const auto sol_mvelo_name = Name_mvelo_Generator(time_info->get_index());
+      cur_velo_mesh->WriteBinary(sol_mvelo_name);
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
@@ -211,9 +235,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
+    pre_disp_mesh->Copy(*cur_disp_mesh);    
+    pre_velo_mesh->Copy(*cur_velo_mesh);
   }
 
-  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
+  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol; 
+  delete pre_velo_mesh; delete cur_velo_mesh; delete pre_disp_mesh; delete cur_disp_mesh;
 }
 
 // EOF

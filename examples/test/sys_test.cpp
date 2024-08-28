@@ -44,6 +44,13 @@
 #include "MaterialModel_ich_GOH14.hpp"
 #include "MaterialModel_ich_StVenant_Kirchhoff.hpp"
 
+void test(const double * const &vv, const unsigned int len)
+{
+  for(unsigned int ii=0; ii<len; ++ii)
+    std::cout<<vv[ii]<<'\t';
+  std::cout<<"End of vector \n";
+}
+
 int main(int argc, char *argv[])
 {
   return EXIT_SUCCESS;

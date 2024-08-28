@@ -11,13 +11,17 @@
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include "APart_Basic_Info.hpp"
+#include "APart_Node_Rotated.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
+#include "ALocal_Interface.hpp"
+#include "Sliding_Interface_Tools.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
+#include "QuadPts_UserDefined_Triangle.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Hex8.hpp"
@@ -36,8 +40,10 @@
 #include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
+#include "PLocAssem_VMS_NS_GenAlpha_Interface.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
+#include "SI_rotation_info.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -106,6 +112,9 @@ int main(int argc, char *argv[])
   double restart_step = 1.0e-3; // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
+  // Angular velocity
+  double angular_velo = 2.0 * MATH_T::PI; //(rad/s)
+
   // Yaml options
   bool is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
@@ -130,6 +139,7 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
+  SYS_T::GetOptionReal("-angular_velo", angular_velo);
   SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
   SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
   SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
@@ -168,6 +178,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-C_bI", C_bI);
 
   // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint("-angular_velo", angular_velo);
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
   SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
@@ -228,6 +239,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
+    cmdh5w->write_doubleScalar("angular_velo", angular_velo);
 
     if( SYS_T::file_exist( inflow_file ) )
       cmdh5w->write_string("inflow_file", inflow_file);
@@ -243,6 +255,15 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Data from Files =====
+  // Read the info of rotation axis from h5file
+  const std::string fName = SYS_T::gen_partfile_name( part_file, rank );
+  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  const std::string gname("/rotation");
+  const Vector_3 point_rotated = h5r -> read_Vector_3( gname.c_str(), "point_rotated" );
+  const Vector_3 angular_direction = h5r -> read_Vector_3( gname.c_str(), "angular_direction" );
+  delete h5r; H5Fclose( file_id );
+
   // Control points' xyz coordinates
   FEANode * fNode = new FEANode(part_file, rank);
 
@@ -271,8 +292,16 @@ int main(int argc, char *argv[])
   ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
   locwbc -> print_info();
 
+  // Interfaces info
+  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
+  locitf -> print_info();
+
+  SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
+
   // Local sub-domain's nodal indices
-  APart_Node * pNode = new APart_Node(part_file, rank);
+  APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
+
+  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, point_rotated, angular_direction);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
@@ -291,7 +320,7 @@ int main(int argc, char *argv[])
   // if( SYS_T::file_exist( inflow_file ) )
   //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   // else
-  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_file );
+  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, inflow_file );
 
   inflow_rate_ptr->print_info();
 
@@ -300,6 +329,7 @@ int main(int argc, char *argv[])
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
   FEAElement * elementvs = nullptr;
+  FEAElement * elementvs_rotated = nullptr;
 
   SYS_T::commPrint("===> Build quadrature rules. \n");
   const int nqp_vol { (GMIptr->get_elemType() == 501 || GMIptr->get_elemType() == 502) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
@@ -307,6 +337,7 @@ int main(int argc, char *argv[])
 
   IQuadPts * quadv = nullptr;
   IQuadPts * quads = nullptr;
+  IQuadPts * free_quad = nullptr;
 
   if( GMIptr->get_elemType() == 501 )
   {
@@ -316,8 +347,10 @@ int main(int argc, char *argv[])
     elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
     elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
     elementvs = new FEAElement_Tet4( nqp_sur );
+    elementvs_rotated = new FEAElement_Tet4( 1 );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
+    free_quad = new QuadPts_UserDefined_Triangle();
   }
   else if( GMIptr->get_elemType() == 502 )
   {
@@ -354,6 +387,8 @@ int main(int argc, char *argv[])
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
+  SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf, nqp_sur);
+
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
 
@@ -369,21 +404,26 @@ int main(int argc, char *argv[])
 
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
-  if( locwbc->get_wall_model_type() == 0 )
-  {
-    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-      tm_galpha_ptr, elementv->get_nLocBas(),
-      quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
-  }
-  else if( locwbc->get_wall_model_type() == 1 )
-  {
-    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-      tm_galpha_ptr, elementv->get_nLocBas(),
-      quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
-  }
-  else SYS_T::print_fatal("Error: Unknown wall model type.\n");
+  // if( locwbc->get_wall_model_type() == 0 )
+  // {
+  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
+  //     tm_galpha_ptr, elementv->get_nLocBas(),
+  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
+  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc );
+  // }
+  // else if( locwbc->get_wall_model_type() == 1 )
+  // {
+  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
+  //     tm_galpha_ptr, elementv->get_nLocBas(),
+  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
+  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc, C_bI );
+  // }
+  // else SYS_T::print_fatal("Error: Unknown wall model type.\n");
+
+  locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_Interface(
+    tm_galpha_ptr, elementv->get_nLocBas(),
+    quadv->get_num_quadPts(), elements->get_nLocBas(),
+    fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
@@ -391,6 +431,8 @@ int main(int argc, char *argv[])
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
   PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+
+  PDNSolution * disp_mesh = new PDNSolution_V( pNode );
 
   if( is_restart )
   {
@@ -445,12 +487,14 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
+  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, elementvs, elementvs_rotated, quads, free_quad,
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
+  SI_sol->update_node_sol(sol);
+  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, locitf, SI_sol);
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+      elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -473,7 +517,8 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
+        elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
+        locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -582,21 +627,22 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, inflow_TI_perturbation, base, dot_sol, sol,
+  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      pmat, elementv, elements, elementvs, elementvs_rotated,
+      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
-  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
-  delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
-  delete lsolver; delete nsolver; delete tsolver;
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info;
+  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
+  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
+  delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
+  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh;
+  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;

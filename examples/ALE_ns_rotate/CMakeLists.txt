@@ -37,13 +37,13 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
-  ${perigee_source}/Mesh/Mesh_Tet.cpp
-  ${perigee_source}/Mesh/Mesh_FEM.cpp
   ${perigee_source}/Mesh/IEN_FEM.cpp
-  ${perigee_source}/Mesh/Part_FEM.cpp
+  ${perigee_source}/Mesh/Part_FEM.cpp  
+  ${perigee_source}/Mesh/Part_FEM_Rotated.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/ElemBC_3D_turbulence_wall_model.cpp
+  ${perigee_source}/Mesh/Interface_pair.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -54,6 +54,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_turbulence_wall_model.cpp
+  ${perigee_source}/Mesh/Interface_Partition.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
@@ -77,6 +78,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
+  ${perigee_source}/Mesh/Sliding_Interface_Tools.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
@@ -86,7 +88,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_Interface.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
+  ${perigee_source}/Analysis_Tool/APart_Node_Rotated.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
@@ -112,8 +116,10 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_Interface.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
   )

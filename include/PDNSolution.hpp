@@ -19,9 +19,8 @@
 // Author: Ju Liu
 // Date: Nov. 23th 2013
 // ============================================================================
+#include "Math_Tools.hpp"
 #include "APart_Node.hpp"
-#include "FEANode.hpp"
-#include "ALocal_InflowBC.hpp"
 
 class PDNSolution
 {
@@ -167,14 +166,6 @@ class PDNSolution
     //   are the same; return false otherwise. 
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
-
-    virtual void randomly_perturbed_parabolic_inflow( const double &std_dev,
-        const APart_Node * const &pNode,
-        const FEANode * const &fNode,
-        const ALocal_InflowBC * const &infbc )
-    {
-      SYS_T::print_fatal("Error: PDNSolution::randomly_perturbed_parabolic_inflow is not implemented.\n");
-    } 
 
   protected:
     // ------------------------------------------------------------------------

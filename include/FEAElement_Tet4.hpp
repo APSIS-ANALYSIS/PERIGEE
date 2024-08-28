@@ -148,8 +148,16 @@ class FEAElement_Tet4 : public FEAElement
     // Get the outwardnormal on faces
     // This function requires the buildBasis with face_id provided, so that the
     // proper triangle face element is constructed
+    // The node numbering of the face element guarantees the get_2d_normal_out
+    // returns the outward normal vector
+    // See FE_T::QuadPts_on_face function for more details.
     virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
     {return triangle_face->get_2d_normal_out( quaindex, area );}
+
+    virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
+        const double * const &volctrl_x,
+        const double * const &volctrl_y,
+        const double * const &volctrl_z );
 
   private:
     // Number of quadrature points

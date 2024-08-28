@@ -27,6 +27,16 @@ class Part_FEM : public IPart
         const int &in_elemType, 
         const Field_Property &in_fp );
 
+    Part_FEM( const IMesh * const &mesh,
+        const IGlobal_Part * const &gpart,
+        const Map_Node_Index * const &mnindex,
+        const IIEN * const &IEN,
+        const std::vector<double> &ctrlPts,
+        const std::vector<int> &rotatedtag,
+        const int &in_cpu_rank, const int &in_cpu_size,
+        const int &in_elemType, 
+        const Field_Property &in_fp );
+
     // Constructor that load the partition info from h5 file on disk
     Part_FEM( const std::string &fileName, const int &in_cpu_rank );
 
@@ -120,6 +130,9 @@ class Part_FEM : public IPart
     int field_id, dofNum;
     bool is_geo_field; // tag is true for geometry-related field
     std::string field_name;
+
+    // 8. rotated element tag
+    std::vector<int> elem_rotated_tag {};
 
     // ------------------------------------------------------------------------
     // Function

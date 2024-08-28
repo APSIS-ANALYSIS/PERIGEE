@@ -182,6 +182,135 @@ double FE_T::get_circumradius( const std::array<Vector_3, 4> &pts )
   return ( centre - pts[0] ).norm2();
 }
 
+bool FE_T::search_closest_point( const Vector_3 &target_xyz,
+    FEAElement * const &elements,
+    const double * const &electrl_x,
+    const double * const &electrl_y,
+    const double * const &electrl_z,
+    IQuadPts * const &closest_point )
+{
+  // initial value
+  elements->buildBasis(closest_point, electrl_x, electrl_y, electrl_z);
+
+  const int nLocBas {elements->get_nLocBas()};
+
+  auto R = elements->get_R(0); // only use the first point of the user-defined IQuadPts
+
+  Vector_3 point_xyz(0.0, 0.0, 0.0);
+
+  // physical xyz of the initial point
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    point_xyz(0) += R[ii] * electrl_x[ii];
+    point_xyz(1) += R[ii] * electrl_y[ii];
+    point_xyz(2) += R[ii] * electrl_z[ii];
+  }
+
+  // initial distance
+  const double init_dist = Vec3::dist(point_xyz, target_xyz);
+
+  // SYS_T::commPrint("      init_dist: %e\n", init_dist);
+  if (init_dist < 1e-9) return true;  // lucky enouugh 
+  if (init_dist > 2e-1) return false;
+
+  // initialize the nonlinear iteration
+  double curr_dist = init_dist;
+  double old_dist = curr_dist;
+  int iter_counter = 0;
+
+  const double eps = 1.0e-6;
+
+  while(iter_counter < 20)
+  {
+    // SYS_T::commPrint("      iter = %d\n",iter_counter);
+    // only use the first point of the user-defined IQuadPts
+    const Vector_3 dx_dr   = elements->get_dx_dr(0, electrl_x, electrl_y, electrl_z);
+    const Vector_3 dx_ds   = elements->get_dx_ds(0, electrl_x, electrl_y, electrl_z);
+    const Vector_3 d2x_drr = elements->get_d2x_drr(0, electrl_x, electrl_y, electrl_z);
+    const Vector_3 d2x_dss = elements->get_d2x_dss(0, electrl_x, electrl_y, electrl_z);
+    const Vector_3 d2x_drs = elements->get_d2x_drs(0, electrl_x, electrl_y, electrl_z);
+
+    // Distance funtion: (x_opp - x_tar)^2 + (y_opp - y_tar)^2 + (z_opp - z_tar)^2,
+    // x_opp = x_opp(r, s), y_opp = y_opp(r, s), z_opp = z_opp(r, s)
+    // To minimize Dist, we need d(Dist)/dr = 0 and d(Dist)/ds = 0.
+
+    const Vector_3 dist_xyz = point_xyz - target_xyz;
+
+    // d(Dist/dr) = 2 * d(x_opp)/dr * (x_opp - x_tar)
+    //            + 2 * d(y_opp)/dr * (y_opp - y_tar)
+    //            + 2 * d(z_opp)/dr * (z_opp - z_tar)
+    // Let Res_r (Residual of 'r' component) = 0.5 * d(Dist/dr).
+    const double Res_r = Vec3::dot_product(dx_dr, dist_xyz);
+
+    // Newton-Raphson iteration:
+    // d(Res_r)/dr * dr + d(Res_r)/ds * ds = - Res_r
+    // Let dRes_r_dr = d(Res_r)/dr = d2(x_opp)/drr * (x_opp - x_tar) + (d(x_opp)/dr)^2
+    //                             + d2(y_opp)/drr * (y_opp - y_tar) + (d(y_opp)/dr)^2
+    //                             + d2(z_opp)/drr * (z_opp - x_tar) + (d(z_opp)/dr)^2.
+    const double dRes_r_dr = Vec3::dot_product( d2x_drr, dist_xyz ) + Vec3::dot_product(dx_dr, dx_dr);
+
+    // Let dRes_r_ds = d(Res_r)/ds = d2(x_opp)/drs * (x_opp - x_tar) + d(x_opp)/dr * d(x_opp)/ds
+    //                             + d2(y_opp)/drs * (y_opp - y_tar) + d(y_opp)/dr * d(y_opp)/ds
+    //                             + d2(z_opp)/drs * (z_opp - x_tar) + d(z_opp)/dr * d(z_opp)/ds.
+    const double dRes_r_ds = Vec3::dot_product( d2x_drs, dist_xyz ) + Vec3::dot_product(dx_dr, dx_ds);
+
+    // Same for Res_s.
+    const double Res_s = Vec3::dot_product( dx_ds, dist_xyz );
+
+    const double dRes_s_ds = Vec3::dot_product( d2x_dss, dist_xyz ) + Vec3::dot_product( dx_ds, dx_ds );
+
+    // We use the fact that d(Res_s)/dr = d(Res_r)/ds
+
+    // Solve [dRes_r_dr  dRes_r_ds  {dr  = {-Res_r
+    //        dRes_s_dr  dRes_s_ds]  ds}    -Res_s}
+
+    // Ax = b, A = [a b   inv(A) = 1/(ad - bc) * [d -b      x = inv(A) * b
+    //              c d]                         -c  a]
+    const double ad_bc = dRes_r_dr * dRes_s_ds - dRes_r_ds * dRes_r_ds;
+    const double dxi   = (-dRes_s_ds * Res_r + dRes_r_ds * Res_s) / ad_bc;
+    const double deta  = (dRes_r_ds * Res_r - dRes_r_dr * Res_s) / ad_bc;
+
+    // SYS_T::commPrint("      dr = %e, ds = %e\n", dxi, deta);
+
+    // Update the xi value
+    const double new_xi  = closest_point->get_qp(0, 0) + dxi;
+    const double new_eta = closest_point->get_qp(0, 1) + deta;
+
+    closest_point->set_qp( new_xi, new_eta );
+    // SYS_T::commPrint("      current [r,s,t] = [%e, %e, %e]\n", closest_point->get_qp(0, 0), closest_point->get_qp(0, 1), closest_point->get_qp(0, 2));
+
+    // Update basis function and physical xyz
+    elements->buildBasis(closest_point, electrl_x, electrl_y, electrl_z);
+
+    R = elements->get_R(0);
+
+    point_xyz = Vector_3(0.0, 0.0, 0.0);
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      point_xyz(0) += R[ii] * electrl_x[ii];
+      point_xyz(1) += R[ii] * electrl_y[ii];
+      point_xyz(2) += R[ii] * electrl_z[ii];
+    }
+
+    curr_dist = Vec3::dist(point_xyz, target_xyz);
+    // SYS_T::commPrint("      curr_dist: %e\n", curr_dist);
+    // SYS_T::commPrint("      old_dist: %e\n", old_dist);
+    if(std::abs(curr_dist - old_dist) < eps)
+    {
+      // SYS_T::commPrint("        Cannot optimize further.\n");
+      break;
+    }
+
+    iter_counter += 1;
+    old_dist = curr_dist;
+  }
+
+  if( closest_point->check_qp_bound() == false )
+    return false;
+  else
+    return true;
+}
+
 namespace FE_T
 {
   Matrix_double_3by3_Array::Matrix_double_3by3_Array()

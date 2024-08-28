@@ -14,6 +14,7 @@
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_V.hpp"
 
 class PNonlinear_NS_Solver
 {
@@ -45,6 +46,8 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
+        const PDNSolution * const &pre_velo_mesh,    
+        const PDNSolution * const &pre_disp_mesh,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         const ICVFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
@@ -55,17 +58,24 @@ class PNonlinear_NS_Solver
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
+        const ALocal_Interface * const &itf_part,
+        SI_T::SI_solution * const &SI_sol,
+        SI_T::SI_quad_point * const &SI_qp,
         const Matrix_PETSc * const &bc_mat,
         FEAElement * const &elementv,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
+        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
+        const PDNSolution * const &velo_mesh,    
+        const PDNSolution * const &disp_mesh,
         bool &conv_flag, int &nl_counter ) const;
 
   private:
