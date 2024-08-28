@@ -39,7 +39,7 @@ class QuadPts_Gauss_Quad final : public IQuadPts
     double get_qp(const int &ii, const int &comp) const override 
     {return qp[2*ii+comp];}
 
-    double get_qw(const int &ii) const {return qw[ii];}
+    double get_qw(const int &ii) const override {return qw[ii];}
 
   private:
     const int num_pts, num_pts_x, num_pts_y;
