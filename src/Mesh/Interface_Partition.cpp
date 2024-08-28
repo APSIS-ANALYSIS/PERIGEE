@@ -17,8 +17,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   fixed_pt_xyz.resize(num_pair);
   fixed_interval_tag.resize(num_pair);
 
-  fixed_layer_node_vol_part_tag.resize(num_pair);
-  fixed_layer_node_loc_pos.resize(num_pair);
+  fixed_node_vol_part_tag.resize(num_pair);
+  fixed_node_loc_pos.resize(num_pair);
 
   rotated_ele_face_id.resize(num_pair);
   rotated_lien.resize(num_pair);
@@ -27,8 +27,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   rotated_pt_xyz.resize(num_pair);
   rotated_interval_tag.resize(num_pair);
 
-  rotated_layer_node_vol_part_tag.resize(num_pair);
-  rotated_layer_node_loc_pos.resize(num_pair);
+  rotated_node_vol_part_tag.resize(num_pair);
+  rotated_node_loc_pos.resize(num_pair);
 
   const int dof = 4;
 
@@ -44,8 +44,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     fixed_interval_tag[ii] = std::vector<int> {};
 
     const int num_fixed_node = VEC_T::get_size(fixed_global_node[ii]);
-    fixed_layer_node_vol_part_tag[ii].resize(num_fixed_node);
-    fixed_layer_node_loc_pos[ii].resize(num_fixed_node);
+    fixed_node_vol_part_tag[ii].resize(num_fixed_node);
+    fixed_node_loc_pos[ii].resize(num_fixed_node);
     fixed_LID[ii].resize(dof * num_fixed_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
@@ -61,44 +61,29 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
       if(part->isNodeInPart( new_gid ))
       {
-        fixed_layer_node_vol_part_tag[ii][jj] = cpu_rank;
-        fixed_layer_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
+        fixed_node_vol_part_tag[ii][jj] = cpu_rank;
+        fixed_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
       }
       else
       {
-        fixed_layer_node_vol_part_tag[ii][jj] = -1;
-        fixed_layer_node_loc_pos[ii][jj] = -1;
+        fixed_node_vol_part_tag[ii][jj] = -1;
+        fixed_node_loc_pos[ii][jj] = -1;
       }
     }
 
     fixed_pt_xyz[ii] = interfaces[ii].get_fixed_pt_xyz();
 
     // partition the fixed element according to the cpu_rank
-    PERIGEE_OMP_PARALLEL
+    for(int ee=0; ee<interfaces[ii].get_num_fixed_ele(); ++ee)
     {
-      std::vector<int> temp_ele_face_id {};
-      std::vector<int> temp_ien {};
-      std::vector<int> temp_interval_tag {};
-
-      PERIGEE_OMP_FOR
-      for(int ee=0; ee < interfaces[ii].get_num_fixed_ele(); ++ee)
+      if(interfaces[ii].get_fixed_cpu_rank(ee)==cpu_rank)
       {
-        const int sur_part_tag = interfaces[ii].get_fixed_cpu_rank(ee);
-        if(sur_part_tag == cpu_rank)
-        {
-          temp_ele_face_id.push_back(interfaces[ii].get_fixed_faceID(ee));
-          for(int jj=0; jj<part->get_nLocBas(); ++jj)
-            temp_ien.push_back(total_fixed_ien[ee * part->get_nLocBas() + jj]);
+        fixed_ele_face_id[ii].push_back(interfaces[ii].get_fixed_faceID(ee));
 
-          temp_interval_tag.push_back(total_fixed_interval_tag[ee]);
-        }
-      }
+        for(int jj=0; jj<part->get_nLocBas(); ++jj)
+          fixed_lien[ii].push_back(total_fixed_ien[ee * part->get_nLocBas() + jj]);
 
-      PERIGEE_OMP_CRITICAL
-      {
-        VEC_T::insert_end(fixed_ele_face_id[ii], temp_ele_face_id);
-        VEC_T::insert_end(fixed_lien[ii], temp_ien);
-        VEC_T::insert_end(fixed_interval_tag[ii], temp_interval_tag);
+        fixed_interval_tag[ii].push_back(total_fixed_interval_tag[ee]);
       }
     }
 
@@ -107,8 +92,8 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     rotated_global_node[ii] = interfaces[ii].get_rotated_global_node();
 
     const int num_rotated_node = VEC_T::get_size(rotated_global_node[ii]);
-    rotated_layer_node_vol_part_tag[ii].resize(num_rotated_node);
-    rotated_layer_node_loc_pos[ii].resize(num_rotated_node);
+    rotated_node_vol_part_tag[ii].resize(num_rotated_node);
+    rotated_node_loc_pos[ii].resize(num_rotated_node);
     rotated_LID[ii].resize(dof * num_rotated_node);
 
     // convert the GlobalNodeID to new(mapped) global node id
@@ -124,13 +109,13 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
       if(part->isNodeInPart( new_gid ))
       {
-        rotated_layer_node_vol_part_tag[ii][jj] = cpu_rank;
-        rotated_layer_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
+        rotated_node_vol_part_tag[ii][jj] = cpu_rank;
+        rotated_node_loc_pos[ii][jj] = part->get_nodeLocGhoIndex( new_gid );
       }
       else
       {
-        rotated_layer_node_vol_part_tag[ii][jj] = -1;
-        rotated_layer_node_loc_pos[ii][jj] = -1;
+        rotated_node_vol_part_tag[ii][jj] = -1;
+        rotated_node_loc_pos[ii][jj] = -1;
       }
     }
 
@@ -203,17 +188,17 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_intVector( group_id, "fixed_node_map", fixed_global_node[ii] );
 
-    h5w -> write_intVector( group_id, "fixed_ID", fixed_LID[ii] );
+    h5w -> write_intVector( group_id, "fixed_LID", fixed_LID[ii] );
 
-    h5w -> write_doubleVector( group_id, "fixed_node_xyz", fixed_pt_xyz[ii] );
+    h5w -> write_doubleVector( group_id, "fixed_pt_xyz", fixed_pt_xyz[ii] );
 
     h5w -> write_intScalar( group_id, "num_rotated_node", VEC_T::get_size(rotated_global_node[ii]) );
 
     h5w -> write_intVector( group_id, "rotated_node_map", rotated_global_node[ii] );
 
-    h5w -> write_intVector( group_id, "rotated_ID", rotated_LID[ii] );
+    h5w -> write_intVector( group_id, "rotated_LID", rotated_LID[ii] );
 
-    h5w -> write_doubleVector( group_id, "rotated_node_xyz", rotated_pt_xyz[ii] );
+    h5w -> write_doubleVector( group_id, "rotated_pt_xyz", rotated_pt_xyz[ii] );
 
     const std::string subgroupbase("tag_");
 

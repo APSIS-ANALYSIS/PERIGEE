@@ -36,6 +36,13 @@
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include <iomanip>
 
+void test(const double * const &vv, const unsigned int len)
+{
+  for(unsigned int ii=0; ii<len; ++ii)
+    std::cout<<vv[ii]<<'\t';
+  std::cout<<"End of vector \n";
+}
+
 int main(int argc, char *argv[])
 {
   return EXIT_SUCCESS;

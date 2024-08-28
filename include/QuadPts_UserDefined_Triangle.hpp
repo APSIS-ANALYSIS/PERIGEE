@@ -33,7 +33,7 @@ class QuadPts_UserDefined_Triangle final : public IQuadPts
 
     bool check_qp_bound() const override
     {
-      constexpr double epsilon = 2.0e-3;
+      constexpr double epsilon = 1.1e-3;
 
       if( qp[0]>=(0-epsilon) && qp[0]<=(1+epsilon) && 
           qp[1]>=(0-epsilon) && qp[1]<=(1+epsilon) && 

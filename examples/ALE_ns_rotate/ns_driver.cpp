@@ -16,6 +16,7 @@
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "ALocal_Interface.hpp"
+#include "Sliding_Interface_Tools.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
@@ -295,6 +296,8 @@ int main(int argc, char *argv[])
   ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
   locitf -> print_info();
 
+  SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
+
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
 
@@ -384,8 +387,7 @@ int main(int argc, char *argv[])
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
-  // Initialize the storage of interface quadrature point info
-  locitf->init_curr( nqp_sur );
+  SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf, nqp_sur);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
@@ -486,13 +488,13 @@ int main(int argc, char *argv[])
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, elementvs, elementvs_rotated, quads, free_quad,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, gbc, nz_estimate );
+      GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  locitf->restore_node_sol(sol);
-  gloAssem_ptr->search_all_opposite_point(0, elementvs, elementvs_rotated, elements, quads, free_quad, locitf);
+  SI_sol->update_node_sol(sol);
+  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, locitf, SI_sol);
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, gbc );
+      elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -516,7 +518,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
         elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
-        locnbc, locebc, locwbc, locitf );
+        locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -627,7 +629,8 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, pmat, elementv, elements, elementvs, elementvs_rotated,
+      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      pmat, elementv, elements, elementvs, elementvs_rotated,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
@@ -635,7 +638,7 @@ int main(int argc, char *argv[])
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info;
-  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf;
+  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh;

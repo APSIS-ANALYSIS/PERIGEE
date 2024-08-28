@@ -183,11 +183,11 @@ double FE_T::get_circumradius( const std::array<Vector_3, 4> &pts )
 }
 
 bool FE_T::search_closest_point( const Vector_3 &target_xyz,
-      FEAElement * const &elements,
-      const double * const &electrl_x,
-      const double * const &electrl_y,
-      const double * const &electrl_z,
-      IQuadPts * const &closest_point )
+    FEAElement * const &elements,
+    const double * const &electrl_x,
+    const double * const &electrl_y,
+    const double * const &electrl_z,
+    IQuadPts * const &closest_point )
 {
   // initial value
   elements->buildBasis(closest_point, electrl_x, electrl_y, electrl_z);
