@@ -1,14 +1,5 @@
 #include "HDF5_Reader.hpp"
 
-HDF5_Reader::HDF5_Reader( const hid_t &in_file_id ) 
-: file_id(in_file_id)
-{}
-
-bool HDF5_Reader::check_data( const char * const &name ) const
-{
-  return H5Lexists(file_id, name, H5P_DEFAULT);
-}
-
 void HDF5_Reader::read_intArray(const char * const &group_name,
     const char * const &data_name,
     hid_t &data_rank, hsize_t * &data_dims, int * &data  ) const
