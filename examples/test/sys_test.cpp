@@ -43,16 +43,13 @@
 #include "MaterialModel_ich_GOH06.hpp"
 #include "MaterialModel_ich_GOH14.hpp"
 #include "MaterialModel_ich_StVenant_Kirchhoff.hpp"
-
-void test(const double * const &vv, const unsigned int len)
-{
-  for(unsigned int ii=0; ii<len; ++ii)
-    std::cout<<vv[ii]<<'\t';
-  std::cout<<"End of vector \n";
-}
+#include "QuadPts_Gauss_1D.hpp"
 
 int main(int argc, char *argv[])
 {
+  QuadPts_Gauss_1D qpts(3);
+
+  qpts.print_info();
   return EXIT_SUCCESS;
 }
 
