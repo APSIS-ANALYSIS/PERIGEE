@@ -12,23 +12,23 @@
 #include "Math_Tools.hpp"
 #include "IQuadPts.hpp"
 
-class QuadPts_Gauss_1D : public IQuadPts
+class QuadPts_Gauss_1D final : public IQuadPts
 {
   public:
     // Construct in_num_pts-point rule for [min, max] domain
     QuadPts_Gauss_1D( const int &in_num_pts, const double &min = 0.0, const double &max = 1.0 );
     
-    virtual ~QuadPts_Gauss_1D() = default;
+    ~QuadPts_Gauss_1D() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual int get_dim() const {return 1;}
+    int get_dim() const override {return 1;}
     
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return num_pts;}
     
-    virtual double get_qp(const int &ii) const {return qp[ii];}
+    double get_qp(const int &ii) const override {return qp[ii];}
    
-    virtual double get_qw(const int &ii) const {return qw[ii];}
+    double get_qw(const int &ii) const override {return qw[ii];}
 
   private:
     // number of quadrature points
@@ -41,7 +41,7 @@ class QuadPts_Gauss_1D : public IQuadPts
     // use Newton-Raphson iteration to find the Gauss quadrature
     // points-weights. This algorithm is obtained from the dealii
     // code, quadrature_lib.cc file.
-    virtual void compute_npts();
+    void compute_npts();
 };
 
 #endif
