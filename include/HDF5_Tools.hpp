@@ -15,29 +15,29 @@
 namespace HDF5_T
 {
   inline int read_intScalar( const std::string &filename, 
-      const std::string groupname, const std::string &dataname )
+      const std::string &groupname, const std::string &dataname )
   {
     hid_t file_id = H5Fopen( filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-    HDF5_Reader * h5r = new HDF5_Reader( file_id );
+    std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>( file_id );
 
     const int output = h5r -> read_intScalar( groupname.c_str(), dataname.c_str() );
 
-    delete h5r; H5Fclose( file_id );
+    H5Fclose( file_id );
 
     return output;
   }
 
   inline std::vector<int> read_intVector( const std::string &filename,
-      const std::string groupname, const std::string &dataname )
+      const std::string &groupname, const std::string &dataname )
   {
     hid_t file_id = H5Fopen( filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-    HDF5_Reader * h5r = new HDF5_Reader( file_id );
+    std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>( file_id );
 
     std::vector<int> output = h5r -> read_intVector( groupname.c_str(), dataname.c_str() );
 
     VEC_T::shrink2fit( output );
 
-    delete h5r; H5Fclose( file_id );
+    H5Fclose( file_id );
 
     return output;
   }
