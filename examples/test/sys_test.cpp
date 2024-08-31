@@ -23,8 +23,21 @@
 #include "ALocal_EBC.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
-#include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_1D.hpp"
+#include "QuadPts_Gauss_Hex.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
+#include "QuadPts_Gauss_Tet.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_UserDefined_Triangle.hpp"
+#include "QuadPts_debug.hpp"
+#include "QuadPts_vis_hex27.hpp"
+#include "QuadPts_vis_hex8.hpp"
+#include "QuadPts_vis_quad4.hpp"
+#include "QuadPts_vis_quad9.hpp"
+#include "QuadPts_vis_tet10.hpp"
+#include "QuadPts_vis_tet10_v2.hpp"
+#include "QuadPts_vis_tet4.hpp"
+#include "QuadPts_vis_tri6.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
@@ -43,13 +56,28 @@
 #include "MaterialModel_ich_GOH06.hpp"
 #include "MaterialModel_ich_GOH14.hpp"
 #include "MaterialModel_ich_StVenant_Kirchhoff.hpp"
-#include "QuadPts_Gauss_1D.hpp"
 
 int main(int argc, char *argv[])
 {
   QuadPts_Gauss_1D qpts(3);
 
+	std::cout << "qpts.print_info():\n";
   qpts.print_info();
+	std::cout << '\n';
+
+	std::cout << "qpts.get_dim():\n";
+	std::cout << qpts.get_dim() << '\n';
+
+	std::cout << "qpts.get_num_quadPts():\n";
+	std::cout << qpts.get_num_quadPts() << '\n';
+
+	const int ii {2};
+	std::cout << "qpts.get_qp():\n";
+	std::cout << qpts.get_qp(ii) << '\n';
+
+	std::cout << "qpts.get_qw(const int &ii):\n";
+	std::cout << qpts.get_qw(ii) << '\n';
+
   return EXIT_SUCCESS;
 }
 
