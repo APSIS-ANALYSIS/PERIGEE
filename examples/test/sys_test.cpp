@@ -59,17 +59,18 @@
 
 int main(int argc, char *argv[])
 {
-  QuadPts_Gauss_Hex qpts(1, 2, 3);
-  QuadPts_Gauss_Hex qpts_a(2);
+	QuadPts_Gauss_Quad qpts(1, 2);
+	QuadPts_Gauss_Quad qpts_a(2);
+
 	std::cout << "print_info():\n";
 	qpts.print_info();
-	qpts_a.print_info();
+	qpts_a.print_info(); 
 
 	std::cout << "get_dim():\n";
 	std::cout << qpts.get_dim() << '\n';
 	std::cout << qpts_a.get_dim() << '\n';
 
-	std::cout << "get_num_quadPts()\n";
+	std::cout << "get_num_quadPts():\n";
 	std::cout << qpts.get_num_quadPts() << '\n';
 	std::cout << qpts_a.get_num_quadPts() << '\n';
 
@@ -77,23 +78,17 @@ int main(int argc, char *argv[])
 	std::cout << qpts.get_num_quadPts_x() << '\n';
 	std::cout << qpts_a.get_num_quadPts_x() << '\n';
 
-	std::cout << "get_num_quadPts_y():\n"; 
+	std::cout << "get_num_quadPts_y():\n";
 	std::cout << qpts.get_num_quadPts_y() << '\n';
 	std::cout << qpts_a.get_num_quadPts_y() << '\n';
 
-	std::cout << "get_num_quadPts_z():\n";
-	std::cout << qpts.get_num_quadPts_z() << '\n';
-	std::cout << qpts_a.get_num_quadPts_z() << '\n';
-
-	const int ii = 1;
-	const int comp = 2;
 	std::cout << "get_qp(const int &ii, const int &comp):\n";
-	std::cout << qpts.get_qp(ii, comp) << '\n';
-	std::cout << qpts_a.get_qp(ii, comp) << '\n';
+	std::cout << qpts.get_qp(1,2) << '\n';
+	std::cout << qpts_a.get_qp(1,2) << '\n';
 
 	std::cout << "get_qw(const int &ii):\n";
-	std::cout << qpts.get_qw(ii) << '\n';
-	std::cout << qpts_a.get_qw(ii) << '\n';
+	std::cout << qpts.get_qw(1) << '\n';
+	std::cout << qpts_a.get_qw(1) << '\n';
 
   return EXIT_SUCCESS;
 }
