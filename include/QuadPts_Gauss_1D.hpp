@@ -41,7 +41,7 @@ class QuadPts_Gauss_1D final : public IQuadPts
     // use Newton-Raphson iteration to find the Gauss quadrature
     // points-weights. This algorithm is obtained from the dealii
     // code, quadrature_lib.cc file.
-    void compute_npts();
+    virtual void compute_npts();
 };
 
 #endif
