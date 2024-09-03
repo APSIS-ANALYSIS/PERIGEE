@@ -59,10 +59,8 @@
 
 int main(int argc, char *argv[])
 {
-//	std::vector<double> ii = {1};
-//	std::vector<double> jj = {1};
-//	QuadPts_debug qpts(ii, jj, 3);
-	QuadPts_debug qpts({1.0, 2.0}, {1.0}, 2);
+	QuadPts_debug qpts{{1,1,1}, {1,2,3}};
+
 	std::cout << "print_info():\n";
 	qpts.print_info();
 
@@ -72,25 +70,22 @@ int main(int argc, char *argv[])
 	std::cout << "get_num_quadPts():\n";
 	std::cout << qpts.get_num_quadPts() << '\n';
 
-	std::cout << "get_qp(const int &ii, const int &comp):\n";
-	std::cout << qpts.get_qp(1,2) << '\n';
+//	std::cout << "get_num_quadPts_x():\n";
+//	std::cout << qpts.get_num_quadPts_x() << '\n';
+
+//	std::cout << "get_num_quadPts_y():\n";
+//	std::cout << qpts.get_num_quadPts_y() << '\n';
 
 	std::cout << "get_qp(const int &ii):\n";
 	std::cout << qpts.get_qp(1) << '\n';
 
-//	std::cout << "set_qp(const double &xi. const double &eta):\n";
-//	qpts.set_qp(1,2);
-
-//	std::cout << "reset():\n";
-//	qpts.set_qp();
-
-//	std::cout << "check_qp_bound():\n";
-//	std::cout << qpts.check_qp_bound() << '\n';
+	std::cout << "get_qp(const int &ii, const int &comp):\n";
+	std::cout << qpts.get_qp(0,2) << '\n';
 
 	std::cout << "get_qw(const int &ii):\n";
 	std::cout << qpts.get_qw(1) << '\n';
 
-	return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 
 // EOF
