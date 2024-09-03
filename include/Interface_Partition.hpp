@@ -38,6 +38,9 @@ class Interface_Partition
     virtual std::vector<std::vector<int>> get_rotated_node_loc_pos() const
     {return rotated_node_loc_pos;}
 
+    virtual int get_fixed_nlocalele(const int &ii) const
+    {return fixed_nlocalele[ii];}
+
   private:
     const int cpu_rank;
 

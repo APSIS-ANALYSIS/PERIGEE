@@ -44,6 +44,9 @@ class ALocal_Interface
     virtual int get_num_fixed_ele(const int &ii) const
     {return num_fixed_ele[ii];}
 
+    virtual int get_max_num_fixed_ele(const int &ii) const
+    {return max_num_fixed_ele[ii];}
+
     virtual int get_num_rotated_ele(const int &ii, const int &tag) const
     {return num_rotated_ele[ii][tag];}
 
@@ -95,6 +98,10 @@ class ALocal_Interface
     // the number of fixed volume elements in this part
     // size: num_itf
     std::vector<int> num_fixed_ele;
+
+    // max numbers of the fixed volume elements among all parts
+    // size: num_itf
+    std::vector<int> max_num_fixed_ele;
 
     // the number of rotated volume elements of each interface
     // size: num_itf x num_tag[ii]
