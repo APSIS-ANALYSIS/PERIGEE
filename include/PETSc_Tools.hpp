@@ -168,6 +168,40 @@ namespace PETSc_T
 
   std::vector<double> GetLocalArray( const Vec &vv );
 
+  // Scatter from a global vector
+  void Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * &values );
+  // Warning:
+  // VecScatterCreate can only be simultaneously run with all the CPUs that 
+  // confirmed by PetscInitialize.
+  // In other words, one should not use this function with only a part of CPUs,
+  // this behavior will result in unknown failure with no error massege.
+  // !!!!!!!!!!  Bad Code Example  !!!!!!!!!!
+  //   (run with 5 CPUs)
+  //   ...
+  //   const int rank = SYS_T::get_MPI_rank();
+  //   for(int ii=0; ii<rank+1; ++ii)
+  //   {
+  //     PETSc_T::Scatter(something...);
+  //     some_functions_to_do_something();
+  //   }
+  //   ...
+  // Since rank 0 have only one chance to run PETSc_T::Scatter, but the others
+  // attempt to run it again, this code will fail.
+  // ---------- Solution ----------
+  //   ...
+  //   const int rank = SYS_T::get_MPI_rank();
+  //   for(int ii=0; ii<rank+1; ++ii)
+  //   {
+  //     PETSc_T::Scatter(something...);
+  //     some_functions_to_do_something();
+  //   }
+  //   const int size = SYS_T::get_MPI_size();
+  //   for(int ii=0; ii<size-rank-1; ++ii)
+  //   {
+  //     PETSc_T::Scatter(anything...);
+  //     (Do nothing but just synchronize all the CPUs)
+  //   }
+
   // Write a vector to disk with file_name
   void WriteBinary( const Vec &a, const std::string &file_name );
 

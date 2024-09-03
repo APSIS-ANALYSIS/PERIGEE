@@ -187,6 +187,44 @@ std::vector<double> PETSc_T::GetLocalArray( const Vec &vv )
   return vv_vector;
 }
 
+void PETSc_T::Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * &values )
+{
+  Vec vv;
+  VecScatter scatter;
+  IS from;
+  PetscInt * temp_idx_from = new PetscInt[length];
+  for(int ii=0; ii<length; ++ii)
+  {
+    if(idx_from[ii] >= 0)
+      temp_idx_from[ii] = idx_from[ii];
+    else
+      temp_idx_from[ii] = 0;
+  }
+
+  VecCreateSeq(PETSC_COMM_SELF, length, &vv);
+  ISCreateGeneral(PETSC_COMM_SELF, length, temp_idx_from, PETSC_COPY_VALUES, &from);
+
+  VecScatterCreate(gg, from, vv, NULL, &scatter);
+  VecScatterBegin(scatter, gg, vv, INSERT_VALUES, SCATTER_FORWARD);
+  VecScatterEnd(scatter, gg, vv, INSERT_VALUES, SCATTER_FORWARD);
+
+  double * array;
+  VecGetArray(vv, &array);
+  for(int ii=0; ii<length; ++ii)
+  {
+    if(idx_from[ii] >= 0)
+      values[ii] = array[ii];
+    else
+      values[ii] = 0.0;
+  }
+
+  ISDestroy(&from);
+  VecScatterDestroy(&scatter);
+  VecDestroy(&vv);
+
+  delete [] temp_idx_from; temp_idx_from = nullptr;
+}
+
 void PETSc_T::WriteBinary( const Vec &a, const std::string &file_name )
 {
   PetscViewer viewer;
