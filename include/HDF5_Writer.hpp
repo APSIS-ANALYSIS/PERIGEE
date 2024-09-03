@@ -198,6 +198,9 @@ class HDF5_Writer
         exit( EXIT_FAILURE );
       }
     }
+
+    void write_string_impl(hid_t location_id, const char * const &data_name, 
+        const std::string& string_input ) const;
 };
 
 #endif

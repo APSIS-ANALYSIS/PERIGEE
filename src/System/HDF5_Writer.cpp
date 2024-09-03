@@ -539,4 +539,25 @@ void HDF5_Writer::write_string( const hid_t &group_id,
   H5Tclose( datatype );
 }
 
+void HDF5_Writer::write_string_impl(hid_t location_id, 
+    const char * const &data_name,
+    const std::string& string_input ) const
+{
+  hsize_t dims[1] = { 1 };
+
+  hid_t datatype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(datatype, string_input.size());
+
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+
+  hid_t dataset = H5Dcreate(location_id, data_name, datatype, 
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, string_input.data() );
+
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
+  H5Tclose( datatype );
+}
+
 // EOF
