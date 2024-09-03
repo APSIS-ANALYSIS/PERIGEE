@@ -575,6 +575,17 @@ class IPLocAssem
       const double * const &rotated_local_sol,
       const double * const &rotated_local_mvelo)
       {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf is not implemented.\n");}
+
+    virtual void Assem_Tangent_itf_MF(
+      const int &fixed_qua,
+      const double &fixed_qw,
+      const double &dt,
+      const FEAElement * const &fixed_elementv,
+      const FEAElement * const &rotated_elementv,
+      const double * const &fixed_local_sol,
+      const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo)
+      {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf is not implemented.\n");}
 };
 
 #endif
