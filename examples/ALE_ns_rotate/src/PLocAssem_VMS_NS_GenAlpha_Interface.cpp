@@ -575,7 +575,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF(
 
     mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
     mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
-    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii]
+    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
   }
 
   // Mesh velocity in the quadrature point

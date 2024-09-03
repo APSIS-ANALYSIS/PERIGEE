@@ -20,6 +20,7 @@
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
 #include "FE_Tools.hpp"
+#include "Sliding_Interface_Tools.hpp"
 
 class PGAssem_NS_FEM : public IPGAssem
 {
@@ -39,7 +40,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &part_nbc,
         const ALocal_EBC * const &part_ebc,
         const ALocal_Interface * const &part_itf,
-        const SI_T::SI_solution * const &SI_sol,
+        SI_T::SI_solution * const &SI_sol,
         SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
@@ -179,11 +180,15 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id );
 
+    virtual void Interface_K_MF(Vec &X, Vec &Y);
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
     
     int snLocBas;
+
+    SI_T::SI_ancillary anci;
 
     // Private function
     // Essential boundary condition
@@ -282,6 +287,14 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp );
+
+    virtual void local_MatMult_MF(
+        const int &dof,
+        PetscInt * &row_index,
+        PetscInt * &col_index,
+        PetscScalar * &Mat,
+        Vec &X,
+        Vec &Y );
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const
