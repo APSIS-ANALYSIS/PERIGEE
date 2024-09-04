@@ -33,10 +33,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
-  ${perigee_source}/System/Tensor2_2D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
-  ${perigee_source}/System/Tensor4_2D.cpp
   ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp

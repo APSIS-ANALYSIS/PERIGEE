@@ -12,7 +12,7 @@
 // Date created: Nov. 6 2013
 // ============================================================================
 #include "IQuadPts.hpp"
-#include "FEANode.hpp"
+#include "Tensor2_3D.hpp"
 
 class FEAElement
 {
@@ -28,12 +28,7 @@ class FEAElement
 
     // Return this element's Type, which defines the type of different 
     // elements defined on this single element domain.
-    virtual int get_Type() const
-    {SYS_T::commPrint("Warning: get_Type is not implemented. \n"); return -1;}
-
-    // Return the element's type name
-    virtual std::string get_TypeName() const
-    {SYS_T::commPrint("Warning: get_TypeName is not implemented. \n"); return "undetermined";}
+    virtual int get_Type() const = 0;
 
     // Return the number of nodes for each type elements
     virtual int get_nLocBas() const = 0;
@@ -47,13 +42,11 @@ class FEAElement
     virtual void print_info() const 
     {SYS_T::commPrint("Warning: print is not implemented. \n");}
 
-    // Return the memory usage of this class in bytes
-    virtual double get_memory_usage() const = 0; 
-
     // ------------------------------------------------------------------------
     // Calculate the element size
     // ------------------------------------------------------------------------
-    virtual double get_h( const double * const &ctrl_x, const double * const &ctrl_y,
+    virtual double get_h( const double * const &ctrl_x, 
+        const double * const &ctrl_y,
         const double * const &ctrl_z ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
@@ -127,61 +120,6 @@ class FEAElement
     virtual void get_R_gradR( const int &quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y, double * const &basis_z ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
-
-    virtual std::vector<double> get_dR_dx( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dx is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_dR_dy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_dR_dz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dz is not implemented. \n");return {};}
-
-    // ------------------------------------------------------------------------    
-    // R, gradR, and Laplacian R
-    // ------------------------------------------------------------------------    
-    virtual void get_3D_R_gradR_LaplacianR( const int &quaindex,
-        double * const &basis, double * const &basis_x, double * const &basis_y,
-        double * const &basis_z, double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_zz ) const 
-    {SYS_T::commPrint("Warning: get_3DLaplacianR is not implemented. \n");}
-
-    virtual void get_2D_R_gradR_LaplacianR( const int &quaindex,
-        double * const &basis, double * const &basis_x, double * const &basis_y,
-        double * const &basis_xx, double * const &basis_yy ) const 
-    {SYS_T::commPrint("Warning: get_2DLaplacianR is not implemented. \n");}
-
-    // ------------------------------------------------------------------------    
-    // R, gradR, and grad gradR
-    // ------------------------------------------------------------------------    
-    virtual void get_2D_R_dR_d2R( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y, double * const &basis_xx, 
-        double * const &basis_yy, double * const &basis_xy ) const
-    {SYS_T::commPrint("Warning: get_2D_R_dR_d2R is not implemented. \n");}
-
-    virtual void get_3D_R_dR_d2R( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy, double * const &basis_zz,
-        double * const &basis_xy, double * const &basis_xz, double * const &basis_yz ) 
-      const {SYS_T::commPrint("Warning: get_3D_R_dR_d2R is not implemented. \n");}
-
-    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxx is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dyy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dzz is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxz is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dyz is not implemented. \n");return {};}
 
     // ------------------------------------------------------------------------    
     // Return the Jacobian determinant
@@ -257,7 +195,7 @@ class FEAElement
     // This function is, for example, called in FEAElement_Line2_3D_der0.
     // ------------------------------------------------------------------------
     virtual Vector_3 get_normal_out( const int &quaindex,
-        const std::vector< Vector_3> &sur_pt, const Vector_3 &int_pt, 
+        const std::vector<Vector_3> &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
     {
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
