@@ -1578,6 +1578,9 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
   delete [] rotated_local_ien; rotated_local_ien = nullptr;
   delete [] rotated_local_sol; rotated_local_sol = nullptr;
 
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
+
   delete [] fixed_row_index; fixed_row_index = nullptr;
   delete [] rotated_row_index; rotated_row_index = nullptr;
 
