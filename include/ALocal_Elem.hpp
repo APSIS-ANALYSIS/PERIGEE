@@ -79,11 +79,6 @@ class ALocal_Elem
     bool isTagged;
 
     // ------------------------------------------------------------------------
-    // Flag that determine if the element has an additional rotated tag
-    // ------------------------------------------------------------------------
-    bool isRotated;
-
-    // ------------------------------------------------------------------------
     // A vector recording the tag of elements. Length is nlocalele.
     // In FSI/ALE_rotated problems, we assume tag 0 gives fluid/fixed element; 
     //                                        tag 1 gives solid/rotated element.
