@@ -14,21 +14,6 @@ FEAElement_Tet4::~FEAElement_Tet4()
   delete triangle_face; triangle_face = nullptr;
 }
 
-void FEAElement_Tet4::print_info() const
-{
-  SYS_T::commPrint("Tet4: ");
-  SYS_T::commPrint("4-node tetrahedral element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("elemType: %d \n", get_Type());
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Tet4::get_memory_usage() const
-{
-  const double double_size = 4 * numQuapts + 31;
-  const double int_size = 1;
-  return double_size * 8.0 + int_size * 4.0;
-}
-
 void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
@@ -124,24 +109,6 @@ void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-std::vector<double> FEAElement_Tet4::get_dR_dx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_dR_dx function error.\n" );
-  return { dR_dx[0], dR_dx[1], dR_dx[2], dR_dx[3] };
-}
-
-std::vector<double> FEAElement_Tet4::get_dR_dy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_dR_dy function error.\n" );
-  return { dR_dy[0], dR_dy[1], dR_dy[2], dR_dy[3] };
-}
-
-std::vector<double> FEAElement_Tet4::get_dR_dz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_dR_dz function error.\n" );
-  return { dR_dz[0], dR_dz[1], dR_dz[2], dR_dz[3] };
-}
-
 void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
@@ -154,50 +121,6 @@ void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     basis_x[ii] = dR_dx[ii];
     basis_y[ii] = dR_dy[ii];
     basis_z[ii] = dR_dz[ii];
-  }
-}
-
-void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz, double * const &basis_xy,
-    double * const &basis_xz, double * const &basis_yz ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_3D_R_dR_d2R function error.\n" );
-  const int offset = quaindex * 4;
-  for( int ii=0; ii<4; ++ii )
-  {
-    basis[ii] = R[offset + ii];
-    basis_x[ii] = dR_dx[ii];
-    basis_y[ii] = dR_dy[ii];
-    basis_z[ii] = dR_dz[ii];
-    basis_xx[ii] = 0.0;
-    basis_yy[ii] = 0.0;
-    basis_zz[ii] = 0.0;
-    basis_xy[ii] = 0.0;
-    basis_xz[ii] = 0.0;
-    basis_yz[ii] = 0.0;
-  }
-}
-
-void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_3D_R_gradR_LaplacianR function error.\n" );
-  const int offset = quaindex * 4;
-  for( int ii=0; ii<4; ++ii )
-  {
-    basis[ii] = R[offset + ii];
-    basis_x[ii] = dR_dx[ii];
-    basis_y[ii] = dR_dy[ii];
-    basis_z[ii] = dR_dz[ii];
-    basis_xx[ii] = 0.0;
-    basis_yy[ii] = 0.0;
-    basis_zz[ii] = 0.0;
   }
 }
 
