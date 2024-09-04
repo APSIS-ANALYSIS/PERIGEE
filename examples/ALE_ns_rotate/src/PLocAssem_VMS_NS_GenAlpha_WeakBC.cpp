@@ -65,7 +65,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   //Update coordinates
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, local_mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
   // Build the basis function of volume element
   elementvs->buildBasis( face_id, quads, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
@@ -102,9 +102,9 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
       v += sol[ii4 + 2] * R[ii];
       w += sol[ii4 + 3] * R[ii];
 
-      mu += mvelo[ii3+0] * R[ii];
-      mv += mvelo[ii3+1] * R[ii];
-      mw += mvelo[ii3+2] * R[ii];
+      mu += local_mvelo[ii3+0] * R[ii];
+      mv += local_mvelo[ii3+1] * R[ii];
+      mw += local_mvelo[ii3+2] * R[ii];
 
       u_x += sol[ii4 + 1] * dR_dx[ii];
       v_x += sol[ii4 + 2] * dR_dx[ii];
@@ -208,7 +208,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   //Update coordinates
-  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
+  get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, local_mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
   // Build the basis function of volume element
   elementvs->buildBasis( face_id, quads, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
@@ -247,9 +247,9 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
       v += sol[ii4 + 2] * R[ii];
       w += sol[ii4 + 3] * R[ii];
 
-      mu += mvelo[ii3+0] * R[ii];
-      mv += mvelo[ii3+1] * R[ii];
-      mw += mvelo[ii3+2] * R[ii];
+      mu += local_mvelo[ii3+0] * R[ii];
+      mv += local_mvelo[ii3+1] * R[ii];
+      mw += local_mvelo[ii3+2] * R[ii];
 
       u_x += sol[ii4 + 1] * dR_dx[ii];
       v_x += sol[ii4 + 2] * dR_dx[ii];
