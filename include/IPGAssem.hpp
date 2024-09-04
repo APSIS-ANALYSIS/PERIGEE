@@ -348,6 +348,7 @@ class IPGAssem
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
+        const PDNSolution * const &mdisp,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,

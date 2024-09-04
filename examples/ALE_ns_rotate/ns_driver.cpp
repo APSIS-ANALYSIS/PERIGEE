@@ -527,7 +527,7 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
         elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
         locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
 

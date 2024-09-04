@@ -181,7 +181,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
   // NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
-  Interface_KG(0.0, 0.1, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_KG(0.1, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   delete temp;
 
@@ -198,6 +198,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 
 void PGAssem_NS_FEM::Assem_mass_residual(
     const PDNSolution * const &sol_a,
+    const PDNSolution * const &mdisp,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
@@ -260,11 +261,12 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(0, 0, sol_a, alelem_ptr, lassem_ptr, elementvs, quad_s,
+  // Default mdisp = mvelo = zeros at t = 0.
+  Weak_EssBC_G(0, 0, sol_a, mdisp, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   // Surface integral from Nitsche method
-  Interface_G(0, 0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_G(0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -372,14 +374,14 @@ void PGAssem_NS_FEM::Assem_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(curr_time, dt, sol_b, alelem_ptr, lassem_ptr, elementvs, quad_s,
+  Weak_EssBC_G(curr_time, dt, sol_b, mvelo, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   // For Poiseuille flow
   NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method
-  Interface_G(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_G(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -488,14 +490,14 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_KG(curr_time, dt, sol_b, alelem_ptr, lassem_ptr, elementvs, quad_s,
+  Weak_EssBC_KG(curr_time, dt, sol_b, mvelo, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   // For Poiseuille flow
   NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method (Only assemble G at present)
-  Interface_KG(curr_time, dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_KG(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1081,6 +1083,8 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
 void PGAssem_NS_FEM::Weak_EssBC_KG(
     const double &curr_time, const double &dt,
     const PDNSolution * const &sol,
+    const PDNSolution * const &mvelo,
+    const PDNSolution * const &mdisp,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_vs,
@@ -1092,7 +1096,11 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 {
   const int loc_dof {dof_mat * nLocBas};
   double * array_b = new double [nlgn * dof_sol];
+  double * array_mvelo = new double [nlgn * 3];
+  double * array_mdisp = new double [nlgn * 3];
   double * local_b = new double [nLocBas * dof_sol];
+  double * local_mvelo = new double [nLocBas * 3];
+  double * local_mdisp = new double [nLocBas * 3];
   int * IEN_v = new int [nLocBas];
   double * ctrl_x = new double [nLocBas];
   double * ctrl_y = new double [nLocBas];
@@ -1100,6 +1108,8 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   sol->GetLocalArray( array_b );
+  mvelo->GetLocalArray( array_mvelo );
+  mdisp->GetLocalArray( array_mdisp );
 
   const int num_wele {wbc_part->get_num_ele()};
 
@@ -1110,21 +1120,15 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
     lien_ptr->get_LIEN(local_ee_index, IEN_v);
     GetLocal(array_b, IEN_v, local_b);
+    GetLocal(array_mvelo, 3, IEN_v, local_mvelo);
+    GetLocal(array_mdisp, 3, IEN_v, local_mdisp);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
 
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
-      lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, element_vs,
-        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
-    }
-    else
-    {
-      lassem_ptr->Assem_Tangent_Residual_Weak_Rotated(curr_time, dt, local_b, element_vs,
-        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
-    }
+    lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, local_mvelo, local_mdisp,
+      element_vs, ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
 
     for(int ii{0}; ii < nLocBas; ++ii)
     {
@@ -1138,7 +1142,11 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
   }
 
   delete [] array_b; array_b = nullptr;
+  delete [] array_mvelo; array_mvelo = nullptr;
+  delete [] array_mdisp; array_mdisp = nullptr;
   delete [] local_b; local_b = nullptr;
+  delete [] local_mvelo; local_mvelo = nullptr;
+  delete [] local_mdisp; local_mdisp = nullptr;
   delete [] IEN_v; IEN_v = nullptr;
   delete [] ctrl_x; ctrl_x = nullptr;
   delete [] ctrl_y; ctrl_y = nullptr;
@@ -1149,6 +1157,8 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 void PGAssem_NS_FEM::Weak_EssBC_G(
     const double &curr_time, const double &dt,
     const PDNSolution * const &sol,
+    const PDNSolution * const &mvelo,
+    const PDNSolution * const &mdisp,
     const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_vs,
@@ -1160,7 +1170,11 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 {
   const int loc_dof {dof_mat * nLocBas};
   double * array_b = new double [nlgn * dof_sol];
+  double * array_mvelo = new double [nlgn * 3];
+  double * array_mdisp = new double [nlgn * 3];
   double * local_b = new double [nLocBas * dof_sol];
+  double * local_mvelo = new double [nLocBas * 3];
+  double * local_mdisp = new double [nLocBas * 3];
   int * IEN_v = new int [nLocBas];
   double * ctrl_x = new double [nLocBas];
   double * ctrl_y = new double [nLocBas];
@@ -1168,6 +1182,8 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
   sol->GetLocalArray( array_b );
+  mvelo->GetLocalArray( array_mvelo );
+  mdisp->GetLocalArray( array_mdisp );
 
   const int num_wele {wbc_part->get_num_ele()};
 
@@ -1178,21 +1194,15 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
     lien_ptr->get_LIEN(local_ee_index, IEN_v);
     GetLocal(array_b, IEN_v, local_b);
+    GetLocal(array_mvelo, 3, IEN_v, local_mvelo);
+    GetLocal(array_mdisp, 3, IEN_v, local_mdisp);
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
 
     const int face_id {wbc_part->get_ele_face_id(ee)};
     
-    if(alelem_ptr->get_elem_tag(ee) == 0)
-    {
-      lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, element_vs,
-        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
-    }
-    else
-    {
-      lassem_ptr->Assem_Residual_Weak_Rotated(curr_time, dt, local_b, element_vs,
-        ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
-    }
+    lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, local_mvelo, local_mdisp,
+      element_vs, ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
 
     for(int ii{0}; ii < nLocBas; ++ii)
     {
@@ -1204,7 +1214,11 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   }
 
   delete [] array_b; array_b = nullptr;
+  delete [] array_mvelo; array_mvelo = nullptr;
+  delete [] array_mdisp; array_mdisp = nullptr;
   delete [] local_b; local_b = nullptr;
+  delete [] local_mvelo; local_mvelo = nullptr;
+  delete [] local_mdisp; local_mdisp = nullptr;
   delete [] IEN_v; IEN_v = nullptr;
   delete [] ctrl_x; ctrl_x = nullptr;
   delete [] ctrl_y; ctrl_y = nullptr;
@@ -1213,7 +1227,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 }
 
 void PGAssem_NS_FEM::Interface_KG(
-  const double &curr_time, const double &dt,
+  const double &dt,
   IPLocAssem * const &lassem_ptr,
   FEAElement * const &fixed_elementv,
   FEAElement * const &rotated_elementv,
@@ -1338,7 +1352,7 @@ void PGAssem_NS_FEM::Interface_KG(
 }
 
 void PGAssem_NS_FEM::Interface_G(
-  const double &curr_time, const double &dt,
+  const double &dt,
   IPLocAssem * const &lassem_ptr,
   FEAElement * const &fixed_elementv,
   FEAElement * const &rotated_elementv,

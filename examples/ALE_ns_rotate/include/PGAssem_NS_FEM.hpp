@@ -69,6 +69,7 @@ class PGAssem_NS_FEM : public IPGAssem
     // Assem mass matrix and residual vector
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
+        const PDNSolution * const &mdisp,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
@@ -244,6 +245,8 @@ class PGAssem_NS_FEM : public IPGAssem
     // Weak imposition of no-slip boundary condition on wall
     void Weak_EssBC_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_vs,
@@ -255,6 +258,8 @@ class PGAssem_NS_FEM : public IPGAssem
 
     void Weak_EssBC_G( const double &curr_time, const double &dt,
         const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp,
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_vs,
@@ -265,7 +270,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_WeakBC * const &wbc_part);
 
     virtual void Interface_KG(
-        const double &curr_time, const double &dt,
+        const double &dt,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &fixed_elementv,
         FEAElement * const &rotated_elementv,
@@ -277,7 +282,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const SI_T::SI_quad_point * const &SI_qp );
 
     virtual void Interface_G(
-        const double &curr_time, const double &dt,
+        const double &dt,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &fixed_elementv,
         FEAElement * const &rotated_elementv,
