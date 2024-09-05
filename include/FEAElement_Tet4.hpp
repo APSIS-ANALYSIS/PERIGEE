@@ -17,8 +17,8 @@ class FEAElement_Tet4 : public FEAElement
   public:
     FEAElement_Tet4( const int &in_nqua );
 
-    virtual ~FEAElement_Tet4();
-
+    virtual ~FEAElement_Tet4() = default;
+ 
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element.
@@ -35,7 +35,7 @@ class FEAElement_Tet4 : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z );
 
-    // Return the element size.
+    // Return the element length.
     // For the linear tet element, we calculate the DIAMETER of the
     // circumscribing sphere
     virtual double get_h( const double * const &ctrl_x,
@@ -81,10 +81,10 @@ class FEAElement_Tet4 : public FEAElement
     //   Tet-Face-1 : Node 0 3 2
     //   Tet-Face-2 : Node 0 1 3
     //   Tet-Face-3 : Node 0 2 1
-    virtual void buildBasis( const int &face_id, const IQuadPts * const &quad_rule_s,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z );
+    //virtual void buildBasis( const int &face_id, const IQuadPts * const &quad_rule_s,
+    //    const double * const &ctrl_x,
+    //    const double * const &ctrl_y,
+    //    const double * const &ctrl_z );
 
     // Get the outwardnormal on faces
     // This function requires the buildBasis with face_id provided, so that the
@@ -92,8 +92,8 @@ class FEAElement_Tet4 : public FEAElement
     // The node numbering of the face element guarantees the get_2d_normal_out
     // returns the outward normal vector
     // See FE_T::QuadPts_on_face function for more details.
-    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
-    {return triangle_face->get_2d_normal_out( quaindex, area );}
+    //virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
+    //{return triangle_face->get_2d_normal_out( quaindex, area );}
 
     virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
         const double * const &volctrl_x,
@@ -102,22 +102,20 @@ class FEAElement_Tet4 : public FEAElement
 
   private:
     // Number of quadrature points
-    const int numQuapts;
+    int numQuapts;
 
     // R : 0 <= ii < 4 x numQuapts
-    double * R;
+    std::vector<double> R {};
 
     // tet4 is linear, thus the first-order derivatives are constant
-    double dR_dx[4], dR_dy[4], dR_dz[4];
+    std::array<double,4> dR_dx, dR_dy, dR_dz;
 
     // Container for
     // dx_dr : 0 <= ii < 9
     // dr_dx : 9 <= ii < 18
-    double Jac[18]; 
+    std::array<double,18> Jac;
 
     double detJac;
-
-    FEAElement * triangle_face;
 };
 
 #endif

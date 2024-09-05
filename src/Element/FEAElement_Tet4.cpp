@@ -2,16 +2,7 @@
 
 FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R = new double [4 * numQuapts];
-
-  triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
-}
-
-FEAElement_Tet4::~FEAElement_Tet4()
-{
-  delete [] R; R = nullptr;
-
-  delete triangle_face; triangle_face = nullptr;
+  R.resize(4 * numQuapts);
 }
 
 void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
@@ -20,6 +11,12 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_z )
 {
   ASSERT( quad -> get_dim() == 4, "FEAElement_Tet4::buildBasis function error.\n" );
+
+  if( numQuaPts != quad -> get_num_quadPts() )
+  {
+    numQuaPts = quad -> get_num_quadPts();
+    R.resize(4 * numQuapts);
+  }
 
   // area coordinates, the rest one is  qua_u = 1.0 - qua_r - qua_s - qua_t
   for( int qua = 0; qua < numQuapts; ++qua )
@@ -144,22 +141,6 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );  
-}
-
-void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
-{
-  // Build the volume element
-  const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
-  this->buildBasis( &quad_v, ctrl_x, ctrl_y, ctrl_z );
-
-  const auto face_ctrl = get_face_ctrlPts( face_id, ctrl_x, ctrl_y, ctrl_z );
-
-  // use the triangle element routine to determine the outward normal vector and
-  // the surface Jacobian.
-  triangle_face->buildBasis( quad_s, face_ctrl[0].data(), face_ctrl[1].data(), face_ctrl[2].data() );
 }
 
 std::array<std::vector<double>, 3> FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
