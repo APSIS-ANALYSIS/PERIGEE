@@ -23,6 +23,7 @@
 #include "ALocal_EBC.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
+#include "IQuadPts.hpp"
 #include "QuadPts_Gauss_1D.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
@@ -38,6 +39,7 @@
 #include "QuadPts_vis_tet10_v2.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_tri6.hpp"
+#include "FE_Tools.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
@@ -59,7 +61,9 @@
 
 int main(int argc, char *argv[])
 {
-	QuadPts_debug qpts{{1,1,1}, {1,2,3}};
+  IQuadPts * lower_quad_rule = new QuadPts_vis_quad9();
+
+	FE_T::QuadPts_on_face qpts{602, 1, lower_quad_rule};
 
 	std::cout << "print_info():\n";
 	qpts.print_info();
@@ -76,14 +80,8 @@ int main(int argc, char *argv[])
 //	std::cout << "get_num_quadPts_y():\n";
 //	std::cout << qpts.get_num_quadPts_y() << '\n';
 
-	std::cout << "get_qp(const int &ii):\n";
-	std::cout << qpts.get_qp(1) << '\n';
-
 	std::cout << "get_qp(const int &ii, const int &comp):\n";
-	std::cout << qpts.get_qp(0,2) << '\n';
-
-	std::cout << "get_qw(const int &ii):\n";
-	std::cout << qpts.get_qw(1) << '\n';
+	std::cout << qpts.get_qp(1,1) << '\n';
 
   return EXIT_SUCCESS;
 }
