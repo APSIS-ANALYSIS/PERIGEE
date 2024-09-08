@@ -20,9 +20,9 @@ class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
 
       hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-      HDF5_Reader * h5r = new HDF5_Reader( file_id );
+      std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
-      std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
+      const auto vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
 
       xdegree = vdeg[0]; ydegree = vdeg[1]; zdegree = vdeg[2];
 
@@ -32,7 +32,6 @@ class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
       probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
       elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
 
-      delete h5r;
       H5Fclose( file_id );
     }
 
