@@ -19,68 +19,59 @@
 // Author: Xuanming Huang
 // Date Created: Jun. 24  2024
 // ============================================================================
-#include "PDNSolution.hpp"
-#include "PETSc_Tools.hpp"
-#include "Math_Tools.hpp"
 
 class ALocal_Interface
 {
   public:
     ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
 
-    virtual ~ALocal_Interface() = default;
+    ~ALocal_Interface() = default;
 
-    virtual void print_info() const;
+    int get_num_itf() const {return num_itf;}
 
-    virtual int get_num_itf() const
-    {return num_itf;}
+    int get_nLocBas() const {return nLocBas;}
 
-    virtual int get_nLocBas() const
-    {return nLocBas;}
+    int get_num_tag(const int &ii) const {return num_tag[ii];}
 
-    virtual int get_num_tag(const int &ii) const
-    {return num_tag[ii];}
+    int get_num_fixed_ele(const int &ii) const {return num_fixed_ele[ii];}
 
-    virtual int get_num_fixed_ele(const int &ii) const
-    {return num_fixed_ele[ii];}
-
-    virtual int get_num_rotated_ele(const int &ii, const int &tag) const
+    int get_num_rotated_ele(const int &ii, const int &tag) const
     {return num_rotated_ele[ii][tag];}
 
-    virtual int get_fixed_face_id(const int &ii, const int &jj) const
+    int get_fixed_face_id(const int &ii, const int &jj) const
     {return fixed_ele_face_id[ii][jj];}
 
-    virtual int get_fixed_ele_tag(const int &ii, const int &jj) const
+    int get_fixed_ele_tag(const int &ii, const int &jj) const
     {return fixed_ele_tag[ii][jj];}
 
-    virtual int get_fixed_lien(const int &ii, const int &jj) const
+    int get_fixed_lien(const int &ii, const int &jj) const
     {return fixed_lien[ii][jj];}
 
-    virtual double get_fixed_pt_xyz(const int &ii, const int &jj) const
+    double get_fixed_pt_xyz(const int &ii, const int &jj) const
     {return fixed_pt_xyz[ii][jj];}
 
-    virtual int get_fixed_node_id(const int &ii, const int &jj) const
+    int get_fixed_node_id(const int &ii, const int &jj) const
     {return fixed_node_id[ii][jj];}
 
-    virtual int get_fixed_LID(const int &ii, const int &dof_index, const int &node) const
+    int get_fixed_LID(const int &ii, const int &dof_index, const int &node) const
     {return fixed_LID[ii][dof_index * num_fixed_node[ii] + node];}
 
-    virtual int get_rotated_lien(const int &ii, const int &tag, const int &jj) const
+    int get_rotated_lien(const int &ii, const int &tag, const int &jj) const
     {return rotated_lien[ii][tag][jj];}
 
-    virtual int get_rotated_face_id(const int &ii, const int &tag, const int &jj) const
+    int get_rotated_face_id(const int &ii, const int &tag, const int &jj) const
     {return rotated_ele_face_id[ii][tag][jj];}
 
-    virtual int get_rotated_node_id(const int &ii, const int &jj) const
+    int get_rotated_node_id(const int &ii, const int &jj) const
     {return rotated_node_id[ii][jj];}
 
-    virtual int get_rotated_LID(const int &ii, const int &dof_index, const int &node) const
+    int get_rotated_LID(const int &ii, const int &dof_index, const int &node) const
     {return rotated_LID[ii][dof_index * num_rotated_node[ii] + node];}
 
-    virtual void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
+    void get_fixed_ele_ctrlPts(const int &ii, const int &ee,
         double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
-    virtual void get_rotated_ele_ctrlPts(const int &ii, const int &tag,const int &ee,
+    void get_rotated_ele_ctrlPts(const int &ii, const int &tag,const int &ee,
         double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
   protected:

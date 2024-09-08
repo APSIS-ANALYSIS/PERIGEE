@@ -37,29 +37,41 @@ class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
 
     ~AGlobal_Mesh_Info_FEM_3D() override = default;
 
+    // --------------------------------------------------------------
     // Get the polynomial degree for the discretization method. For
     // unstructured mesh, the three function should return the same
     // value since one cannot differentiate the xyz direction in, e.g.,
     // tet mesh.
+    // --------------------------------------------------------------
     int get_xdegree() const override {return xdegree;}
     int get_ydegree() const override {return ydegree;}
     int get_zdegree() const override {return zdegree;}
 
+    // --------------------------------------------------------------
     // Get the total number of element of the whole mesh. 
+    // --------------------------------------------------------------
     int get_nElem() const override {return nElem;}
 
+    // --------------------------------------------------------------
     // Get the total number of nodes of the whole mesh.
+    // --------------------------------------------------------------
     int get_nFunc() const override {return nFunc;}
 
+    // --------------------------------------------------------------
     // Get the number of local basis functions for the element.
     // Note: this implicitly implies that we use the same type of element
     //       for the mesh.
+    // --------------------------------------------------------------
     int get_nLocBas() const override {return nLocBas;}
 
+    // --------------------------------------------------------------
     // Get the dimension of the problem.
+    // --------------------------------------------------------------
     int get_probDim() const override {return probDim;}
 
+    // --------------------------------------------------------------
     // Get an integer that indicate the element type.
+    // --------------------------------------------------------------
     int get_elemType() const override {return elemType;}
 
     void print_info() const override
