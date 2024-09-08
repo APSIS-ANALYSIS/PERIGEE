@@ -32,12 +32,13 @@ class APart_Basic_Info
       const std::string fName = SYS_T::gen_partfile_name( fbasename, in_rank );
 
       hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-      HDF5_Reader * h5r = new HDF5_Reader( file_id );
+
+      std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
       cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
       cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
 
-      delete h5r; H5Fclose( file_id );
+      H5Fclose( file_id );
     }
 
     ~APart_Basic_Info() = default;
