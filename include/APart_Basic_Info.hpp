@@ -29,7 +29,7 @@ class APart_Basic_Info
     // --------------------------------------------------------------
     APart_Basic_Info( const std::string &fbasename, const int &in_rank = 0 )
     {
-      const std::string fName = SYS_T::gen_partfile_name( fileBaseName, in_cpu_rank );
+      const std::string fName = SYS_T::gen_partfile_name( fbasename, in_rank );
 
       hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
       HDF5_Reader * h5r = new HDF5_Reader( file_id );
