@@ -33,10 +33,8 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
-  ${perigee_source}/System/Tensor2_2D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/System/Tensor4_3D.cpp
-  ${perigee_source}/System/Tensor4_2D.cpp
   ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/SV_Tools.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
@@ -94,8 +92,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
-  ${perigee_source}/Element/FEAElement_Line2_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Line3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
@@ -108,8 +104,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Triangle6.cpp
   ${perigee_source}/Element/FEAElement_Quad4.cpp
   ${perigee_source}/Element/FEAElement_Quad9.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp

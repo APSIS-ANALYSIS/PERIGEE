@@ -89,7 +89,7 @@ double POST_ERROR_E::get_manu_sol_errorH1(
     
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     Vector_3 sol(0.0, 0.0, 0.0);
-    Tensor2_3D grad_sol; grad_sol.gen_zero();
+    Tensor2_3D grad_sol = Ten2::gen_zero();
 
     for(int ii=0; ii<element-> get_nLocBas(); ++ii)
     {
