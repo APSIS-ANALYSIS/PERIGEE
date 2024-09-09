@@ -1,20 +1,18 @@
-#ifndef AGLOBAL_MESH_INFO_FEM_3D_HPP
-#define AGLOBAL_MESH_INFO_FEM_3D_HPP
+#ifndef AGLOBAL_MESH_INFO_HPP
+#define AGLOBAL_MESH_INFO_HPP
 // ==================================================================
-// AGlobal_Mesh_Info_FEM_3D.hpp
+// AGlobal_Mesh_Info.hpp
 //
 // This is the global mesh info class used for a 3D FEM mesh.
 //
 // Date Created: Jan 21 2017
 // ==================================================================
-#include "IAGlobal_Mesh_Info.hpp"
 #include "HDF5_Reader.hpp"
 
-class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
+class AGlobal_Mesh_Info
 {
   public:
-    AGlobal_Mesh_Info_FEM_3D( const std::string &fileBaseName,
-        const int &cpu_rank )
+    AGlobal_Mesh_Info( const std::string &fileBaseName, const int &cpu_rank )
     {
       const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -35,7 +33,7 @@ class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
       H5Fclose( file_id );
     }
 
-    ~AGlobal_Mesh_Info_FEM_3D() override = default;
+    ~AGlobal_Mesh_Info() = default;
 
     // --------------------------------------------------------------
     // Get the polynomial degree for the discretization method. For
@@ -43,40 +41,40 @@ class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
     // value since one cannot differentiate the xyz direction in, e.g.,
     // tet mesh.
     // --------------------------------------------------------------
-    int get_xdegree() const override {return xdegree;}
-    int get_ydegree() const override {return ydegree;}
-    int get_zdegree() const override {return zdegree;}
+    int get_xdegree() const {return xdegree;}
+    int get_ydegree() const {return ydegree;}
+    int get_zdegree() const {return zdegree;}
 
     // --------------------------------------------------------------
     // Get the total number of element of the whole mesh. 
     // --------------------------------------------------------------
-    int get_nElem() const override {return nElem;}
+    int get_nElem() const {return nElem;}
 
     // --------------------------------------------------------------
     // Get the total number of nodes of the whole mesh.
     // --------------------------------------------------------------
-    int get_nFunc() const override {return nFunc;}
+    int get_nFunc() const {return nFunc;}
 
     // --------------------------------------------------------------
     // Get the number of local basis functions for the element.
     // Note: this implicitly implies that we use the same type of element
     //       for the mesh.
     // --------------------------------------------------------------
-    int get_nLocBas() const override {return nLocBas;}
+    int get_nLocBas() const {return nLocBas;}
 
     // --------------------------------------------------------------
     // Get the dimension of the problem.
     // --------------------------------------------------------------
-    int get_probDim() const override {return probDim;}
+    int get_probDim() const {return probDim;}
 
     // --------------------------------------------------------------
     // Get an integer that indicate the element type.
     // --------------------------------------------------------------
-    int get_elemType() const override {return elemType;}
+    int get_elemType() const {return elemType;}
 
-    void print_info() const override
+    void print_info() const
     {
-      std::cout<<"AGlobal_Mesh_Info_FEM_3D:"<<std::endl;
+      std::cout<<"AGlobal_Mesh_Info:"<<std::endl;
       std::cout<<"degree: "<<xdegree<<'\t'<<ydegree<<'\t'<<zdegree<<'\n';
       std::cout<<"nElem: "<<nElem<<'\n';
       std::cout<<"nFunc: "<<nFunc<<'\n';
@@ -89,7 +87,7 @@ class AGlobal_Mesh_Info_FEM_3D final : public IAGlobal_Mesh_Info
     int xdegree, ydegree, zdegree;
     int nElem, nFunc, nLocBas, probDim, elemType;
 
-    AGlobal_Mesh_Info_FEM_3D() = delete;
+    AGlobal_Mesh_Info() = delete;
 };
 
 #endif
