@@ -224,6 +224,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-ilt_density",       ilt_density);
   SYS_T::GetOptionReal(  "-ilt_E",             ilt_E);
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
+  SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
+  SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
   SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
