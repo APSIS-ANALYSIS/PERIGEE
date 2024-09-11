@@ -42,6 +42,7 @@ class PTime_NS_Solver
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_InflowBC * const &infnbc_part,
+        const ALocal_RotatedBC * const &rotnbc_part,
         const ALocal_EBC * const &ebc_part,
         IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,

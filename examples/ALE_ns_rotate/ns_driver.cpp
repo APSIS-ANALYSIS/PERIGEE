@@ -15,6 +15,7 @@
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
+#include "ALocal_RotatedBC.hpp"
 #include "ALocal_Interface.hpp"
 #include "Sliding_Interface_Tools.hpp"
 #include "Matrix_Free_Tools.hpp"
@@ -285,6 +286,9 @@ int main(int argc, char *argv[])
 
   // Local sub-domain's inflow bc
   ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
+
+  // Local sub-domain's rotated bc
+  ALocal_RotatedBC * locrotnbc = new ALocal_RotatedBC(part_file, rank);
 
   // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
@@ -640,7 +644,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
       pmat, elementv, elements, elementvs, elementvs_rotated,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
 
@@ -650,7 +654,7 @@ int main(int argc, char *argv[])
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info;
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info; delete locrotnbc;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;

@@ -54,6 +54,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_RotatedBC * const &rotnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
@@ -129,6 +130,12 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // Update the inflow boundary values
   rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
+  // ------------------------------------------------- 
+
+  // ------------------------------------------------- 
+  // Update the inflow boundary values
+  update_rotatedbc_value(rotnbc_part, velo_mesh, sol);
+  update_rotatedbc_value(rotnbc_part, &mvelo_alpha, &sol_alpha);
   // ------------------------------------------------- 
 
   SI_sol->update_node_mvelo(&mvelo_alpha);
@@ -292,6 +299,31 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 
       VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
     }
+  }
+
+  sol->Assembly_GhostUpdate();
+}
+
+void PNonlinear_NS_Solver::update_rotatedbc_value(
+    const ALocal_RotatedBC * const &rotbc,
+    const PDNSolution * const &velo_mesh,
+    PDNSolution * const &sol ) const
+{
+  const int numnode = rotbc -> get_Num_LD( );
+
+  for(int ii=0; ii<numnode; ++ii)
+  {
+    const int node_index = rotbc -> get_LDN( ii );
+  
+    const int meshv_idx[3] = { node_index*3+0, node_index*3+1, node_index*3+2 };
+
+    double meshv_vals[3];
+
+    VecGetValues(velo_mesh->solution, 3, meshv_idx, meshv_vals);
+
+    const int sol_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
+
+    VecSetValues(sol->solution, 3, sol_idx, meshv_vals, INSERT_VALUES);
   }
 
   sol->Assembly_GhostUpdate();
