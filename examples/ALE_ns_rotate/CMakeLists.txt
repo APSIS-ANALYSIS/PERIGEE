@@ -52,6 +52,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
+  ${perigee_source}/Mesh/NBC_Partition_rotated.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_turbulence_wall_model.cpp
