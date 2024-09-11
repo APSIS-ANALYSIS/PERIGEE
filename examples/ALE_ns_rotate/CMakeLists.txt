@@ -86,6 +86,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_RotatedBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
