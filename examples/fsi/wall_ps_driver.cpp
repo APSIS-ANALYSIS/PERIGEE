@@ -90,7 +90,7 @@ int main( int argc, char *argv[] )
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
   // Solid properties
-  bool   is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
+  bool is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
   std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -258,17 +258,17 @@ int main( int argc, char *argv[] )
       std::string sl_fk2_name = "-sl_fk2_" + std::to_string(ii);
       std::string sl_fkd_name = "-sl_fkd_" + std::to_string(ii);
 
-      SYS_T::commPrint(  sl_density_name.c_str(), solid_density[ii]);
-      SYS_T::commPrint(  sl_E_name.c_str(),       solid_E[ii]);
-      SYS_T::commPrint(  sl_nu_name.c_str(),      solid_nu[ii]);
-      SYS_T::commPrint(  sl_mu_name.c_str(),      solid_mu[ii]);
-      SYS_T::commPrint(  sl_f1the_name.c_str(),   solid_f1the[ii]);
-      SYS_T::commPrint(  sl_f1phi_name.c_str(),   solid_f1phi[ii]);
-      SYS_T::commPrint(  sl_f2the_name.c_str(),   solid_f2the[ii]);
-      SYS_T::commPrint(  sl_f2phi_name.c_str(),   solid_f2phi[ii]);
-      SYS_T::commPrint(  sl_fk1_name.c_str(),     solid_fk1[ii]);
-      SYS_T::commPrint(  sl_fk2_name.c_str(),     solid_fk2[ii]);
-      SYS_T::commPrint(  sl_fkd_name.c_str(),     solid_fkd[ii]);
+      SYS_T::cmdPrint(  sl_density_name.c_str(), solid_density[ii]);
+      SYS_T::cmdPrint(  sl_E_name.c_str(),       solid_E[ii]);
+      SYS_T::cmdPrint(  sl_nu_name.c_str(),      solid_nu[ii]);
+      SYS_T::cmdPrint(  sl_mu_name.c_str(),      solid_mu[ii]);
+      SYS_T::cmdPrint(  sl_f1the_name.c_str(),   solid_f1the[ii]);
+      SYS_T::cmdPrint(  sl_f1phi_name.c_str(),   solid_f1phi[ii]);
+      SYS_T::cmdPrint(  sl_f2the_name.c_str(),   solid_f2the[ii]);
+      SYS_T::cmdPrint(  sl_f2phi_name.c_str(),   solid_f2phi[ii]);
+      SYS_T::cmdPrint(  sl_fk1_name.c_str(),     solid_fk1[ii]);
+      SYS_T::cmdPrint(  sl_fk2_name.c_str(),     solid_fk2[ii]);
+      SYS_T::cmdPrint(  sl_fkd_name.c_str(),     solid_fkd[ii]);
     }
   }
   SYS_T::cmdPrint("-ilt_density", ilt_density);
