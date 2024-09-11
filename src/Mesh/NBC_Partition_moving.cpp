@@ -59,11 +59,6 @@ NBC_Partition_moving::NBC_Partition_moving(
         for( int kk=0; kk<cell_nLocBas[ii]; ++kk )
           local_node.push_back( nbc->get_ien(ii, jj, kk) );
       }
-
-      // need xyz-coordinates of moving node
-      for( int kk=0; kk<cell_nLocBas[ii]; ++kk )
-        local_node.push_back( nbc->get_ien(ii, jj, kk) );
-
     }
 
     VEC_T::sort_unique_resize( local_node );
