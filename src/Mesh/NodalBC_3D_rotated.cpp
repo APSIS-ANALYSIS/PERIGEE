@@ -1,26 +1,26 @@
 #include "NodalBC_3D_rotated.hpp"
 
-NodalBC_3D_rotated::NodalBC_3D_rotated( const std::string &inffile,
-    const int &nFunc,
-    const int &elemtype )
-: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( elemtype )
+NodalBC_3D_rotated::NodalBC_3D_rotated( 
+    const std::string &rotated_file,
+    const std::string &fixed_file,
+    const int &nFunc, const int &elemtype )
+: elem_type( elemtype )
 {
-  // 1. Clear the container for Dirichlet nodes
+  // Prepare the numbers that need to be shifted
+  const int fixed_nFunc = VTK_T::read_num_pt(fixed_file);
+  const int fixed_nElem = VTK_T::read_num_cl(fixed_file);
+
+  // Clear the container for Dirichlet nodes
   dir_nodes_on_rotated_surface.clear();
   num_dir_nodes_on_rotated_surface = 0;
 
-  // 2. Analyze the file type and read in the data
+  // Analyze the file type and read in the data
   num_node = 0;
   num_cell = 0;
   nLocBas = 0;
 
-  sur_ien.resize(num_nbc );
-  pt_xyz.resize( num_nbc );
-
-  global_node.resize(  num_nbc );
-  global_cell.resize(  num_nbc );
-
-  SYS_T::file_check( inffile );
+  SYS_T::file_check( rotated_file );
+  SYS_T::file_check( fixed_file );
 
   if( elemtype == 501 )
     nLocBas = 3;
@@ -33,10 +33,19 @@ NodalBC_3D_rotated::NodalBC_3D_rotated( const std::string &inffile,
   else 
     SYS_T::print_fatal("Error: NodalBC_3D_rotated::NodalBC_3D_rotated: unknown element type.\n");
 
-  VTK_T::read_grid( inffile, num_node, num_cell, pt_xyz, sur_ien );
+  VTK_T::read_grid( rotated_file, num_node, num_cell, pt_xyz, sur_ien );
 
-  global_node = VTK_T::read_int_PointData(inffile, "GlobalNodeID");
-  global_cell = VTK_T::read_int_CellData(inffile, "GlobalElementID");  //Nodalbc doesn't record GlobalElementID
+  for(int &nodeid : sur_ien)
+    nodeid += fixed_nFunc;
+
+  global_node = VTK_T::read_int_PointData(rotated_file, "GlobalNodeID");
+  global_cell = VTK_T::read_int_CellData(rotated_file, "GlobalElementID");
+
+  for(int &nodeid : global_node)
+    nodeid += fixed_nFunc;
+
+  for(int &cellid : global_cell)
+    cellid += fixed_nElem;
 
   for(unsigned int jj=0; jj<global_node.size(); ++jj)
   {
@@ -54,12 +63,8 @@ NodalBC_3D_rotated::NodalBC_3D_rotated( const std::string &inffile,
   // Generate ID array
   Create_ID( nFunc );
 
-
   // Finish and print info on screen
   std::cout<<"===> NodalBC_3D_rotated specified by\n";
-  for(int ii=0; ii<num_nbc; ++ii)
-  {
-    std::cout<<"     nbc_id = "<<ii<<": "<<inffileList[ii]<<" :\n ";
-    std::cout<<"          num_node: "<<num_node[ii]<<", num_cell: "<<num_cell[ii]<<'\n';
-  }
+  std::cout<<"                    "<<rotated_file<<" :\n ";
+  std::cout<<"          num_node: "<<num_node<<", num_cell: "<<num_cell<<'\n';
 }

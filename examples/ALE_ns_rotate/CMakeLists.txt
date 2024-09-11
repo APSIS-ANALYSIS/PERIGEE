@@ -46,6 +46,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Interface_pair.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
+  ${perigee_source}/Mesh/NodalBC_3D_rotated.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp

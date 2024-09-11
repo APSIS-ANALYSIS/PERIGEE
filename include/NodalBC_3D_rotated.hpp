@@ -22,7 +22,9 @@ class NodalBC_3D_rotated : public INodalBC
     // ------------------------------------------------------------------------
     // Generate the rotated bc bc given by a list of inffiles.
     // ------------------------------------------------------------------------
-    NodalBC_3D_rotated( const std::string &inffile,
+    NodalBC_3D_rotated( 
+        const std::string &rotated_file,
+        const std::string &fixed_file,
         const int &nFunc,
         const int &elemtype );
 
@@ -74,7 +76,7 @@ class NodalBC_3D_rotated : public INodalBC
     unsigned int num_dir_nodes_on_rotated_surface; 
 
     // number of moving surfaces and element type
-    const int num_nbc, elem_type;
+    const int elem_type;
 
     // number of nodes and cells on rotated surface.
     // Note: num_node equal num_dir_nodes in this class.
