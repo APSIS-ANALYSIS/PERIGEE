@@ -39,9 +39,16 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       for(int ii{0}; ii<vec_size*vec_size; ++ii)
       {
         Tangent_ss[ii] = 0.0;
+        Tangent_rr[ii] = 0.0;
+      }
+    }
+
+    virtual void Zero_Tangent_itf_MF()
+    {
+      for(int ii{0}; ii<vec_size*vec_size; ++ii)
+      {
         Tangent_sr[ii] = 0.0;
         Tangent_rs[ii] = 0.0;
-        Tangent_rr[ii] = 0.0;
       }
     }
 
@@ -73,6 +80,16 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const double * const &fixed_local_sol,
       const double * const &rotated_local_sol,
       const double * const &rotated_local_mvelo);
+
+    virtual void Assem_Tangent_itf_MF(
+      const int &fixed_qua,
+      const double &fixed_qw,
+      const double &dt,
+      const FEAElement * const &fixed_elementv,
+      const FEAElement * const &rotated_elementv,
+      const double * const &fixed_local_sol,
+      const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo );
 };
 
 #endif

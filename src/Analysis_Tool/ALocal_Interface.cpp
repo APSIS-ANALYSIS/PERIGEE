@@ -14,6 +14,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
   SYS_T::print_fatal_if(num_itf < 1, "Error, ALocal_Interface: there is no interface in this geometric model.\n");
 
   num_fixed_ele = h5r -> read_intVector( gname.c_str(), "num_part_fixed_cell" );
+  max_num_fixed_ele = h5r -> read_intVector( gname.c_str(), "max_num_fixed_cell" );
   num_tag = h5r -> read_intVector( gname.c_str(), "num_tag" );
 
   std::string groupbase(gname);

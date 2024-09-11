@@ -417,6 +417,7 @@ int main( int argc, char * argv[] )
 
   SYS_T::Timer * mytimer = new SYS_T::Timer();
 
+  // Shared data for interfaces
   std::vector<std::vector<std::vector<int>>> distributed_fixed_node_vol_part_tag;
   distributed_fixed_node_vol_part_tag.resize(cpu_size);
 
@@ -428,6 +429,8 @@ int main( int argc, char * argv[] )
 
   std::vector<std::vector<std::vector<int>>> distributed_rotated_node_loc_pos;
   distributed_rotated_node_loc_pos.resize(cpu_size);
+
+  std::vector<int> max_fixed_nlocalele (num_interface_pair, 0);
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
@@ -487,6 +490,10 @@ int main( int argc, char * argv[] )
 
     distributed_rotated_node_vol_part_tag[proc_rank] = itfpart -> get_rotated_node_vol_part_tag();
     distributed_rotated_node_loc_pos[proc_rank] = itfpart -> get_rotated_node_loc_pos();
+
+    for(int ii = 0; ii < VEC_T::get_size(interfaces); ++ii)
+      if(max_fixed_nlocalele[ii] < itfpart -> get_fixed_nlocalele(ii))
+        max_fixed_nlocalele[ii] = itfpart -> get_fixed_nlocalele(ii);
 
     itfpart -> write_hdf5( part_file );
 
@@ -555,6 +562,8 @@ int main( int argc, char * argv[] )
     hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
+
+    h5w -> write_intVector( g_id, "max_num_fixed_cell", max_fixed_nlocalele );
 
     const std::string groupbase("interfaceid_");
 
