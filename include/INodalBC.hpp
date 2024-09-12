@@ -25,19 +25,19 @@ class INodalBC
 
     // ------------------------------------------------------------------------
     // get_dir_nodes returns the ii-th dirichlet node's global nodal index.
-    // The parameter ii runs 0 <= ii < get_num_dir_nodes(nbc_id).
+    // The parameter ii runs 0 <= ii < get_num_dir_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const = 0;
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
-    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
+    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const = 0;
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
-    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
+    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const = 0;
     
@@ -292,7 +292,7 @@ class INodalBC
     {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
 
     // --------------------------------------------------------------
-    // get the dirichlet-type nodal index on different nbc_id surfaces
+    // get the dirichlet-type nodal index on rotated surface
     // --------------------------------------------------------------
     virtual unsigned int get_dir_nodes_on_rotated_surface( const unsigned int &ii ) const
     {

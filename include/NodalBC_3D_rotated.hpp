@@ -30,6 +30,23 @@ class NodalBC_3D_rotated : public INodalBC
 
     virtual ~NodalBC_3D_rotated() = default;
 
+    virtual unsigned int get_dir_nodes(const unsigned int &ii) const
+    {return dir_nodes[ii];}
+
+    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}    
+
+    virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
+    {
+      SYS_T::print_fatal("Error: NodalBC_3D_rotated::get_per_master_nodes: periodic nodes are not defined.\n");
+      return 0;
+    }    
+
+    virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const
+    {
+      SYS_T::print_fatal("Error: NodalBC_3D_rotated::get_per_slave_nodes: periodic nodes are not defined.\n");
+      return 0;
+    }    
+
     virtual unsigned int get_num_per_nodes() const {return 0;}
 
     // get the dirichlet-type nodal index on different nbc_id surfaces
@@ -74,6 +91,11 @@ class NodalBC_3D_rotated : public INodalBC
     // length = num_dir_nodes_on_rotated_surface
     std::vector<unsigned int> dir_nodes_on_rotated_surface;
     unsigned int num_dir_nodes_on_rotated_surface; 
+
+    // The dirichlet nodes
+    // length = num_dir_nodes
+    std::vector<unsigned int> dir_nodes;
+    unsigned int num_dir_nodes; 
 
     // number of moving surfaces and element type
     const int elem_type;

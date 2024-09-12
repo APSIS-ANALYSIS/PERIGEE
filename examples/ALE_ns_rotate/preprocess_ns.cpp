@@ -60,6 +60,7 @@ int main( int argc, char * argv[] )
 
   const int num_interface_pair        = paras["num_interface_pair"].as<int>();
   const std::string rotated_geo_file  = paras["rotated_geo_file"].as<std::string>();
+  const std::string rotated_sur_file  = paras["rotated_sur_file"].as<std::string>();
   const std::string fixed_interface_base   = paras["fixed_interface_base"].as<std::string>();
   const std::string rotated_interface_base = paras["rotated_interface_base"].as<std::string>();
 
@@ -346,9 +347,13 @@ int main( int argc, char * argv[] )
     SYS_T::print_fatal("Unknown wall model type.");
 
   NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, nFunc );
+  NBC_list[1] = new NodalBC( dir_list, rotated_sur_file, geo_file, nFunc );
+  NBC_list[2] = new NodalBC( dir_list, rotated_sur_file, geo_file, nFunc );
+  NBC_list[3] = new NodalBC( dir_list, rotated_sur_file, geo_file, nFunc );
+
+  //Rotated BC info
+  INodalBC * RotBC = new NodalBC_3D_rotated( rotated_sur_file, geo_file,
+      nFunc, elemType );  
 
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
@@ -459,10 +464,15 @@ int main( int argc, char * argv[] )
     
     nbcpart -> write_hdf5( part_file );
 
+    //Partition Nodal Rotated BC and write to h5 file
+    NBC_Partition_rotated * rotpart = new NBC_Partition_rotated(part, mnindex, RotBC);
+
+    rotpart -> write_hdf5( part_file );
+
     // Partition Nodal Inflow BC and write to h5 file
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     
-    infpart->write_hdf5( part_file );
+    infpart -> write_hdf5( part_file );
     
     // Partition Elemental BC and write to h5 file
     EBC_Partition * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
@@ -507,7 +517,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; delete itfpart;
+    delete part; delete nbcpart; delete rotpart; delete infpart; delete ebcpart; delete wbcpart; delete itfpart;
   }
 
   // Combine the fixed/rotated_node_vol_part_tag and rotated_node_loc_pos
@@ -607,7 +617,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto &it_nbc : NBC_list) delete it_nbc;
 
-  delete InFBC; delete ebc; delete wbc; delete mytimer;
+  delete InFBC; delete RotBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
 
   return EXIT_SUCCESS;

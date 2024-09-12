@@ -13,7 +13,7 @@ int main( int argc, char * argv[] )
   SYS_T::print_omp_info();
   SYS_T::set_omp_num_threads();
 
-  const std::string input_yaml_file("input_gmsh2vtk.yml");
+  const std::string input_yaml_file("input_gmsh2vtk_2.yml");
   
   SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );
 

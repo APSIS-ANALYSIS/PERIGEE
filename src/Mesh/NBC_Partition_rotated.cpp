@@ -7,6 +7,7 @@ NBC_Partition_rotated::NBC_Partition_rotated(
 : cpu_rank(part->get_cpu_rank())
 {  
   // Collect the Dirichlet nodes on the rotated boundary surface
+  LDN.clear();
   Num_LD = 0;
   for(unsigned int jj=0; jj<nbc->get_num_dir_nodes_on_rotated_surface(); ++jj)
   {
@@ -22,8 +23,7 @@ NBC_Partition_rotated::NBC_Partition_rotated(
   // Record the geometrical info of the rotated surface in this CPU
   cell_nLocBas = nbc -> get_nLocBas();
 
-  std::vector<int> local_node, local_elem;
-  local_node.clear(); local_elem.clear();
+  std::vector<int> local_node {}, local_elem {};
 
   local_global_cell.clear();
 
@@ -102,7 +102,7 @@ void NBC_Partition_rotated::write_hdf5( const std::string &FileName ) const
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
   h5w->write_intScalar( g_id, "Num_LD", Num_LD );
-  
+
   h5w->write_intVector( g_id, "LDN", LDN );
 
   h5w->write_intScalar( g_id, "num_local_node", num_local_node );
