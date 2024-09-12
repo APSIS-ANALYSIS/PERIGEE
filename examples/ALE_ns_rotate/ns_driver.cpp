@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
 
   // Angular velocity
   double angular_velo = 2.0 * MATH_T::PI; //(rad/s)
+  double angular_thd_time = 0.5; // prescribed time for rotating part to reach angular velocity
 
   // Yaml options
   bool is_loadYaml = true;
@@ -306,7 +307,7 @@ int main(int argc, char *argv[])
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
 
-  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, point_rotated, angular_direction);
+  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, angular_thd_time, point_rotated, angular_direction);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 

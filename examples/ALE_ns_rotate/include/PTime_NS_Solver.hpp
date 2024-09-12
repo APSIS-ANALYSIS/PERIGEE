@@ -114,7 +114,7 @@ class PTime_NS_Solver
         const int &type) const
     {
       double mag_angular_velo = 0.0; // (rad/s)
-      const double angular_velo = si_ptr->get_angular_velo();
+      const double angular_velo = si_ptr->get_angular_velo(tt);
       const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
 
       Vector_3 curr_pt_xyz(0, 0, 0);
@@ -169,7 +169,7 @@ class PTime_NS_Solver
         const double &tt,
         const SI_rotation_info * const &si_ptr) const
     {
-      const double angular_velo = si_ptr->get_angular_velo();
+      const double angular_velo = si_ptr->get_angular_velo(tt);
       const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
       const Vector_3 point_rotated = si_ptr->get_point_rotated(); 
 
