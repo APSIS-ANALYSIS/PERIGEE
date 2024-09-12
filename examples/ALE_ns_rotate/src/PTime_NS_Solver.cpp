@@ -128,7 +128,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, si_ptr); 
       const Vector_3 velo_mesh_alpha = Vec3::cross_product(si_ptr->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*si_ptr->get_direction_rotated(), radius_alpha);
 
-      const Vector_3 radius_curr = get_radius(curr_pt_xyz, si_ptr); //get_radius() may be writtern into Sl_tools   
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, si_ptr); //get_radius() may be writtern into Sl_tools  
       const Vector_3 velo_mesh_curr = Vec3::cross_product(si_ptr->get_angular_velo(time_info->get_time() + time_info->get_step())*si_ptr->get_direction_rotated(), radius_curr);
 
       const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
