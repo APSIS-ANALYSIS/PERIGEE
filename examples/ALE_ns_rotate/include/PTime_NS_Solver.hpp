@@ -112,11 +112,7 @@ class PTime_NS_Solver
         const double &tt,
         const SI_rotation_info * const &si_ptr,
         const int &type) const
-    {
-      double mag_angular_velo = 0.0; // (rad/s)
-      const double angular_velo = si_ptr->get_angular_velo(tt);
-      const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
-
+    {       
       Vector_3 curr_pt_xyz(0, 0, 0);
 
       const Vector_3 radius_pt = get_radius(init_pt_xyz, si_ptr);
@@ -125,29 +121,26 @@ class PTime_NS_Solver
       
       double angle = 0.0;
 
-      //case 0: x-axis, case 1: y-axis, case 2: z-axis
+      //rotation axis: case 0: x-axis, case 1: y-axis, case 2: z-axis
       switch(type) 
       {
         case 0:
-          mag_angular_velo = angular_velo * direction_rotated.x();
-          angle = MATH_T::get_angle_2d(init_pt_xyz.y(), init_pt_xyz.z());      
-          angle += mag_angular_velo * tt;
+          angle = MATH_T::get_angle_2d(init_pt_xyz.y(), init_pt_xyz.z());
+          angle += si_ptr->get_rotated_theta(tt);
           curr_pt_xyz.x() = init_pt_xyz.x();
           curr_pt_xyz.y() = std::cos(angle) * rr;
           curr_pt_xyz.z() = std::sin(angle) * rr;       
           break;
         case 1: 
-          mag_angular_velo = angular_velo * direction_rotated.y();
           angle = MATH_T::get_angle_2d(init_pt_xyz.z(), init_pt_xyz.x());        
-          angle += mag_angular_velo * tt;
+          angle += si_ptr->get_rotated_theta(tt);
           curr_pt_xyz.x() = std::sin(angle) * rr;
           curr_pt_xyz.y() = init_pt_xyz.y();
           curr_pt_xyz.z() = std::cos(angle) * rr;            
           break;            
         case 2: 
-          mag_angular_velo = angular_velo * direction_rotated.z();
           angle = MATH_T::get_angle_2d(init_pt_xyz.x(), init_pt_xyz.y());        
-          angle += mag_angular_velo * tt;
+          angle += si_ptr->get_rotated_theta(tt);
           curr_pt_xyz.x() = std::cos(angle) * rr;
           curr_pt_xyz.y() = std::sin(angle) * rr;
           curr_pt_xyz.z() = init_pt_xyz.z();            
@@ -168,8 +161,7 @@ class PTime_NS_Solver
     Vector_3 get_currPts(const Vector_3 init_pt_xyz,
         const double &tt,
         const SI_rotation_info * const &si_ptr) const
-    {
-      const double angular_velo = si_ptr->get_angular_velo(tt);
+    {      
       const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
       const Vector_3 point_rotated = si_ptr->get_point_rotated(); 
 
@@ -177,8 +169,8 @@ class PTime_NS_Solver
       const double bb = direction_rotated.y();       
       const double cc = direction_rotated.z();
 
-      const double theta = angular_velo * tt; 
-        
+      const double theta = si_ptr->get_rotated_theta(tt); 
+
       const double m00 = std::cos(theta) + aa*aa*(1-std::cos(theta)); 
       const double m01 = aa*bb*(1-std::cos(theta)) - cc*std::sin(theta);
       const double m02 = bb*std::sin(theta) + aa*cc*(1-std::cos(theta));

@@ -78,6 +78,8 @@ class PNonlinear_NS_Solver
         PDNSolution * const &sol,
         const PDNSolution * const &velo_mesh,    
         const PDNSolution * const &disp_mesh,
+        const PDNSolution * const &mvelo_alpha,    
+        const PDNSolution * const &mdisp_alpha,  
         bool &conv_flag, int &nl_counter,
         Mat &shell ) const;
 

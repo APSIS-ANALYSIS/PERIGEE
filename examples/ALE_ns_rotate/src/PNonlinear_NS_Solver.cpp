@@ -76,6 +76,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PDNSolution * const &sol,
     const PDNSolution * const &velo_mesh,    
     const PDNSolution * const &disp_mesh,
+    const PDNSolution * const &mvelo_alpha,    
+    const PDNSolution * const &mdisp_alpha,    
     bool &conv_flag, int &nl_counter,
     Mat &shell ) const
 {
@@ -116,15 +118,15 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
 
-  // Define the velo_mesh at alpha_f: mvelo_alpha
-  PDNSolution mvelo_alpha(*pre_velo_mesh);
-  mvelo_alpha.ScaleValue( 1.0 - alpha_f );
-  mvelo_alpha.PlusAX( *velo_mesh, alpha_f );
+  // // Define the velo_mesh at alpha_f: mvelo_alpha
+  // PDNSolution mvelo_alpha(*pre_velo_mesh);
+  // mvelo_alpha.ScaleValue( 1.0 - alpha_f );
+  // mvelo_alpha.PlusAX( *velo_mesh, alpha_f );
 
-  // Define the disp_mesh at alpha_f: mdisp_alpha
-  PDNSolution mdisp_alpha(*pre_disp_mesh);
-  mdisp_alpha.ScaleValue( 1.0 - alpha_f );
-  mdisp_alpha.PlusAX( *disp_mesh, alpha_f );
+  // // Define the disp_mesh at alpha_f: mdisp_alpha
+  // PDNSolution mdisp_alpha(*pre_disp_mesh);
+  // mdisp_alpha.ScaleValue( 1.0 - alpha_f );
+  // mdisp_alpha.PlusAX( *disp_mesh, alpha_f );
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
@@ -135,11 +137,11 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // ------------------------------------------------- 
   // Update the inflow boundary values
   update_rotatedbc_value(rotnbc_part, velo_mesh, sol);
-  update_rotatedbc_value(rotnbc_part, &mvelo_alpha, &sol_alpha);
+  update_rotatedbc_value(rotnbc_part, mvelo_alpha, &sol_alpha);
   // ------------------------------------------------- 
 
-  SI_sol->update_node_mvelo(&mvelo_alpha);
-  SI_sol->update_node_mdisp(&mdisp_alpha);
+  SI_sol->update_node_mvelo(mvelo_alpha);
+  SI_sol->update_node_mdisp(mdisp_alpha);
   SI_sol->update_node_sol(&sol_alpha);
   SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements,
     quad_s, free_quad, itf_part, SI_sol);
@@ -154,7 +156,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol, 
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
    
@@ -176,7 +178,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
@@ -223,7 +225,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
           quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
@@ -242,7 +244,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
           quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 

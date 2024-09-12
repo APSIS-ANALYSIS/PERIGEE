@@ -23,9 +23,25 @@ class SI_rotation_info
       return angular_velo;
     }
 
+    double get_target_angular_velo(const double &time) const {return target_angular_velo;}
+
     Vector_3 get_point_rotated() const {return point_rotated;}
 
     Vector_3 get_direction_rotated() const {return direction_rotated;}
+
+    double get_thred_time() const {return thred_time;}
+
+    double get_rotated_theta(const double &time) const
+    {
+      double theta = 0.0;
+
+      if(time < thred_time)
+        theta = 0.5 * target_angular_velo * (time - thred_time*std::sin(MATH_T::PI * time / thred_time)/MATH_T::PI);
+      else
+        theta = 0.5 * target_angular_velo * (time - thred_time*std::sin(MATH_T::PI * time / thred_time)/MATH_T::PI) +  target_angular_velo * (time - thred_time);
+      
+      return theta;
+    }
     
   private:
     // Info of rotation axis
