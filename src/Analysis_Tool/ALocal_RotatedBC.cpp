@@ -53,17 +53,24 @@ ALocal_RotatedBC::ALocal_RotatedBC(
     local_cell_ien.clear();
   }
 
-  const std::vector<double> temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
+  if(num_local_node > 0)
+  {  
+    const std::vector<double> temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
 
-  ASSERT( VEC_T::get_size(temp_xyz) == num_local_node*3, "Error: ALocal_RotatedBC local_pt_xyz format is wrong.\n");
+    ASSERT( VEC_T::get_size(temp_xyz) == num_local_node*3, "Error: ALocal_RotatedBC local_pt_xyz format is wrong.\n");
 
-  local_pt_xyz = std::vector<Vector_3> (num_local_node, Vector_3{ 0, 0, 0 });
-    
-  for(int ii {0}; ii < num_local_node; ++ii)
-    local_pt_xyz[ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
+    local_pt_xyz = std::vector<Vector_3> (num_local_node, Vector_3{ 0, 0, 0 });
+      
+    for(int ii {0}; ii < num_local_node; ++ii)
+      local_pt_xyz[ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
 
-  local_node_pos = h5r->read_intVector( gname.c_str(), "local_node_pos" );
-
+    local_node_pos = h5r->read_intVector( gname.c_str(), "local_node_pos" );
+  }
+  else
+  {
+    local_pt_xyz.clear();
+    local_node_pos.clear();
+  }
 
   delete h5r; H5Fclose( file_id );    
 }

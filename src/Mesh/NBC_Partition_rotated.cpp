@@ -102,26 +102,35 @@ void NBC_Partition_rotated::write_hdf5( const std::string &FileName ) const
   HDF5_Writer * h5w = new HDF5_Writer(file_id);
 
   h5w->write_intScalar( g_id, "Num_LD", Num_LD );
-
-  h5w->write_intVector( g_id, "LDN", LDN );
+  
+  if( Num_LD > 0 )
+  {
+    h5w->write_intVector( g_id, "LDN", LDN );
+    
+    h5w->write_doubleVector( g_id, "LDN_pt_xyz", LDN_pt_xyz );
+  }
 
   h5w->write_intScalar( g_id, "num_local_node", num_local_node );
+
+  if( num_local_node > 0 )
+  {
+    h5w->write_doubleVector( g_id, "local_pt_xyz", local_pt_xyz );
+    
+    h5w->write_intVector( g_id, "local_node_pos", local_node_pos );
+    
+    h5w->write_intVector( g_id, "local_global_node", local_global_node );        
+  }
 
   h5w->write_intScalar( g_id, "num_local_cell", num_local_cell );
 
   h5w->write_intScalar( g_id, "cell_nLocBas", cell_nLocBas );
 
-  h5w->write_doubleVector( g_id, "local_pt_xyz", local_pt_xyz );
+  if( num_local_cell > 0 )
+  {  
+    h5w->write_intVector( g_id, "local_cell_ien", local_cell_ien );
 
-  h5w->write_doubleVector( g_id, "LDN_pt_xyz", LDN_pt_xyz );
-
-  h5w->write_intVector( g_id, "local_cell_ien", local_cell_ien );
-
-  h5w->write_intVector( g_id, "local_global_node", local_global_node );
-
-  h5w->write_intVector( g_id, "local_node_pos", local_node_pos );
-
-  h5w->write_intVector( g_id, "local_global_cell", local_global_cell );
+    h5w->write_intVector( g_id, "local_global_cell", local_global_cell );   
+  }
 
   delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
