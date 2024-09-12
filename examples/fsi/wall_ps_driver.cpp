@@ -24,6 +24,7 @@
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH11_ST91_Mixed.hpp"
 #include "MaterialModel_GOH11_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Mixed.hpp"
 #include "MaterialModel_Vorp03_ST91_Mixed.hpp"
 #include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
@@ -119,6 +120,7 @@ int main( int argc, char *argv[] )
   double ilt_nu = -1;
   double ilt_c1 = -1;
   double ilt_c2 = -1;
+  double deg_ratio = -1;
 
   // Initialize PETSc
 #if PETSC_VERSION_LT(3,19,0)
@@ -202,6 +204,7 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
   SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
   SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
+  SYS_T::GetOptionReal(  "-deg_ratio",         deg_ratio);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "part_v_file:",          part_v_file);
@@ -276,6 +279,7 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint("-ilt_nu", ilt_nu);
   SYS_T::cmdPrint("-ilt_c1", ilt_c1);
   SYS_T::cmdPrint("-ilt_c2", ilt_c2);
+  SYS_T::cmdPrint("-deg_ratio", deg_ratio);
 
   // ====== Record important parameters ======
   if(rank == 0)
@@ -404,8 +408,8 @@ int main( int argc, char *argv[] )
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IMaterialModel ** matmodel = new IMaterialModel* [num_layer+1];
-  IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer+1];
+  IMaterialModel ** matmodel = new IMaterialModel* [num_layer+2];
+  IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer+2];
 
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -430,7 +434,7 @@ int main( int argc, char *argv[] )
       }
       else
       {
-        matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( matmodel_file_name.c_str() );
+        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( matmodel_file_name.c_str() );
 
         locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
             matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
@@ -448,7 +452,7 @@ int main( int argc, char *argv[] )
       }
       else
       {
-        matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
+        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
 
         locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
@@ -464,22 +468,20 @@ int main( int argc, char *argv[] )
 
     HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
 
-    ilt_nu = model_h5r -> read_doubleScalar("/", "nu");
+    solid_nu[num_layer] = model_h5r -> read_doubleScalar("/", "nu");
 
     delete model_h5r; H5Fclose(model_file);
-      
-    if( ilt_nu == 0.5 )
+    
+    if( solid_nu[num_layer] == 0.5 )
     {
-      // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
-      matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( matmodel_file_name.c_str() );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
-      // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
-      matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( matmodel_file_name.c_str() );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
@@ -487,22 +489,70 @@ int main( int argc, char *argv[] )
   }
   else
   {
-    if( ilt_nu == 0.5 )
+    if( solid_nu[2] == 0.5 )
     {
-      // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
-      matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed(ilt_density, ilt_c1, ilt_c2);
+      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[2], deg_ratio*solid_mu[2],
+          solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
-      // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
-      matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed(ilt_density, ilt_E, ilt_nu,
-        ilt_c1, ilt_c2);
+      matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[2], deg_ratio*solid_E[2], solid_nu[2],
+          solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+  }
+  if( is_read_material )
+  {
+    std::string matmodel_file_name = "material_model_" + std::to_string(num_layer+1) + ".h5";
+      
+    hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+    HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
+
+    ilt_nu = model_h5r -> read_doubleScalar("/", "nu");
+
+    delete model_h5r; H5Fclose(model_file);
+      
+    if( ilt_nu == 0.5 )
+    {
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer+1] = new MaterialModel_Vorp03_Incompressible_Mixed( matmodel_file_name.c_str() );
+
+      locAssem_solid_ptr[num_layer+1] = new PLocAssem_2x2Block_VMS_Incompressible(
+          matmodel[num_layer+1], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer+1] = new MaterialModel_Vorp03_ST91_Mixed( matmodel_file_name.c_str() );
+
+      locAssem_solid_ptr[num_layer+1] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+          matmodel[num_layer+1], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+  }
+  else
+  {
+    if( ilt_nu == 0.5 )
+    {
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
+      matmodel[num_layer+1] = new MaterialModel_Vorp03_Incompressible_Mixed(ilt_density, ilt_c1, ilt_c2);
+
+      locAssem_solid_ptr[num_layer+1] = new PLocAssem_2x2Block_VMS_Incompressible(
+          matmodel[num_layer+1], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    }
+    else
+    {
+      // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
+      matmodel[num_layer+1] = new MaterialModel_Vorp03_ST91_Mixed(ilt_density, ilt_E, ilt_nu,
+        ilt_c1, ilt_c2);
+
+      locAssem_solid_ptr[num_layer+1] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+          matmodel[num_layer+1], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
   }
 
@@ -595,7 +645,7 @@ int main( int argc, char *argv[] )
   delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
   delete timeinfo; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  for (int ii = 0; ii<num_layer+1; ++ii)
+  for (int ii = 0; ii<num_layer+2; ++ii)
   {
     delete locAssem_solid_ptr[ii];
     delete matmodel[ii];

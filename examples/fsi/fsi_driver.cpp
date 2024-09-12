@@ -582,7 +582,7 @@ int main(int argc, char *argv[])
     }
     else
     {
-      matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
+      matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
 
       //matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
