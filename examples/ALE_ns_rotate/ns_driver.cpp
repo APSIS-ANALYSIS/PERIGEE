@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   int nl_threshold = 4;    // threshold of tangent matrix renewal
 
   // time stepping parameters
-  double initial_time = 0.0; // time of the initial condition
+  double initial_time = 0.1; // time of the initial condition
   double initial_step = 0.1; // time step size
   int initial_index = 0;     // indiex of the initial condition
   double final_time = 1.0;   // final time

@@ -178,8 +178,8 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
-  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  // NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
+  NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
   Interface_KG(0.1, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
@@ -369,8 +369,8 @@ void PGAssem_NS_FEM::Assem_residual(
   // BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // // Resistance type boundary condition
-  // NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-  //    nbc_part, ebc_part, gbc );
+  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -378,7 +378,7 @@ void PGAssem_NS_FEM::Assem_residual(
       lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   // For Poiseuille flow
-  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method
   Interface_G(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
@@ -485,8 +485,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // // Resistance type boundary condition
-  // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-  //    nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -494,7 +494,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   // For Poiseuille flow
-  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method (Only assemble G at present)
   Interface_KG(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
@@ -921,9 +921,9 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        Res[3*ii+0] = lassem_ptr->Residual[4*ii+1];
-        Res[3*ii+1] = lassem_ptr->Residual[4*ii+2];
-        Res[3*ii+2] = lassem_ptr->Residual[4*ii+3];
+        Res[3*ii+0] = lassem_ptr->sur_Residual[4*ii+1];
+        Res[3*ii+1] = lassem_ptr->sur_Residual[4*ii+2];
+        Res[3*ii+2] = lassem_ptr->sur_Residual[4*ii+3];
 
         srow_idx[3*ii+0] = dof_mat * nbc_part->get_LID(1, LSIEN[ii]) + 1;
         srow_idx[3*ii+1] = dof_mat * nbc_part->get_LID(2, LSIEN[ii]) + 2;
@@ -1028,9 +1028,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
       // Residual vector is scaled by the resistance value
       for(int ii=0; ii<snLocBas; ++ii)
       {
-        Res[3*ii+0] = resis_val * lassem_ptr->Residual[4*ii+1];
-        Res[3*ii+1] = resis_val * lassem_ptr->Residual[4*ii+2];
-        Res[3*ii+2] = resis_val * lassem_ptr->Residual[4*ii+3];
+        Res[3*ii+0] = resis_val * lassem_ptr->sur_Residual[4*ii+1];
+        Res[3*ii+1] = resis_val * lassem_ptr->sur_Residual[4*ii+2];
+        Res[3*ii+2] = resis_val * lassem_ptr->sur_Residual[4*ii+3];
       }
 
       for(int A=0; A<snLocBas; ++A)
@@ -1041,9 +1041,9 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
           for(int B=0; B<num_face_nodes; ++B)
           {
             // Residual[4*A+ii+1] is intNB[A]*out_n[ii]
-            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.x();
-            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.y();
-            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->Residual[4*A+ii+1] * intNB[B] * out_n.z();
+            Tan[temp_row + 3*B + 0] = coef * lassem_ptr->sur_Residual[4*A+ii+1] * intNB[B] * out_n.x();
+            Tan[temp_row + 3*B + 1] = coef * lassem_ptr->sur_Residual[4*A+ii+1] * intNB[B] * out_n.y();
+            Tan[temp_row + 3*B + 2] = coef * lassem_ptr->sur_Residual[4*A+ii+1] * intNB[B] * out_n.z();
           }
         }
       }
