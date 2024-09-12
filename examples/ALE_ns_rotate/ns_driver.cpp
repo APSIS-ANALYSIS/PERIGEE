@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
-  double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
+  double inflow_thd_time = 0.01; // prescribed time for inflow to reach steadness
   double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
 
   // Turbulence intensity for the purtabation at inlets, 3% ==> 0.03
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
   int nl_threshold = 4;    // threshold of tangent matrix renewal
 
   // time stepping parameters
-  double initial_time = 0.1; // time of the initial condition
+  double initial_time = 0.0; // time of the initial condition
   double initial_step = 0.1; // time step size
   int initial_index = 0;     // indiex of the initial condition
   double final_time = 1.0;   // final time
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 
   // Angular velocity
   double angular_velo = 2.0 * MATH_T::PI; //(rad/s)
-  double angular_thd_time = 0.5; // prescribed time for rotating part to reach angular velocity
+  double angular_thd_time = 0.1; // prescribed time for rotating part to reach angular velocity
 
   // Yaml options
   bool is_loadYaml = true;
