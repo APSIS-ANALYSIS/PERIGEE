@@ -489,18 +489,18 @@ int main( int argc, char *argv[] )
   }
   else
   {
-    if( solid_nu[2] == 0.5 )
+    if( solid_nu[1] == 0.5 )
     {
-      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[2], deg_ratio*solid_mu[2],
-          solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
+      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[1], deg_ratio*solid_mu[1],
+          solid_f1the[1], solid_f1phi[1], solid_f2the[1], solid_f2phi[1], deg_ratio*solid_fk1[1], solid_fk2[1], solid_fkd[1] );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
     }
     else
     {
-      matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[2], deg_ratio*solid_E[2], solid_nu[2],
-          solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
+      matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[1], deg_ratio*solid_E[1], solid_nu[1],
+          solid_f1the[1], solid_f1phi[1], solid_f2the[1], solid_f2phi[1], deg_ratio*solid_fk1[1], solid_fk2[1], solid_fkd[1] );
 
       locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );

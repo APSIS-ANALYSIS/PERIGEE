@@ -595,11 +595,11 @@ int main(int argc, char *argv[])
     matmodel[ii] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
   }
   SYS_T::commPrint("Material model of solid %d :\n", num_layer);
-  if( solid_nu[2] == 0.5 )
+  if( solid_nu[1] == 0.5 )
   {
-    matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[2], deg_ratio*solid_mu[2],
-        solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], 
-        deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
+    matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[1], deg_ratio*solid_mu[1],
+        solid_f1the[1], solid_f1phi[1], solid_f2the[1], solid_f2phi[1], 
+        deg_ratio*solid_fk1[1], solid_fk2[1], solid_fkd[1] );
   
     //matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
 
@@ -608,8 +608,8 @@ int main(int argc, char *argv[])
   }
   else
   {
-    matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[2], deg_ratio*solid_E[2], solid_nu[2],
-        solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
+    matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[1], deg_ratio*solid_E[1], solid_nu[1],
+        solid_f1the[1], solid_f1phi[1], solid_f2the[1], solid_f2phi[1], deg_ratio*solid_fk1[1], solid_fk2[1], solid_fkd[1] );
 
     //matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
