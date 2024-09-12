@@ -836,7 +836,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       }
       intep.interpolateVTKData( asize, ptOffset, inputInfo_p, elemptr, dataVecs[2] );
       
-      if( phy_tag == num_layer )
+      if( phy_tag == num_layer+1 )
       {
         // Interpolate von Mises stress
         interpolateVonStress( ptOffset, inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
