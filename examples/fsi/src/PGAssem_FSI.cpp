@@ -117,7 +117,7 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   const int nElem = alelem_ptr->get_nlocalele();
 
   lassem_f_ptr->Assem_Estimate();
-  for (int ii=0; ii<num_layer+1; ++ii)
+  for (int ii=0; ii<num_layer+2; ++ii)
     lassem_s_ptr[ii]->Assem_Estimate();
 
   PetscInt * row_id_v = new PetscInt [3*nLocBas];
@@ -243,7 +243,7 @@ void PGAssem_FSI::Assem_mass_residual(
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
     }
-    else if( phy_tag == num_layer)
+    else if( phy_tag == num_layer+1)
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
@@ -382,7 +382,7 @@ void PGAssem_FSI::Assem_Residual(
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
     }
-    else if( phy_tag == num_layer )
+    else if( phy_tag == num_layer+1 )
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
@@ -529,7 +529,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
     }
-    else if( phy_tag == num_layer )
+    else if( phy_tag == num_layer+1 )
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
