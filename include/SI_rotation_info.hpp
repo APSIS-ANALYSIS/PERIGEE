@@ -38,7 +38,7 @@ class SI_rotation_info
       if(time < thred_time)
         theta = 0.5 * target_angular_velo * (time - thred_time*std::sin(MATH_T::PI * time / thred_time)/MATH_T::PI);
       else
-        theta = 0.5 * target_angular_velo * (time - thred_time*std::sin(MATH_T::PI * time / thred_time)/MATH_T::PI) +  target_angular_velo * (time - thred_time);
+        theta = 0.5 * target_angular_velo * thred_time +  target_angular_velo * (time - thred_time);
       
       return theta;
     }
