@@ -135,7 +135,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // ------------------------------------------------- 
 
   // ------------------------------------------------- 
-  // Update the inflow boundary values
+  // Update the rotated boundary values
   update_rotatedbc_value(rotnbc_part, velo_mesh, sol);
   update_rotatedbc_value(rotnbc_part, mvelo_alpha, &sol_alpha);
   // ------------------------------------------------- 
