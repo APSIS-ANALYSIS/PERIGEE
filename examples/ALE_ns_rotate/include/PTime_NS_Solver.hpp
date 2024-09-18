@@ -46,7 +46,7 @@ class PTime_NS_Solver
         IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
-        const SI_rotation_info * const &si_ptr,
+        const SI_rotation_info * const &rot_info,
         SI_T::SI_solution * const &SI_sol,
         SI_T::SI_quad_point * const &SI_qp,
         const Matrix_PETSc * const &bc_mat,
@@ -88,11 +88,11 @@ class PTime_NS_Solver
         const std::string &solname ) const;
     
     //This func may be written into the SI_tools?
-    Vector_3 get_radius(const Vector_3 &coor, const SI_rotation_info * const &si_ptr) const 
+    Vector_3 get_radius(const Vector_3 &coor, const SI_rotation_info * const &rot_info) const 
     { 
-      const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
+      const Vector_3 direction_rotated = rot_info->get_direction_rotated();
       
-      const Vector_3 point_rotated = si_ptr->get_point_rotated();  
+      const Vector_3 point_rotated = rot_info->get_point_rotated();  
 
       // The vector from the rotation point to the input point
       const Vector_3 point_rotated_to_coor (coor.x() - point_rotated.x(), coor.y() - point_rotated.y(), coor.z() - point_rotated.z());
@@ -109,16 +109,16 @@ class PTime_NS_Solver
     // Get the current point coordinates for the case of rotation around x/y/z-axis
     Vector_3 get_currPts( const Vector_3 init_pt_xyz,
         const double &tt,
-        const SI_rotation_info * const &si_ptr,
+        const SI_rotation_info * const &rot_info,
         const int &type) const
     {
       double mag_angular_velo = 0.0; // (rad/s)
-      const double angular_velo = si_ptr->get_angular_velo();
-      const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
+      const double angular_velo = rot_info->get_angular_velo();
+      const Vector_3 direction_rotated = rot_info->get_direction_rotated();
 
       Vector_3 curr_pt_xyz(0, 0, 0);
 
-      const Vector_3 radius_pt = get_radius(init_pt_xyz, si_ptr);
+      const Vector_3 radius_pt = get_radius(init_pt_xyz, rot_info);
 
       const double rr = radius_pt.norm2();
       
@@ -166,11 +166,11 @@ class PTime_NS_Solver
     // [ -b*sin(theta) + a*c(1-cos(theta)), a*sin(theta) + b*c(1-cos(theta)), cos(theta) + c*c(1-cos(theta))    ]
     Vector_3 get_currPts(const Vector_3 init_pt_xyz,
         const double &tt,
-        const SI_rotation_info * const &si_ptr) const
+        const SI_rotation_info * const &rot_info) const
     {
-      const double angular_velo = si_ptr->get_angular_velo();
-      const Vector_3 direction_rotated = si_ptr->get_direction_rotated();
-      const Vector_3 point_rotated = si_ptr->get_point_rotated(); 
+      const double angular_velo = rot_info->get_angular_velo();
+      const Vector_3 direction_rotated = rot_info->get_direction_rotated();
+      const Vector_3 point_rotated = rot_info->get_point_rotated(); 
 
       const double aa = direction_rotated.x();
       const double bb = direction_rotated.y();       
