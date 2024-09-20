@@ -86,7 +86,6 @@ int main ( int argc , char * argv[] )
   double ilt_nu = -1;
   double ilt_c1 = -1;
   double ilt_c2 = -1;
-  double deg_ratio = -1;
 
   // Load analysis code parameter from solver_cmd.h5 file
   prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -151,7 +150,6 @@ int main ( int argc , char * argv[] )
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
   SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
   SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
-  SYS_T::GetOptionReal(  "-deg_ratio",         deg_ratio);
 
   // Correct time_step if it does not match with sol_rec_freq
   if( time_step % sol_rec_freq != 0 ) time_step = sol_rec_freq;
@@ -208,24 +206,23 @@ int main ( int argc , char * argv[] )
       std::string sl_fk2_name = "-sl_fk2_" + std::to_string(ii);
       std::string sl_fkd_name = "-sl_fkd_" + std::to_string(ii);
 
-      SYS_T::cmdPrint(  sl_density_name.c_str(), solid_density[ii]);
-      SYS_T::cmdPrint(  sl_E_name.c_str(),       solid_E[ii]);
-      SYS_T::cmdPrint(  sl_nu_name.c_str(),      solid_nu[ii]);
-      SYS_T::cmdPrint(  sl_mu_name.c_str(),      solid_mu[ii]);
-      SYS_T::cmdPrint(  sl_f1the_name.c_str(),   solid_f1the[ii]);
-      SYS_T::cmdPrint(  sl_f1phi_name.c_str(),   solid_f1phi[ii]);
-      SYS_T::cmdPrint(  sl_f2the_name.c_str(),   solid_f2the[ii]);
-      SYS_T::cmdPrint(  sl_f2phi_name.c_str(),   solid_f2phi[ii]);
-      SYS_T::cmdPrint(  sl_fk1_name.c_str(),     solid_fk1[ii]);
-      SYS_T::cmdPrint(  sl_fk2_name.c_str(),     solid_fk2[ii]);
-      SYS_T::cmdPrint(  sl_fkd_name.c_str(),     solid_fkd[ii]);
+      SYS_T::commPrint(  sl_density_name.c_str(), solid_density[ii]);
+      SYS_T::commPrint(  sl_E_name.c_str(),       solid_E[ii]);
+      SYS_T::commPrint(  sl_nu_name.c_str(),      solid_nu[ii]);
+      SYS_T::commPrint(  sl_mu_name.c_str(),      solid_mu[ii]);
+      SYS_T::commPrint(  sl_f1the_name.c_str(),   solid_f1the[ii]);
+      SYS_T::commPrint(  sl_f1phi_name.c_str(),   solid_f1phi[ii]);
+      SYS_T::commPrint(  sl_f2the_name.c_str(),   solid_f2the[ii]);
+      SYS_T::commPrint(  sl_f2phi_name.c_str(),   solid_f2phi[ii]);
+      SYS_T::commPrint(  sl_fk1_name.c_str(),     solid_fk1[ii]);
+      SYS_T::commPrint(  sl_fk2_name.c_str(),     solid_fk2[ii]);
+      SYS_T::commPrint(  sl_fkd_name.c_str(),     solid_fkd[ii]);
     }
     SYS_T::cmdPrint("-ilt_density", ilt_density);
     SYS_T::cmdPrint("-ilt_E", ilt_E);
     SYS_T::cmdPrint("-ilt_nu", ilt_nu);
     SYS_T::cmdPrint("-ilt_c1", ilt_c1);
     SYS_T::cmdPrint("-ilt_c2", ilt_c2);
-    SYS_T::cmdPrint("-deg_ratio", deg_ratio);
   }
   
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
@@ -269,7 +266,41 @@ int main ( int argc , char * argv[] )
   quad -> print_info();
 
   // material model
-  IMaterialModel ** matmodel = new IMaterialModel* [num_layer+2];
+  IMaterialModel ** matmodel = new IMaterialModel* [num_layer+1];
+  if( is_read_material )
+  {
+    std::string matmodel_file_name = "material_model_" + std::to_string(0) + ".h5";
+      
+    hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+    HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
+
+    solid_nu[0] = model_h5r -> read_doubleScalar("/", "nu");
+
+    delete model_h5r; H5Fclose(model_file);
+      
+    if( solid_nu[0] == 0.5 )
+    {
+      matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( matmodel_file_name.c_str() );
+    }
+    else
+    {
+      matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( matmodel_file_name.c_str() );
+    }
+  }
+  else
+  {
+    if( solid_nu[0] == 0.5 )
+    {
+      matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( solid_density[0], solid_mu[0],
+        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
+    }
+    else
+    {
+      matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( solid_density[0], solid_E[0], solid_nu[0],
+        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
+    }
+  }
   for(int ii=0; ii<num_layer; ++ii)
   {
     if( is_read_material )
@@ -291,7 +322,7 @@ int main ( int argc , char * argv[] )
       else
       {
         //matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
-        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( matmodel_file_name.c_str() );
+        matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( matmodel_file_name.c_str() );
       }
     }
     else
@@ -305,7 +336,7 @@ int main ( int argc , char * argv[] )
       {
         //matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
         //  solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
+        matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
       }
     }
@@ -313,43 +344,6 @@ int main ( int argc , char * argv[] )
   if( is_read_material )
   {
     std::string matmodel_file_name = "material_model_" + std::to_string(num_layer) + ".h5";
-
-    hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-
-    HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
-
-    solid_nu[num_layer] = model_h5r -> read_doubleScalar("/", "nu");
-
-    delete model_h5r; H5Fclose(model_file);
-
-    if( solid_nu[num_layer] == 0.5 )
-    {
-      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( matmodel_file_name.c_str() );
-    }
-    else
-    {
-      //matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
-      matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( matmodel_file_name.c_str() );
-    }
-  }
-  else
-  {
-    if( solid_nu[2] == 0.5 )
-    {
-      matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[2], deg_ratio*solid_mu[2],
-        solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
-    }
-    else
-    {
-        //matmodel = new MaterialModel_GOH06_ST91_Mixed( solid_density, solid_E, solid_nu,
-        //  solid_f1the, solid_f1phi, solid_f2the, solid_f2phi, solid_fk1, solid_fk2, solid_fkd );
-      matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[2], deg_ratio*solid_E[2], solid_nu[2],
-        solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
-    }
-  }
-  if( is_read_material )
-  {
-    std::string matmodel_file_name = "material_model_" + std::to_string(num_layer+1) + ".h5";
       
     hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
@@ -362,12 +356,12 @@ int main ( int argc , char * argv[] )
     if( ilt_nu == 0.5 )
     {
      // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( matmodel_file_name.c_str() );
-      matmodel[num_layer+1] = new MaterialModel_Vorp03_Incompressible_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed( matmodel_file_name.c_str() );
     }
     else
     {
       // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( matmodel_file_name.c_str() );
-      matmodel[num_layer+1] = new MaterialModel_Vorp03_ST91_Mixed( matmodel_file_name.c_str() );
+      matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed( matmodel_file_name.c_str() );
     }
   }
   else
@@ -375,12 +369,12 @@ int main ( int argc , char * argv[] )
     if( ilt_nu == 0.5 )
     {
       // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
-      matmodel[num_layer+1] = new MaterialModel_Vorp03_Incompressible_Mixed(ilt_density, ilt_c1, ilt_c2);
+      matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed(ilt_density, ilt_c1, ilt_c2);
     }
     else
     {
       // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
-      matmodel[num_layer+1] = new MaterialModel_Vorp03_ST91_Mixed(ilt_density, ilt_E, ilt_nu,
+      matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed(ilt_density, ilt_E, ilt_nu,
         ilt_c1, ilt_c2);
     }
   }
@@ -461,7 +455,7 @@ int main ( int argc , char * argv[] )
   delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
   delete [] pointArrays; delete vtk_w;
-  for (int ii = 0; ii<num_layer+2; ++ii)
+  for (int ii = 0; ii<num_layer+1; ++ii)
     delete matmodel[ii];
   delete [] matmodel;
   PetscFinalize();
