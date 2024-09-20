@@ -92,7 +92,7 @@ int main( int argc, char *argv[] )
 
   // Solid properties
   bool is_read_material = true;    // bool flag to decide if one wants to read material model from h5 file
-  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer+1);
+  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
     solid_density[ii] = -1.0;

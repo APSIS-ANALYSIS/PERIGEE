@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // solid properties
-  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer+1);
+  std::vector<double> solid_density(num_layer), solid_E(num_layer), solid_nu(num_layer);
   for(int ii=0; ii<num_layer; ++ii)
   {
     solid_density[ii] = -1.0;
