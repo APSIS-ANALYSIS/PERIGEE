@@ -111,6 +111,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/MaterialModel_GOH11_Incompressible_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH11_ST91_Mixed.cpp
   ${perigee_source}/Model/MaterialModel_GOH14_ST91_Mixed.cpp
+  ${perigee_source}/Model/MaterialModel_GOH14_ST91_Degradation.cpp
   ${perigee_source}/Model/Tissue_prestress.cpp
   ${perigee_source}/Model/Tissue_property.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
@@ -131,6 +132,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Incompressible.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Degradation.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Mesh.cpp
