@@ -83,7 +83,7 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
-  for (int ii=0; ii<num_layer+2; ++ii)
+  for (int ii=0; ii<num_layer+1; ++ii)
     lassem_s_ptr[ii]->Assem_Estimate();
 
   PetscInt * row_id_v = new PetscInt [3*nLocBas];
@@ -349,7 +349,7 @@ void PGAssem_Wall_Prestress::Assem_Residual(
 
     if( phy_tag>-1 )
     {
-      if( phy_tag == num_layer+1 )
+      if( phy_tag == num_layer )
       {
         const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
@@ -470,7 +470,7 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 
     if( phy_tag>-1 )
     {
-      if( phy_tag == num_layer+1 )
+      if( phy_tag == num_layer )
       {
         const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
@@ -563,7 +563,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
-      if( phy_tag == num_layer+1 )
+      if( phy_tag == num_layer )
       {
         const std::vector<Tensor2_3D> sigma = lassem_s_ptr[phy_tag] -> get_Wall_CauchyStress( &local_d[0], 
             &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
