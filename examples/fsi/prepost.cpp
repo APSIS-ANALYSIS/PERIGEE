@@ -44,7 +44,6 @@ int main( int argc, char * argv[] )
   const std::string geo_t_file = cmd_h5r -> read_string("/", "geo_t_file");
   const std::string sur_s_file_interior_wall_base = cmd_h5r -> read_string("/", "sur_s_file_interior_wall_base");
   const std::string sur_ilt_file_interior_wall = cmd_h5r-> read_string("/", "sur_ilt_file_interior_wall");
-  const std::string sur_deg_ring = cmd_h5r-> read_string("/", "sur_deg_ring");
   const int elemType = cmd_h5r -> read_intScalar("/","elemType");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
@@ -102,9 +101,9 @@ int main( int argc, char * argv[] )
   // interface wall node will be assgiend to nFunc_v + ii.
   // Read the F-S interface vtp file
   std::vector< std::string > sur_s_file_interior_wall_in( num_layer );
-  std::vector<std::vector<int>> wall_node_id( num_layer+2 );
-  std::vector<int> nFunc_interface( num_layer+2 );
-  std::vector<int> layer_offset( num_layer+2 );
+  std::vector<std::vector<int>> wall_node_id( num_layer+1 );
+  std::vector<int> nFunc_interface( num_layer+1 );
+  std::vector<int> layer_offset( num_layer+1 );
   int nFunc_p = nFunc_v;
   for(int ii=0; ii<num_layer; ++ii)
   {
@@ -119,16 +118,11 @@ int main( int argc, char * argv[] )
   }
   SYS_T::file_check( sur_ilt_file_interior_wall );
   std::cout<<sur_ilt_file_interior_wall<<" found. \n";
-  SYS_T::file_check( sur_deg_ring );
-  std::cout<<sur_deg_ring<<" found. \n";
-  wall_node_id[num_layer] = VTK_T::read_int_PointData( sur_deg_ring, "GlobalNodeID" );
+  wall_node_id[num_layer] = VTK_T::read_int_PointData( sur_ilt_file_interior_wall, "GlobalNodeID" );
   nFunc_interface[num_layer] = static_cast<int>( wall_node_id[num_layer].size() );
   nFunc_p += nFunc_interface[num_layer];
-  wall_node_id[num_layer+1] = VTK_T::read_int_PointData( sur_ilt_file_interior_wall, "GlobalNodeID" );
-  nFunc_interface[num_layer+1] = static_cast<int>( wall_node_id[num_layer+1].size() );
-  nFunc_p += nFunc_interface[num_layer+1];
   layer_offset[0] = 0;
-  for(int ii=1; ii<num_layer+2; ++ii)
+  for(int ii=1; ii<num_layer+1; ++ii)
   {
     layer_offset[ii] = layer_offset[ii-1] + nFunc_interface[ii-1];
   }
@@ -270,7 +264,7 @@ int main( int argc, char * argv[] )
   std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
   std::cout<<"Fluid-Solid interface: "<<nFunc_interface[0]<<" nodes.\n";
-  for(int ii=1; ii<num_layer+2; ++ii)
+  for(int ii=1; ii<num_layer+1; ++ii)
     std::cout<<"Solid"<<ii<<"-Solid"<<ii+1<<" interface: "<<nFunc_interface[ii]<<" nodes.\n";
 
   // --------------------------------------------------------------------------
