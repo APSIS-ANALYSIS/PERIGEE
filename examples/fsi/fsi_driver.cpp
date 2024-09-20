@@ -31,7 +31,6 @@
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH11_ST91_Mixed.hpp"
 #include "MaterialModel_GOH11_Incompressible_Mixed.hpp"
-#include "MaterialModel_GOH14_ST91_Mixed.hpp"
 #include "MaterialModel_Vorp03_ST91_Mixed.hpp"
 #include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
@@ -99,7 +98,6 @@ int main(int argc, char *argv[])
   double ilt_nu = -1;
   double ilt_c1 = -1;
   double ilt_c2 = -1;
-  double deg_ratio = -1;
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;
@@ -228,7 +226,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
   SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
   SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
-  SYS_T::GetOptionReal(  "-deg_ratio",         deg_ratio);
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
   SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
@@ -296,7 +293,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-ilt_nu", ilt_nu);
   SYS_T::cmdPrint("-ilt_c1", ilt_c1);
   SYS_T::cmdPrint("-ilt_c2", ilt_c2);
-  SYS_T::cmdPrint("-deg_ratio", deg_ratio);
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
 
@@ -383,7 +379,6 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "ilt_nu",          ilt_nu);
     cmdh5w->write_doubleScalar(  "ilt_c1",          ilt_c1);
     cmdh5w->write_doubleScalar(  "ilt_c2",          ilt_c2);
-    cmdh5w->write_doubleScalar(  "deg_ratio",       deg_ratio);
     cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
@@ -564,8 +559,8 @@ int main(int argc, char *argv[])
       tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
       fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
 
-  IMaterialModel ** matmodel = new IMaterialModel* [num_layer+2];
-  IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer+2];
+  IMaterialModel ** matmodel = new IMaterialModel* [num_layer+1];
+  IPLocAssem_2x2Block ** locAssem_solid_ptr = new IPLocAssem_2x2Block* [num_layer+1];
   
   for (int ii=0; ii<num_layer; ++ii)
   {
@@ -595,49 +590,25 @@ int main(int argc, char *argv[])
     matmodel[ii] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
   }
   SYS_T::commPrint("Material model of solid %d :\n", num_layer);
-  if( solid_nu[2] == 0.5 )
+  if( ilt_nu == 0.5 )
   {
-    matmodel[num_layer] = new MaterialModel_GOH06_Incompressible_Mixed( solid_density[2], deg_ratio*solid_mu[2],
-        solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], 
-        deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
-  
-    //matmodel = new MaterialModel_NeoHookean_Incompressible_Mixed( solid_density, solid_E );
+    // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
+    matmodel[num_layer] = new MaterialModel_Vorp03_Incompressible_Mixed( ilt_density, ilt_c1, ilt_c2 );
 
     locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Incompressible(
         matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
   else
   {
-    matmodel[num_layer] = new MaterialModel_GOH14_ST91_Mixed( solid_density[2], deg_ratio*solid_E[2], solid_nu[2],
-        solid_f1the[2], solid_f1phi[2], solid_f2the[2], solid_f2phi[2], deg_ratio*solid_fk1[2], solid_fk2[2], solid_fkd[2] );
-
-    //matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+    // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
+    matmodel[num_layer] = new MaterialModel_Vorp03_ST91_Mixed( ilt_density, ilt_E, ilt_nu,
+      ilt_c1, ilt_c2);
 
     locAssem_solid_ptr[num_layer] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
         matmodel[num_layer], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
   }
-  std::string matmodel_file_name = "material_model_" + std::to_string(num_layer) + ".h5";
-  matmodel[num_layer] -> write_hdf5(matmodel_file_name.c_str()); // record model parameter on disk
-  SYS_T::commPrint("Material model of solid %d :\n", num_layer+1);
-  if( ilt_nu == 0.5 )
-  {
-    // matmodel[num_layer] = new MaterialModel_NeoHookean_Incompressible_Mixed( ilt_density, ilt_E );
-    matmodel[num_layer+1] = new MaterialModel_Vorp03_Incompressible_Mixed( ilt_density, ilt_c1, ilt_c2 );
-
-    locAssem_solid_ptr[num_layer+1] = new PLocAssem_2x2Block_VMS_Incompressible(
-        matmodel[num_layer+1], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-  }
-  else
-  {
-    // matmodel[num_layer] = new MaterialModel_NeoHookean_M94_Mixed( ilt_density, ilt_E, ilt_nu );
-    matmodel[num_layer+1] = new MaterialModel_Vorp03_ST91_Mixed( ilt_density, ilt_E, ilt_nu,
-      ilt_c1, ilt_c2);
-
-    locAssem_solid_ptr[num_layer+1] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-        matmodel[num_layer+1], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
-  }
-  std::string matmodel_file_name_ILT = "material_model_" + std::to_string(num_layer+1) + ".h5";
-  matmodel[num_layer+1] -> write_hdf5(matmodel_file_name_ILT.c_str()); // record model parameter on disk
+  std::string matmodel_file_name_ILT = "material_model_" + std::to_string(num_layer) + ".h5";
+  matmodel[num_layer] -> write_hdf5(matmodel_file_name_ILT.c_str()); // record model parameter on disk
   
   // Pseudo elastic mesh motion
   IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
@@ -945,7 +916,7 @@ int main(int argc, char *argv[])
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 
   delete locIEN_v; delete locIEN_p; delete ps_data; delete tp_data;
-  for (int ii = 0; ii<num_layer+2; ++ii)
+  for (int ii = 0; ii<num_layer+1; ++ii)
   {
     delete locAssem_solid_ptr[ii];
     delete matmodel[ii];
