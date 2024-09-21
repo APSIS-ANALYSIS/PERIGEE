@@ -309,7 +309,7 @@ void MaterialModel_GOH14_ST91_Degradation::update_fibre_dir( const Vector_3 &bas
   a2 = a02(0) * basis_r + a02(1) * basis_c + a02(2) * basis_l;
 }
 
-void MaterialModel_GOH14_ST91_Degradation::updata_parameters( const double &degradation )
+void MaterialModel_GOH14_ST91_Degradation::update_parameters( const double &degradation )
 {
   mu = degradation * mu0;
   fk1 = degradation * fk10;
