@@ -221,7 +221,7 @@ class PLocAssem_2x2Block_VMS_Degradation : public IPLocAssem_2x2Block
     {
         double max_deg = 0.25;
         Vector_3 dist = coor - deg_center;
-        return max_deg*0.5*(std::tanh(deg_k*(dist.norm2()-deg_R))+1.0);
+        return (1.0-max_deg)*0.5*(std::tanh(deg_k*(dist.norm2()-deg_R))+1.0)+max_deg;
     }
 };
 

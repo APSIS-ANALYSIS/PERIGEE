@@ -201,7 +201,7 @@ class VTK_Writer_FSI
           double dist = std::sqrt((ectrl_x[ii]-deg_center_x)*(ectrl_x[ii]-deg_center_x)+
                                   (ectrl_y[ii]-deg_center_y)*(ectrl_y[ii]-deg_center_y)+
                                   (ectrl_z[ii]-deg_center_z)*(ectrl_z[ii]-deg_center_z));
-          degradation[ii] = max_deg*0.5*(std::tanh(deg_k*(dist-deg_R))+1.0);
+          degradation[ii] = (1.0-max_deg)*0.5*(std::tanh(deg_k*(dist-deg_R))+1.0)+max_deg;
         }
         return degradation;
     }
