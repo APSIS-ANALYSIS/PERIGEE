@@ -31,11 +31,14 @@
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH11_ST91_Mixed.hpp"
 #include "MaterialModel_GOH11_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Degradation.hpp"
 #include "MaterialModel_Vorp03_ST91_Mixed.hpp"
 #include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_2x2Block_VMS_Degradation.hpp"
 #include "PLocAssem_FSI_Mesh_Elastostatic.hpp"
 #include "PLocAssem_FSI_Mesh_Laplacian.hpp"
 #include "PGAssem_FSI.hpp"
@@ -98,6 +101,12 @@ int main(int argc, char *argv[])
   double ilt_nu = -1;
   double ilt_c1 = -1;
   double ilt_c2 = -1;
+
+  double deg_center_x = -1;
+  double deg_center_y = -1;
+  double deg_center_z = -1;
+  double deg_k = -1;
+  double deg_R = -1;
 
   // mesh motion elasticity solver parameters
   double mesh_E  = 1.0;
@@ -226,6 +235,11 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
   SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
   SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
+  SYS_T::GetOptionReal(  "-deg_center_x",      deg_center_x);
+  SYS_T::GetOptionReal(  "-deg_center_y",      deg_center_y);
+  SYS_T::GetOptionReal(  "-deg_center_z",      deg_center_z);
+  SYS_T::GetOptionReal(  "-deg_k",             deg_k);
+  SYS_T::GetOptionReal(  "-deg_R",             deg_R);
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
   SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
@@ -293,6 +307,11 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-ilt_nu", ilt_nu);
   SYS_T::cmdPrint("-ilt_c1", ilt_c1);
   SYS_T::cmdPrint("-ilt_c2", ilt_c2);
+  SYS_T::cmdPrint("-deg_center_x", deg_center_x);
+  SYS_T::cmdPrint("-deg_center_y", deg_center_y);
+  SYS_T::cmdPrint("-deg_center_z", deg_center_z);
+  SYS_T::cmdPrint("-deg_k", deg_k);
+  SYS_T::cmdPrint("-deg_R", deg_R);
   SYS_T::cmdPrint("-mesh_E:", mesh_E);
   SYS_T::cmdPrint("-mesh_nu:", mesh_nu);
 
@@ -379,6 +398,11 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "ilt_nu",          ilt_nu);
     cmdh5w->write_doubleScalar(  "ilt_c1",          ilt_c1);
     cmdh5w->write_doubleScalar(  "ilt_c2",          ilt_c2);
+    cmdh5w->write_doubleScalar(  "deg_center_x",    deg_center_x);
+    cmdh5w->write_doubleScalar(  "deg_center_y",    deg_center_y);
+    cmdh5w->write_doubleScalar(  "deg_center_z",    deg_center_z);
+    cmdh5w->write_doubleScalar(  "deg_k",           deg_k);
+    cmdh5w->write_doubleScalar(  "deg_R",           deg_R);
     cmdh5w->write_doubleScalar(  "mesh_E",          mesh_E);
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
@@ -577,13 +601,27 @@ int main(int argc, char *argv[])
     }
     else
     {
-      matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
+      if(ii!=1)
+      {
+        matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
           solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
 
       //matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
 
-      locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+        locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
           matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+      }
+      else
+      {
+        matmodel[ii] = new MaterialModel_GOH14_ST91_Degradation( solid_density[ii], solid_E[ii], solid_nu[ii],
+          solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
+
+      //matmodel = new MaterialModel_NeoHookean_M94_Mixed( solid_density, solid_E, solid_nu );
+
+        locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Degradation(
+          matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(),
+            deg_center_x, deg_center_y, deg_center_z, deg_k, deg_R );
+      } 
     }
 
     std::string matmodel_file_name = "material_model_" + std::to_string(ii) + ".h5";

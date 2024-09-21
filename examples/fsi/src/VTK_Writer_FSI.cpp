@@ -1,8 +1,17 @@
 #include "VTK_Writer_FSI.hpp"
 
 VTK_Writer_FSI::VTK_Writer_FSI( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file )
-: nLocBas(in_nlocbas), nElem(in_nelem)
+    const int &in_nlocbas, const std::string &epart_file,
+    const double &in_deg_center_x,
+    const double &in_deg_center_y,
+    const double &in_deg_center_z,
+    const double &in_deg_k,
+    const double &in_deg_R )
+: nLocBas(in_nlocbas), nElem(in_nelem),
+  deg_center_x(in_deg_center_x),
+  deg_center_y(in_deg_center_y),
+  deg_center_z(in_deg_center_z),
+  deg_k(in_deg_k), deg_R(in_deg_R)
 {
   VIS_T::read_epart( epart_file, nElem, epart_map );
 }
@@ -141,6 +150,67 @@ void VTK_Writer_FSI::interpolateVonStress( const int &ptoffset,
 }
 
 void VTK_Writer_FSI::interpolateVonStress( const int &ptoffset,
+    const std::vector<double> &degradation,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<double> &inputDisp,
+    const std::vector<double> &inputPres,
+    const FEAElement * const &elem,
+    IMaterialModel * const &model,
+    vtkDoubleArray * const &vtkData )
+{
+  // interpolate dispacment
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0), p (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputDisp[ii*3];
+    v[ii] = inputDisp[ii*3+1];
+    w[ii] = inputDisp[ii*3+2];
+    p[ii] = inputPres[ii];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  Interpolater intep( nLocBas );
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  const int nqp = elem->get_numQuapts();
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    // update fibre direction by the basis vector on an arbitrary node
+    model->update_fibre_dir(eleBasis_r[0], eleBasis_c[0], eleBasis_l[0]);
+    model->update_parameters(degradation[ii]);
+
+    // F
+    const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                        vx[ii],       vy[ii] + 1.0, vz[ii],
+                        wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    // Cauchy stress
+    Tensor2_3D sigma_d = model -> get_Cauchy_stress( F );
+
+    Tensor2_3D pres( -p[ii], 0.0, 0.0, 0.0, -p[ii], 0.0, 0.0, 0.0, -p[ii]);
+
+    Tensor2_3D sigma = sigma_d + pres;
+
+    // Principal stress
+    double eta1, eta2, eta3;
+    Vector_3 vec1, vec2, vec3, temp_vec;
+    const int num_dif_eigen = sigma.eigen_decomp(eta1, eta2, eta3, vec1, vec2, vec3);
+
+    double sigma_v = 0.5 * std::sqrt(2.0) * std::sqrt( (eta1 - eta2) * (eta1 - eta2)
+                    + (eta2 - eta3) * (eta2 - eta3) + (eta3 - eta1) * (eta3 - eta1) );
+
+    vtkData->InsertComponent( ptoffset+ii, 0, sigma_v );
+  }
+}
+
+void VTK_Writer_FSI::interpolateVonStress( const int &ptoffset,
     const std::vector<double> &inputDisp,
     const std::vector<double> &inputPres,
     const FEAElement * const &elem,
@@ -227,6 +297,64 @@ void VTK_Writer_FSI::interpolateCauchyStress( const int &ptoffset,
   {
     // update fibre direction by the basis vector on an arbitrary node
     model->update_fibre_dir(eleBasis_r[0], eleBasis_c[0], eleBasis_l[0]);
+
+    // F
+    const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
+                        vx[ii],       vy[ii] + 1.0, vz[ii],
+                        wx[ii],       wy[ii],       wz[ii] + 1.0 );
+
+    // Cauchy stress
+    Tensor2_3D sigma_d = model -> get_Cauchy_stress( F );
+
+    Tensor2_3D pres( -p[ii], 0.0, 0.0, 0.0, -p[ii], 0.0, 0.0, 0.0, -p[ii]);
+
+    Tensor2_3D sigma = sigma_d + pres;
+
+    vtkData->InsertComponent(ptoffset+ii, 0, sigma(0,0));
+    vtkData->InsertComponent(ptoffset+ii, 1, sigma(1,1));
+    vtkData->InsertComponent(ptoffset+ii, 2, sigma(2,2));
+    vtkData->InsertComponent(ptoffset+ii, 3, sigma(0,1));
+    vtkData->InsertComponent(ptoffset+ii, 4, sigma(0,2));
+    vtkData->InsertComponent(ptoffset+ii, 5, sigma(1,2));
+  }
+}
+
+void VTK_Writer_FSI::interpolateCauchyStress( const int &ptoffset,
+    const std::vector<double> &degradation,
+    const std::vector<Vector_3> &eleBasis_r,
+    const std::vector<Vector_3> &eleBasis_c,
+    const std::vector<Vector_3> &eleBasis_l,
+    const std::vector<double> &inputDisp,
+    const std::vector<double> &inputPres,
+    const FEAElement * const &elem,
+    IMaterialModel * const &model,
+    vtkDoubleArray * const &vtkData )
+{
+  // interpolate dispacment
+  std::vector<double> u (nLocBas, 0.0), v (nLocBas, 0.0), w (nLocBas, 0.0), p (nLocBas, 0.0);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    u[ii] = inputDisp[ii*3];
+    v[ii] = inputDisp[ii*3+1];
+    w[ii] = inputDisp[ii*3+2];
+    p[ii] = inputPres[ii];
+  }
+
+  std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
+
+  Interpolater intep( nLocBas );
+
+  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
+  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
+  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+
+  const int nqp = elem->get_numQuapts();
+  for(int ii=0; ii<nqp; ++ii)
+  {
+    // update fibre direction by the basis vector on an arbitrary node
+    model->update_fibre_dir(eleBasis_r[0], eleBasis_c[0], eleBasis_l[0]);
+    model->update_parameters(degradation[ii]);
 
     // F
     const Tensor2_3D F( ux[ii] + 1.0, uy[ii],       uz[ii],
@@ -787,6 +915,9 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
 
       fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0]);
 
+      // get the degradation
+      const std::vector<double> degradation = get_degradation(ectrl_x, ectrl_y, ectrl_z);
+
       // get fibre direction basis
       std::vector<Vector_3> ebasis_r(nLocBas);
       std::vector<Vector_3> ebasis_c(nLocBas);
@@ -846,13 +977,26 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       }
       else
       {
-        // Interpolate von Mises stress
-        interpolateVonStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
+        if(phy_tag != 1)
+        {
+          // Interpolate von Mises stress
+          interpolateVonStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
             inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
 
-        // Interpolate Cauchy stress
-        interpolateCauchyStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
+          // Interpolate Cauchy stress
+          interpolateCauchyStress( ptOffset, ebasis_r, ebasis_c, ebasis_l, 
             inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[5] );
+        }
+        else
+        {
+          // Interpolate von Mises stress
+          interpolateVonStress( ptOffset, degradation, ebasis_r, ebasis_c, ebasis_l, 
+            inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[4] );
+
+          // Interpolate Cauchy stress
+          interpolateCauchyStress( ptOffset, degradation, ebasis_r, ebasis_c, ebasis_l, 
+            inputInfo_d, inputInfo_p, elemptr, matmodel[phy_tag], dataVecs[5] );
+        }
       }
       
       // Interpolate the velocity vector

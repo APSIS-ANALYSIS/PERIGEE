@@ -18,6 +18,7 @@
 #include "MaterialModel_GOH06_ST91_Mixed.hpp"
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH14_ST91_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Degradation.hpp"
 #include "MaterialModel_NeoHookean_Incompressible_Mixed.hpp"
 #include "MaterialModel_NeoHookean_M94_Mixed.hpp"
 #include "MaterialModel_GOH11_ST91_Mixed.hpp"
@@ -94,6 +95,11 @@ int main ( int argc , char * argv[] )
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
   const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
+  const double deg_center_x = cmd_h5r -> read_doubleScalar("/", "deg_center_x");
+  const double deg_center_y = cmd_h5r -> read_doubleScalar("/", "deg_center_y");
+  const double deg_center_z = cmd_h5r -> read_doubleScalar("/", "deg_center_z");
+  const double deg_k = cmd_h5r -> read_doubleScalar("/", "deg_k");
+  const double deg_R = cmd_h5r -> read_doubleScalar("/", "deg_R");
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -267,40 +273,6 @@ int main ( int argc , char * argv[] )
 
   // material model
   IMaterialModel ** matmodel = new IMaterialModel* [num_layer+1];
-  if( is_read_material )
-  {
-    std::string matmodel_file_name = "material_model_" + std::to_string(0) + ".h5";
-      
-    hid_t model_file = H5Fopen(matmodel_file_name.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-
-    HDF5_Reader * model_h5r = new HDF5_Reader( model_file );
-
-    solid_nu[0] = model_h5r -> read_doubleScalar("/", "nu");
-
-    delete model_h5r; H5Fclose(model_file);
-      
-    if( solid_nu[0] == 0.5 )
-    {
-      matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( matmodel_file_name.c_str() );
-    }
-    else
-    {
-      matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( matmodel_file_name.c_str() );
-    }
-  }
-  else
-  {
-    if( solid_nu[0] == 0.5 )
-    {
-      matmodel[0] = new MaterialModel_GOH11_Incompressible_Mixed( solid_density[0], solid_mu[0],
-        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
-    }
-    else
-    {
-      matmodel[0] = new MaterialModel_GOH11_ST91_Mixed( solid_density[0], solid_E[0], solid_nu[0],
-        solid_f1the[0], solid_f1phi[0], solid_f2the[0], solid_f2phi[0], solid_fk1[0], solid_fkd[0] );
-    }
-  }
   for(int ii=0; ii<num_layer; ++ii)
   {
     if( is_read_material )
@@ -321,8 +293,14 @@ int main ( int argc , char * argv[] )
       }
       else
       {
-        //matmodel = new MaterialModel_GOH06_ST91_Mixed( "material_model.h5" );
-        matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( matmodel_file_name.c_str() );
+        if(ii!=1)
+        {
+          matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( matmodel_file_name.c_str() );
+        }
+        else
+        {
+          matmodel[ii] = new MaterialModel_GOH14_ST91_Degradation( matmodel_file_name.c_str());
+        }
       }
     }
     else
@@ -407,7 +385,8 @@ int main ( int argc , char * argv[] )
   pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
 
   VTK_Writer_FSI * vtk_w = new VTK_Writer_FSI( GMIptr_v->get_nElem(),
-      element->get_nLocBas(), element_part_file );  
+      element->get_nLocBas(), element_part_file,
+      deg_center_x, deg_center_y, deg_center_z, deg_k, deg_R );  
 
   std::ostringstream time_index;
 

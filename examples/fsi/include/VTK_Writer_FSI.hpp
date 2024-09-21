@@ -24,7 +24,12 @@ class VTK_Writer_FSI
   public:
     VTK_Writer_FSI( const int &in_nelem,
         const int &in_nlocbas, 
-        const std::string &epart_file );
+        const std::string &epart_file,
+        const double &in_deg_center_x,
+        const double &in_deg_center_y,
+        const double &in_deg_center_z,
+        const double &in_deg_k,
+        const double &in_deg_R );
 
     ~VTK_Writer_FSI();
 
@@ -102,6 +107,8 @@ class VTK_Writer_FSI
   private:
     const int nLocBas, nElem;
 
+    const double deg_center_x, deg_center_y, deg_center_z, deg_k, deg_R;
+
     std::vector<int> epart_map;
 
     // --------------------------------------------------------------
@@ -132,6 +139,18 @@ class VTK_Writer_FSI
         const FEAElement * const &elem,
         IMaterialModel * const &model,
         vtkDoubleArray * const &vtkData );
+
+    void interpolateVonStress( const int &ptoffset,
+        const std::vector<double> &degradation,
+	    const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l,
+        const std::vector<double> &inputDisp,
+        const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
+        vtkDoubleArray * const &vtkData );
+    
     
     void interpolateVonStress( const int &ptoffset,
         const std::vector<double> &inputDisp,
@@ -154,11 +173,38 @@ class VTK_Writer_FSI
         vtkDoubleArray * const &vtkData );
     
     void interpolateCauchyStress( const int &ptoffset,
+        const std::vector<double> &degradation,
+	    const std::vector<Vector_3> &eleBasis_r,
+        const std::vector<Vector_3> &eleBasis_c,
+        const std::vector<Vector_3> &eleBasis_l,
         const std::vector<double> &inputDisp,
         const std::vector<double> &inputPres,
         const FEAElement * const &elem,
         IMaterialModel * const &model,
         vtkDoubleArray * const &vtkData );
+    
+    void interpolateCauchyStress( const int &ptoffset,
+        const std::vector<double> &inputDisp,
+        const std::vector<double> &inputPres,
+        const FEAElement * const &elem,
+        IMaterialModel * const &model,
+        vtkDoubleArray * const &vtkData );
+
+    std::vector<double> get_degradation( const std::vector<double> &ectrl_x,
+        const std::vector<double> &ectrl_y,
+        const std::vector<double> &ectrl_z ) const
+    {
+        double max_deg = 0.25;
+        std::vector<double> degradation(nLocBas, 0.0);
+        for(int ii=0; ii<nLocBas; ++ii)
+        {
+          double dist = std::sqrt((ectrl_x[ii]-deg_center_x)*(ectrl_x[ii]-deg_center_x)+
+                                  (ectrl_y[ii]-deg_center_y)*(ectrl_y[ii]-deg_center_y)+
+                                  (ectrl_z[ii]-deg_center_z)*(ectrl_z[ii]-deg_center_z));
+          degradation[ii] = max_deg*0.5*(std::tanh(deg_k*(dist-deg_R))+1.0);
+        }
+        return degradation;
+    }
 };
 
 #endif

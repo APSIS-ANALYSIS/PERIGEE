@@ -70,7 +70,7 @@ class MaterialModel_GOH14_ST91_Degradation : public IMaterialModel
 
     virtual void update_fibre_dir( const Vector_3 &basis_r, const Vector_3 &basis_c, const Vector_3 &basis_l );
 
-    void updata_parameters( const double &degradation );
+    virtual void updata_parameters( const double &degradation );
 
   private:
     double rho0, E0, E, nu, lambda0, lambda, mu0, mu, kappa0, kappa;

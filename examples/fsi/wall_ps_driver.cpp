@@ -24,10 +24,13 @@
 #include "MaterialModel_GOH06_Incompressible_Mixed.hpp"
 #include "MaterialModel_GOH11_ST91_Mixed.hpp"
 #include "MaterialModel_GOH11_Incompressible_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Mixed.hpp"
+#include "MaterialModel_GOH14_ST91_Degradation.hpp"
 #include "MaterialModel_Vorp03_ST91_Mixed.hpp"
 #include "MaterialModel_Vorp03_Incompressible_Mixed.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_2x2Block_VMS_Degradation.hpp"
 #include "PTime_FSI_Solver.hpp"
 
 int main( int argc, char *argv[] )
@@ -120,6 +123,12 @@ int main( int argc, char *argv[] )
   double ilt_c1 = -1;
   double ilt_c2 = -1;
 
+  double deg_center_x = -1;
+  double deg_center_y = -1;
+  double deg_center_z = -1;
+  double deg_k = -1;
+  double deg_R = -1;
+
   // Initialize PETSc
 #if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -202,6 +211,11 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-ilt_nu",            ilt_nu);
   SYS_T::GetOptionReal(  "-ilt_c1",            ilt_c1);
   SYS_T::GetOptionReal(  "-ilt_c2",            ilt_c2);
+  SYS_T::GetOptionReal(  "-deg_center_x",      deg_center_x);
+  SYS_T::GetOptionReal(  "-deg_center_y",      deg_center_y);
+  SYS_T::GetOptionReal(  "-deg_center_z",      deg_center_z);
+  SYS_T::GetOptionReal(  "-deg_k",             deg_k);
+  SYS_T::GetOptionReal(  "-deg_R",             deg_R);
 
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint(      "part_v_file:",          part_v_file);
@@ -276,6 +290,11 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint("-ilt_nu", ilt_nu);
   SYS_T::cmdPrint("-ilt_c1", ilt_c1);
   SYS_T::cmdPrint("-ilt_c2", ilt_c2);
+  SYS_T::cmdPrint("-deg_center_x", deg_center_x);
+  SYS_T::cmdPrint("-deg_center_y", deg_center_y);
+  SYS_T::cmdPrint("-deg_center_z", deg_center_z);
+  SYS_T::cmdPrint("-deg_k", deg_k);
+  SYS_T::cmdPrint("-deg_R", deg_R);
 
   // ====== Record important parameters ======
   if(rank == 0)
@@ -448,11 +467,23 @@ int main( int argc, char *argv[] )
       }
       else
       {
-        matmodel[ii] = new MaterialModel_GOH06_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
-          solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
+        if(ii!=1)
+        {
+          matmodel[ii] = new MaterialModel_GOH14_ST91_Mixed( solid_density[ii], solid_E[ii], solid_nu[ii],
+            solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
 
-        locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+          locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Hyperelasticity(
             matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+        }
+        else
+        {
+          matmodel[ii] = new MaterialModel_GOH14_ST91_Degradation( solid_density[ii], solid_E[ii], solid_nu[ii],
+            solid_f1the[ii], solid_f1phi[ii], solid_f2the[ii], solid_f2phi[ii], solid_fk1[ii], solid_fk2[ii], solid_fkd[ii] );
+
+          locAssem_solid_ptr[ii] = new PLocAssem_2x2Block_VMS_Degradation(
+            matmodel[ii], tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(),
+              deg_center_x, deg_center_y, deg_center_z, deg_k, deg_R );
+        }
       }
     }
   }

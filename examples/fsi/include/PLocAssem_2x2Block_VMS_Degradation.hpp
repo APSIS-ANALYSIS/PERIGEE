@@ -22,7 +22,9 @@ class PLocAssem_2x2Block_VMS_Degradation : public IPLocAssem_2x2Block
         const int &in_nlocbas, const int &in_snlocbas,
         const double &in_deg_center_x,
         const double &in_deg_center_y,
-        const double &in_deg_center_z );
+        const double &in_deg_center_z,
+        const double &in_deg_k,
+        const double &in_deg_R );
 
     virtual ~PLocAssem_2x2Block_VMS_Degradation();
 
@@ -184,7 +186,7 @@ class PLocAssem_2x2Block_VMS_Degradation : public IPLocAssem_2x2Block
         const IQuadPts * const &quad ) const;
 
   private:
-    const double rho0, alpha_f, alpha_m, gamma;
+    const double rho0, alpha_f, alpha_m, gamma, deg_k, deg_R;
 
     const int nLocBas, snLocBas, vec_size_0, vec_size_1, sur_size_0;
 
@@ -218,10 +220,8 @@ class PLocAssem_2x2Block_VMS_Degradation : public IPLocAssem_2x2Block
     double get_degradation( const Vector_3 &coor ) const
     {
         double max_deg = 0.25;
-        double k = -10.0;
-        double R = 2.0;
-        Vector dist = coor - deg_center;
-        return max_deg*0.5*(std::tanh(k*(dist.norm2()-R))+1.0);
+        Vector_3 dist = coor - deg_center;
+        return max_deg*0.5*(std::tanh(deg_k*(dist.norm2()-deg_R))+1.0);
     }
 };
 

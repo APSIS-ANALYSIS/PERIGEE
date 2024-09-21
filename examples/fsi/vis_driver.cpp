@@ -143,7 +143,8 @@ int main( int argc, char * argv[] )
   pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
 
   VTK_Writer_FSI * vtk_w = new VTK_Writer_FSI( GMIptr_v->get_nElem(),
-      element->get_nLocBas(), element_part_file );
+      element->get_nLocBas(), element_part_file,
+      0.0, 0.0, 0.0, 0.0, 0.0 );
 
   std::ostringstream time_index;
 

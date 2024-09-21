@@ -207,6 +207,11 @@ class IMaterialModel
     {
       SYS_T::commPrint("Warning: IMaterialModel::update_fibre_dir() is not implemented. \n");
     }
+
+    virtual void update_parameters( const double &degradation )
+    {
+      SYS_T::commPrint("Warning: IMaterialModel::update_parameters() is not implemented. \n");
+    }
 };
 
 #endif

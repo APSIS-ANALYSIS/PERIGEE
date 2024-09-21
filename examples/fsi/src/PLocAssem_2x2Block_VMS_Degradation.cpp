@@ -6,10 +6,13 @@ PLocAssem_2x2Block_VMS_Degradation::PLocAssem_2x2Block_VMS_Degradation(
     const int &in_nlocbas, const int &in_snlocbas,
     const double &in_deg_center_x,
     const double &in_deg_center_y,
-    const double &in_deg_center_z )
+    const double &in_deg_center_z,
+    const double &in_deg_k,
+    const double &in_deg_R )
 : rho0( in_matmodel->get_elastic_rho0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
+  deg_k(in_deg_k), deg_R(in_deg_R),
   nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
   sur_size_0( snLocBas * 3 ),
@@ -214,7 +217,7 @@ void PLocAssem_2x2Block_VMS_Degradation::Assem_Residual(
     Tensor2_3D P_iso, S_iso;
     matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     const double degradation = get_degradation(coor);
-    matmodel->updata_parameters(degradation);
+    matmodel->update_parameters(degradation);
     matmodel->get_PK(F, P_iso, S_iso);
 
     // ------------------------------------------------------------------------
@@ -549,7 +552,7 @@ void PLocAssem_2x2Block_VMS_Degradation::Assem_Tangent_Residual(
     Tensor4_3D AA_iso;
     matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     const double degradation = get_degradation(coor);
-    matmodel->updata_parameters(degradation);
+    matmodel->update_parameters(degradation);
     matmodel->get_PK_FFStiffness(F, P_iso, S_iso, AA_iso);
     
     // ------------------------------------------------------------------------
@@ -1168,7 +1171,7 @@ void PLocAssem_2x2Block_VMS_Degradation::Assem_Mass_Residual(
     Tensor2_3D P_iso, S_iso;
     matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     const double degradation = get_degradation(coor);
-    matmodel->updata_parameters(degradation);
+    matmodel->update_parameters(degradation);
     matmodel->get_PK(F, P_iso, S_iso);
     
     // ------------------------------------------------------------------------
@@ -1496,7 +1499,7 @@ std::vector<Tensor2_3D> PLocAssem_2x2Block_VMS_Degradation::get_Wall_CauchyStres
 
     matmodel->update_fibre_dir(basis_r, basis_c, basis_l);
     const double degradation = get_degradation(coor);
-    matmodel->updata_parameters(degradation);
+    matmodel->update_parameters(degradation);
     stress[qua] = matmodel -> get_Cauchy_stress( F );
 
     stress[qua].xx() -= pp;
