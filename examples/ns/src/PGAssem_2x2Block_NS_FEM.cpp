@@ -4,7 +4,7 @@ PGAssem_2x2Block_NS_FEM::PGAssem_2x2Block_NS_FEM(
     IPLocAssem_2x2Block * const &locassem_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quads,
-    const IAGlobal_Mesh_Info * const &agmi_ptr,
+    const AGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &aien_ptr,
     const APart_Node * const &pnode_ptr,
