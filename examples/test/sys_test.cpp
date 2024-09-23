@@ -66,10 +66,10 @@
 
 int main(int argc, char *argv[])
 {
-	// HDF5_reader: new.h5
+	// ******************************** HDF5_reader: new.h5
 	hid_t prepcmd_file = H5Fopen("new.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+	HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
 	// read_intScalar
 	const int elemType = cmd_h5r -> read_intScalar("/Global_Mesh_Info","elemType");
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
 	// read_doubleVector
 	const std::vector<double> doubleVector = cmd_h5r -> 
-														read_doubleVector("/inflow/nbcid_0", "Outward_normal_vector");
+		read_doubleVector("/inflow/nbcid_0", "Outward_normal_vector");
 	std::cout << "read_doubleVector: " << '\n';
 	VEC_T::print(doubleVector, '\t');
 	for (const double num : doubleVector)
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
 	// read_intVector
 	const std::vector<int> intVector = cmd_h5r -> 
-												 read_intVector("/inflow/nbcid_0", "LDN");
+		read_intVector("/inflow/nbcid_0", "LDN");
 	std::cout << "read_intVector: " << '\n';
 	for(const int num : intVector)
 	{
@@ -112,21 +112,21 @@ int main(int argc, char *argv[])
 	// read_Vector_3
 	std::cout << "read_Vector_3: " << '\n';
 	const Vector_3	foo = cmd_h5r -> 
-												read_Vector_3("/inflow/nbcid_0", "Outward_normal_vector");
+		read_Vector_3("/inflow/nbcid_0", "Outward_normal_vector");
 
 	foo.print();
 	std::cout << '\n' << '\n';
 
 	// read_intMatrix
 	std::cout << "read_intMatrix:\n ";
-  int num_row, num_col;
-  const std::vector<int> LIEN_vec = cmd_h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
+	int num_row, num_col;
+	const std::vector<int> LIEN_vec = cmd_h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
 	VEC_T::print(LIEN_vec, '\t');
 
 	// read_doubleMatrix
 	std::cout << "read_doubleMatrix:\n ";
-  int num_row_d, num_col_d;
-  const std::vector<double> LIEN_vec_d = cmd_h5r -> read_doubleMatrix("LIEN", "LIEN", num_row_d, num_col_d);
+	int num_row_d, num_col_d;
+	const std::vector<double> LIEN_vec_d = cmd_h5r -> read_doubleMatrix("LIEN", "LIEN", num_row_d, num_col_d);
 	VEC_T::print(LIEN_vec_d, '\t');
 
 	// read_intScalar
@@ -147,36 +147,36 @@ int main(int argc, char *argv[])
 
 	delete cmd_h5r; H5Fclose( prepcmd_file );
 
-	// HDF5_writer: preprocessor_cmd.h5
-	
+	//********************************* HDF5_writer: preprocessor_cmd.h5
+
 	// file_id
 	hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+	HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
 	// Yaml options
-  const std::string yaml_file("ns_preprocess.yml");
+	const std::string yaml_file("ns_preprocess.yml");
 
-  // Check if the yaml file exist on disk
-  SYS_T::file_check(yaml_file);
+	// Check if the yaml file exist on disk
+	SYS_T::file_check(yaml_file);
 
-  YAML::Node paras = YAML::LoadFile( yaml_file );
+	YAML::Node paras = YAML::LoadFile( yaml_file );
 
 	const std::string geo_file          = paras["geo_file"].as<std::string>();
-  const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
+	const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
 
 	// write_string
-  cmdh5w -> write_string("geo_file", geo_file);
-	
-  // group_id: file
-  hid_t group_id = H5Gcreate( cmd_file_id, "/Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
+	cmdh5w -> write_string("geo_file", geo_file);
+
+	// group_id: file
+	hid_t group_id = H5Gcreate( cmd_file_id, "/Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
 	cmdh5w -> write_string(group_id, "sur_file_in_base", sur_file_in_base);
 
-  H5Gclose( group_id );
+	H5Gclose( group_id );
 
 	delete cmdh5w; H5Fclose( cmd_file_id );
 
-  return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 
 // EOF
