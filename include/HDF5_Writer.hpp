@@ -51,7 +51,7 @@ class HDF5_Writer
     // valid file_id. After the writing, the user is also responsible 
     // to call H5Fclose to close the h5 file.
     // --------------------------------------------------------------
-    HDF5_Writer( const hid_t &in_file_id );
+    HDF5_Writer( const hid_t &in_file_id ) : file_id(in_file_id) {}
     
     virtual ~HDF5_Writer() = default;
   
@@ -198,6 +198,9 @@ class HDF5_Writer
         exit( EXIT_FAILURE );
       }
     }
+
+    void write_string_impl(hid_t location_id, const char * const &data_name, 
+        const std::string& string_input ) const;
 };
 
 #endif

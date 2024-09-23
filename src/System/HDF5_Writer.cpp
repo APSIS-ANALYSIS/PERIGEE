@@ -1,22 +1,16 @@
 #include "HDF5_Writer.hpp"
 
-HDF5_Writer::HDF5_Writer( const hid_t &in_file_id )
-: file_id(in_file_id)
-{}
-
 void HDF5_Writer::write_intScalar( const hid_t &group_id,
     const char * const &data_name, const int &value ) const
 {
-  hid_t dataspace, dataset;
   hsize_t dims[1];
-  herr_t status;
   dims[0] = 1;
 
-  dataspace = H5Screate_simple(1, dims, NULL);
-  dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_INT,
-     dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_INT,
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
-  status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
       H5P_DEFAULT, &value );
 
   check_error(status, "write_intScalar");
@@ -28,16 +22,14 @@ void HDF5_Writer::write_intScalar( const hid_t &group_id,
 void HDF5_Writer::write_intScalar( const char * const &data_name,
     const int &value ) const
 {
-  hid_t dataspace, dataset;
   hsize_t dims[1];
-  herr_t status;
   dims[0] = 1;
 
-  dataspace = H5Screate_simple(1, dims, NULL);
-  dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_INT,
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_INT,
      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
-  status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
       H5P_DEFAULT, &value );
 
   check_error(status, "write_intScalar");
@@ -378,19 +370,16 @@ void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &dat
   const double val[3] = { value.x(), value.y(), value.z() };
 
   hsize_t dims[1]; dims[0] = 3;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace = H5Screate_simple(1, dims, NULL);
-    hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, &val[0] );
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+      H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_Vector_3");
+  check_error(status, "write_Vector_3");
 
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
 }
 
 void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 &value ) const
@@ -399,19 +388,16 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 
   const double val[3] = { value.x(), value.y(), value.z() };
 
   hsize_t dims[1]; dims[0] = 3;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace = H5Screate_simple(1, dims, NULL);
-    hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, &val[0] );
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+      H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_Vector_3");
+  check_error(status, "write_Vector_3");
 
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
 }
 
 void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
@@ -421,19 +407,16 @@ void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &d
   const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
 
   hsize_t dims[1]; dims[0] = 9;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace = H5Screate_simple(1, dims, NULL);
-    hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, &val[0] );
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+      H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_Tensor2_3D");
+  check_error(status, "write_Tensor2_3D");
 
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
 }
 
 void HDF5_Writer::write_Tensor2_3D( const char * const &data_name, const Tensor2_3D &value ) const
@@ -442,19 +425,16 @@ void HDF5_Writer::write_Tensor2_3D( const char * const &data_name, const Tensor2
   const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
 
   hsize_t dims[1]; dims[0] = 9;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace = H5Screate_simple(1, dims, NULL);
-    hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, &val[0] );
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+      H5P_DEFAULT, &val[0] );
 
-    check_error(status, "write_Tensor2_3D");
+  check_error(status, "write_Tensor2_3D");
 
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
 }
 
 void HDF5_Writer::write_intMatrix( const hid_t &group_id,
@@ -553,6 +533,27 @@ void HDF5_Writer::write_string( const hid_t &group_id,
       dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
   H5Dwrite( dataset, datatype, H5S_ALL, H5S_ALL,
       H5P_DEFAULT, &string_input[0] );
+
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
+  H5Tclose( datatype );
+}
+
+void HDF5_Writer::write_string_impl(hid_t location_id, 
+    const char * const &data_name,
+    const std::string& string_input ) const
+{
+  hsize_t dims[1] = { 1 };
+
+  hid_t datatype = H5Tcopy(H5T_C_S1);
+  H5Tset_size(datatype, string_input.size());
+
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+
+  hid_t dataset = H5Dcreate(location_id, data_name, datatype, 
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+
+  H5Dwrite(dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, string_input.data() );
 
   H5Dclose( dataset );
   H5Sclose( dataspace );

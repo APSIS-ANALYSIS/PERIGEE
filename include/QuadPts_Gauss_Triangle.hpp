@@ -27,23 +27,23 @@
 #include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
-class QuadPts_Gauss_Triangle : public IQuadPts
+class QuadPts_Gauss_Triangle final : public IQuadPts
 {
   public:
     QuadPts_Gauss_Triangle( const int &in_num_pts );
     
-    virtual ~QuadPts_Gauss_Triangle() = default;
+    ~QuadPts_Gauss_Triangle() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual int get_dim() const {return 3;}
+    int get_dim() const override {return 3;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return num_pts;}
 
-    virtual double get_qp(const int &ii, const int &comp) const
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(const int &ii) const
+    double get_qw(const int &ii) const override
     {return qw[ii];}
 
   private:
