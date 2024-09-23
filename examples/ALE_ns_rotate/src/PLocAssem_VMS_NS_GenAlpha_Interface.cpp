@@ -20,7 +20,7 @@ PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
   Residual_s = new PetscScalar[vec_size];
   Residual_r = new PetscScalar[vec_size];
 
-  Zero_Tangent_Residual_itf();
+  Zero_Residual_itf();
   Zero_Tangent_itf_MF();
 }
 
@@ -226,13 +226,13 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   }
 }
 
-void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
+void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
-  const double * const &rotated_local_mvelo)
+  const double * const &rotated_local_mvelo )
 {
-  Zero_Tangent_Residual_itf();
+  Zero_Tangent_itf_MF();
 
   double ps {0.0};
   double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
@@ -333,61 +333,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
     const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
 
     const int A4 = 4 * A;
-
-    // Mass -- s
-    Residual_s[A4] += -0.5 * gwts * NAs * velo_jump.dot_product(normal_s);
-
-    // x-dir -- s
-    Residual_s[A4+1] += gwts * (0.5 * ( NAs * (ps * nsx - vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
-      - pr * nrx + vis_mu * (2 * ur_x * nrx + (ur_y + vr_x) * nry + (ur_z + wr_x) * nrz))
-      - (2 * NAs_x * nsx + NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.x()
-      - NAs_y * nsx * vis_mu * velo_jump.y()
-      - NAs_z * nsx * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.x());
-
-    // y-dir -- s
-    Residual_s[A4+2] += gwts * (0.5 * ( NAs * (ps * nsy - vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      - pr * nry + vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
-      - NAs_x * nsy * vis_mu * velo_jump.x()
-      - (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.y()
-      - NAs_z * nsy * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.y());
-
-    // z-dir -- s
-    Residual_s[A4+3] += gwts * (0.5 * ( NAs * (ps * nsz - vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      - pr * nrz + vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
-      - NAs_x * nsz * vis_mu * velo_jump.x()
-      - NAs_y * nsz * vis_mu * velo_jump.y()
-      - (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.z());
-
-
-    // Mass -- r
-    Residual_r[A4] += 0.5 * gwts * NAr * velo_jump.dot_product(normal_r);
-
-    // x-dir -- r
-    Residual_r[A4+1] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsx + vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
-      + pr * nrx - vis_mu * (2 * ur_x * nrx + (ur_y + vr_x) * nry + (ur_z + wr_x) * nrz))
-      + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.x()
-      + NAr_y * nrx * vis_mu * velo_jump.y()
-      + NAr_z * nrx * vis_mu * velo_jump.z() )
-      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.x());
-
-    // y-dir -- r
-    Residual_r[A4+2] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsy + vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
-      + NAr_x * nry * vis_mu * velo_jump.x()
-      + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
-      + NAr_z * nrz * vis_mu * velo_jump.z() )
-      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.y());
-
-    // z-dir -- r
-    Residual_r[A4+3] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsz + vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      + pr * nrz - vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
-      + NAr_x * nrz * vis_mu * velo_jump.x()
-      + NAr_y * nrz * vis_mu * velo_jump.y()
-      + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * vis_mu * velo_jump.z() )
-      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.z());
 
     for(int B{0}; B<nLocBas; ++B)
     {
@@ -524,89 +469,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
         -0.5 * vis_mu * (NAr * (NBr_x * nrx + NBr_y * nry + 2 * NBr_z * nrz)
                       + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBr)
         + NArNBr * (tau_I + rho0 * (delta_r * velo_jump.z() * nrz - inflow_r)) );
-    }
-  }
-}
-
-void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF(
-  const int &qua, const double &fixed_qw, const double &dt,
-  const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
-  const double * const &fixed_local_sol, const double * const &rotated_local_sol,
-  const double * const &rotated_local_mvelo )
-{
-  Zero_Tangent_itf_MF();
-
-  double us {0.0}, vs {0.0}, ws {0.0};
-  double ur {0.0}, vr {0.0}, wr {0.0};
-
-  double mur {0.0}, mvr {0.0}, mwr{0.0};
-
-  std::vector<double> Ns(nLocBas, 0.0), dNs_dx(nLocBas, 0.0), dNs_dy(nLocBas, 0.0), dNs_dz(nLocBas, 0.0);
-  std::vector<double> Nr(nLocBas, 0.0), dNr_dx(nLocBas, 0.0), dNr_dy(nLocBas, 0.0), dNr_dz(nLocBas, 0.0);
-
-  fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
-  rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
-
-  double fixed_J {0.0}, rotated_J {0.0};
-  const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(0, rotated_J);
-
-  // Calculate h_b and tau_I
-  const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
-  const double h_s = get_h_b(s_dxi_dx, normal_s);
-
-  const auto r_dxi_dx = rotated_elementv -> get_invJacobian(0);
-  const double h_r = get_h_b(r_dxi_dx, normal_r);
-
-  const double tau_I = 0.5 * vis_mu * C_bI * (1.0 / h_s + 1.0 / h_r);
-
-  for(int ii{0}; ii<nLocBas; ++ii)
-  {
-    const int ii4{4 * ii};
-    const int ii3{3 * ii};
-
-    us += fixed_local_sol[ii4 + 1] * Ns[ii];
-    vs += fixed_local_sol[ii4 + 2] * Ns[ii];
-    ws += fixed_local_sol[ii4 + 3] * Ns[ii];
-
-    ur += rotated_local_sol[ii4 + 1] * Nr[ii];
-    vr += rotated_local_sol[ii4 + 2] * Nr[ii];
-    wr += rotated_local_sol[ii4 + 3] * Nr[ii];
-
-    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
-    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
-    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
-  }
-
-  // Mesh velocity in the quadrature point
-  const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
-
-  const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
-  const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
-  const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
-
-  double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
-
-  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-                     (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
-
-  const double gwts = fixed_J * fixed_qw;
-  const double dd_dv = alpha_f * gamma * dt;
-  const double common_coef = gwts * dd_dv;
-
-  for(int A{0}; A<nLocBas; ++A)
-  {
-    const double NAs {Ns[A]}, NAs_x {dNs_dx[A]}, NAs_y {dNs_dy[A]}, NAs_z {dNs_dz[A]};
-    const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
-
-    const int A4 = 4 * A;
-
-    for(int B{0}; B<nLocBas; ++B)
-    {
-      const double NBs {Ns[B]}, NBs_x {dNs_dx[B]}, NBs_y {dNs_dy[B]}, NBs_z {dNs_dz[B]};
-      const double NBr {Nr[B]}, NBr_x {dNr_dx[B]}, NBr_y {dNr_dy[B]}, NBr_z {dNr_dz[B]};
-
-      const int B4 = 4 * B, nLocBas4 = 4 * nLocBas;
 
       const double NAsNBr = NAs * NBr, NArNBs = NAr * NBs;
 

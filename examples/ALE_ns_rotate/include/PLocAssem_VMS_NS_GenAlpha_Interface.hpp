@@ -29,24 +29,12 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
 
     virtual void print_info() const;
 
-    virtual void Zero_Tangent_Residual_itf()
-    {
-      for(int ii{0}; ii<vec_size; ++ii)
-      {
-        Residual_s[ii] = 0.0;
-        Residual_r[ii] = 0.0;
-      }
-      for(int ii{0}; ii<vec_size*vec_size; ++ii)
-      {
-        Tangent_ss[ii] = 0.0;
-        Tangent_rr[ii] = 0.0;
-      }
-    }
-
     virtual void Zero_Tangent_itf_MF()
     {
       for(int ii{0}; ii<vec_size*vec_size; ++ii)
       {
+        Tangent_ss[ii] = 0.0;
+        Tangent_rr[ii] = 0.0;
         Tangent_sr[ii] = 0.0;
         Tangent_rs[ii] = 0.0;
       }
@@ -68,16 +56,6 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo);
-
-    virtual void Assem_Tangent_Residual_itf(
-      const int &fixed_qua,
-      const double &fixed_qw,
-      const double &dt,
-      const FEAElement * const &fixed_elementv,
-      const FEAElement * const &rotated_elementv,
-      const double * const &fixed_local_sol,
       const double * const &rotated_local_sol,
       const double * const &rotated_local_mvelo);
 
