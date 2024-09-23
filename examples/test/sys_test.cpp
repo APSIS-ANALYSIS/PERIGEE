@@ -66,89 +66,6 @@
 
 int main(int argc, char *argv[])
 {
-	// ******************************** HDF5_reader: new.h5
-	hid_t prepcmd_file = H5Fopen("new.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-
-	HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-
-	// read_intScalar
-	const int elemType = cmd_h5r -> read_intScalar("/Global_Mesh_Info","elemType");
-	std::cout << "read_intScalar: " << '\n';
-	std::cout << "elemType: " << elemType << '\n';
-	std::cout << '\n';
-
-	// check_data
-	const bool isTagged = cmd_h5r -> check_data("/Global_Mesh_Info/elemType");
-	std::cout << "check_data: " << '\n';
-	std::cout << isTagged << '\n';
-
-	// read_doubleScalar
-	const double Inflow_full_area = cmd_h5r -> read_doubleScalar("/inflow/nbcid_0", "Inflow_full_area");
-	std::cout << "read_doubleScalar: " << '\n';
-	std::cout << "Inflow_full_area: " << std::setprecision(17) << Inflow_full_area << '\n';
-	std::cout << '\n';
-
-	// read_doubleVector
-	const std::vector<double> doubleVector = cmd_h5r -> 
-		read_doubleVector("/inflow/nbcid_0", "Outward_normal_vector");
-	std::cout << "read_doubleVector: " << '\n';
-	VEC_T::print(doubleVector, '\t');
-	for (const double num : doubleVector)
-		std::cout << std::setprecision(1) << std::fixed <<  num << '\t';
-	std::cout << '\n' << '\n';
-
-	// read_intVector
-	const std::vector<int> intVector = cmd_h5r -> 
-		read_intVector("/inflow/nbcid_0", "LDN");
-	std::cout << "read_intVector: " << '\n';
-	for(const int num : intVector)
-	{
-		std::cout << num << '\t';
-		if(num == 82)
-			break;
-	}
-	std::cout << '\n' << '\n';
-
-	// read_Vector_3
-	std::cout << "read_Vector_3: " << '\n';
-	const Vector_3	foo = cmd_h5r -> 
-		read_Vector_3("/inflow/nbcid_0", "Outward_normal_vector");
-
-	foo.print();
-	std::cout << '\n' << '\n';
-
-	// read_intMatrix
-	std::cout << "read_intMatrix:\n ";
-	int num_row, num_col;
-	const std::vector<int> LIEN_vec = cmd_h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
-	VEC_T::print(LIEN_vec, '\t');
-
-	// read_doubleMatrix
-	std::cout << "read_doubleMatrix:\n ";
-	int num_row_d, num_col_d;
-	const std::vector<double> LIEN_vec_d = cmd_h5r -> read_doubleMatrix("LIEN", "LIEN", num_row_d, num_col_d);
-	VEC_T::print(LIEN_vec_d, '\t');
-
-	// read_intScalar
-	const int output = HDF5_T::read_intScalar("new.h5", "/Global_Mesh_Info", "elemType");
-	std::cout << "HDF_T::read_intScalar: " << '\n';
-	std::cout << output << '\n';
-
-	// read_intVector
-	const std::vector<int> foo_3 = HDF5_T::read_intVector("new.h5", "/inflow/nbcid_0", "LDN");
-	std::cout << "HDF_T::read_intVector: " << '\n';
-	for(const int num : intVector)
-	{
-		std::cout << num << '\t';
-		if(num == 82)
-			break;
-	}
-	std::cout << '\n';
-
-	delete cmd_h5r; H5Fclose( prepcmd_file );
-
-	//********************************* HDF5_writer: preprocessor_cmd.h5
-
 	// file_id
 	hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
@@ -164,19 +81,39 @@ int main(int argc, char *argv[])
 
 	const std::string geo_file          = paras["geo_file"].as<std::string>();
 	const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
+	const std::string part_file         = paras["part_file"].as<std::string>();
+	const int num_inlet                 = paras["num_inlet"].as<int>();
 
-	// write_string
-	cmdh5w -> write_string("geo_file", geo_file);
 
 	// group_id: file
-	hid_t group_id = H5Gcreate( cmd_file_id, "/Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
-	cmdh5w -> write_string(group_id, "sur_file_in_base", sur_file_in_base);
+	hid_t group_id_2 = H5Gcreate( cmd_file_id, "/ebc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
+	hid_t group_id_1 = H5Gcreate( cmd_file_id, "/Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
 
-	H5Gclose( group_id );
+	// HDF5_WRITE
+	// write_string
+	cmdh5w -> write_string("geo_file", geo_file);
+	cmdh5w -> write_string("part_file", part_file);
+	cmdh5w -> write_string(group_id_1, "sur_file_in_base", sur_file_in_base);
 
+	// write_intScalar
+	cmdh5w->write_intScalar("num_inlet", num_inlet);
+	cmdh5w->write_intScalar(group_id_1, "num_inlet", num_inlet);
+
+	// write_Tensor2_3D
+	const Tensor2_3D foo {};
+	cmdh5w -> write_Tensor2_3D(group_id_2, "foo", foo);
+	cmdh5w -> write_Tensor2_3D("foo", foo);
+
+	// HDF5_READER
+
+	HDF5_Reader * cmdh5r = new HDF5_Reader(cmd_file_id);
+	Tensor2_3D goo_1 = cmdh5r -> read_Tensor2_3D("/ebc", "foo");
+	goo_1.print();
+
+	H5Gclose( group_id_2); H5Gclose( group_id_1); 
+	delete cmdh5r; 
 	delete cmdh5w; H5Fclose( cmd_file_id );
 
 	return EXIT_SUCCESS;
 }
-
 // EOF
