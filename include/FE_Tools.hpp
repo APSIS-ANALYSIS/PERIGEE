@@ -247,7 +247,7 @@ namespace FE_T
   // This is a quadrature rule class that expresses a surface quadrature
   // rule on a face of a volume element, with higher-dimensional coordinates
   // ==================================================================
-  class QuadPts_on_face : public IQuadPts
+  class QuadPts_on_face final : public IQuadPts
   {
     public:
       // Input: \para vol_eleType     : the element type of the volume element
@@ -256,15 +256,15 @@ namespace FE_T
       QuadPts_on_face(const int &vol_elemType, const int &face_id, 
           const IQuadPts * const lower_quad_rule);
 
-      ~QuadPts_on_face() = default;
+      ~QuadPts_on_face() override = default;
 
-      virtual void print_info() const;
+      void print_info() const override;
 
-      virtual int get_dim() const {return dim;}
+      int get_dim() const override {return dim;}
 
-      virtual int get_num_quadPts() const {return num_pts;}
+      int get_num_quadPts() const override {return num_pts;}
 
-      virtual double get_qp(const int &ii, const int &comp) const
+      double get_qp(const int &ii, const int &comp) const override
       {return qp[dim * ii + comp];}
 
     private:
