@@ -25,22 +25,6 @@
 #include "ALocal_EBC.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
-#include "IQuadPts.hpp"
-#include "QuadPts_Gauss_1D.hpp"
-#include "QuadPts_Gauss_Hex.hpp"
-#include "QuadPts_Gauss_Quad.hpp"
-#include "QuadPts_Gauss_Tet.hpp"
-#include "QuadPts_Gauss_Triangle.hpp"
-#include "QuadPts_UserDefined_Triangle.hpp"
-#include "QuadPts_debug.hpp"
-#include "QuadPts_vis_hex27.hpp"
-#include "QuadPts_vis_hex8.hpp"
-#include "QuadPts_vis_quad4.hpp"
-#include "QuadPts_vis_quad9.hpp"
-#include "QuadPts_vis_tet10.hpp"
-#include "QuadPts_vis_tet10_v2.hpp"
-#include "QuadPts_vis_tet4.hpp"
-#include "QuadPts_vis_tri6.hpp"
 #include "FE_Tools.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Tet10_v2.hpp"
@@ -66,53 +50,119 @@
 
 int main(int argc, char *argv[])
 {
-	// file_id
+	SYS_T::execute("rm -rf part_p*.h5");
+	SYS_T::execute("rm -rf preprocess_cmd.h5");
+	
+	//*******************************************************HDF5_WRITER
 	hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+	hid_t group_id_1  = H5Gcreate(cmd_file_id, "/Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
 	HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
-	// Yaml options
-	const std::string yaml_file("ns_preprocess.yml");
+	const std::string geo_file { "SUSTech" };
+	const int num_inlet { 1 };
 
-	// Check if the yaml file exist on disk
-	SYS_T::file_check(yaml_file);
-
-	YAML::Node paras = YAML::LoadFile( yaml_file );
-
-	const std::string geo_file          = paras["geo_file"].as<std::string>();
-	const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
-	const std::string part_file         = paras["part_file"].as<std::string>();
-	const int num_inlet                 = paras["num_inlet"].as<int>();
-
-
-	// group_id: file
-	hid_t group_id_2 = H5Gcreate( cmd_file_id, "/ebc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
-	hid_t group_id_1 = H5Gcreate( cmd_file_id, "/Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
-
-	// HDF5_WRITE
 	// write_string
 	cmdh5w -> write_string("geo_file", geo_file);
-	cmdh5w -> write_string("part_file", part_file);
-	cmdh5w -> write_string(group_id_1, "sur_file_in_base", sur_file_in_base);
+	cmdh5w -> write_string(group_id_1, "geo_file", "geo_file");
 
 	// write_intScalar
-	cmdh5w->write_intScalar("num_inlet", num_inlet);
-	cmdh5w->write_intScalar(group_id_1, "num_inlet", num_inlet);
+	cmdh5w -> write_intScalar("num_inlet", num_inlet);
+	cmdh5w -> write_intScalar(group_id_1, "num_inlet", num_inlet);
+
+	// write_doubleScalar
+	const double doubleScalar = 1.2;
+	cmdh5w -> write_doubleScalar("doubleScalar", doubleScalar);
+	cmdh5w -> write_doubleScalar(group_id_1, "doubleScalar", doubleScalar);
+
+	// write_intVector
+	const std::vector<int> intVector {1, 2, 3};
+	cmdh5w -> write_intVector("intVector", intVector);
+
+	// write_doubleVector
+	const std::vector<double> doubleVector {1.0, 2.0, 3.0};
+	cmdh5w -> write_doubleVector("doubleVector", doubleVector);
+
+	// write_Vector_3
+	const Vector_3 vector_3 {};
+	cmdh5w -> write_Vector_3("Vector_3", vector_3);
+	cmdh5w -> write_Vector_3(group_id_1, "Vector_3", vector_3);
 
 	// write_Tensor2_3D
-	const Tensor2_3D foo {};
-	cmdh5w -> write_Tensor2_3D(group_id_2, "foo", foo);
-	cmdh5w -> write_Tensor2_3D("foo", foo);
+	Tensor2_3D tensor2_3D {};
+	cmdh5w -> write_Tensor2_3D("Tensor2_3D", tensor2_3D);
+	cmdh5w -> write_Tensor2_3D(group_id_1, "Tensor2_3D", tensor2_3D);
 
-	// HDF5_READER
+	// write_intMatrix
+	int num_row = 3, num_col = 3;
+	const std::vector<int> intMatrix = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	cmdh5w -> write_intMatrix(group_id_1, "intMatrix", intMatrix, num_row, num_col);
 
-	HDF5_Reader * cmdh5r = new HDF5_Reader(cmd_file_id);
-	Tensor2_3D goo_1 = cmdh5r -> read_Tensor2_3D("/ebc", "foo");
-	goo_1.print();
+	// write_doubleMatrix
+	std::vector<double> doubleMatrix = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+	cmdh5w -> write_doubleMatrix(group_id_1, "doubleMatrix", doubleMatrix, num_row, num_col);
+	
 
-	H5Gclose( group_id_2); H5Gclose( group_id_1); 
-	delete cmdh5r; 
-	delete cmdh5w; H5Fclose( cmd_file_id );
+	delete cmdh5w; H5Gclose( group_id_1 ); H5Fclose( cmd_file_id );
+
+	// *************************************************HDF5_READER
+	hid_t file_id = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
+	HDF5_Reader * cmdh5r = new HDF5_Reader(file_id);
+
+	// read_intScalar
+	const	int intScalar = cmdh5r -> read_intScalar("/Info", "num_inlet");
+	std::cout << "read_intScalar: " << intScalar << '\n';
+
+	// read_doubleScalar
+	const double doubleScalar_2 = cmdh5r -> read_doubleScalar("/", "doubleScalar");
+	std::cout << "read_doubleScalar: " << doubleScalar_2 << '\n';
+
+	// read_intVector
+	const std::vector<int> intVector_2 = cmdh5r -> read_intVector("/", "intVector");
+	std::cout << "read_intVector: ";
+	VEC_T::print(intVector_2);
+
+	// read_doubleVector
+	const std::vector<double> doubleVector_2 = cmdh5r -> read_doubleVector("/", "doubleVector");
+	std::cout << "read_doubleVector: "; 
+	VEC_T::print(doubleVector_2);
+
+	// read_Vector_3
+	const Vector_3 foo = cmdh5r -> read_Vector_3("/", "Vector_3");
+	std::cout << "read_Vector_3: ";
+	foo.print();
+
+	// read_Tensor2_3D
+	const Tensor2_3D foo_2 = cmdh5r -> read_Tensor2_3D("/", "Tensor2_3D");
+	std::cout << "read_Tensor2_3D: ";
+	foo_2.print();
+
+	// check_data
+	const bool foo_3 = cmdh5r -> check_data("Vector_3");
+	std::cout << "check_data: " << foo_3 << '\n'; 
+
+	// read_intMatrix
+	const std::vector<int> intMatrix_2 = cmdh5r -> read_intMatrix("/Info", "intMatrix", num_row, num_col);
+	VEC_T::print(intMatrix_2);
+
+	// read_doubleMatrix
+	const std::vector<double> doubleMatrix_2 = cmdh5r -> read_doubleMatrix("/Info", "doubleMatrix", num_row, num_col);
+	VEC_T::print(doubleMatrix_2);
+
+	// read_string
+	const std::string sustech = cmdh5r -> read_string("/", "geo_file");
+	std::cout << "read_string: " << sustech << '\n';
+
+	delete cmdh5r; 	H5Fclose( file_id );
+
+	//**********************************************HDF5_Tools.cpp
+	const int foo_4 = HDF5_T::read_intScalar("preprocessor_cmd.h5", "/", "num_inlet");
+	std::cout << "HDF5_T::read_intScalar: " << foo_4 << '\n';
+
+	const std::vector<int> foo_5 = HDF5_T::read_intVector("preprocessor_cmd.h5", "/", "Vector_3");
+	std::cout << "HDF5_T::read_intVector: ";
+	VEC_T::print(foo_5);
 
 	return EXIT_SUCCESS;
 }
