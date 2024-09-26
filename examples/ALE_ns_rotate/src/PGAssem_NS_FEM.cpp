@@ -49,6 +49,11 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &K);
 
+  const int n_L2proj_totalrow = SI_sol->get_num_all_fixed_node();
+  MatCreateAIJ(PETSC_COMM_WORLD, PETSC_DECIDE, PETSC_DECIDE, 
+    n_L2proj_totalrow, n_L2proj_totalrow,
+    dof_mat*in_nz_estimate, NULL, dof_mat*in_nz_estimate, NULL, &L2_proj_mat);
+
   // Allocate the vector G
   VecCreate(PETSC_COMM_WORLD, &G);
   VecSetSizes(G, nlocrow, PETSC_DECIDE);
@@ -56,6 +61,42 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   VecSetFromOptions(G);
   VecSet(G, 0.0);
   VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  VecCreate(PETSC_COMM_WORLD, &L2_proj_lhs);
+  VecSetSizes(L2_proj_lhs, PETSC_DECIDE, n_L2proj_totalrow);
+  VecSetFromOptions(L2_proj_lhs);
+  VecSet(L2_proj_lhs, 0.0);
+  VecSetOption(L2_proj_lhs, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+  
+  VecCreate(PETSC_COMM_WORLD, &L2_proj_sol);
+  VecSetSizes(L2_proj_sol, PETSC_DECIDE, n_L2proj_totalrow);
+  VecSetFromOptions(L2_proj_sol);
+  VecSet(L2_proj_sol, 0.0);
+  VecSetOption(L2_proj_sol, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  VecCreate(PETSC_COMM_WORLD, &L2_proj_sol_x);
+  VecSetSizes(L2_proj_sol_x, PETSC_DECIDE, n_L2proj_totalrow);
+  VecSetFromOptions(L2_proj_sol_x);
+  VecSet(L2_proj_sol_x, 0.0);
+  VecSetOption(L2_proj_sol_x, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  VecCreate(PETSC_COMM_WORLD, &L2_proj_sol_y);
+  VecSetSizes(L2_proj_sol_y, PETSC_DECIDE, n_L2proj_totalrow);
+  VecSetFromOptions(L2_proj_sol_y);
+  VecSet(L2_proj_sol_y, 0.0);
+  VecSetOption(L2_proj_sol_y, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  VecCreate(PETSC_COMM_WORLD, &L2_proj_sol_z);
+  VecSetSizes(L2_proj_sol_z, PETSC_DECIDE, n_L2proj_totalrow);
+  VecSetFromOptions(L2_proj_sol_z);
+  VecSet(L2_proj_sol_z, 0.0);
+  VecSetOption(L2_proj_sol_z, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  VecCreate(PETSC_COMM_WORLD, &L2_proj_mvelo);
+  VecSetSizes(L2_proj_mvelo, PETSC_DECIDE, n_L2proj_totalrow);
+  VecSetFromOptions(L2_proj_mvelo);
+  VecSet(L2_proj_mvelo, 0.0);
+  VecSetOption(L2_proj_mvelo, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
@@ -74,12 +115,21 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   // Create Mat with precise preallocation 
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+
+  Assem_L2_proj_mat(elementvs, elements, quads, part_itf, SI_sol);
 }
 
 PGAssem_NS_FEM::~PGAssem_NS_FEM()
 {
   VecDestroy(&G);
   MatDestroy(&K);
+  VecDestroy(&L2_proj_lhs);
+  VecDestroy(&L2_proj_sol);
+  VecDestroy(&L2_proj_sol_x);
+  VecDestroy(&L2_proj_sol_y);
+  VecDestroy(&L2_proj_sol_z);
+  VecDestroy(&L2_proj_mvelo);
+  MatDestroy(&L2_proj_mat);
 }
 
 void PGAssem_NS_FEM::EssBC_KG(
@@ -1459,7 +1509,7 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
       }
     }
-    delete local_X; local_X = nullptr;
+    delete [] local_X; local_X = nullptr;
   }
 
   VecAssemblyBegin(Y);
@@ -1509,6 +1559,296 @@ void PGAssem_NS_FEM::local_MatMult_MF(
 
   delete [] local_X; local_X = nullptr;
   delete [] local_dY; local_dY = nullptr;
+}
+
+void PGAssem_NS_FEM::Assem_L2_proj_mat(
+  FEAElement * const &fixed_elementv,
+  FEAElement * const &elements,
+  const IQuadPts * const &quad_s,
+  const ALocal_Interface * const &itf_part,
+  const SI_T::SI_solution * const &SI_sol )
+{
+  const int loc_dof {dof_mat * nLocBas};
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+
+  PetscScalar * mat_L2_proj = new PetscScalar[loc_dof * loc_dof];
+  PetscInt * row_index = new PetscInt[loc_dof];
+
+  const int num_itf {itf_part->get_num_itf()};
+
+  for(int itf_id{0}; itf_id<num_itf; ++itf_id)
+  {
+    const int num_fixed_elem = itf_part->get_num_fixed_ele(itf_id);
+
+    const int fixed_face_nqp {quad_s->get_num_quadPts()};
+
+    for(int ee{0}; ee<num_fixed_elem; ++ee)
+    {
+      itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
+
+      fixed_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
+
+      for(int dd=0; dd<loc_dof * loc_dof; ++dd)
+        mat_L2_proj[dd] = 0.0;
+
+      for(int qua{0}; qua<fixed_face_nqp; ++qua)
+      {
+        std::vector<double> R = fixed_elementv->get_R(qua);
+
+        const double gwts = fixed_elementv->get_detJac(qua) * quad_s->get_qw(qua);
+
+        for(int A=0; A<nLocBas; ++A)
+        {
+          const double NA = R[A];
+          for(int B=0; B<nLocBas; ++B)
+          {
+            const double NB = R[B];
+
+            mat_L2_proj[16*nLocBas*A+4*B] += gwts * NA * NB;
+
+            mat_L2_proj[4*nLocBas*(4*A+1)+4*B+1] += gwts * NA * NB;
+
+            mat_L2_proj[4*nLocBas*(4*A+2)+4*B+2] += gwts * NA * NB;
+
+            mat_L2_proj[4*nLocBas*(4*A+3)+4*B+3] += gwts * NA * NB;
+          }
+        }
+      }
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          const int node = itf_part->get_fixed_lien(itf_id, nLocBas * ee + ii);
+          row_index[dof_mat * ii + mm] = dof_mat * SI_sol->get_L2_proj_fixed_node_pos(itf_id, node) + mm;
+        }
+      }
+
+      MatSetValues(L2_proj_mat, loc_dof, row_index, loc_dof, row_index, mat_L2_proj, ADD_VALUES);
+    }
+  }
+
+  if(SYS_T::get_MPI_rank() == 0)
+  {
+    int num_inner = SI_sol->get_num_all_fixed_inner_node();
+    for(int ii=0; ii<num_inner; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+      {
+        const int row = dof_mat * SI_sol->get_fixed_inner_node(ii) + mm;
+        MatSetValue(K, row, row, 1.0, INSERT_VALUES);
+      }
+    }
+  }
+
+  MatAssemblyBegin(L2_proj_mat, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(L2_proj_mat, MAT_FINAL_ASSEMBLY);
+
+  delete [] row_index; row_index = nullptr;
+  delete [] mat_L2_proj; mat_L2_proj = nullptr;
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+}
+
+void PGAssem_NS_FEM::Assem_L2_proj_rhs(
+  FEAElement * const &fixed_elementv,
+  FEAElement * const &rotated_elementv,
+  FEAElement * const &elements,
+  const IQuadPts * const &quad_s,
+  IQuadPts * const &free_quad,
+  const ALocal_Interface * const &itf_part,
+  const SI_T::SI_solution * const &SI_sol,
+  const SI_T::SI_quad_point * const &SI_qp)
+{
+  Clear_L2_proj_rhs();
+
+  const int loc_dof {dof_mat * nLocBas};
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+
+  double * curPt_x = new double [nLocBas];
+  double * curPt_y = new double [nLocBas];
+  double * curPt_z = new double [nLocBas];
+
+  int * rotated_local_ien = new int [nLocBas];
+  double * rotated_local_sol = new double [nLocBas * dof_sol];
+  double * rotated_local_mvelo = new double [nLocBas * 3];
+  double * rotated_local_disp = new double [nLocBas * 3];
+
+  PetscScalar * res_L2_proj_sol = new PetscScalar[loc_dof];
+  PetscScalar * res_L2_proj_sol_x = new PetscScalar[loc_dof];
+  PetscScalar * res_L2_proj_sol_y = new PetscScalar[loc_dof];
+  PetscScalar * res_L2_proj_sol_z = new PetscScalar[loc_dof];
+  PetscScalar * res_L2_proj_mvelo = new PetscScalar[loc_dof];
+  PetscInt * row_index = new PetscInt[loc_dof];
+
+  const int num_itf {itf_part->get_num_itf()};
+
+  int ele_tag {-1};
+  int rotated_ee {-1};
+  double rotated_xi {1.0 / 3.0};
+  double rotated_eta {1.0 / 3.0};
+
+  for(int itf_id{0}; itf_id<num_itf; ++itf_id)
+  {
+    const int num_fixed_elem = itf_part->get_num_fixed_ele(itf_id);
+
+    const int fixed_face_nqp {quad_s->get_num_quadPts()};
+
+    for(int ee{0}; ee<num_fixed_elem; ++ee)
+    {
+      itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
+
+      fixed_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
+
+      for(int dd=0; dd<loc_dof; ++dd)
+      {
+        res_L2_proj_sol[dd] = 0.0;
+        res_L2_proj_sol_x[dd] = 0.0;
+        res_L2_proj_sol_y[dd] = 0.0;
+        res_L2_proj_sol_z[dd] = 0.0;
+        res_L2_proj_mvelo[dd] = 0.0;
+      }
+
+      for(int qua{0}; qua<fixed_face_nqp; ++qua)
+      {
+        SI_qp->get_curr(itf_id, ee, qua, ele_tag, rotated_ee, rotated_xi, rotated_eta);
+
+        const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ele_tag, rotated_ee)};
+
+        itf_part->get_rotated_ele_ctrlPts(itf_id, ele_tag, rotated_ee, ctrl_x, ctrl_y, ctrl_z);
+
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+        free_quad->set_qp( rotated_xi, rotated_eta );
+
+        rotated_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
+
+        SI_sol->get_rotated_local(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_sol);
+        SI_sol->get_rotated_mvelo(itf_part, itf_id, ele_tag, rotated_ee, rotated_local_ien, rotated_local_mvelo);
+
+        const double gwts = fixed_elementv->get_detJac(qua) * quad_s->get_qw(qua);
+
+        std::vector<double> Ns = fixed_elementv->get_R(qua);
+
+        std::vector<double> Nr(nLocBas, 0.0), dNr_dx(nLocBas, 0.0), dNr_dy(nLocBas, 0.0), dNr_dz(nLocBas, 0.0);
+
+        double pr {0.0};
+        double ur {0.0}, ur_x {0.0}, ur_y {0.0}, ur_z {0.0};
+        double vr {0.0}, vr_x {0.0}, vr_y {0.0}, vr_z {0.0};
+        double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
+        double mur {0.0}, mvr {0.0}, mwr{0.0};
+
+        for(int ii=0; ii<nLocBas; ++ii)
+        {
+          const int ii4{4 * ii};
+          const int ii3{3 * ii};
+
+          pr += rotated_local_sol[ii4 + 0] * Nr[ii];
+          ur += rotated_local_sol[ii4 + 1] * Nr[ii];
+          vr += rotated_local_sol[ii4 + 2] * Nr[ii];
+          wr += rotated_local_sol[ii4 + 3] * Nr[ii];
+
+          mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
+          mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
+          mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
+
+          ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
+          ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
+          ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
+
+          vr_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
+          vr_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
+          vr_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
+
+          wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
+          wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
+          wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
+        }
+
+        for(int A=0; A<nLocBas; ++A)
+        {
+          const double NA = Ns[A];
+          const int A4 = 4 * A;
+
+          res_L2_proj_sol[A4] += gwts * NA * pr;
+          res_L2_proj_sol[A4+1] += gwts * NA * ur;
+          res_L2_proj_sol[A4+2] += gwts * NA * vr;
+          res_L2_proj_sol[A4+3] += gwts * NA * wr;
+
+          res_L2_proj_sol_x[A4+1] += gwts * NA * ur_x;
+          res_L2_proj_sol_x[A4+2] += gwts * NA * vr_x;
+          res_L2_proj_sol_x[A4+3] += gwts * NA * wr_x;
+
+          res_L2_proj_sol_y[A4+1] += gwts * NA * ur_y;
+          res_L2_proj_sol_y[A4+2] += gwts * NA * vr_y;
+          res_L2_proj_sol_y[A4+3] += gwts * NA * wr_y;
+
+          res_L2_proj_sol_z[A4+1] += gwts * NA * ur_z;
+          res_L2_proj_sol_z[A4+2] += gwts * NA * vr_z;
+          res_L2_proj_sol_z[A4+3] += gwts * NA * wr_z;
+
+          res_L2_proj_mvelo[A4+1] += gwts * NA * mur;
+          res_L2_proj_mvelo[A4+2] += gwts * NA * mvr;
+          res_L2_proj_mvelo[A4+3] += gwts * NA * mwr;
+        }
+      }
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat; ++mm)
+        {
+          const int node = itf_part->get_fixed_lien(itf_id, nLocBas * ee + ii);
+          row_index[dof_mat * ii + mm] = dof_mat * SI_sol->get_L2_proj_fixed_node_pos(itf_id, node) + mm;
+        }
+      }
+
+      VecSetValues(L2_proj_sol, loc_dof, row_index, res_L2_proj_sol, ADD_VALUES);
+      VecSetValues(L2_proj_sol_x, loc_dof, row_index, res_L2_proj_sol_x, ADD_VALUES);
+      VecSetValues(L2_proj_sol_y, loc_dof, row_index, res_L2_proj_sol_y, ADD_VALUES);
+      VecSetValues(L2_proj_sol_z, loc_dof, row_index, res_L2_proj_sol_z, ADD_VALUES);
+      VecSetValues(L2_proj_mvelo, loc_dof, row_index, res_L2_proj_mvelo, ADD_VALUES);
+    }
+  }
+
+  VecAssemblyBegin(L2_proj_sol);
+  VecAssemblyEnd(L2_proj_sol);
+
+  VecAssemblyBegin(L2_proj_sol_x);
+  VecAssemblyEnd(L2_proj_sol_x);
+
+  VecAssemblyBegin(L2_proj_sol_y);
+  VecAssemblyEnd(L2_proj_sol_y);
+
+  VecAssemblyBegin(L2_proj_sol_z);
+  VecAssemblyEnd(L2_proj_sol_z);
+
+  VecAssemblyBegin(L2_proj_mvelo);
+  VecAssemblyEnd(L2_proj_mvelo);
+
+  delete [] rotated_local_ien; rotated_local_ien = nullptr;
+  delete [] rotated_local_sol; rotated_local_sol = nullptr;
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
+
+  delete [] row_index; row_index = nullptr;
+  delete [] res_L2_proj_sol; res_L2_proj_sol = nullptr;
+  delete [] res_L2_proj_sol_x; res_L2_proj_sol_x = nullptr;
+  delete [] res_L2_proj_sol_y; res_L2_proj_sol_y = nullptr;
+  delete [] res_L2_proj_sol_z; res_L2_proj_sol_z = nullptr;
+  delete [] res_L2_proj_mvelo; res_L2_proj_mvelo = nullptr;
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
 }
 
 // EOF

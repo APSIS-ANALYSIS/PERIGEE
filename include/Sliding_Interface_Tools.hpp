@@ -109,6 +109,26 @@ namespace SI_T
         }
       }
 
+      int get_num_all_fixed_node() const
+      {
+        return num_all_fixed_node;
+      }
+
+      int get_L2_proj_fixed_node_pos(const int &ii, const int &jj) const
+      {
+        return L2_proj_fixed_node_pos[ii][jj];
+      }
+
+      int get_num_all_fixed_inner_node() const
+      {
+        return num_all_fixed_inner_node;
+      }
+
+      int get_fixed_inner_node(const int &ii) const
+      {
+        return all_fixed_inner_node[ii];
+      }
+
     private:
       const int cpu_rank;
       int nLocBas, dof_sol;
@@ -120,6 +140,21 @@ namespace SI_T
       // stores the pressure and velocity info of the nodes from the fixed volume elements
       // size: num_itf x (4 x num_fixed_node[ii])
       std::vector<std::vector<double>> fixed_node_sol;
+
+      std::vector<std::vector<double>> f_r_node_sol;
+      std::vector<std::vector<double>> f_r_node_sol_x;
+      std::vector<std::vector<double>> f_r_node_sol_y;
+      std::vector<std::vector<double>> f_r_node_sol_z;
+      
+      std::vector<std::vector<double>> f_r_node_mvelo;
+
+      std::vector<std::vector<int>> L2_proj_fixed_node_pos;
+
+      int num_all_fixed_node;
+
+      int num_all_fixed_inner_node;
+
+      std::vector<int> all_fixed_inner_node;
     
       // stores the partition tag of the nodes from the rotated volume elements
       // size: num_itf x num_fixed_node[ii]

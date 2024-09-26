@@ -17,6 +17,18 @@ namespace SI_T
 
     num_fixed_node.assign(num_itf, 0);
     fixed_node_sol.resize(num_itf);
+
+    f_r_node_sol.resize(num_itf);
+    f_r_node_sol_x.resize(num_itf);
+    f_r_node_sol_y.resize(num_itf);
+    f_r_node_sol_z.resize(num_itf);
+
+    f_r_node_mvelo.resize(num_itf);
+
+    L2_proj_fixed_node_pos.resize(num_itf);
+    num_all_fixed_node = h5r -> read_intScalar( gname.c_str(), "num_all_fixed_node" );
+    all_fixed_inner_node = h5r -> read_intVector( gname.c_str(), "all_fixed_inner_node" );
+    num_all_fixed_inner_node = VEC_T::get_size(all_fixed_inner_node);
     fixed_node_part_tag.resize(num_itf);
     fixed_node_loc_pos.resize(num_itf);
 
@@ -42,6 +54,16 @@ namespace SI_T
       num_fixed_node[ii] = VEC_T::get_size(h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_map" ));
 
       fixed_node_sol[ii] = std::vector<double> (dof_sol * num_fixed_node[ii], 0.0);
+
+      f_r_node_sol[ii] = std::vector<double> (dof_sol * num_fixed_node[ii], 0.0);
+
+      f_r_node_sol_x[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
+      f_r_node_sol_y[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
+      f_r_node_sol_z[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
+
+      f_r_node_mvelo[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
+
+      L2_proj_fixed_node_pos[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "L2_proj_fixed_node_pos" );
 
       fixed_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_part_tag" );
 

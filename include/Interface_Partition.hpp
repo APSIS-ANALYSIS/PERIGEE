@@ -98,6 +98,14 @@ class Interface_Partition
 
     // // stores the interval tag of each element of the rotated interface
     std::vector<std::vector<int>> rotated_interval_tag;
+
+    int num_all_fixed_node;
+
+    std::vector<int> all_fixed_global_node;
+
+    std::vector<int> all_fixed_inner_node;
+
+    std::vector<std::vector<int>> L2_proj_fixed_node_pos;
 };
 
 #endif

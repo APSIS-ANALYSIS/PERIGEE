@@ -46,49 +46,74 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
     std::string subgroup_name(groupbase);
     subgroup_name.append( std::to_string(ii) );
 
-    fixed_ele_face_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_face_id" );
-
-    fixed_ele_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_tag" );
-
-    fixed_lien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_ien" );
-
-    fixed_pt_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "fixed_pt_xyz" );
-
-    fixed_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_map" );
-
-    fixed_LID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "fixed_LID" );
-
-    num_fixed_node[ii] = VEC_T::get_size(fixed_node_id[ii]);
-
-    rotated_lien[ii].resize(num_tag[ii]);
-    rotated_ele_face_id[ii].resize(num_tag[ii]);
-    num_rotated_ele[ii].resize(num_tag[ii]);
-    
-    std::string subsubgroupbase(subgroup_name);
-    subsubgroupbase.append("/tag_");
-
-    for(int jj=0; jj<num_tag[ii]; ++jj)
+    if(num_fixed_ele[ii] > 0)
     {
-      std::string subsubgroup_name(subsubgroupbase);
-      subsubgroup_name.append( std::to_string(jj) );
+      fixed_ele_face_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_face_id" );
 
-      num_rotated_ele[ii][jj] = h5r -> read_intScalar( subsubgroup_name.c_str(), "num_rotated_cell" );
+      fixed_ele_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_tag" );
 
-      if(num_rotated_ele[ii][jj] > 0)
+      fixed_lien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_ien" );
+
+      fixed_pt_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "fixed_pt_xyz" );
+
+      fixed_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_map" );
+
+      fixed_LID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "fixed_LID" );
+
+      num_fixed_node[ii] = VEC_T::get_size(fixed_node_id[ii]);
+
+      rotated_lien[ii].resize(num_tag[ii]);
+      rotated_ele_face_id[ii].resize(num_tag[ii]);
+      num_rotated_ele[ii].resize(num_tag[ii]);
+      
+      std::string subsubgroupbase(subgroup_name);
+      subsubgroupbase.append("/tag_");
+
+      for(int jj=0; jj<num_tag[ii]; ++jj)
       {
-        rotated_lien[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_ien" );
+        std::string subsubgroup_name(subsubgroupbase);
+        subsubgroup_name.append( std::to_string(jj) );
 
-        rotated_ele_face_id[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_face_id" );
+        num_rotated_ele[ii][jj] = h5r -> read_intScalar( subsubgroup_name.c_str(), "num_rotated_cell" );
+
+        if(num_rotated_ele[ii][jj] > 0)
+        {
+          rotated_lien[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_ien" );
+
+          rotated_ele_face_id[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "rotated_cell_face_id" );
+        }
       }
+
+      rotated_pt_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "rotated_pt_xyz" );
+
+      rotated_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" );
+
+      rotated_LID[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_LID" );
+
+      num_rotated_node[ii] = VEC_T::get_size(rotated_node_id[ii]);
     }
+    else
+    {
+      fixed_ele_face_id[ii] = std::vector<int> {};
+      fixed_ele_tag[ii] = std::vector<int> {};
+      fixed_lien[ii] = std::vector<int> {};
+      fixed_pt_xyz[ii] = std::vector<double> {};
+      fixed_node_id[ii] = std::vector<int> {};
+      fixed_LID[ii] = std::vector<int> {};
+      num_fixed_node[ii] = 0;
 
-    rotated_pt_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "rotated_pt_xyz" );
-
-    rotated_node_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" );
-
-    rotated_LID[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_LID" );
-
-    num_rotated_node[ii] = VEC_T::get_size(rotated_node_id[ii]);
+      num_rotated_ele[ii] = std::vector<int> {};
+      for(int jj=0; jj<num_tag[ii]; ++jj)
+      {
+        rotated_lien[ii][jj] = std::vector<int> {};
+        rotated_ele_face_id[ii][jj] = std::vector<int> {};
+      }
+      rotated_pt_xyz[ii] = std::vector<double> {};
+      rotated_node_id[ii] = std::vector<int> {};
+      rotated_LID[ii] = std::vector<int> {};
+      num_rotated_node[ii] = 0;
+      // Both fixed and rotated info will not be used
+    }
   }
 
   delete h5r; H5Fclose( file_id );

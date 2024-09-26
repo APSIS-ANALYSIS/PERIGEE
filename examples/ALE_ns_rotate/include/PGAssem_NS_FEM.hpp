@@ -183,6 +183,16 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
+    Mat L2_proj_mat;
+
+    Vec L2_proj_sol;
+    Vec L2_proj_sol_x;
+    Vec L2_proj_sol_y;
+    Vec L2_proj_sol_z;
+    Vec L2_proj_mvelo;
+
+    Vec L2_proj_lhs;
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
@@ -269,18 +279,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_WeakBC * const &wbc_part);
 
-    virtual void Interface_KG(
-        const double &dt,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
-
     virtual void Interface_G(
         const double &dt,
         IPLocAssem * const &lassem_ptr,
@@ -347,6 +345,32 @@ class PGAssem_NS_FEM : public IPGAssem
         currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
         currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
       }
+    }
+
+    void Assem_L2_proj_mat(
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol );
+
+    void Assem_L2_proj_rhs(
+        FEAElement * const &fixed_elementv,
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        IQuadPts * const &free_quad,
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol,
+        const SI_T::SI_quad_point * const &SI_qp );
+
+    void Clear_L2_proj_rhs()
+    {
+      VecSet(L2_proj_sol, 0.0);
+      VecSet(L2_proj_sol_x, 0.0);
+      VecSet(L2_proj_sol_y, 0.0);
+      VecSet(L2_proj_sol_z, 0.0);
+      VecSet(L2_proj_mvelo, 0.0);
     }
 };
 

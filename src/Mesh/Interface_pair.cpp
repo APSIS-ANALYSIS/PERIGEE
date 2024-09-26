@@ -80,6 +80,8 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   // Read the partion tag from the .h5 file
   fixed_cpu_rank = HDF5_T::read_intVector( fixed_h5file.c_str(), "/", "part");
 
+  fixed_inner_node = std::vector<int> {};
+
   // Generate the face id and layer's ien array
   if(elemtype_in == 501 || elemtype_in == 502)
   {
@@ -102,7 +104,19 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       fixed_face_id[ee] = tetcell->get_face_id( node_t_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
+      {
         fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+
+        // Check the inner nodes
+        bool inner = true;
+        for(int jj=0; jj<s_nLocBas; ++jj)
+        {
+          if(fixed_sur_ien[ee * s_nLocBas + jj] == VIEN->get_IEN(cell_gi, ii))
+            inner = false;
+        }
+        if(inner == true)
+          fixed_inner_node.push_back(VIEN->get_IEN(cell_gi, ii));
+      }
     }
 
     for(int ee=0; ee<num_rotated_ele; ++ee)
@@ -150,7 +164,19 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       fixed_face_id[ee] = hexcell->get_face_id( node_q_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
+      {
         fixed_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+
+        // Check the inner nodes
+        bool inner = true;
+        for(int jj=0; jj<s_nLocBas; ++jj)
+        {
+          if(fixed_sur_ien[ee * s_nLocBas + jj] == VIEN->get_IEN(cell_gi, ii))
+            inner = false;
+        }
+        if(inner == true)
+          fixed_inner_node.push_back(VIEN->get_IEN(cell_gi, ii));
+      }
     }
 
     for(int ee=0; ee<num_rotated_ele; ++ee)
@@ -184,6 +210,8 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   fixed_global_node = fixed_vien;
   VEC_T::sort_unique_resize(fixed_global_node);
   const int num_fixed_node = VEC_T::get_size(fixed_global_node);
+
+  VEC_T::sort_unique_resize(fixed_inner_node);
 
   for(int &nodeid : fixed_vien)
   {

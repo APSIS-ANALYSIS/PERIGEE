@@ -30,6 +30,10 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
   rotated_node_vol_part_tag.resize(num_pair);
   rotated_node_loc_pos.resize(num_pair);
 
+  L2_proj_fixed_node_pos.resize(num_pair);
+  all_fixed_global_node = std::vector<int> {};
+  all_fixed_inner_node = std::vector<int> {};
+
   const int dof = 4;
 
   for(int ii=0; ii<num_pair; ++ii)
@@ -70,6 +74,20 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
         fixed_node_loc_pos[ii][jj] = -1;
       }
     }
+
+    VEC_T::insert_end(all_fixed_global_node, fixed_global_node[ii]);
+    L2_proj_fixed_node_pos[ii].resize(num_fixed_node);
+
+    std::vector<int> fixed_inner_node = interfaces[ii].get_fixed_inner_node();
+    const int num_inner_node = VEC_T::get_size(fixed_inner_node);
+    PERIGEE_OMP_PARALLEL_FOR
+    for(int jj=0; jj<num_inner_node; ++jj)
+    {
+      const int new_gid = mnindex->get_old2new(fixed_inner_node[jj]);
+      fixed_inner_node[jj] = new_gid;
+    }
+
+    VEC_T::insert_end(all_fixed_inner_node, fixed_inner_node);
 
     fixed_pt_xyz[ii] = interfaces[ii].get_fixed_pt_xyz();
 
@@ -151,6 +169,23 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
 
     num_tag[ii] = n_tag;
   }
+
+  VEC_T::sort_unique_resize(all_fixed_inner_node);
+  VEC_T::sort_unique_resize(all_fixed_global_node);
+  for(int ii=0; ii<num_pair; ++ii)
+  {
+    const int num_fixed_node = VEC_T::get_size(fixed_global_node[ii]);
+
+    PERIGEE_OMP_PARALLEL_FOR
+    for(int jj=0; jj<num_fixed_node; ++jj)
+    {
+      const int is_inner = VEC_T::get_pos(all_fixed_inner_node, fixed_global_node[ii][jj]);
+      if(is_inner == -1)
+        L2_proj_fixed_node_pos[ii][jj] = VEC_T::get_pos(all_fixed_global_node, fixed_global_node[ii][jj]);
+      else
+        L2_proj_fixed_node_pos[ii][jj] = -1;  // Inner node --> Dirichlet node
+    }
+  }
 }
 
 void Interface_Partition::write_hdf5(const std::string &FileName) const
@@ -168,6 +203,10 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
   h5w -> write_intVector( g_id, "num_part_fixed_cell", fixed_nlocalele );
 
   h5w -> write_intVector( g_id, "num_tag", num_tag );
+
+  h5w -> write_intScalar( g_id, "num_all_fixed_node", num_all_fixed_node );
+
+  h5w -> write_intVector( g_id, "all_fixed_inner_node", all_fixed_inner_node );
 
   const std::string groupbase("interfaceid_");
 
@@ -187,6 +226,8 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
     h5w -> write_intVector( group_id, "fixed_cell_tag", fixed_interval_tag[ii] );
 
     h5w -> write_intVector( group_id, "fixed_node_map", fixed_global_node[ii] );
+
+    h5w -> write_intVector( group_id, "L2_proj_fixed_node_pos", L2_proj_fixed_node_pos[ii] );
 
     h5w -> write_intVector( group_id, "fixed_LID", fixed_LID[ii] );
 
