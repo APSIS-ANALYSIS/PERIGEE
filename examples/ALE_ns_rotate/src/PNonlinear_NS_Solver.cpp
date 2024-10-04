@@ -15,12 +15,25 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   // Generate the incremental solution vector used for update 
   // the solution of the nonlinear algebraic system 
   dot_step = new PDNSolution_NS( anode_ptr, 0, false );
+
+  lsolver_L2_proj = new PLinear_Solver_PETSc(
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+
+  KSPSetType(lsolver_L2_proj->ksp, KSPGMRES);
+  KSPGMRESSetOrthogonalization(lsolver_L2_proj->ksp,
+      KSPGMRESModifiedGramSchmidtOrthogonalization);
+  KSPGMRESSetRestart(lsolver_L2_proj->ksp, 500);
+
+  PC preproc; lsolver_L2_proj->GetPC(&preproc);
+  PCSetType( preproc, PCHYPRE );
+  PCHYPRESetType( preproc, "boomeramg" );
 }
 
 
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
   delete dot_step; dot_step = nullptr;
+  delete lsolver_L2_proj; lsolver_L2_proj = nullptr;
 }
 
 
@@ -137,6 +150,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements,
     quad_s, free_quad, itf_part, SI_sol);
 
+  gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
+
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
@@ -206,6 +221,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
     SI_sol->update_node_sol(&sol_alpha);
+    gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )

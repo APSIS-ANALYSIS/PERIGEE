@@ -183,6 +183,18 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
+    virtual void Solve_L2_proj(PLinear_Solver_PETSc * const &lsolver_ptr);
+
+    virtual void Init_L2_proj();
+
+  private:
+    // Private data
+    const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
+    
+    int snLocBas;
+
+    SI_T::SI_ancillary anci;
+
     Mat L2_proj_mat;
 
     Vec L2_proj_sol;
@@ -192,14 +204,6 @@ class PGAssem_NS_FEM : public IPGAssem
     Vec L2_proj_mvelo;
 
     Vec L2_proj_lhs;
-
-  private:
-    // Private data
-    const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
-    
-    int snLocBas;
-
-    SI_T::SI_ancillary anci;
 
     // Private function
     // Essential boundary condition

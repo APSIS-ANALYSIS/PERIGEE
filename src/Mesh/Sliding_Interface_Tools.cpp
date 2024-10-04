@@ -192,6 +192,64 @@ namespace SI_T
     delete [] array; array = nullptr; 
   }
 
+  void SI_solution::update_L2_proj_result(const Vec &L2_proj_lhs, const int &which)
+  {
+    for(int ii = 0; ii < VEC_T::get_size(num_fixed_node); ++ii)
+    {
+      PetscInt * idx;
+      if(which == 0)
+      {
+        idx = new PetscInt[4 * num_fixed_node[ii]];
+        for(int jj = 0; jj < num_fixed_node[ii]; ++jj)
+        {
+          idx[4 * jj] = 4 * L2_proj_fixed_node_pos[ii][jj];
+          idx[4 * jj + 1] = 4 * L2_proj_fixed_node_pos[ii][jj] + 1;
+          idx[4 * jj + 2] = 4 * L2_proj_fixed_node_pos[ii][jj] + 2;
+          idx[4 * jj + 3] = 4 * L2_proj_fixed_node_pos[ii][jj] + 3;
+        }
+      }
+      else
+      {
+        idx = new PetscInt[3 * num_fixed_node[ii]];
+        for(int jj = 0; jj < num_fixed_node[ii]; ++jj)
+        {
+          idx[3 * jj] = 4 * L2_proj_fixed_node_pos[ii][jj] + 1;
+          idx[3 * jj + 1] = 4 * L2_proj_fixed_node_pos[ii][jj] + 2;
+          idx[3 * jj + 2] = 4 * L2_proj_fixed_node_pos[ii][jj] + 3;
+        }
+      }
+
+      switch (which)
+      {
+        case 0:
+          PETSc_T::Scatter(L2_proj_lhs, idx, 4 * num_fixed_node[ii], &f_r_node_sol[ii][0]);
+        break;
+
+        case 1:
+          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_sol_x[ii][0]);
+        break;
+
+        case 2:
+          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_sol_y[ii][0]);
+        break;
+
+        case 3:
+          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_sol_z[ii][0]);
+        break;
+
+        case 4:
+          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_mvelo[ii][0]);
+        break;
+        
+        default:
+          SYS_T::print_fatal("Error, SI_solution::update_L2_proj_result, wrong input.\n");
+        break;
+      }
+        
+      delete idx; idx = nullptr;
+    }
+  }
+
   SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in)
     : nqp_sur( nqp_sur_in )
   {

@@ -69,8 +69,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::print_info() const
 void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
-  const double * const &fixed_local_sol, const double * const &rotated_local_sol,
-  const double * const &rotated_local_mvelo)
+  const double * const &fixed_local_sol, const double * const &proj_rotated_local_sol,
+  const double * const &proj_rotated_local_sol_x, const double * const &proj_rotated_local_sol_y,
+  const double * const &proj_rotated_local_sol_z, const double * const &proj_rotated_local_mvelo)
 {
   Zero_Residual_itf();
 
@@ -91,9 +92,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
   rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-  double fixed_J {0.0}, rotated_J {0.0};
+  double fixed_J {0.0}; //, rotated_J {0.0};
   const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(0, rotated_J);
+  const Vector_3 normal_r = -1 * normal_s; // rotated_elementv -> get_2d_normal_out(0, rotated_J);
 
   // Calculate h_b and tau_I
   const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
@@ -126,26 +127,26 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
     ws_y += fixed_local_sol[ii4 + 3] * dNs_dy[ii];
     ws_z += fixed_local_sol[ii4 + 3] * dNs_dz[ii];
 
-    pr += rotated_local_sol[ii4 + 0] * Nr[ii];
-    ur += rotated_local_sol[ii4 + 1] * Nr[ii];
-    vr += rotated_local_sol[ii4 + 2] * Nr[ii];
-    wr += rotated_local_sol[ii4 + 3] * Nr[ii];
+    pr += proj_rotated_local_sol[ii4 + 0] * Ns[ii];
+    ur += proj_rotated_local_sol[ii4 + 1] * Ns[ii];
+    vr += proj_rotated_local_sol[ii4 + 2] * Ns[ii];
+    wr += proj_rotated_local_sol[ii4 + 3] * Ns[ii];
 
-    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
-    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
-    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
+    mur += proj_rotated_local_mvelo[ii3 + 0] * Ns[ii];
+    mvr += proj_rotated_local_mvelo[ii3 + 1] * Ns[ii];
+    mwr += proj_rotated_local_mvelo[ii3 + 2] * Ns[ii];
 
-    ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
-    ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
-    ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
+    ur_x += proj_rotated_local_sol_x[ii3 + 0] * Ns[ii];
+    ur_y += proj_rotated_local_sol_y[ii3 + 0] * Ns[ii];
+    ur_z += proj_rotated_local_sol_z[ii3 + 0] * Ns[ii];
 
-    vr_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
-    vr_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
-    vr_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
+    vr_x += proj_rotated_local_sol_x[ii3 + 1] * Ns[ii];
+    vr_y += proj_rotated_local_sol_y[ii3 + 1] * Ns[ii];
+    vr_z += proj_rotated_local_sol_z[ii3 + 1] * Ns[ii];
 
-    wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
-    wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
-    wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
+    wr_x += proj_rotated_local_sol_x[ii3 + 2] * Ns[ii];
+    wr_y += proj_rotated_local_sol_y[ii3 + 2] * Ns[ii];
+    wr_z += proj_rotated_local_sol_z[ii3 + 2] * Ns[ii];
   }
 
   // Mesh velocity in the quadrature point
@@ -229,20 +230,13 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
-  const double * const &fixed_local_sol, const double * const &rotated_local_sol,
-  const double * const &rotated_local_mvelo )
+  const double * const &fixed_local_sol, const double * const &proj_rotated_local_sol,
+  const double * const &proj_rotated_local_mvelo)
 {
   Zero_Tangent_itf_MF();
 
-  double ps {0.0};
-  double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
-  double vs {0.0}, vs_x {0.0}, vs_y {0.0}, vs_z {0.0};
-  double ws {0.0}, ws_x {0.0}, ws_y {0.0}, ws_z {0.0};
-
-  double pr {0.0};
-  double ur {0.0}, ur_x {0.0}, ur_y {0.0}, ur_z {0.0};
-  double vr {0.0}, vr_x {0.0}, vr_y {0.0}, vr_z {0.0};
-  double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
+  double ps {0.0}, us {0.0}, vs {0.0}, ws {0.0};
+  double pr {0.0}, ur {0.0}, vr {0.0}, wr {0.0};
   double mur {0.0}, mvr {0.0}, mwr{0.0};
 
   std::vector<double> Ns(nLocBas, 0.0), dNs_dx(nLocBas, 0.0), dNs_dy(nLocBas, 0.0), dNs_dz(nLocBas, 0.0);
@@ -251,9 +245,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF(
   fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
   rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-  double fixed_J {0.0}, rotated_J {0.0};
+  double fixed_J {0.0}; //, rotated_J {0.0};
   const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(0, rotated_J);
+  const Vector_3 normal_r = -1 * normal_s; // rotated_elementv -> get_2d_normal_out(0, rotated_J);
 
   // Calculate h_b and tau_I
   const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
@@ -274,38 +268,14 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF(
     vs += fixed_local_sol[ii4 + 2] * Ns[ii];
     ws += fixed_local_sol[ii4 + 3] * Ns[ii];
 
-    us_x += fixed_local_sol[ii4 + 1] * dNs_dx[ii];
-    us_y += fixed_local_sol[ii4 + 1] * dNs_dy[ii];
-    us_z += fixed_local_sol[ii4 + 1] * dNs_dz[ii];
+    pr += proj_rotated_local_sol[ii4 + 0] * Ns[ii];
+    ur += proj_rotated_local_sol[ii4 + 1] * Ns[ii];
+    vr += proj_rotated_local_sol[ii4 + 2] * Ns[ii];
+    wr += proj_rotated_local_sol[ii4 + 3] * Ns[ii];
 
-    vs_x += fixed_local_sol[ii4 + 2] * dNs_dx[ii];
-    vs_y += fixed_local_sol[ii4 + 2] * dNs_dy[ii];
-    vs_z += fixed_local_sol[ii4 + 2] * dNs_dz[ii];
-
-    ws_x += fixed_local_sol[ii4 + 3] * dNs_dx[ii];
-    ws_y += fixed_local_sol[ii4 + 3] * dNs_dy[ii];
-    ws_z += fixed_local_sol[ii4 + 3] * dNs_dz[ii];
-
-    pr += rotated_local_sol[ii4 + 0] * Nr[ii];
-    ur += rotated_local_sol[ii4 + 1] * Nr[ii];
-    vr += rotated_local_sol[ii4 + 2] * Nr[ii];
-    wr += rotated_local_sol[ii4 + 3] * Nr[ii];
-
-    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
-    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
-    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
-
-    ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
-    ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
-    ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
-
-    vr_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
-    vr_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
-    vr_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
-
-    wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
-    wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
-    wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
+    mur += proj_rotated_local_mvelo[ii3 + 0] * Ns[ii];
+    mvr += proj_rotated_local_mvelo[ii3 + 1] * Ns[ii];
+    mwr += proj_rotated_local_mvelo[ii3 + 2] * Ns[ii];
   }
 
   // Mesh velocity in the quadrature point

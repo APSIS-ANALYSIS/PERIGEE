@@ -186,6 +186,14 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
         L2_proj_fixed_node_pos[ii][jj] = -1;  // Inner node --> Dirichlet node
     }
   }
+
+  for(int nn=0; nn<VEC_T::get_size(all_fixed_inner_node); ++nn)
+  {
+   const int inner_index = VEC_T::get_pos(all_fixed_global_node, all_fixed_inner_node[nn]);
+   all_fixed_inner_node[nn] = inner_index;
+  }
+
+  num_all_fixed_node = VEC_T::get_size(all_fixed_global_node);
 }
 
 void Interface_Partition::write_hdf5(const std::string &FileName) const

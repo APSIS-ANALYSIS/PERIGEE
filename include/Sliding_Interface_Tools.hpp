@@ -9,6 +9,7 @@
 #include "ALocal_Interface.hpp"
 #include "IPLocAssem.hpp"
 #include "FE_Tools.hpp"
+#include "PETSc_Tools.hpp"
 
 namespace SI_T
 {
@@ -32,30 +33,20 @@ namespace SI_T
         }
       }
 
-      void get_rotated_local(const ALocal_Interface * const &itf,
-        const int &ii, const int &tag, const int &ee,
-        int * const &local_ien, double * const &local_sol) const
+      void get_projected_rotated_local(const int &ii, const int * const &fixed_local_ien,
+        double * const &local_sol, double * const &local_sol_x, double * const &local_sol_y,
+        double * const &local_sol_z, double * const &local_mvleo) const
       {
-        for(int nn = 0; nn < nLocBas; ++nn)
+        for(int nn=0; nn < nLocBas; ++nn)
         {
-          local_ien[nn] = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
-
-          for(int dd = 0; dd < dof_sol; ++dd)
-            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
-        }
-      }
-
-      // Return the local ien array and the local mvelo array of a rotated layer element
-      void get_rotated_mvelo(const ALocal_Interface * const &itf,
-        const int &ii, const int &tag, const int &ee,
-        int * const &local_ien, double * const &local_mvleo) const
-      {
-        for(int nn = 0; nn < nLocBas; ++nn)
-        {
-          local_ien[nn] = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
-
-          for(int dd = 0; dd < 3; ++dd)
-            local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
+          for(int dd=0; dd < dof_sol; ++dd)
+          {
+            local_sol[dof_sol * nn + dd] = f_r_node_sol[ii][dof_sol * fixed_local_ien[nn] + dd];
+            local_sol_x[3 * nn + dd] = f_r_node_sol_x[ii][3 * fixed_local_ien[nn] + dd];
+            local_sol_y[3 * nn + dd] = f_r_node_sol_y[ii][3 * fixed_local_ien[nn] + dd];
+            local_sol_z[3 * nn + dd] = f_r_node_sol_z[ii][3 * fixed_local_ien[nn] + dd];
+            local_mvleo[3 * nn + dd] = f_r_node_mvelo[ii][3 * fixed_local_ien[nn] + dd];
+          }
         }
       }
 
@@ -70,6 +61,19 @@ namespace SI_T
 
           for(int dd = 0; dd < 3; ++dd)
             local_disp[3 * nn + dd] = rotated_node_mdisp[ii][3 * local_ien[nn] + dd];
+        }
+      }
+
+      void get_rotated_local(const int &ii, const int * const &local_ien,
+        double * const &local_sol, double * const &local_mvleo) const
+      {
+        for(int nn = 0; nn < nLocBas; ++nn)
+        {
+          for(int dd = 0; dd < dof_sol; ++dd)
+          {
+            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
+            local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
+          }
         }
       }
 
@@ -128,6 +132,11 @@ namespace SI_T
       {
         return all_fixed_inner_node[ii];
       }
+
+      void update_L2_proj_result(const Vec &L2_proj_lhs, const int &which);
+      // which: 0 -- f_r_node_sol
+      //        1,2,3 -- f_r_node_sol_x/y/z
+      //        4 -- f_r_node_mvelo
 
     private:
       const int cpu_rank;

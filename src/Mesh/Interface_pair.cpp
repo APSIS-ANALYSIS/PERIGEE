@@ -111,7 +111,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
         bool inner = true;
         for(int jj=0; jj<s_nLocBas; ++jj)
         {
-          if(fixed_sur_ien[ee * s_nLocBas + jj] == VIEN->get_IEN(cell_gi, ii))
+          if(fixed_global_node[fixed_sur_ien[ee * s_nLocBas + jj]] == VIEN->get_IEN(cell_gi, ii))
             inner = false;
         }
         if(inner == true)
@@ -171,7 +171,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
         bool inner = true;
         for(int jj=0; jj<s_nLocBas; ++jj)
         {
-          if(fixed_sur_ien[ee * s_nLocBas + jj] == VIEN->get_IEN(cell_gi, ii))
+          if(fixed_global_node[fixed_sur_ien[ee * s_nLocBas + jj]] == VIEN->get_IEN(cell_gi, ii))
             inner = false;
         }
         if(inner == true)

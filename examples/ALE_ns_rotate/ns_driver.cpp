@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Angular velocity
-  double angular_velo = 2.0 * MATH_T::PI; //(rad/s)
+  double angular_velo = -250 * MATH_T::PI / 3; //(rad/s)
 
   // Yaml options
   bool is_loadYaml = true;
@@ -510,6 +510,8 @@ int main(int argc, char *argv[])
     PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem_ptr, &shell_mat);
 
   MatShellSetOperation(shell_mat, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
+
+  gloAssem_ptr->Init_L2_proj();
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )

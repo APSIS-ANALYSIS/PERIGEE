@@ -56,8 +56,11 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo);
+      const double * const &proj_rotated_local_sol,
+      const double * const &proj_rotated_local_sol_x,
+      const double * const &proj_rotated_local_sol_y,
+      const double * const &proj_rotated_local_sol_z,
+      const double * const &proj_rotated_local_mvelo );
 
     virtual void Assem_Tangent_itf_MF(
       const int &fixed_qua,
@@ -66,8 +69,8 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol,
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo );
+      const double * const &proj_rotated_local_sol,
+      const double * const &proj_rotated_local_mvelo );
 };
 
 #endif
