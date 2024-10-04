@@ -187,7 +187,7 @@ std::vector<double> PETSc_T::GetLocalArray( const Vec &vv )
   return vv_vector;
 }
 
-void PETSc_T::Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * &values )
+void PETSc_T::Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * const &values )
 {
   Vec vv;
   VecScatter scatter;
