@@ -33,7 +33,7 @@
 #include "FEAElement_Hex27.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include <iomanip>
 #include "MaterialModel_Mixed_Elasticity.hpp"
 #include "MaterialModel_ich_NeoHookean.hpp"

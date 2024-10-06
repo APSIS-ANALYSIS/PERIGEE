@@ -15,7 +15,7 @@
 // ============================================================================
 #include "APart_Node.hpp"
 #include "ALocal_Elem.hpp"
-#include "IAGlobal_Mesh_Info.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include "IPLocAssem.hpp"
 #include "IPLocAssem_2x2Block.hpp"
 #include "FEANode.hpp"

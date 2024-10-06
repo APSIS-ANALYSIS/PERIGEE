@@ -93,11 +93,6 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
   delete h5r; H5Fclose( file_id );
 }
 
-void ALocal_Interface::print_info() const
-{
-  SYS_T::commPrint("Interfaces: %d\n", num_itf);
-}
-
 void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &ee,
   double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const
 {

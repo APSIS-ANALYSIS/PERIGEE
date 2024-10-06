@@ -5,7 +5,7 @@
 //
 // Data: Oct. 25 2023
 // ==================================================================
-#include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
@@ -50,7 +50,7 @@ int main( int argc, char * argv[] )
 
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
+  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
 
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
 

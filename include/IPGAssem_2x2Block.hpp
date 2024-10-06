@@ -15,7 +15,7 @@
 // Date: Jan 18 2018
 // ==================================================================
 #include "PETSc_Tools.hpp"
-#include "IAGlobal_Mesh_Info.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include "IPLocAssem_2x2Block.hpp"
 #include "ALocal_NBC.hpp"
 #include "ALocal_NodalBC_2x2Block.hpp"

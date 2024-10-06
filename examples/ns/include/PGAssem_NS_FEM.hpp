@@ -28,7 +28,7 @@ class PGAssem_NS_FEM : public IPGAssem
         IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quads,
-        const IAGlobal_Mesh_Info * const &agmi_ptr,
+        const AGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,

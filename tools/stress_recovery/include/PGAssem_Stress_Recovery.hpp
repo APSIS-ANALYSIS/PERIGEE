@@ -10,7 +10,7 @@ class PGAssem_Stress_Recovery : public IPGAssem
     // Constructor
     PGAssem_Stress_Recovery(
         IPLocAssem * const &locassem_ptr,
-        const IAGlobal_Mesh_Info * const &agmi_ptr,
+        const AGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,
