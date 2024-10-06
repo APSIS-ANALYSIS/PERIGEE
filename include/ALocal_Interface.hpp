@@ -19,6 +19,8 @@
 // Author: Xuanming Huang
 // Date Created: Jun. 24  2024
 // ============================================================================
+#include <vector>
+#include "PDNSolution.hpp"
 
 class ALocal_Interface
 {
