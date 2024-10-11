@@ -32,6 +32,7 @@ class Interface_pair
     Interface_pair( const std::string &fixed_vtkfile,
                     const std::string &rotated_vtkfile,
                     const std::string &fixed_h5file,
+                    const std::string &rotated_h5file,
                     const int &total_num_fixed_elem,
                     const int &total_num_fixed_pt,
                     const std::vector<double> &all_vol_ctrlPts,
@@ -44,6 +45,7 @@ class Interface_pair
     Interface_pair( const std::string &fixed_vtkfile,
                     const std::string &rotated_vtkfile,
                     const std::string &fixed_h5file,
+                    const std::string &rotated_h5file,
                     const int &total_num_fixed_elem,
                     const int &total_num_fixed_pt,
                     const std::vector<double> &all_vol_ctrlPts,
@@ -60,8 +62,8 @@ class Interface_pair
     virtual int get_fixed_cpu_rank(const int &cell_index) const
     {return fixed_cpu_rank[cell_index];}
 
-    virtual int get_fixed_faceID(const int &cell_index) const
-    {return fixed_face_id[cell_index];}
+    virtual std::vector<int> get_fixed_faceID() const
+    {return fixed_face_id;}
 
     virtual std::vector<int> get_fixed_vien() const
     {return fixed_vien;}
@@ -74,6 +76,15 @@ class Interface_pair
 
     virtual std::vector<int> get_fixed_interval_tag() const
     {return fixed_interval_tag;}
+
+    virtual std::vector<int> get_fixed_inner_node() const
+    {return fixed_inner_node;}
+
+    virtual int get_num_rotated_ele() const
+    {return  num_rotated_ele;}
+
+    virtual int get_rotated_cpu_rank(const int &cell_index) const
+    {return rotated_cpu_rank[cell_index];}
 
     virtual std::vector<int> get_rotated_faceID() const
     {return rotated_face_id;}
@@ -90,8 +101,8 @@ class Interface_pair
     virtual std::vector<int> get_rotated_interval_tag() const
     {return rotated_interval_tag;}
 
-    virtual std::vector<int> get_fixed_inner_node() const
-    {return fixed_inner_node;}
+    virtual std::vector<int> get_rotated_inner_node() const
+    {return rotated_inner_node;}
 
   private:
     // 0: Lofted along an axis
@@ -133,6 +144,9 @@ class Interface_pair
     // the number of the rotated layer elements
     int num_rotated_ele;
 
+    // the partition tag of the fixed layer elements
+    std::vector<int> rotated_cpu_rank;
+
     // the face id of the rotated layer elements
     std::vector<int> rotated_face_id;
 
@@ -141,6 +155,8 @@ class Interface_pair
 
     // the GlobalNodeID of the rotated layer nodes
     std::vector<int> rotated_global_node;
+
+    std::vector<int> rotated_inner_node;
 
     // the xyz-coordinate of nodes, corresponding to the rotated_global_node
     std::vector<double> rotated_pt_xyz;
@@ -151,6 +167,7 @@ class Interface_pair
     virtual void Initialize(const std::string &fixed_vtkfile,
       const std::string &rotated_vtkfile,
       const std::string &fixed_h5file,
+      const std::string &rotated_h5file,
       const int &total_num_fixed_elem,
       const int &total_num_fixed_pt,
       const std::vector<double> &all_vol_ctrlPts,

@@ -1,28 +1,31 @@
 #include "Interface_pair.hpp"
 
 Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::string &rotated_vtkfile,
-  const std::string &fixed_h5file, const int &total_num_fixed_elem, const int &total_num_fixed_pt,
+  const std::string &fixed_h5file, const std::string &rotated_h5file, 
+  const int &total_num_fixed_elem, const int &total_num_fixed_pt,
   const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const int &elemtype_in,
   const std::vector<double> &intervals_in, const int &direction_in) :
   interface_type {0}, T0_axial_direction{direction_in}, T1_surface_centroid{Vector_3(0,0,0)}
 {
-  Initialize(fixed_vtkfile, rotated_vtkfile, fixed_h5file, total_num_fixed_elem, total_num_fixed_pt,
-    all_vol_ctrlPts, VIEN, elemtype_in, intervals_in);
+  Initialize(fixed_vtkfile, rotated_vtkfile, fixed_h5file, rotated_h5file,
+    total_num_fixed_elem, total_num_fixed_pt, all_vol_ctrlPts, VIEN, elemtype_in, intervals_in);
 }
 
 Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::string &rotated_vtkfile,
-  const std::string &fixed_h5file, const int &total_num_fixed_elem, const int &total_num_fixed_pt,
+  const std::string &fixed_h5file, const std::string &rotated_h5file, 
+  const int &total_num_fixed_elem, const int &total_num_fixed_pt,
   const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const int &elemtype_in,
   const std::vector<double> &intervals_in, const Vector_3 &centroid_in) :
   interface_type {1}, T0_axial_direction{-1}, T1_surface_centroid{centroid_in}
 {
-  Initialize(fixed_vtkfile, rotated_vtkfile, fixed_h5file, total_num_fixed_elem, total_num_fixed_pt,
-    all_vol_ctrlPts, VIEN, elemtype_in, intervals_in);
+  Initialize(fixed_vtkfile, rotated_vtkfile, fixed_h5file, rotated_h5file,
+    total_num_fixed_elem, total_num_fixed_pt, all_vol_ctrlPts, VIEN, elemtype_in, intervals_in);
 }
 
 void Interface_pair::Initialize(const std::string &fixed_vtkfile,
                     const std::string &rotated_vtkfile,
                     const std::string &fixed_h5file,
+                    const std::string &rotated_h5file,
                     const int &total_num_fixed_elem,
                     const int &total_num_fixed_pt,
                     const std::vector<double> &all_vol_ctrlPts,
@@ -82,6 +85,10 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
   fixed_inner_node = std::vector<int> {};
 
+  rotated_cpu_rank = HDF5_T::read_intVector( rotated_h5file.c_str(), "/", "part");
+
+  rotated_inner_node = std::vector<int> {};
+
   // Generate the face id and layer's ien array
   if(elemtype_in == 501 || elemtype_in == 502)
   {
@@ -136,7 +143,19 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       rotated_face_id[ee] = tetcell->get_face_id( node_t_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
+      {
         rotated_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+
+        // Check the inner nodes
+        bool inner = true;
+        for(int jj=0; jj<s_nLocBas; ++jj)
+        {
+          if(rotated_global_node[rotated_sur_ien[ee * s_nLocBas + jj]] == VIEN->get_IEN(cell_gi, ii))
+            inner = false;
+        }
+        if(inner == true)
+          rotated_inner_node.push_back(VIEN->get_IEN(cell_gi, ii));
+      }
     }
 
     delete tetcell;
@@ -198,7 +217,19 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
       rotated_face_id[ee] = hexcell->get_face_id( node_q_gi );
 
       for(int ii=0; ii<v_nLocBas; ++ii)
+      {
         rotated_vien[ee * v_nLocBas + ii] = VIEN->get_IEN(cell_gi, ii);
+
+        // Check the inner nodes
+        bool inner = true;
+        for(int jj=0; jj<s_nLocBas; ++jj)
+        {
+          if(rotated_global_node[rotated_sur_ien[ee * s_nLocBas + jj]] == VIEN->get_IEN(cell_gi, ii))
+            inner = false;
+        }
+        if(inner == true)
+          rotated_inner_node.push_back(VIEN->get_IEN(cell_gi, ii));
+      }
     }
 
     delete hexcell;
