@@ -268,13 +268,13 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
   h5w -> write_intVector( g_id, "num_tag", num_tag );
 
-  h5w -> write_intVector( g_id, "num_fixed_cell", fixed_nlocalele );
+  h5w -> write_intVector( g_id, "num_local_fixed_cell", fixed_nlocalele );
 
   h5w -> write_intScalar( g_id, "num_all_fixed_node", num_all_fixed_node );
 
   h5w -> write_intVector( g_id, "all_fixed_inner_node", all_fixed_inner_node );
 
-  h5w -> write_intVector( g_id, "num_rotated_cell", rotated_nlocalele );
+  h5w -> write_intVector( g_id, "num_local_rotated_cell", rotated_nlocalele );
 
   h5w -> write_intScalar( g_id, "num_all_rotated_node", num_all_rotated_node );
 
@@ -305,6 +305,8 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     h5w -> write_doubleVector( group_id, "fixed_pt_xyz", fixed_pt_xyz[ii] );
 
+    h5w -> write_intVector(group_id, "local_fixed_cell", fixed_ele_in_this_part[ii] );
+
     h5w -> write_intVector(group_id, "num_tagged_fixed_cell", num_tagged_fixed_ele[ii]);
 
     h5w -> write_intScalar( group_id, "num_rotated_node", VEC_T::get_size(rotated_global_node[ii]) );
@@ -322,6 +324,10 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
     h5w -> write_intVector( group_id, "rotated_LID", rotated_LID[ii] );
 
     h5w -> write_doubleVector( group_id, "rotated_pt_xyz", rotated_pt_xyz[ii] );
+
+    h5w -> write_intVector( group_id, "local_rotated_cell", rotated_ele_in_this_part[ii] );
+
+    h5w -> write_intVector( group_id, "num_tagged_rotated_cell", num_tagged_rotated_ele[ii] );
 
     const std::string subgroupbase("tag_");
 

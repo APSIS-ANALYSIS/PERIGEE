@@ -5,7 +5,7 @@
 // 
 // A combination of two surface mesh information of an interface.
 // Assume there is a fixed surface and a rotated surface.
-// The numerical quadrature points will be generated on the fixed surface,
+// At first, the numerical quadrature points will be generated on the fixed surface,
 // and the counterpart will be searched on the rotated surface.
 // For the efficiency of searching, the following data is critical:
 // 
@@ -19,6 +19,10 @@
 //
 // The other data constructions are similar with ElemBC_turbulence_wall_model.
 // 
+// Only the terms including the test function on the fixed surface will use the
+// Gauss quadrature point generated on the fixed surface. The terms including 
+// the test function on the rotated surface will use the Gauss quadrature
+// point generated on the rotated surface, and they need a similar data structure. 
 // Author: Xuanming Huag
 // Date: Jun 24 2024
 // ============================================================================
