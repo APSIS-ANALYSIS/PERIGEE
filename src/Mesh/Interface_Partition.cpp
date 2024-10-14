@@ -112,7 +112,7 @@ Interface_Partition::Interface_Partition(const IPart * const &part,
     // read info from interfaces
     rotated_ele_face_id[ii] = interfaces[ii].get_rotated_faceID();
     rotated_lien[ii] = interfaces[ii].get_rotated_vien();
-    rotated_interval_tag[ii] = interfaces[ii].get_fixed_interval_tag();
+    rotated_interval_tag[ii] = interfaces[ii].get_rotated_interval_tag();
     rotated_ele_in_this_part[ii] = std::vector<int> {};
     rotated_global_node[ii] = interfaces[ii].get_rotated_global_node();
     rotated_pt_xyz[ii] = interfaces[ii].get_rotated_pt_xyz();
