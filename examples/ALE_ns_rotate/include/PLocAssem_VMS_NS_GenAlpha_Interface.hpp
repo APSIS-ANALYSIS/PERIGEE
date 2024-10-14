@@ -49,7 +49,7 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       }
     }
 
-    virtual void Assem_Residual_itf(
+    virtual void Assem_Residual_itf_fixed(
       const int &fixed_qua,
       const double &fixed_qw,
       const double &dt,
@@ -62,7 +62,20 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const double * const &proj_rotated_local_sol_z,
       const double * const &proj_rotated_local_mvelo );
 
-    virtual void Assem_Tangent_itf_MF(
+    virtual void Assem_Residual_itf_rotated(
+      const int &rotated_qua,
+      const double &rotated_qw,
+      const double &dt,
+      const FEAElement * const &rotated_elementv,
+      const FEAElement * const &fixed_elementv,
+      const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo, 
+      const double * const &proj_fixed_local_sol,
+      const double * const &proj_fixed_local_sol_x,
+      const double * const &proj_fixed_local_sol_y,
+      const double * const &proj_fixed_local_sol_z );
+
+    virtual void Assem_Tangent_itf_MF_fixed(
       const int &fixed_qua,
       const double &fixed_qw,
       const double &dt,
@@ -71,6 +84,16 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const double * const &fixed_local_sol,
       const double * const &proj_rotated_local_sol,
       const double * const &proj_rotated_local_mvelo );
+
+    virtual void Assem_Tangent_itf_MF_rotated(
+      const int &rotated_qua,
+      const double &rotated_qw,
+      const double &dt,
+      const FEAElement * const &rotated_elementv,
+      const FEAElement * const &fixed_elementv,
+      const double * const &rotated_local_sol,
+      const double * const &proj_rotated_local_sol,
+      const double * const &rotated_local_mvelo );
 };
 
 #endif

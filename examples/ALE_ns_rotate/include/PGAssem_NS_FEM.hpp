@@ -185,6 +185,8 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Solve_L2_proj(PLinear_Solver_PETSc * const &lsolver_ptr);
 
+    virtual void Solve_L2_proj_2(PLinear_Solver_PETSc * const &lsolver_ptr);
+
     virtual void Init_L2_proj();
 
   private:
@@ -204,6 +206,15 @@ class PGAssem_NS_FEM : public IPGAssem
     Vec L2_proj_mvelo;
 
     Vec L2_proj_lhs;
+
+    Mat L2_proj_mat_2;
+
+    Vec L2_proj_sol_2;
+    Vec L2_proj_sol_x_2;
+    Vec L2_proj_sol_y_2;
+    Vec L2_proj_sol_z_2;
+
+    Vec L2_proj_lhs_2;
 
     // Private function
     // Essential boundary condition
@@ -286,8 +297,8 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual void Interface_G(
         const double &dt,
         IPLocAssem * const &lassem_ptr,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
+        FEAElement * const &anchor_elementv,
+        FEAElement * const &opposite_elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
@@ -358,6 +369,13 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol );
 
+    void Assem_L2_proj_mat_2(
+        FEAElement * const &rotated_elementv,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        const ALocal_Interface * const &itf_part,
+        const SI_T::SI_solution * const &SI_sol );
+
     void Assem_L2_proj_rhs(
         FEAElement * const &fixed_elementv,
         FEAElement * const &rotated_elementv,
@@ -375,6 +393,11 @@ class PGAssem_NS_FEM : public IPGAssem
       VecSet(L2_proj_sol_y, 0.0);
       VecSet(L2_proj_sol_z, 0.0);
       VecSet(L2_proj_mvelo, 0.0);
+
+      VecSet(L2_proj_sol_2, 0.0);
+      VecSet(L2_proj_sol_x_2, 0.0);
+      VecSet(L2_proj_sol_y_2, 0.0);
+      VecSet(L2_proj_sol_z_2, 0.0);
     }
 };
 

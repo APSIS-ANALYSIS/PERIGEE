@@ -94,6 +94,8 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
       for(int jj=0; jj<num_tag[ii]; ++jj)
       {
+        std::string subsubgroup_name(subsubgroupbase);
+        subsubgroup_name.append( std::to_string(jj) );
         if(num_tagged_rotated_ele[ii][jj] > 0)
           tagged_rotated_ele[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "tagged_rotated_cell" );
         else
@@ -114,6 +116,8 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
 
       for(int jj=0; jj<num_tag[ii]; ++jj)
       {
+        std::string subsubgroup_name(subsubgroupbase);
+        subsubgroup_name.append( std::to_string(jj) );
         if(num_tagged_fixed_ele[ii][jj] > 0)
           tagged_fixed_ele[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "tagged_fixed_cell" );
         else
