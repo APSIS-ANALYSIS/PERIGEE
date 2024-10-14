@@ -1307,7 +1307,7 @@ void PGAssem_NS_FEM::Interface_G(
       for(int qua{0}; qua<face_nqp; ++qua)
       {
 
-        SI_qp->get_curr_rotated(itf_id, ee, qua, opposite_ee, opposite_xi, opposite_eta);
+        SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, opposite_ee)};
 
@@ -1362,7 +1362,7 @@ void PGAssem_NS_FEM::Interface_G(
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
-        SI_qp->get_curr_fixed(itf_id, ee, qua, opposite_ee, opposite_xi, opposite_eta);
+        SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, opposite_ee)};
 
@@ -1474,7 +1474,7 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
       {
         anci.A_fixed_elementv->get_R(qua, &R[0]);
 
-        anci.A_SI_qp->get_curr_rotated(itf_id, ee, qua, opposite_ee, opposite_xi, opposite_eta);
+        anci.A_SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int rotated_face_id {anci.A_itf_part->get_rotated_face_id(itf_id, opposite_ee)};
 
@@ -1550,7 +1550,7 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
-        anci.A_SI_qp->get_curr_fixed(itf_id, ee, qua, opposite_ee, opposite_xi, opposite_eta);
+        anci.A_SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int fixed_face_id {anci.A_itf_part->get_fixed_face_id(itf_id, opposite_ee)};
 
@@ -2137,6 +2137,21 @@ void PGAssem_NS_FEM::Assem_L2_proj_rhs(
       VecSetValues(L2_proj_sol_z_2, loc_dof, row_index, res_L2_proj_sol_z, ADD_VALUES);
     }
   }
+
+  VecAssemblyBegin(L2_proj_sol);
+  VecAssemblyEnd(L2_proj_sol);
+
+  VecAssemblyBegin(L2_proj_sol_x);
+  VecAssemblyEnd(L2_proj_sol_x);
+
+  VecAssemblyBegin(L2_proj_sol_y);
+  VecAssemblyEnd(L2_proj_sol_y);
+
+  VecAssemblyBegin(L2_proj_sol_z);
+  VecAssemblyEnd(L2_proj_sol_z);
+
+  VecAssemblyBegin(L2_proj_mvelo);
+  VecAssemblyEnd(L2_proj_mvelo);
 
   VecAssemblyBegin(L2_proj_sol_2);
   VecAssemblyEnd(L2_proj_sol_2);
