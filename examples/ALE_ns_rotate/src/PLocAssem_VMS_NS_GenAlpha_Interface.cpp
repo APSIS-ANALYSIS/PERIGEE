@@ -20,8 +20,10 @@ PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
   Residual_s = new PetscScalar[vec_size];
   Residual_r = new PetscScalar[vec_size];
 
-  Zero_Residual_itf();
-  Zero_Tangent_itf_MF();
+  Zero_Residual_itf_fixed();
+  Zero_Residual_itf_rotated();
+  Zero_Tangent_itf_MF_fixed();
+  Zero_Tangent_itf_MF_rotated();
 }
 
 PLocAssem_VMS_NS_GenAlpha_Interface::~PLocAssem_VMS_NS_GenAlpha_Interface()
@@ -73,8 +75,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
   const double * const &proj_rotated_local_sol_x, const double * const &proj_rotated_local_sol_y,
   const double * const &proj_rotated_local_sol_z, const double * const &proj_rotated_local_mvelo)
 {
-  Zero_Residual_itf();
-
+  Zero_Residual_itf_fixed();
   double ps {0.0};
   double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
   double vs {0.0}, vs_x {0.0}, vs_y {0.0}, vs_z {0.0};
@@ -204,6 +205,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
   const double * const &proj_fixed_local_sol, const double * const &proj_fixed_local_sol_x,
   const double * const &proj_fixed_local_sol_y, const double * const &proj_fixed_local_sol_z)
 {
+  Zero_Residual_itf_rotated();
   double ps {0.0};
   double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
   double vs {0.0}, vs_x {0.0}, vs_y {0.0}, vs_z {0.0};
@@ -331,8 +333,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
   const double * const &fixed_local_sol, const double * const &proj_rotated_local_sol,
   const double * const &proj_rotated_local_mvelo)
 {
-  Zero_Tangent_itf_MF();
-
+  Zero_Tangent_itf_MF_fixed();
   double ps {0.0}, us {0.0}, vs {0.0}, ws {0.0};
   double pr {0.0}, ur {0.0}, vr {0.0}, wr {0.0};
   double mur {0.0}, mvr {0.0}, mwr{0.0};
@@ -548,6 +549,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
   const double * const &rotated_local_sol, const double * const &proj_fixed_local_sol,
   const double * const &rotated_local_mvelo)
 {
+  Zero_Tangent_itf_MF_rotated();
   double ps {0.0}, us {0.0}, vs {0.0}, ws {0.0};
   double pr {0.0}, ur {0.0}, vr {0.0}, wr {0.0};
   double mur {0.0}, mvr {0.0}, mwr{0.0};

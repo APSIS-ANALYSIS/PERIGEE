@@ -1384,7 +1384,7 @@ void PGAssem_NS_FEM::Interface_G(
         {
           for(int mm{0}; mm < dof_mat; ++mm)
           {
-            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_fixed_LID(itf_id, mm, anchor_local_ien[ii]) + mm;
+            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_rotated_LID(itf_id, mm, anchor_local_ien[ii]) + mm;
           }
         }
 
