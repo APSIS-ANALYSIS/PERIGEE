@@ -150,7 +150,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
         bool inner = true;
         for(int jj=0; jj<s_nLocBas; ++jj)
         {
-          if(rotated_global_node[rotated_sur_ien[ee * s_nLocBas + jj]] total_num_fixed_pt == VIEN->get_IEN(cell_gi, ii))
+          if(rotated_global_node[rotated_sur_ien[ee * s_nLocBas + jj]] + total_num_fixed_pt == VIEN->get_IEN(cell_gi, ii))
             inner = false;
         }
         if(inner == true)
