@@ -236,6 +236,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     SI_sol->update_node_sol(&sol_alpha);
     gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
+    gassem_ptr->Solve_L2_proj_2(lsolver_L2_proj_2);
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )

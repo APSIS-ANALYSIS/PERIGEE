@@ -42,6 +42,10 @@ namespace SI_T
           for(int dd=0; dd < dof_sol; ++dd)
           {
             local_sol[dof_sol * nn + dd] = f_r_node_sol[ii][dof_sol * fixed_local_ien[nn] + dd];
+          }
+
+          for(int dd=0; dd < 3; ++dd)
+          {
             local_sol_x[3 * nn + dd] = f_r_node_sol_x[ii][3 * fixed_local_ien[nn] + dd];
             local_sol_y[3 * nn + dd] = f_r_node_sol_y[ii][3 * fixed_local_ien[nn] + dd];
             local_sol_z[3 * nn + dd] = f_r_node_sol_z[ii][3 * fixed_local_ien[nn] + dd];
@@ -75,6 +79,9 @@ namespace SI_T
           for(int dd = 0; dd < dof_sol; ++dd)
           {
             local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
+          }
+          for(int dd = 0; dd < 3; ++dd)
+          {
             local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
           }
         }
@@ -88,6 +95,9 @@ namespace SI_T
           for(int dd = 0; dd < dof_sol; ++dd)
           {
             local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
+          }
+          for(int dd = 0; dd < 3; ++dd)
+          {
             local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
           }
         }
@@ -102,6 +112,9 @@ namespace SI_T
           for(int dd=0; dd < dof_sol; ++dd)
           {
             local_sol[dof_sol * nn + dd] = r_f_node_sol[ii][dof_sol * rotated_local_ien[nn] + dd];
+          }
+          for(int dd=0; dd < 3; ++dd)
+          {
             local_sol_x[3 * nn + dd] = r_f_node_sol_x[ii][3 * rotated_local_ien[nn] + dd];
             local_sol_y[3 * nn + dd] = r_f_node_sol_y[ii][3 * rotated_local_ien[nn] + dd];
             local_sol_z[3 * nn + dd] = r_f_node_sol_z[ii][3 * rotated_local_ien[nn] + dd];
@@ -189,6 +202,8 @@ namespace SI_T
       // which: 0 -- f_r_node_sol
       //        1,2,3 -- f_r_node_sol_x/y/z
       //        4 -- f_r_node_mvelo
+      //        5 -- r_f_node_sol
+      //        6,7,8 -- r_f_node_sol_x/y/z
 
     private:
       const int cpu_rank;
