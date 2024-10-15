@@ -565,10 +565,10 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
   const Vector_3 normal_s = -1 * normal_r;
 
   // Calculate h_b and tau_I
-  const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
+  const auto s_dxi_dx = fixed_elementv -> get_invJacobian(0);
   const double h_s = get_h_b(s_dxi_dx, normal_s);
 
-  const auto r_dxi_dx = rotated_elementv -> get_invJacobian(0);
+  const auto r_dxi_dx = rotated_elementv -> get_invJacobian(qua);
   const double h_r = get_h_b(r_dxi_dx, normal_r);
 
   const double tau_I = 0.5 * vis_mu * C_bI * (1.0 / h_s + 1.0 / h_r);
