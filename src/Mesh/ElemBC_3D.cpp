@@ -49,6 +49,16 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     
     global_node[ii] = VTK_T::read_int_PointData( vtkfileList[ii], "GlobalNodeID");
     global_cell[ii] = VTK_T::read_int_CellData( vtkfileList[ii], "GlobalElementID");
+
+
+    if(ii == 0)
+    {
+      for(int &node : global_node[ii])
+        node += 93;
+
+      for(int &elem : global_cell[ii])
+        elem += 234;
+    }
   }
 
   std::cout<<"     is generated. \n";

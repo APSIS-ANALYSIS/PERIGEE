@@ -189,6 +189,32 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // virtual void Init_L2_proj();
 
+    virtual void Assem_test_fixed();
+
+    virtual void Assem_test_rotated();
+
+    virtual void Print_test(const int &index)
+    {
+      PetscInt * idx_from = new PetscInt[4];
+
+      for(int ii=0; ii < 4; ++ii)
+        idx_from[ii] = 4 * index + ii;
+
+      double * values = new double[4];
+
+      PETSc_T::Scatter(G, idx_from, 4, values);
+      
+      SYS_T::commPrint("\n");
+      SYS_T::commPrint("p-comp = %e\n", values[0]);
+      SYS_T::commPrint("x-comp = %e\n", values[1]);
+      SYS_T::commPrint("y-comp = %e\n", values[2]);
+      SYS_T::commPrint("z-comp = %e\n", values[3]);
+      SYS_T::commPrint("\n");
+      
+      delete [] idx_from;
+      delete [] values;
+    }
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
@@ -360,6 +386,11 @@ class PGAssem_NS_FEM : public IPGAssem
         currPt_y[ii] = ept_y[ii] + disp[3*ii+1];
         currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
       }
+    }
+
+    double test_f(const Vector_3& pt)
+    {
+      return (pt.x()-2) * (pt.x()-2) * (pt.x()-2) * (pt.x()-2) * (pt.y()+5) * (pt.y()+5);
     }
 
     // void Assem_L2_proj_mat(

@@ -357,6 +357,74 @@ Vector_3 TET_T::get_out_normal( const std::string &file,
   return outVec;
 }
 
+Vector_3 TET_T::get_out_normal( const std::string &file,
+    const std::vector<double> &vol_ctrlPts,
+    const IIEN * const &vol_ien,
+    const double &num_shifted_node,
+    const double &num_shifted_elem )
+{
+  int numpts, numcels;
+  std::vector<double> pts;
+  std::vector<int> ien;
+
+  // Analyze the file type
+  std::string fend; fend.assign( file.end()-4 , file.end() );
+
+  VTK_T::read_grid( file, numpts, numcels, pts, ien);
+
+  std::vector<int> gnode = VTK_T::read_int_PointData(file, "GlobalNodeID");
+  std::vector<int> gelem = VTK_T::read_int_CellData(file, "GlobalElementID");
+  
+  for(int &node : gnode)
+    node += num_shifted_node;
+
+  for(int &elem : gelem)
+    elem += num_shifted_elem;
+  
+  // triangle nodes' global indices
+  const std::vector<int> trn = { gnode[ ien[0] ], gnode[ ien[1] ], gnode[ ien[2] ] };
+
+  const int tete0 = gelem[0]; // triangle's associated tet element indices
+
+  SYS_T::print_fatal_if(tete0 == -1, "Error: TET_T::get_out_normal requires the element indices for the vtp file.\n");
+
+  const int ten[4] { vol_ien->get_IEN(tete0, 0), vol_ien->get_IEN(tete0, 1), 
+    vol_ien->get_IEN(tete0, 2), vol_ien->get_IEN(tete0, 3) };
+
+  int inside_node = 0, node_check = 0;
+  for(int ii=0; ii<4; ++ii)
+  {
+    if( !VEC_T::is_invec( trn, ten[ii] ) ) inside_node = ten[ii];
+    else node_check += 1;
+  }
+
+  SYS_T::print_fatal_if(node_check!=3, "Error: TET_T::get_out_normal, the associated tet element is incompatible with the triangle element. \n");
+
+  // make cross line-0-1 and line-0-2
+  const Vector_3 l01( vol_ctrlPts[3*trn[1]] - vol_ctrlPts[3*trn[0]],
+      vol_ctrlPts[3*trn[1]+1] - vol_ctrlPts[3*trn[0]+1],
+      vol_ctrlPts[3*trn[1]+2] - vol_ctrlPts[3*trn[0]+2] );
+
+  const Vector_3 l02( vol_ctrlPts[3*trn[2]] - vol_ctrlPts[3*trn[0]],
+      vol_ctrlPts[3*trn[2]+1] - vol_ctrlPts[3*trn[0]+1],
+      vol_ctrlPts[3*trn[2]+2] - vol_ctrlPts[3*trn[0]+2] );
+
+  Vector_3 outVec = Vec3::cross_product( l01, l02 );
+
+  outVec.normalize();
+
+  // obtain the line from tri node 0 to the out-of-surface node
+  const Vector_3 inw( vol_ctrlPts[inside_node*3] - vol_ctrlPts[3*trn[0]],
+      vol_ctrlPts[inside_node*3+1] - vol_ctrlPts[3*trn[0]+1],
+      vol_ctrlPts[inside_node*3+2] - vol_ctrlPts[3*trn[0]+2] );
+
+  // inner product outward with inward, and correct outVec
+  if(inw.dot_product(outVec) > 0.0) outVec *= -1.0;
+
+  return outVec;
+}
+
+
 void TET_T::tetgenio2vtu( const tetgenio &meshout, const std::string &fName )
 {
   const int index_offset = meshout.firstnumber;

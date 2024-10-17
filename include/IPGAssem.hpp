@@ -1138,6 +1138,15 @@ class IPGAssem
 
     virtual void Init_L2_proj()
     {SYS_T::commPrint("Warning: Init_L2_proj() is not implemented. \n");}
+
+    virtual void Assem_test_fixed()
+    {}
+
+    virtual void Assem_test_rotated()
+    {}
+
+    virtual void Print_test(const int &index)
+    {}
 };
 
 #endif
