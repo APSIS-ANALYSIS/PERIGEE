@@ -183,11 +183,11 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
-    virtual void Solve_L2_proj(PLinear_Solver_PETSc * const &lsolver_ptr);
+    // virtual void Solve_L2_proj(PLinear_Solver_PETSc * const &lsolver_ptr);
 
-    virtual void Solve_L2_proj_2(PLinear_Solver_PETSc * const &lsolver_ptr);
+    // virtual void Solve_L2_proj_2(PLinear_Solver_PETSc * const &lsolver_ptr);
 
-    virtual void Init_L2_proj();
+    // virtual void Init_L2_proj();
 
   private:
     // Private data
@@ -197,24 +197,24 @@ class PGAssem_NS_FEM : public IPGAssem
 
     SI_T::SI_ancillary anci;
 
-    Mat L2_proj_mat;
+    // Mat L2_proj_mat;
 
-    Vec L2_proj_sol;
-    Vec L2_proj_sol_x;
-    Vec L2_proj_sol_y;
-    Vec L2_proj_sol_z;
-    Vec L2_proj_mvelo;
+    // Vec L2_proj_sol;
+    // Vec L2_proj_sol_x;
+    // Vec L2_proj_sol_y;
+    // Vec L2_proj_sol_z;
+    // Vec L2_proj_mvelo;
 
-    Vec L2_proj_lhs;
+    // Vec L2_proj_lhs;
 
-    Mat L2_proj_mat_2;
+    // Mat L2_proj_mat_2;
 
-    Vec L2_proj_sol_2;
-    Vec L2_proj_sol_x_2;
-    Vec L2_proj_sol_y_2;
-    Vec L2_proj_sol_z_2;
+    // Vec L2_proj_sol_2;
+    // Vec L2_proj_sol_x_2;
+    // Vec L2_proj_sol_y_2;
+    // Vec L2_proj_sol_z_2;
 
-    Vec L2_proj_lhs_2;
+    // Vec L2_proj_lhs_2;
 
     // Private function
     // Essential boundary condition
@@ -362,43 +362,43 @@ class PGAssem_NS_FEM : public IPGAssem
       }
     }
 
-    void Assem_L2_proj_mat(
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol );
+    // void Assem_L2_proj_mat(
+    //     FEAElement * const &fixed_elementv,
+    //     FEAElement * const &elements,
+    //     const IQuadPts * const &quad_s,
+    //     const ALocal_Interface * const &itf_part,
+    //     const SI_T::SI_solution * const &SI_sol );
 
-    void Assem_L2_proj_mat_2(
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol );
+    // void Assem_L2_proj_mat_2(
+    //     FEAElement * const &rotated_elementv,
+    //     FEAElement * const &elements,
+    //     const IQuadPts * const &quad_s,
+    //     const ALocal_Interface * const &itf_part,
+    //     const SI_T::SI_solution * const &SI_sol );
 
-    void Assem_L2_proj_rhs(
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
+    // void Assem_L2_proj_rhs(
+    //     FEAElement * const &fixed_elementv,
+    //     FEAElement * const &rotated_elementv,
+    //     FEAElement * const &elements,
+    //     const IQuadPts * const &quad_s,
+    //     IQuadPts * const &free_quad,
+    //     const ALocal_Interface * const &itf_part,
+    //     const SI_T::SI_solution * const &SI_sol,
+    //     const SI_T::SI_quad_point * const &SI_qp );
 
-    void Clear_L2_proj_rhs()
-    {
-      VecSet(L2_proj_sol, 0.0);
-      VecSet(L2_proj_sol_x, 0.0);
-      VecSet(L2_proj_sol_y, 0.0);
-      VecSet(L2_proj_sol_z, 0.0);
-      VecSet(L2_proj_mvelo, 0.0);
+    // void Clear_L2_proj_rhs()
+    // {
+    //   VecSet(L2_proj_sol, 0.0);
+    //   VecSet(L2_proj_sol_x, 0.0);
+    //   VecSet(L2_proj_sol_y, 0.0);
+    //   VecSet(L2_proj_sol_z, 0.0);
+    //   VecSet(L2_proj_mvelo, 0.0);
 
-      VecSet(L2_proj_sol_2, 0.0);
-      VecSet(L2_proj_sol_x_2, 0.0);
-      VecSet(L2_proj_sol_y_2, 0.0);
-      VecSet(L2_proj_sol_z_2, 0.0);
-    }
+    //   VecSet(L2_proj_sol_2, 0.0);
+    //   VecSet(L2_proj_sol_x_2, 0.0);
+    //   VecSet(L2_proj_sol_y_2, 0.0);
+    //   VecSet(L2_proj_sol_z_2, 0.0);
+    // }
 };
 
 #endif

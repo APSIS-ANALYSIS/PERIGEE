@@ -16,37 +16,37 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   // the solution of the nonlinear algebraic system 
   dot_step = new PDNSolution_NS( anode_ptr, 0, false );
 
-  lsolver_L2_proj = new PLinear_Solver_PETSc(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+  // lsolver_L2_proj = new PLinear_Solver_PETSc(
+  //       1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
-  KSPSetType(lsolver_L2_proj->ksp, KSPGMRES);
-  KSPGMRESSetOrthogonalization(lsolver_L2_proj->ksp,
-      KSPGMRESModifiedGramSchmidtOrthogonalization);
-  KSPGMRESSetRestart(lsolver_L2_proj->ksp, 500);
+  // KSPSetType(lsolver_L2_proj->ksp, KSPGMRES);
+  // KSPGMRESSetOrthogonalization(lsolver_L2_proj->ksp,
+  //     KSPGMRESModifiedGramSchmidtOrthogonalization);
+  // KSPGMRESSetRestart(lsolver_L2_proj->ksp, 500);
 
-  PC preproc; lsolver_L2_proj->GetPC(&preproc);
-  PCSetType( preproc, PCHYPRE );
-  PCHYPRESetType( preproc, "boomeramg" );
+  // PC preproc; lsolver_L2_proj->GetPC(&preproc);
+  // PCSetType( preproc, PCHYPRE );
+  // PCHYPRESetType( preproc, "boomeramg" );
 
-  lsolver_L2_proj_2 = new PLinear_Solver_PETSc(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+  // lsolver_L2_proj_2 = new PLinear_Solver_PETSc(
+  //       1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
-  KSPSetType(lsolver_L2_proj_2->ksp, KSPGMRES);
-  KSPGMRESSetOrthogonalization(lsolver_L2_proj_2->ksp,
-      KSPGMRESModifiedGramSchmidtOrthogonalization);
-  KSPGMRESSetRestart(lsolver_L2_proj_2->ksp, 500);
+  // KSPSetType(lsolver_L2_proj_2->ksp, KSPGMRES);
+  // KSPGMRESSetOrthogonalization(lsolver_L2_proj_2->ksp,
+  //     KSPGMRESModifiedGramSchmidtOrthogonalization);
+  // KSPGMRESSetRestart(lsolver_L2_proj_2->ksp, 500);
 
-  PC preproc_2; lsolver_L2_proj_2->GetPC(&preproc_2);
-  PCSetType( preproc_2, PCHYPRE );
-  PCHYPRESetType( preproc_2, "boomeramg" );
+  // PC preproc_2; lsolver_L2_proj_2->GetPC(&preproc_2);
+  // PCSetType( preproc_2, PCHYPRE );
+  // PCHYPRESetType( preproc_2, "boomeramg" );
 }
 
 
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
   delete dot_step; dot_step = nullptr;
-  delete lsolver_L2_proj; lsolver_L2_proj = nullptr;
-  delete lsolver_L2_proj_2; lsolver_L2_proj_2 = nullptr;
+  // delete lsolver_L2_proj; lsolver_L2_proj = nullptr;
+  // delete lsolver_L2_proj_2; lsolver_L2_proj_2 = nullptr;
 }
 
 
@@ -162,9 +162,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   SI_sol->update_node_sol(&sol_alpha);
   SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements,
     quad_s, free_quad, itf_part, SI_sol);
-  gassem_ptr->Assem_L2_proj_mat_2(elementvs, elements, quad_s, itf_part, SI_sol);
-  gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
-  gassem_ptr->Solve_L2_proj_2(lsolver_L2_proj_2);
+  // gassem_ptr->Assem_L2_proj_mat_2(elementvs, elements, quad_s, itf_part, SI_sol);
+  // gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
+  // gassem_ptr->Solve_L2_proj_2(lsolver_L2_proj_2);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -235,8 +235,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
 
     SI_sol->update_node_sol(&sol_alpha);
-    gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
-    gassem_ptr->Solve_L2_proj_2(lsolver_L2_proj_2);
+    // gassem_ptr->Solve_L2_proj(lsolver_L2_proj);
+    // gassem_ptr->Solve_L2_proj_2(lsolver_L2_proj_2);
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )

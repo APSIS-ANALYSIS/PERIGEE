@@ -565,11 +565,8 @@ class IPLocAssem
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &proj_rotated_local_sol,
-      const double * const &proj_rotated_local_sol_x,
-      const double * const &proj_rotated_local_sol_y,
-      const double * const &proj_rotated_local_sol_z,
-      const double * const &proj_rotated_local_mvelo)
+      const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo)
       {SYS_T::commPrint("Warning: this Assem_Residual_itf_fixed is not implemented.\n");}
 
     virtual void Assem_Residual_itf_rotated(
@@ -580,10 +577,7 @@ class IPLocAssem
       const FEAElement * const &fixed_elementv,
       const double * const &rotated_local_sol,
       const double * const &rotated_local_mvelo,
-      const double * const &proj_fixed_local_sol,
-      const double * const &proj_fixed_local_sol_x,
-      const double * const &proj_fixed_local_sol_y,
-      const double * const &proj_fixed_local_sol_z)
+      const double * const &fixed_local_sol)
       {SYS_T::commPrint("Warning: this Assem_Residual_itf_rotated is not implemented.\n");}
 
     virtual void Assem_Tangent_itf_MF_fixed(
@@ -593,8 +587,8 @@ class IPLocAssem
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol,
-      const double * const &proj_rotated_local_sol,
-      const double * const &proj_rotated_local_mvelo)
+      const double * const &rotated_local_sol,
+      const double * const &rotated_local_mvelo)
       {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf_MF_fixed is not implemented.\n");}
 
     virtual void Assem_Tangent_itf_MF_rotated(
@@ -604,7 +598,7 @@ class IPLocAssem
       const FEAElement * const &rotated_elementv,
       const FEAElement * const &fixed_elementv,
       const double * const &rotated_local_sol,
-      const double * const &proj_fixed_local_sol,
+      const double * const &fixed_local_sol,
       const double * const &rotated_local_mvelo)
       {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf_MF_fixed is not implemented.\n");}
 };
