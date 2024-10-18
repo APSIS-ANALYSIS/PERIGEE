@@ -62,20 +62,26 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 
   SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, part_itf, SI_sol);
 
-  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, SI_sol, SI_qp, gbc );
+  // Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
+  //     elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, SI_sol, SI_qp, gbc );
 
-  // Obtain the precise dnz and onz count
-  std::vector<int> Kdnz, Konz;
-  PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
+  // // Obtain the precise dnz and onz count
+  // std::vector<int> Kdnz, Konz;
+  // PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
 
-  MatDestroy(&K); // Destroy the K with rough preallocation
+  // MatDestroy(&K); // Destroy the K with rough preallocation
  
-  // Create Mat with precise preallocation 
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+  // // Create Mat with precise preallocation 
+  // MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
+  //     PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 
   // Assem_L2_mat(elementvs, elements, quads, part_itf, SI_sol);
+
+  quad_fixed = 0.0;
+  quad_rotated = 0.0;
+
+  sum_qf = 0.0;
+  sum_qr = 0.0;
 }
 
 PGAssem_NS_FEM::~PGAssem_NS_FEM()
@@ -1698,6 +1704,8 @@ void PGAssem_NS_FEM::Assem_test_fixed()
   double opposite_xi {1.0 / 3.0};
   double opposite_eta {1.0 / 3.0};
 
+  quad_fixed = 0.0;
+
   for(int itf_id{0}; itf_id<num_itf; ++itf_id)
   {
     // SYS_T::commPrint("itf_id = %d\n", itf_id);
@@ -1763,6 +1771,8 @@ void PGAssem_NS_FEM::Assem_test_fixed()
           oppo_pt.z() += curPt_z[ii] * Nr[ii];
         }
 
+        quad_fixed += qw * J * test_g(oppo_pt);
+
         for(int A{0}; A < nLocBas; ++A)
         {
           local_residual[4*A] += qw * J * test_f(oppo_pt);
@@ -1779,6 +1789,8 @@ void PGAssem_NS_FEM::Assem_test_fixed()
         VecSetValues(G, loc_dof, fixed_row_index, local_residual, ADD_VALUES);
       }
     }
+
+    MPI_Allreduce(&quad_fixed, &sum_qf, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD);
   }
 
   VecAssemblyBegin(G);
@@ -1841,6 +1853,8 @@ void PGAssem_NS_FEM::Assem_test_rotated()
   double opposite_xi {1.0 / 3.0};
   double opposite_eta {1.0 / 3.0};
 
+  quad_rotated = 0.0;
+
   for(int itf_id{0}; itf_id<num_itf; ++itf_id)
   {
     // SYS_T::commPrint("itf_id = %d\n", itf_id);
@@ -1902,6 +1916,8 @@ void PGAssem_NS_FEM::Assem_test_rotated()
           oppo_pt.z() += ctrl_z[ii] * Ns[ii];
         }
 
+        quad_rotated += qw * J * test_g(oppo_pt);
+
         for(int A{0}; A < nLocBas; ++A)
         {
           local_residual[4*A] += qw * J * test_f(oppo_pt);
@@ -1917,7 +1933,9 @@ void PGAssem_NS_FEM::Assem_test_rotated()
 
         VecSetValues(G, loc_dof, rotated_row_index, local_residual, ADD_VALUES);
       }
-    }    
+    }
+
+    MPI_Allreduce(&quad_rotated, &sum_qr, 1, MPI_DOUBLE, MPI_SUM, PETSC_COMM_WORLD); 
   }
 
   VecAssemblyBegin(G);

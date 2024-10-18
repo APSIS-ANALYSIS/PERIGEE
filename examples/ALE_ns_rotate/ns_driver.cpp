@@ -514,34 +514,34 @@ int main(int argc, char *argv[])
   // gloAssem_ptr->Init_L2_proj();
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
-  if( is_restart == false )
-  {
-    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+  // if( is_restart == false )
+  // {
+  //   SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+  //   PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+  //       1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
-    KSPSetType(lsolver_acce->ksp, KSPGMRES);
-    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-        KSPGMRESModifiedGramSchmidtOrthogonalization);
-    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+  //   KSPSetType(lsolver_acce->ksp, KSPGMRES);
+  //   KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+  //       KSPGMRESModifiedGramSchmidtOrthogonalization);
+  //   KSPGMRESSetRestart(lsolver_acce->ksp, 500);
 
-    PC preproc; lsolver_acce->GetPC(&preproc);
-    PCSetType( preproc, PCHYPRE );
-    PCHYPRESetType( preproc, "boomeramg" );
+  //   PC preproc; lsolver_acce->GetPC(&preproc);
+  //   PCSetType( preproc, PCHYPRE );
+  //   PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
-        elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
-        locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
+  //   gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
+  //       elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
+  //       locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
 
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+  //   lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
-    dot_sol -> ScaleValue(-1.0);
+  //   dot_sol -> ScaleValue(-1.0);
 
-    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-    lsolver_acce -> print_info();
-    delete lsolver_acce;
-    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  }
+  //   SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+  //   lsolver_acce -> print_info();
+  //   delete lsolver_acce;
+  //   SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
+  // }
 
   // ===== Linear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
@@ -651,9 +651,13 @@ int main(int argc, char *argv[])
 
   gloAssem_ptr->Clear_G();
 
+  gloAssem_ptr->Assem_test_fixed();
+
   gloAssem_ptr->Assem_test_rotated();
 
-  gloAssem_ptr->Print_test(133);
+  gloAssem_ptr->print_value();
+
+  // gloAssem_ptr->Print_test(133);
 
   // ===== Print complete solver info =====
   // lsolver -> print_info();

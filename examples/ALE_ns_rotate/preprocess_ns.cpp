@@ -53,8 +53,7 @@ int main( int argc, char * argv[] )
   const int num_outlet                = paras["num_outlet"].as<int>();
   const std::string geo_file          = paras["geo_file"].as<std::string>();
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
-  const std::string sur_file_wall_1     = paras["sur_file_wall_1"].as<std::string>();
-  const std::string sur_file_wall_2     = paras["sur_file_wall_2"].as<std::string>();
+  const std::string sur_file_wall     = paras["sur_file_wall"].as<std::string>();
   const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
 
   const int num_interface_pair        = paras["num_interface_pair"].as<int>();
@@ -96,7 +95,7 @@ int main( int argc, char * argv[] )
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
-  // cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
+  cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
   cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
   cout<<" -fixed_interface_base: "<<fixed_interface_base<<endl;
   cout<<" -rotated_interface_base: "<<rotated_interface_base<<endl;
@@ -113,7 +112,7 @@ int main( int argc, char * argv[] )
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
 
-  // SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
+  SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
   // Generate the inlet file names and check existance
   std::vector< std::string > sur_file_in;
@@ -191,8 +190,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
-  cmdh5w->write_string("sur_file_wall_1", sur_file_wall_1);
-  cmdh5w->write_string("sur_file_wall_2", sur_file_wall_2);
+  cmdh5w->write_string("sur_file_wall", sur_file_wall);
   cmdh5w->write_string("fixed_interface_base", fixed_interface_base);
   cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
   cmdh5w->write_string("part_file", part_file);
@@ -362,13 +360,11 @@ int main( int argc, char * argv[] )
   
   if (wall_model_type == 0)
   {
-    dir_list.push_back( sur_file_wall_1 );
-    dir_list.push_back( sur_file_wall_2 );
+    dir_list.push_back( sur_file_wall );
   }
   else if (wall_model_type == 1 || wall_model_type == 2)
   {
-    weak_list.push_back( sur_file_wall_1 );
-    weak_list.push_back( sur_file_wall_2 );
+    weak_list.push_back( sur_file_wall );
   }
   else
     SYS_T::print_fatal("Unknown wall model type.");
@@ -383,8 +379,8 @@ int main( int argc, char * argv[] )
 
   if(elemType == 501 || elemType == 502)
   {
-    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );    
+    // inlet_outvec[0] = TET_T::get_out_normal( sur_file_in[0], ctrlPts, IEN );
+    // inlet_outvec[1] = TET_T::get_out_normal( sur_file_in[1], ctrlPts, IEN, 15383, 74621);  
   }
   else if(elemType == 601 || elemType == 602)
   {
@@ -394,7 +390,7 @@ int main( int argc, char * argv[] )
   else
     SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the inflow boundary condition. \n");
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall_1,
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
 
   InFBC -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
@@ -405,7 +401,8 @@ int main( int argc, char * argv[] )
   
   if(elemType == 501 || elemType == 502)
   {
-    outlet_outvec[0] = TET_T::get_out_normal( sur_file_out[0], ctrlPts, IEN, 93, 234 );  
+    // outlet_outvec[0] = TET_T::get_out_normal( sur_file_out[0], ctrlPts, IEN );
+    // outlet_outvec[1] = TET_T::get_out_normal( sur_file_out[1], ctrlPts, IEN, 15383,  74621);
   }
   else if(elemType == 601 || elemType == 602)
   {
@@ -417,16 +414,16 @@ int main( int argc, char * argv[] )
 
   ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
-  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  // ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
   ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
-  std::vector<double> intervals_0 {0.0, 3.0};
+  std::vector<double> intervals_0 {0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0};
 
   Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_fixed_itf.h5", "epart_000_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, Vector_3(1.0, 1.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 2);
 
   // std::vector<double> intervals_12 {0.0, 0.4};
 

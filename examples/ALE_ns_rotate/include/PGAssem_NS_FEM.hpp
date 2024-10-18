@@ -215,6 +215,19 @@ class PGAssem_NS_FEM : public IPGAssem
       delete [] values;
     }
 
+    virtual void print_value()
+    {
+      SYS_T::commPrint("Value with fixed qp = %e\n", sum_qf);
+      SYS_T::commPrint("Value with rotated qp = %e\n", sum_qr);
+    }
+
+    double quad_fixed;
+
+    double quad_rotated;
+
+    double sum_qf;
+    double sum_qr;
+
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
@@ -388,9 +401,14 @@ class PGAssem_NS_FEM : public IPGAssem
       }
     }
 
-    double test_f(const Vector_3& pt)
+    double test_f(const Vector_3 &pt)
     {
       return (pt.x()-2) * (pt.x()-2) * (pt.x()-2) * (pt.x()-2) * (pt.y()+5) * (pt.y()+5);
+    }
+
+    double test_g(const Vector_3 &pt)
+    {
+      return pt.x() * pt.x() * pt.z();
     }
 
     // void Assem_L2_proj_mat(

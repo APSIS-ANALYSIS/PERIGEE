@@ -1147,6 +1147,9 @@ class IPGAssem
 
     virtual void Print_test(const int &index)
     {}
+
+    virtual void print_value()
+    {}
 };
 
 #endif
