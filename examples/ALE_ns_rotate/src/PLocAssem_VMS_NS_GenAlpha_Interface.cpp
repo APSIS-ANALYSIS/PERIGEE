@@ -250,13 +250,13 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
     ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
     ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
 
-    vs_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
-    vs_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
-    vs_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
+    vr_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
+    vr_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
+    vr_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
 
-    ws_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
-    ws_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
-    ws_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
+    wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
+    wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
+    wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
 
     mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
     mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
