@@ -11,26 +11,26 @@
 #include "IQuadPts.hpp"
 #include "Vec_Tools.hpp"
 
-class QuadPts_debug : public IQuadPts
+class QuadPts_debug final : public IQuadPts
 {
   public:
     QuadPts_debug( const std::vector<double> &in_qp,
         const std::vector<double> &in_qw, const int &in_dim = 1 );
 
-    virtual ~QuadPts_debug() = default;
+    ~QuadPts_debug() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual int get_dim() const {return dim;}
+    int get_dim() const override {return dim;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return num_pts;}
 
-    virtual double get_qp(const int &ii) const {return qp[ii];}
+    double get_qp(const int &ii) const override {return qp[ii];}
 
-    virtual double get_qp(const int &ii, const int &comp) const
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[dim*ii + comp];}
 
-    virtual double get_qw(const int &ii) const {return qw[ii];}
+    double get_qw(const int &ii) const override {return qw[ii];}
 
   private:
     const int num_pts, dim;

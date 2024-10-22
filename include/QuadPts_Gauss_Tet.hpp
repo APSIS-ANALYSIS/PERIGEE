@@ -20,23 +20,23 @@
 #include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
-class QuadPts_Gauss_Tet : public IQuadPts
+class QuadPts_Gauss_Tet final : public IQuadPts
 {
   public:
     QuadPts_Gauss_Tet( const int &in_num_pts );
 
-    virtual ~QuadPts_Gauss_Tet() = default;
+    ~QuadPts_Gauss_Tet() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual int get_dim() const {return 4;}
+    int get_dim() const override {return 4;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return num_pts;}
 
-    virtual double get_qp(const int &ii, const int &comp) const
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[4*ii+comp];}
 
-    virtual double get_qw(const int &ii) const
+    double get_qw(const int &ii) const override
     {return qw[ii];}
 
   private:

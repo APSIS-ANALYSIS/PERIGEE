@@ -19,28 +19,28 @@
 // ==================================================================
 #include "IQuadPts.hpp"
 
-class QuadPts_vis_tet10_v2 : public IQuadPts
+class QuadPts_vis_tet10_v2 final : public IQuadPts
 {
   public:
     QuadPts_vis_tet10_v2() = default;
 
-    virtual ~QuadPts_vis_tet10_v2() = default;
+    ~QuadPts_vis_tet10_v2() override = default;
 
-    virtual void print_info() const
+    void print_info() const override 
     {
       SYS_T::commPrint("\n===== Visualization Points for Tet10 v2 ===== \n");
       IQuadPts::print_info();
       SYS_T::commPrint("========================================= \n");
     }
 
-    virtual int get_dim() const {return 4;}
+    int get_dim() const override {return 4;}
 
-    virtual int get_num_quadPts() const {return 10;}
+    int get_num_quadPts() const override {return 10;}
 
-    virtual double get_qp(const int &ii, const int &comp) const
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[4*ii+comp];}
 
-    virtual double get_qw(const int &ii) const {return 0.1/6.0;}
+    double get_qw(const int &ii) const override {return 0.1/6.0;}
 
   private:
     const double qp[40] { 0.0, 0.0, 0.0, 1.0,
