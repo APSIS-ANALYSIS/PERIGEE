@@ -27,7 +27,7 @@ class PGAssem_2x2Block_FEM : public IPGAssem_2x2Block
   public:
     PGAssem_2x2Block_FEM(
         IPLocAssem_2x2Block * const &locassem_ptr,
-        IAGlobal_Mesh_Info const * const &agmi_ptr,
+        AGlobal_Mesh_Info const * const &agmi_ptr,
         ALocal_Elem const * const &alelem_ptr,
         ALocal_IEN const * const &aien_ptr,
         APart_Node const * const &pnode_ptr,
