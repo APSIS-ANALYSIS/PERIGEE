@@ -18,33 +18,11 @@ namespace SI_T
     num_fixed_node.assign(num_itf, 0);
     fixed_node_sol.resize(num_itf);
 
-    f_r_node_sol.resize(num_itf);
-    f_r_node_sol_x.resize(num_itf);
-    f_r_node_sol_y.resize(num_itf);
-    f_r_node_sol_z.resize(num_itf);
-
-    f_r_node_mvelo.resize(num_itf);
-
-    L2_proj_fixed_node_pos.resize(num_itf);
-    num_all_fixed_node = h5r -> read_intScalar( gname.c_str(), "num_all_fixed_node" );
-    all_fixed_inner_node = h5r -> read_intVector( gname.c_str(), "all_fixed_inner_node" );
-    num_all_fixed_inner_node = VEC_T::get_size(all_fixed_inner_node);
-
     fixed_node_part_tag.resize(num_itf);
     fixed_node_loc_pos.resize(num_itf);
 
     num_rotated_node.assign(num_itf, 0);
     rotated_node_sol.resize(num_itf);
-
-    r_f_node_sol.resize(num_itf);
-    r_f_node_sol_x.resize(num_itf);
-    r_f_node_sol_y.resize(num_itf);
-    r_f_node_sol_z.resize(num_itf);
-
-    L2_proj_rotated_node_pos.resize(num_itf);
-    num_all_rotated_node = h5r -> read_intScalar( gname.c_str(), "num_all_rotated_node" );
-    all_rotated_inner_node = h5r -> read_intVector( gname.c_str(), "all_rotated_inner_node" );
-    num_all_rotated_inner_node = VEC_T::get_size(all_rotated_inner_node);
 
     rotated_node_mvelo.resize(num_itf);
     rotated_node_mdisp.resize(num_itf);
@@ -67,31 +45,11 @@ namespace SI_T
 
       fixed_node_sol[ii] = std::vector<double> (dof_sol * num_fixed_node[ii], 0.0);
 
-      f_r_node_sol[ii] = std::vector<double> (dof_sol * num_fixed_node[ii], 0.0);
-
-      f_r_node_sol_x[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
-      f_r_node_sol_y[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
-      f_r_node_sol_z[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
-
-      f_r_node_mvelo[ii] = std::vector<double> (3 * num_fixed_node[ii], 0.0);
-
-      L2_proj_fixed_node_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "L2_proj_fixed_node_pos" );
-
       fixed_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_part_tag" );
 
       fixed_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_loc_pos" );
 
       num_rotated_node[ii] = VEC_T::get_size(h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" ));
-
-      rotated_node_sol[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
-
-      r_f_node_sol[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
-
-      r_f_node_sol_x[ii] = std::vector<double> (3 * num_rotated_node[ii], 0.0);
-      r_f_node_sol_y[ii] = std::vector<double> (3 * num_rotated_node[ii], 0.0);
-      r_f_node_sol_z[ii] = std::vector<double> (3 * num_rotated_node[ii], 0.0);
-
-      L2_proj_rotated_node_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "L2_proj_rotated_node_pos" );
 
       rotated_node_mvelo[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
 
@@ -210,101 +168,6 @@ namespace SI_T
     }
 
     delete [] array; array = nullptr; 
-  }
-
-  void SI_solution::update_L2_proj_result(const Vec &L2_proj_lhs, const int &which)
-  {
-    for(int ii = 0; ii < VEC_T::get_size(num_fixed_node); ++ii)
-    {
-      PetscInt * idx;
-      if(which == 0)
-      {
-        idx = new PetscInt[4 * num_fixed_node[ii]];
-        for(int jj = 0; jj < num_fixed_node[ii]; ++jj)
-        {
-          idx[4 * jj] = 4 * L2_proj_fixed_node_pos[ii][jj];
-          idx[4 * jj + 1] = 4 * L2_proj_fixed_node_pos[ii][jj] + 1;
-          idx[4 * jj + 2] = 4 * L2_proj_fixed_node_pos[ii][jj] + 2;
-          idx[4 * jj + 3] = 4 * L2_proj_fixed_node_pos[ii][jj] + 3;
-        }
-      }
-      else if(which > 0 && which < 5)
-      {
-        idx = new PetscInt[3 * num_fixed_node[ii]];
-        for(int jj = 0; jj < num_fixed_node[ii]; ++jj)
-        {
-          idx[3 * jj] = 4 * L2_proj_fixed_node_pos[ii][jj] + 1;
-          idx[3 * jj + 1] = 4 * L2_proj_fixed_node_pos[ii][jj] + 2;
-          idx[3 * jj + 2] = 4 * L2_proj_fixed_node_pos[ii][jj] + 3;
-        }
-      }
-      else if(which == 5)
-      {
-        idx = new PetscInt[4 * num_rotated_node[ii]];
-        for(int jj = 0; jj < num_rotated_node[ii]; ++jj)
-        {
-          idx[4 * jj] = 4 * L2_proj_rotated_node_pos[ii][jj];
-          idx[4 * jj + 1] = 4 * L2_proj_rotated_node_pos[ii][jj] + 1;
-          idx[4 * jj + 2] = 4 * L2_proj_rotated_node_pos[ii][jj] + 2;
-          idx[4 * jj + 3] = 4 * L2_proj_rotated_node_pos[ii][jj] + 3;
-        }
-      }
-      else if(which > 5 && which < 9)
-      {
-        idx = new PetscInt[3 * num_rotated_node[ii]];
-        for(int jj = 0; jj < num_rotated_node[ii]; ++jj)
-        {
-          idx[3 * jj] = 4 * L2_proj_rotated_node_pos[ii][jj] + 1;
-          idx[3 * jj + 1] = 4 * L2_proj_rotated_node_pos[ii][jj] + 2;
-          idx[3 * jj + 2] = 4 * L2_proj_rotated_node_pos[ii][jj] + 3;
-        }
-      }
-
-      switch (which)
-      {
-        case 0:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 4 * num_fixed_node[ii], &f_r_node_sol[ii][0]);
-        break;
-
-        case 1:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_sol_x[ii][0]);
-        break;
-
-        case 2:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_sol_y[ii][0]);
-        break;
-
-        case 3:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_sol_z[ii][0]);
-        break;
-
-        case 4:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_fixed_node[ii], &f_r_node_mvelo[ii][0]);
-        break;
-
-        case 5:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 4 * num_rotated_node[ii], &r_f_node_sol[ii][0]);
-        break;
-
-        case 6:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_rotated_node[ii], &r_f_node_sol_x[ii][0]);
-        break;
-
-        case 7:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_rotated_node[ii], &r_f_node_sol_y[ii][0]);
-        break;
-
-        case 8:
-          PETSc_T::Scatter(L2_proj_lhs, idx, 3 * num_rotated_node[ii], &r_f_node_sol_z[ii][0]);
-        break;
-        
-        default:
-          SYS_T::print_fatal("Error, SI_solution::update_L2_proj_result, wrong input.\n");
-        break;
-      }
-        
-      delete idx; idx = nullptr;
-    }
   }
 
   SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in)

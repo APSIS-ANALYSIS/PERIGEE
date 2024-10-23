@@ -120,22 +120,6 @@ class Interface_Partition
     std::vector<std::vector<std::vector<int>>> tagged_rotated_ele;
 
     std::vector<std::vector<int>> num_tagged_rotated_ele;
-
-    int num_all_fixed_node;
-
-    std::vector<int> all_fixed_global_node;
-
-    std::vector<int> all_fixed_inner_node;
-
-    std::vector<std::vector<int>> L2_proj_fixed_node_pos;
-
-    int num_all_rotated_node;
-
-    std::vector<int> all_rotated_global_node;
-
-    std::vector<int> all_rotated_inner_node;
-
-    std::vector<std::vector<int>> L2_proj_rotated_node_pos;
 };
 
 #endif

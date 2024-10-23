@@ -81,9 +81,6 @@ class Interface_pair
     virtual std::vector<int> get_fixed_interval_tag() const
     {return fixed_interval_tag;}
 
-    virtual std::vector<int> get_fixed_inner_node() const
-    {return fixed_inner_node;}
-
     virtual int get_num_rotated_ele() const
     {return  num_rotated_ele;}
 
@@ -104,9 +101,6 @@ class Interface_pair
 
     virtual std::vector<int> get_rotated_interval_tag() const
     {return rotated_interval_tag;}
-
-    virtual std::vector<int> get_rotated_inner_node() const
-    {return rotated_inner_node;}
 
   private:
     // 0: Lofted along an axis
@@ -137,8 +131,6 @@ class Interface_pair
     // the GlobalNodeID of the fixed layer nodes
     std::vector<int> fixed_global_node;
 
-    std::vector<int> fixed_inner_node;
-
     // the xyz-coordinate of nodes, corresponding to the fixed_global_node
     std::vector<double> fixed_pt_xyz;
 
@@ -159,8 +151,6 @@ class Interface_pair
 
     // the GlobalNodeID of the rotated layer nodes
     std::vector<int> rotated_global_node;
-
-    std::vector<int> rotated_inner_node;
 
     // the xyz-coordinate of nodes, corresponding to the rotated_global_node
     std::vector<double> rotated_pt_xyz;

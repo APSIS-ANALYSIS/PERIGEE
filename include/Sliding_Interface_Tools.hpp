@@ -33,27 +33,6 @@ namespace SI_T
         }
       }
 
-      void get_projected_rotated_local(const int &ii, const int * const &fixed_local_ien,
-        double * const &local_sol, double * const &local_sol_x, double * const &local_sol_y,
-        double * const &local_sol_z, double * const &local_mvleo) const
-      {
-        for(int nn=0; nn < nLocBas; ++nn)
-        {
-          for(int dd=0; dd < dof_sol; ++dd)
-          {
-            local_sol[dof_sol * nn + dd] = f_r_node_sol[ii][dof_sol * fixed_local_ien[nn] + dd];
-          }
-
-          for(int dd=0; dd < 3; ++dd)
-          {
-            local_sol_x[3 * nn + dd] = f_r_node_sol_x[ii][3 * fixed_local_ien[nn] + dd];
-            local_sol_y[3 * nn + dd] = f_r_node_sol_y[ii][3 * fixed_local_ien[nn] + dd];
-            local_sol_z[3 * nn + dd] = f_r_node_sol_z[ii][3 * fixed_local_ien[nn] + dd];
-            local_mvleo[3 * nn + dd] = f_r_node_mvelo[ii][3 * fixed_local_ien[nn] + dd];
-          }
-        }
-      }
-
       // Return the local ien array and the local mdisp array of a rotated layer element
       void get_rotated_mdisp(const ALocal_Interface * const &itf,
         const int &ii, const int &ee,
@@ -103,25 +82,6 @@ namespace SI_T
         }
       }
 
-      void get_projected_fixed_local(const int &ii, const int * const &rotated_local_ien,
-        double * const &local_sol, double * const &local_sol_x, double * const &local_sol_y,
-        double * const &local_sol_z) const
-      {
-        for(int nn=0; nn < nLocBas; ++nn)
-        {
-          for(int dd=0; dd < dof_sol; ++dd)
-          {
-            local_sol[dof_sol * nn + dd] = r_f_node_sol[ii][dof_sol * rotated_local_ien[nn] + dd];
-          }
-          for(int dd=0; dd < 3; ++dd)
-          {
-            local_sol_x[3 * nn + dd] = r_f_node_sol_x[ii][3 * rotated_local_ien[nn] + dd];
-            local_sol_y[3 * nn + dd] = r_f_node_sol_y[ii][3 * rotated_local_ien[nn] + dd];
-            local_sol_z[3 * nn + dd] = r_f_node_sol_z[ii][3 * rotated_local_ien[nn] + dd];
-          }
-        }
-      }
-
       void update_node_sol(const PDNSolution * const &sol);
 
       void update_node_mvelo(const PDNSolution * const &mvelo);
@@ -158,53 +118,6 @@ namespace SI_T
         }
       }
 
-      int get_num_all_fixed_node() const
-      {
-        return num_all_fixed_node;
-      }
-
-      int get_L2_proj_fixed_node_pos(const int &ii, const int &jj) const
-      {
-        return L2_proj_fixed_node_pos[ii][jj];
-      }
-
-      int get_num_all_fixed_inner_node() const
-      {
-        return num_all_fixed_inner_node;
-      }
-
-      int get_fixed_inner_node(const int &ii) const
-      {
-        return all_fixed_inner_node[ii];
-      }
-
-      int get_num_all_rotated_node() const
-      {
-        return num_all_rotated_node;
-      }
-
-      int get_L2_proj_rotated_node_pos(const int &ii, const int &jj) const
-      {
-        return L2_proj_rotated_node_pos[ii][jj];
-      }
-
-      int get_num_all_rotated_inner_node() const
-      {
-        return num_all_rotated_inner_node;
-      }
-
-      int get_rotated_inner_node(const int &ii) const
-      {
-        return all_rotated_inner_node[ii];
-      }
-
-      void update_L2_proj_result(const Vec &L2_proj_lhs, const int &which);
-      // which: 0 -- f_r_node_sol
-      //        1,2,3 -- f_r_node_sol_x/y/z
-      //        4 -- f_r_node_mvelo
-      //        5 -- r_f_node_sol
-      //        6,7,8 -- r_f_node_sol_x/y/z
-
     private:
       const int cpu_rank;
       int nLocBas, dof_sol;
@@ -216,21 +129,6 @@ namespace SI_T
       // stores the pressure and velocity info of the nodes from the fixed volume elements
       // size: num_itf x (4 x num_fixed_node[ii])
       std::vector<std::vector<double>> fixed_node_sol;
-
-      std::vector<std::vector<double>> f_r_node_sol;
-      std::vector<std::vector<double>> f_r_node_sol_x;
-      std::vector<std::vector<double>> f_r_node_sol_y;
-      std::vector<std::vector<double>> f_r_node_sol_z;
-      
-      std::vector<std::vector<double>> f_r_node_mvelo;
-
-      std::vector<std::vector<int>> L2_proj_fixed_node_pos;
-
-      int num_all_fixed_node;
-
-      int num_all_fixed_inner_node;
-
-      std::vector<int> all_fixed_inner_node;
     
       // stores the partition tag of the nodes from the rotated volume elements
       // size: num_itf x num_fixed_node[ii]
@@ -247,21 +145,6 @@ namespace SI_T
       // stores the pressure and velocity info of the nodes from the rotated volume elements
       // size: num_itf x (4 x num_rotated_node[ii])
       std::vector<std::vector<double>> rotated_node_sol;
-
-      std::vector<std::vector<double>> r_f_node_sol;
-      std::vector<std::vector<double>> r_f_node_sol_x;
-      std::vector<std::vector<double>> r_f_node_sol_y;
-      std::vector<std::vector<double>> r_f_node_sol_z;
-
-      // r_f_node_mvelo are zeros 
-
-      std::vector<std::vector<int>> L2_proj_rotated_node_pos;
-
-      int num_all_rotated_node;
-
-      int num_all_rotated_inner_node;
-
-      std::vector<int> all_rotated_inner_node;
 
       // stores the mesh velocity info of the nodes from the rotated volume elements
       // size: num_itf x (3 x num_rotated_node[ii])    
@@ -334,10 +217,6 @@ namespace SI_T
     private:
       const int nqp_sur;
 
-      // // stores the current rotated element tag for each quadrature point
-      // // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface)
-      // std::vector<std::vector<int>> fixed_qp_curr_rotated_tag;
-
       // stores the current rotated element number for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface)
       std::vector<std::vector<int>> fixed_qp_curr_rotated_ee;
@@ -347,7 +226,7 @@ namespace SI_T
       std::vector<std::vector<double>> fixed_qp_curr_rotated_xi;
       std::vector<std::vector<double>> fixed_qp_curr_rotated_eta;
 
-      // std::vector<std::vector<int>> rotated_qp_curr_fixed_tag;
+      // rotated counterpart
       std::vector<std::vector<int>> rotated_qp_curr_fixed_ee;
       std::vector<std::vector<double>> rotated_qp_curr_fixed_xi;
       std::vector<std::vector<double>> rotated_qp_curr_fixed_eta;
