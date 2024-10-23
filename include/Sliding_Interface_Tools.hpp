@@ -20,6 +20,7 @@ namespace SI_T
 
       ~SI_solution() = default;
 
+      // Return the local ien array and the local solution array of a fixed layer element
       void get_fixed_local(const ALocal_Interface * const &itf,
         const int &ii, const int &ee,
         int * const &local_ien, double * const &local_sol) const
@@ -47,25 +48,8 @@ namespace SI_T
         }
       }
 
-      void get_rotated_local(const ALocal_Interface * const &itf,
-        const int &ii, const int &ee,
-        int * const &local_ien, double * const &local_sol, double * const &local_mvleo) const
-      {
-        for(int nn = 0; nn < nLocBas; ++nn)
-        {
-          local_ien[nn] = itf->get_rotated_lien(ii, ee * nLocBas + nn);
-
-          for(int dd = 0; dd < dof_sol; ++dd)
-          {
-            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
-          }
-          for(int dd = 0; dd < 3; ++dd)
-          {
-            local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
-          }
-        }
-      }
-
+      // Return the local solution array and mesh velocity of a rotated layer element
+      // Used after get_rotated_mdisp
       void get_rotated_local(const int &ii, const int * const &local_ien,
         double * const &local_sol, double * const &local_mvleo) const
       {

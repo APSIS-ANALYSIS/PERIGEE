@@ -1338,7 +1338,7 @@ void PGAssem_NS_FEM::Interface_G(
 
       anchor_elementv->buildBasis(rotated_face_id, quad_s, curPt_x, curPt_y, curPt_z);
 
-      SI_sol->get_rotated_local(itf_part, itf_id, ee, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
+      SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
@@ -1519,8 +1519,7 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
 
       anci.A_fixed_elementv->buildBasis(rotated_face_id, anci.A_quad_s, curPt_x, curPt_y, curPt_z);
 
-      anci.A_SI_sol->get_rotated_local(anci.A_itf_part, itf_id, ee, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
-      // mvelo is not projected here, just use this name
+      anci.A_SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
