@@ -234,8 +234,8 @@ namespace SI_T
       {
         A_dt = 0.0;
         A_lassemptr = lassem_ptr;
-        A_fixed_elementv = fixed_elementv;
-        A_rotated_elementv = rotated_elementv;
+        A_anchor_elementv = fixed_elementv;
+        A_opposite_elementv = rotated_elementv;
         A_elements = elements;
         A_quad_s = quad_s;
         A_free_quad = free_quad;
@@ -248,8 +248,8 @@ namespace SI_T
       {
         A_dt = 0.0;
         A_lassemptr = nullptr;
-        A_fixed_elementv = nullptr;
-        A_rotated_elementv = nullptr;
+        A_anchor_elementv = nullptr;
+        A_opposite_elementv = nullptr;
         A_elements = nullptr;
         A_free_quad = nullptr;
         A_SI_sol = nullptr;
@@ -260,9 +260,9 @@ namespace SI_T
 
       IPLocAssem * A_lassemptr;
 
-      FEAElement * A_fixed_elementv;
+      FEAElement * A_anchor_elementv;
 
-      FEAElement * A_rotated_elementv;
+      FEAElement * A_opposite_elementv;
 
       FEAElement * A_elements;
 

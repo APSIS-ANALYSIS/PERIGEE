@@ -1276,7 +1276,9 @@ void PGAssem_NS_FEM::Interface_G(
     {
       // SYS_T::commPrint("  fixed_ee = %d\n", ee);
       // const int local_ee_index{itf_part->get_fixed_ele_id(itf_id, ee)};
-      int ee = itf_part->get_fixed_ele(itf_id, ee_index);
+
+      // Pick out the fixed element 
+      const int ee = itf_part->get_fixed_ele(itf_id, ee_index);
 
       itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
 
@@ -1289,24 +1291,26 @@ void PGAssem_NS_FEM::Interface_G(
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
-
+        // Get the quadrature point info
         SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, opposite_ee)};
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, opposite_ee, ctrl_x, ctrl_y, ctrl_z);
 
-        SI_sol->get_rotated_mdisp(itf_part, itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
-        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
-
         free_quad->set_qp( opposite_xi, opposite_eta );
-
-        opposite_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
-
-        SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
 
         const double qw = quad_s->get_qw(qua);
 
+        // Get the local ien , displacement, solution and mesh velocity of the rotated element 
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+        SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
+
+        opposite_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
+
+        // Assembly
         lassem_ptr->Assem_Residual_itf_fixed(qua, qw, dt, anchor_elementv, opposite_elementv, anchor_local_sol,
           opposite_local_sol, rotated_local_mvelo);
 
@@ -1327,21 +1331,24 @@ void PGAssem_NS_FEM::Interface_G(
 
     for(int ee_index{0}; ee_index<num_rotated_elem; ++ee_index)
     {
-      int ee = itf_part->get_rotated_ele(itf_id, ee_index);
+      // Pick out the rotated element
+      const int ee = itf_part->get_rotated_ele(itf_id, ee_index);
 
       itf_part->get_rotated_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
 
+      // Get the local ien , displacement, solution and mesh velocity of the rotated element
       SI_sol->get_rotated_mdisp(itf_part, itf_id, ee, anchor_local_ien, rotated_local_disp);
       get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+      SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
 
       const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ee)};
 
       anchor_elementv->buildBasis(rotated_face_id, quad_s, curPt_x, curPt_y, curPt_z);
 
-      SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
-
       for(int qua{0}; qua<face_nqp; ++qua)
       {
+        // Get the quadrature point info
         SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, opposite_ee)};
@@ -1352,10 +1359,12 @@ void PGAssem_NS_FEM::Interface_G(
 
         opposite_elementv->buildBasis(fixed_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
 
-        SI_sol->get_fixed_local(itf_part, itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
-
         const double qw = quad_s->get_qw(qua);
 
+        // Get the local ien and local sol of the fixed element
+        SI_sol->get_fixed_local(itf_part, itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
+
+        // Assembly
         lassem_ptr->Assem_Residual_itf_rotated(qua, qw, dt, anchor_elementv, opposite_elementv, anchor_local_sol, rotated_local_mvelo,
           opposite_local_sol);
 
@@ -1420,53 +1429,55 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
   int opposite_ee {-1};
   double opposite_xi {1.0 / 3.0};
   double opposite_eta {1.0 / 3.0};
-
+  
   for(int itf_id{0}; itf_id<num_itf; ++itf_id)
   {
     // SYS_T::commPrint("itf_id = %d\n", itf_id);
     const int face_nqp {anci.A_quad_s->get_num_quadPts()};
 
+    // anchor = fixed, opposite = rotated
     const int num_fixed_elem = anci.A_itf_part->get_num_fixed_ele(itf_id);
 
     for(int ee_index{0}; ee_index<num_fixed_elem; ++ee_index)
     {
       // SYS_T::commPrint("  fixed_ee = %d\n", ee);
       // const int local_ee_index{itf_part->get_fixed_ele_id(itf_id, ee)};
-      int ee = anci.A_itf_part->get_fixed_ele(itf_id, ee_index);
+
+      // Pick out the fixed element 
+      const int ee = anci.A_itf_part->get_fixed_ele(itf_id, ee_index);
 
       anci.A_itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
 
       const int fixed_face_id {anci.A_itf_part->get_fixed_face_id(itf_id, ee)};
 
-      anci.A_fixed_elementv->buildBasis(fixed_face_id, anci.A_quad_s, ctrl_x, ctrl_y, ctrl_z);
-
-      std::vector<double> R(nLocBas, 0.0);
+      anci.A_anchor_elementv->buildBasis(fixed_face_id, anci.A_quad_s, ctrl_x, ctrl_y, ctrl_z);
 
       // Get the local ien and local sol of this fixed element
       anci.A_SI_sol->get_fixed_local(anci.A_itf_part, itf_id, ee, anchor_local_ien, anchor_local_sol);
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
-        anci.A_fixed_elementv->get_R(qua, &R[0]);
-
+        // Get the quadrature point info
         anci.A_SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int rotated_face_id {anci.A_itf_part->get_rotated_face_id(itf_id, opposite_ee)};
 
         anci.A_itf_part->get_rotated_ele_ctrlPts(itf_id, opposite_ee, ctrl_x, ctrl_y, ctrl_z);
 
-        anci.A_SI_sol->get_rotated_mdisp(anci.A_itf_part, itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
-        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
-
         anci.A_free_quad->set_qp( opposite_xi, opposite_eta );
-
-        anci.A_rotated_elementv->buildBasis(rotated_face_id, anci.A_free_quad, curPt_x, curPt_y, curPt_z);
-
-        anci.A_SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
 
         const double qw = anci.A_quad_s->get_qw(qua);
 
-        anci.A_lassemptr->Assem_Tangent_itf_MF_fixed(qua, qw, anci.A_dt, anci.A_fixed_elementv, anci.A_rotated_elementv,
+        // Get the local ien , displacement, solution and mesh velocity of the rotated element
+        anci.A_SI_sol->get_rotated_mdisp(anci.A_itf_part, itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+        anci.A_SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
+
+        anci.A_opposite_elementv->buildBasis(rotated_face_id, anci.A_free_quad, curPt_x, curPt_y, curPt_z);
+
+        // Assembly
+        anci.A_lassemptr->Assem_Tangent_itf_MF_fixed(qua, qw, anci.A_dt, anci.A_anchor_elementv, anci.A_opposite_elementv,
           anchor_local_sol, opposite_local_sol, rotated_local_mvelo);
 
         for(int ii{0}; ii < nLocBas; ++ii)
@@ -1498,31 +1509,35 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
     {
       for(int qua{0}; qua<face_nqp; ++qua)
       {
+        // The content of scatter is not important
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
       }
     }
 
-    // Need change the variants' names
+    // anchor = rotated, opposite = fixed
     const int num_rotated_elem = anci.A_itf_part->get_num_rotated_ele(itf_id);
 
     for(int ee_index{0}; ee_index<num_rotated_elem; ++ee_index)
     {
-      int ee = anci.A_itf_part->get_rotated_ele(itf_id, ee_index);
+      // Pick out this rotated element
+      const int ee = anci.A_itf_part->get_rotated_ele(itf_id, ee_index);
 
       anci.A_itf_part->get_rotated_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
 
+      const int rotated_face_id {anci.A_itf_part->get_rotated_face_id(itf_id, ee)};
+
+      // Get the local ien , displacement, solution and mesh velocity of the rotated element
       anci.A_SI_sol->get_rotated_mdisp(anci.A_itf_part, itf_id, ee, anchor_local_ien, rotated_local_disp);
       get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
-      const int rotated_face_id {anci.A_itf_part->get_rotated_face_id(itf_id, ee)};
-
-      anci.A_fixed_elementv->buildBasis(rotated_face_id, anci.A_quad_s, curPt_x, curPt_y, curPt_z);
-
       anci.A_SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
+
+      anci.A_anchor_elementv->buildBasis(rotated_face_id, anci.A_quad_s, curPt_x, curPt_y, curPt_z);
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
+        // Get the quadrature point info
         anci.A_SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int fixed_face_id {anci.A_itf_part->get_fixed_face_id(itf_id, opposite_ee)};
@@ -1531,13 +1546,15 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
 
         anci.A_free_quad->set_qp( opposite_xi, opposite_eta );
 
-        anci.A_rotated_elementv->buildBasis(fixed_face_id, anci.A_free_quad, ctrl_x, ctrl_y, ctrl_z);
-
-        anci.A_SI_sol->get_fixed_local(anci.A_itf_part, itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
-
         const double qw = anci.A_quad_s->get_qw(qua);
 
-        anci.A_lassemptr->Assem_Tangent_itf_MF_rotated(qua, qw, anci.A_dt, anci.A_fixed_elementv, anci.A_rotated_elementv,
+        anci.A_opposite_elementv->buildBasis(fixed_face_id, anci.A_free_quad, ctrl_x, ctrl_y, ctrl_z);
+
+        // Get the local ien and local sol of this fixed element
+        anci.A_SI_sol->get_fixed_local(anci.A_itf_part, itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
+
+        // Assembly
+        anci.A_lassemptr->Assem_Tangent_itf_MF_rotated(qua, qw, anci.A_dt, anci.A_anchor_elementv, anci.A_opposite_elementv,
           anchor_local_sol, opposite_local_sol, rotated_local_mvelo);
 
         for(int ii{0}; ii < nLocBas; ++ii)
@@ -1568,6 +1585,7 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
     {
       for(int qua{0}; qua<face_nqp; ++qua)
       {
+        // The content of scatter is not important
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
       }
