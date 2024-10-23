@@ -155,12 +155,6 @@ namespace TET_T
   Vector_3 get_out_normal( const std::string &file,
       const std::vector<double> &vol_ctrlPts,
       const IIEN * const &vol_ien );
-
-  Vector_3 get_out_normal( const std::string &file,
-      const std::vector<double> &vol_ctrlPts,
-      const IIEN * const &vol_ien,
-      const double &num_shifted_node,
-      const double &num_shifted_elem );
   
   // ================================================================
   // 3. TetGen interface

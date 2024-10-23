@@ -1121,35 +1121,6 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
-
-    virtual void Assem_L2_proj_mat_2(
-        FEAElement * const &rotated_elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol )
-    {SYS_T::commPrint("Warning: Assem_L2_proj_mat_2() is not implemented. \n");}
-
-    virtual void Solve_L2_proj(PLinear_Solver_PETSc * const &lsolver_ptr)
-    {SYS_T::commPrint("Warning: Solve_L2_proj() is not implemented. \n");}
-
-    virtual void Solve_L2_proj_2(PLinear_Solver_PETSc * const &lsolver_ptr)
-    {SYS_T::commPrint("Warning: Solve_L2_proj() is not implemented. \n");}
-
-    virtual void Init_L2_proj()
-    {SYS_T::commPrint("Warning: Init_L2_proj() is not implemented. \n");}
-
-    virtual void Assem_test_fixed()
-    {}
-
-    virtual void Assem_test_rotated()
-    {}
-
-    virtual void Print_test(const int &index)
-    {}
-
-    virtual void print_value()
-    {}
 };
 
 #endif

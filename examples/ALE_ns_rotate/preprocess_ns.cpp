@@ -379,8 +379,8 @@ int main( int argc, char * argv[] )
 
   if(elemType == 501 || elemType == 502)
   {
-    // inlet_outvec[0] = TET_T::get_out_normal( sur_file_in[0], ctrlPts, IEN );
-    // inlet_outvec[1] = TET_T::get_out_normal( sur_file_in[1], ctrlPts, IEN, 15383, 74621);  
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );  
   }
   else if(elemType == 601 || elemType == 602)
   {
@@ -401,8 +401,8 @@ int main( int argc, char * argv[] )
   
   if(elemType == 501 || elemType == 502)
   {
-    // outlet_outvec[0] = TET_T::get_out_normal( sur_file_out[0], ctrlPts, IEN );
-    // outlet_outvec[1] = TET_T::get_out_normal( sur_file_out[1], ctrlPts, IEN, 15383,  74621);
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
   }
   else if(elemType == 601 || elemType == 602)
   {
@@ -420,20 +420,20 @@ int main( int argc, char * argv[] )
   ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
-  std::vector<double> intervals_0 {0.0, 0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0};
+  std::vector<double> intervals_0 {-0.6, -0.2};
 
   Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_fixed_itf.h5", "epart_000_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 2);
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 0);
 
-  // std::vector<double> intervals_12 {0.0, 0.4};
+  std::vector<double> intervals_12 {0.0, 0.4};
 
-  // Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_fixed_itf.h5", "epart_001_rotated_itf.h5",
-  //   fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.6, 0.0, 0.0));
+  Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_fixed_itf.h5", "epart_001_rotated_itf.h5",
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.6, 0.0, 0.0));
 
-  // Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_fixed_itf.h5", "epart_002_rotated_itf.h5",
-  //   fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.2, 0.0, 0.0));
+  Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_fixed_itf.h5", "epart_002_rotated_itf.h5",
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.2, 0.0, 0.0));
 
-  std::vector<Interface_pair> interfaces {itf_0};
+  std::vector<Interface_pair> interfaces {itf_0, itf_1, itf_2};
  
   // Start partition the mesh for each cpu_rank 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;

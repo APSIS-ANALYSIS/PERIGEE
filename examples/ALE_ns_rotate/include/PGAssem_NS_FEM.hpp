@@ -183,51 +183,6 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
-    // virtual void Solve_L2_proj(PLinear_Solver_PETSc * const &lsolver_ptr);
-
-    // virtual void Solve_L2_proj_2(PLinear_Solver_PETSc * const &lsolver_ptr);
-
-    // virtual void Init_L2_proj();
-
-    virtual void Assem_test_fixed();
-
-    virtual void Assem_test_rotated();
-
-    virtual void Print_test(const int &index)
-    {
-      PetscInt * idx_from = new PetscInt[4];
-
-      for(int ii=0; ii < 4; ++ii)
-        idx_from[ii] = 4 * index + ii;
-
-      double * values = new double[4];
-
-      PETSc_T::Scatter(G, idx_from, 4, values);
-      
-      SYS_T::commPrint("\n");
-      SYS_T::commPrint("p-comp = %e\n", values[0]);
-      SYS_T::commPrint("x-comp = %e\n", values[1]);
-      SYS_T::commPrint("y-comp = %e\n", values[2]);
-      SYS_T::commPrint("z-comp = %e\n", values[3]);
-      SYS_T::commPrint("\n");
-      
-      delete [] idx_from;
-      delete [] values;
-    }
-
-    virtual void print_value()
-    {
-      SYS_T::commPrint("Value with fixed qp = %e\n", sum_qf);
-      SYS_T::commPrint("Value with rotated qp = %e\n", sum_qr);
-    }
-
-    double quad_fixed;
-
-    double quad_rotated;
-
-    double sum_qf;
-    double sum_qr;
-
   private:
     // Private data
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
@@ -235,25 +190,6 @@ class PGAssem_NS_FEM : public IPGAssem
     int snLocBas;
 
     SI_T::SI_ancillary anci;
-
-    // Mat L2_proj_mat;
-
-    // Vec L2_proj_sol;
-    // Vec L2_proj_sol_x;
-    // Vec L2_proj_sol_y;
-    // Vec L2_proj_sol_z;
-    // Vec L2_proj_mvelo;
-
-    // Vec L2_proj_lhs;
-
-    // Mat L2_proj_mat_2;
-
-    // Vec L2_proj_sol_2;
-    // Vec L2_proj_sol_x_2;
-    // Vec L2_proj_sol_y_2;
-    // Vec L2_proj_sol_z_2;
-
-    // Vec L2_proj_lhs_2;
 
     // Private function
     // Essential boundary condition
@@ -400,54 +336,6 @@ class PGAssem_NS_FEM : public IPGAssem
         currPt_z[ii] = ept_z[ii] + disp[3*ii+2];
       }
     }
-
-    double test_f(const Vector_3 &pt)
-    {
-      return (pt.x()-2) * (pt.x()-2) * (pt.x()-2) * (pt.x()-2) * (pt.y()+5) * (pt.y()+5);
-    }
-
-    double test_g(const Vector_3 &pt)
-    {
-      return pt.x() * pt.x() * pt.z();
-    }
-
-    // void Assem_L2_proj_mat(
-    //     FEAElement * const &fixed_elementv,
-    //     FEAElement * const &elements,
-    //     const IQuadPts * const &quad_s,
-    //     const ALocal_Interface * const &itf_part,
-    //     const SI_T::SI_solution * const &SI_sol );
-
-    // void Assem_L2_proj_mat_2(
-    //     FEAElement * const &rotated_elementv,
-    //     FEAElement * const &elements,
-    //     const IQuadPts * const &quad_s,
-    //     const ALocal_Interface * const &itf_part,
-    //     const SI_T::SI_solution * const &SI_sol );
-
-    // void Assem_L2_proj_rhs(
-    //     FEAElement * const &fixed_elementv,
-    //     FEAElement * const &rotated_elementv,
-    //     FEAElement * const &elements,
-    //     const IQuadPts * const &quad_s,
-    //     IQuadPts * const &free_quad,
-    //     const ALocal_Interface * const &itf_part,
-    //     const SI_T::SI_solution * const &SI_sol,
-    //     const SI_T::SI_quad_point * const &SI_qp );
-
-    // void Clear_L2_proj_rhs()
-    // {
-    //   VecSet(L2_proj_sol, 0.0);
-    //   VecSet(L2_proj_sol_x, 0.0);
-    //   VecSet(L2_proj_sol_y, 0.0);
-    //   VecSet(L2_proj_sol_z, 0.0);
-    //   VecSet(L2_proj_mvelo, 0.0);
-
-    //   VecSet(L2_proj_sol_2, 0.0);
-    //   VecSet(L2_proj_sol_x_2, 0.0);
-    //   VecSet(L2_proj_sol_y_2, 0.0);
-    //   VecSet(L2_proj_sol_z_2, 0.0);
-    // }
 };
 
 #endif

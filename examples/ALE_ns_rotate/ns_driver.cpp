@@ -511,37 +511,35 @@ int main(int argc, char *argv[])
 
   MatShellSetOperation(shell_mat, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
 
-  // gloAssem_ptr->Init_L2_proj();
-
   // ===== Initialize the dot_sol vector by solving mass matrix =====
-  // if( is_restart == false )
-  // {
-  //   SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-  //   PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-  //       1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+  if( is_restart == false )
+  {
+    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
-  //   KSPSetType(lsolver_acce->ksp, KSPGMRES);
-  //   KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-  //       KSPGMRESModifiedGramSchmidtOrthogonalization);
-  //   KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+    KSPSetType(lsolver_acce->ksp, KSPGMRES);
+    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+        KSPGMRESModifiedGramSchmidtOrthogonalization);
+    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
 
-  //   PC preproc; lsolver_acce->GetPC(&preproc);
-  //   PCSetType( preproc, PCHYPRE );
-  //   PCHYPRESetType( preproc, "boomeramg" );
+    PC preproc; lsolver_acce->GetPC(&preproc);
+    PCSetType( preproc, PCHYPRE );
+    PCHYPRESetType( preproc, "boomeramg" );
 
-  //   gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
-  //       elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
-  //       locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
+    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
+        elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,
+        locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
 
-  //   lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
-  //   dot_sol -> ScaleValue(-1.0);
+    dot_sol -> ScaleValue(-1.0);
 
-  //   SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-  //   lsolver_acce -> print_info();
-  //   delete lsolver_acce;
-  //   SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  // }
+    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+    lsolver_acce -> print_info();
+    delete lsolver_acce;
+    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
+  }
 
   // ===== Linear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
@@ -553,114 +551,101 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  // PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
-  //     nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
+  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
+      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
-  // nsolver->print_info();
+  nsolver->print_info();
 
-  // // ===== Temporal solver context =====
-  // PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
-  //     sol_record_freq, ttan_renew_freq, final_time );
+  // ===== Temporal solver context =====
+  PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
+      sol_record_freq, ttan_renew_freq, final_time );
 
-  // tsolver->print_info();
+  tsolver->print_info();
 
-  // // ===== Outlet data recording files =====
-  // for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
-  // {
-  //   const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-  //       dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+  // ===== Outlet data recording files =====
+  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  {
+    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
 
-  //   const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-  //       sol, locAssem_ptr, elements, quads, locebc, ff );
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
-  //   const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-  //       sol, locAssem_ptr, elements, quads, locebc, ff );
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, locebc, ff );
 
-  //   // set the gbc initial conditions using the 3D data
-  //   gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
+    // set the gbc initial conditions using the 3D data
+    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
 
-  //   const double dot_lpn_flowrate = dot_face_flrate;
-  //   const double lpn_flowrate = face_flrate;
-  //   const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
+    const double dot_lpn_flowrate = dot_face_flrate;
+    const double lpn_flowrate = face_flrate;
+    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
 
-  //   // Create the txt files and write the initial flow rates
-  //   if(rank == 0)
-  //   {
-  //     std::ofstream ofile;
+    // Create the txt files and write the initial flow rates
+    if(rank == 0)
+    {
+      std::ofstream ofile;
 
-  //     // If this is NOT a restart run, generate a new file, otherwise append to
-  //     // existing file
-  //     if( !is_restart )
-  //       ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-  //     else
-  //       ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+      // If this is NOT a restart run, generate a new file, otherwise append to
+      // existing file
+      if( !is_restart )
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-  //     // If this is NOT a restart, then record the initial values
-  //     if( !is_restart )
-  //     {
-  //       ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
-  //       ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-  //     }
+      // If this is NOT a restart, then record the initial values
+      if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+      }
 
-  //     ofile.close();
-  //   }
-  // }
+      ofile.close();
+    }
+  }
 
-  // MPI_Barrier(PETSC_COMM_WORLD);
+  MPI_Barrier(PETSC_COMM_WORLD);
 
-  // // ===== Inlet data recording files =====
-  // for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  // {
-  //   const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-  //       sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+  // ===== Inlet data recording files =====
+  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
+  {
+    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-  //   const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-  //       sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-  //   if( rank == 0 )
-  //   {
-  //     std::ofstream ofile;
-  //     if( !is_restart )
-  //       ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-  //     else
-  //       ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+    if( rank == 0 )
+    {
+      std::ofstream ofile;
+      if( !is_restart )
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+      else
+        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
 
-  //     if( !is_restart )
-  //     {
-  //       ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
-  //       ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-  //     }
+      if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+      }
 
-  //     ofile.close();
-  //   }
-  // }
+      ofile.close();
+    }
+  }
 
-  // MPI_Barrier(PETSC_COMM_WORLD);
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  // tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
-  //     tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-  //     locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
-  //     pmat, elementv, elements, elementvs, elementvs_rotated,
-  //     quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
-
-  SI_sol->update_node_sol(sol);
-  SI_sol->update_node_mdisp(disp_mesh);
-
-  gloAssem_ptr->Clear_G();
-
-  gloAssem_ptr->Assem_test_fixed();
-
-  gloAssem_ptr->Assem_test_rotated();
-
-  gloAssem_ptr->print_value();
-
-  // gloAssem_ptr->Print_test(133);
+  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
+      tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      pmat, elementv, elements, elementvs, elementvs_rotated,
+      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
 
   // ===== Print complete solver info =====
-  // lsolver -> print_info();
+  lsolver -> print_info();
 
   MatDestroy(&shell_mat);
 

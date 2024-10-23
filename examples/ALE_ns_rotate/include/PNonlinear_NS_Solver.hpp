@@ -86,10 +86,6 @@ class PNonlinear_NS_Solver
     // vector container for the step update in the smaller matrix problem
     PDNSolution * dot_step;
 
-    // PLinear_Solver_PETSc * lsolver_L2_proj;
-
-    // PLinear_Solver_PETSc * lsolver_L2_proj_2;
-
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
     {PetscPrintf(PETSC_COMM_WORLD,

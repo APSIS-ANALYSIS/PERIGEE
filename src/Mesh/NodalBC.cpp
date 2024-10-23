@@ -26,12 +26,7 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
     const auto vtkfile = vtkfileList[ii];
     SYS_T::file_check( vtkfile );
 
-    auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
-    if(ii == 2)
-    {
-      for(int &node : gnode)
-        node += 93;
-    }
+    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
   
     for(unsigned int jj=0; jj<gnode.size(); ++jj)
     {
