@@ -282,30 +282,39 @@ int main( int argc, char * argv[] )
   // Partition the interfaces
   for(int ii=0; ii < num_interface_pair; ++ii)
   {
-    int s_nFunc, s_nElem;
-    std::vector<int> s_vecIEN;
-    std::vector<double> s_ctrlPts;
+    int s_fixed_nFunc, s_fixed_nElem, s_rotated_nFunc, s_rotated_nElem;
+    std::vector<int> s_fixed_vecIEN, s_rotated_vecIEN;
+    std::vector<double> s_fixed_ctrlPts, s_rotated_ctrlPts;
 
-    VTK_T::read_grid(fixed_interface_file[ii], s_nFunc, s_nElem, s_ctrlPts, s_vecIEN);
+    VTK_T::read_grid(fixed_interface_file[ii], s_fixed_nFunc, s_fixed_nElem, s_fixed_ctrlPts, s_fixed_vecIEN);
+    VTK_T::read_grid(rotated_interface_file[ii], s_rotated_nFunc, s_rotated_nElem, s_rotated_ctrlPts, s_rotated_vecIEN);
 
-    IIEN * sIEN = new IEN_FEM(s_nElem, s_vecIEN);
-    VEC_T::clean(s_vecIEN);
+    IIEN * s_fixed_IEN = new IEN_FEM(s_fixed_nElem, s_fixed_vecIEN);
+    VEC_T::clean(s_fixed_vecIEN);
 
-    IMesh * s_mesh = nullptr;
+    IIEN * s_rotated_IEN = new IEN_FEM(s_rotated_nElem, s_rotated_vecIEN);
+    VEC_T::clean(s_rotated_vecIEN);
+
+    IMesh * s_fixed_mesh = nullptr;
+    IMesh * s_rotated_mesh = nullptr;
 
     switch( elemType )
     {
       case 501:
-        s_mesh = new Mesh_FEM(s_nFunc, s_nElem, 3, 1);
+        s_fixed_mesh = new Mesh_FEM(s_fixed_nFunc, s_fixed_nElem, 3, 1);
+        s_rotated_mesh = new Mesh_FEM(s_rotated_nFunc, s_rotated_nElem, 3, 1);
         break;
       case 502:
-        s_mesh = new Mesh_FEM(s_nFunc, s_nElem, 6, 2);
+        s_fixed_mesh = new Mesh_FEM(s_fixed_nFunc, s_fixed_nElem, 6, 2);
+        s_rotated_mesh = new Mesh_FEM(s_rotated_nFunc, s_rotated_nElem, 6, 2);
         break;
       case 601:
-        s_mesh = new Mesh_FEM(s_nFunc, s_nElem, 4, 1);
+        s_fixed_mesh = new Mesh_FEM(s_fixed_nFunc, s_fixed_nElem, 4, 1);
+        s_rotated_mesh = new Mesh_FEM(s_rotated_nFunc, s_rotated_nElem, 4, 1);
         break;
       case 602:
-        s_mesh = new Mesh_FEM(s_nFunc, s_nElem, 9, 2);
+        s_fixed_mesh = new Mesh_FEM(s_fixed_nFunc, s_fixed_nElem, 9, 2);
+        s_rotated_mesh = new Mesh_FEM(s_rotated_nFunc, s_rotated_nElem, 9, 2);
         break;      
       default:
         SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
@@ -313,18 +322,31 @@ int main( int argc, char * argv[] )
     }
     
     std::string epart_base = "epart_", npart_base = "npart_";
-    std::string epart = SYS_T::gen_capfile_name(epart_base, ii, "_itf");
-    std::string npart = SYS_T::gen_capfile_name(npart_base, ii, "_itf");
+    std::string fixed_epart = SYS_T::gen_capfile_name(epart_base, ii, "_fixed_itf");
+    std::string fixed_npart = SYS_T::gen_capfile_name(npart_base, ii, "_fixed_itf");
+    std::string rotated_epart = SYS_T::gen_capfile_name(epart_base, ii, "_rotated_itf");
+    std::string rotated_npart = SYS_T::gen_capfile_name(npart_base, ii, "_rotated_itf");
 
-    IGlobal_Part * global_part_itf = nullptr;
+    IGlobal_Part * global_part_fixed_itf = nullptr;
+    IGlobal_Part * global_part_rotated_itf = nullptr;
     if(cpu_size > 1)
-      global_part_itf = new Global_Part_METIS( cpu_size, in_ncommon,
-          isDualGraph, s_mesh, sIEN, epart, npart );
+    {
+      global_part_fixed_itf = new Global_Part_METIS( cpu_size, in_ncommon,
+        isDualGraph, s_fixed_mesh, s_fixed_IEN, fixed_epart, fixed_npart );
+
+      global_part_rotated_itf = new Global_Part_METIS( cpu_size, in_ncommon,
+        isDualGraph, s_rotated_mesh, s_rotated_IEN, rotated_epart, rotated_npart );
+    }
     else if(cpu_size == 1)
-      global_part_itf = new Global_Part_Serial( s_mesh, epart, npart );
+    {
+      global_part_fixed_itf = new Global_Part_Serial( s_fixed_mesh, fixed_epart, fixed_npart );
+
+      global_part_rotated_itf = new Global_Part_Serial( s_rotated_mesh, rotated_epart, rotated_npart );
+    }
     else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
-    delete global_part_itf; delete s_mesh; delete sIEN;
+    delete global_part_fixed_itf; delete global_part_rotated_itf;
+    delete s_fixed_mesh; delete s_rotated_mesh; delete s_fixed_IEN; delete s_rotated_IEN;
   }
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
@@ -337,9 +359,13 @@ int main( int argc, char * argv[] )
     dir_list.push_back( sur_file_in[ii] );
   
   if (wall_model_type == 0)
+  {
     dir_list.push_back( sur_file_wall );
+  }
   else if (wall_model_type == 1 || wall_model_type == 2)
+  {
     weak_list.push_back( sur_file_wall );
+  }
   else
     SYS_T::print_fatal("Unknown wall model type.");
 
@@ -354,7 +380,7 @@ int main( int argc, char * argv[] )
   if(elemType == 501 || elemType == 502)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );    
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );  
   }
   else if(elemType == 601 || elemType == 602)
   {
@@ -375,8 +401,8 @@ int main( int argc, char * argv[] )
   
   if(elemType == 501 || elemType == 502)
   {
-    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );  
+    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
   }
   else if(elemType == 601 || elemType == 602)
   {
@@ -396,15 +422,15 @@ int main( int argc, char * argv[] )
   // Set up interface info
   std::vector<double> intervals_0 {-0.6, -0.2};
 
-  Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_itf.h5",
+  Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_fixed_itf.h5", "epart_000_rotated_itf.h5",
     fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 0);
 
   std::vector<double> intervals_12 {0.0, 0.4};
 
-  Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_itf.h5",
+  Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_fixed_itf.h5", "epart_001_rotated_itf.h5",
     fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.6, 0.0, 0.0));
 
-  Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_itf.h5",
+  Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_fixed_itf.h5", "epart_002_rotated_itf.h5",
     fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.2, 0.0, 0.0));
 
   std::vector<Interface_pair> interfaces {itf_0, itf_1, itf_2};
@@ -431,6 +457,8 @@ int main( int argc, char * argv[] )
   distributed_rotated_node_loc_pos.resize(cpu_size);
 
   std::vector<int> max_fixed_nlocalele (num_interface_pair, 0);
+
+  std::vector<int> max_rotated_nlocalele(num_interface_pair, 0);
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
@@ -492,8 +520,13 @@ int main( int argc, char * argv[] )
     distributed_rotated_node_loc_pos[proc_rank] = itfpart -> get_rotated_node_loc_pos();
 
     for(int ii = 0; ii < VEC_T::get_size(interfaces); ++ii)
+    {
       if(max_fixed_nlocalele[ii] < itfpart -> get_fixed_nlocalele(ii))
         max_fixed_nlocalele[ii] = itfpart -> get_fixed_nlocalele(ii);
+
+      if(max_rotated_nlocalele[ii] < itfpart -> get_rotated_nlocalele(ii))
+        max_rotated_nlocalele[ii] = itfpart ->get_rotated_nlocalele(ii);
+    }
 
     itfpart -> write_hdf5( part_file );
 
@@ -563,7 +596,9 @@ int main( int argc, char * argv[] )
 
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
 
-    h5w -> write_intVector( g_id, "max_num_fixed_cell", max_fixed_nlocalele );
+    h5w -> write_intVector( g_id, "max_num_local_fixed_cell", max_fixed_nlocalele );
+
+    h5w -> write_intVector( g_id, "max_num_local_rotated_cell", max_rotated_nlocalele );
 
     const std::string groupbase("interfaceid_");
 

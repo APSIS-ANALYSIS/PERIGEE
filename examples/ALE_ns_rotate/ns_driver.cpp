@@ -511,8 +511,6 @@ int main(int argc, char *argv[])
 
   MatShellSetOperation(shell_mat, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
 
-  gloAssem_ptr->Init_L2_proj();
-
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )
   {

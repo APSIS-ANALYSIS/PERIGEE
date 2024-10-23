@@ -41,6 +41,9 @@ class Interface_Partition
     virtual int get_fixed_nlocalele(const int &ii) const
     {return fixed_nlocalele[ii];}
 
+    virtual int get_rotated_nlocalele(const int &ii) const
+    {return rotated_nlocalele[ii];}
+
   private:
     const int cpu_rank;
 
@@ -53,10 +56,13 @@ class Interface_Partition
     // the number of the local elements of the fixed interfaces
     std::vector<int> fixed_nlocalele;
 
-    // stores the face id of the volume element of the fixed interface in this part
+    // stores the local fixed element index in this partition
+    std::vector<std::vector<int>> fixed_ele_in_this_part;
+
+    // stores the face id of the volume element of the fixed interface
     std::vector<std::vector<int>> fixed_ele_face_id;
 
-    // stores ien of the volume element of the fixed layer in this part
+    // stores ien of the volume element of the fixed layer
     std::vector<std::vector<int>> fixed_lien;
 
     // stores the fixed layer nodes indices, converted by get_old2new()
@@ -76,11 +82,22 @@ class Interface_Partition
     // stores the interval tag of each element of the fixed interface
     std::vector<std::vector<int>> fixed_interval_tag;
 
+    // classified by interval tag
+    std::vector<std::vector<std::vector<int>>> tagged_fixed_ele;
+
+    std::vector<std::vector<int>> num_tagged_fixed_ele;
+
+    // the number of the local elements of the rotated interfaces
+    std::vector<int> rotated_nlocalele;
+
+    // stores the local rotated element index in this partition
+    std::vector<std::vector<int>> rotated_ele_in_this_part;
+
     // stores the face id of all the volume element of the rotated layer
-    std::vector<std::vector<std::vector<int>>> rotated_ele_face_id;
+    std::vector<std::vector<int>> rotated_ele_face_id;
 
     // stores ien of all the volume element of the rotated layer
-    std::vector<std::vector<std::vector<int>>> rotated_lien;
+    std::vector<std::vector<int>> rotated_lien;
 
     // stores the rotated layer nodes indices, converted by get_old2new()
     std::vector<std::vector<int>> rotated_global_node;
@@ -96,16 +113,13 @@ class Interface_Partition
 
     std::vector<std::vector<int>> rotated_node_loc_pos;
 
-    // // stores the interval tag of each element of the rotated interface
+    // stores the interval tag of each element of the rotated interface
     std::vector<std::vector<int>> rotated_interval_tag;
 
-    int num_all_fixed_node;
+    // classified by interval tag
+    std::vector<std::vector<std::vector<int>>> tagged_rotated_ele;
 
-    std::vector<int> all_fixed_global_node;
-
-    std::vector<int> all_fixed_inner_node;
-
-    std::vector<std::vector<int>> L2_proj_fixed_node_pos;
+    std::vector<std::vector<int>> num_tagged_rotated_ele;
 };
 
 #endif
