@@ -21,8 +21,6 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
   delete dot_step; dot_step = nullptr;
-  // delete lsolver_L2_proj; lsolver_L2_proj = nullptr;
-  // delete lsolver_L2_proj_2; lsolver_L2_proj_2 = nullptr;
 }
 
 

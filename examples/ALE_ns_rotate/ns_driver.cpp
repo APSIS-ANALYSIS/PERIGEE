@@ -655,7 +655,7 @@ int main(int argc, char *argv[])
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh;
-  delete gloAssem_ptr; delete lsolver; // delete nsolver; delete tsolver;
+  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;

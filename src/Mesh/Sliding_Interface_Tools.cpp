@@ -17,13 +17,11 @@ namespace SI_T
 
     num_fixed_node.assign(num_itf, 0);
     fixed_node_sol.resize(num_itf);
-
     fixed_node_part_tag.resize(num_itf);
     fixed_node_loc_pos.resize(num_itf);
 
     num_rotated_node.assign(num_itf, 0);
     rotated_node_sol.resize(num_itf);
-
     rotated_node_mvelo.resize(num_itf);
     rotated_node_mdisp.resize(num_itf);
     rotated_node_part_tag.resize(num_itf);
@@ -173,24 +171,20 @@ namespace SI_T
   SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in)
     : nqp_sur( nqp_sur_in )
   {
-    // fixed_qp_curr_rotated_tag.resize(itf->get_num_itf());
     fixed_qp_curr_rotated_ee.resize(itf->get_num_itf());
     fixed_qp_curr_rotated_xi.resize(itf->get_num_itf());
     fixed_qp_curr_rotated_eta.resize(itf->get_num_itf());
 
-    // rotated_qp_curr_fixed_tag.resize(itf->get_num_itf());
     rotated_qp_curr_fixed_ee.resize(itf->get_num_itf());
     rotated_qp_curr_fixed_xi.resize(itf->get_num_itf());
     rotated_qp_curr_fixed_eta.resize(itf->get_num_itf());
 
     for(int ii = 0; ii < itf->get_num_itf(); ++ii)
     {
-      // fixed_qp_curr_rotated_tag[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, -1);
       fixed_qp_curr_rotated_ee[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, -1);
       fixed_qp_curr_rotated_xi[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, 0.0);
       fixed_qp_curr_rotated_eta[ii].assign(itf->get_num_fixed_ele(ii) * nqp_sur, 0.0);
 
-      // rotated_qp_curr_fixed_tag[ii].assign(itf->get_num_rotated_ele(ii) * nqp_sur, -1);
       rotated_qp_curr_fixed_ee[ii].assign(itf->get_num_rotated_ele(ii) * nqp_sur, -1);
       rotated_qp_curr_fixed_xi[ii].assign(itf->get_num_rotated_ele(ii) * nqp_sur, 0.0);
       rotated_qp_curr_fixed_eta[ii].assign(itf->get_num_rotated_ele(ii) * nqp_sur, 0.0);
@@ -200,7 +194,6 @@ namespace SI_T
   void SI_quad_point::set_curr_rotated(const double &itf_id, const int &fixed_ee_index, const int &qua,
     const int &rotated_ee, const double &xi, const double &eta)
   {
-    // fixed_qp_curr_rotated_tag[itf_id][fixed_ee * nqp_sur + qua]   = ele_tag;
     fixed_qp_curr_rotated_ee[itf_id][fixed_ee_index * nqp_sur + qua]    = rotated_ee;
     fixed_qp_curr_rotated_xi[itf_id][fixed_ee_index * nqp_sur + qua] = xi;
     fixed_qp_curr_rotated_eta[itf_id][fixed_ee_index * nqp_sur + qua] = eta;
@@ -209,7 +202,6 @@ namespace SI_T
   void SI_quad_point::get_curr_rotated(const double &itf_id, const int &fixed_ee_index, const int &qua,
     int &rotated_ee, double &xi, double &eta) const
   {
-    // ele_tag = fixed_qp_curr_rotated_tag[itf_id][fixed_ee * nqp_sur + qua];
     rotated_ee = fixed_qp_curr_rotated_ee[itf_id][fixed_ee_index * nqp_sur + qua];
     xi = fixed_qp_curr_rotated_xi[itf_id][fixed_ee_index * nqp_sur + qua];
     eta = fixed_qp_curr_rotated_eta[itf_id][fixed_ee_index * nqp_sur + qua];
@@ -218,7 +210,6 @@ namespace SI_T
   void SI_quad_point::set_curr_fixed(const double &itf_id, const int &rotated_ee_index, const int &qua,
     const int &fixed_ee, const double &xi, const double &eta)
   {
-    // rotated_qp_curr_fixed_tag[itf_id][rotated_ee * nqp_sur + qua]   = ele_tag;
     rotated_qp_curr_fixed_ee[itf_id][rotated_ee_index * nqp_sur + qua]    = fixed_ee;
     rotated_qp_curr_fixed_xi[itf_id][rotated_ee_index * nqp_sur + qua] = xi;
     rotated_qp_curr_fixed_eta[itf_id][rotated_ee_index * nqp_sur + qua] = eta;
@@ -227,7 +218,6 @@ namespace SI_T
   void SI_quad_point::get_curr_fixed(const double &itf_id, const int &rotated_ee_index, const int &qua,
     int &fixed_ee, double &xi, double &eta) const
   {
-    // ele_tag = rotated_qp_curr_fixed_tag[itf_id][rotated_ee * nqp_sur + qua];
     fixed_ee = rotated_qp_curr_fixed_ee[itf_id][rotated_ee_index * nqp_sur + qua];
     xi = rotated_qp_curr_fixed_xi[itf_id][rotated_ee_index * nqp_sur + qua];
     eta = rotated_qp_curr_fixed_eta[itf_id][rotated_ee_index * nqp_sur + qua];
