@@ -414,7 +414,7 @@ int main( int argc, char * argv[] )
 
   ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
 
-  // ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
   ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );

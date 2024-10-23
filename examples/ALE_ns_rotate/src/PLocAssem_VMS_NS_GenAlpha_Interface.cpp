@@ -92,9 +92,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
   fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
   rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-  double fixed_J {0.0}; //, rotated_J {0.0};
+  double fixed_J {0.0};
   const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = -1 * normal_s; // rotated_elementv -> get_2d_normal_out(0, rotated_J);
+  const Vector_3 normal_r = -1 * normal_s;
 
   // Calculate h_b and tau_I
   const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
@@ -157,9 +157,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
-
-  // double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-  //                    (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
 
   const double gwts = fixed_J * fixed_qw;
 
@@ -287,8 +284,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  // double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
-
   double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
 
@@ -346,9 +341,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
   fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
   rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-  double fixed_J {0.0}; //, rotated_J {0.0};
+  double fixed_J {0.0};
   const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = -1 * normal_s; // rotated_elementv -> get_2d_normal_out(0, rotated_J);
+  const Vector_3 normal_r = -1 * normal_s;
 
   // Calculate h_b and tau_I
   const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
@@ -389,11 +384,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
   double delta_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? 1.0 : 0.0);
 
-  // double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-  //                    (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
-  // double delta_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-  //                    1.0 : 0.0);
-
   const double gwts = fixed_J * fixed_qw;
   const double dd_dv = alpha_f * gamma * dt;
   const double common_coef = gwts * dd_dv;
@@ -401,7 +391,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
   for(int A{0}; A<nLocBas; ++A)
   {
     const double NAs {Ns[A]}, NAs_x {dNs_dx[A]}, NAs_y {dNs_dy[A]}, NAs_z {dNs_dz[A]};
-    // const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
 
     const int A4 = 4 * A;
 
@@ -602,9 +591,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  // double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
-  // double delta_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? 1.0 : 0.0);
-
   double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
   double delta_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
@@ -616,7 +602,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
 
   for(int A{0}; A<nLocBas; ++A)
   {
-    // const double NAs {Ns[A]}, NAs_x {dNs_dx[A]}, NAs_y {dNs_dy[A]}, NAs_z {dNs_dz[A]};
     const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
 
     const int A4 = 4 * A;
