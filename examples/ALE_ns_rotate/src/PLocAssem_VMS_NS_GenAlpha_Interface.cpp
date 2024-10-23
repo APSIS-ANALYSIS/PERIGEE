@@ -316,7 +316,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
       + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
       + NAr_x * nry * vis_mu * velo_jump.x()
       + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
-      + NAr_z * nry * vis_mu * velo_jump.z() )
+      + NAr_z * nrz * vis_mu * velo_jump.z() )
       + NAr * (rho0 * inflow_r - tau_I) * velo_jump.y());
 
     // z-dir -- r
