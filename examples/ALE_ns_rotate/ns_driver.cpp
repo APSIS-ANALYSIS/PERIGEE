@@ -435,6 +435,8 @@ int main(int argc, char *argv[])
 
   PDNSolution * disp_mesh = new PDNSolution_V( pNode );
 
+  PDNSolution * velo_mesh = new PDNSolution_V( pNode );
+
   if( is_restart )
   {
     initial_index = restart_index;
@@ -449,20 +451,40 @@ int main(int argc, char *argv[])
     std::string restart_dot_name = "dot_";
     restart_dot_name.append(restart_name);
 
+    // generate the corresponding mdisp file name
+    std::string restart_mdisp_name = "DISP_";
+    restart_mdisp_name.append(std::to_string(900000000 + initial_index));
+
+    // generate the corresponding mvelo file name
+    std::string restart_mvelo_name = "MVELO_";
+    restart_mvelo_name.append(std::to_string(900000000 + initial_index));
+
     // Read dot_sol file
     SYS_T::file_check(restart_dot_name);
     dot_sol->ReadBinary(restart_dot_name);
 
+    // Read mdisp file
+    SYS_T::file_check(restart_mdisp_name);
+    disp_mesh->ReadBinary(restart_mdisp_name);
+
+    // Read mvelo file
+    SYS_T::file_check(restart_mvelo_name);
+    velo_mesh->ReadBinary(restart_mvelo_name);
+
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
     SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_mdisp_name: %s \n", restart_mdisp_name.c_str());
+    SYS_T::commPrint("     restart_mvelo_name: %s \n", restart_mvelo_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
   SI_sol->update_node_sol(sol);
-
+  SI_sol->update_node_mdisp(disp_mesh);
+  SI_sol->update_node_mvelo(velo_mesh);
+  
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
@@ -640,7 +662,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh,
+  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh, velo_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
       pmat, elementv, elements, elementvs, elementvs_rotated,
@@ -656,7 +678,7 @@ int main(int argc, char *argv[])
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs; delete elementvs_rotated;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh;
+  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
   delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
