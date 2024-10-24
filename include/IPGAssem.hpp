@@ -29,7 +29,6 @@
 #include "Sliding_Interface_Tools.hpp"
 #include "IGenBC.hpp"
 #include "Tissue_prestress.hpp"
-#include "PLinear_Solver_PETSc.hpp"
 
 class IPGAssem
 {
