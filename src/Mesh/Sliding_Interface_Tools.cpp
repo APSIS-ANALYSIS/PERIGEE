@@ -49,9 +49,11 @@ namespace SI_T
 
       num_rotated_node[ii] = VEC_T::get_size(h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_map" ));
 
-      rotated_node_mvelo[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
+      rotated_node_sol[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0);
 
-      rotated_node_mdisp[ii] = std::vector<double> (dof_sol * num_rotated_node[ii], 0.0); 
+      rotated_node_mvelo[ii] = std::vector<double> (3 * num_rotated_node[ii], 0.0);
+
+      rotated_node_mdisp[ii] = std::vector<double> (3 * num_rotated_node[ii], 0.0); 
 
       rotated_node_part_tag[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_part_tag" );
 
