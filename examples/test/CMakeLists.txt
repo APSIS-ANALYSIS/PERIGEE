@@ -117,6 +117,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
+  ${perigee_source}/Solver/Runge_Kutta_Butcher.cpp
   )
 
 SET( perigee_postprocess_lib_src

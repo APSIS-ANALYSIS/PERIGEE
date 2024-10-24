@@ -35,24 +35,27 @@
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "AGlobal_Mesh_Info_FEM_3D.hpp"
 #include <iomanip>
-#include "MaterialModel_Mixed_Elasticity.hpp"
-#include "MaterialModel_ich_NeoHookean.hpp"
-#include "MaterialModel_vol_Incompressible.hpp"
-#include "MaterialModel_vol_ST91.hpp"
-#include "MaterialModel_vol_M94.hpp"
-#include "MaterialModel_ich_GOH06.hpp"
-#include "MaterialModel_ich_GOH14.hpp"
-#include "MaterialModel_ich_StVenant_Kirchhoff.hpp"
+#include "Runge_Kutta_Butcher.hpp"
 
-void test(const double * const &vv, const unsigned int len)
-{
-  for(unsigned int ii=0; ii<len; ++ii)
-    std::cout<<vv[ii]<<'\t';
-  std::cout<<"End of vector \n";
-}
 
 int main(int argc, char *argv[])
 {
+#if PETSC_VERSION_LT(3,19,0)
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
+
+  const Runge_Kutta_Butcher RK(5, 3, false);
+  RK.printCoefficients();
+
+  SYS_T::commPrint("%e \n", RK.get_RK_a(0, 1));
+  SYS_T::commPrint("%e \n", RK.get_RK_b(2));
+  SYS_T::commPrint("%e \n", RK.get_RK_c(3));
+
+  SYS_T::commPrint("%e \n", RK.get_RK_a(5, 1));
+
+  PetscFinalize();
   return EXIT_SUCCESS;
 }
 
