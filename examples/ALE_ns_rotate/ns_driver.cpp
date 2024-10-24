@@ -461,6 +461,8 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
+  SI_sol->update_node_sol(sol);
+
   // ===== Time step info =====
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
@@ -492,10 +494,8 @@ int main(int argc, char *argv[])
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc, nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  SI_sol->update_node_sol(sol);
-  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, locitf, SI_sol);
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, elementvs, elementvs_rotated, quads, free_quad, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc );
+      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -526,6 +526,8 @@ int main(int argc, char *argv[])
     PC preproc; lsolver_acce->GetPC(&preproc);
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
+
+    SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, locitf, SI_sol);
 
     gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
         elements, elementvs, elementvs_rotated, quadv, quads, free_quad, locIEN, fNode,

@@ -60,10 +60,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements, quads, free_quad, part_itf, SI_sol);
-
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, elementvs, elementvs_rotated, quads, free_quad, aien_ptr, pnode_ptr, part_nbc, part_ebc, part_itf, SI_sol, SI_qp, gbc );
+      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -139,17 +137,11 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
     const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc )
 {
   const int nElem = alelem_ptr->get_nlocalele();

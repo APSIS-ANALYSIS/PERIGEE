@@ -53,17 +53,11 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part,
-        const ALocal_Interface * const &itf_part,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp,
         const IGenBC * const &gbc );
 
     // Assem mass matrix and residual vector
