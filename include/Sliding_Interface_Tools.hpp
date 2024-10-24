@@ -221,8 +221,8 @@ namespace SI_T
     public:
       SI_ancillary(
         IPLocAssem * const &lassem_ptr,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
+        FEAElement * const &anchor_elementv,
+        FEAElement * const &opposite_elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
@@ -233,8 +233,8 @@ namespace SI_T
       {
         A_dt = 0.0;
         A_lassemptr = lassem_ptr;
-        A_anchor_elementv = fixed_elementv;
-        A_opposite_elementv = rotated_elementv;
+        A_anchor_elementv = anchor_elementv;
+        A_opposite_elementv = opposite_elementv;
         A_elements = elements;
         A_quad_s = quad_s;
         A_free_quad = free_quad;
