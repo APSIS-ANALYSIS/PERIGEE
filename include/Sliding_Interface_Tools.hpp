@@ -145,7 +145,6 @@ namespace SI_T
       // stores the local position in the partition of the nodes from the rotated volume elements
       // size: num_itf x num_rotated_node[ii]
       std::vector<std::vector<int>> rotated_node_loc_pos;
-
   };
 
   class SI_quad_point
@@ -275,7 +274,6 @@ namespace SI_T
       SI_T::SI_solution * A_SI_sol;
 
       SI_T::SI_quad_point * A_SI_qp;
-
   };
 
   void get_currPts( const double * const &ept_x,
