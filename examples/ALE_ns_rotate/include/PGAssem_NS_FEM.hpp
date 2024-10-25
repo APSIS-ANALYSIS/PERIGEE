@@ -33,7 +33,7 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &elementvs_rotated,
         const IQuadPts * const &quads,
         IQuadPts * const &free_quad,
-        const IAGlobal_Mesh_Info * const &agmi_ptr,
+        const AGlobal_Mesh_Info * const &agmi_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &aien_ptr,
         const APart_Node * const &pnode_ptr,

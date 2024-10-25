@@ -9,7 +9,7 @@
 // Date: Feb. 6 2020
 // ==================================================================
 #include "HDF5_Writer.hpp"
-#include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_Rotated.hpp"
 #include "ALocal_EBC_outflow.hpp"
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
 
   // Global mesh info
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_file,rank);
+  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
 
   // Mesh partition info
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
@@ -295,7 +295,8 @@ int main(int argc, char *argv[])
 
   // Interfaces info
   ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
-  locitf -> print_info();
+  SYS_T::commPrint("Interfaces: %d\n", locitf->get_num_itf());
+  //locitf -> print_info();
 
   SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
 
