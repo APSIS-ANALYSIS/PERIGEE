@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
   // Interfaces info
   ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
   SYS_T::commPrint("Interfaces: %d\n", locitf->get_num_itf());
-  //locitf -> print_info();
+  locitf -> print_info();
 
   SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
 
@@ -670,7 +670,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh, velo_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
       pmat, elementv, elements, anchor_elementv, opposite_elementv,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
 
