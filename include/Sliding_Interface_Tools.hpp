@@ -9,6 +9,7 @@
 #include "ALocal_Interface.hpp"
 #include "IPLocAssem.hpp"
 #include "FE_Tools.hpp"
+#include "PETSc_Tools.hpp"
 
 namespace SI_T
 {
@@ -19,6 +20,7 @@ namespace SI_T
 
       ~SI_solution() = default;
 
+      // Return the local ien array and the local solution array of a fixed layer element
       void get_fixed_local(const ALocal_Interface * const &itf,
         const int &ii, const int &ee,
         int * const &local_ien, double * const &local_sol) const
@@ -32,44 +34,35 @@ namespace SI_T
         }
       }
 
-      void get_rotated_local(const ALocal_Interface * const &itf,
-        const int &ii, const int &tag, const int &ee,
-        int * const &local_ien, double * const &local_sol) const
-      {
-        for(int nn = 0; nn < nLocBas; ++nn)
-        {
-          local_ien[nn] = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
-
-          for(int dd = 0; dd < dof_sol; ++dd)
-            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
-        }
-      }
-
-      // Return the local ien array and the local mvelo array of a rotated layer element
-      void get_rotated_mvelo(const ALocal_Interface * const &itf,
-        const int &ii, const int &tag, const int &ee,
-        int * const &local_ien, double * const &local_mvleo) const
-      {
-        for(int nn = 0; nn < nLocBas; ++nn)
-        {
-          local_ien[nn] = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
-
-          for(int dd = 0; dd < 3; ++dd)
-            local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
-        }
-      }
-
       // Return the local ien array and the local mdisp array of a rotated layer element
       void get_rotated_mdisp(const ALocal_Interface * const &itf,
-        const int &ii, const int &tag, const int &ee,
+        const int &ii, const int &ee,
         int * const &local_ien, double * const &local_disp) const
       {
         for(int nn = 0; nn < nLocBas; ++nn)
         {
-          local_ien[nn] = itf->get_rotated_lien(ii, tag, ee * nLocBas + nn);
+          local_ien[nn] = itf->get_rotated_lien(ii, ee * nLocBas + nn);
 
           for(int dd = 0; dd < 3; ++dd)
             local_disp[3 * nn + dd] = rotated_node_mdisp[ii][3 * local_ien[nn] + dd];
+        }
+      }
+
+      // Return the local solution array and mesh velocity of a rotated layer element
+      // Used after get_rotated_mdisp
+      void get_rotated_local(const int &ii, const int * const &local_ien,
+        double * const &local_sol, double * const &local_mvleo) const
+      {
+        for(int nn = 0; nn < nLocBas; ++nn)
+        {
+          for(int dd = 0; dd < dof_sol; ++dd)
+          {
+            local_sol[dof_sol * nn + dd] = rotated_node_sol[ii][dof_sol * local_ien[nn] + dd];
+          }
+          for(int dd = 0; dd < 3; ++dd)
+          {
+            local_mvleo[3 * nn + dd] = rotated_node_mvelo[ii][3 * local_ien[nn] + dd];
+          }
         }
       }
 
@@ -152,7 +145,6 @@ namespace SI_T
       // stores the local position in the partition of the nodes from the rotated volume elements
       // size: num_itf x num_rotated_node[ii]
       std::vector<std::vector<int>> rotated_node_loc_pos;
-
   };
 
   class SI_quad_point
@@ -162,22 +154,28 @@ namespace SI_T
 
       ~SI_quad_point() = default;
 
-      void set_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-          const int &ele_tag, const int &rotated_ee, const double &xi, const double &eta);
+      void set_curr_rotated(const double &itf_id, const int &fixed_ee_index, const int &qua,
+          const int &rotated_ee, const double &xi, const double &eta);
 
-      void get_curr(const double &itf_id, const int &fixed_ee, const int &qua,
-          int &ele_tag, int &rotated_ee, double &xi, double &eta) const;
+      void get_curr_rotated(const double &itf_id, const int &fixed_ee_index, const int &qua,
+          int &rotated_ee, double &xi, double &eta) const;
+
+      void set_curr_fixed(const double &itf_id, const int &rotated_ee_index, const int &qua,
+          const int &fixed_ee, const double &xi, const double &eta);
+
+      void get_curr_fixed(const double &itf_id, const int &rotated_ee_index, const int &qua,
+          int &fixed_ee, double &xi, double &eta) const;
 
       void search_all_opposite_point(
-          FEAElement * const &fixed_elementv,
-          FEAElement * const &rotated_elementv,
+          FEAElement * const &anchor_elementv,
+          FEAElement * const &opposite_elementv,
           FEAElement * const &elements,
           const IQuadPts * const &quad_s,
           IQuadPts * const &free_quad,
           const ALocal_Interface * const &itf_part,
           const SI_solution * const &SI_sol );
 
-      void search_opposite_point(
+      void search_opposite_rotated_point(
           const Vector_3 &fixed_pt,
           const ALocal_Interface * const &itf_part,
           const SI_solution * const &SI_sol,
@@ -188,21 +186,33 @@ namespace SI_T
           int &rotated_ee,
           IQuadPts * const &rotated_xi );
 
+      void search_opposite_fixed_point(
+          const Vector_3 &rotated_pt,
+          const ALocal_Interface * const &itf_part,
+          const SI_solution * const &SI_sol,
+          const int &itf_id,
+          FEAElement * fixed_elementv,
+          FEAElement * elements,
+          int &tag,
+          int &fixed_ee,
+          IQuadPts * const &fixed_xi );
+
     private:
       const int nqp_sur;
 
-      // stores the current rotated element tag for each quadrature point
-      // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface)
-      std::vector<std::vector<int>> curr_tag;
-
       // stores the current rotated element number for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface)
-      std::vector<std::vector<int>> curr_ee;
+      std::vector<std::vector<int>> fixed_qp_curr_rotated_ee;
 
       // stores the current rotated element xi = (r, s) for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface) x 2
-      std::vector<std::vector<double>> curr_xi;
-      std::vector<std::vector<double>> curr_eta;
+      std::vector<std::vector<double>> fixed_qp_curr_rotated_xi;
+      std::vector<std::vector<double>> fixed_qp_curr_rotated_eta;
+
+      // rotated counterpart
+      std::vector<std::vector<int>> rotated_qp_curr_fixed_ee;
+      std::vector<std::vector<double>> rotated_qp_curr_fixed_xi;
+      std::vector<std::vector<double>> rotated_qp_curr_fixed_eta;
   };
 
   // ancillary parameters for PGAssem_NS_FEM
@@ -211,8 +221,8 @@ namespace SI_T
     public:
       SI_ancillary(
         IPLocAssem * const &lassem_ptr,
-        FEAElement * const &fixed_elementv,
-        FEAElement * const &rotated_elementv,
+        FEAElement * const &anchor_elementv,
+        FEAElement * const &opposite_elementv,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
@@ -223,8 +233,8 @@ namespace SI_T
       {
         A_dt = 0.0;
         A_lassemptr = lassem_ptr;
-        A_fixed_elementv = fixed_elementv;
-        A_rotated_elementv = rotated_elementv;
+        A_anchor_elementv = anchor_elementv;
+        A_opposite_elementv = opposite_elementv;
         A_elements = elements;
         A_quad_s = quad_s;
         A_free_quad = free_quad;
@@ -237,8 +247,8 @@ namespace SI_T
       {
         A_dt = 0.0;
         A_lassemptr = nullptr;
-        A_fixed_elementv = nullptr;
-        A_rotated_elementv = nullptr;
+        A_anchor_elementv = nullptr;
+        A_opposite_elementv = nullptr;
         A_elements = nullptr;
         A_free_quad = nullptr;
         A_SI_sol = nullptr;
@@ -249,9 +259,9 @@ namespace SI_T
 
       IPLocAssem * A_lassemptr;
 
-      FEAElement * A_fixed_elementv;
+      FEAElement * A_anchor_elementv;
 
-      FEAElement * A_rotated_elementv;
+      FEAElement * A_opposite_elementv;
 
       FEAElement * A_elements;
 
@@ -264,7 +274,6 @@ namespace SI_T
       SI_T::SI_solution * A_SI_sol;
 
       SI_T::SI_quad_point * A_SI_qp;
-
   };
 
   void get_currPts( const double * const &ept_x,

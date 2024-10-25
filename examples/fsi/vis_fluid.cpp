@@ -5,7 +5,7 @@
 //
 // Date: Jan 17 2022
 // ============================================================================
-#include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "APart_Node_FSI.hpp"
@@ -106,8 +106,8 @@ int main( int argc, char * argv[] )
   ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
   ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
 
-  IAGlobal_Mesh_Info * GMIptr_v = new AGlobal_Mesh_Info_FEM_3D(part_v_file, rank);
-  IAGlobal_Mesh_Info * GMIptr_p = new AGlobal_Mesh_Info_FEM_3D(part_p_file, rank);
+  AGlobal_Mesh_Info * GMIptr_v = new AGlobal_Mesh_Info(part_v_file, rank);
+  AGlobal_Mesh_Info * GMIptr_p = new AGlobal_Mesh_Info(part_p_file, rank);
 
   ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
 

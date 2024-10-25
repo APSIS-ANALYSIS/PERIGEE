@@ -218,7 +218,7 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
   double old_dist = curr_dist;
   int iter_counter = 0;
 
-  const double eps = 1.0e-6;
+  const double eps = 1.0e-7;
 
   while(iter_counter < 20)
   {

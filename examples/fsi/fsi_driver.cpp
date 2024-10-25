@@ -5,7 +5,7 @@
 // Date: Dec. 26 2021
 // ============================================================================
 #include "HDF5_Tools.hpp"
-#include "AGlobal_Mesh_Info_FEM_3D.hpp"
+#include "AGlobal_Mesh_Info.hpp"
 #include "APart_Basic_Info.hpp"
 #include "APart_Node_FSI.hpp"
 #include "ALocal_EBC_outflow.hpp"
@@ -294,7 +294,7 @@ int main(int argc, char *argv[])
   // ===== Main Data Strucutre =====
   // Control points are only stored for the geometry-defining field, that is the velo/disp
   // field.
-  IAGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info_FEM_3D(part_v_file, rank);
+  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_v_file, rank);
 
   APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, rank);
 

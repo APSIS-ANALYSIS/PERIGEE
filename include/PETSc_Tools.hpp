@@ -169,7 +169,7 @@ namespace PETSc_T
   std::vector<double> GetLocalArray( const Vec &vv );
 
   // Scatter from a global vector
-  void Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * &values );
+  void Scatter( const Vec &gg, PetscInt * &idx_from, const int &length, double * const &values );
   // Warning:
   // VecScatterCreate can only be simultaneously run with all the CPUs that 
   // confirmed by PetscInitialize.
