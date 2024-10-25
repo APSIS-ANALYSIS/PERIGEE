@@ -20,7 +20,10 @@ PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
   Residual_s = new PetscScalar[vec_size];
   Residual_r = new PetscScalar[vec_size];
 
-  Zero_Tangent_Residual_itf();
+  Zero_Residual_itf_fixed();
+  Zero_Residual_itf_rotated();
+  Zero_Tangent_itf_MF_fixed();
+  Zero_Tangent_itf_MF_rotated();
 }
 
 PLocAssem_VMS_NS_GenAlpha_Interface::~PLocAssem_VMS_NS_GenAlpha_Interface()
@@ -65,14 +68,13 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
+void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
   const double * const &rotated_local_mvelo)
 {
-  Zero_Residual_itf();
-
+  Zero_Residual_itf_fixed();
   double ps {0.0};
   double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
   double vs {0.0}, vs_x {0.0}, vs_y {0.0}, vs_z {0.0};
@@ -84,17 +86,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
   double mur {0.0}, mvr {0.0}, mwr{0.0};
 
-  Vector_3 opposite_xyz(0.0, 0.0, 0.0);
-
   std::vector<double> Ns(nLocBas, 0.0), dNs_dx(nLocBas, 0.0), dNs_dy(nLocBas, 0.0), dNs_dz(nLocBas, 0.0);
   std::vector<double> Nr(nLocBas, 0.0), dNr_dx(nLocBas, 0.0), dNr_dy(nLocBas, 0.0), dNr_dz(nLocBas, 0.0);
 
   fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
   rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-  double fixed_J {0.0}, rotated_J {0.0};
+  double fixed_J {0.0};
   const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(0, rotated_J);
+  const Vector_3 normal_r = -1 * normal_s;
 
   // Calculate h_b and tau_I
   const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
@@ -158,15 +158,11 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
 
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
 
-  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-                     (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
-
   const double gwts = fixed_J * fixed_qw;
 
   for(int A{0}; A<nLocBas; ++A)
   {
     const double NAs {Ns[A]}, NAs_x {dNs_dx[A]}, NAs_y {dNs_dy[A]}, NAs_z {dNs_dz[A]};
-    const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
 
     const int A4 = 4 * A;
 
@@ -196,7 +192,108 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       - NAs_y * nsz * vis_mu * velo_jump.y()
       - (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * vis_mu * velo_jump.z() )
       + NAs * (tau_I - rho0 * inflow_s) * velo_jump.z());
+  
+  }
+}
 
+void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
+  const int &qua, const double &rotated_qw, const double &dt,
+  const FEAElement * const &rotated_elementv, const FEAElement * const &fixed_elementv,
+  const double * const &rotated_local_sol, const double * const &rotated_local_mvelo,
+  const double * const &fixed_local_sol)
+{
+  Zero_Residual_itf_rotated();
+  double ps {0.0};
+  double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
+  double vs {0.0}, vs_x {0.0}, vs_y {0.0}, vs_z {0.0};
+  double ws {0.0}, ws_x {0.0}, ws_y {0.0}, ws_z {0.0};
+
+  double pr {0.0};
+  double ur {0.0}, ur_x {0.0}, ur_y {0.0}, ur_z {0.0};
+  double vr {0.0}, vr_x {0.0}, vr_y {0.0}, vr_z {0.0};
+  double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
+  double mur {0.0}, mvr {0.0}, mwr{0.0};
+  
+  std::vector<double> Ns(nLocBas, 0.0), dNs_dx(nLocBas, 0.0), dNs_dy(nLocBas, 0.0), dNs_dz(nLocBas, 0.0);
+  std::vector<double> Nr(nLocBas, 0.0), dNr_dx(nLocBas, 0.0), dNr_dy(nLocBas, 0.0), dNr_dz(nLocBas, 0.0);
+
+  fixed_elementv -> get_R_gradR( 0, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
+  rotated_elementv -> get_R_gradR( qua, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
+
+  double  rotated_J {0.0};
+  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(qua, rotated_J);
+  const Vector_3 normal_s = -1 * normal_r;
+
+  // Calculate h_b and tau_I
+  const auto s_dxi_dx = fixed_elementv -> get_invJacobian(0);
+  const double h_s = get_h_b(s_dxi_dx, normal_s);
+
+  const auto r_dxi_dx = rotated_elementv -> get_invJacobian(qua);
+  const double h_r = get_h_b(r_dxi_dx, normal_r);
+
+  const double tau_I = 0.5 * vis_mu * C_bI * (1.0 / h_s + 1.0 / h_r);
+
+  for(int ii{0}; ii<nLocBas; ++ii)
+  {
+    const int ii4{4 * ii};
+    const int ii3{3 * ii};
+
+    pr += rotated_local_sol[ii4 + 0] * Nr[ii];
+    ur += rotated_local_sol[ii4 + 1] * Nr[ii];
+    vr += rotated_local_sol[ii4 + 2] * Nr[ii];
+    wr += rotated_local_sol[ii4 + 3] * Nr[ii];
+
+    ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
+    ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
+    ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
+
+    vr_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
+    vr_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
+    vr_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
+
+    wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
+    wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
+    wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
+
+    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
+    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
+    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
+
+    ps += fixed_local_sol[ii4 + 0] * Ns[ii];
+    us += fixed_local_sol[ii4 + 1] * Ns[ii];
+    vs += fixed_local_sol[ii4 + 2] * Ns[ii];
+    ws += fixed_local_sol[ii4 + 3] * Ns[ii];
+
+    us_x += fixed_local_sol[ii4 + 1] * dNs_dx[ii];
+    us_y += fixed_local_sol[ii4 + 1] * dNs_dy[ii];
+    us_z += fixed_local_sol[ii4 + 1] * dNs_dz[ii];
+
+    vs_x += fixed_local_sol[ii4 + 2] * dNs_dx[ii];
+    vs_y += fixed_local_sol[ii4 + 2] * dNs_dy[ii];
+    vs_z += fixed_local_sol[ii4 + 2] * dNs_dz[ii];
+
+    ws_x += fixed_local_sol[ii4 + 3] * dNs_dx[ii];
+    ws_y += fixed_local_sol[ii4 + 3] * dNs_dy[ii];
+    ws_z += fixed_local_sol[ii4 + 3] * dNs_dz[ii];
+  }
+
+  // Mesh velocity in the quadrature point
+  const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
+
+  const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
+  const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
+  const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
+
+  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
+                     (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
+
+  const double gwts = rotated_J * rotated_qw;
+
+  for(int A{0}; A<nLocBas; ++A)
+  {
+    const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
+
+    const int A4 = 4 * A;
 
     // Mass -- r
     Residual_r[A4] += 0.5 * gwts * NAr * velo_jump.dot_product(normal_r);
@@ -214,7 +311,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
       + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
       + NAr_x * nry * vis_mu * velo_jump.x()
       + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
-      + NAr_z * nrz * vis_mu * velo_jump.z() )
+      + NAr_z * nry * vis_mu * velo_jump.z() )
       + NAr * (rho0 * inflow_r - tau_I) * velo_jump.y());
 
     // z-dir -- r
@@ -227,26 +324,16 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf(
   }
 }
 
-void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
+void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
   const int &qua, const double &fixed_qw, const double &dt,
   const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
   const double * const &fixed_local_sol, const double * const &rotated_local_sol,
   const double * const &rotated_local_mvelo)
 {
-  Zero_Tangent_Residual_itf();
-
-  double ps {0.0};
-  double us {0.0}, us_x {0.0}, us_y {0.0}, us_z {0.0};
-  double vs {0.0}, vs_x {0.0}, vs_y {0.0}, vs_z {0.0};
-  double ws {0.0}, ws_x {0.0}, ws_y {0.0}, ws_z {0.0};
-
-  double pr {0.0};
-  double ur {0.0}, ur_x {0.0}, ur_y {0.0}, ur_z {0.0};
-  double vr {0.0}, vr_x {0.0}, vr_y {0.0}, vr_z {0.0};
-  double wr {0.0}, wr_x {0.0}, wr_y {0.0}, wr_z {0.0};
+  Zero_Tangent_itf_MF_fixed();
+  double ps {0.0}, us {0.0}, vs {0.0}, ws {0.0};
+  double pr {0.0}, ur {0.0}, vr {0.0}, wr {0.0};
   double mur {0.0}, mvr {0.0}, mwr{0.0};
-
-  Vector_3 opposite_xyz(0.0, 0.0, 0.0);
 
   std::vector<double> Ns(nLocBas, 0.0), dNs_dx(nLocBas, 0.0), dNs_dy(nLocBas, 0.0), dNs_dz(nLocBas, 0.0);
   std::vector<double> Nr(nLocBas, 0.0), dNr_dx(nLocBas, 0.0), dNr_dy(nLocBas, 0.0), dNr_dz(nLocBas, 0.0);
@@ -254,9 +341,9 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   fixed_elementv -> get_R_gradR( qua, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
   rotated_elementv -> get_R_gradR( 0, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-  double fixed_J {0.0}, rotated_J {0.0};
+  double fixed_J {0.0};
   const Vector_3 normal_s = fixed_elementv -> get_2d_normal_out(qua, fixed_J);
-  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(0, rotated_J);
+  const Vector_3 normal_r = -1 * normal_s;
 
   // Calculate h_b and tau_I
   const auto s_dxi_dx = fixed_elementv -> get_invJacobian(qua);
@@ -277,18 +364,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
     vs += fixed_local_sol[ii4 + 2] * Ns[ii];
     ws += fixed_local_sol[ii4 + 3] * Ns[ii];
 
-    us_x += fixed_local_sol[ii4 + 1] * dNs_dx[ii];
-    us_y += fixed_local_sol[ii4 + 1] * dNs_dy[ii];
-    us_z += fixed_local_sol[ii4 + 1] * dNs_dz[ii];
-
-    vs_x += fixed_local_sol[ii4 + 2] * dNs_dx[ii];
-    vs_y += fixed_local_sol[ii4 + 2] * dNs_dy[ii];
-    vs_z += fixed_local_sol[ii4 + 2] * dNs_dz[ii];
-
-    ws_x += fixed_local_sol[ii4 + 3] * dNs_dx[ii];
-    ws_y += fixed_local_sol[ii4 + 3] * dNs_dy[ii];
-    ws_z += fixed_local_sol[ii4 + 3] * dNs_dz[ii];
-
     pr += rotated_local_sol[ii4 + 0] * Nr[ii];
     ur += rotated_local_sol[ii4 + 1] * Nr[ii];
     vr += rotated_local_sol[ii4 + 2] * Nr[ii];
@@ -297,18 +372,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
     mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
     mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
     mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
-
-    ur_x += rotated_local_sol[ii4 + 1] * dNr_dx[ii];
-    ur_y += rotated_local_sol[ii4 + 1] * dNr_dy[ii];
-    ur_z += rotated_local_sol[ii4 + 1] * dNr_dz[ii];
-
-    vr_x += rotated_local_sol[ii4 + 2] * dNr_dx[ii];
-    vr_y += rotated_local_sol[ii4 + 2] * dNr_dy[ii];
-    vr_z += rotated_local_sol[ii4 + 2] * dNr_dz[ii];
-
-    wr_x += rotated_local_sol[ii4 + 3] * dNr_dx[ii];
-    wr_y += rotated_local_sol[ii4 + 3] * dNr_dy[ii];
-    wr_z += rotated_local_sol[ii4 + 3] * dNr_dz[ii];
   }
 
   // Mesh velocity in the quadrature point
@@ -321,11 +384,6 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
   double delta_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? 1.0 : 0.0);
 
-  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-                     (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
-  double delta_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
-                     1.0 : 0.0);
-
   const double gwts = fixed_J * fixed_qw;
   const double dd_dv = alpha_f * gamma * dt;
   const double common_coef = gwts * dd_dv;
@@ -333,64 +391,8 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
   for(int A{0}; A<nLocBas; ++A)
   {
     const double NAs {Ns[A]}, NAs_x {dNs_dx[A]}, NAs_y {dNs_dy[A]}, NAs_z {dNs_dz[A]};
-    const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
 
     const int A4 = 4 * A;
-
-    // Mass -- s
-    Residual_s[A4] += -0.5 * gwts * NAs * velo_jump.dot_product(normal_s);
-
-    // x-dir -- s
-    Residual_s[A4+1] += gwts * (0.5 * ( NAs * (ps * nsx - vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
-      - pr * nrx + vis_mu * (2 * ur_x * nrx + (ur_y + vr_x) * nry + (ur_z + wr_x) * nrz))
-      - (2 * NAs_x * nsx + NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.x()
-      - NAs_y * nsx * vis_mu * velo_jump.y()
-      - NAs_z * nsx * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.x());
-
-    // y-dir -- s
-    Residual_s[A4+2] += gwts * (0.5 * ( NAs * (ps * nsy - vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      - pr * nry + vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
-      - NAs_x * nsy * vis_mu * velo_jump.x()
-      - (NAs_x * nsx + 2 * NAs_y * nsy + NAs_z * nsz) * vis_mu * velo_jump.y()
-      - NAs_z * nsy * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.y());
-
-    // z-dir -- s
-    Residual_s[A4+3] += gwts * (0.5 * ( NAs * (ps * nsz - vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      - pr * nrz + vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
-      - NAs_x * nsz * vis_mu * velo_jump.x()
-      - NAs_y * nsz * vis_mu * velo_jump.y()
-      - (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * vis_mu * velo_jump.z() )
-      + NAs * (tau_I - rho0 * inflow_s) * velo_jump.z());
-
-
-    // Mass -- r
-    Residual_r[A4] += 0.5 * gwts * NAr * velo_jump.dot_product(normal_r);
-
-    // x-dir -- r
-    Residual_r[A4+1] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsx + vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
-      + pr * nrx - vis_mu * (2 * ur_x * nrx + (ur_y + vr_x) * nry + (ur_z + wr_x) * nrz))
-      + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.x()
-      + NAr_y * nrx * vis_mu * velo_jump.y()
-      + NAr_z * nrx * vis_mu * velo_jump.z() )
-      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.x());
-
-    // y-dir -- r
-    Residual_r[A4+2] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsy + vis_mu * ((us_y + vs_x) * nsx + 2 * vs_y * nsy + (vs_z + ws_y) * nsz)
-      + pr * nry - vis_mu * ((ur_y + vr_x) * nrx + 2 * vr_y * nry + (vr_z + wr_y) * nrz))
-      + NAr_x * nry * vis_mu * velo_jump.x()
-      + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * vis_mu * velo_jump.y()
-      + NAr_z * nrz * vis_mu * velo_jump.z() )
-      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.y());
-
-    // z-dir -- r
-    Residual_r[A4+3] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsz + vis_mu * ((us_z + ws_x) * nsx + (vs_z + ws_y) * nsy + 2 * ws_z * nsz)
-      + pr * nrz - vis_mu * ((ur_z + wr_x) * nrx + (vr_z + wr_y) * nry + 2 * wr_z * nrz))
-      + NAr_x * nrz * vis_mu * velo_jump.x()
-      + NAr_y * nrz * vis_mu * velo_jump.y()
-      + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * vis_mu * velo_jump.z() )
-      + NAr * (rho0 * inflow_r - tau_I) * velo_jump.z());
 
     for(int B{0}; B<nLocBas; ++B)
     {
@@ -399,7 +401,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
 
       const int B4 = 4 * B, nLocBas4 = 4 * nLocBas;
 
-      const double NAsNBs = NAs * NBs, NAsNBr = NAs * NBr, NArNBs = NAr * NBs, NArNBr = NAr * NBr; 
+      const double NAsNBs = NAs * NBs; 
 
       // Ks1s1
       // Tangent_ss[nLocBas4 * A4 + B4] += 0;
@@ -464,6 +466,8 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
                       + (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * NBs)
         + NAsNBs * (tau_I - rho0 * (delta_s * velo_jump.z() * nsz + inflow_s)) );
 
+      const double NAsNBr = NAs * NBr;
+
       // Ks1r1
       // Tangent_sr[nLocBas4 * A4 + B4] += 0;
 
@@ -526,69 +530,90 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
         0.5 * vis_mu * (NAs * (NBr_x * nrx + NBr_y * nry + 2 * NBr_z * nrz)
                      + (NAs_x * nsx + NAs_y * nsy + 2 * NAs_z * nsz) * NBr)
         + NAsNBr * (rho0 * inflow_s - tau_I) );
+    }
+  }
+}
 
-      // Kr1s1
-      // Tangent_rs[nLocBas4 * A4 + B4] += 0;
+void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
+  const int &qua, const double &rotated_qw, const double &dt,
+  const FEAElement * const &rotated_elementv, const FEAElement * const &fixed_elementv,
+  const double * const &rotated_local_sol, const double * const &fixed_local_sol,
+  const double * const &rotated_local_mvelo)
+{
+  Zero_Tangent_itf_MF_rotated();
+  double ps {0.0}, us {0.0}, vs {0.0}, ws {0.0};
+  double pr {0.0}, ur {0.0}, vr {0.0}, wr {0.0};
+  double mur {0.0}, mvr {0.0}, mwr{0.0};
 
-      // Kr1s2
-      Tangent_rs[nLocBas4 * A4 + B4 + 1] += 0.5 * common_coef * NArNBs * nrx;
+  std::vector<double> Ns(nLocBas, 0.0), dNs_dx(nLocBas, 0.0), dNs_dy(nLocBas, 0.0), dNs_dz(nLocBas, 0.0);
+  std::vector<double> Nr(nLocBas, 0.0), dNr_dx(nLocBas, 0.0), dNr_dy(nLocBas, 0.0), dNr_dz(nLocBas, 0.0);
 
-      // Kr1s3
-      Tangent_rs[nLocBas4 * A4 + B4 + 2] += 0.5 * common_coef * NArNBs * nry;
+  fixed_elementv -> get_R_gradR( 0, &Ns[0], &dNs_dx[0], &dNs_dy[0], &dNs_dz[0] );
+  rotated_elementv -> get_R_gradR( qua, &Nr[0], &dNr_dx[0], &dNr_dy[0], &dNr_dz[0] );
 
-      // Kr1s4
-      Tangent_rs[nLocBas4 * A4 + B4 + 3] += 0.5 * common_coef * NArNBs * nrz;
+  double rotated_J {0.0};
+  const Vector_3 normal_r = rotated_elementv -> get_2d_normal_out(qua, rotated_J);
+  const Vector_3 normal_s = -1 * normal_r;
 
-      // Kr2s1
-      Tangent_rs[nLocBas4 * (A4 + 1) + B4] += -0.5 * common_coef * NArNBs * nsx;
+  // Calculate h_b and tau_I
+  const auto s_dxi_dx = fixed_elementv -> get_invJacobian(0);
+  const double h_s = get_h_b(s_dxi_dx, normal_s);
 
-      // Kr2s2
-      Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
-        0.5 * vis_mu * (NAr * (2 * NBs_x * nsx + NBs_y * nsy + NBs_z * nsz)
-                     + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * NBs)
-        + NArNBs * (rho0 * inflow_r - tau_I) );
+  const auto r_dxi_dx = rotated_elementv -> get_invJacobian(qua);
+  const double h_r = get_h_b(r_dxi_dx, normal_r);
 
-      // Kr2s3
-      Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 2] += 0.5 * common_coef * vis_mu * (
-        NAr * NBs_x * nsy + NAr_y * nrx * NBs );
+  const double tau_I = 0.5 * vis_mu * C_bI * (1.0 / h_s + 1.0 / h_r);
 
-      // Kr2s4
-      Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 3] += 0.5 * common_coef * vis_mu * (
-        NAr * NBs_x * nsz + NAr_z * nrx * NBs );
+  for(int ii{0}; ii<nLocBas; ++ii)
+  {
+    const int ii4{4 * ii};
+    const int ii3{3 * ii};
 
-      // Kr3s1
-      Tangent_rs[nLocBas4 * (A4 + 2) + B4] += -0.5 * common_coef * NArNBs * nsy;
+    ps += fixed_local_sol[ii4 + 0] * Ns[ii];
+    us += fixed_local_sol[ii4 + 1] * Ns[ii];
+    vs += fixed_local_sol[ii4 + 2] * Ns[ii];
+    ws += fixed_local_sol[ii4 + 3] * Ns[ii];
 
-      // Kr3s2
-      Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 1] += 0.5 * common_coef * vis_mu * (
-        NAr * NBs_y * nsx + NAr_x * nry * NBs );
+    pr += rotated_local_sol[ii4 + 0] * Nr[ii];
+    ur += rotated_local_sol[ii4 + 1] * Nr[ii];
+    vr += rotated_local_sol[ii4 + 2] * Nr[ii];
+    wr += rotated_local_sol[ii4 + 3] * Nr[ii];
 
-      // Kr3s3
-      Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * (
-        0.5 * vis_mu * (NAr * (NBs_x * nsx + 2 * NBs_y * nsy + NBs_z * nsz)
-                     + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * NBs)
-        + NArNBs * (rho0 * inflow_r - tau_I) );
-      
-      // Kr3s4
-      Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 3] += 0.5 * common_coef * vis_mu * (
-        NAr * NBs_y * nsz + NAr_z * nry * NBs );
+    mur += rotated_local_mvelo[ii3 + 0] * Nr[ii];
+    mvr += rotated_local_mvelo[ii3 + 1] * Nr[ii];
+    mwr += rotated_local_mvelo[ii3 + 2] * Nr[ii];
+  }
 
-      // Kr4s1
-      Tangent_rs[nLocBas4 * (A4 + 3) + B4] += -0.5 * common_coef * NArNBs * nsz;
+  // Mesh velocity in the quadrature point
+  const Vector_3 velo_mesh = Vector_3(mur, mvr, mwr);
 
-      // Kr4s2
-      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 1] += 0.5 * common_coef * vis_mu * (
-        NAr * NBs_z * nsx + NAr_x * nrz * NBs );
+  const Vector_3 velo_jump(us - ur, vs - vr, ws - wr);
+  const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
+  const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-      // Kr4s3
-      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 2] += 0.5 * common_coef * vis_mu * (
-        NAr * NBs_z * nsy + NAr_y * nrz * NBs );
+  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
+                     (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
+  double delta_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
+                     1.0 : 0.0);
 
-      // Kr4s4
-      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * (
-        0.5 * vis_mu * (NAr * (NBs_x * nsx + NBs_y * nsy + 2 * NBs_z * nsz)
-                     + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBs)
-        + NArNBs * (rho0 * inflow_r - tau_I) );
+  const double gwts = rotated_J * rotated_qw;
+  const double dd_dv = alpha_f * gamma * dt;
+  const double common_coef = gwts * dd_dv;
+
+  for(int A{0}; A<nLocBas; ++A)
+  {
+    const double NAr {Nr[A]}, NAr_x {dNr_dx[A]}, NAr_y {dNr_dy[A]}, NAr_z {dNr_dz[A]};
+
+    const int A4 = 4 * A;
+
+    for(int B{0}; B<nLocBas; ++B)
+    {
+      const double NBs {Ns[B]}, NBs_x {dNs_dx[B]}, NBs_y {dNs_dy[B]}, NBs_z {dNs_dz[B]};
+      const double NBr {Nr[B]}, NBr_x {dNr_dx[B]}, NBr_y {dNr_dy[B]}, NBr_z {dNr_dz[B]};
+
+      const int B4 = 4 * B, nLocBas4 = 4 * nLocBas;
+
+      const double NArNBr = NAr * NBr; 
 
       // Kr1r1
       // Tangent_rr[nLocBas4 * A4 + B4] += 0;
@@ -653,6 +678,71 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_Residual_itf(
         -0.5 * vis_mu * (NAr * (NBr_x * nrx + NBr_y * nry + 2 * NBr_z * nrz)
                       + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBr)
         + NArNBr * (tau_I + rho0 * (delta_r * velo_jump.z() * nrz - inflow_r)) );
+
+      const double NArNBs = NAr * NBs;
+
+      // Kr1s1
+      // Tangent_rs[nLocBas4 * A4 + B4] += 0;
+
+      // Kr1s2
+      Tangent_rs[nLocBas4 * A4 + B4 + 1] += 0.5 * common_coef * NArNBs * nrx;
+
+      // Kr1s3
+      Tangent_rs[nLocBas4 * A4 + B4 + 2] += 0.5 * common_coef * NArNBs * nry;
+
+      // Kr1s4
+      Tangent_rs[nLocBas4 * A4 + B4 + 3] += 0.5 * common_coef * NArNBs * nrz;
+
+      // Kr2s1
+      Tangent_rs[nLocBas4 * (A4 + 1) + B4] += -0.5 * common_coef * NArNBs * nsx;
+
+      // Kr2s2
+      Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 1] += common_coef * (
+        0.5 * vis_mu * (NAr * (2 * NBs_x * nsx + NBs_y * nsy + NBs_z * nsz)
+                     + (2 * NAr_x * nrx + NAr_y * nry + NAr_z * nrz) * NBs)
+        + NArNBs * (rho0 * inflow_r - tau_I) );
+
+      // Kr2s3
+      Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 2] += 0.5 * common_coef * vis_mu * (
+        NAr * NBs_x * nsy + NAr_y * nrx * NBs );
+
+      // Kr2s4
+      Tangent_rs[nLocBas4 * (A4 + 1) + B4 + 3] += 0.5 * common_coef * vis_mu * (
+        NAr * NBs_x * nsz + NAr_z * nrx * NBs );
+
+      // Kr3s1
+      Tangent_rs[nLocBas4 * (A4 + 2) + B4] += -0.5 * common_coef * NArNBs * nsy;
+
+      // Kr3s2
+      Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 1] += 0.5 * common_coef * vis_mu * (
+        NAr * NBs_y * nsx + NAr_x * nry * NBs );
+
+      // Kr3s3
+      Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 2] += common_coef * (
+        0.5 * vis_mu * (NAr * (NBs_x * nsx + 2 * NBs_y * nsy + NBs_z * nsz)
+                     + (NAr_x * nrx + 2 * NAr_y * nry + NAr_z * nrz) * NBs)
+        + NArNBs * (rho0 * inflow_r - tau_I) );
+      
+      // Kr3s4
+      Tangent_rs[nLocBas4 * (A4 + 2) + B4 + 3] += 0.5 * common_coef * vis_mu * (
+        NAr * NBs_y * nsz + NAr_z * nry * NBs );
+
+      // Kr4s1
+      Tangent_rs[nLocBas4 * (A4 + 3) + B4] += -0.5 * common_coef * NArNBs * nsz;
+
+      // Kr4s2
+      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 1] += 0.5 * common_coef * vis_mu * (
+        NAr * NBs_z * nsx + NAr_x * nrz * NBs );
+
+      // Kr4s3
+      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 2] += 0.5 * common_coef * vis_mu * (
+        NAr * NBs_z * nsy + NAr_y * nrz * NBs );
+
+      // Kr4s4
+      Tangent_rs[nLocBas4 * (A4 + 3) + B4 + 3] += common_coef * (
+        0.5 * vis_mu * (NAr * (NBs_x * nsx + NBs_y * nsy + 2 * NBs_z * nsz)
+                     + (NAr_x * nrx + NAr_y * nry + 2 * NAr_z * nrz) * NBs)
+        + NArNBs * (rho0 * inflow_r - tau_I) );
     }
   }
 }

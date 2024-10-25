@@ -75,7 +75,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PDNSolution * const &sol,
     const PDNSolution * const &velo_mesh,    
     const PDNSolution * const &disp_mesh,
-    bool &conv_flag, int &nl_counter ) const
+    bool &conv_flag, int &nl_counter,
+    Mat &shell ) const
 {
 #ifdef PETSC_USE_LOG
   PetscLogEvent mat_assem_0_event, mat_assem_1_event;
@@ -158,7 +159,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     
     // SetOperator will pass the tangent matrix to the linear solver and the
     // linear solver will generate the preconditioner based on the new matrix.
-    lsolver_ptr->SetOperator( gassem_ptr->K );
+    lsolver_ptr->SetOperator( shell, gassem_ptr->K );
   }
   else
   {
@@ -224,7 +225,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       SYS_T::commPrint("  --- M updated");
-      lsolver_ptr->SetOperator(gassem_ptr->K);
+      lsolver_ptr->SetOperator(shell, gassem_ptr->K);
     }
     else
     {
