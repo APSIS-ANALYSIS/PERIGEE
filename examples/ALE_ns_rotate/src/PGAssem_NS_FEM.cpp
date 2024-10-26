@@ -359,8 +359,8 @@ void PGAssem_NS_FEM::Assem_residual(
   // BackFlow_G( sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // // Resistance type boundary condition
-  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-     nbc_part, ebc_part, gbc );
+  // NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -475,8 +475,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // // Resistance type boundary condition
-  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-     nbc_part, ebc_part, gbc );
+  // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
