@@ -35,8 +35,6 @@ class ALocal_Interface
 
     int get_num_tag(const int &ii) const {return num_tag[ii];}
 
-    int get_num_fixed_ele(const int &ii) const {return num_fixed_ele[ii];}
-
     virtual int get_num_fixed_ele(const int &ii) const
     {return num_local_fixed_ele[ii];}
 
