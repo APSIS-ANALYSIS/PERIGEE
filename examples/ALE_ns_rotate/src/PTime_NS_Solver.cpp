@@ -32,7 +32,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
-    const PDNSolution * const &init_disp,
+    const PDNSolution * const &init_mdisp,
+    const PDNSolution * const &init_mvelo,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
     const ICVFlowRate * const flr_ptr,
@@ -46,7 +47,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
-    const SI_rotation_info * const &si_ptr,
+    const SI_rotation_info * const &rot_info,
     SI_T::SI_solution * const &SI_sol,
     SI_T::SI_quad_point * const &SI_qp,
     const Matrix_PETSc * const &bc_mat,
@@ -60,16 +61,17 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr ) const
+    PNonlinear_NS_Solver * const &nsolver_ptr,
+    Mat &shell ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
   PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * pre_disp_mesh = new PDNSolution(*init_disp);
-  PDNSolution * cur_disp_mesh = new PDNSolution(*init_disp);
-  PDNSolution * pre_velo_mesh = new PDNSolution(*init_disp);
-  PDNSolution * cur_velo_mesh = new PDNSolution(*init_disp);
+  PDNSolution * pre_disp_mesh = new PDNSolution(*init_mdisp);
+  PDNSolution * cur_disp_mesh = new PDNSolution(*init_mdisp);
+  PDNSolution * pre_velo_mesh = new PDNSolution(*init_mvelo);
+  PDNSolution * cur_velo_mesh = new PDNSolution(*init_mvelo);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -111,10 +113,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     { 
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
-      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), si_ptr, 0); //get_currPts() may be writtern into Sl_tools
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info, 0); //get_currPts() may be writtern into Sl_tools
 
-      const Vector_3 radius_curr = get_radius(curr_pt_xyz, si_ptr); //get_radius() may be writtern into Sl_tools
-      const Vector_3 velo_mesh_curr = Vec3::cross_product(si_ptr->get_angular_velo()*si_ptr->get_direction_rotated(), radius_curr);
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info); //get_radius() may be writtern into Sl_tools
+      const Vector_3 velo_mesh_curr = Vec3::cross_product(rot_info->get_angular_velo()*rot_info->get_direction_rotated(), radius_curr);
 
       const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
 
@@ -151,7 +153,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
         ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, bc_mat, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
-        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, conv_flag, nl_counter );
+        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, conv_flag, nl_counter, shell );
 
     // Update the time step information
     time_info->TimeIncrement();
