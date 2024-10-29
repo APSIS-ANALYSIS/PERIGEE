@@ -497,46 +497,14 @@ void HDF5_Writer::write_doubleMatrix( const hid_t &group_id,
 void HDF5_Writer::write_string( const char * const &data_name, 
     const std::string &string_input ) const
 {
-  hid_t dataspace, dataset;
-
-  hsize_t dims[1];
-  dims[0] = 1;
-
-  hid_t datatype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(datatype, string_input.size());
-
-  dataspace = H5Screate_simple(1, dims, NULL);
-  dataset   = H5Dcreate( file_id, data_name, datatype,
-      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  H5Dwrite( dataset, datatype, H5S_ALL, H5S_ALL,
-      H5P_DEFAULT, &string_input[0] );
-
-  H5Dclose( dataset );
-  H5Sclose( dataspace );
-  H5Tclose( datatype );
+  write_string_impl(file_id, data_name, string_input);
 }
 
 void HDF5_Writer::write_string( const hid_t &group_id,
     const char * const &data_name, 
     const std::string &string_input ) const
 {
-  hid_t dataspace, dataset;
-
-  hsize_t dims[1];
-  dims[0] = 1;
-
-  hid_t datatype = H5Tcopy(H5T_C_S1);
-  H5Tset_size(datatype, string_input.size());
-
-  dataspace = H5Screate_simple(1, dims, NULL);
-  dataset   = H5Dcreate( group_id, data_name, datatype,
-      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  H5Dwrite( dataset, datatype, H5S_ALL, H5S_ALL,
-      H5P_DEFAULT, &string_input[0] );
-
-  H5Dclose( dataset );
-  H5Sclose( dataspace );
-  H5Tclose( datatype );
+  write_string_impl(group_id, data_name, string_input);
 }
 
 void HDF5_Writer::write_string_impl(hid_t location_id, 
