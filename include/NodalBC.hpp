@@ -53,6 +53,16 @@ class NodalBC : public INodalBC
         const int &nFunc );
 
     // --------------------------------------------------------------
+    // The list of vtp files specifies the rotated wall nodes. 
+    // No periodical type BC nodes.
+    // --------------------------------------------------------------
+    NodalBC( const std::vector<std::string> &vtkfileList,
+        const std::string &rotated_file,
+        const std::string &rotated_wall_file, 
+        const std::string &fixed_file,    
+        const int &nFunc );
+
+    // --------------------------------------------------------------
     // General NodalBC constructor. The specific implementation is 
     // determined by the private funcitons, indicated by the type var.
     // --------------------------------------------------------------

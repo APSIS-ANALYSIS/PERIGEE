@@ -115,8 +115,8 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Angular velocity
-  double angular_velo = -250 * MATH_T::PI; //(rad/s)
-  double angular_thd_time = 1.0; // prescribed time for rotating part to reach angular velocity
+  double angular_velo = 250 * MATH_T::PI; //(rad/s)
+  double angular_thd_time = 1.5; // prescribed time for rotating part to reach angular velocity // 1.5 1.0
 
   // Yaml options
   bool is_loadYaml = true;
