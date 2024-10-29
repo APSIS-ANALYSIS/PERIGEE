@@ -29,6 +29,8 @@ class ALocal_Interface
 
     ~ALocal_Interface() = default;
 
+    virtual void print_info() const;
+
     int get_num_itf() const {return num_itf;}
 
     int get_nLocBas() const {return nLocBas;}
