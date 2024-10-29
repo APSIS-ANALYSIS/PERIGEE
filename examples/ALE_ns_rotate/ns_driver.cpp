@@ -158,6 +158,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
   SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
   SYS_T::GetOptionReal("-inflow_TI_perturbation", inflow_TI_perturbation);
+  SYS_T::GetOptionReal("-angular_velo", angular_velo);
+  SYS_T::GetOptionReal("-angular_thd_time", angular_thd_time);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
