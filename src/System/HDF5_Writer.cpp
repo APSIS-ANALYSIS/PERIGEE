@@ -3,39 +3,13 @@
 void HDF5_Writer::write_intScalar( const hid_t &group_id,
     const char * const &data_name, const int &value ) const
 {
-  hsize_t dims[1];
-  dims[0] = 1;
-
-  hid_t dataspace = H5Screate_simple(1, dims, NULL);
-  hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_INT,
-      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-
-  herr_t status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-      H5P_DEFAULT, &value );
-
-  check_error(status, "write_intScalar");
-
-  H5Dclose( dataset );
-  H5Sclose( dataspace );
+  write_intScalar_impl(group_id, data_name, value);
 }
 
 void HDF5_Writer::write_intScalar( const char * const &data_name,
     const int &value ) const
 {
-  hsize_t dims[1];
-  dims[0] = 1;
-
-  hid_t dataspace = H5Screate_simple(1, dims, NULL);
-  hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_INT,
-     dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-
-  herr_t status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-      H5P_DEFAULT, &value );
-
-  check_error(status, "write_intScalar");
-
-  H5Dclose( dataset );
-  H5Sclose( dataspace );
+  write_intScalar_impl(file_id, data_name, value);
 }
 
 void HDF5_Writer::write_int64Scalar( const char * const &data_name,
@@ -84,39 +58,13 @@ void HDF5_Writer::write_uintScalar(
 void HDF5_Writer::write_doubleScalar( const hid_t &group_id,
     const char * const &data_name, const double &value ) const
 {
-  hid_t dataspace, dataset;
-  hsize_t dims[1]; dims[0] = 1;
-  herr_t status;
-
-  dataspace = H5Screate_simple(1, dims, NULL);
-  dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
-      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-      H5P_DEFAULT, &value );
-
-  check_error(status, "write_doubleScalar");
-
-  H5Dclose( dataset );
-  H5Sclose( dataspace );
+  write_doubleScalar_impl(group_id, data_name, value);
 }
 
 void HDF5_Writer::write_doubleScalar( const char * const &data_name,
     const double &value ) const
 {
-  hid_t dataspace, dataset;
-  hsize_t dims[1]; dims[0] = 1;
-  herr_t status;
-
-  dataspace = H5Screate_simple(1, dims, NULL);
-  dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
-      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-  status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-      H5P_DEFAULT, &value );
-
-  check_error(status, "write_dobleScalar");
-
-  H5Dclose( dataset );
-  H5Sclose( dataspace );
+  write_doubleScalar_impl(file_id, data_name, value);
 }
 
 void HDF5_Writer::write_intVector( const hid_t & group_id,
@@ -526,6 +474,46 @@ void HDF5_Writer::write_string_impl(hid_t location_id,
   H5Dclose( dataset );
   H5Sclose( dataspace );
   H5Tclose( datatype );
+}
+
+void HDF5_Writer::write_intScalar_impl( hid_t location_id, 
+    const char * const &data_name, 
+    const int &value ) const
+{
+  hsize_t dims[1];
+  dims[0] = 1;
+
+  hid_t dataspace = H5Screate_simple(1, dims, NULL);
+  hid_t dataset   = H5Dcreate( location_id, data_name, H5T_NATIVE_INT,
+  dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+
+  herr_t status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+      H5P_DEFAULT, &value );
+
+  check_error(status, "write_intScalar");
+
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
+}
+
+void HDF5_Writer::write_doubleScalar_impl( hid_t location_id, 
+    const char * const &data_name, 
+    const double &value ) const
+{
+  hid_t dataspace, dataset;
+  hsize_t dims[1]; dims[0] = 1;
+  herr_t status;
+
+  dataspace = H5Screate_simple(1, dims, NULL);
+  dataset   = H5Dcreate( location_id, data_name, H5T_NATIVE_DOUBLE,
+      dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+      H5P_DEFAULT, &value );
+
+  check_error(status, "write_doubleScalar");
+
+  H5Dclose( dataset );
+  H5Sclose( dataspace );
 }
 
 // EOF

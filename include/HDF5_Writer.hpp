@@ -201,6 +201,12 @@ class HDF5_Writer
 
     void write_string_impl(hid_t location_id, const char * const &data_name, 
         const std::string& string_input ) const;
+
+    void write_intScalar_impl( hid_t location_id, const char * const &data_name, 
+        const int &value ) const; 
+
+    void write_doubleScalar_impl( hid_t location_id, const char * const &data_name, 
+        const double &value ) const; 
 };
 
 #endif
