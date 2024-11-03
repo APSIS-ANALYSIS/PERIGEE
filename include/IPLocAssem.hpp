@@ -237,6 +237,56 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
+    //-------------------------------------------------------------------------
+    // HERK
+      virtual void Assem_Tangent_Residual_Substep(
+        const double &time, const double &dt,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<std::vector<double>>& pre_velo_sols,
+        const std::vector<std::vector<double>>& pre_pres_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<double>& pre_velo_before,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_Substep(...) is not implemented. \n");}
+
+    virtual void Assem_Tangent_Residual_Laststep(
+        const double &time, const double &dt,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<double>& cur_velo,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<std::vector<double>>& pre_velo_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<std::vector<double>>& pre_pres_sols,
+        const std::vector<double>& pre_velo_before,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_Laststep(...) is not implemented. \n");}        
+
+    virtual void Assem_Tangent_Residual_Finalstep(
+        const double &time, const double &dt,
+        const std::vector<double>& cur_dot_velo,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<double>& cur_velo,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<double>& cur_pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_Finalstep(...) is not implemented. \n");} 
+
+    //-------------------------------------------------------------------------
+
     // ------------------------------------------------------------------------
     // \para element: the container for classical element routine. It only
     //                requires the x-y-z coordinates for the nodes and the 

@@ -391,7 +391,23 @@ int main(int argc, char *argv[])
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
-  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );  
+
+  PDNSolution * velo = new PDNSolution_V( pNode, 0, 3, true, "velo" );
+
+  PDNSolution * pres = new PDNSolution_P( pNode, 0, 1, true, "pres" );
+
+  PDNSolution * dot_velo = new PDNSolution_V( pNode, 0, 3, true, "dot_velo" );
+
+  //===== RK Butcher Table =====
+  Runge_Kutta_Butcher * tm_RK_ptr = new Runge_Kutta_Butcher(5, 3, true);
+
+  // int m = 4;
+  // PDNSolution** solutions = new PDNSolution*[m];
+  // solutions[0] = base;
+  // solutions[1] = sol;
+  // solutions[2] = dot_sol;
+  // solutions[3] = sol1;
 
   if( is_restart )
   {
@@ -583,8 +599,13 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+  // tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
+  //     tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+  //     locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
+  //     locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+
+  tsolver->TM_NS_HERK(is_restart, base, sol, velo, pres,
+      tm_RK_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
@@ -596,8 +617,10 @@ int main(int argc, char *argv[])
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
-  delete lsolver; delete nsolver; delete tsolver;
+  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete velo; delete pres; 
+  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
+
+  delete tm_RK_ptr;
 
   PetscFinalize();
   return EXIT_SUCCESS;

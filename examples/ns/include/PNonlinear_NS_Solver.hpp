@@ -10,10 +10,13 @@
 // ==================================================================
 #include "ICVFlowRate.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "Runge_Kutta_Butcher.hpp"
 #include "IPGAssem.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_V.hpp"
+#include "PDNSolution_P.hpp"
 
 class PNonlinear_NS_Solver
 {
@@ -68,6 +71,42 @@ class PNonlinear_NS_Solver
         PDNSolution * const &sol,
         bool &conv_flag, int &nl_counter ) const;
 
+    void HERK_Solve_NS(
+        const double &curr_time,
+        const double &dt,
+        const PDNSolution * const &sol_base,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution * const &cur_dot_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution * const &cur_pres,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_pres,
+        PDNSolution * const &pre_velo_before,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ICVFlowRate * const flr_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &anode_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_InflowBC * const &infnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IPLocAssem * const &lassem_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PDNSolution * const &sol) const;
+
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
@@ -86,6 +125,18 @@ class PNonlinear_NS_Solver
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
+
+    void Update_pressure_velocity(     
+        const APart_Node * const &anode_ptr, 
+        PDNSolution * const &velo,
+        PDNSolution * const &pres,
+        const PDNSolution * const &step) const;
+
+    void Update_solutions(     
+        const APart_Node * const &anode_ptr, 
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        PDNSolution * const &sol) const;
 };
 
 #endif

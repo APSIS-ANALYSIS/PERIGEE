@@ -50,6 +50,35 @@ class PTime_NS_Solver
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PNonlinear_NS_Solver * const &nsolver_ptr ) const;
 
+    void TM_NS_HERK( 
+        const bool &restart_init_assembly_flag,
+        PDNSolution * const &sol_base,
+        const PDNSolution * const &init_sol,
+        const PDNSolution * const &init_velo,
+        const PDNSolution * const &init_pres,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        PDNTimeStep * const &time_info,
+        const ICVFlowRate * const flr_ptr,
+        const APart_Node * const &pNode_ptr,
+        const ALocal_Elem * const &alelem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &feanode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_InflowBC * const &infnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part,
+        const Matrix_PETSc * const &bc_mat,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        IPLocAssem * const &lassem_fluid_ptr,
+        IPGAssem * const &gassem_ptr,
+        PLinear_Solver_PETSc * const &lsolver_ptr,
+        PNonlinear_NS_Solver * const &nsolver_ptr ) const;
+
   private:
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions

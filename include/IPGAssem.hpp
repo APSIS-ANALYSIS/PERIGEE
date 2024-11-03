@@ -29,6 +29,7 @@
 #include "Sliding_Interface_Tools.hpp"
 #include "IGenBC.hpp"
 #include "Tissue_prestress.hpp"
+#include "Runge_Kutta_Butcher.hpp"
 
 class IPGAssem
 {
@@ -963,6 +964,86 @@ class IPGAssem
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    // --------------------------------------------------------------
+    // HERK 
+    virtual void Assem_tangent_residual_substep(
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual_substep() is not implemented. \n");}
+
+    virtual void Assem_tangent_residual_laststep(
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual_laststep() is not implemented. \n");} 
+
+    virtual void Assem_tangent_residual_finalstep(
+        PDNSolution * const &cur_dot_velo,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution * const &cur_pres,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual_finalstep() is not implemented. \n");}            
+    // --------------------------------------------------------------
+
 
     // --------------------------------------------------------------
     // Assembly boundary integrals

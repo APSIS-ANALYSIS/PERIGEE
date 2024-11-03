@@ -112,8 +112,11 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
+  ${perigee_source}/Solver/Runge_Kutta_Butcher.cpp
   )
 
 SET( perigee_postprocess_lib_src

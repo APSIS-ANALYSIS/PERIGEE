@@ -19,6 +19,8 @@
 #include "IPGAssem.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_V.hpp"
+#include "PDNSolution_P.hpp"
 
 class PGAssem_NS_FEM : public IPGAssem
 {
@@ -112,6 +114,81 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part );
+
+    // HERK
+    virtual void Assem_tangent_residual_substep(
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
+
+    virtual void Assem_tangent_residual_laststep(
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
+
+    virtual void Assem_tangent_residual_finalstep(
+        PDNSolution * const &cur_dot_velo,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution * const &cur_pres,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
+    // HERK     
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
@@ -247,6 +324,17 @@ class PGAssem_NS_FEM : public IPGAssem
         for(int jj=0; jj<dof_sol; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
       }
+    }
+
+    std::vector<double> GetLocal( const std::vector<double> &array,
+        const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
+    {
+      std::vector<double> out( in_locbas * in_dof, 0.0 );
+      for(int ii=0; ii<in_locbas; ++ii)
+        for(int jj=0; jj<in_dof; ++jj)
+          out[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
+    
+      return out;
     }
 };
 

@@ -1,5 +1,5 @@
 #ifndef RUNGE_KUTTA_BUTCHER_HPP
-#define RUNGE_KUTTA_BUTCHERK_HPP
+#define RUNGE_KUTTA_BUTCHER_HPP
 
 #include "Sys_Tools.hpp"
 #include <vector>
@@ -7,14 +7,6 @@
 class Runge_Kutta_Butcher 
 {
   public:
-    const int ss;  // step
-    const int mm;  // order
-    const bool isImplicit;  // Is it an implicit RK?
-
-    std::vector<double> cc;  // ci coefficients
-    std::vector<double> bb;  // bi coefficients
-    std::vector<std::vector<double>> aa;  // aij coefficients
-
     // Constructor, initialize RK coefficients
     Runge_Kutta_Butcher(const int &steps, const int &order, const bool &flag);
 
@@ -22,6 +14,16 @@ class Runge_Kutta_Butcher
 
     // Print coefficient (for debugging or viewing)
     void printCoefficients() const;
+
+    int get_RK_step() const
+    {
+      return ss;
+    }
+
+    int get_RK_order() const
+    {
+      return mm;
+    }
 
     double get_RK_a(const int &ii, const int &jj) const
     {
@@ -57,6 +59,14 @@ class Runge_Kutta_Butcher
     }
 
   private:
+    const int ss;  // step
+    const int mm;  // order
+    const bool isImplicit;  // Is it an implicit RK?
+
+    std::vector<double> cc;  // ci coefficients
+    std::vector<double> bb;  // bi coefficients
+    std::vector<std::vector<double>> aa;  // aij coefficients
+    
     // Set coefficients based on the given number of steps and order
     void setCoefficients();
 };

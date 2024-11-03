@@ -114,6 +114,9 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
   ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
@@ -127,6 +130,7 @@ SET( perigee_postprocess_lib_src
   )
 
 INCLUDE_DIRECTORIES( ../../include )
+INCLUDE_DIRECTORIES( ./include )
 
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES

@@ -212,4 +212,127 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
 }
 
+void PTime_NS_Solver::TM_NS_HERK( 
+    const bool &restart_init_assembly_flag,
+    PDNSolution * const &sol_base,
+    const PDNSolution * const &init_sol,
+    const PDNSolution * const &init_velo,
+    const PDNSolution * const &init_pres,
+    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    PDNTimeStep * const &time_info,
+    const ICVFlowRate * const flr_ptr,
+    const APart_Node * const &pNode_ptr,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &feanode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_EBC * const &ebc_part,
+    IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part,
+    const Matrix_PETSc * const &bc_mat,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    FEAElement * const &elementvs,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    IPLocAssem * const &lassem_fluid_ptr,
+    IPGAssem * const &gassem_ptr,
+    PLinear_Solver_PETSc * const &lsolver_ptr,
+    PNonlinear_NS_Solver * const &nsolver_ptr ) const
+{
+  const int ss = tm_RK_ptr->get_RK_step();
+
+  // n+1 步的子步速度解
+  PDNSolution** cur_velo_sols = new PDNSolution*[ss];
+  for(int ii = 0; ii < ss; ++ii)
+    cur_velo_sols[ii] = new PDNSolution(*init_velo);
+
+  // n+1 步的终步速度解
+  PDNSolution * cur_velo = new PDNSolution(*init_velo);
+
+  // n+1 步的最终步dot速度解
+  PDNSolution * cur_dot_velo = new PDNSolution(*init_velo);
+
+  // n+1 步的子步压强解
+  PDNSolution** cur_pres_sols = new PDNSolution*[ss];
+  for(int ii = 0; ii < ss; ++ii)
+    cur_pres_sols[ii] = new PDNSolution(*init_pres);
+
+  // n+1 步的终步压强解
+  PDNSolution * cur_pres = new PDNSolution(*init_pres);
+
+  // n+1 步的解
+  PDNSolution * cur_sol = new PDNSolution(*init_sol);
+
+  // n 步的子步速度解
+  PDNSolution** pre_velo_sols = new PDNSolution*[ss];
+  for(int ii = 0; ii < ss; ++ii)
+    pre_velo_sols[ii] = new PDNSolution(*init_velo);
+
+  // n 步的子步压强解
+  PDNSolution** pre_pres_sols = new PDNSolution*[ss];
+  for(int ii = 0; ii < ss; ++ii)
+    pre_pres_sols[ii] = new PDNSolution(*init_pres);    
+
+  // n 步的终步速度解
+  PDNSolution * pre_velo = new PDNSolution(*init_velo);
+
+  // n 步的终步压强解
+  PDNSolution * pre_pres = new PDNSolution(*init_pres);
+
+  // n-1 步的终步速度解
+  PDNSolution * pre_velo_before = new PDNSolution(*init_velo);
+
+  // If this is a restart run, do not re-write the solution binaries
+  if(restart_init_assembly_flag == false)
+  {
+    const auto sol_name = Name_Generator(time_info->get_index());
+    cur_sol->WriteBinary(sol_name);
+  }
+
+  // Call the nonlinear equation solver
+  nsolver_ptr->HERK_Solve_NS(
+      time_info->get_time(), time_info->get_step(),
+      sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
+      cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
+      pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr,
+      alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
+      ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
+      gassem_ptr, lsolver_ptr, cur_sol);
+
+  // Update the time step information
+  time_info->TimeIncrement();
+
+  SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
+      time_info->get_time(), time_info->get_step(), time_info->get_index(),
+      SYS_T::get_time().c_str());
+
+  // Record solution if meets criteria
+  if( time_info->get_index()%sol_record_freq == 0 )
+  {
+    const auto sol_name = Name_Generator( time_info->get_index() );
+    cur_sol->WriteBinary(sol_name);
+  }
+
+  // Prepare for next time step
+  pre_velo_before->Copy(*pre_velo);
+  pre_velo->Copy(*cur_velo);
+  pre_pres->Copy(*cur_pres);
+
+  for(int ii = 0; ii < ss; ++ii)
+  {
+    pre_velo_sols[ii]->Copy(*cur_velo_sols[ii]);
+    pre_pres_sols[ii]->Copy(*cur_pres_sols[ii]);  
+  }
+
+  for (int ii = 0; ii < ss; ++ii) 
+  {
+      delete cur_velo_sols[ii]; delete pre_velo_sols[ii]; 
+      delete cur_pres_sols[ii]; delete pre_pres_sols[ii];
+  }
+  delete[] cur_velo_sols; delete[] pre_velo_sols; delete[] cur_pres_sols; delete[] cur_velo_sols; 
+
+}
+
 // EOF
