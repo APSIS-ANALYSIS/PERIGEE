@@ -243,7 +243,7 @@ int main( int argc, char * argv[] )
   }
   else if(elemType == 601 || elemType == 602)
   {
-    for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
+    for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
       outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
   }
   else
