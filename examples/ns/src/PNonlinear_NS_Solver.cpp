@@ -238,6 +238,7 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     const double &curr_time,
     const double &dt,
     const PDNSolution * const &sol_base,
+    const PDNSolution * const &dot_sol_base,
     PDNSolution ** const &cur_velo_sols,
     PDNSolution * const &cur_velo,
     PDNSolution * const &cur_dot_velo,
@@ -250,6 +251,7 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     PDNSolution * const &pre_velo_before,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
     const ICVFlowRate * const flr_ptr,
+    const ICVFlowRate * const dot_flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &anode_ptr,
@@ -294,6 +296,9 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
   // 子步
   for(int ii = 1; ii < ss; ++ii)
   {
+    // 使得每个子步的速度满足Dirchlet边界
+    rescale_inflow_velo(curr_time + tm_RK_ptr->get_RK_c(ii) * dt, infnbc_part, flr_ptr, sol_base, cur_velo_sols[ii]);
+
     gassem_ptr->Clear_KG();
     
     gassem_ptr->Assem_tangent_residual_substep( cur_velo_sols, cur_pres_sols,
@@ -309,6 +314,9 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
   }
   // 终步
+    // 使得终步的速度满足Dirchlet边界
+    rescale_inflow_velo(curr_time + dt, infnbc_part, flr_ptr, sol_base, cur_velo);
+
     gassem_ptr->Clear_KG();
 
     gassem_ptr->Assem_tangent_residual_laststep( cur_velo_sols, cur_velo, 
@@ -324,6 +332,9 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
 
   // 最终步
+    // 使得终步的dot速度满足Dirchlet边界
+    rescale_inflow_velo(curr_time + dt, infnbc_part, dot_flr_ptr, dot_sol_base, cur_dot_velo);
+
     gassem_ptr->Clear_KG();
 
     gassem_ptr->Assem_tangent_residual_finalstep( cur_dot_velo, cur_velo_sols, 
@@ -380,6 +391,48 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
   }
 
   sol->Assembly_GhostUpdate();
+}
+
+void PNonlinear_NS_Solver::rescale_inflow_velo( const double &stime,
+    const ALocal_InflowBC * const &infbc,
+    const ICVFlowRate * const &flrate,
+    const PDNSolution * const &base,
+    PDNSolution * const &velo ) const
+{
+  const int num_nbc = infbc -> get_num_nbc();
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  {
+    const int numnode = infbc -> get_Num_LD( nbc_id );
+
+    const double factor  = flrate -> get_flow_rate( nbc_id, stime );
+    const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
+
+    for(int ii=0; ii<numnode; ++ii)
+    {
+      const int node_index = infbc -> get_LDN( nbc_id, ii );
+      
+      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
+
+      double base_vals[3];
+
+      VecGetValues(base->solution, 3, base_idx, base_vals);
+
+      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
+      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
+      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
+
+      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
+        base_vals[1] * factor * (1.0 + perturb_y),
+        base_vals[2] * factor * (1.0 + perturb_z) };
+
+      const int velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
+
+      VecSetValues(velo->solution, 3, velo_idx, vals, INSERT_VALUES);
+    }
+  }
+
+  velo->Assembly_GhostUpdate();
 }
 
 void PNonlinear_NS_Solver::Update_pressure_velocity(     

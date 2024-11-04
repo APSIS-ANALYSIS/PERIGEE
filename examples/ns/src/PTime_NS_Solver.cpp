@@ -214,13 +214,16 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
 void PTime_NS_Solver::TM_NS_HERK( 
     const bool &restart_init_assembly_flag,
-    PDNSolution * const &sol_base,
+    const PDNSolution * const &sol_base,
+    const PDNSolution * const &dot_sol_base,
     const PDNSolution * const &init_sol,
     const PDNSolution * const &init_velo,
+    const PDNSolution * const &init_dot_velo,
     const PDNSolution * const &init_pres,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
     PDNTimeStep * const &time_info,
     const ICVFlowRate * const flr_ptr,
+    const ICVFlowRate * const dot_flr_ptr,
     const APart_Node * const &pNode_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -252,7 +255,7 @@ void PTime_NS_Solver::TM_NS_HERK(
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
   // n+1 步的最终步dot速度解
-  PDNSolution * cur_dot_velo = new PDNSolution(*init_velo);
+  PDNSolution * cur_dot_velo = new PDNSolution(*init_dot_velo);
 
   // n+1 步的子步压强解
   PDNSolution** cur_pres_sols = new PDNSolution*[ss];
@@ -294,9 +297,9 @@ void PTime_NS_Solver::TM_NS_HERK(
   // Call the nonlinear equation solver
   nsolver_ptr->HERK_Solve_NS(
       time_info->get_time(), time_info->get_step(),
-      sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
+      sol_base, dot_sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
       cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
-      pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr,
+      pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr, dot_flr_ptr,
       alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
       ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
       gassem_ptr, lsolver_ptr, cur_sol);
@@ -323,7 +326,7 @@ void PTime_NS_Solver::TM_NS_HERK(
   for(int ii = 0; ii < ss; ++ii)
   {
     pre_velo_sols[ii]->Copy(*cur_velo_sols[ii]);
-    pre_pres_sols[ii]->Copy(*cur_pres_sols[ii]);  
+    pre_pres_sols[ii]->Copy(*cur_pres_sols[ii]);
   }
 
   for (int ii = 0; ii < ss; ++ii) 
@@ -331,7 +334,9 @@ void PTime_NS_Solver::TM_NS_HERK(
       delete cur_velo_sols[ii]; delete pre_velo_sols[ii]; 
       delete cur_pres_sols[ii]; delete pre_pres_sols[ii];
   }
-  delete[] cur_velo_sols; delete[] pre_velo_sols; delete[] cur_pres_sols; delete[] cur_velo_sols; 
+  delete[] cur_velo_sols; delete[] pre_velo_sols; delete[] cur_pres_sols; delete[] pre_pres_sols;
+  delete cur_velo; delete cur_dot_velo; delete cur_pres; delete cur_sol; 
+  delete pre_velo; delete pre_pres; delete pre_velo_before;
 
 }
 

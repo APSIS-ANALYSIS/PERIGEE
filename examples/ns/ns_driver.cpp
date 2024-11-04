@@ -29,6 +29,7 @@
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "CVFlowRate_Cosine2Steady.hpp"
+#include "CVFlowRateDot_Sine2Zero.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
 
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
+  std::string dot_inflow_file("dot_inflow_fourier_series.txt");
 
   double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
   double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
@@ -142,6 +144,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
   SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
+  SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
   SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
   SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
   SYS_T::GetOptionReal("-inflow_TI_perturbation", inflow_TI_perturbation);
@@ -182,8 +185,11 @@ int main(int argc, char *argv[])
 
   // if inflow file exists, print the file name
   // otherwise, print the parameter for linear2steady inflow setting
-  if( SYS_T::file_exist( inflow_file ) )
+  if( SYS_T::file_exist( inflow_file ) && SYS_T::file_exist( dot_inflow_file ) )
+  {
     SYS_T::cmdPrint("-inflow_file:", inflow_file);
+    SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);       
+  }
   else
   {
     SYS_T::cmdPrint("-inflow_thd_time:", inflow_thd_time);
@@ -229,8 +235,11 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
 
-    if( SYS_T::file_exist( inflow_file ) )
+    if( SYS_T::file_exist( inflow_file ) && SYS_T::file_exist( dot_inflow_file ) )
+    {
       cmdh5w->write_string("inflow_file", inflow_file);
+      cmdh5w->write_string("dot_inflow_file", dot_inflow_file);         
+    }
     else
     {
       cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
@@ -285,16 +294,26 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
   ICVFlowRate * inflow_rate_ptr = nullptr;
+  
+  ICVFlowRate * dot_inflow_rate_ptr = nullptr;
 
   // If inflow file exist, load it
   // otherwise, call the linear incremental flow rate to reach a steady flow
-  // if( SYS_T::file_exist( inflow_file ) )
-  //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
-  // else
-  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
-      inflow_file );
+  if( SYS_T::file_exist( inflow_file ) &&  SYS_T::file_exist( dot_inflow_file ) )
+  {
+    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+    dot_inflow_rate_ptr = new CVFlowRate_Unsteady( dot_inflow_file.c_str() );
+  }
+  else
+  {
+    inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
+        inflow_file );
+    dot_inflow_rate_ptr = new CVFlowRateDot_Sine2Zero( inflow_thd_time, inflow_TI_perturbation, 
+        inflow_file );
+  }
 
   inflow_rate_ptr->print_info();
+  dot_inflow_rate_ptr->print_info();
 
   // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
@@ -389,9 +408,11 @@ int main(int argc, char *argv[])
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
 
+  PDNSolution * dot_base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
+
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
-  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );  
+  // PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );  // unused
 
   PDNSolution * velo = new PDNSolution_V( pNode, 0, 3, true, "velo" );
 
@@ -420,16 +441,16 @@ int main(int argc, char *argv[])
     sol->ReadBinary(restart_name);
 
     // generate the corresponding dot_sol file name
-    std::string restart_dot_name = "dot_";
-    restart_dot_name.append(restart_name);
+    // std::string restart_dot_name = "dot_";
+    // restart_dot_name.append(restart_name);
 
     // Read dot_sol file
-    SYS_T::file_check(restart_dot_name);
-    dot_sol->ReadBinary(restart_dot_name);
+    // SYS_T::file_check(restart_dot_name);
+    // dot_sol->ReadBinary(restart_dot_name);
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    // SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
@@ -474,33 +495,33 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
-  if( is_restart == false )
-  {
-    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+  // if( is_restart == false )
+  // {
+  //   SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+  //   PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+  //       1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
-    KSPSetType(lsolver_acce->ksp, KSPGMRES);
-    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-        KSPGMRESModifiedGramSchmidtOrthogonalization);
-    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+  //   KSPSetType(lsolver_acce->ksp, KSPGMRES);
+  //   KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+  //       KSPGMRESModifiedGramSchmidtOrthogonalization);
+  //   KSPGMRESSetRestart(lsolver_acce->ksp, 500);
 
-    PC preproc; lsolver_acce->GetPC(&preproc);
-    PCSetType( preproc, PCHYPRE );
-    PCHYPRESetType( preproc, "boomeramg" );
+  //   PC preproc; lsolver_acce->GetPC(&preproc);
+  //   PCSetType( preproc, PCHYPRE );
+  //   PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
+  //   gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+  //       elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
 
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+  //   lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
-    dot_sol -> ScaleValue(-1.0);
+  //   dot_sol -> ScaleValue(-1.0);
 
-    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-    lsolver_acce -> print_info();
-    delete lsolver_acce;
-    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  }
+  //   SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+  //   lsolver_acce -> print_info();
+  //   delete lsolver_acce;
+  //   SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
+  // }
 
   // ===== Linear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
@@ -526,8 +547,8 @@ int main(int argc, char *argv[])
   // ===== Outlet data recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
-    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+    // const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+    //     dot_sol, locAssem_ptr, elements, quads, locebc, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
         sol, locAssem_ptr, elements, quads, locebc, ff );
@@ -538,9 +559,10 @@ int main(int argc, char *argv[])
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
 
-    const double dot_lpn_flowrate = dot_face_flrate;
+    // const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
-    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
+    const double dot_lpn_flowrate = 0.0; 
+    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() ); // dot_lpn_flowrate is useless
 
     // Create the txt files and write the initial flow rates
     if(rank == 0)
@@ -557,8 +579,8 @@ int main(int argc, char *argv[])
       // If this is NOT a restart, then record the initial values
       if( !is_restart )
       {
-        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
+        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
       }
 
       ofile.close();
@@ -604,8 +626,8 @@ int main(int argc, char *argv[])
   //     locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
   //     locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
-  tsolver->TM_NS_HERK(is_restart, base, sol, velo, pres,
-      tm_RK_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+  tsolver->TM_NS_HERK(is_restart, base, dot_base, sol, velo, dot_velo, pres,
+      tm_RK_ptr, timeinfo, inflow_rate_ptr, dot_inflow_rate_ptr, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
       locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
@@ -616,9 +638,9 @@ int main(int argc, char *argv[])
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
-  delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete velo; delete pres; 
-  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
+  delete quads; delete quadv; delete inflow_rate_ptr; delete dot_inflow_rate_ptr; delete gbc; delete timeinfo;
+  delete locAssem_ptr; delete base; delete dot_base; delete sol; delete velo; delete dot_velo; 
+  delete pres; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   delete tm_RK_ptr;
 

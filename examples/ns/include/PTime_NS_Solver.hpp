@@ -52,13 +52,16 @@ class PTime_NS_Solver
 
     void TM_NS_HERK( 
         const bool &restart_init_assembly_flag,
-        PDNSolution * const &sol_base,
+        const PDNSolution * const &sol_base,
+        const PDNSolution * const &dot_sol_base,
         const PDNSolution * const &init_sol,
         const PDNSolution * const &init_velo,
+        const PDNSolution * const &init_dot_velo,
         const PDNSolution * const &init_pres,
         const Runge_Kutta_Butcher * const &tm_RK_ptr,
         PDNTimeStep * const &time_info,
         const ICVFlowRate * const flr_ptr,
+        const ICVFlowRate * const dot_flr_ptr,
         const APart_Node * const &pNode_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,

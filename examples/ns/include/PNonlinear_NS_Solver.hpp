@@ -75,6 +75,7 @@ class PNonlinear_NS_Solver
         const double &curr_time,
         const double &dt,
         const PDNSolution * const &sol_base,
+        const PDNSolution * const &dot_sol_base,
         PDNSolution ** const &cur_velo_sols,
         PDNSolution * const &cur_velo,
         PDNSolution * const &cur_dot_velo,
@@ -87,6 +88,7 @@ class PNonlinear_NS_Solver
         PDNSolution * const &pre_velo_before,
         const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const ICVFlowRate * const flr_ptr,
+        const ICVFlowRate * const dot_flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &anode_ptr,
@@ -125,6 +127,12 @@ class PNonlinear_NS_Solver
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
+
+    void rescale_inflow_velo( const double &stime,
+        const ALocal_InflowBC * const &infbc,
+        const ICVFlowRate * const &flrate,
+        const PDNSolution * const &base,
+        PDNSolution * const &velo ) const;
 
     void Update_pressure_velocity(     
         const APart_Node * const &anode_ptr, 
