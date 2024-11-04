@@ -1069,8 +1069,17 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
       v_n += pre_velo[ii3+1] * R[ii];
       w_n += pre_velo[ii3+2] * R[ii];
 
-      for(int jj=0; jj<num_steps; ++jj)
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    for(int jj=0; jj<num_steps; ++jj)
+    {
+      for(int ii=0; ii<nLocBas; ++ii)
       {
+        const int ii3 = 3 * ii;
+
         u[jj] += cur_velo_sols[jj][ii3+0] * R[ii];
         v[jj] += cur_velo_sols[jj][ii3+1] * R[ii];
         w[jj] += cur_velo_sols[jj][ii3+2] * R[ii];
@@ -1112,10 +1121,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
         w_xy[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxy[ii];
         w_yz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dyz[ii];
       }
-
-      coor.x() += eleCtrlPts_x[ii] * R[ii];
-      coor.y() += eleCtrlPts_y[ii] * R[ii];
-      coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
     const auto dxi_dx = element->get_invJacobian(qua);
