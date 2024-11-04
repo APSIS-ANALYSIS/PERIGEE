@@ -117,6 +117,7 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // HERK
     virtual void Assem_tangent_residual_substep(
+        const int &substep_index,
         PDNSolution ** const &cur_velo_sols,
         PDNSolution ** const &cur_pres_sols,
         PDNSolution ** const &pre_velo_sols,

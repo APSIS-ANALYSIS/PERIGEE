@@ -992,7 +992,8 @@ void PLocAssem_VMS_NS_GenAlpha::get_pressure_area(
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
-    const double &time, const double &dt,
+    const double &time, const double &dt, 
+    const int &subindex,
     const std::vector<std::vector<double>>& cur_velo_sols,
     const std::vector<std::vector<double>>& cur_pres_sols,
     const std::vector<std::vector<double>>& pre_velo_sols,
@@ -1005,6 +1006,150 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int num_steps = VEC_T::get_size(cur_velo_sols); // get_size能否接受一个二维vector?
+
+  Zero_Tangent_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
+  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
+
+  for(int qua=0; qua<nqp; ++qua)
+  { 
+    // u, v, w, p represents the substep variable
+    // double u_n = 0.0, u_nm1 = 0.0; u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
+    // double v_n = 0.0, v_nm1 = 0.0; v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
+    // double w_n = 0.0, w_nm1 = 0.0; w = 0.0, w_x = 0.0, w_y = 0.0, w_z = 0.0;
+    // double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
+    // double u_xx = 0.0, u_yy = 0.0, u_zz = 0.0; u_xy = 0.0; u_xz = 0.0; u_yz = 0.0;
+    // double v_xx = 0.0, v_yy = 0.0, v_zz = 0.0; v_xy = 0.0; v_xz = 0.0; v_yz = 0.0;
+    // double w_xx = 0.0, w_yy = 0.0, w_zz = 0.0; w_xy = 0.0；w_xz = 0.0; w_yz = 0.0;
+
+    double u_n = 0.0, u_nm1 = 0.0; 
+    double v_n = 0.0, v_nm1 = 0.0;
+    double w_n = 0.0, w_nm1 = 0.0;
+
+    std::vector<double> u(num_steps, 0); std::vector<double> v(num_steps, 0); 
+    std::vector<double> w(num_steps, 0); std::vector<double> p(num_steps, 0); 
+
+    std::vector<double> u_x(num_steps, 0); std::vector<double> v_x(num_steps, 0); 
+    std::vector<double> w_x(num_steps, 0); std::vector<double> p_x(num_steps, 0); 
+
+    std::vector<double> u_y(num_steps, 0); std::vector<double> v_y(num_steps, 0); 
+    std::vector<double> w_y(num_steps, 0); std::vector<double> p_y(num_steps, 0); 
+
+    std::vector<double> u_z(num_steps, 0); std::vector<double> v_z(num_steps, 0); 
+    std::vector<double> w_z(num_steps, 0); std::vector<double> p_z(num_steps, 0); 
+
+    std::vector<double> u_xx(num_steps, 0); std::vector<double> v_xx(num_steps, 0); std::vector<double> w_xx(num_steps, 0); 
+    std::vector<double> u_yy(num_steps, 0); std::vector<double> v_yy(num_steps, 0); std::vector<double> w_yy(num_steps, 0); 
+    std::vector<double> u_zz(num_steps, 0); std::vector<double> v_zz(num_steps, 0); std::vector<double> w_zz(num_steps, 0); 
+
+    std::vector<double> u_xy(num_steps, 0); std::vector<double> v_xy(num_steps, 0); std::vector<double> w_xy(num_steps, 0); 
+    std::vector<double> u_xz(num_steps, 0); std::vector<double> v_xz(num_steps, 0); std::vector<double> w_xz(num_steps, 0); 
+    std::vector<double> u_yz(num_steps, 0); std::vector<double> v_yz(num_steps, 0); std::vector<double> w_yz(num_steps, 0);
+
+    Vector_3 coor(0.0, 0.0, 0.0);
+
+    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
+                              &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
+                              &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int ii3 = 3 * ii;
+
+      u_nm1 += pre_velo_before[ii3+0] * R[ii];
+      v_nm1 += pre_velo_before[ii3+1] * R[ii];
+      w_nm1 += pre_velo_before[ii3+2] * R[ii];
+
+      u_n += pre_velo[ii3+0] * R[ii];
+      v_n += pre_velo[ii3+1] * R[ii];
+      w_n += pre_velo[ii3+2] * R[ii];
+
+      for(int jj=0; jj<num_steps; ++jj)
+      {
+        u[jj] += cur_velo_sols[jj][ii3+0] * R[ii];
+        v[jj] += cur_velo_sols[jj][ii3+1] * R[ii];
+        w[jj] += cur_velo_sols[jj][ii3+2] * R[ii];
+        p[jj] += cur_pres_sols[jj][ii] * R[ii];
+
+        u_x[jj] += cur_velo_sols[jj][ii3+0] * dR_dx[ii];
+        v_x[jj] += cur_velo_sols[jj][ii3+1] * dR_dx[ii];
+        w_x[jj] += cur_velo_sols[jj][ii3+2] * dR_dx[ii];
+        p_x[jj] += cur_pres_sols[jj][ii] * dR_dx[ii];
+
+        u_y[jj] += cur_velo_sols[jj][ii3+0] * dR_dy[ii];
+        v_y[jj] += cur_velo_sols[jj][ii3+1] * dR_dy[ii];
+        w_y[jj] += cur_velo_sols[jj][ii3+2] * dR_dy[ii];
+        p_y[jj] += cur_pres_sols[jj][ii] * dR_dy[ii];
+
+        u_z[jj] += cur_velo_sols[jj][ii3+0] * dR_dz[ii];
+        v_z[jj] += cur_velo_sols[jj][ii3+1] * dR_dz[ii];
+        w_z[jj] += cur_velo_sols[jj][ii3+2] * dR_dz[ii];
+        p_z[jj] += cur_pres_sols[jj][ii] * dR_dz[ii];
+
+        u_xx[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxx[ii];
+        u_yy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyy[ii];
+        u_zz[jj] += cur_velo_sols[jj][ii3+0] * d2R_dzz[ii];
+        u_xz[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxz[ii];
+        u_xy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxy[ii];
+        u_yz[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyz[ii];
+
+        v_xx[jj] += cur_velo_sols[jj][ii3+1] * d2R_dxx[ii];
+        v_yy[jj] += cur_velo_sols[jj][ii3+1] * d2R_dyy[ii];
+        v_zz[jj] += cur_velo_sols[jj][ii3+1] * d2R_dzz[ii];
+        v_xz[jj] += cur_velo_sols[jj][ii3+1] * d2R_dxz[ii];
+        v_xy[jj] += cur_velo_sols[jj][ii3+1] * d2R_dxy[ii];
+        v_yz[jj] += cur_velo_sols[jj][ii3+1] * d2R_dyz[ii];
+
+        w_xx[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxx[ii];
+        w_yy[jj] += cur_velo_sols[jj][ii3+2] * d2R_dyy[ii];
+        w_zz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dzz[ii];
+        w_xz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxz[ii];
+        w_xy[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxy[ii];
+        w_yz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dyz[ii];
+      }
+
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    const auto dxi_dx = element->get_invJacobian(qua);
+
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u[subindex], v[subindex], w[subindex] );
+    const double tau_m = tau[0];
+    const double tau_c = tau[1];
+
+    const double tau_m_2 = tau_m * tau_m;
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
+
+    const Vector_3 f_body = get_f( coor, time );
+
+    // const double u_lap = u_xx + u_yy + u_zz;
+    // const double v_lap = v_xx + v_yy + v_zz;
+    // const double w_lap = w_xx + w_yy + w_zz;
+
+    // const double rx = rho0 * ( u_t + u_x * u + u_y * v + u_z * w - f_body.x() ) + p_x - vis_mu * u_lap;
+    // const double ry = rho0 * ( v_t + v_x * u + v_y * v + v_z * w - f_body.y() ) + p_y - vis_mu * v_lap ;
+    // const double rz = rho0 * ( w_t + w_x * u + w_y * v + w_z * w - f_body.z() ) + p_z - vis_mu * w_lap;
+
+    // const double div_vel = u_x + v_y + w_z;
+
+    // const double u_prime = -1.0 * tau_m * rx;
+    // const double v_prime = -1.0 * tau_m * ry;
+    // const double w_prime = -1.0 * tau_m * rz;
+
+    // const double r_dot_gradu = u_x * rx + u_y * ry + u_z * rz;
+    // const double r_dot_gradv = v_x * rx + v_y * ry + v_z * rz;
+    // const double r_dot_gradw = w_x * rx + w_y * ry + w_z * rz;
+    
+    // const double tau_dc = get_DC( dxi_dx, u_prime, v_prime, w_prime );
+  }
 
 }
 

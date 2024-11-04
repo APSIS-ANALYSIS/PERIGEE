@@ -1119,6 +1119,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 }
 
 void PGAssem_NS_FEM::Assem_tangent_residual_substep(
+    const int &substep_index,
     PDNSolution ** const &cur_velo_sols,
     PDNSolution ** const &cur_pres_sols,
     PDNSolution ** const &pre_velo_sols,
@@ -1188,7 +1189,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual_substep(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Tangent_Residual_Substep(curr_time, dt, local_cur_velo_sols, local_cur_pres_sols,
+    lassem_ptr->Assem_Tangent_Residual_Substep(curr_time, dt, substep_index, local_cur_velo_sols, local_cur_pres_sols,
         local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before,
         elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
 

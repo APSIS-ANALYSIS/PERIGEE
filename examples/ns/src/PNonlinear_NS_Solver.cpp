@@ -301,9 +301,9 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
 
     gassem_ptr->Clear_KG();
     
-    gassem_ptr->Assem_tangent_residual_substep( cur_velo_sols, cur_pres_sols,
+    gassem_ptr->Assem_tangent_residual_substep( ii, cur_velo_sols, cur_pres_sols,
       pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before, tm_RK_ptr, 
-      curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
+      curr_time + tm_RK_ptr->get_RK_c(ii) * dt, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
       quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );     
     
     lsolver_ptr->SetOperator(gassem_ptr->K);

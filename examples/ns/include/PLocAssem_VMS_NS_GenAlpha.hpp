@@ -140,6 +140,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_Substep(
         const double &time, const double &dt,
+        const int &subindex,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<std::vector<double>>& cur_pres_sols,
         const std::vector<std::vector<double>>& pre_velo_sols,
