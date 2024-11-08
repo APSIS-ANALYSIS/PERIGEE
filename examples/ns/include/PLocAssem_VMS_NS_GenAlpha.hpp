@@ -141,6 +141,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     virtual void Assem_Tangent_Residual_Substep(
         const double &time, const double &dt,
         const int &subindex,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<std::vector<double>>& cur_pres_sols,
         const std::vector<std::vector<double>>& pre_velo_sols,
@@ -155,6 +156,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_Laststep(
         const double &time, const double &dt,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<double>& cur_velo,
         const std::vector<std::vector<double>>& cur_pres_sols,
@@ -170,6 +172,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual void Assem_Tangent_Residual_Finalstep(
         const double &time, const double &dt,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const std::vector<double>& cur_dot_velo,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<double>& cur_velo,
