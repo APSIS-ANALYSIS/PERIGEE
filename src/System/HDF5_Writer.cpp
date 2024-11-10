@@ -3,13 +3,13 @@
 void HDF5_Writer::write_intScalar( const hid_t &group_id,
     const char * const &data_name, const int &value ) const
 {
-  write_intScalar_impl(group_id, data_name, value);
+  write_intScalar_impl( group_id, data_name, value );
 }
 
 void HDF5_Writer::write_intScalar( const char * const &data_name,
     const int &value ) const
 {
-  write_intScalar_impl(file_id, data_name, value);
+  write_intScalar_impl( file_id, data_name, value );
 }
 
 void HDF5_Writer::write_int64Scalar( const char * const &data_name,
@@ -58,60 +58,28 @@ void HDF5_Writer::write_uintScalar(
 void HDF5_Writer::write_doubleScalar( const hid_t &group_id,
     const char * const &data_name, const double &value ) const
 {
-  write_doubleScalar_impl(group_id, data_name, value);
+  write_doubleScalar_impl( group_id, data_name, value );
 }
 
 void HDF5_Writer::write_doubleScalar( const char * const &data_name,
     const double &value ) const
 {
-  write_doubleScalar_impl(file_id, data_name, value);
+  write_doubleScalar_impl( file_id, data_name, value );
 }
 
-void HDF5_Writer::write_intVector( const hid_t & group_id,
+void HDF5_Writer::write_intVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<int> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1, dims, NULL);
-    dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_INT,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-       H5P_DEFAULT, &value[0] );
-    
-    check_error(status, "write_intVector");
-    
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_intVector_impl( group_id, data_name, value.data(), value.size() );
 }
 
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const std::vector<int> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1, dims, NULL);
-    dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_INT,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-       H5P_DEFAULT, &value[0] );
-    
-    check_error(status, "write_intVector");
-    
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_intVector_impl( file_id, data_name, value.data(), value.size() );
 }
 
-void HDF5_Writer::write_uintVector( const hid_t & group_id,
+void HDF5_Writer::write_uintVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<unsigned int> &value ) const
 {
   hsize_t dims[1]; dims[0] = value.size();
@@ -133,53 +101,21 @@ void HDF5_Writer::write_uintVector( const hid_t & group_id,
   }
 }
 
-void HDF5_Writer::write_intVector( const hid_t & group_id,
+void HDF5_Writer::write_intVector( const hid_t &group_id,
     const char * const &data_name, const int * const &value, 
     const int &length ) const
 {
-  hsize_t dims[1]; dims[0] = length;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1, dims, NULL);
-    dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_INT,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-       H5P_DEFAULT, value );
-    
-    check_error(status, "write_intVector");
-    
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_intVector_impl( group_id, data_name, value, length );
 }
 
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const int * const  &value,
     const int &length ) const
 {
-  hsize_t dims[1]; dims[0] = length;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1, dims, NULL);
-    dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_INT,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, value );
-
-    check_error(status, "write_intVector");
-
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_intVector_impl( file_id, data_name, value, length );
 }
 
-void HDF5_Writer::write_int64Vector( const hid_t & group_id,
+void HDF5_Writer::write_int64Vector( const hid_t &group_id,
     const char * const &data_name, 
     const int64_t * const &value, const int64_t &length ) const
 {
@@ -228,87 +164,25 @@ void HDF5_Writer::write_doubleVector( const hid_t &group_id,
     const char * const &data_name,
     const double * const &value, const int &length ) const
 {
-  hsize_t dims[1]; dims[0] = length;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1,dims,NULL);
-    dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, value );
-
-    check_error(status, "write-doubleVector");
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_doubleVector_impl( group_id, data_name, value, length );
 }
 
 void HDF5_Writer::write_doubleVector( const char * const &data_name,
     const double * const &value, const int &length ) const
 {
-  hsize_t dims[1]; dims[0] = length;
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1,dims,NULL);
-    dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, value );
-
-    check_error(status, "write-doubleVector");
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_doubleVector_impl( file_id, data_name, value, length );
 }
 
-void HDF5_Writer::write_doubleVector( const hid_t & group_id,
+void HDF5_Writer::write_doubleVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<double> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1, dims, NULL);
-    dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, &value[0] );
-
-    check_error(status, "write_doubleVector");
-
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_doubleVector_impl( group_id, data_name, value.data(), value.size() );
 }
 
 void HDF5_Writer::write_doubleVector( const char * const &data_name, 
     const std::vector<double> &value ) const
 {
-  hsize_t dims[1]; dims[0] = value.size();
-  if(dims[0] > 0)
-  {
-    hid_t dataspace, dataset;
-    herr_t status;
-
-    dataspace = H5Screate_simple(1, dims, NULL);
-    dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
-        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
-        H5P_DEFAULT, &value[0] );
-
-    check_error(status, "write_doubleVector");
-
-    H5Dclose( dataset );
-    H5Sclose( dataspace );
-  }
+  write_doubleVector_impl( file_id, data_name, value.data(), value.size() );
 }
 
 void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &data_name,
@@ -516,4 +390,48 @@ void HDF5_Writer::write_doubleScalar_impl( hid_t location_id,
   H5Sclose( dataspace );
 }
 
+void HDF5_Writer::write_intVector_impl( hid_t location_id,
+    const char * const &data_name, 
+    const int * const &value, const int &length ) const
+{
+  hsize_t dims[1]; dims[0] = length;
+  if(dims[0] > 0)
+  {
+    hid_t dataspace, dataset;
+    herr_t status;
+
+    dataspace = H5Screate_simple(1, dims, NULL);
+    dataset   = H5Dcreate( location_id, data_name, H5T_NATIVE_INT,
+        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    status = H5Dwrite( dataset, H5T_NATIVE_INT, H5S_ALL, H5S_ALL,
+       H5P_DEFAULT, &value[0] );
+    
+    check_error(status, "write_intVector");
+    
+    H5Dclose( dataset );
+    H5Sclose( dataspace );
+  }
+}
+
+void HDF5_Writer::write_doubleVector_impl( hid_t location_id,
+    const char * const &data_name,
+    const double * const &value, const int &length ) const
+{
+  hsize_t dims[1]; dims[0] = length;
+  if(dims[0] > 0)
+  {
+    hid_t dataspace, dataset;
+    herr_t status;
+
+    dataspace = H5Screate_simple(1,dims,NULL);
+    dataset   = H5Dcreate( location_id, data_name, H5T_NATIVE_DOUBLE,
+        dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
+        H5P_DEFAULT, value );
+
+    check_error(status, "write-doubleVector");
+    H5Dclose( dataset );
+    H5Sclose( dataspace );
+  }    
+}
 // EOF
