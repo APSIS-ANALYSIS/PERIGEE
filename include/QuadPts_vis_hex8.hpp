@@ -15,14 +15,14 @@
 // ==================================================================
 #include "IQuadPts.hpp"
 
-class QuadPts_vis_hex8 : public IQuadPts
+class QuadPts_vis_hex8 final : public IQuadPts
 {
   public:
     QuadPts_vis_hex8() = default;
     
-    virtual ~QuadPts_vis_hex8() = default;
+    ~QuadPts_vis_hex8() override = default;
 
-    virtual void print_info() const
+    void print_info() const override
     {
       SYS_T::commPrint("\n===== Visualization Points for Hex8 ===== \n");
       IQuadPts::print_info();
@@ -31,21 +31,21 @@ class QuadPts_vis_hex8 : public IQuadPts
 
     // it stores the coordinate of the quadrature points 
     // in the sequence of x-y-z, so the dim is 4
-    virtual int get_dim() const {return 3;}
+    int get_dim() const override {return 3;}
 
     // num_pts = num_pts_x x num_pts_y x num_pts_z
-    virtual int get_num_quadPts() const {return 8;}
+    int get_num_quadPts() const override {return 8;}
 
-    virtual int get_num_quadPts_x() const {return 2;}
+    int get_num_quadPts_x() const override {return 2;}
 
-    virtual int get_num_quadPts_y() const {return 2;}
+    int get_num_quadPts_y() const override {return 2;}
 
-    virtual int get_num_quadPts_z() const {return 2;}
+    int get_num_quadPts_z() const override {return 2;}
 
-    virtual double get_qp(const int &ii, const int &comp) const 
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(const int &ii) const {return 0.5;}
+    double get_qw(const int &ii) const override {return 0.5;}
 
   private:
     const double qp[24] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0,

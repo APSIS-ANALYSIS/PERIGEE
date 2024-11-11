@@ -29,13 +29,13 @@ class ALocal_Interface
 
     ~ALocal_Interface() = default;
 
+    virtual void print_info() const;
+
     int get_num_itf() const {return num_itf;}
 
     int get_nLocBas() const {return nLocBas;}
 
     int get_num_tag(const int &ii) const {return num_tag[ii];}
-
-    int get_num_fixed_ele(const int &ii) const {return num_fixed_ele[ii];}
 
     virtual int get_num_fixed_ele(const int &ii) const
     {return num_local_fixed_ele[ii];}

@@ -1,14 +1,5 @@
 #include "HDF5_Reader.hpp"
 
-HDF5_Reader::HDF5_Reader( const hid_t &in_file_id ) 
-: file_id(in_file_id)
-{}
-
-bool HDF5_Reader::check_data( const char * const &name ) const
-{
-  return H5Lexists(file_id, name, H5P_DEFAULT);
-}
-
 void HDF5_Reader::read_intArray(const char * const &group_name,
     const char * const &data_name,
     hid_t &data_rank, hsize_t * &data_dims, int * &data  ) const
@@ -115,7 +106,7 @@ int HDF5_Reader::read_intScalar( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  int outdata = intdata[0];
+  const int outdata = intdata[0];
   delete [] ddims; delete [] intdata;
 
   return outdata;
@@ -138,7 +129,7 @@ double HDF5_Reader::read_doubleScalar( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  double outdata = ddata[0];
+  const double outdata = ddata[0];
   delete [] ddims; delete [] ddata;
 
   return outdata;
@@ -161,7 +152,7 @@ std::vector<int> HDF5_Reader::read_intVector( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  std::vector<int> out = VEC_T::fillArray( intdata, ddims[0] );
+  const std::vector<int> out = VEC_T::fillArray( intdata, ddims[0] );
 
   delete [] ddims; delete [] intdata; ddims = nullptr; intdata = nullptr;
 
@@ -185,7 +176,7 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
     SYS_T::print_fatal( oss.str().c_str() );
   }
   
-  std::vector<double> out = VEC_T::fillArray( ddata, ddims[0] );
+  const std::vector<double> out = VEC_T::fillArray( ddata, ddims[0] );
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
@@ -208,7 +199,7 @@ Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  Vector_3 out( ddata[0], ddata[1], ddata[2] );
+  const Vector_3 out( ddata[0], ddata[1], ddata[2] );
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
@@ -231,7 +222,7 @@ Tensor2_3D HDF5_Reader::read_Tensor2_3D( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  Tensor2_3D out( ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] );
+  const Tensor2_3D out( ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] );
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
@@ -257,7 +248,7 @@ std::vector<int> HDF5_Reader::read_intMatrix( const char * const &group_name,
   num_row = ddims[0];
   num_col = ddims[1];
 
-  std::vector<int> out = VEC_T::fillArray( intdata, num_row * num_col );
+  const std::vector<int> out = VEC_T::fillArray( intdata, num_row * num_col );
 
   delete [] ddims; delete [] intdata; ddims = nullptr; intdata = nullptr;
 
@@ -284,7 +275,7 @@ std::vector<double> HDF5_Reader::read_doubleMatrix( const char * const &group_na
   num_row = ddims[0];
   num_col = ddims[1];
 
-  std::vector<double> out = VEC_T::fillArray( ddata, num_row * num_col );
+  const std::vector<double> out = VEC_T::fillArray( ddata, num_row * num_col );
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
 
