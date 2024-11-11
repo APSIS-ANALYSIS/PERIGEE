@@ -70,13 +70,15 @@ void HDF5_Writer::write_doubleScalar( const char * const &data_name,
 void HDF5_Writer::write_intVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<int> &value ) const
 {
-  write_intVector_impl( group_id, data_name, value.data(), static_cast<int>( value.size() ) );
+  write_intVector_impl( group_id, data_name, value.data(), 
+      static_cast<int>( value.size() ) );
 }
 
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const std::vector<int> &value ) const
 {
-  write_intVector_impl( file_id, data_name, value.data(), static_cast<int>( value.size() ) );
+  write_intVector_impl( file_id, data_name, value.data(), 
+      static_cast<int>( value.size() ) );
 }
 
 void HDF5_Writer::write_uintVector( const hid_t &group_id,
@@ -176,13 +178,15 @@ void HDF5_Writer::write_doubleVector( const char * const &data_name,
 void HDF5_Writer::write_doubleVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<double> &value ) const
 {
-  write_doubleVector_impl( group_id, data_name, value.data(), value.size() );
+  write_doubleVector_impl( group_id, data_name, value.data(), 
+      static_cast<int>(value.size()) );
 }
 
 void HDF5_Writer::write_doubleVector( const char * const &data_name, 
     const std::vector<double> &value ) const
 {
-  write_doubleVector_impl( file_id, data_name, value.data(), value.size() );
+  write_doubleVector_impl( file_id, data_name, value.data(), 
+      static_cast<int>(value.size()) );
 }
 
 void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &data_name,
