@@ -70,13 +70,13 @@ void HDF5_Writer::write_doubleScalar( const char * const &data_name,
 void HDF5_Writer::write_intVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<int> &value ) const
 {
-  write_intVector_impl( group_id, data_name, value.data(), VEC_T::get_size( value ) );
+  write_intVector_impl( group_id, data_name, value.data(), static_cast<int>( value.size() ) );
 }
 
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const std::vector<int> &value ) const
 {
-  write_intVector_impl( file_id, data_name, value.data(), VEC_T::get_size( value ) );
+  write_intVector_impl( file_id, data_name, value.data(), static_cast<int>( value.size() ) );
 }
 
 void HDF5_Writer::write_uintVector( const hid_t &group_id,
@@ -391,7 +391,7 @@ void HDF5_Writer::write_intVector_impl( hid_t location_id,
     const char * const &data_name, 
     const int * const &value, const int &length ) const
 {
-  hsize_t dims[1] = { length };
+  hsize_t dims[1] = { static_cast<hsize_t>(length) };
   if(dims[0] > 0)
   {
     hid_t dataspace = H5Screate_simple(1, dims, NULL);
@@ -411,7 +411,7 @@ void HDF5_Writer::write_doubleVector_impl( hid_t location_id,
     const char * const &data_name,
     const double * const &value, const int &length ) const
 {
-  hsize_t dims[1] = { length };
+  hsize_t dims[1] = { static_cast<hsize_t>(length) };
   if(dims[0] > 0)
   {
     hid_t dataspace = H5Screate_simple(1, dims, NULL);
