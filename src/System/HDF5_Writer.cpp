@@ -70,13 +70,13 @@ void HDF5_Writer::write_doubleScalar( const char * const &data_name,
 void HDF5_Writer::write_intVector( const hid_t &group_id,
     const char * const &data_name, const std::vector<int> &value ) const
 {
-  write_intVector_impl( group_id, data_name, value.data(), value.size() );
+  write_intVector_impl( group_id, data_name, value.data(), VEC_T::get_size( value ) );
 }
 
 void HDF5_Writer::write_intVector( const char * const &data_name, 
     const std::vector<int> &value ) const
 {
-  write_intVector_impl( file_id, data_name, value.data(), value.size() );
+  write_intVector_impl( file_id, data_name, value.data(), VEC_T::get_size( value ) );
 }
 
 void HDF5_Writer::write_uintVector( const hid_t &group_id,
@@ -191,7 +191,7 @@ void HDF5_Writer::write_Vector_3( const hid_t &group_id, const char * const &dat
   // First convert Vector_3 to a double array
   const double val[3] = { value.x(), value.y(), value.z() };
 
-  hsize_t dims[1]; dims[0] = 3;
+  hsize_t dims[1] = { 3 };
   hid_t dataspace = H5Screate_simple(1, dims, NULL);
   hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
       dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -209,7 +209,7 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const Vector_3 
   // First convert Vector_3 to a double array
   const double val[3] = { value.x(), value.y(), value.z() };
 
-  hsize_t dims[1]; dims[0] = 3;
+  hsize_t dims[1] = { 3 };
   hid_t dataspace = H5Screate_simple(1, dims, NULL);
   hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
       dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -228,7 +228,7 @@ void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &d
   // First convert Tensor2_3D to a double array
   const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
 
-  hsize_t dims[1]; dims[0] = 9;
+  hsize_t dims[1] = { 9 };
   hid_t dataspace = H5Screate_simple(1, dims, NULL);
   hid_t dataset   = H5Dcreate( group_id, data_name, H5T_NATIVE_DOUBLE,
       dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -246,7 +246,7 @@ void HDF5_Writer::write_Tensor2_3D( const char * const &data_name, const Tensor2
   // First convert Tensor2_3D to a double array
   const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
 
-  hsize_t dims[1]; dims[0] = 9;
+  hsize_t dims[1] = { 9 };
   hid_t dataspace = H5Screate_simple(1, dims, NULL);
   hid_t dataset   = H5Dcreate( file_id, data_name, H5T_NATIVE_DOUBLE,
       dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -414,7 +414,7 @@ void HDF5_Writer::write_doubleVector_impl( hid_t location_id,
   hsize_t dims[1] = { length };
   if(dims[0] > 0)
   {
-    hid_t dataspace = H5Screate_simple(1,dims,NULL);
+    hid_t dataspace = H5Screate_simple(1, dims, NULL);
     hid_t dataset   = H5Dcreate( location_id, data_name, H5T_NATIVE_DOUBLE,
         dataspace, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
     herr_t status = H5Dwrite( dataset, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL,
