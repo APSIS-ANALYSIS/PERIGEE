@@ -2258,9 +2258,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Finalstep(
     const double w_stab2_2 = v_np1_prime * (w_np1 + w_np1_prime);
     const double w_stab2_3 = w_np1_prime * (w_np1 + w_np1_prime);
 
-    const double grad_p = p_np1;
-    const double grad_p_stab = p_np1_prime;
-
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
@@ -2270,13 +2267,65 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Finalstep(
       Residual[4*A] += gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 
       Residual[4*A + 1] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
-                                  + 0);
+                                  + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu *  u_diffu1_3 
+                                  - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
+                                  - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
+                                  + NA * rho0 * u_stab1_1 + NA * rho0 * u_stab1_2 + NA * rho0 * u_stab1_3 
+                                  - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
+
+      Residual[4*A + 2] += gwts * ( NA * rho0 * dot_v_np1 - NA_y * p_np1 + NA * rho0 * dot_v_np1_prime - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).y() 
+                                  + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
+                                  - NA_xy * vis_mu * u_diffu2_1 - NA_yy * vis_mu * v_diffu2_2 - NA_yz * vis_mu * w_diffu2_3
+                                  - NA_xx * vis_mu * v_diffu2_2 - NA_yy * vis_mu * v_diffu2_2 - NA_zz * vis_mu * v_diffu2_2
+                                  + NA * rho0 * v_stab1_1 + NA * rho0 * v_stab1_2 + NA * rho0 * v_stab1_3
+                                  - NA_x * rho0 * v_stab2_1 - NA_y * rho0 * v_stab2_2 - NA_z * rho0 * v_stab2_3 );
+
+      Residual[4*A + 3] += gwts * ( NA * rho0 * dot_w_np1 - NA_z * p_np1+ NA * rho0 * dot_w_np1_prime - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).z()
+                                  + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
+                                  - NA_xz * vis_mu * u_diffu2_1 - NA_yz * vis_mu * v_diffu2_2 - NA_zz * vis_mu * w_diffu2_3
+                                  - NA_xx * vis_mu * w_diffu2_3 - NA_yy * vis_mu * w_diffu2_3 - NA_zz * vis_mu * w_diffu2_3
+                                  + NA * rho0 * w_stab1_1 + NA * rho0 * w_stab1_2 + NA * rho0 * w_stab1_3
+                                  - NA_x * rho0 * w_stab2_1 - NA_y * rho0 * w_stab2_2 - NA_z * rho0 * w_stab2_3 );
 
       for(int B=0; B<nLocBas; ++B)
       {
+        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        // Continuity equation with respect to p, u, v, w
+        Tangent[4*nLocBas*(4*A  )+4*B  ] += gwts * (NA_x * tau_m * NB_x + NA_y * tau_m * NB_y + NA_z * tau_m * NB_z);
+    
+        Tangent[4*nLocBas*(4*A  )+4*B+1] += gwts * (NA * NB_x + NA_x * tau_m * NB * rho0);
 
+        Tangent[4*nLocBas*(4*A  )+4*B+2] += gwts * (NA * NB_y + NA_y * tau_m * NB * rho0);
+        
+        Tangent[4*nLocBas*(4*A  )+4*B+3] += gwts * (NA * NB_z + NA_z * tau_m * NB * rho0);
+
+        // Momentum-x with respect to p, u, v, w
+        Tangent[4*nLocBas*(4*A+1)+4*B  ] += gwts * (-NA_x * NB - NA * rho0 * tau_m * NB_x);
+        
+        Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0 + NA_x * tau_c * NB_x);
+        
+        Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * (NA_x * tau_c * NB_y);
+      
+        Tangent[4*nLocBas*(4*A+1)+4*B+3] += gwts * (NA_x * tau_c * NB_z);
+
+        // Momentum-y with repspect to p, u, v, w
+        Tangent[4*nLocBas*(4*A+2)+4*B  ] += gwts * (-NA_y *  NB - NA * rho0 * tau_m * NB_y);
+        
+        Tangent[4*nLocBas*(4*A+2)+4*B+1] += gwts * (NA_y * tau_c * NB_x);
+
+        Tangent[4*nLocBas*(4*A+2)+4*B+2] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0 + NA_y * tau_c * NB_y);
+
+        Tangent[4*nLocBas*(4*A+2)+4*B+3] += gwts * (NA_y * tau_c * NB_z);
+
+        // Momentum-z with repspect to p, u, v, w
+        Tangent[4*nLocBas*(4*A+3)+4*B  ] += gwts * (-NA_z * NB - NA * rho0 * tau_m * NB_z);
+
+        Tangent[4*nLocBas*(4*A+3)+4*B+1] += gwts * (NA_z * tau_c * NB_x);
+
+        Tangent[4*nLocBas*(4*A+3)+4*B+2] += gwts * (NA_z * tau_c * NB_y);
+
+        Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0 + NA_z * tau_c * NB_z);   
       }
-
     }
   }
 }
