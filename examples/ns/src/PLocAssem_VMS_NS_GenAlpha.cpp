@@ -105,6 +105,22 @@ std::array<double, 2> PLocAssem_VMS_NS_GenAlpha::get_tau(
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
 
+std::array<double, 2> PLocAssem_VMS_NS_GenAlpha::get_tau_dot(
+    const double &dt, const std::array<double, 9> &dxi_dx,
+    const double &u, const double &v, const double &w ) const
+{
+  const SymmTensor2_3D G = get_metric( dxi_dx );
+
+  const Vector_3 velo_vec( u, v, w );
+
+  const double temp_nu = vis_mu / rho0;
+
+  const double denom_m = std::sqrt( CT + G.VecMatVec( velo_vec, velo_vec) * (dt*dt) + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
+
+  // return tau_m followed by tau_c
+  return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
+}
+
 double PLocAssem_VMS_NS_GenAlpha::get_DC(
     const std::array<double, 9> &dxi_dx,
     const double &u, const double &v, const double &w ) const
@@ -1476,10 +1492,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
 
         Tangent[4*nLocBas*(4*A+3)+4*B+3] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt + NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z);        
       }
-    
     }
   }
-
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
@@ -1964,6 +1978,306 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Finalstep(
     const double * const &eleCtrlPts_z,
     const IQuadPts * const &quad )
 {
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
+  const int num_steps = tm_RK_ptr->get_RK_step();
+
+  Zero_Tangent_Residual();
+
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
+  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
+
+  for(int qua=0; qua<nqp; ++qua)
+  {
+    double u_n = 0.0, u_np1 = 0.0, u_np1_x = 0.0, u_np1_y = 0.0, u_np1_z = 0.0;
+    double v_n = 0.0, v_np1 = 0.0, v_np1_x = 0.0, v_np1_y = 0.0, v_np1_z = 0.0;
+    double w_n = 0.0, w_np1 = 0.0, w_np1_x = 0.0, w_np1_y = 0.0, w_np1_z = 0.0;
+
+    double u_np1_xx = 0.0, u_np1_yy = 0.0, u_np1_zz = 0.0;
+    double u_np1_xy = 0.0, u_np1_xz = 0.0, u_np1_yz = 0.0;
+
+    double v_np1_xx = 0.0, v_np1_yy = 0.0, v_np1_zz = 0.0;
+    double v_np1_xy = 0.0, v_np1_xz = 0.0, v_np1_yz = 0.0;
+
+    double w_np1_xx = 0.0, w_np1_yy = 0.0, w_np1_zz = 0.0;
+    double w_np1_xy = 0.0, w_np1_xz = 0.0, w_np1_yz = 0.0;
+
+    double dot_u_np1 = 0.0, dot_u_np1_x = 0.0, dot_u_np1_y = 0.0, dot_u_np1_z = 0.0;
+    double dot_v_np1 = 0.0, dot_v_np1_x = 0.0, dot_v_np1_y = 0.0, dot_v_np1_z = 0.0;
+    double dot_w_np1 = 0.0, dot_w_np1_x = 0.0, dot_w_np1_y = 0.0, dot_w_np1_z = 0.0;
+
+    double p_np1 = 0.0, p_np1_x = 0.0, p_np1_y = 0.0, p_np1_z = 0.0;
+
+    // 当前所有子步
+    std::vector<double> u(num_steps, 0); std::vector<double> v(num_steps, 0); 
+    std::vector<double> w(num_steps, 0); std::vector<double> p(num_steps, 0); 
+
+    std::vector<double> u_x(num_steps, 0); std::vector<double> v_x(num_steps, 0); 
+    std::vector<double> w_x(num_steps, 0); std::vector<double> p_x(num_steps, 0); 
+
+    std::vector<double> u_y(num_steps, 0); std::vector<double> v_y(num_steps, 0); 
+    std::vector<double> w_y(num_steps, 0); std::vector<double> p_y(num_steps, 0); 
+
+    std::vector<double> u_z(num_steps, 0); std::vector<double> v_z(num_steps, 0); 
+    std::vector<double> w_z(num_steps, 0); std::vector<double> p_z(num_steps, 0); 
+
+    std::vector<double> u_xx(num_steps, 0); std::vector<double> v_xx(num_steps, 0); std::vector<double> w_xx(num_steps, 0); 
+    std::vector<double> u_yy(num_steps, 0); std::vector<double> v_yy(num_steps, 0); std::vector<double> w_yy(num_steps, 0); 
+    std::vector<double> u_zz(num_steps, 0); std::vector<double> v_zz(num_steps, 0); std::vector<double> w_zz(num_steps, 0); 
+
+    std::vector<double> u_xy(num_steps, 0); std::vector<double> v_xy(num_steps, 0); std::vector<double> w_xy(num_steps, 0); 
+    std::vector<double> u_xz(num_steps, 0); std::vector<double> v_xz(num_steps, 0); std::vector<double> w_xz(num_steps, 0); 
+    std::vector<double> u_yz(num_steps, 0); std::vector<double> v_yz(num_steps, 0); std::vector<double> w_yz(num_steps, 0);
+
+    Vector_3 coor(0.0, 0.0, 0.0);
+
+    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
+                              &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
+                              &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int ii3 = 3 * ii;
+
+      u_n += pre_velo[ii3+0] * R[ii];
+      v_n += pre_velo[ii3+1] * R[ii];
+      w_n += pre_velo[ii3+2] * R[ii];
+
+      p_np1_x += cur_pres[ii] * dR_dx[ii];
+      p_np1_y += cur_pres[ii] * dR_dx[ii];
+      p_np1_z += cur_pres[ii] * dR_dx[ii];     
+      p_np1 += cur_pres[ii] * R[ii];
+
+      u_np1_x += cur_velo[ii3+0] * dR_dx[ii];
+      u_np1_y += cur_velo[ii3+0] * dR_dy[ii];
+      u_np1_z += cur_velo[ii3+0] * dR_dz[ii];
+
+      v_np1_x += cur_velo[ii3+1] * dR_dx[ii];
+      v_np1_y += cur_velo[ii3+1] * dR_dy[ii];
+      v_np1_z += cur_velo[ii3+1] * dR_dz[ii];
+      
+      w_np1_x += cur_velo[ii3+2] * dR_dx[ii];     
+      w_np1_y += cur_velo[ii3+2] * dR_dy[ii];
+      w_np1_z += cur_velo[ii3+2] * dR_dz[ii];
+
+      u_np1_xx += cur_velo[ii3+0] * d2R_dxx[ii];
+      u_np1_yy += cur_velo[ii3+0] * d2R_dyy[ii];
+      u_np1_zz += cur_velo[ii3+0] * d2R_dzz[ii];
+      u_np1_xz += cur_velo[ii3+0] * d2R_dxz[ii];
+      u_np1_xy += cur_velo[ii3+0] * d2R_dxy[ii];
+      u_np1_yz += cur_velo[ii3+0] * d2R_dyz[ii];
+
+      v_np1_xx += cur_velo[ii3+1] * d2R_dxx[ii];
+      v_np1_yy += cur_velo[ii3+1] * d2R_dyy[ii];
+      v_np1_zz += cur_velo[ii3+1] * d2R_dzz[ii];
+      v_np1_xz += cur_velo[ii3+1] * d2R_dxz[ii];
+      v_np1_xy += cur_velo[ii3+1] * d2R_dxy[ii];
+      v_np1_yz += cur_velo[ii3+1] * d2R_dyz[ii];
+
+      w_np1_xx += cur_velo[ii3+2] * d2R_dxx[ii];
+      w_np1_yy += cur_velo[ii3+2] * d2R_dyy[ii];
+      w_np1_zz += cur_velo[ii3+2] * d2R_dzz[ii];
+      w_np1_xz += cur_velo[ii3+2] * d2R_dxz[ii];
+      w_np1_xy += cur_velo[ii3+2] * d2R_dxy[ii];
+      w_np1_yz += cur_velo[ii3+2] * d2R_dyz[ii];      
+
+      u_np1 += cur_velo[ii3+0] * R[ii];
+      v_np1 += cur_velo[ii3+1] * R[ii];
+      w_np1 += cur_velo[ii3+2] * R[ii];
+
+      dot_u_np1_x += cur_velo[ii3+0] * dR_dx[ii];
+      dot_u_np1_y += cur_velo[ii3+0] * dR_dy[ii];
+      dot_u_np1_z += cur_velo[ii3+0] * dR_dz[ii];
+
+      dot_v_np1_x += cur_velo[ii3+1] * dR_dx[ii];
+      dot_v_np1_y += cur_velo[ii3+1] * dR_dy[ii];
+      dot_v_np1_z += cur_velo[ii3+1] * dR_dz[ii];
+      
+      dot_w_np1_x += cur_velo[ii3+2] * dR_dx[ii];     
+      dot_w_np1_y += cur_velo[ii3+2] * dR_dy[ii];
+      dot_w_np1_z += cur_velo[ii3+2] * dR_dz[ii];
+
+      dot_u_np1 += cur_velo[ii3+0] * R[ii];
+      dot_v_np1 += cur_velo[ii3+1] * R[ii];
+      dot_w_np1 += cur_velo[ii3+2] * R[ii];
+
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
+    }
+
+    for(int jj=0; jj<num_steps; ++jj)
+    {
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const int ii3 = 3 * ii;
+
+        u[jj] += cur_velo_sols[jj][ii3+0] * R[ii];
+        v[jj] += cur_velo_sols[jj][ii3+1] * R[ii];
+        w[jj] += cur_velo_sols[jj][ii3+2] * R[ii];
+        p[jj] += cur_pres_sols[jj][ii] * R[ii];
+
+        u_x[jj] += cur_velo_sols[jj][ii3+0] * dR_dx[ii];
+        v_x[jj] += cur_velo_sols[jj][ii3+1] * dR_dx[ii];
+        w_x[jj] += cur_velo_sols[jj][ii3+2] * dR_dx[ii];
+        p_x[jj] += cur_pres_sols[jj][ii] * dR_dx[ii];
+
+        u_y[jj] += cur_velo_sols[jj][ii3+0] * dR_dy[ii];
+        v_y[jj] += cur_velo_sols[jj][ii3+1] * dR_dy[ii];
+        w_y[jj] += cur_velo_sols[jj][ii3+2] * dR_dy[ii];
+        p_y[jj] += cur_pres_sols[jj][ii] * dR_dy[ii];
+
+        u_z[jj] += cur_velo_sols[jj][ii3+0] * dR_dz[ii];
+        v_z[jj] += cur_velo_sols[jj][ii3+1] * dR_dz[ii];
+        w_z[jj] += cur_velo_sols[jj][ii3+2] * dR_dz[ii];
+        p_z[jj] += cur_pres_sols[jj][ii] * dR_dz[ii];
+
+        u_xx[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxx[ii];
+        u_yy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyy[ii];
+        u_zz[jj] += cur_velo_sols[jj][ii3+0] * d2R_dzz[ii];
+        u_xz[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxz[ii];
+        u_xy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxy[ii];
+        u_yz[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyz[ii];
+
+        v_xx[jj] += cur_velo_sols[jj][ii3+1] * d2R_dxx[ii];
+        v_yy[jj] += cur_velo_sols[jj][ii3+1] * d2R_dyy[ii];
+        v_zz[jj] += cur_velo_sols[jj][ii3+1] * d2R_dzz[ii];
+        v_xz[jj] += cur_velo_sols[jj][ii3+1] * d2R_dxz[ii];
+        v_xy[jj] += cur_velo_sols[jj][ii3+1] * d2R_dxy[ii];
+        v_yz[jj] += cur_velo_sols[jj][ii3+1] * d2R_dyz[ii];
+
+        w_xx[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxx[ii];
+        w_yy[jj] += cur_velo_sols[jj][ii3+2] * d2R_dyy[ii];
+        w_zz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dzz[ii];
+        w_xz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxz[ii];
+        w_xy[jj] += cur_velo_sols[jj][ii3+2] * d2R_dxy[ii];
+        w_yz[jj] += cur_velo_sols[jj][ii3+2] * d2R_dyz[ii];
+      }
+    }
+
+    const auto dxi_dx = element->get_invJacobian(qua);
+
+    const std::array<double, 2> tau_np1_dot = get_tau_dot( dt, dxi_dx, u_np1, v_np1, w_np1 );
+    const double tau_m = tau_np1_dot[0];
+    const double tau_c = tau_np1_dot[1];
+
+    const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
+    const double tau_m_n = tau_n[0];
+    const double tau_c_n = tau_n[1];
+
+    const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
+
+    double sum_u_cur_advec = 0.0, sum_u_cur_diffu = 0.0, sum_a_fx_cur = 0.0, sum_last_p_x = 0;
+    double sum_v_cur_advec = 0.0, sum_v_cur_diffu = 0.0, sum_a_fy_cur = 0.0, sum_last_p_y = 0;
+    double sum_w_cur_advec = 0.0, sum_w_cur_diffu = 0.0, sum_a_fz_cur = 0.0, sum_last_p_z = 0;
+
+    for(int jj=0; jj<num_steps; ++jj)
+    {
+      sum_u_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
+      sum_u_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
+      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+  
+      sum_v_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
+      sum_v_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
+      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+
+      sum_w_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
+      sum_w_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
+      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+    }
+
+    for(int jj=0; jj<num_steps-1; ++jj)
+    {
+      sum_last_p_x += tm_RK_ptr->get_RK_b(jj) * p_x[jj];
+      sum_last_p_y += tm_RK_ptr->get_RK_b(jj) * p_y[jj];
+      sum_last_p_z += tm_RK_ptr->get_RK_b(jj) * p_z[jj];
+    }
+
+    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1] + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu + sum_last_p_x - rho0 * sum_a_fx_cur ); 
+    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1] + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu + sum_last_p_y - rho0 * sum_a_fy_cur );
+    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1] + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu + sum_last_p_z - rho0 * sum_a_fz_cur );
+
+    const double u_np1_adevc = u_np1 * u_np1_x + v_np1 * u_np1_y + w_np1 * u_np1_z;
+    const double u_np1_diffu = u_np1_xx + v_np1_xy + w_np1_xz + u_np1_xx + u_np1_yy + u_np1_zz;
+
+    const double v_np1_adevc = u_np1 * v_np1_x + v_np1 * v_np1_y + w_np1 * v_np1_z;
+    const double v_np1_diffu = u_np1_xy + v_np1_yy + w_np1_yz + v_np1_xx + v_np1_yy + v_np1_zz;
+
+    const double w_np1_adevc = u_np1 * w_np1_x + v_np1 * w_np1_y + w_np1 * w_np1_z;
+    const double w_np1_diffu = u_np1_xz + v_np1_yz + w_np1_zz + w_np1_xx + w_np1_yy + w_np1_zz;
+
+    const double dot_u_np1_prime = -1.0 * tau_m * ( rho0 * dot_u_np1 +  p_np1_x + rho0 * u_np1_adevc - vis_mu * u_np1_diffu - rho0 * get_f( coor, time + dt ).x() );
+    const double dot_v_np1_prime = -1.0 * tau_m * ( rho0 * dot_v_np1 +  p_np1_y + rho0 * v_np1_adevc - vis_mu * v_np1_diffu - rho0 * get_f( coor, time + dt ).y() );
+    const double dot_w_np1_prime = -1.0 * tau_m * ( rho0 * dot_w_np1 +  p_np1_z + rho0 * w_np1_adevc - vis_mu * w_np1_diffu - rho0 * get_f( coor, time + dt ).z() );    
+
+    const double div_dot_vel_np1 = dot_u_np1_x + dot_v_np1_y + dot_w_np1_z;
+    const double p_np1_prime = -1.0 * tau_c * div_dot_vel_np1;
+
+    // 扩散项1
+    const double u_diffu1_1 = u_np1_x + u_np1_x;
+    const double u_diffu1_2 = u_np1_y + v_np1_x;
+    const double u_diffu1_3 = u_np1_z + w_np1_x;
+
+    const double v_diffu1_1 = u_np1_y + v_np1_x;
+    const double v_diffu1_2 = v_np1_y + v_np1_y;
+    const double v_diffu1_3 = w_np1_y + v_np1_z;
+
+    const double w_diffu1_1 = u_np1_z + w_np1_x;
+    const double w_diffu1_2 = v_np1_z + w_np1_y;
+    const double w_diffu1_3 = w_np1_z + w_np1_z;
+
+    // 扩散项2
+    const double u_diffu2_1 = u_np1_prime;
+    const double v_diffu2_2 = v_np1_prime;
+    const double w_diffu2_3 = w_np1_prime;
+
+    // 交叉应力1 + 对流项
+    const double u_stab1_1 = (u_np1 + u_np1_prime) * u_np1_x;
+    const double u_stab1_2 = (v_np1 + v_np1_prime) * u_np1_y;
+    const double u_stab1_3 = (w_np1 + w_np1_prime) * u_np1_z;
+
+    const double v_stab1_1 = (u_np1 + u_np1_prime) * v_np1_x;
+    const double v_stab1_2 = (v_np1 + v_np1_prime) * v_np1_y;
+    const double v_stab1_3 = (w_np1 + w_np1_prime) * v_np1_z;
+
+    const double w_stab1_1 = (u_np1 + u_np1_prime) * w_np1_x;
+    const double w_stab1_2 = (v_np1 + v_np1_prime) * w_np1_y;
+    const double w_stab1_3 = (w_np1 + w_np1_prime) * w_np1_z;
+
+    // 交叉应力2 + 雷诺应力
+    const double u_stab2_1 = u_np1_prime * (u_np1 + u_np1_prime);
+    const double u_stab2_2 = v_np1_prime * (u_np1 + u_np1_prime);
+    const double u_stab2_3 = w_np1_prime * (u_np1 + u_np1_prime);
+
+    const double v_stab2_1 = u_np1_prime * (v_np1 + v_np1_prime);
+    const double v_stab2_2 = v_np1_prime * (v_np1 + v_np1_prime);
+    const double v_stab2_3 = w_np1_prime * (v_np1 + v_np1_prime);
+
+    const double w_stab2_1 = u_np1_prime * (w_np1 + w_np1_prime);
+    const double w_stab2_2 = v_np1_prime * (w_np1 + w_np1_prime);
+    const double w_stab2_3 = w_np1_prime * (w_np1 + w_np1_prime);
+
+    const double grad_p = p_np1;
+    const double grad_p_stab = p_np1_prime;
+
+    for(int A=0; A<nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
+      const double NA_xx = d2R_dxx[A], NA_yy = d2R_dyy[A], NA_zz = d2R_dzz[A];
+      const double NA_xy = d2R_dxy[A], NA_xz = d2R_dxz[A], NA_yz = d2R_dyz[A];
+
+      Residual[4*A] += gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
+
+      Residual[4*A + 1] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
+                                  + 0);
+
+      for(int B=0; B<nLocBas; ++B)
+      {
+
+      }
+
+    }
+  }
 }
 // EOF

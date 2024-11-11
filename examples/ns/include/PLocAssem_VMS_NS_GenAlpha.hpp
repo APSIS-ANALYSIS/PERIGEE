@@ -214,6 +214,11 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
+    // Return tau_m_dot and tau_c_dot in RB-VMS
+    std::array<double, 2> get_tau_dot( const double &dt, 
+        const std::array<double, 9> &dxi_dx,
+        const double &u, const double &v, const double &w ) const;
+
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
     // Users can refer to Int. J. Numer. Meth. Fluids 2001; 35: 93–116 
