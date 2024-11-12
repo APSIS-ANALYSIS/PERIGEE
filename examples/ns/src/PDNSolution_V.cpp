@@ -5,7 +5,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
 {
-  SYS_T::print_fatal_if( pNode->get_dof() != 3, "Error: PDNSolution_V : the APart_Node gives wrong dof number. \n");
+  // SYS_T::print_fatal_if( pNode->get_dof() != 3, "Error: PDNSolution_V : the APart_Node gives wrong dof number. \n");
   
   switch(type)
   {
@@ -24,7 +24,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
     const std::string &in_name )
 : PDNSolution( pNode, input_dof_num ), sol_name( in_name ), is_print( isprint )
 {
-  SYS_T::print_fatal_if( pNode->get_dof() != 3, "Error: PDNSolution_V : the APart_Node gives wrong dof number. \n");
+  // SYS_T::print_fatal_if( pNode->get_dof() != 3, "Error: PDNSolution_V : the APart_Node gives wrong dof number. \n");
   
   switch(type)
   {
@@ -44,7 +44,7 @@ PDNSolution_V::PDNSolution_V( const APart_Node * const &pNode,
     const std::string &in_name )
 : PDNSolution( pNode ), sol_name( in_name ), is_print( isprint )
 {
-  SYS_T::print_fatal_if( pNode->get_dof() != 3, "Error: PDNSolution_V : the APart_Node gives wrong dof number. \n");
+  // SYS_T::print_fatal_if( pNode->get_dof() != 3, "Error: PDNSolution_V : the APart_Node gives wrong dof number. \n");
   
   switch(type)
   {

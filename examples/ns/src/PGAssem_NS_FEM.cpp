@@ -163,7 +163,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  // NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
 
   delete temp;
 

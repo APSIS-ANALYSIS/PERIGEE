@@ -306,10 +306,14 @@ int main(int argc, char *argv[])
   }
   else
   {
-    inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
-        inflow_file );
-    dot_inflow_rate_ptr = new CVFlowRateDot_Sine2Zero( inflow_thd_time, inflow_TI_perturbation, 
-        inflow_file );
+    // inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
+    //     inflow_file );
+    // dot_inflow_rate_ptr = new CVFlowRateDot_Sine2Zero( inflow_thd_time, inflow_TI_perturbation, 
+    //     inflow_file );
+
+    inflow_rate_ptr = new CVFlowRate_Cosine2Steady( 1, inflow_thd_time, inflow_tgt_rate, inflow_TI_perturbation );
+    dot_inflow_rate_ptr = new CVFlowRateDot_Sine2Zero( 1, inflow_thd_time, inflow_tgt_rate, inflow_TI_perturbation );
+
   }
 
   inflow_rate_ptr->print_info();

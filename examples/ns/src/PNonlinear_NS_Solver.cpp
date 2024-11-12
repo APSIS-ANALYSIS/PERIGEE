@@ -291,7 +291,7 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
   // 第一个子步, u_1 = u_n
   cur_velo_sols[0] -> Copy(*pre_velo);
   
-  SYS_T::commPrint(" --- substep = 1 is solved. \n");
+  SYS_T::commPrint(" ==> Start solving the SubStep -- substep = 1 is solved. \n");
 
   // 子步（从第二个子步开始）
   for(int ii = 1; ii < ss; ++ii)
@@ -309,12 +309,14 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
 
-    SYS_T::commPrint(" --- substep = %d is solved. \n", ii);
+    SYS_T::commPrint(" --- substep = %d is solved. \n", ii+1);
 
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
   }
   // 终步
     // 使得终步的速度满足Dirchlet边界
+    SYS_T::commPrint(" ==> Start solving the LastStep: \n");
+
     rescale_inflow_velo(curr_time + dt, infnbc_part, flr_ptr, sol_base, cur_velo);
 
     gassem_ptr->Clear_KG();
@@ -333,6 +335,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
 
   // 最终步
     // 使得终步的dot速度满足Dirchlet边界
+    SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
+
     rescale_inflow_velo(curr_time + dt, infnbc_part, dot_flr_ptr, dot_sol_base, cur_dot_velo);
 
     gassem_ptr->Clear_KG();

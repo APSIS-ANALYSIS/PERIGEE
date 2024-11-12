@@ -294,39 +294,46 @@ void PTime_NS_Solver::TM_NS_HERK(
     cur_sol->WriteBinary(sol_name);
   }
 
-  // Call the nonlinear equation solver
-  nsolver_ptr->HERK_Solve_NS(
-      time_info->get_time(), time_info->get_step(),
-      sol_base, dot_sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
-      cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
-      pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr, dot_flr_ptr,
-      alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
-      ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
-      gassem_ptr, lsolver_ptr, cur_sol);
-
-  // Update the time step information
-  time_info->TimeIncrement();
-
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
 
-  // Record solution if meets criteria
-  if( time_info->get_index()%sol_record_freq == 0 )
+  while (time_info->get_time() < final_time)
   {
-    const auto sol_name = Name_Generator( time_info->get_index() );
-    cur_sol->WriteBinary(sol_name);
-  }
+    // Call the nonlinear equation solver
+    nsolver_ptr->HERK_Solve_NS(
+        time_info->get_time(), time_info->get_step(),
+        sol_base, dot_sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
+        cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
+        pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr, dot_flr_ptr,
+        alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
+        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
+        gassem_ptr, lsolver_ptr, cur_sol);
 
-  // Prepare for next time step
-  pre_velo_before->Copy(*pre_velo);
-  pre_velo->Copy(*cur_velo);
-  pre_pres->Copy(*cur_pres);
+    // Update the time step information
+    time_info->TimeIncrement();
 
-  for(int ii = 0; ii < ss; ++ii)
-  {
-    pre_velo_sols[ii]->Copy(*cur_velo_sols[ii]);
-    pre_pres_sols[ii]->Copy(*cur_pres_sols[ii]);
+    SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
+        time_info->get_time(), time_info->get_step(), time_info->get_index(),
+        SYS_T::get_time().c_str());
+
+    // Record solution if meets criteria
+    if( time_info->get_index()%sol_record_freq == 0 )
+    {
+      const auto sol_name = Name_Generator( time_info->get_index() );
+      cur_sol->WriteBinary(sol_name);
+    }
+
+    // Prepare for next time step
+    pre_velo_before->Copy(*pre_velo);
+    pre_velo->Copy(*cur_velo);
+    pre_pres->Copy(*cur_pres);
+
+    for(int ii = 0; ii < ss; ++ii)
+    {
+      pre_velo_sols[ii]->Copy(*cur_velo_sols[ii]);
+      pre_pres_sols[ii]->Copy(*cur_pres_sols[ii]);
+    }
   }
 
   for (int ii = 0; ii < ss; ++ii) 
