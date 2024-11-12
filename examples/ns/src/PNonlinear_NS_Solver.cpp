@@ -314,9 +314,9 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
   }
   // 终步
-    // 使得终步的速度满足Dirchlet边界
     SYS_T::commPrint(" ==> Start solving the LastStep: \n");
 
+    // 使得终步的速度满足Dirchlet边界
     rescale_inflow_velo(curr_time + dt, infnbc_part, flr_ptr, sol_base, cur_velo);
 
     gassem_ptr->Clear_KG();
@@ -334,9 +334,9 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
 
   // 最终步
-    // 使得终步的dot速度满足Dirchlet边界
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
 
+    // 使得终步的dot速度满足Dirchlet边界
     rescale_inflow_velo(curr_time + dt, infnbc_part, dot_flr_ptr, dot_sol_base, cur_dot_velo);
 
     gassem_ptr->Clear_KG();
@@ -412,6 +412,8 @@ void PNonlinear_NS_Solver::rescale_inflow_velo( const double &stime,
     const double factor  = flrate -> get_flow_rate( nbc_id, stime );
     const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
 
+    // std::cout<<"xxxxxxxxxxxxxxxxx:"<<factor<<std::endl;
+
     for(int ii=0; ii<numnode; ++ii)
     {
       const int node_index = infbc -> get_LDN( nbc_id, ii );
@@ -431,6 +433,8 @@ void PNonlinear_NS_Solver::rescale_inflow_velo( const double &stime,
         base_vals[2] * factor * (1.0 + perturb_z) };
 
       const int velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
+
+    // std::cout<<"xxxxxxxxxxxxxxxxx:"<<vals[0]<<vals[1]<<vals[2]<<std::endl;
 
       VecSetValues(velo->solution, 3, velo_idx, vals, INSERT_VALUES);
     }
@@ -458,10 +462,10 @@ void PNonlinear_NS_Solver::Update_pressure_velocity(
 
     for(int ii=0; ii<anode_ptr->get_nlocalnode(); ++ii)
     {
-      array_pres[ii       ] = array_step[ii*4 + 0];
-      array_velo[ii*3 + 0 ] = array_step[ii*4 + 1];
-      array_velo[ii*3 + 1 ] = array_step[ii*4 + 2];
-      array_velo[ii*3 + 2 ] = array_step[ii*4 + 3];
+      array_pres[ii       ] -= array_step[ii*4 + 0];
+      array_velo[ii*3 + 0 ] -= array_step[ii*4 + 1];
+      array_velo[ii*3 + 1 ] -= array_step[ii*4 + 2];
+      array_velo[ii*3 + 2 ] -= array_step[ii*4 + 3];
     }
 
     VecRestoreArray(lvelo, &array_velo);    

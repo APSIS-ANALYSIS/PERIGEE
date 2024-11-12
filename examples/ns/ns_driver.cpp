@@ -425,7 +425,9 @@ int main(int argc, char *argv[])
   PDNSolution * dot_velo = new PDNSolution_V( pNode, 0, 3, true, "dot_velo" );
 
   //===== RK Butcher Table =====
-  Runge_Kutta_Butcher * tm_RK_ptr = new Runge_Kutta_Butcher(5, 3, true);
+  Runge_Kutta_Butcher * tm_RK_ptr = new Runge_Kutta_Butcher(3, 3, false);
+
+  tm_RK_ptr->printCoefficients();
 
   // int m = 4;
   // PDNSolution** solutions = new PDNSolution*[m];

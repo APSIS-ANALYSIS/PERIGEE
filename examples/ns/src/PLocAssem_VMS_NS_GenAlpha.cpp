@@ -99,7 +99,8 @@ std::array<double, 2> PLocAssem_VMS_NS_GenAlpha::get_tau(
 
   const double temp_nu = vis_mu / rho0;
 
-  const double denom_m = std::sqrt( CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
+  // const double denom_m = std::sqrt( CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
+  const double denom_m = std::sqrt( CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
 
   // return tau_m followed by tau_c
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
@@ -115,7 +116,9 @@ std::array<double, 2> PLocAssem_VMS_NS_GenAlpha::get_tau_dot(
 
   const double temp_nu = vis_mu / rho0;
 
-  const double denom_m = std::sqrt( CT + G.VecMatVec( velo_vec, velo_vec) * (dt*dt) + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
+  // const double denom_m = std::sqrt( CT + G.VecMatVec( velo_vec, velo_vec) * (dt*dt) + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
+
+  const double denom_m = std::sqrt( CT + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
 
   // return tau_m followed by tau_c
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
@@ -1342,9 +1345,13 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
       sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
     }
 
-    const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
-    const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
-    const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+    // const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
+    // const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
+    // const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+
+    const double u_n_prime = 0.0;
+    const double v_n_prime = 0.0;
+    const double w_n_prime = 0.0;
 
     const double div_vel= u_x[subindex] + v_y[subindex] + w_z[subindex];
 
@@ -1468,7 +1475,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
         // Momentum-x with respect to p, u, v, w
         Tangent[4*nLocBas*(4*A+1)+4*B  ] += gwts * (-NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x);
         
-        Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0 /dt + NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x );
+        Tangent[4*nLocBas*(4*A+1)+4*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0 /dt + NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
         
         Tangent[4*nLocBas*(4*A+1)+4*B+2] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
       
@@ -1750,7 +1757,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
       u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1] + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index] + sum_p_x[index] - rho0 * sum_a_fx[index] );
       v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1] + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index] + sum_p_y[index] - rho0 * sum_a_fy[index] );
       w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1] + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index] + sum_p_z[index] - rho0 * sum_a_fz[index] );
-      p_prime[index-1]= -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
+      p_prime[index-1] = -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
     }
     
     double sum_u_pre_advec = 0.0, sum_u_pre_diffu = 0.0, sum_a_fx_pre = 0.0, sum_p_pre_x = 0;
@@ -1779,9 +1786,12 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
       sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
     }
 
-    const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
-    const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
-    const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+    // const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
+    // const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
+    // const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+    const double u_n_prime = 0.0;
+    const double v_n_prime = 0.0;
+    const double w_n_prime = 0.0;
 
     double sum_u_cur_advec = 0.0, sum_u_cur_diffu = 0.0, sum_a_fx_cur = 0.0, sum_last_p_x = 0;
     double sum_v_cur_advec = 0.0, sum_v_cur_diffu = 0.0, sum_a_fy_cur = 0.0, sum_last_p_y = 0;

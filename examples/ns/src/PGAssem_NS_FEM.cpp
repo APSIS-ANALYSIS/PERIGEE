@@ -1146,15 +1146,19 @@ void PGAssem_NS_FEM::Assem_tangent_residual_substep(
   const int nElem = alelem_ptr->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
   
-  std::vector<std::vector<double>> array_cur_velo_sols(tm_RK_ptr->get_RK_step());
-  std::vector<std::vector<double>> array_cur_pres_sols(tm_RK_ptr->get_RK_step());
+  std::vector<std::vector<double>> array_cur_velo_sols(substep_index+1);
+  std::vector<std::vector<double>> array_cur_pres_sols(substep_index+1);
   std::vector<std::vector<double>> array_pre_velo_sols(tm_RK_ptr->get_RK_step());
   std::vector<std::vector<double>> array_pre_pres_sols(tm_RK_ptr->get_RK_step());
 
-  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  for(int ii = 0; ii < substep_index+1; ++ii)
   {
     array_cur_velo_sols[ii] = cur_velo_sols[ii] -> GetLocalArray();
     array_cur_pres_sols[ii] = cur_pres_sols[ii] -> GetLocalArray();
+  }
+
+  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  {
     array_pre_velo_sols[ii] = pre_velo_sols[ii] -> GetLocalArray();
     array_pre_pres_sols[ii] = pre_pres_sols[ii] -> GetLocalArray();
   }
@@ -1171,15 +1175,19 @@ void PGAssem_NS_FEM::Assem_tangent_residual_substep(
   {
     const std::vector<int> IEN_e = lien_ptr->get_LIEN(ee);
 
-    std::vector<std::vector<double>> local_cur_velo_sols(tm_RK_ptr->get_RK_step());    
-    std::vector<std::vector<double>> local_cur_pres_sols(tm_RK_ptr->get_RK_step()); 
+    std::vector<std::vector<double>> local_cur_velo_sols(substep_index+1);    
+    std::vector<std::vector<double>> local_cur_pres_sols(substep_index+1); 
     std::vector<std::vector<double>> local_pre_velo_sols(tm_RK_ptr->get_RK_step()); 
     std::vector<std::vector<double>> local_pre_pres_sols(tm_RK_ptr->get_RK_step()); 
 
-    for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+    for(int ii = 0; ii < substep_index+1; ++ii)
     {
       local_cur_velo_sols[ii] = GetLocal( array_cur_velo_sols[ii], IEN_e, nLocBas, 3 );
       local_cur_pres_sols[ii] = GetLocal( array_cur_pres_sols[ii], IEN_e, nLocBas, 1 );
+    }
+
+    for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+    {
       local_pre_velo_sols[ii] = GetLocal( array_pre_velo_sols[ii], IEN_e, nLocBas, 3 );
       local_pre_pres_sols[ii] = GetLocal( array_pre_pres_sols[ii], IEN_e, nLocBas, 1 );
     }

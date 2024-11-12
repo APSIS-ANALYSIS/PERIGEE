@@ -20,6 +20,15 @@ void Runge_Kutta_Butcher::setCoefficients()
 {
   switch (ss) 
   {
+    case 3:
+      if (mm == 3)
+      {
+        cc[0] = 0.0; cc[1] = 8.0/15.0; cc[2] = 2.0/3.0;
+        aa[0][0] = 0.0; aa[1][0] = 8.0/15.0;
+        aa[2][0] = 1.0/4.0; aa[2][1] = 5.0/12.0;
+        bb[0] = 1.0/4.0; bb[1] = 0.0; bb[2] = 3.0/4.0;
+      }
+      break;
     case 5:
       if (mm == 3) 
       {
