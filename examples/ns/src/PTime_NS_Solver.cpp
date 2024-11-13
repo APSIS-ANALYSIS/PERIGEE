@@ -338,7 +338,7 @@ void PTime_NS_Solver::TM_NS_HERK(
     // for(int ii = 0; ii < ss; ++ii)
     //   VecView(cur_velo_sols[ii]->solution, PETSC_VIEWER_STDOUT_WORLD);
 
-    // // n+1 步的子步速度解
+    // n+1 步的子步速度解
     for(int ii = 0; ii < ss; ++ii)
       cur_velo_sols[ii]->Copy(*init_velo);
 

@@ -434,8 +434,6 @@ void PNonlinear_NS_Solver::rescale_inflow_velo( const double &stime,
 
       const int velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
 
-    // std::cout<<"xxxxxxxxxxxxxxxxx:"<<vals[0]<<vals[1]<<vals[2]<<std::endl;
-
       VecSetValues(velo->solution, 3, velo_idx, vals, INSERT_VALUES);
     }
   }
