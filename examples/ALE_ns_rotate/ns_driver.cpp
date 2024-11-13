@@ -520,6 +520,8 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+  SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
+
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, anchor_elementv, opposite_elementv, quads, free_quad,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc, nz_estimate );
 
