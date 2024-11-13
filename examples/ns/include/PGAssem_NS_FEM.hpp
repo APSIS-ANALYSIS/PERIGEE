@@ -116,6 +116,56 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_WeakBC * const &wbc_part );
 
     // HERK
+    virtual void Assem_tangent_residual_substep_init(
+        const int &substep_index,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
+
+    virtual void Assem_tangent_residual_laststep_init(
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elementv,
+        FEAElement * const &elements,
+        FEAElement * const &elementvs,
+        const IQuadPts * const &quad_v,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const ALocal_WeakBC * const &wbc_part );
+
     virtual void Assem_tangent_residual_substep(
         const int &substep_index,
         PDNSolution ** const &cur_velo_sols,
@@ -239,6 +289,33 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part );
+
+    // Natural boundary condition for substep of the HERK
+    void NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
+        const int &substep_index,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part );
+
+    // Natural boundary condition for laststep of the HERK
+    void NatBC_G_HERK_Last( const double &curr_time, const double &dt,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part );
+
+    // Natural boundary condition for finalstep of the HERK
+    void NatBC_G_HERK_Final( const double &curr_time, const double &dt,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,

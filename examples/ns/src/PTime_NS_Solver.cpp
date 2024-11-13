@@ -300,15 +300,29 @@ void PTime_NS_Solver::TM_NS_HERK(
 
   while (time_info->get_time() < final_time)
   {
-    // Call the nonlinear equation solver
-    nsolver_ptr->HERK_Solve_NS(
-        time_info->get_time(), time_info->get_step(),
-        sol_base, dot_sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
-        cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
-        pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr, dot_flr_ptr,
-        alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
-        gassem_ptr, lsolver_ptr, cur_sol);
+    if (time_info->get_index() == 0) 
+    {
+      nsolver_ptr->HERK_Solve_NS_init(
+          time_info->get_time(), time_info->get_step(),
+          sol_base, dot_sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
+          cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
+          pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr, dot_flr_ptr,
+          alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
+          ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
+          gassem_ptr, lsolver_ptr, cur_sol);
+    }
+    else
+    {
+      // Call the nonlinear equation solver
+      nsolver_ptr->HERK_Solve_NS(
+          time_info->get_time(), time_info->get_step(),
+          sol_base, dot_sol_base, cur_velo_sols, cur_velo, cur_dot_velo, 
+          cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
+          pre_pres_sols, pre_pres, pre_velo_before, tm_RK_ptr, flr_ptr, dot_flr_ptr,
+          alelem_ptr, lien_ptr, pNode_ptr, feanode_ptr, nbc_part, infnbc_part,
+          ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
+          gassem_ptr, lsolver_ptr, cur_sol);
+    }
 
     // Update the time step information
     time_info->TimeIncrement();

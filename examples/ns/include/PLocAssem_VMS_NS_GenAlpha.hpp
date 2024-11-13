@@ -89,6 +89,36 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    virtual void Assem_Residual_EBC_HERK_Sub(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const int &subindex,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Residual_EBC_HERK_Last(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Residual_EBC_HERK_Final(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
@@ -132,6 +162,38 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
         const double * const &sol,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Tangent_Residual_Substep_Init(
+        const double &time, const double &dt,
+        const int &subindex,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<std::vector<double>>& pre_velo_sols,
+        const std::vector<std::vector<double>>& pre_pres_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<double>& pre_velo_before,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void Assem_Tangent_Residual_Laststep_Init(
+        const double &time, const double &dt,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<double>& cur_velo,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<std::vector<double>>& pre_velo_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<std::vector<double>>& pre_pres_sols,
+        const std::vector<double>& pre_velo_before,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,

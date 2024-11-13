@@ -432,6 +432,138 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   VecAssemblyEnd(G);
 }
 
+void PGAssem_NS_FEM::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
+    const int &substep_index,
+    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      lassem_ptr->Assem_Residual_EBC_HERK_Sub(ebc_id, curr_time, dt, substep_index, tm_RK_ptr,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat; ++mm)
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+      }
+
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
+
+void PGAssem_NS_FEM::NatBC_G_HERK_Last( const double &curr_time, const double &dt,
+    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      lassem_ptr->Assem_Residual_EBC_HERK_Last(ebc_id, curr_time, dt, tm_RK_ptr,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat; ++mm)
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+      }
+
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
+
+void PGAssem_NS_FEM::NatBC_G_HERK_Final( const double &curr_time, const double &dt,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &element_s,
+    const IQuadPts * const &quad_s,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part )
+{
+  int * LSIEN = new int [snLocBas];
+  double * sctrl_x = new double [snLocBas];
+  double * sctrl_y = new double [snLocBas];
+  double * sctrl_z = new double [snLocBas];
+  PetscInt * srow_index = new PetscInt [dof_mat * snLocBas];
+
+  for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+  {
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+
+    for(int ee=0; ee<num_sele; ++ee)
+    {
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+      lassem_ptr->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt,
+          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+
+      for(int ii=0; ii<snLocBas; ++ii)
+      {
+        for(int mm=0; mm<dof_mat; ++mm)
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+      }
+
+      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+    }
+  }
+
+  delete [] LSIEN; LSIEN = nullptr;
+  delete [] sctrl_x; sctrl_x = nullptr;
+  delete [] sctrl_y; sctrl_y = nullptr;
+  delete [] sctrl_z; sctrl_z = nullptr;
+  delete [] srow_index; srow_index = nullptr;
+}
+
 void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_s,
@@ -1118,6 +1250,253 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   delete [] row_index; row_index = nullptr;
 }
 
+void PGAssem_NS_FEM::Assem_tangent_residual_substep_init(
+    const int &substep_index,
+    PDNSolution ** const &cur_velo_sols,
+    PDNSolution ** const &cur_pres_sols,
+    PDNSolution ** const &pre_velo_sols,
+    PDNSolution * const &pre_velo,
+    PDNSolution ** const &pre_pres_sols,
+    PDNSolution * const &pre_velo_before,    
+    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const double &curr_time,
+    const double &dt,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    FEAElement * const &elementvs,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
+  
+  std::vector<std::vector<double>> array_cur_velo_sols(substep_index+1);
+  std::vector<std::vector<double>> array_cur_pres_sols(substep_index+1);
+  std::vector<std::vector<double>> array_pre_velo_sols(tm_RK_ptr->get_RK_step());
+  std::vector<std::vector<double>> array_pre_pres_sols(tm_RK_ptr->get_RK_step());
+
+  for(int ii = 0; ii < substep_index+1; ++ii)
+  {
+    array_cur_velo_sols[ii] = cur_velo_sols[ii] -> GetLocalArray();
+    array_cur_pres_sols[ii] = cur_pres_sols[ii] -> GetLocalArray();
+  }
+
+  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  {
+    array_pre_velo_sols[ii] = pre_velo_sols[ii] -> GetLocalArray();
+    array_pre_pres_sols[ii] = pre_pres_sols[ii] -> GetLocalArray();
+  }
+
+  const std::vector<double> array_pre_velo = pre_velo -> GetLocalArray();
+  const std::vector<double> array_pre_velo_before = pre_velo_before -> GetLocalArray();
+
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    const std::vector<int> IEN_e = lien_ptr->get_LIEN(ee);
+
+    std::vector<std::vector<double>> local_cur_velo_sols(substep_index+1);    
+    std::vector<std::vector<double>> local_cur_pres_sols(substep_index+1); 
+    std::vector<std::vector<double>> local_pre_velo_sols(tm_RK_ptr->get_RK_step()); 
+    std::vector<std::vector<double>> local_pre_pres_sols(tm_RK_ptr->get_RK_step()); 
+
+    for(int ii = 0; ii < substep_index+1; ++ii)
+    {
+      local_cur_velo_sols[ii] = GetLocal( array_cur_velo_sols[ii], IEN_e, nLocBas, 3 );
+      local_cur_pres_sols[ii] = GetLocal( array_cur_pres_sols[ii], IEN_e, nLocBas, 1 );
+    }
+
+    for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+    {
+      local_pre_velo_sols[ii] = GetLocal( array_pre_velo_sols[ii], IEN_e, nLocBas, 3 );
+      local_pre_pres_sols[ii] = GetLocal( array_pre_pres_sols[ii], IEN_e, nLocBas, 1 );
+    }
+
+    const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
+    const std::vector<double> local_pre_velo_before = GetLocal( array_pre_velo_before, IEN_e, nLocBas, 3 );
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+    lassem_ptr->Assem_Tangent_Residual_Substep_Init(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
+        local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+    }
+
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
+
+  // Backflow stabilization residual & tangent contribution
+  // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // Resistance type boundary condition
+  // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
+
+  NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part );
+
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  // Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+  //   lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
+
+void PGAssem_NS_FEM::Assem_tangent_residual_laststep_init(
+    PDNSolution ** const &cur_velo_sols,
+    PDNSolution * const &cur_velo,
+    PDNSolution ** const &cur_pres_sols,
+    PDNSolution ** const &pre_velo_sols,
+    PDNSolution * const &pre_velo,
+    PDNSolution ** const &pre_pres_sols,
+    PDNSolution * const &pre_velo_before,    
+    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const double &curr_time,
+    const double &dt,
+    const ALocal_Elem * const &alelem_ptr,
+    IPLocAssem * const &lassem_ptr,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    FEAElement * const &elementvs,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    const ALocal_IEN * const &lien_ptr,
+    const FEANode * const &fnode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part )
+{
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof = dof_mat * nLocBas;
+  
+  std::vector<std::vector<double>> array_cur_velo_sols(tm_RK_ptr->get_RK_step());
+  std::vector<std::vector<double>> array_cur_pres_sols(tm_RK_ptr->get_RK_step());
+  std::vector<std::vector<double>> array_pre_velo_sols(tm_RK_ptr->get_RK_step());
+  std::vector<std::vector<double>> array_pre_pres_sols(tm_RK_ptr->get_RK_step());
+
+  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  {
+    array_cur_velo_sols[ii] = cur_velo_sols[ii] -> GetLocalArray();
+    array_cur_pres_sols[ii] = cur_pres_sols[ii] -> GetLocalArray();
+    array_pre_velo_sols[ii] = pre_velo_sols[ii] -> GetLocalArray();
+    array_pre_pres_sols[ii] = pre_pres_sols[ii] -> GetLocalArray();
+  }
+
+  const std::vector<double> array_cur_velo = cur_velo -> GetLocalArray();
+  const std::vector<double> array_pre_velo = pre_velo -> GetLocalArray();
+  const std::vector<double> array_pre_velo_before = pre_velo_before -> GetLocalArray();
+
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    const std::vector<int> IEN_e = lien_ptr->get_LIEN(ee);
+
+    std::vector<std::vector<double>> local_cur_velo_sols(tm_RK_ptr->get_RK_step());    
+    std::vector<std::vector<double>> local_cur_pres_sols(tm_RK_ptr->get_RK_step()); 
+    std::vector<std::vector<double>> local_pre_velo_sols(tm_RK_ptr->get_RK_step()); 
+    std::vector<std::vector<double>> local_pre_pres_sols(tm_RK_ptr->get_RK_step()); 
+
+    for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+    {
+      local_cur_velo_sols[ii] = GetLocal( array_cur_velo_sols[ii], IEN_e, nLocBas, 3 );
+      local_cur_pres_sols[ii] = GetLocal( array_cur_pres_sols[ii], IEN_e, nLocBas, 1 );
+      local_pre_velo_sols[ii] = GetLocal( array_pre_velo_sols[ii], IEN_e, nLocBas, 3 );
+      local_pre_pres_sols[ii] = GetLocal( array_pre_pres_sols[ii], IEN_e, nLocBas, 1 );
+    }
+
+    const std::vector<double> local_cur_velo = GetLocal( array_cur_velo, IEN_e, nLocBas, 3 );
+    const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
+    const std::vector<double> local_pre_velo_before = GetLocal( array_pre_velo_before, IEN_e, nLocBas, 3 );
+
+    fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+    lassem_ptr->Assem_Tangent_Residual_Laststep_Init(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
+        local_cur_pres_sols, local_pre_velo_sols, local_pre_velo, local_pre_pres_sols, local_pre_velo_before,
+        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat; ++mm)
+        row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+    }
+
+    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+        lassem_ptr->Tangent, ADD_VALUES);
+
+    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  }
+
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_index; row_index = nullptr;
+
+  // Backflow stabilization residual & tangent contribution
+  // BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+
+  // Resistance type boundary condition
+  // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
+  //    nbc_part, ebc_part, gbc );
+
+  NatBC_G_HERK_Last( curr_time, dt, tm_RK_ptr, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part );
+
+
+  // Weakly enforced no-slip boundary condition
+  // If wall_model_type = 0, it will do nothing.
+  // Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
+  //   lien_ptr, fnode_ptr, nbc_part, wbc_part);
+
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+
+  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(G);
+  VecAssemblyEnd(G);
+}
+
 void PGAssem_NS_FEM::Assem_tangent_residual_substep(
     const int &substep_index,
     PDNSolution ** const &cur_velo_sols,
@@ -1224,6 +1603,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual_substep(
   // Resistance type boundary condition
   // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
   //    nbc_part, ebc_part, gbc );
+
+  NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -1342,6 +1724,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual_laststep(
   // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
   //    nbc_part, ebc_part, gbc );
 
+  NatBC_G_HERK_Last( curr_time, dt, tm_RK_ptr, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part );
+
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
   // Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
@@ -1451,6 +1836,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual_finalstep(
   // Resistance type boundary condition
   // NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
   //    nbc_part, ebc_part, gbc );
+  NatBC_G_HERK_Final( curr_time, dt, lassem_ptr, elements, quad_s, 
+     nbc_part, ebc_part );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.

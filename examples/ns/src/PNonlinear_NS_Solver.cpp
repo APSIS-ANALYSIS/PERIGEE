@@ -234,6 +234,129 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   else conv_flag = false;
 }
 
+void PNonlinear_NS_Solver::HERK_Solve_NS_init(
+    const double &curr_time,
+    const double &dt,
+    const PDNSolution * const &sol_base,
+    const PDNSolution * const &dot_sol_base,
+    PDNSolution ** const &cur_velo_sols,
+    PDNSolution * const &cur_velo,
+    PDNSolution * const &cur_dot_velo,
+    PDNSolution ** const &cur_pres_sols,
+    PDNSolution * const &cur_pres,
+    PDNSolution ** const &pre_velo_sols,
+    PDNSolution * const &pre_velo,
+    PDNSolution ** const &pre_pres_sols,
+    PDNSolution * const &pre_pres,
+    PDNSolution * const &pre_velo_before,
+    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const ICVFlowRate * const flr_ptr,
+    const ICVFlowRate * const dot_flr_ptr,
+    const ALocal_Elem * const &alelem_ptr,
+    const ALocal_IEN * const &lien_ptr,
+    const APart_Node * const &anode_ptr,
+    const FEANode * const &feanode_ptr,
+    const ALocal_NBC * const &nbc_part,
+    const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc,
+    const ALocal_WeakBC * const &wbc_part,
+    const Matrix_PETSc * const &bc_mat,
+    FEAElement * const &elementv,
+    FEAElement * const &elements,
+    FEAElement * const &elementvs,
+    const IQuadPts * const &quad_v,
+    const IQuadPts * const &quad_s,
+    IPLocAssem * const &lassem_ptr,
+    IPGAssem * const &gassem_ptr,
+    PLinear_Solver_PETSc * const &lsolver_ptr,
+    PDNSolution * const &cur_sol) const
+{
+#ifdef PETSC_USE_LOG
+  PetscLogEvent mat_assem_0_event, mat_assem_1_event;
+  PetscLogEvent vec_assem_0_event, vec_assem_1_event;
+  PetscLogEvent lin_solve_event;
+  PetscClassId classid_assembly;
+  PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
+  PetscLogEventRegister("assembly mat 0", classid_assembly, &mat_assem_0_event);
+  PetscLogEventRegister("assembly mat 1", classid_assembly, &mat_assem_1_event);
+  PetscLogEventRegister("assembly vec 0", classid_assembly, &vec_assem_0_event);
+  PetscLogEventRegister("assembly vec 1", classid_assembly, &vec_assem_1_event);
+  PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
+#endif
+
+  // HERK steps
+  const int ss = tm_RK_ptr->get_RK_step();
+
+  // 第一个子步, u_1 = u_n
+  cur_velo_sols[0] -> Copy(*pre_velo);
+  
+  SYS_T::commPrint(" ==> Start solving the SubStep -- substep = 1 is solved. \n");
+
+  // 子步（从第二个子步开始）
+  for(int ii = 1; ii < ss; ++ii)
+  {
+    // 使得每个子步的速度满足Dirchlet边界
+    rescale_inflow_velo(curr_time + tm_RK_ptr->get_RK_c(ii) * dt, infnbc_part, flr_ptr, sol_base, cur_velo_sols[ii]);
+
+    gassem_ptr->Clear_KG();
+    
+    gassem_ptr->Assem_tangent_residual_substep_init( ii, cur_velo_sols, cur_pres_sols,
+      pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before, tm_RK_ptr, 
+      curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
+      quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );     
+    
+    lsolver_ptr->SetOperator(gassem_ptr->K);
+    lsolver_ptr->Solve(gassem_ptr->G, dot_step);
+
+    SYS_T::commPrint(" --- substep = %d is solved. \n", ii+1);
+
+    Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
+  }
+  // 终步
+    SYS_T::commPrint(" ==> Start solving the LastStep: \n");
+
+    // 使得终步的速度满足Dirchlet边界
+    rescale_inflow_velo(curr_time + dt, infnbc_part, flr_ptr, sol_base, cur_velo);
+
+    gassem_ptr->Clear_KG();
+
+    gassem_ptr->Assem_tangent_residual_laststep_init( cur_velo_sols, cur_velo, 
+      cur_pres_sols, pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before,
+      tm_RK_ptr, curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
+      quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
+
+    lsolver_ptr->SetOperator(gassem_ptr->K);
+    lsolver_ptr->Solve(gassem_ptr->G, dot_step);
+
+    SYS_T::commPrint(" --- laststep is solved. \n");
+
+    Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
+
+  // 最终步
+    SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
+
+    // 使得终步的dot速度满足Dirchlet边界
+    rescale_inflow_velo(curr_time + dt, infnbc_part, dot_flr_ptr, dot_sol_base, cur_dot_velo);
+
+    gassem_ptr->Clear_KG();
+
+    gassem_ptr->Assem_tangent_residual_finalstep( cur_dot_velo, cur_velo_sols, 
+      cur_velo, cur_pres_sols, pre_velo, cur_pres, tm_RK_ptr, curr_time, dt, 
+      alelem_ptr, lassem_ptr, elementv, elements, elementvs, quad_v, quad_s, 
+      lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
+
+    lsolver_ptr->SetOperator(gassem_ptr->K);
+    lsolver_ptr->Solve(gassem_ptr->G, dot_step);
+
+    SYS_T::commPrint(" --- finalstep is solved. \n");
+
+    Update_pressure_velocity(anode_ptr, cur_dot_velo, cur_pres, dot_step);
+
+  // 将n+1步速度和压强组装为解向量
+    Update_solutions(anode_ptr, cur_velo, cur_pres, cur_sol);
+}
+
 void PNonlinear_NS_Solver::HERK_Solve_NS(
     const double &curr_time,
     const double &dt,
