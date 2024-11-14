@@ -23,8 +23,11 @@ void Runge_Kutta_Butcher::setCoefficients()
     case 2:
       if (mm == 2)
       {
-        cc[1] = 0.5;
-        aa[1][0] = 0.5;
+        // cc[1] = 0.5;
+        // aa[1][0] = 0.5;
+        // bb[1] = 1.0;
+        cc[1] = 1.0;
+        aa[1][0] = 1.0;
         bb[1] = 1.0;
       }
       break;    

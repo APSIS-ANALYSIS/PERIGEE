@@ -28,6 +28,10 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 
   Zero_sur_Tangent_Residual();
 
+  flist = nullptr;
+  flist = new locassem_vms_ns_funs[1];
+  flist[0] = &PLocAssem_VMS_NS_GenAlpha::get_H1;
+
   print_info();
 }
 
@@ -805,18 +809,16 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_HERK_Sub(
     }
 
     // const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
-
     double sum_h_x = 0.0, sum_h_y = 0.0, sum_h_z = 0.0;
 
     for(int jj=0; jj<subindex; ++jj)
     {
       const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
-
       sum_h_x += tm_RK_ptr->get_RK_a(subindex, jj) * traction.x();
       sum_h_y += tm_RK_ptr->get_RK_a(subindex, jj) * traction.y();
       sum_h_z += tm_RK_ptr->get_RK_a(subindex, jj) * traction.z();
     }
-
+    
     for(int A=0; A<snLocBas; ++A)
     {
       sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * sum_h_x;
@@ -2056,7 +2058,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep_Init(
 
       Residual[4*A + 1] += gwts * ( NA * rho0/dt * u_np1 - NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * p[num_steps-1]
                                   + NA * rho0/dt * u_np1_prime - NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * p_prime[num_steps-1] 
-                                  - NA * rho0/dt * sum_a_fx_cur - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
+                                  - NA * rho0 * sum_a_fx_cur - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
                                   + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu * u_diffu1_3
                                   - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                   - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
@@ -3019,7 +3021,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
 
       Residual[4*A + 1] += gwts * ( NA * rho0/dt * u_np1 - NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * p[num_steps-1]
                                   + NA * rho0/dt * u_np1_prime - NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * p_prime[num_steps-1] 
-                                  - NA * rho0/dt * sum_a_fx_cur - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
+                                  - NA * rho0 * sum_a_fx_cur - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
                                   + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu * u_diffu1_3
                                   - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                   - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1

@@ -1359,7 +1359,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual_substep_init(
 
   NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr, lassem_ptr, elements, quad_s, 
      nbc_part, ebc_part );
-
+    
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
   // Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
