@@ -93,7 +93,7 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 Dr. Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
 
 ## Acknowledgement
-National Natural Science Foundation of China, Grant number 12172160
+National Natural Science Foundation of China, Grant numbers 12172160, 12472201
 
 Shenzhen Science and Technology Program, Grant number JCYJ20220818100600002
 
