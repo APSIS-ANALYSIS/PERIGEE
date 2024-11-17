@@ -22,7 +22,7 @@ class FEAElement_Tet4 : public FEAElement
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element.
-    virtual int get_Type() const {return 501;}
+    virtual FEType get_Type() const {return FEType::Tet4;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 
