@@ -61,9 +61,6 @@ class FEAElement
     virtual void print_info() const 
     {SYS_T::commPrint("Warning: print is not implemented. \n");}
 
-    // Return the memory usage of this class in bytes
-    virtual double get_memory_usage() const = 0; 
-
     // ------------------------------------------------------------------------
     // Calculate the element size
     // ------------------------------------------------------------------------
