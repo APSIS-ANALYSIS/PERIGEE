@@ -21,7 +21,7 @@ class FEAElement_Triangle6 : public FEAElement
 
     virtual int get_elemDim() const {return 2;}
 
-    virtual int get_Type() const {return 552;}
+    virtual FEType get_Type() const {return FEType::Tri6;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 

@@ -43,7 +43,7 @@ class FEAElement_Quad9_3D_der0 : public FEAElement
 
     virtual int get_elemDim() const {return 2;}
 
-    virtual int get_Type() const {return 622;}
+    virtual FEType get_Type() const {return FEType::Quad9_der0;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 

@@ -47,7 +47,7 @@ class FEAElement_Tet10 : public FEAElement
 
     virtual int get_elemDim() const {return 3;}
 
-    virtual int get_Type() const {return 503;}
+    virtual FEType get_Type() const {return FEType::Tet10;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 
