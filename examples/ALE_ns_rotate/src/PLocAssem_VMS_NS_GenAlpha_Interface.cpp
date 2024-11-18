@@ -160,6 +160,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
 
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
 
+  double beta_T1 = 0.0;
+
+  if(ps >= 0.0 && ps < 1.0e-4)
+    beta_T1 = 1.0e4;
+  else if( ps < 0.0 && ps >-1.0e-4)
+    beta_T1 = -1.0e4;
+  else
+    beta_T1 = 1.0/ps;
+
   const double gwts = fixed_J * fixed_qw;
 
   for(int A{0}; A<nLocBas; ++A)
@@ -169,7 +178,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
     const int A4 = 4 * A;
 
     // Mass -- s
-    Residual_s[A4] += -0.5 * gwts * NAs * velo_jump.dot_product(normal_s);
+    Residual_s[A4] += gwts * NAs * (-0.5 * velo_jump.dot_product(normal_s) - beta_T1 * inflow_s * (ps - pr));
 
     // x-dir -- s
     Residual_s[A4+1] += gwts * (0.5 * ( NAs * (ps * nsx - vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
@@ -289,6 +298,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
   double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
 
+  double beta_T2 = 0.0;
+
+  if(pr >= 0.0 && pr < 1.0e-4)
+    beta_T2 = 1.0e4;
+  else if( pr < 0.0 && pr >-1.0e-4)
+    beta_T2 = -1.0e4;
+  else
+    beta_T2 = 1.0/pr;
+
   const double gwts = rotated_J * rotated_qw;
 
   for(int A{0}; A<nLocBas; ++A)
@@ -298,7 +316,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
     const int A4 = 4 * A;
 
     // Mass -- r
-    Residual_r[A4] += 0.5 * gwts * NAr * velo_jump.dot_product(normal_r);
+    Residual_r[A4] += gwts * NAr * (0.5 * velo_jump.dot_product(normal_r) - beta_T2 * inflow_r * (pr - ps));
 
     // x-dir -- r
     Residual_r[A4+1] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsx + vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
@@ -418,6 +436,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_fixed(
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
   double delta_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? 1.0 : 0.0);
 
+  double beta_T1 = 0.0;
+
+  if(ps >= 0.0 && ps < 1.0e-4)
+    beta_T1 = 1.0e4;
+  else if( ps < 0.0 && ps >-1.0e-4)
+    beta_T1 = -1.0e4;
+  else
+    beta_T1 = 1.0/ps;
+
   const double gwts = fixed_J * fixed_qw;
   const double dd_dv = alpha_f * gamma * dt;
   const double common_coef = gwts * dd_dv;
@@ -429,7 +456,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_fixed(
     const int A4 = 4 * A;
 
     // Mass -- s
-    Residual_s[A4] += -0.5 * gwts * NAs * velo_jump.dot_product(normal_s);
+     Residual_s[A4] += gwts * NAs * (-0.5 * velo_jump.dot_product(normal_s) - beta_T1 * inflow_s * (ps - pr));
 
     // x-dir -- s
     Residual_s[A4+1] += gwts * (0.5 * ( NAs * (ps * nsx - vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
@@ -464,16 +491,16 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_fixed(
       const double NAsNBs = NAs * NBs; 
 
       // Ks1s1
-      // Tangent_ss[nLocBas4 * A4 + B4] += 0;
+      Tangent_ss[nLocBas4 * A4 + B4] += -common_coef * beta_T1 * inflow_s * NAsNBs;
 
       // Ks1s2
-      Tangent_ss[nLocBas4 * A4 + B4 + 1] += -0.5 * common_coef * NAsNBs * nsx;
+      Tangent_ss[nLocBas4 * A4 + B4 + 1] += -common_coef * NAsNBs * nsx * (0.5 + delta_s * beta_T1 * (ps - pr));
 
       // Ks1s3
-      Tangent_ss[nLocBas4 * A4 + B4 + 2] += -0.5 * common_coef * NAsNBs * nsy;
+      Tangent_ss[nLocBas4 * A4 + B4 + 2] += -common_coef * NAsNBs * nsy * (0.5 + delta_s * beta_T1 * (ps - pr));
 
       // Ks1s4
-      Tangent_ss[nLocBas4 * A4 + B4 + 3] += -0.5 * common_coef * NAsNBs * nsz;
+      Tangent_ss[nLocBas4 * A4 + B4 + 3] += -common_coef * NAsNBs * nsz * (0.5 + delta_s * beta_T1 * (ps - pr));
 
       // Ks2s1
       Tangent_ss[nLocBas4 * (A4 + 1) + B4] += 0.5 * common_coef * NAsNBs * nsx;
@@ -623,6 +650,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_rotate
   double delta_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      1.0 : 0.0);
 
+  double beta_T2 = 0.0;
+
+  if(pr >= 0.0 && pr < 1.0e-4)
+    beta_T2 = 1.0e4;
+  else if( pr < 0.0 && pr >-1.0e-4)
+    beta_T2 = -1.0e4;
+  else
+    beta_T2 = 1.0/pr;
+
   const double gwts = rotated_J * rotated_qw;
   const double dd_dv = alpha_f * gamma * dt;
   const double common_coef = gwts * dd_dv;
@@ -634,7 +670,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_rotate
     const int A4 = 4 * A;
 
     // Mass -- r
-    Residual_r[A4] += 0.5 * gwts * NAr * velo_jump.dot_product(normal_r);
+    Residual_r[A4] += gwts * NAr * (0.5 * velo_jump.dot_product(normal_r) - beta_T2 * inflow_r * (pr - ps));
 
     // x-dir -- r
     Residual_r[A4+1] += gwts * (0.5 * ( NAr * (-1.0 * ps * nsx + vis_mu * (2 * us_x * nsx + (us_y + vs_x) * nsy + (us_z + ws_x) * nsz)
@@ -669,16 +705,16 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_rotate
       const double NArNBr = NAr * NBr; 
 
       // Kr1r1
-      // Tangent_rr[nLocBas4 * A4 + B4] += 0;
+      Tangent_rr[nLocBas4 * A4 + B4] += -common_coef * beta_T2 * inflow_r * NArNBr;
 
       // Kr1r2
-      Tangent_rr[nLocBas4 * A4 + B4 + 1] += -0.5 * common_coef * NArNBr * nrx;
+      Tangent_rr[nLocBas4 * A4 + B4 + 1] += -common_coef * NArNBr * nrx * (0.5 + delta_r * beta_T2 * (pr - ps));
 
       // Kr1r3
-      Tangent_rr[nLocBas4 * A4 + B4 + 2] += -0.5 * common_coef * NArNBr * nry;
+      Tangent_rr[nLocBas4 * A4 + B4 + 2] += -common_coef * NArNBr * nry * (0.5 + delta_r * beta_T2 * (pr - ps));
 
       // Kr1r4
-      Tangent_rr[nLocBas4 * A4 + B4 + 3] += -0.5 * common_coef * NArNBr * nrz;
+      Tangent_rr[nLocBas4 * A4 + B4 + 3] += -common_coef * NArNBr * nrz * (0.5 + delta_r * beta_T2 * (pr - ps));
 
       // Kr2r1
       Tangent_rr[nLocBas4 * (A4 + 1) + B4] += 0.5 * common_coef * NArNBr * nrx;
@@ -794,6 +830,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
 
   double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
 
+  double beta_T1 = 0.0;
+
+  if(ps >= 0.0 && ps < 1.0e-4)
+    beta_T1 = 1.0e4;
+  else if( ps < 0.0 && ps >-1.0e-4)
+    beta_T1 = -1.0e4;
+  else
+    beta_T1 = 1.0/ps;
+
   const double gwts = fixed_J * fixed_qw;
   const double dd_dv = alpha_f * gamma * dt;
   const double common_coef = gwts * dd_dv;
@@ -813,7 +858,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
       const double NAsNBr = NAs * NBr;
 
       // Ks1r1
-      // Tangent_sr[nLocBas4 * A4 + B4] += 0;
+      Tangent_sr[nLocBas4 * A4 + B4] += common_coef * beta_T1 * inflow_s * NAsNBr;
 
       // Ks1r2
       Tangent_sr[nLocBas4 * A4 + B4 + 1] += 0.5 * common_coef * NAsNBr * nsx;
@@ -938,6 +983,15 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
   double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
 
+  double beta_T2 = 0.0;
+
+  if(pr >= 0.0 && pr < 1.0e-4)
+    beta_T2 = 1.0e4;
+  else if( pr < 0.0 && pr >-1.0e-4)
+    beta_T2 = -1.0e4;
+  else
+    beta_T2 = 1.0/pr;
+
   const double gwts = rotated_J * rotated_qw;
   const double dd_dv = alpha_f * gamma * dt;
   const double common_coef = gwts * dd_dv;
@@ -957,7 +1011,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
       const double NArNBs = NAr * NBs;
 
       // Kr1s1
-      // Tangent_rs[nLocBas4 * A4 + B4] += 0;
+      Tangent_rs[nLocBas4 * A4 + B4] += common_coef * beta_T2 * inflow_r * NArNBs;
 
       // Kr1s2
       Tangent_rs[nLocBas4 * A4 + B4 + 1] += 0.5 * common_coef * NArNBs * nrx;
