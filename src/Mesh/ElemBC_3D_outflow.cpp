@@ -3,7 +3,7 @@
 ElemBC_3D_outflow::ElemBC_3D_outflow(
     const std::vector<std::string> &vtkfileList,
     const std::vector< Vector_3 > &outlet_normal_vec,
-    const int &elemtype )
+    const FEType &elemtype )
 : ElemBC_3D( vtkfileList, elemtype )
 {
   SYS_T::print_fatal_if(outlet_normal_vec.size() != static_cast<unsigned int>( num_ebc ),
@@ -19,7 +19,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     for(int jj=0; jj<num_node[ii]; ++jj )
       intNA[ii][jj] = 0.0;
 
-  if(elem_type == 501)
+  if(elem_type == FEType::Tet4)
   {
     const int nqp_tri = 3;
 
@@ -61,7 +61,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     }
     delete quads; delete elems;
   }
-  else if(elem_type == 502)
+  else if(elem_type == FEType::Tet10 || elem_type == FEType::Tet10_v2)
   {
     const int nqp_tri = 6;
 
@@ -112,7 +112,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     } // loop over outlet surfaces
     delete quads; delete elems;
   }
-  else if(elem_type == 601)
+  else if(elem_type == FEType::Hex8)
   {
     const int nqp_quad = 2;  // nqp_quad represents the number of quadrature points in one direction 
 
@@ -159,7 +159,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     }
     delete quads; delete elems;
   }
-  else if(elem_type == 602)
+  else if(elem_type == FEType::Hex27)
   {
     const int nqp_quad = 4;
 

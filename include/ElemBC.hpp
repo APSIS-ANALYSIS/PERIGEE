@@ -34,6 +34,7 @@
 // ==================================================================
 #include "Hex_Tools.hpp"
 #include "IIEN.hpp"
+#include "FEType.hpp"
 
 class ElemBC
 {

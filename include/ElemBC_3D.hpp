@@ -14,9 +14,9 @@ class ElemBC_3D : public ElemBC
 {
   public:
     // Default constructor: prescribe an elembc class with no surface mesh data.
-    ElemBC_3D( const int &elemtype );
+    ElemBC_3D( const FEType &elemtype );
 
-    ElemBC_3D( const std::vector<std::string> &vtkfileList, const int &elemtype );
+    ElemBC_3D( const std::vector<std::string> &vtkfileList, const FEType &elemtype );
 
     virtual ~ElemBC_3D() = default;
 
@@ -121,7 +121,8 @@ class ElemBC_3D : public ElemBC
     {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
 
   protected:
-    const int elem_type, num_ebc;
+    const FEType elem_type;
+    const int num_ebc;
     
     std::vector<int> num_node;     // length num_ebc
     std::vector<int> num_cell;     // length num_ebc
