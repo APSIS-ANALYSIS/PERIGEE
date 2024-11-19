@@ -7,7 +7,7 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_elemType, const Field_Property &fp )
+    const FEType &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -68,7 +68,7 @@ Part_FEM::Part_FEM(
     const std::vector<double> &ctrlPts,
     const std::vector<int> &rotatedtag,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_elemType, const Field_Property &fp )
+    const FEType &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -161,6 +161,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 
   // global mesh info
   std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
+  std::string elemType_str;
 
   sDegree = vdeg[0]; tDegree = vdeg[1]; uDegree = vdeg[2];
 
@@ -168,7 +169,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
   nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
   probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
-  elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
+  elemType_str = h5r -> read_string("Global_Mesh_Info", "elemType");
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
   field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
   field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
@@ -176,6 +177,19 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   const int temp = h5r -> read_intScalar("Global_Mesh_Info", "is_geo_field");
   if(temp == 1) is_geo_field = true;
   else is_geo_field = false;
+
+  if (elemType_str==std::string("Tet4"))
+    elemType =  FEType::Tet4;
+  else if (elemType_str==std::string("Tet10"))
+    elemType =  FEType::Tet10;
+  else if (elemType_str==std::string("Tet10_v2"))
+    elemType =  FEType::Tet10_v2;
+  else if (elemType_str==std::string("Hex8"))
+    elemType =  FEType::Hex8;
+  else if(elemType_str==std::string("Hex27"))
+    elemType =  FEType::Hex27;
+  else 
+    elemType =  FEType::Unknown;
 
   // LIEN
   int num_row, num_col;
@@ -385,7 +399,19 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
-  h5w->write_intScalar( group_id_3, "elemType", elemType );
+
+  if(elemType == FEType::Tet4)
+    h5w->write_string( group_id_3, "elemType", std::string("Tet4") );
+  else if(elemType == FEType::Tet10)
+    h5w->write_string( group_id_3, "elemType", std::string("Tet10") );
+  else if(elemType == FEType::Tet10_v2)
+    h5w->write_string( group_id_3, "elemType", std::string("Tet10_v2") );
+  else if(elemType == FEType::Hex8)
+    h5w->write_string( group_id_3, "elemType", std::string("Hex8") );
+  else if(elemType == FEType::Hex27)
+    h5w->write_string( group_id_3, "elemType", std::string("Hex27") );
+  else
+    h5w->write_string( group_id_3, "elemType", std::string("Unknown") );
 
   h5w->write_intScalar( group_id_3, "field_id", field_id );
   h5w->write_intScalar( group_id_3, "is_geo_field", (is_geo_field ? 1 : 0) );
