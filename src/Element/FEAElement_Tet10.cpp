@@ -43,7 +43,6 @@ void FEAElement_Tet10::print_info() const
 {
   SYS_T::commPrint("Tet10: ");
   SYS_T::commPrint("10-node tetrahedral element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 

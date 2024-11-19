@@ -46,7 +46,6 @@ void FEAElement_Hex27::print_info() const
 {
   SYS_T::commPrint("Hex27: ");
   SYS_T::commPrint("27-node hexagon element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 

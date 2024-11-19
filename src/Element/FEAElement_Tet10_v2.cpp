@@ -47,7 +47,6 @@ void FEAElement_Tet10_v2::print_info() const
 {
   SYS_T::commPrint("Tet10_v2: ");
   SYS_T::commPrint("10-node tetrahedral element with up to 2nd derivatives. Compatible with vtk format \n");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
