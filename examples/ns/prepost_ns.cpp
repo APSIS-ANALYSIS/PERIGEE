@@ -31,7 +31,7 @@ int main( int argc, char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
-  const int elemType = cmd_h5r -> read_intScalar("/","elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
 
@@ -57,7 +57,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<"part_file: "<<part_file<<endl;
   cout<<"geo_file: "<<geo_file<<endl;
-  cout<<"elemType: "<<elemType<<endl;
+  cout<<"elemType: "<<elemType_str<<endl;
   cout<<"dof_num: "<<dofNum<<endl;
 
   // Read the geo_file
@@ -75,18 +75,35 @@ int main( int argc, char * argv[] )
   
   IMesh * mesh = nullptr;
 
+  FEType elemType;
+  if (elemType_str==std::string("Tet4"))
+    elemType = FEType::Tet4;
+  else if (elemType_str==std::string("Tet10"))
+    elemType = FEType::Tet10;
+  else if (elemType_str==std::string("Tet10_v2"))
+    elemType = FEType::Tet10_v2;
+  else if (elemType_str==std::string("Hex8"))
+    elemType = FEType::Hex8;
+  else if(elemType_str==std::string("Hex27"))
+    elemType = FEType::Hex27;
+  else 
+    elemType = FEType::Unknown;
+
   switch( elemType )
   {
-    case 501:
+    case FEType::Tet4:
       mesh = new Mesh_Tet(nFunc, nElem, 1);
       break;
-    case 502:
+    case FEType::Tet10:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
-    case 601:
+    case FEType::Tet10_v2:
+      mesh =new Mesh_Tet(nFunc, nElem, 2);
+      break;
+    case FEType::Hex8:
       mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
       break;
-    case 602:
+    case FEType::Hex27:
       mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
