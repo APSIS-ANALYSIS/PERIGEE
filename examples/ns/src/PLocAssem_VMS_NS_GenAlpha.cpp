@@ -2472,6 +2472,10 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Substep(
     // const double v_n_prime = 0.0;
     // const double w_n_prime = 0.0;
 
+    u_prime[0] = u_n_prime;
+    v_prime[0] = v_n_prime;
+    w_prime[0] = w_n_prime;
+
     const double div_vel= u_x[subindex] + v_y[subindex] + w_z[subindex];
 
     double u_diffu1_1 = 0.0, u_diffu1_2 = 0.0, u_diffu1_3 = 0.0;
@@ -2908,9 +2912,14 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
     const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
     const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
     const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+    
     // const double u_n_prime = 0.0;
     // const double v_n_prime = 0.0;
     // const double w_n_prime = 0.0;
+    
+    u_prime[0] = u_n_prime;
+    v_prime[0] = v_n_prime;
+    w_prime[0] = w_n_prime;
 
     double sum_u_cur_advec = 0.0, sum_u_cur_diffu = 0.0, sum_a_fx_cur = 0.0, sum_last_p_x = 0;
     double sum_v_cur_advec = 0.0, sum_v_cur_diffu = 0.0, sum_a_fy_cur = 0.0, sum_last_p_y = 0;
