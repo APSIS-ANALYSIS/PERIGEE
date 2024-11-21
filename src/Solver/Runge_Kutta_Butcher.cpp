@@ -21,11 +21,17 @@ void Runge_Kutta_Butcher::setCoefficients()
   switch (ss) 
   {
     case 2:
-      if (mm == 2)
+      if (mm == 1)
       {
         // Forward Euler
         cc[1] = 1.0;
         aa[1][0] = 1.0;
+        bb[1] = 1.0;
+      }
+      else if (mm == 2)
+      {
+        cc[1] = 0.5;
+        aa[1][0] = 0.5;
         bb[1] = 1.0;
       }
       break;    
