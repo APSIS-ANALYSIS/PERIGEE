@@ -352,25 +352,25 @@ void PTime_NS_Solver::TM_NS_HERK(
     // for(int ii = 0; ii < ss; ++ii)
     //   VecView(cur_velo_sols[ii]->solution, PETSC_VIEWER_STDOUT_WORLD);
 
-    // n+1 步的子步速度解
-    for(int ii = 0; ii < ss; ++ii)
-      cur_velo_sols[ii]->Copy(*init_velo);
+    // // n+1 步的子步速度解
+    // for(int ii = 0; ii < ss; ++ii)
+    //   cur_velo_sols[ii]->Copy(*init_velo);
 
-    // n+1 步的终步速度解
-    cur_velo->Copy(*init_velo);
+    // // n+1 步的终步速度解
+    // cur_velo->Copy(*init_velo);
 
-    // n+1 步的最终步dot速度解
-    cur_dot_velo->Copy(*init_dot_velo);
+    // // n+1 步的最终步dot速度解
+    // cur_dot_velo->Copy(*init_dot_velo);
 
-    // n+1 步的子步压强解
-    for(int ii = 0; ii < ss; ++ii)
-      cur_pres_sols[ii]->Copy(*init_pres);
+    // // n+1 步的子步压强解
+    // for(int ii = 0; ii < ss; ++ii)
+    //   cur_pres_sols[ii]->Copy(*init_pres);
 
-    // n+1 步的终步压强解
-    cur_pres->Copy(*init_pres);
+    // // n+1 步的终步压强解
+    // cur_pres->Copy(*init_pres);
 
-    // n+1 步的解
-    cur_sol->Copy(*init_sol);    
+    // // n+1 步的解
+    // cur_sol->Copy(*init_sol);    
   }
 
   for (int ii = 0; ii < ss; ++ii) 

@@ -3178,8 +3178,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Finalstep(
       w_np1 += cur_velo[ii3+2] * R[ii];
 
       p_np1_x += cur_pres[ii] * dR_dx[ii];
-      p_np1_y += cur_pres[ii] * dR_dx[ii];
-      p_np1_z += cur_pres[ii] * dR_dx[ii];     
+      p_np1_y += cur_pres[ii] * dR_dy[ii];
+      p_np1_z += cur_pres[ii] * dR_dz[ii];     
       p_np1 += cur_pres[ii] * R[ii];
 
       u_np1_x += cur_velo[ii3+0] * dR_dx[ii];
@@ -3215,21 +3215,21 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Finalstep(
       w_np1_xy += cur_velo[ii3+2] * d2R_dxy[ii];
       w_np1_yz += cur_velo[ii3+2] * d2R_dyz[ii];      
 
-      dot_u_np1 += cur_velo[ii3+0] * R[ii];
-      dot_v_np1 += cur_velo[ii3+1] * R[ii];
-      dot_w_np1 += cur_velo[ii3+2] * R[ii];
+      dot_u_np1 += cur_dot_velo[ii3+0] * R[ii];
+      dot_v_np1 += cur_dot_velo[ii3+1] * R[ii];
+      dot_w_np1 += cur_dot_velo[ii3+2] * R[ii];
 
-      dot_u_np1_x += cur_velo[ii3+0] * dR_dx[ii];
-      dot_u_np1_y += cur_velo[ii3+0] * dR_dy[ii];
-      dot_u_np1_z += cur_velo[ii3+0] * dR_dz[ii];
+      dot_u_np1_x += cur_dot_velo[ii3+0] * dR_dx[ii];
+      dot_u_np1_y += cur_dot_velo[ii3+0] * dR_dy[ii];
+      dot_u_np1_z += cur_dot_velo[ii3+0] * dR_dz[ii];
 
-      dot_v_np1_x += cur_velo[ii3+1] * dR_dx[ii];
-      dot_v_np1_y += cur_velo[ii3+1] * dR_dy[ii];
-      dot_v_np1_z += cur_velo[ii3+1] * dR_dz[ii];
+      dot_v_np1_x += cur_dot_velo[ii3+1] * dR_dx[ii];
+      dot_v_np1_y += cur_dot_velo[ii3+1] * dR_dy[ii];
+      dot_v_np1_z += cur_dot_velo[ii3+1] * dR_dz[ii];
       
-      dot_w_np1_x += cur_velo[ii3+2] * dR_dx[ii];     
-      dot_w_np1_y += cur_velo[ii3+2] * dR_dy[ii];
-      dot_w_np1_z += cur_velo[ii3+2] * dR_dz[ii];
+      dot_w_np1_x += cur_dot_velo[ii3+2] * dR_dx[ii];     
+      dot_w_np1_y += cur_dot_velo[ii3+2] * dR_dy[ii];
+      dot_w_np1_z += cur_dot_velo[ii3+2] * dR_dz[ii];
 
       coor.x() += eleCtrlPts_x[ii] * R[ii];
       coor.y() += eleCtrlPts_y[ii] * R[ii];
