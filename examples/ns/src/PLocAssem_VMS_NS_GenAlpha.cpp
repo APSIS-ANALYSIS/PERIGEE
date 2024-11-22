@@ -1868,7 +1868,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep_Init(
 
     for(int index=1; index<num_steps; ++index)
     {
-      const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
+      const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] );  // Laststep中，每个子步粗尺度已知
       tau_m[index] = tau_sub[0];
       tau_c[index] = tau_sub[1];
     }
@@ -2835,7 +2835,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
 
     for(int index=1; index<num_steps; ++index)
     {
-      const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
+      const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] ); // Laststep中，每个子步粗尺度已知
       tau_m[index] = tau_sub[0];
       tau_c[index] = tau_sub[1];
     }
