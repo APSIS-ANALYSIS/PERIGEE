@@ -1916,6 +1916,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep_Init(
       p_prime[index-1] = -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
     }
     
+    p_prime[num_steps-1] = -1.0 * tau_c_n * (u_np1_x + v_np1_y + w_np1_z);
+
     double sum_u_pre_advec = 0.0, sum_u_pre_diffu = 0.0, sum_a_fx_pre = 0.0, sum_p_pre_x = 0;
     double sum_v_pre_advec = 0.0, sum_v_pre_diffu = 0.0, sum_a_fy_pre = 0.0, sum_p_pre_y = 0;
     double sum_w_pre_advec = 0.0, sum_w_pre_diffu = 0.0, sum_a_fz_pre = 0.0, sum_p_pre_z = 0;
@@ -2883,6 +2885,8 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_Laststep(
       p_prime[index-1] = -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
     }
     
+    p_prime[num_steps-1] = -1.0 * tau_c_n * (u_np1_x + v_np1_y + w_np1_z);
+
     double sum_u_pre_advec = 0.0, sum_u_pre_diffu = 0.0, sum_a_fx_pre = 0.0, sum_p_pre_x = 0;
     double sum_v_pre_advec = 0.0, sum_v_pre_diffu = 0.0, sum_a_fy_pre = 0.0, sum_p_pre_y = 0;
     double sum_w_pre_advec = 0.0, sum_w_pre_diffu = 0.0, sum_a_fz_pre = 0.0, sum_p_pre_z = 0;
