@@ -68,7 +68,23 @@ int main( int argc, char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
   const std::string geo_file  = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
-  const int elemType = cmd_h5r -> read_intScalar("/", "elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
+
+  FEType elemType;
+  if (elemType_str==std::string("Tet4"))
+    elemType = FEType::Tet4;
+  else if (elemType_str==std::string("Tet10"))
+    elemType = FEType::Tet10;
+  else if (elemType_str==std::string("Tet10_v2"))
+    elemType = FEType::Tet10_v2;
+  else if (elemType_str==std::string("Hex8"))
+    elemType = FEType::Hex8;
+  else if(elemType_str==std::string("Hex27"))
+    elemType = FEType::Hex27;
+  else 
+    elemType = FEType::Unknown;
+
+  if(elemType==FEType::Unknown) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -82,7 +98,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // Enforce the element to be trilinear hex for now
-  if( elemType != 601 ) SYS_T::print_fatal("Error: element type should be 601 trilinear hex element.\n");
+  if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be 601 trilinear hex element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -101,7 +117,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<" geo_file: "<<geo_file<<endl;
   cout<<" wall_file: "<<wall_file<<endl;
-  cout<<" elemType: "<<elemType<<endl;
+  cout<<" elemType: "<<elemType_str<<endl;
   cout<<" out_bname: "<<out_bname<<endl;
   cout<<" fl_mu: "<<fluid_mu<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
