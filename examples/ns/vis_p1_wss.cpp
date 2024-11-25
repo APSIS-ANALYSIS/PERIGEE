@@ -89,7 +89,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // enforce this code is for linear element only
-  SYS_T::print_fatal_if( elemType != FEType::Tet4, "Error: element type should be 501 linear tet element.\n");
+  SYS_T::print_fatal_if( elemType != FEType::Tet4, "Error: element type should be linear tet element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);

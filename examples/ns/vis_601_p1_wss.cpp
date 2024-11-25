@@ -98,7 +98,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // Enforce the element to be trilinear hex for now
-  if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be 601 trilinear hex element.\n");
+  if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be trilinear hex element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
