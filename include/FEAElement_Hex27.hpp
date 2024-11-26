@@ -155,7 +155,7 @@ class FEAElement_Hex27 : public FEAElement
 
     virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const;
 
-    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const;
+    std::vector<double> get_d2R_dyz( const int &quaindex ) const override;
 
     // Get the Jacobian matrix dx/dr
     virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
