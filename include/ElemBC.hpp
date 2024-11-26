@@ -122,16 +122,6 @@ class ElemBC
     virtual int get_faceID( const int &cell_index ) const
     {SYS_T::commPrint("Warning: get_faceID is not implemented. \n"); return {};}
  
-    // Overwrite ElemBC_3D_wall properties from a vtp/vtu file
-    virtual void overwrite_from_vtk( const std::string &wallprop_vtk,
-        const int &type, const std::string &vtk_fieldname )
-    {SYS_T::commPrint("Warning: overwrite_from_vtk is not implemented. \n");}
-
-    // write the surface to a vtk/vtu file
-    virtual void write_vtk( const int &ebc_id,
-       const std::string &filename="elembc_surface" ) const
-    {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
-
     // print the information of the ebc object on screen.    
     virtual void print_info() const
     {SYS_T::commPrint("Warning: print_info is not implemented. \n");}

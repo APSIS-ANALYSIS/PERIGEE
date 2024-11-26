@@ -202,29 +202,6 @@ class ALocal_EBC
       return Vector_3();
     }
 
-    // ------------------------------------------------------------------------
-    // ! get the number of (wall) surface nodes in this partition. 
-    //   There may be nodes on the surface that are not associated with any surface 
-    //   cell in this partition, which means 
-    //            get_num_local_node_on_sur <= get_num_local_cell_node
-    // ------------------------------------------------------------------------
-    virtual int get_num_local_node_on_sur() const 
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_num_local_node_on_sur is not implemented. \n");
-      return -1;
-    }
-    
-    // ------------------------------------------------------------------------
-    // ! get the location of the partition's (wall) surface node in the 
-    //   local_to_global array.
-    //   \para 0 <= ii < get_num_local_node_on_sur_pos()
-    // ------------------------------------------------------------------------
-    virtual int get_local_node_on_sur_pos(const int &ii) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_local_node_on_sur_pos is not implemented. \n");
-      return -1;
-    }
- 
   protected:
     // the number of different ebc domain on which one may prescribe different
     // elemental boundary conditions.
