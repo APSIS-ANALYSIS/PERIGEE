@@ -175,6 +175,9 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 
   delete temp;
 
+  Interface_KG(0.1, lassem_ptr, anci.A_anchor_elementv, anci.A_opposite_elementv, anci.A_elements,
+    anci.A_quad_s, anci.A_free_quad, anci.A_itf_part, anci.A_SI_sol, anci.A_SI_qp);
+
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
@@ -487,7 +490,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method (Only assemble G at present)
-  Interface_G(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_KG(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1216,6 +1219,187 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   delete [] row_index; row_index = nullptr;
 }
 
+void PGAssem_NS_FEM::Interface_KG(
+  const double &dt,
+  IPLocAssem * const &lassem_ptr,
+  FEAElement * const &anchor_elementv,
+  FEAElement * const &opposite_elementv,
+  FEAElement * const &elements,
+  const IQuadPts * const &quad_s,
+  IQuadPts * const &free_quad,
+  const ALocal_Interface * const &itf_part,
+  const SI_T::SI_solution * const &SI_sol,
+  const SI_T::SI_quad_point * const &SI_qp )
+{
+  anci.A_dt = dt;
+  const int loc_dof {dof_mat * nLocBas};
+  double * ctrl_x = new double [nLocBas];
+  double * ctrl_y = new double [nLocBas];
+  double * ctrl_z = new double [nLocBas];
+
+  double * curPt_x = new double [nLocBas];
+  double * curPt_y = new double [nLocBas];
+  double * curPt_z = new double [nLocBas];
+
+  int * anchor_local_ien = new int [nLocBas];
+  double * anchor_local_sol = new double [nLocBas * dof_sol];
+
+  int * opposite_local_ien = new int [nLocBas];
+  double * opposite_local_sol = new double [nLocBas * dof_sol];
+
+  double * rotated_local_mvelo = new double [nLocBas * 3];
+  double * rotated_local_disp = new double [nLocBas * 3];
+
+  PetscInt * fixed_row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * rotated_row_index = new PetscInt [nLocBas * dof_mat];
+
+  const int num_itf {itf_part->get_num_itf()};
+
+  int opposite_ee {-1};
+  double opposite_xi {1.0 / 3.0};
+  double opposite_eta {1.0 / 3.0};
+
+  for(int itf_id{0}; itf_id<num_itf; ++itf_id)
+  {
+    // SYS_T::commPrint("itf_id = %d\n", itf_id);
+    const int face_nqp {quad_s->get_num_quadPts()};
+
+    // anchor = fixed, opposite = rotated
+    const int num_fixed_elem = itf_part->get_num_fixed_ele(itf_id);
+
+    for(int ee_index{0}; ee_index<num_fixed_elem; ++ee_index)
+    {
+      // SYS_T::commPrint("  fixed_ee = %d\n", ee);
+
+      // Pick out the fixed element 
+      const int ee = itf_part->get_fixed_ele(itf_id, ee_index);
+
+      itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
+
+      const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
+
+      anchor_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
+
+      // Get the local ien and local sol of this fixed element
+      SI_sol->get_fixed_local(itf_part, itf_id, ee, anchor_local_ien, anchor_local_sol);
+
+      for(int qua{0}; qua<face_nqp; ++qua)
+      {
+        // Get the quadrature point info
+        SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
+
+        const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, opposite_ee)};
+
+        itf_part->get_rotated_ele_ctrlPts(itf_id, opposite_ee, ctrl_x, ctrl_y, ctrl_z);
+
+        free_quad->set_qp( opposite_xi, opposite_eta );
+
+        const double qw = quad_s->get_qw(qua);
+
+        // Get the local ien , displacement, solution and mesh velocity of the rotated element 
+        SI_sol->get_rotated_mdisp(itf_part, itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
+        get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+        SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
+
+        opposite_elementv->buildBasis(rotated_face_id, free_quad, curPt_x, curPt_y, curPt_z);
+
+        // Assembly
+        lassem_ptr->Assem_Diag_Tangent_Residual_itf_fixed(qua, qw, dt, anchor_elementv, opposite_elementv,
+          anchor_local_sol, opposite_local_sol, rotated_local_mvelo);
+
+        for(int ii{0}; ii < nLocBas; ++ii)
+        {
+          for(int mm{0}; mm < dof_mat; ++mm)
+          {
+            fixed_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_fixed_LID(itf_id, mm, anchor_local_ien[ii]) + mm;
+          }
+        }
+
+        VecSetValues(G, loc_dof, fixed_row_index, lassem_ptr->Residual_s, ADD_VALUES);
+
+        MatSetValues(K, loc_dof, fixed_row_index, loc_dof, fixed_row_index,
+          lassem_ptr->Tangent_ss, ADD_VALUES);
+      }
+    }
+
+    // anchor = rotated, opposite = fixed
+    const int num_rotated_elem = itf_part->get_num_rotated_ele(itf_id);
+
+    for(int ee_index{0}; ee_index<num_rotated_elem; ++ee_index)
+    {
+      // Pick out the rotated element
+      const int ee = itf_part->get_rotated_ele(itf_id, ee_index);
+
+      itf_part->get_rotated_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
+
+      // Get the local ien , displacement, solution and mesh velocity of the rotated element
+      SI_sol->get_rotated_mdisp(itf_part, itf_id, ee, anchor_local_ien, rotated_local_disp);
+      get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
+
+      SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
+
+      const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ee)};
+
+      anchor_elementv->buildBasis(rotated_face_id, quad_s, curPt_x, curPt_y, curPt_z);
+
+      for(int qua{0}; qua<face_nqp; ++qua)
+      {
+        // Get the quadrature point info
+        SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
+
+        const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, opposite_ee)};
+
+        itf_part->get_fixed_ele_ctrlPts(itf_id, opposite_ee, ctrl_x, ctrl_y, ctrl_z);
+
+        free_quad->set_qp( opposite_xi, opposite_eta );
+
+        opposite_elementv->buildBasis(fixed_face_id, free_quad, ctrl_x, ctrl_y, ctrl_z);
+
+        const double qw = quad_s->get_qw(qua);
+
+        // Get the local ien and local sol of the fixed element
+        SI_sol->get_fixed_local(itf_part, itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
+
+        // Assembly
+        lassem_ptr->Assem_Diag_Tangent_Residual_itf_rotated(qua, qw, dt, anchor_elementv, opposite_elementv,
+          anchor_local_sol, rotated_local_mvelo, opposite_local_sol);
+
+        for(int ii{0}; ii < nLocBas; ++ii)
+        {
+          for(int mm{0}; mm < dof_mat; ++mm)
+          {
+            rotated_row_index[dof_mat * ii + mm] = dof_mat * itf_part->get_rotated_LID(itf_id, mm, anchor_local_ien[ii]) + mm;
+          }
+        }
+
+        VecSetValues(G, loc_dof, rotated_row_index, lassem_ptr->Residual_r, ADD_VALUES);
+
+        MatSetValues(K, loc_dof, rotated_row_index, loc_dof, rotated_row_index, lassem_ptr->Tangent_rr, ADD_VALUES);
+      }
+    }
+  }
+
+  delete [] anchor_local_ien; anchor_local_ien = nullptr;
+  delete [] anchor_local_sol; anchor_local_sol = nullptr;
+  delete [] opposite_local_ien; opposite_local_ien = nullptr;
+  delete [] opposite_local_sol; opposite_local_sol = nullptr;
+
+  delete [] rotated_local_mvelo; rotated_local_mvelo = nullptr;
+  delete [] rotated_local_disp; rotated_local_disp = nullptr;
+
+  delete [] fixed_row_index; fixed_row_index = nullptr;
+  delete [] rotated_row_index; rotated_row_index = nullptr;
+
+  delete [] ctrl_x; ctrl_x = nullptr;
+  delete [] ctrl_y; ctrl_y = nullptr;
+  delete [] ctrl_z; ctrl_z = nullptr;
+
+  delete [] curPt_x; curPt_x = nullptr;
+  delete [] curPt_y; curPt_y = nullptr;
+  delete [] curPt_z; curPt_z = nullptr;
+}
+
 void PGAssem_NS_FEM::Interface_G(
   const double &dt,
   IPLocAssem * const &lassem_ptr,
@@ -1267,7 +1451,6 @@ void PGAssem_NS_FEM::Interface_G(
     for(int ee_index{0}; ee_index<num_fixed_elem; ++ee_index)
     {
       // SYS_T::commPrint("  fixed_ee = %d\n", ee);
-      // const int local_ee_index{itf_part->get_fixed_ele_id(itf_id, ee)};
 
       // Pick out the fixed element 
       const int ee = itf_part->get_fixed_ele(itf_id, ee_index);
@@ -1433,7 +1616,6 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
     for(int ee_index{0}; ee_index<num_fixed_elem; ++ee_index)
     {
       // SYS_T::commPrint("  fixed_ee = %d\n", ee);
-      // const int local_ee_index{itf_part->get_fixed_ele_id(itf_id, ee)};
 
       // Pick out the fixed element 
       const int ee = anci.A_itf_part->get_fixed_ele(itf_id, ee_index);
@@ -1482,7 +1664,6 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
         }
 
         // Matrix-free method
-        local_MatMult_MF(loc_dof, fixed_row_index, fixed_row_index, anci.A_lassemptr->Tangent_ss, X, Y);
         local_MatMult_MF(loc_dof, fixed_row_index, rotated_row_index, anci.A_lassemptr->Tangent_sr, X, Y);
       }
     }
@@ -1502,7 +1683,6 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
       for(int qua{0}; qua<face_nqp; ++qua)
       {
         // The content of scatter is not important
-        PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
       }
     }
@@ -1559,7 +1739,6 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
         }
 
         // Matrix-free method
-        local_MatMult_MF(loc_dof, rotated_row_index, rotated_row_index, anci.A_lassemptr->Tangent_rr, X, Y);
         local_MatMult_MF(loc_dof, rotated_row_index, fixed_row_index, anci.A_lassemptr->Tangent_rs, X, Y);
       }
     }
@@ -1578,7 +1757,6 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
       for(int qua{0}; qua<face_nqp; ++qua)
       {
         // The content of scatter is not important
-        PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
         PETSc_T::Scatter(X, fixed_row_index, loc_dof, local_X);
       }
     }
