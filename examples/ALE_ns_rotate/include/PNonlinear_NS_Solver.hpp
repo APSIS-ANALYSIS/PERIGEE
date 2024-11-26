@@ -15,6 +15,7 @@
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution_NS.hpp"
 #include "PDNSolution_V.hpp"
+#include "ALocal_RotatedBC.hpp"
 
 class PNonlinear_NS_Solver
 {
@@ -55,6 +56,7 @@ class PNonlinear_NS_Solver
         const FEANode * const &feanode_ptr,
         const ALocal_NBC * const &nbc_part,
         const ALocal_InflowBC * const &infnbc_part,
+        const ALocal_RotatedBC * const &rotnbc_part,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         const ALocal_WeakBC * const &wbc_part,
@@ -76,6 +78,8 @@ class PNonlinear_NS_Solver
         PDNSolution * const &sol,
         const PDNSolution * const &velo_mesh,    
         const PDNSolution * const &disp_mesh,
+        const PDNSolution * const &mvelo_alpha,    
+        const PDNSolution * const &mdisp_alpha,  
         bool &conv_flag, int &nl_counter,
         Mat &shell ) const;
 
@@ -97,6 +101,12 @@ class PNonlinear_NS_Solver
         const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
+
+    void update_rotatedbc_value(
+        const ALocal_RotatedBC * const &rotbc,
+        const PDNSolution * const &velo_mesh,
+        PDNSolution * const &sol ) const;
+
 };
 
 #endif

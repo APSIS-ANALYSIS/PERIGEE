@@ -45,11 +45,13 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Interface_pair.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
+  ${perigee_source}/Mesh/NodalBC_3D_rotated.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
+  ${perigee_source}/Mesh/NBC_Partition_rotated.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_turbulence_wall_model.cpp
@@ -82,6 +84,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
+  ${perigee_source}/Analysis_Tool/ALocal_RotatedBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp

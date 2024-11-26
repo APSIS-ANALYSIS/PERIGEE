@@ -25,19 +25,19 @@ class INodalBC
 
     // ------------------------------------------------------------------------
     // get_dir_nodes returns the ii-th dirichlet node's global nodal index.
-    // The parameter ii runs 0 <= ii < get_num_dir_nodes(nbc_id).
+    // The parameter ii runs 0 <= ii < get_num_dir_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const = 0;
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
-    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
+    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const = 0;
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
-    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
+    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const = 0;
     
@@ -290,6 +290,72 @@ class INodalBC
     // --------------------------------------------------------------
     virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN )
     {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
+
+    // --------------------------------------------------------------
+    // get the dirichlet-type nodal index on rotated surface
+    // --------------------------------------------------------------
+    virtual unsigned int get_dir_nodes_on_rotated_surface( const unsigned int &ii ) const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_dir_nodes_on_rotated_surface is not implemented. \n");
+      return 0;
+    }
+
+    virtual unsigned int get_num_dir_nodes_on_rotated_surface() const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_num_dir_nodes_on_rotated_surface is not implemented. \n");
+      return 0;
+    }   
+
+    // Access to num_node
+    virtual int get_num_node() const
+    {
+      SYS_T::commPrint("Warning: get_num_node is not implemented. \n");
+      return -1;
+    }
+
+    // Access to num_cell
+    virtual int get_num_cell() const
+    {
+      SYS_T::commPrint("Warning: get_num_cell is not implemented. \n");
+      return -1;
+    }
+
+    // Access to (surface) nLocBas
+    virtual int get_nLocBas() const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+
+    // Access to (surface) ien
+    virtual int get_ien(const int &cell, const int &lnode) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+
+    // Access to point coordinates, 
+    // node = 0, ..., num_node-1.
+    // dir  = 0, 1, 2.
+    virtual double get_pt_xyz(const int &node, const int &dir) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1.0;
+    }
+
+    // Access to volumetric nodal index
+    virtual int get_global_node(const int &node_idx) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+
+    // Access to volumetric cell index
+    virtual int get_global_cell(const int &cell_idx) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
 
   protected:
     std::vector<int> ID {};
