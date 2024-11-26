@@ -36,13 +36,13 @@ class NodalBC_3D_FSI : public INodalBC
 
     virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const
     {
-      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_CMM.\n");
+      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_FSI.\n");
       return 0;
     }
 
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
     {
-      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_CMM.\n");
+      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_FSI.\n");
       return 0;
     }
 
