@@ -114,26 +114,6 @@ class ElemBC
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 
-    // This returns the wall thickness used in CMM
-    virtual std::vector<double> get_wall_thickness() const
-    {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n"); return {};}
-
-    // This returns the wall youngs modulus used in CMM
-    virtual std::vector<double> get_wall_youngsmod() const
-    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n"); return {};}
-
-    // This returns the wall spring constant used in CMM
-    virtual std::vector<double> get_wall_springconst() const
-    {SYS_T::commPrint("Warning: get_wall_springconst is not implemented. \n"); return {};}
-
-    // This returns the wall damping constant used in CMM
-    virtual std::vector<double> get_wall_dampingconst() const
-    {SYS_T::commPrint("Warning: get_wall_dampingconst is not implemented. \n"); return {};}
-
-    // This returns the fluid density used for the young's modulus in CMM
-    virtual double get_fluid_density() const
-    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
-
     // Access the data in ElemBC_3D_wall_turbulence, wall model type
     virtual int get_wall_model_type() const
     {SYS_T::commPrint("Warning: get_wall_model_type is not implemented. \n"); return -1;}
