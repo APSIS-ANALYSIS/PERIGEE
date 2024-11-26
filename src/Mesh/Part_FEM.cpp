@@ -182,8 +182,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
     elemType =  FEType::Tet4;
   else if (elemType_str==std::string("Tet10"))
     elemType =  FEType::Tet10;
-  else if (elemType_str==std::string("Tet10_v2"))
-    elemType =  FEType::Tet10_v2;
   else if (elemType_str==std::string("Hex8"))
     elemType =  FEType::Hex8;
   else if(elemType_str==std::string("Hex27"))
@@ -404,8 +402,6 @@ void Part_FEM::write( const std::string &inputFileName ) const
     h5w->write_string( group_id_3, "elemType", std::string("Tet4") );
   else if(elemType == FEType::Tet10)
     h5w->write_string( group_id_3, "elemType", std::string("Tet10") );
-  else if(elemType == FEType::Tet10_v2)
-    h5w->write_string( group_id_3, "elemType", std::string("Tet10_v2") );
   else if(elemType == FEType::Hex8)
     h5w->write_string( group_id_3, "elemType", std::string("Hex8") );
   else if(elemType == FEType::Hex27)
