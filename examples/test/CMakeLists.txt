@@ -92,9 +92,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
-  ${perigee_source}/Element/FEAElement_Tet_P2_P1.cpp
-  ${perigee_source}/Element/FEAElement_MINI_P1_3D.cpp
-  ${perigee_source}/Element/FEAElement_MINI_P1_2D.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp
