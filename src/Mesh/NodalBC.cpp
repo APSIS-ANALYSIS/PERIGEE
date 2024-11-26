@@ -21,8 +21,9 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_master_nodes.clear();
   num_per_nodes = 0;
 
-  for( const auto &vtkfile : vtkfileList )
+  for( int ii{0}; ii < VEC_T::get_size(vtkfileList); ++ii )
   {
+    const auto vtkfile = vtkfileList[ii];
     SYS_T::file_check( vtkfile );
 
     const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");

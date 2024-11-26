@@ -78,8 +78,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/Sliding_Interface_Tools.cpp
-  ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
-  ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp

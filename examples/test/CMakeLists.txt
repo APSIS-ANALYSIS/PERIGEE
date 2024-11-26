@@ -80,8 +80,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Hex.cpp
   ${perigee_source}/Mesh/QuadPts_debug.cpp
-  ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
-  ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
   ${perigee_source}/Analysis_Tool/ALocal_Elem.cpp
   ${perigee_source}/Analysis_Tool/ALocal_IEN.cpp
   ${perigee_source}/Analysis_Tool/ALocal_NBC.cpp
@@ -92,8 +90,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
-  ${perigee_source}/Element/FEAElement_Line2_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Line3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
@@ -106,8 +102,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Triangle6.cpp
   ${perigee_source}/Element/FEAElement_Quad4.cpp
   ${perigee_source}/Element/FEAElement_Quad9.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_membrane.cpp
-  ${perigee_source}/Element/FEAElement_Triangle6_membrane.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp

@@ -198,6 +198,21 @@ class HDF5_Writer
         exit( EXIT_FAILURE );
       }
     }
+
+    void write_string_impl(hid_t location_id, const char * const &data_name, 
+        const std::string& string_input ) const;
+
+    void write_intScalar_impl( hid_t location_id, const char * const &data_name, 
+        const int &value ) const; 
+
+    void write_doubleScalar_impl( hid_t location_id, const char * const &data_name, 
+        const double &value ) const; 
+
+    void write_intVector_impl( hid_t location_id, const char * const &data_name, 
+        const int * const &value, const int &length ) const;
+
+    void write_doubleVector_impl( hid_t location_id, const char * const &data_name,
+        const double * const &value, const int &length ) const;
 };
 
 #endif

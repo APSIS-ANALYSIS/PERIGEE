@@ -27,19 +27,37 @@ class APart_Basic_Info
     //              Therefore, one only needs, and is recommended to,
     //              read from rank 0.
     // --------------------------------------------------------------
-    APart_Basic_Info( const std::string &fbasename, const int &in_rank = 0 );
+    APart_Basic_Info( const std::string &fbasename, const int &in_rank = 0 )
+    {
+      const std::string fName = SYS_T::gen_partfile_name( fbasename, in_rank );
 
-    virtual ~APart_Basic_Info() = default;
+      hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-    virtual int get_cpu_rank() const {return cpu_rank;}
-    
-    virtual int get_cpu_size() const {return cpu_size;}
-    
-    virtual void print_info() const;
-  
+      std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+
+      cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
+      cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
+
+      H5Fclose( file_id );
+    }
+
+    ~APart_Basic_Info() = default;
+
+    int get_cpu_rank() const {return cpu_rank;}
+
+    int get_cpu_size() const {return cpu_size;}
+
+    void print_info() const
+    {
+      PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Basic Partition Information: \n");
+      PetscSynchronizedPrintf(PETSC_COMM_WORLD, "cpu_rank: %d \n", cpu_rank);
+      PetscSynchronizedPrintf(PETSC_COMM_WORLD, "cpu_size: %d \n", cpu_size);
+      PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
+    }
+
   private:
     int cpu_rank, cpu_size;
-    
+
     // Disallow the default constructor
     APart_Basic_Info() = delete; 
 };
