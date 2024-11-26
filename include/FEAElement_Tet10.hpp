@@ -1,14 +1,11 @@
-#ifndef FEAELEMENT_TET10_V2_HPP
-#define FEAELEMENT_TET10_V2_HPP
+#ifndef FEAELEMENT_TET10_HPP
+#define FEAELEMENT_TET10_HPP
 // ==================================================================
-// FEAElement_Tet10_v2.hpp
+// FEAElement_Tet10.hpp
 // Element routine for quadratic 10-node tetrahedral element.
-// In this version v2, the node numbering is made compatible
-// compatible with the vtk format -- see the graph below.
+// The node numbering is made compatible with the vtk format -- see 
+// the graph below.
 // 
-// Notice that only nodes 8 and 9 are switched. The remaining nodes
-// are numbered identically to those in FEAElement_Tet10 class.
-//
 // Tet10 : 10-node tet element, aka, quadratic tet.
 //
 //                     t
@@ -42,17 +39,17 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
-class FEAElement_Tet10_v2 : public FEAElement
+class FEAElement_Tet10 : public FEAElement
 {
   public:
-    FEAElement_Tet10_v2( const int &in_nqua );
+    FEAElement_Tet10( const int &in_nqua );
 
-    virtual ~FEAElement_Tet10_v2();
+    virtual ~FEAElement_Tet10();
 
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element. 
-    virtual FEType get_Type() const {return FEType::Tet10_v2;}
+    virtual FEType get_Type() const {return FEType::Tet10;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 
