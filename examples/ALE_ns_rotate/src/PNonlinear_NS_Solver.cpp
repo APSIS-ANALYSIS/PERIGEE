@@ -54,6 +54,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_RotatedBC * const &rotnbc_part,
     const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
@@ -75,6 +76,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PDNSolution * const &sol,
     const PDNSolution * const &velo_mesh,    
     const PDNSolution * const &disp_mesh,
+    const PDNSolution * const &mvelo_alpha,    
+    const PDNSolution * const &mdisp_alpha,    
     bool &conv_flag, int &nl_counter,
     Mat &shell ) const
 {
@@ -115,15 +118,15 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   sol_alpha.ScaleValue( 1.0 - alpha_f );
   sol_alpha.PlusAX( *sol, alpha_f );
 
-  // Define the velo_mesh at alpha_f: mvelo_alpha
-  PDNSolution mvelo_alpha(*pre_velo_mesh);
-  mvelo_alpha.ScaleValue( 1.0 - alpha_f );
-  mvelo_alpha.PlusAX( *velo_mesh, alpha_f );
+  // // Define the velo_mesh at alpha_f: mvelo_alpha
+  // PDNSolution mvelo_alpha(*pre_velo_mesh);
+  // mvelo_alpha.ScaleValue( 1.0 - alpha_f );
+  // mvelo_alpha.PlusAX( *velo_mesh, alpha_f );
 
-  // Define the disp_mesh at alpha_f: mdisp_alpha
-  PDNSolution mdisp_alpha(*pre_disp_mesh);
-  mdisp_alpha.ScaleValue( 1.0 - alpha_f );
-  mdisp_alpha.PlusAX( *disp_mesh, alpha_f );
+  // // Define the disp_mesh at alpha_f: mdisp_alpha
+  // PDNSolution mdisp_alpha(*pre_disp_mesh);
+  // mdisp_alpha.ScaleValue( 1.0 - alpha_f );
+  // mdisp_alpha.PlusAX( *disp_mesh, alpha_f );
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
@@ -131,8 +134,14 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
   // ------------------------------------------------- 
 
-  SI_sol->update_node_mvelo(&mvelo_alpha);
-  SI_sol->update_node_mdisp(&mdisp_alpha);
+  // ------------------------------------------------- 
+  // Update the rotated boundary values
+  update_rotatedbc_value(rotnbc_part, velo_mesh, sol);
+  update_rotatedbc_value(rotnbc_part, mvelo_alpha, &sol_alpha);
+  // ------------------------------------------------- 
+
+  SI_sol->update_node_mvelo(mvelo_alpha);
+  SI_sol->update_node_mdisp(mdisp_alpha);
   SI_sol->update_node_sol(&sol_alpha);
   SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements,
     quad_s, free_quad, itf_part, SI_sol);
@@ -147,7 +156,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol, 
+    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
    
@@ -169,7 +178,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
@@ -216,7 +225,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
           quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
@@ -235,7 +244,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,  &mvelo_alpha, &mdisp_alpha, dot_sol, sol,
+      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
           quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
@@ -292,6 +301,31 @@ void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
 
       VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
     }
+  }
+
+  sol->Assembly_GhostUpdate();
+}
+
+void PNonlinear_NS_Solver::update_rotatedbc_value(
+    const ALocal_RotatedBC * const &rotbc,
+    const PDNSolution * const &velo_mesh,
+    PDNSolution * const &sol ) const
+{
+  const int numnode = rotbc -> get_Num_LD( );
+
+  for(int ii=0; ii<numnode; ++ii)
+  {
+    const int node_index = rotbc -> get_LDN( ii );
+  
+    const int meshv_idx[3] = { node_index*3+0, node_index*3+1, node_index*3+2 };
+
+    double meshv_vals[3];
+
+    VecGetValues(velo_mesh->solution, 3, meshv_idx, meshv_vals);
+
+    const int sol_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
+
+    VecSetValues(sol->solution, 3, sol_idx, meshv_vals, INSERT_VALUES);
   }
 
   sol->Assembly_GhostUpdate();

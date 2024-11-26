@@ -248,7 +248,6 @@ namespace SI_T
 
       for(int ee_index{0}; ee_index<num_fixed_elem; ++ee_index)
       {
-        // SYS_T::commPrint("  fixed_ee = %d\n", ee);
         const int ee = itf_part->get_fixed_ele(itf_id, ee_index);
 
         itf_part->get_fixed_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);
@@ -291,7 +290,6 @@ namespace SI_T
 
       for(int ee_index{0}; ee_index<num_rotated_elem; ++ee_index)
       {
-        // SYS_T::commPrint("  fixed_ee = %d\n", ee);
         const int ee = itf_part->get_rotated_ele(itf_id, ee_index);
 
         itf_part->get_rotated_ele_ctrlPts(itf_id, ee, ctrl_x, ctrl_y, ctrl_z);

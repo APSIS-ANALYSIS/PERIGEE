@@ -27,7 +27,9 @@ class ALocal_Interface
   public:
     ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
 
-    ~ALocal_Interface() = default;
+    virtual ~ALocal_Interface() = default;
+
+    virtual void print_info() const;
 
     virtual void print_info() const;
 
