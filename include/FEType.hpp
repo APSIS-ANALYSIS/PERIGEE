@@ -15,7 +15,6 @@ enum class FEType
   Unknown,
   Tet4,
   Tet10,
-  Tet10_v2,
   Hex8,
   Hex27,
   Tri3,
@@ -38,7 +37,6 @@ namespace FE_T
       case FEType::Unknown: return "Unknown";
       case FEType::Tet4: return "Tet4";
       case FEType::Tet10: return "Tet10";
-      case FEType::Tet10_v2: return "Tet10_v2";
       case FEType::Hex8: return "Hex8";
       case FEType::Hex27: return "Hex27";
       case FEType::Tri3: return "Tri3";
@@ -61,7 +59,6 @@ namespace FE_T
       {"Unknown", FEType::Unknown},
       {"Tet4", FEType::Tet4},
       {"Tet10", FEType::Tet10},
-      {"Tet10_v2", FEType::Tet10_v2},
       {"Hex8", FEType::Hex8},
       {"Hex27", FEType::Hex27},
       {"Tri3", FEType::Tri3},
