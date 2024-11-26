@@ -13,7 +13,7 @@ ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model(
   {
     face_id.resize(num_cell[0]);
 
-    if(elem_type == FEType::Tet4 || elem_type == FEType::Tet10 || elem_type == FEType::Tet10_v2)
+    if(elem_type == FEType::Tet4 || elem_type == FEType::Tet10)
     {
       TET_T::Tet4 * tetcell = new TET_T::Tet4();
 

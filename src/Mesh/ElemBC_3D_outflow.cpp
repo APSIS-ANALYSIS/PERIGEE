@@ -61,7 +61,7 @@ ElemBC_3D_outflow::ElemBC_3D_outflow(
     }
     delete quads; delete elems;
   }
-  else if(elem_type == FEType::Tet10 || elem_type == FEType::Tet10_v2)
+  else if(elem_type == FEType::Tet10)
   {
     const int nqp_tri = 6;
 
