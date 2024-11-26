@@ -61,7 +61,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
     if( elemtype == FEType::Tet4 )
       nLocBas[ii] = 3;
-    else if( elemtype == FEType::Tet10 || elemtype == FEType::Tet10_v2 )
+    else if( elemtype == FEType::Tet10 )
       nLocBas[ii] = 6;
     else if( elemtype == FEType::Hex8 )
       nLocBas[ii] = 4;
@@ -182,7 +182,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else if( elemtype == FEType::Tet10 || elemtype == FEType::Tet10_v2 )
+    else if( elemtype == FEType::Tet10 )
     {
       const int nqp_tri = 6;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
@@ -329,8 +329,6 @@ void NodalBC_3D_inflow::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
   if(elem_type == FEType::Tet4)
     reset501IEN_outwardnormal(VIEN); 
   else if(elem_type == FEType::Tet10)
-    reset502IEN_outwardnormal(VIEN); 
-  else if(elem_type == FEType::Tet10_v2)
     reset502IEN_outwardnormal(VIEN); 
   else if(elem_type == FEType::Hex8)
     reset601IEN_outwardnormal(VIEN);     
