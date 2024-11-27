@@ -1,4 +1,4 @@
-// ==================================================================
+// ============================================================================
 // vis_p1_wss.cpp
 //
 // This is a visualization driver for Wall Shear Stress, which is
@@ -8,7 +8,7 @@
 //
 // Author: Ju Liu
 // Date: Sept 16 2019
-// ==================================================================
+// ============================================================================
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -61,21 +61,7 @@ int main( int argc, char * argv[] )
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
   const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
 
-  FEType elemType;
-  if (elemType_str==std::string("Tet4"))
-    elemType = FEType::Tet4;
-  else if (elemType_str==std::string("Tet10"))
-    elemType = FEType::Tet10;
-  else if (elemType_str==std::string("Tet10_v2"))
-    elemType = FEType::Tet10_v2;
-  else if (elemType_str==std::string("Hex8"))
-    elemType = FEType::Hex8;
-  else if(elemType_str==std::string("Hex27"))
-    elemType = FEType::Hex27;
-  else 
-    elemType = FEType::Unknown;
-
-  if(elemType==FEType::Unknown) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
