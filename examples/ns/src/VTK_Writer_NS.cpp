@@ -93,7 +93,7 @@ void VTK_Writer_NS::writeOutput(
     // Set mesh connectivity
     if( elemptr->get_Type() == FEType::Tet4 )
       VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );
-    else if( elemptr->get_Type() == FEType::Tet10 || elemptr->get_Type() == FEType::Tet10_v2 )
+    else if( elemptr->get_Type() == FEType::Tet10 )
       VIS_T::setQuadTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
           IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
           gridData );
