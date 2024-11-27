@@ -72,8 +72,6 @@ int main( int argc, char * argv[] )
 
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
-  if(elemType==FEType::Hex8) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
-
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // Read the material property from the solver HDF5 file
