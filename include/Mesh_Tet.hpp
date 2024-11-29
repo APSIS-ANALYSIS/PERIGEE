@@ -14,23 +14,23 @@
 class Mesh_Tet : public IMesh
 {
   public:
-    Mesh_Tet(const int &in_nFunc, const int &in_nElem, 
-        const int &in_deg) : nFunc(in_nFunc), nElem(in_nElem), deg(in_deg)
-{
-  switch(deg)
-  {
-    case 1:
-      nLocBas = 4;
-      break;
-    case 2:
-      nLocBas = 10;
-      break;
-    default:
-      SYS_T::print_fatal("Error: Mesh_Tet, the input value of degree %d is not supported.\n", deg);
-      nLocBas = 0;
-      break;
-  }
-}
+    Mesh_Tet(const int &in_nFunc, const int &in_nElem, const int &in_deg) 
+      : nFunc(in_nFunc), nElem(in_nElem), deg(in_deg)
+    {
+      switch(deg)
+      {
+        case 1:
+          nLocBas = 4;
+          break;
+        case 2:
+          nLocBas = 10;
+          break;
+        default:
+          SYS_T::print_fatal("Error: Mesh_Tet, the input value of degree %d is not supported.\n", deg);
+          nLocBas = 0;
+          break;
+      }
+    }
 
     virtual ~Mesh_Tet() = default;
 
@@ -54,7 +54,7 @@ class Mesh_Tet : public IMesh
 
   private:
     const int nFunc, nElem, deg;
-   
+
     // ------------------------------------------------------------------------ 
     // In this class, nLocBas is determined by the element type, and since we
     // are restricted to tet element, the degree determines the value of it.
