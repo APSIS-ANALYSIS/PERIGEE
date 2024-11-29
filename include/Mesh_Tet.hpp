@@ -32,9 +32,9 @@ class Mesh_Tet : public IMesh
       }
     }
 
-    virtual ~Mesh_Tet() = default;
+    ~Mesh_Tet() override = default;
 
-    virtual void print_info() const
+    void print_info() const override
     {
       std::cout<<"======= Mesh_Tet ======="<<std::endl;
       std::cout<<"Degree: "       <<get_degree()<<std::endl;
@@ -44,13 +44,13 @@ class Mesh_Tet : public IMesh
       std::cout<<"========================="<<std::endl;
     }
 
-    virtual int get_degree() const {return deg;}
+    int get_degree() const override {return deg;}
 
-    virtual int get_nFunc() const {return nFunc;}
+    int get_nFunc() const override {return nFunc;}
 
-    virtual int get_nElem() const {return nElem;}
+    int get_nElem() const override {return nElem;}
 
-    virtual int get_nLocBas() const {return nLocBas;}
+    int get_nLocBas() const override {return nLocBas;}
 
   private:
     const int nFunc, nElem, deg;
