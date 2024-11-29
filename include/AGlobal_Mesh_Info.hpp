@@ -35,8 +35,6 @@ class AGlobal_Mesh_Info
         elemType = FEType::Tet4;
       else if (elemType_str==std::string("Tet10"))
         elemType = FEType::Tet10;
-      else if (elemType_str==std::string("Tet10_v2"))
-        elemType = FEType::Tet10_v2;
       else if (elemType_str==std::string("Hex8"))
         elemType = FEType::Hex8;
       else if(elemType_str==std::string("Hex27"))

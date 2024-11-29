@@ -1,11 +1,11 @@
-// ==================================================================
+// ============================================================================
 // preprocess_ns.cpp
 //
 // This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
 //
 // Date Created: Jan 01 2020
-// ==================================================================
+// ============================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
 #include "Mesh_FEM.hpp"
@@ -64,21 +64,10 @@ int main( int argc, char * argv[] )
   //                  2 strongly enforced in wall-normal direction,
   //                   and weakly enforced in wall-tangent direction
 
-  FEType elemType;
-  if (elemType_str==std::string("Tet4"))
-    elemType = FEType::Tet4;
-  else if (elemType_str==std::string("Tet10"))
-    elemType = FEType::Tet10;
-  else if (elemType_str==std::string("Tet10_v2"))
-    elemType = FEType::Tet10_v2;
-  else if (elemType_str==std::string("Hex8"))
-    elemType = FEType::Hex8;
-  else if(elemType_str==std::string("Hex27"))
-    elemType = FEType::Hex27;
-  else 
-    elemType = FEType::Unknown;
-
-  if(elemType==FEType::Unknown) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
+  const FEType elemType = FE_T::to_FEType(elemType_str);
+  
+  if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27)
+    SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
@@ -112,7 +101,7 @@ int main( int argc, char * argv[] )
   {  
     if(elemType == FEType::Tet4 || elemType == FEType::Hex8)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" );   
-    else if(elemType == FEType::Tet10 || elemType == FEType::Tet10_v2 ||elemType == FEType::Hex27)
+    else if(elemType == FEType::Tet10 ||elemType == FEType::Hex27)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" );
     else
       SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
@@ -129,7 +118,7 @@ int main( int argc, char * argv[] )
   {
     if(elemType == FEType::Tet4 || elemType == FEType::Hex8)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
-    else if(elemType == FEType::Tet10 || elemType == FEType::Tet10_v2 ||elemType == FEType::Hex27)
+    else if(elemType == FEType::Tet10 ||elemType == FEType::Hex27)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
     else
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
@@ -175,9 +164,6 @@ int main( int argc, char * argv[] )
       mesh = new Mesh_Tet(nFunc, nElem, 1);
       break;
     case FEType::Tet10:
-      mesh = new Mesh_Tet(nFunc, nElem, 2);
-      break;
-    case FEType::Tet10_v2:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
     case FEType::Hex8:
@@ -231,7 +217,7 @@ int main( int argc, char * argv[] )
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
 
-  if(elemType == FEType::Tet4 || elemType == FEType::Tet10 || elemType == FEType::Tet10_v2)
+  if(elemType == FEType::Tet4 || elemType == FEType::Tet10)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
       inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );    
@@ -253,7 +239,7 @@ int main( int argc, char * argv[] )
   // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
   
-  if(elemType == FEType::Tet4 || elemType == FEType::Tet10 || elemType == FEType::Tet10_v2)
+  if(elemType == FEType::Tet4 || elemType == FEType::Tet10)
   {
     for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
       outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );  

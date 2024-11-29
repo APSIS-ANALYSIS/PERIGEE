@@ -679,7 +679,7 @@ namespace FE_T
       const IQuadPts * const lower_quad_rule)
     : dim(lower_quad_rule->get_dim() + 1), num_pts( lower_quad_rule -> get_num_quadPts() )
   {
-    if(vol_elemType == FEType::Tet4 || vol_elemType == FEType::Tet10 || vol_elemType == FEType::Tet10_v2) // Tet element
+    if(vol_elemType == FEType::Tet4 || vol_elemType == FEType::Tet10) // Tet element
     {
       //                     t
       //                     ^

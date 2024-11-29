@@ -38,7 +38,7 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
     
     if(elem_type == FEType::Tet4)
       cell_nLocBas[ii] = 3; // linear triangle
-    else if(elem_type == FEType::Tet10 || elem_type == FEType::Tet10_v2)
+    else if(elem_type == FEType::Tet10)
       cell_nLocBas[ii] = 6; // quadratic triangle
     else if(elem_type == FEType::Hex8)
       cell_nLocBas[ii] = 4; // bilinear quadrangle
@@ -63,8 +63,6 @@ void ElemBC_3D::print_info() const
     std::cout<<" elem_type = Tet4"<<'\t';
   else if(elem_type == FEType::Tet10)
     std::cout<<" elem_type = Tet10"<<'\t';
-  else if(elem_type == FEType::Tet10_v2)
-    std::cout<<" elem_type = Tet10_v2"<<'\t';
   else if(elem_type == FEType::Hex8)
     std::cout<<" elem_type = Hex8"<<'\t';
   else if(elem_type == FEType::Hex27)
@@ -92,7 +90,7 @@ void ElemBC_3D::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
 {
   if(elem_type == FEType::Tet4)
     reset501IEN_outwardnormal(VIEN); 
-  else if(elem_type == FEType::Tet10 || elem_type == FEType::Tet10_v2)
+  else if(elem_type == FEType::Tet10)
     reset502IEN_outwardnormal(VIEN); 
   else if(elem_type == FEType::Hex8)
     reset601IEN_outwardnormal(VIEN);     

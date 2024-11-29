@@ -1,10 +1,10 @@
-// ==================================================================
+// ============================================================================
 // prepost_ns_tets.cpp
 //
 // This is the partitioning routine for parallel postprocessors.
 //
 // Date: Jan. 24 2017
-// ==================================================================
+// ============================================================================
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
 #include "Mesh_Tet.hpp"
@@ -75,19 +75,7 @@ int main( int argc, char * argv[] )
   
   IMesh * mesh = nullptr;
 
-  FEType elemType;
-  if (elemType_str==std::string("Tet4"))
-    elemType = FEType::Tet4;
-  else if (elemType_str==std::string("Tet10"))
-    elemType = FEType::Tet10;
-  else if (elemType_str==std::string("Tet10_v2"))
-    elemType = FEType::Tet10_v2;
-  else if (elemType_str==std::string("Hex8"))
-    elemType = FEType::Hex8;
-  else if(elemType_str==std::string("Hex27"))
-    elemType = FEType::Hex27;
-  else 
-    elemType = FEType::Unknown;
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   switch( elemType )
   {
@@ -96,9 +84,6 @@ int main( int argc, char * argv[] )
       break;
     case FEType::Tet10:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
-      break;
-    case FEType::Tet10_v2:
-      mesh =new Mesh_Tet(nFunc, nElem, 2);
       break;
     case FEType::Hex8:
       mesh = new Mesh_FEM(nFunc, nElem, 8, 1);

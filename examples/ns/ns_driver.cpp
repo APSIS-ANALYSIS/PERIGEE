@@ -19,7 +19,7 @@
 #include "QuadPts_Gauss_Tet.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Tet10.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
@@ -303,9 +303,9 @@ int main(int argc, char *argv[])
   FEAElement * elementvs = nullptr;
 
   SYS_T::commPrint("===> Build quadrature rules. \n");
-  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10 || GMIptr->get_elemType() == FEType::Tet10_v2) ?
+  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ?
                       nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
-  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10 || GMIptr->get_elemType() == FEType::Tet10_v2) ? 
+  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ? 
                       nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
   IQuadPts * quadv = nullptr;
@@ -322,14 +322,14 @@ int main(int argc, char *argv[])
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
-  else if( GMIptr->get_elemType() == FEType::Tet10 || GMIptr->get_elemType() == FEType::Tet10_v2 )
+  else if( GMIptr->get_elemType() == FEType::Tet10 )
   {
     SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for tets.\n" );
     SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for triangles.\n" );
 
-    elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type Tet10_v2
+    elementv = new FEAElement_Tet10( nqp_vol ); // elem type Tet10
     elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
-    elementvs = new FEAElement_Tet10_v2( nqp_sur );
+    elementvs = new FEAElement_Tet10( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
