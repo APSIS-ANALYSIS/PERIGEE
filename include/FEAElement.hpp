@@ -12,7 +12,6 @@
 // Date created: Nov. 6 2013
 // ============================================================================
 #include "IQuadPts.hpp"
-#include "FEANode.hpp"
 #include "FEType.hpp"
 
 class FEAElement
@@ -153,7 +152,8 @@ class FEAElement
     // ------------------------------------------------------------------------    
     // Return the Jacobian determinant
     // ------------------------------------------------------------------------    
-    virtual double get_detJac(const int &quaindex) const = 0;
+    virtual double get_detJac(const int &quaindex) const
+    {SYS_T::commPrint("Warning: get_detJac is not implemented.\n"); return 0.0;}
 
     // ------------------------------------------------------------------------    
     // Return the Jacobian matrix in rows, i.e. dx_dxi, dx_deta, dx_dzeta,
