@@ -234,7 +234,7 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
 std::array<std::vector<double>, 3> FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
     const double * const &vol_ctrl_x,
     const double * const &vol_ctrl_y,
-    const double * const &vol_ctrl_z )
+    const double * const &vol_ctrl_z ) const
 {
   std::array<std::vector<double>, 3> out;
 
