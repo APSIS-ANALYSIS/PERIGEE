@@ -2,15 +2,13 @@
 
 FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R = new double [4 * numQuapts];
+  R.resize(4 * numQuapts);
 
   triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
 }
 
 FEAElement_Tet4::~FEAElement_Tet4()
 {
-  delete [] R; R = nullptr;
-
   delete triangle_face; triangle_face = nullptr;
 }
 

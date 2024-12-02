@@ -120,15 +120,15 @@ class FEAElement_Tet4 final : public FEAElement
     const int numQuapts;
 
     // R : 0 <= ii < 4 x numQuapts
-    double * R;
+    std::vector<double> R {};
 
     // tet4 is linear, thus the first-order derivatives are constant
-    double dR_dx[4], dR_dy[4], dR_dz[4];
+    std::array<double,4> dR_dx, dR_dy, dR_dz;
 
     // Container for
     // dx_dr : 0 <= ii < 9
     // dr_dx : 9 <= ii < 18
-    double Jac[18]; 
+    std::array<double,18> Jac; 
 
     double detJac;
 
