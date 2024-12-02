@@ -57,12 +57,6 @@ class FEAElement_Tet4 final : public FEAElement
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const override;
 
-    std::vector<double> get_dR_dx( const int &quaindex ) const override;
-    
-    std::vector<double> get_dR_dy( const int &quaindex ) const override;
-    
-    std::vector<double> get_dR_dz( const int &quaindex ) const override;
-
     void get_3D_R_dR_d2R( const int &quaindex, 
         double * const &basis, double * const &basis_x, 
         double * const &basis_y, double * const &basis_z,
@@ -75,42 +69,6 @@ class FEAElement_Tet4 final : public FEAElement
         double * const &basis_y, double * const &basis_z, 
         double * const &basis_xx, double * const &basis_yy, 
         double * const &basis_zz ) const override;
-
-    std::vector<double> get_d2R_dxx( const int &quaindex ) const override
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxx function error.\n" );
-      return { 0.0, 0.0, 0.0, 0.0 };
-    }
-
-    std::vector<double> get_d2R_dyy( const int &quaindex ) const override
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyy function error.\n" );
-      return { 0.0, 0.0, 0.0, 0.0 };
-    }
-
-    std::vector<double> get_d2R_dzz( const int &quaindex ) const override
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dzz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
-    }
-
-    std::vector<double> get_d2R_dxy( const int &quaindex ) const override
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxy function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
-    }
-
-    std::vector<double> get_d2R_dxz( const int &quaindex ) const override
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dxz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
-    }
-
-    std::vector<double> get_d2R_dyz( const int &quaindex ) const override
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_d2R_dyz function error.\n"  );
-      return { 0.0, 0.0, 0.0, 0.0 };
-    }
 
     // Get the Jacobian matrix dx/dr
     void get_Jacobian(const int &quaindex, double * const &jac_value) const override;
