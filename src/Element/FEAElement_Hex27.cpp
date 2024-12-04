@@ -396,30 +396,6 @@ void FEAElement_Hex27::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-std::vector<double> FEAElement_Hex27::get_dR_dx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_dR_dx function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(dR_dx + offset, dR_dx + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_dR_dy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_dR_dy function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(dR_dy + offset, dR_dy + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_dR_dz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_dR_dz function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(dR_dz + offset, dR_dz + offset + 27);
-  return vec;
-}
-
 void FEAElement_Hex27::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
@@ -462,54 +438,6 @@ void FEAElement_Hex27::get_3D_R_gradR_LaplacianR( const int &quaindex,
     basis_yy[ii] = d2R_dyy[offset + ii];
     basis_zz[ii] = d2R_dzz[offset + ii];
   }
-}
-
-std::vector<double> FEAElement_Hex27::get_d2R_dxx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_d2R_dxx function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(d2R_dxx + offset, d2R_dxx + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_d2R_dyy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_d2R_dyy function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(d2R_dyy + offset, d2R_dyy + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_d2R_dzz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_d2R_dzz function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(d2R_dzz + offset, d2R_dzz + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_d2R_dxy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_d2R_dxy function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(d2R_dxy + offset, d2R_dxy + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_d2R_dxz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_d2R_dxz function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(d2R_dxz + offset, d2R_dxz + offset + 27);
-  return vec;
-}
-
-std::vector<double> FEAElement_Hex27::get_d2R_dyz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_d2R_dyz function error.\n" );
-  const int offset = quaindex * 27;
-  std::vector<double> vec(d2R_dyz + offset, d2R_dyz + offset + 27);
-  return vec;
 }
 
 void FEAElement_Hex27::get_Jacobian(const int &quaindex,
