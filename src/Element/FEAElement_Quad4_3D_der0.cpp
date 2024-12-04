@@ -15,12 +15,6 @@ void FEAElement_Quad4_3D_der0::print_info() const
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
 }
 
-double FEAElement_Quad4_3D_der0::get_memory_usage() const
-{
-  const double dsize = 8 * numQuapts;
-  return dsize * 8.0 + 4.0;
-}
-
 void FEAElement_Quad4_3D_der0::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
