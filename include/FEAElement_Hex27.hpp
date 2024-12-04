@@ -100,8 +100,6 @@ class FEAElement_Hex27 : public FEAElement
 
     void print_info() const override;
 
-    double get_memory_usage() const override;
-
     // Given the quadrature points and nodal coordinates, evaluate the basis 
     // functions and their derivatives up to second order
     void buildBasis( const IQuadPts * const &quad_rule,
@@ -173,19 +171,25 @@ class FEAElement_Hex27 : public FEAElement
     const int numQuapts;
 
     // R : 0 <= ii < 27 x numQuapts
-    double * R, * dR_dx, * dR_dy, * dR_dz;
-    double * d2R_dxx, * d2R_dyy, * d2R_dzz;
-    double * d2R_dxy, * d2R_dxz, * d2R_dyz;
-
+    std::vector<double> R {};
+    std::vector<double> dR_dx {};
+    std::vector<double> dR_dy {};
+    std::vector<double> dR_dz {};
+    std::vector<double> d2R_dxx {};
+    std::vector<double> d2R_dyy {};
+    std::vector<double> d2R_dzz {};
+    std::vector<double> d2R_dxy {};
+    std::vector<double> d2R_dxz {};
+    std::vector<double> d2R_dyz {};
     // Container for
     // dx_dr : 0 <= ii < 9 numQuapts
-    double * dx_dr;
+    std::vector<double> dx_dr {};
 
     // dr_dx : 0 <= ii < 9 numQuapts
-    double * dr_dx;
+    std::vector<double> dr_dx {};
 
     // detJac : 0 <= ii < numQuapts
-    double * detJac;
+    std::vector<double> detJac {};
 
     FEAElement * quadrilateral_face;
 };

@@ -54,8 +54,6 @@ class FEAElement_Hex8 final: public FEAElement
 
     void print_info() const override;
 
-    double get_memory_usage() const override;
-
     // Given the quadrature points and nodal coordinates, evaluate the basis 
     // functions and their derivatives up to second order
     void buildBasis( const IQuadPts * const &quad_rule,

@@ -34,13 +34,6 @@ void FEAElement_Hex8::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
-double FEAElement_Hex8::get_memory_usage() const
-{
-  const double double_size = 99.0 * numQuapts;
-  const double int_size = 1.0;
-  return double_size * 8.0 + int_size * 4.0;
-}
-
 void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
     const double * const &ctrl_x,
     const double * const &ctrl_y,

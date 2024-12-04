@@ -2,43 +2,28 @@
 
 FEAElement_Hex27::FEAElement_Hex27( const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R = new double [27 * numQuapts];
+  R.resize(27 * numQuapts);
 
-  dR_dx = new double [27 * numQuapts];
-  dR_dy = new double [27 * numQuapts];
-  dR_dz = new double [27 * numQuapts];
+  dR_dx.resize(27 * numQuapts);
+  dR_dy.resize(27 * numQuapts);
+  dR_dz.resize(27 * numQuapts);
 
-  d2R_dxx = new double [27 * numQuapts];
-  d2R_dyy = new double [27 * numQuapts];
-  d2R_dzz = new double [27 * numQuapts];
-  d2R_dxy = new double [27 * numQuapts];
-  d2R_dxz = new double [27 * numQuapts];
-  d2R_dyz = new double [27 * numQuapts];
+  d2R_dxx.resize(27 * numQuapts);
+  d2R_dyy.resize(27 * numQuapts);
+  d2R_dzz.resize(27 * numQuapts);
+  d2R_dxy.resize(27 * numQuapts);
+  d2R_dxz.resize(27 * numQuapts);
+  d2R_dyz.resize(27 * numQuapts);
 
-  dx_dr = new double [9*numQuapts];
-  dr_dx = new double [9*numQuapts];
-  detJac = new double [numQuapts];
+  dx_dr.resize(9 * numQuapts);
+  dr_dx.resize(9 * numQuapts);
+  detJac.resize(numQuapts)
 
   quadrilateral_face = new FEAElement_Quad9_3D_der0( numQuapts );
 }
 
 FEAElement_Hex27::~FEAElement_Hex27()
 {
-  delete [] R;             R = nullptr;
-  delete [] dR_dx;     dR_dx = nullptr;
-  delete [] dR_dy;     dR_dy = nullptr;
-  delete [] dR_dz;     dR_dz = nullptr;
-  delete [] d2R_dxx; d2R_dxx = nullptr;
-  delete [] d2R_dyy; d2R_dyy = nullptr;
-  delete [] d2R_dzz; d2R_dzz = nullptr;
-  delete [] d2R_dxy; d2R_dxy = nullptr;
-  delete [] d2R_dxz; d2R_dxz = nullptr;
-  delete [] d2R_dyz; d2R_dyz = nullptr;
-
-  delete [] dx_dr;     dx_dr = nullptr;
-  delete [] dr_dx;     dr_dx = nullptr;
-  delete [] detJac;   detJac = nullptr;
-
   delete quadrilateral_face; quadrilateral_face = nullptr;
 }
 
@@ -47,13 +32,6 @@ void FEAElement_Hex27::print_info() const
   SYS_T::commPrint("Hex27: ");
   SYS_T::commPrint("27-node hexagon element with up to 2nd derivatives. \n");
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Hex27::get_memory_usage() const
-{
-  const double double_size = 289.0 * numQuapts;
-  const double int_size = 1.0;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
