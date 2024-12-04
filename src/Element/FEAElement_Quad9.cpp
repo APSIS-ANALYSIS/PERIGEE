@@ -2,26 +2,16 @@
 
 FEAElement_Quad9::FEAElement_Quad9( const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R = new double [9*numQuapts];
-  dR_dx = new double [9*numQuapts];
-  dR_dy = new double [9*numQuapts];
+  R.resize(9 * numQuapts);
+
+  dR_dx.resize(9 * numQuapts);
+  dR_dy.resize(9 * numQuapts);
+
+  d2R_dxx.resize(9 * numQuapts);
+  d2R_dyy.resize(9 * numQuapts);
+  d2R_dxy.resize(9 * numQuapts);
   
-  Jac = new double [9*numQuapts];
-
-  d2R_dxx = new double [9 * numQuapts];
-  d2R_dyy = new double [9 * numQuapts];
-  d2R_dxy = new double [9 * numQuapts];
-}
-
-FEAElement_Quad9::~FEAElement_Quad9()
-{
-  delete [] R;             R = nullptr;
-  delete [] dR_dx;     dR_dx = nullptr;
-  delete [] dR_dy;     dR_dy = nullptr;
-  delete [] Jac;         Jac = nullptr;
-  delete [] d2R_dxx; d2R_dxx = nullptr;
-  delete [] d2R_dyy; d2R_dyy = nullptr;
-  delete [] d2R_dxy; d2R_dxy = nullptr;
+  Jac.resize(9 * numQuapts);
 }
 
 void FEAElement_Quad9::print_info() const
@@ -29,13 +19,6 @@ void FEAElement_Quad9::print_info() const
   SYS_T::commPrint("Quad9: ");
   SYS_T::commPrint("9-node quadrilateral element with up to 2nd derivatives. \n");
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Quad9::get_memory_usage() const
-{
-  double double_size = 63 * numQuapts;
-  double int_size = 1;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,

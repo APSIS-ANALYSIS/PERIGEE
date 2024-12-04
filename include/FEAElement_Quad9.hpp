@@ -17,74 +17,70 @@ class FEAElement_Quad9 : public FEAElement
   public:
     FEAElement_Quad9( const int &in_nqua );
 
-    virtual ~FEAElement_Quad9();
+    ~FEAElement_Quad9() override {}
 
-    virtual int get_elemDim() const {return 2;}
+    int get_elemDim() const override {return 2;}
 
-    virtual FEType get_Type() const {return FEType::Quad9;}
+    FEType get_Type() const override {return FEType::Quad9;}
 
-    virtual int get_numQuapts() const {return numQuapts;}
+    int get_numQuapts() const override {return numQuapts;}
 
-    virtual int get_nLocBas() const {return 9;}
+    int get_nLocBas() const override {return 9;}
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual double get_memory_usage() const;
-
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
+    void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
-        const double * const &ctrl_y );
+        const double * const &ctrl_y ) override;
 
-    virtual double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y ) const;
+    double get_h( const double * const &ctrl_x,
+        const double * const &ctrl_y ) const override;
 
-    virtual void get_R( const int &quaindex, double * const &basis ) const;
+    void get_R( const int &quaindex, double * const &basis ) const override;
 
-    virtual std::vector<double> get_R( const int &quaindex ) const;
+    std::vector<double> get_R( const int &quaindex ) const override;
 
-    virtual void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y ) const;
+    void get_gradR( const int &quaindex, double * const &basis_x,
+        double * const &basis_y ) const override;
 
-    virtual void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y ) const;
+    void get_R_gradR( const int &quaindex, double * const &basis,
+        double * const &basis_x, double * const &basis_y ) const override;
 
-    virtual std::vector<double> get_dR_dx( const int &quaindex ) const;
+    std::vector<double> get_dR_dx( const int &quaindex ) const override;
 
-    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
+    std::vector<double> get_dR_dy( const int &quaindex ) const override;
 
-    virtual void get_2D_R_dR_d2R( const int &quaindex,
+    void get_2D_R_dR_d2R( const int &quaindex,
         double * const &basis,
         double * const &basis_x, double * const &basis_y,
         double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_xy ) const;
+        double * const &basis_xy ) const override;
 
-    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const;
+    void get_Jacobian(const int &quaindex,
+        double * const &jac_value) const override;
 
-    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const;
+    void get_invJacobian(const int &quaindex,
+        double * const &jac_value) const override;
 
-    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const;
-
-    virtual void get_Jacobian(const int &quaindex,
-        double * const &jac_value) const;
-
-    virtual void get_invJacobian(const int &quaindex,
-        double * const &jac_value) const;
-
-    virtual double get_detJac(const int &quaindex) const
+    double get_detJac(const int &quaindex) const override
     {return Jac[8*numQuapts + quaindex];}
 
   private:
     const int numQuapts;
 
     // length 9 x numQuapts
-    double * R, * dR_dx, * dR_dy;
-    double * d2R_dxx, * d2R_dyy, * d2R_dxy;
+    std::vector<double> R {};
+    std::vector<double> dR_dx {};
+    std::vector<double> dR_dy {};
+    std::vector<double> d2R_dxx {};
+    std::vector<double> d2R_dyy {};
+    std::vector<double> d2R_dxy {};
 
     // length 9 x numQuapts
     // dx_ds : 0             <= ii < 4 * numQuapts
     // ds_dx : 4 * numQuapts <= ii < 8 * numQuapts
     // detJac: 8 * numQuapts <= ii < 9 * numQuapts
-    double * Jac;
+    std::vector<double> Jac {};
 };
 
 #endif
