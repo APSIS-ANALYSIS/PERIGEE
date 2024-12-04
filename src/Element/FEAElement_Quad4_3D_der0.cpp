@@ -3,15 +3,9 @@
 FEAElement_Quad4_3D_der0::FEAElement_Quad4_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R = new double [4*numQuapts];
-  detJac = new double [numQuapts];
-  un.resize( numQuapts );
-}
-
-FEAElement_Quad4_3D_der0::~FEAElement_Quad4_3D_der0()
-{
-  delete [] R;         R = nullptr;
-  delete [] detJac; detJac = nullptr;
+  R.resize(4 * numQuapts);
+  detJac.resize(numQuapts);
+  un.resize(numQuapts);
 }
 
 void FEAElement_Quad4_3D_der0::print_info() const
