@@ -36,7 +36,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
-class FEAElement_Hex8 final: public FEAElement
+class FEAElement_Hex8 final : public FEAElement
 {
   public :
     FEAElement_Hex8( const int &in_nqua );

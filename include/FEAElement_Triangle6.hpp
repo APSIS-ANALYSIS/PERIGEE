@@ -12,7 +12,7 @@
 #include "FEAElement.hpp"
 #include "FE_Tools.hpp"
 
-class FEAElement_Triangle6 : public FEAElement
+class FEAElement_Triangle6 final : public FEAElement
 {
   public:
     FEAElement_Triangle6( const int &in_nqua );

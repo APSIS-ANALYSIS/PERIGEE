@@ -11,7 +11,7 @@
 // ==================================================================
 #include "FEAElement.hpp"
 
-class FEAElement_Triangle3 : public FEAElement
+class FEAElement_Triangle3 final : public FEAElement
 {
   public:
     FEAElement_Triangle3( const int &in_nqua );

@@ -34,7 +34,7 @@
 #include "Math_Tools.hpp"
 #include "Vector_3.hpp"
 
-class FEAElement_Quad4_3D_der0 : public FEAElement
+class FEAElement_Quad4_3D_der0 final : public FEAElement
 {
   public:
     FEAElement_Quad4_3D_der0( const int &in_nqua );
