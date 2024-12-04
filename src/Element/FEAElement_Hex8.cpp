@@ -267,30 +267,6 @@ void FEAElement_Hex8::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-std::vector<double> FEAElement_Hex8::get_dR_dx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_dR_dx function error.\n" );
-  const int offset = quaindex * 8;
-  return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2], dR_dx[offset+3],
-    dR_dx[offset+4], dR_dx[offset+5], dR_dx[offset+6], dR_dx[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_dR_dy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_dR_dy function error.\n" );
-  const int offset = quaindex * 8;
-  return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2], dR_dy[offset+3],
-    dR_dy[offset+4], dR_dy[offset+5], dR_dy[offset+6], dR_dy[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_dR_dz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_dR_dz function error.\n" );
-  const int offset = quaindex * 8;
-  return { dR_dz[offset], dR_dz[offset+1], dR_dz[offset+2], dR_dz[offset+3],
-    dR_dz[offset+4], dR_dz[offset+5], dR_dz[offset+6], dR_dz[offset+7] };
-}
-
 void FEAElement_Hex8::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
@@ -333,54 +309,6 @@ void FEAElement_Hex8::get_3D_R_gradR_LaplacianR( const int &quaindex,
     basis_yy[ii] = d2R_dyy[offset + ii];
     basis_zz[ii] = d2R_dzz[offset + ii];
   }
-}
-
-std::vector<double> FEAElement_Hex8::get_d2R_dxx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_d2R_dxx function error.\n" );
-  const int offset = quaindex * 8;
-  return { d2R_dxx[offset], d2R_dxx[offset+1], d2R_dxx[offset+2], d2R_dxx[offset+3],
-    d2R_dxx[offset+4], d2R_dxx[offset+5], d2R_dxx[offset+6], d2R_dxx[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_d2R_dyy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_d2R_dyy function error.\n" );
-  const int offset = quaindex * 8;
-  return { d2R_dyy[offset], d2R_dyy[offset+1], d2R_dyy[offset+2], d2R_dyy[offset+3],
-    d2R_dyy[offset+4], d2R_dyy[offset+5], d2R_dyy[offset+6], d2R_dyy[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_d2R_dzz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_d2R_dzz function error.\n" );
-  const int offset = quaindex * 8;
-  return { d2R_dzz[offset], d2R_dzz[offset+1], d2R_dzz[offset+2], d2R_dzz[offset+3],
-    d2R_dzz[offset+4], d2R_dzz[offset+5], d2R_dzz[offset+6], d2R_dzz[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_d2R_dxy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_d2R_dxy function error.\n" );
-  const int offset = quaindex * 8;
-  return { d2R_dxy[offset], d2R_dxy[offset+1], d2R_dxy[offset+2], d2R_dxy[offset+3],
-    d2R_dxy[offset+4], d2R_dxy[offset+5], d2R_dxy[offset+6], d2R_dxy[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_d2R_dxz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_d2R_dxz function error.\n" );
-  const int offset = quaindex * 8;
-  return { d2R_dxz[offset], d2R_dxz[offset+1], d2R_dxz[offset+2], d2R_dxz[offset+3],
-    d2R_dxz[offset+4], d2R_dxz[offset+5], d2R_dxz[offset+6], d2R_dxz[offset+7] };
-}
-
-std::vector<double> FEAElement_Hex8::get_d2R_dyz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_d2R_dyz function error.\n" );
-  const int offset = quaindex * 8;
-  return { d2R_dyz[offset], d2R_dyz[offset+1], d2R_dyz[offset+2], d2R_dyz[offset+3],
-    d2R_dyz[offset+4], d2R_dyz[offset+5], d2R_dyz[offset+6], d2R_dyz[offset+7] };
 }
 
 void FEAElement_Hex8::get_Jacobian(const int &quaindex,
