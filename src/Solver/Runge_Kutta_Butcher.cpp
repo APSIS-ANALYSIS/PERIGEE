@@ -213,6 +213,19 @@ void Runge_Kutta_Butcher::setCoefficients()
     //   break; 
       break;
       // Other cases
+    case 6:
+      if (mm == 5)
+      {
+        cc[0] = 0.0; cc[1] = 1.0/4.0; cc[2] = 3.0/8.0; cc[3] = 12.0/13.0; cc[4] = 1.0; cc[5] = 1.0/2.0;
+        aa[0][0] = 0.0;
+        aa[1][0] = 1.0/4.0;
+        aa[2][0] = 3.0/32.0; aa[2][1] = 9.0/32.0;
+        aa[3][0] = 1932.0/2197.0; aa[3][1] = -7200.0/2197.0; aa[3][2] = 7296.0/2197.0;
+        aa[4][0] = 439.0/216.0; aa[4][1] = -8.0; aa[4][2] = 3680.0/513.0 aa[4][3] = -845.0/4104.0;
+        aa[5][0] = -8.0/27.0; aa[5][1] = 2.0; aa[5][2] = -3544.0/2565.0; aa[5][3] = 1859.0/4104.0; aa[5][4] = -11.0/40.0;
+        bb[0] = 16.0/135.0; bb[1] = 0.0; bb[2] = 6656.0/12825.0; bb[3] = 28561.0/56430.0; bb[4] = -9.0/50.0; bb[5] = 2.0/55.0;
+      }
+      break;
     default:
       SYS_T::print_fatal("Error: Runge_Kutta_Butcher::setCoefficients: Unsupported number of steps or order. \n");
       break;
