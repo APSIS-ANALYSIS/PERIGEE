@@ -181,7 +181,7 @@ void FEAElement_Quad9::get_R( const int &quaindex,
 std::vector<double> FEAElement_Quad9::get_R( const int &quaindex ) const
 {
   const int offset = quaindex * 9;
-  std::vector<double> vec(R + offset, R + offset + 9);
+  std::vector<double> vec(R.begin() + offset, R.begin() + offset + 9);
   return vec;
 }
 
