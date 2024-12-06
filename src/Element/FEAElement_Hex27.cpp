@@ -17,7 +17,7 @@ FEAElement_Hex27::FEAElement_Hex27( const int &in_nqua ) : numQuapts( in_nqua )
 
   dx_dr.resize(9 * numQuapts);
   dr_dx.resize(9 * numQuapts);
-  detJac.resize(numQuapts)
+  detJac.resize(numQuapts);
 
   quadrilateral_face = new FEAElement_Quad9_3D_der0( numQuapts );
 }
@@ -342,7 +342,7 @@ std::vector<double> FEAElement_Hex27::get_R( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R function error.\n" );
   const int offset = quaindex * 27;
-  std::vector<double> vec(R + offset, R + offset + 27);
+  std::vector<double> vec(R.begin() + offset, R.begin() + offset + 27);
   return vec;
 }
 

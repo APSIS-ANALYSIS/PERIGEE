@@ -12,6 +12,7 @@
 // Date created: Nov. 6 2013
 // ============================================================================
 #include "IQuadPts.hpp"
+#include "Tensor2_3D.hpp"
 #include "FEType.hpp"
 
 class FEAElement

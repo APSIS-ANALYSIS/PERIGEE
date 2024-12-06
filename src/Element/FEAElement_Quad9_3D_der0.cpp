@@ -85,7 +85,7 @@ std::vector<double> FEAElement_Quad9_3D_der0::get_R(
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Quad9_3D_der0::get_R function error.\n" );
   const int offset = quaindex * 9;
-  std::vector<double> vec(R + offset, R + offset + 9);
+  std::vector<double> vec(R.begin() + offset, R.begin() + offset + 9);
   return vec;
 }
 

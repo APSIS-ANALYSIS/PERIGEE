@@ -43,7 +43,7 @@ class FEAElement_Hex8 final : public FEAElement
 
     ~FEAElement_Hex8() override;
 
-    int get_elemDim() const {return 3;}
+    int get_elemDim() const override {return 3;}
 
     // A unique number for this element.
     FEType get_Type() const override {return FEType::Hex8;}

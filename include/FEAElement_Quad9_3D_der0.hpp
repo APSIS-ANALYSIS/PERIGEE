@@ -82,7 +82,7 @@ class FEAElement_Quad9_3D_der0 final : public FEAElement
     std::vector<Vector_3> un;
 
     // Jacobian determinant, length numQuapts
-    std::vector<double> detJec {};
+    std::vector<double> detJac {};
 };
 
 #endif

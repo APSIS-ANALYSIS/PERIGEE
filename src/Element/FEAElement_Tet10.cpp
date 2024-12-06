@@ -18,7 +18,7 @@ FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua )
 
   dx_dr.resize(9 * numQuapts);
   dr_dx.resize(9 * numQuapts);
-  detJac.resize(numQuapts)
+  detJac.resize(numQuapts);
 
   triangle_face = new FEAElement_Triangle6_3D_der0( numQuapts );
 }

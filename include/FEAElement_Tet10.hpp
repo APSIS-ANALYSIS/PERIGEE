@@ -125,7 +125,7 @@ class FEAElement_Tet10 final : public FEAElement
     const int numQuapts;
 
     // R: 0 <= ii < 10 numQuapts
-    td::vector<double> R {};
+    std::vector<double> R {};
     std::vector<double> dR_dx {};
     std::vector<double> dR_dy {};
     std::vector<double> dR_dz {};
