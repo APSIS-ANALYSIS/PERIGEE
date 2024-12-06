@@ -17,7 +17,7 @@ class FEAElement_Tet4 final : public FEAElement
   public:
     FEAElement_Tet4( const int &in_nqua );
 
-    ~FEAElement_Tet4() override;
+    ~FEAElement_Tet4() override = default;
 
     int get_elemDim() const override {return 3;}
 
@@ -132,7 +132,7 @@ class FEAElement_Tet4 final : public FEAElement
 
     double detJac;
 
-    FEAElement * triangle_face;
+    std::unique_ptr<FEAElement> triangle_face;
 };
 
 #endif

@@ -1,15 +1,9 @@
 #include "FEAElement_Tet4.hpp"
 
-FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua )
+FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua ) ,
+  triangle_face( SYS_T::make_unique<FEAElement_Triangle3_3D_der0>(numQuapts) )
 {
   R.resize(4 * numQuapts);
-
-  triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
-}
-
-FEAElement_Tet4::~FEAElement_Tet4()
-{
-  delete triangle_face; triangle_face = nullptr;
 }
 
 void FEAElement_Tet4::print_info() const
