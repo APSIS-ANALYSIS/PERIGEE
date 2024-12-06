@@ -209,20 +209,6 @@ void FEAElement_Quad9::get_R_gradR( const int &quaindex,
   }
 }
 
-std::vector<double> FEAElement_Quad9::get_dR_dx( const int &quaindex ) const
-{
-  const int offset = quaindex * 9;
-  std::vector<double> vec(dR_dx + offset, dR_dx + offset + 9);
-  return vec;
-}
-
-std::vector<double> FEAElement_Quad9::get_dR_dy( const int &quaindex ) const
-{
-  const int offset = quaindex * 9;
-  std::vector<double> vec(dR_dy + offset, dR_dy + offset + 9);
-  return vec;
-}
-
 void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
@@ -240,30 +226,6 @@ void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
     basis_yy[ii] = d2R_dyy[offset + ii];
     basis_xy[ii] = d2R_dxy[offset + ii];
   }
-}
-
-std::vector<double> FEAElement_Quad9::get_d2R_dxx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad9::get_d2R_dxx function error.\n" );
-  const int offset = quaindex * 9;
-  std::vector<double> vec(d2R_dxx + offset, d2R_dxx + offset + 9);
-  return vec;
-}
-
-std::vector<double> FEAElement_Quad9::get_d2R_dyy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad9::get_d2R_dyy function error.\n" );
-  const int offset = quaindex * 9;
-  std::vector<double> vec(d2R_dyy + offset, d2R_dyy + offset + 9);
-  return vec;
-}
-
-std::vector<double> FEAElement_Quad9::get_d2R_dxy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad9::get_d2R_dxy function error.\n" );
-  const int offset = quaindex * 9;
-  std::vector<double> vec(d2R_dxy + offset, d2R_dxy + offset + 9);
-  return vec;
 }
 
 void FEAElement_Quad9::get_Jacobian(const int &quaindex,
