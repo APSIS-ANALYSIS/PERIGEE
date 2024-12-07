@@ -17,7 +17,7 @@ class FEAElement_Quad9 final : public FEAElement
   public:
     FEAElement_Quad9( const int &in_nqua );
 
-    ~FEAElement_Quad9() override {}
+    ~FEAElement_Quad9() override = default;
 
     int get_elemDim() const override {return 2;}
 

@@ -16,7 +16,7 @@ class FEAElement_Triangle3 final : public FEAElement
   public:
     FEAElement_Triangle3( const int &in_nqua );
 
-    ~FEAElement_Triangle3() override {}
+    ~FEAElement_Triangle3() override = default;
 
     int get_elemDim() const override {return 2;}
 

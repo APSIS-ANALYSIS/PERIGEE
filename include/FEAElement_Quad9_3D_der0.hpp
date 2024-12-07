@@ -39,7 +39,7 @@ class FEAElement_Quad9_3D_der0 final : public FEAElement
   public:
     FEAElement_Quad9_3D_der0( const int &in_nqua );
 
-    ~FEAElement_Quad9_3D_der0() override {}
+    ~FEAElement_Quad9_3D_der0() override = default;
 
     int get_elemDim() const override {return 2;}
 
