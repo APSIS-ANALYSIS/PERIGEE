@@ -1,7 +1,7 @@
 #include "FEAElement_Tet10.hpp"
 
-FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua )
-: numQuapts( in_nqua )
+FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua ) : numQuapts( in_nqua ) ,
+  triangle_face( SYS_T::make_unique<FEAElement_Triangle6_3D_der0>(numQuapts) )
 {
   R.resize(10 * numQuapts);
 
@@ -19,13 +19,6 @@ FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua )
   dx_dr.resize(9 * numQuapts);
   dr_dx.resize(9 * numQuapts);
   detJac.resize(numQuapts);
-
-  triangle_face = new FEAElement_Triangle6_3D_der0( numQuapts );
-}
-
-FEAElement_Tet10::~FEAElement_Tet10()
-{
-  delete triangle_face; triangle_face = nullptr;
 }
 
 void FEAElement_Tet10::print_info() const
