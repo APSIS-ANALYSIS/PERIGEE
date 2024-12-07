@@ -1,6 +1,7 @@
 #include "FEAElement_Hex8.hpp"
 
-FEAElement_Hex8::FEAElement_Hex8( const int &in_nqua ) : numQuapts( in_nqua )
+FEAElement_Hex8::FEAElement_Hex8( const int &in_nqua ) : numQuapts( in_nqua ),
+  quadrilateral_face( SYS_T::make_unique<FEAElement_Quad4_3D_der0>(numQuapts) )
 {
   R.resize(8 * numQuapts);
 
@@ -18,13 +19,6 @@ FEAElement_Hex8::FEAElement_Hex8( const int &in_nqua ) : numQuapts( in_nqua )
   dx_dr.resize(9 * numQuapts);
   dr_dx.resize(9 * numQuapts);
   detJac.resize(numQuapts);
-
-  quadrilateral_face = new FEAElement_Quad4_3D_der0( numQuapts );
-}
-
-FEAElement_Hex8::~FEAElement_Hex8()
-{
-  delete quadrilateral_face; quadrilateral_face = nullptr;
 }
 
 void FEAElement_Hex8::print_info() const

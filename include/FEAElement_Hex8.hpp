@@ -41,7 +41,7 @@ class FEAElement_Hex8 final : public FEAElement
   public :
     FEAElement_Hex8( const int &in_nqua );
 
-    ~FEAElement_Hex8() override;
+    ~FEAElement_Hex8() override = default;
 
     int get_elemDim() const override {return 3;}
 
@@ -146,7 +146,7 @@ class FEAElement_Hex8 final : public FEAElement
     // detJac : 0 <= ii < numQuapts
     std::vector<double> detJac {};
 
-    FEAElement * quadrilateral_face;
+    std::unique_ptr<FEAElement> quadrilateral_face;
 };
 
 #endif
