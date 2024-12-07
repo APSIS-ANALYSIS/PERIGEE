@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
   
   const int cpu_size           = paras["cpu_size"].as<int>();
   const int in_ncommon         = paras["in_ncommon"].as<int>();
-  const int elemType           = paras["elem_type"].as<int>();
+  const std::string elemType_str  = paras["elem_type"].as<std::string>();
   const int dofNum             = paras["dof_num"].as<int>();
   const int dofMat             = paras["dof_mat"].as<int>();
   const bool isDualGraph       = paras["is_dualgraph"].as<bool>();
@@ -44,9 +44,10 @@ int main( int argc, char * argv[] )
   const std::string part_file  = paras["part_file"].as<std::string>();
   const std::vector<std::string> neu_list = paras["Neumann"].as<std::vector<std::string>>();
   const std::vector<std::vector<std::string>> dir_list = paras["Dirichlet"].as<std::vector<std::vector<std::string>>>();
-
+  const FEType elemType = FE_T::to_FEType(elemType_str);
   // Check if the element type is valid
-  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  if( elemType != FEType::Tet4 && elemType != FEType::Tet10 && elemType != FEType::Hex8 && elemType != FEType::Hex27 ) 
+    SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
   
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file);
@@ -66,7 +67,7 @@ int main( int argc, char * argv[] )
   
   // Print the command line arguments
   std::cout << "======== Command Line Arguments  ========" << std::endl;
-  std::cout << " -elem_type: "        << elemType          << std::endl;
+  std::cout << " -elem_type: "        << elemType_str      << std::endl;
   std::cout << " -geo_file: "         << geo_file          << std::endl;
   std::cout << " -part_file: "        << part_file         << std::endl;
   std::cout << " -cpu_size: "         << cpu_size          << std::endl;
@@ -96,7 +97,7 @@ int main( int argc, char * argv[] )
 
   cmdh5w->write_intScalar("cpu_size", cpu_size);
   cmdh5w->write_intScalar("in_ncommon", in_ncommon);
-  cmdh5w->write_intScalar("elemType", elemType);
+  cmdh5w->write_string("elemType", elemType_str);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("part_file", part_file);
   cmdh5w->write_intScalar("dof_num", dofNum);
@@ -118,20 +119,20 @@ int main( int argc, char * argv[] )
 
   switch( elemType )
   {
-    case 501:
+    case FEType::Tet4:
       mesh = new Mesh_Tet(nFunc, nElem, 1);
       break;
-    case 502:
+    case FEType::Tet10:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
-    case 601:
+    case FEType::Hex8:
       mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
       break;
-    case 602:
+    case FEType::Hex27:
       mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
-      SYS_T::print_fatal("Error: elemType %d is not supported.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %s is not supported.\n", elemType_str.c_str());
       break;
   }
 
