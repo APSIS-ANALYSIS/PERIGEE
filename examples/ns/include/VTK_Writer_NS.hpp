@@ -11,6 +11,7 @@
 // ==================================================================
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
+#include "FEANode.hpp"
 #include "IVisDataPrep.hpp"
 #include "Interpolater.hpp"
 #include "Vis_Tools.hpp"

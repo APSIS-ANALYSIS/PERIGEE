@@ -3,12 +3,7 @@
 FEAElement_Triangle3::FEAElement_Triangle3( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R = new double [3 * numQuapts];
-}
-
-FEAElement_Triangle3::~FEAElement_Triangle3()
-{
-  delete [] R; R = nullptr;
+  R.resize(3 * numQuapts);
 }
 
 void FEAElement_Triangle3::print_info() const
@@ -16,13 +11,6 @@ void FEAElement_Triangle3::print_info() const
   SYS_T::commPrint("Tri3: ");
   SYS_T::commPrint("3-node triangle element with up to 2nd derivatives. \n");
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Triangle3::get_memory_usage() const
-{
-  double double_size = 3 * numQuapts + 15;
-  double int_size = 1;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
@@ -112,18 +100,6 @@ void FEAElement_Triangle3::get_gradR( const int &quaindex,
     basis_y[ii] = dR_dy[ii];
   } 
 }
-
-std::vector<double> FEAElement_Triangle3::get_dR_dx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_dR_dx function error.\n" );
-  return { dR_dx[0], dR_dx[1], dR_dx[2] };
-}
-
-std::vector<double> FEAElement_Triangle3::get_dR_dy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_dR_dy function error.\n" );
-  return { dR_dy[0], dR_dy[1], dR_dy[2] };
-} 
 
 void FEAElement_Triangle3::get_R_gradR( const int &quaindex, 
     double * const &basis,
