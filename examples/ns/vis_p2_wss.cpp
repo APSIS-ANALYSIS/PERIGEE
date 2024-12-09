@@ -8,7 +8,7 @@
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tri6.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
-#include "QuadPts_vis_tet10_v2.hpp"
+#include "QuadPts_vis_tet10.hpp"
 #include "FEAElement_Tet10.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
 
@@ -175,7 +175,7 @@ int main( int argc, char * argv[] )
   }
 
   // Volumetric element visualization sampling point 
-  IQuadPts * quad = new QuadPts_vis_tet10_v2();
+  IQuadPts * quad = new QuadPts_vis_tet10();
 
   quad -> print_info();
 

@@ -9,7 +9,7 @@
 #include "AGlobal_Mesh_Info.hpp"
 #include "APart_Basic_Info.hpp"
 #include "QuadPts_vis_tet4.hpp"
-#include "QuadPts_vis_tet10_v2.hpp"
+#include "QuadPts_vis_tet10.hpp"
 #include "QuadPts_vis_hex8.hpp"
 #include "QuadPts_vis_hex27.hpp"
 #include "FEAElement_Tet4.hpp"
@@ -109,7 +109,7 @@ int main( int argc, char * argv[] )
   }
   else if( GMIptr->get_elemType() == FEType::Tet10 )
   {
-    quad = new QuadPts_vis_tet10_v2();
+    quad = new QuadPts_vis_tet10();
     element = new FEAElement_Tet10( quad-> get_num_quadPts() );
   }
   else if( GMIptr->get_elemType() == FEType::Hex8 )
