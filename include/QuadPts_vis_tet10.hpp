@@ -1,7 +1,7 @@
-#ifndef QUADPTS_VIS_TET10_V2_HPP
-#define QUADPTS_VIS_TET10_V2_HPP
+#ifndef QUADPTS_VIS_TET10_HPP
+#define QUADPTS_VIS_TET10_HPP
 // ==================================================================
-// QuadPts_vis_tet10_v2.hpp
+// QuadPts_vis_tet10.hpp
 //
 // This is a class that stores the visualization sampling points in
 // a reference tetrahedron.
@@ -19,16 +19,16 @@
 // ==================================================================
 #include "IQuadPts.hpp"
 
-class QuadPts_vis_tet10_v2 final : public IQuadPts
+class QuadPts_vis_tet10 final : public IQuadPts
 {
   public:
-    QuadPts_vis_tet10_v2() = default;
+    QuadPts_vis_tet10() = default;
 
-    ~QuadPts_vis_tet10_v2() override = default;
+    ~QuadPts_vis_tet10() override = default;
 
     void print_info() const override 
     {
-      SYS_T::commPrint("\n===== Visualization Points for Tet10 v2 ===== \n");
+      SYS_T::commPrint("\n===== Visualization Points for Tet10 ===== \n");
       IQuadPts::print_info();
       SYS_T::commPrint("========================================= \n");
     }
