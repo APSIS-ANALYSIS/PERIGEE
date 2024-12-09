@@ -9,7 +9,7 @@
 class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 {
   public:
-    // Constructor for CMM equations
+    // Constructor for equations
     PGAssem_LinearPDE_GenAlpha(
         IPLocAssem * const &locassem_ptr,
         const AGlobal_Mesh_Info * const &agmi_ptr,
