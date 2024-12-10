@@ -166,9 +166,9 @@ void VTK_Writer_FSI::writeOutput(
     intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[3] );
 
     // Set mesh connectivity
-    if( elemptr->get_Type() == 501 )
+    if( elemptr->get_Type() == FEType::Tet4 )
       VIS_T::setTetraelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], gridData );
-    else if( elemptr->get_Type() == 601 )
+    else if( elemptr->get_Type() == FEType::Hex8 )
       VIS_T::setHexelem( IEN_p[0], IEN_p[1], IEN_p[2], IEN_p[3], 
         IEN_p[4], IEN_p[5], IEN_p[6], IEN_p[7], gridData );
     else SYS_T::print_fatal("Error: unknown element type.\n");
@@ -386,9 +386,9 @@ void VTK_Writer_FSI::writeOutput_fluid(
       }
 
       // Set mesh connectivity
-      if( elemptr->get_Type() == 501 )
+      if( elemptr->get_Type() == FEType::Tet4 )
         VIS_T::setTetraelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], gridData );
-      else if( elemptr->get_Type() == 601 )
+      else if( elemptr->get_Type() == FEType::Hex8 )
         VIS_T::setHexelem( IEN_f[0], IEN_f[1], IEN_f[2], IEN_f[3], 
           IEN_f[4], IEN_f[5], IEN_f[6], IEN_f[7], gridData );
       else SYS_T::print_fatal("Error: unknown element type.\n");
@@ -579,9 +579,9 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[3] );
       
       // Set mesh connectivity
-      if( elemptr->get_Type() == 501 )
+      if( elemptr->get_Type() == FEType::Tet4 )
         VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
-      else if( elemptr->get_Type() == 601 )
+      else if( elemptr->get_Type() == FEType::Hex8 )
         VIS_T::setHexelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], 
           IEN_s[4], IEN_s[5], IEN_s[6], IEN_s[7], gridData );
       else SYS_T::print_fatal("Error: unknown element type.\n");
@@ -743,9 +743,9 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
       intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] );
       
       // Set mesh connectivity
-      if( elemptr->get_Type() == 501 )
+      if( elemptr->get_Type() == FEType::Tet4 )
         VIS_T::setTetraelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], gridData );
-      else if( elemptr->get_Type() == 601 )
+      else if( elemptr->get_Type() == FEType::Hex8 )
         VIS_T::setHexelem( IEN_s[0], IEN_s[1], IEN_s[2], IEN_s[3], 
           IEN_s[4], IEN_s[5], IEN_s[6], IEN_s[7], gridData );
       else SYS_T::print_fatal("Error: unknown element type.\n");
