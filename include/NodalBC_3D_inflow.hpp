@@ -21,6 +21,7 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
+#include "FEType.hpp"
 
 class NodalBC_3D_inflow : public INodalBC
 {
@@ -32,7 +33,7 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype );
+        const FEType &elemtype );
 
     virtual ~NodalBC_3D_inflow() = default;
 
@@ -153,7 +154,8 @@ class NodalBC_3D_inflow : public INodalBC
     unsigned int num_dir_nodes;
 
     // number of inlet surfaces and element type
-    const int num_nbc, elem_type;
+    const int num_nbc;
+    const FEType elem_type;
     
     // This is the area calculated by setting the wall nodes to be zero.
     // It is designed to compute the area to give a plug flow profile with
@@ -211,7 +213,7 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype );
+        const FEType &elemtype );
 
     // Reset function for the IEN array of different element types.
     void reset501IEN_outwardnormal( const IIEN * const &VIEN );
