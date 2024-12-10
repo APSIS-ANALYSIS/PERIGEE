@@ -39,8 +39,9 @@ int main( int argc, char * argv[] )
 
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string sur_s_file_interior_wall = cmd_h5r -> read_string("/", "sur_s_file_interior_wall");
-  const int elemType = cmd_h5r -> read_intScalar("/","elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/","elemType");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -67,7 +68,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<"geo_file: "<<geo_file<<endl;
   cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<endl;
-  cout<<"elemType: "<<elemType<<endl;
+  cout<<"elemType: "<<elemType_str<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
   // Read the geometry file for the whole FSI domain for the velocity /
@@ -104,7 +105,7 @@ int main( int argc, char * argv[] )
     {
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {  
         for(int ii=0; ii<4; ++ii)
         {
@@ -112,7 +113,7 @@ int main( int argc, char * argv[] )
           if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;
         }
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii)
         {
@@ -121,7 +122,7 @@ int main( int argc, char * argv[] )
         }
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating a new IEN array for the pressure variable. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating a new IEN array for the pressure variable. \n", elemType_str.c_str());
     }
   }
 
@@ -137,29 +138,29 @@ int main( int argc, char * argv[] )
   {
     if(phy_tag[ee] == 0)
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );        
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the pre-postprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of velocity nodes for fluid during the pre-postprocessing. \n", elemType_str.c_str());
     }
     else
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );   
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the pre-postprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of velocity nodes for solid during the pre-postprocessing. \n", elemType_str.c_str());
     }
   }
 
@@ -171,29 +172,29 @@ int main( int argc, char * argv[] )
   {
     if(phy_tag[ee] == 0)
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );    
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the pre-postprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of pressure nodes for fluid during the pre-postprocessing. \n", elemType_str.c_str());
     }
     else
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );       
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );            
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the pre-postprocessing. \n", elemType);        
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of pressure nodes for solid during the pre-postprocessing. \n", elemType_str.c_str());        
     }
   }
 
@@ -207,16 +208,16 @@ int main( int argc, char * argv[] )
 
   switch( elemType )
   {
-    case 501:
+    case FEType::Tet4:
       mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
       mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
       break;
-    case 601:
+    case FEType::Hex8:
       mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
       mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
       break;
     default:
-      SYS_T::print_fatal("Error: elemType %d is not supported when generating the mesh.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %s is not supported when generating the mesh.\n", elemType_str.c_str());
       break;
   }
 
