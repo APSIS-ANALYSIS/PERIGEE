@@ -5,6 +5,7 @@
 //
 // Date: Oct 24 2023
 // ============================================================================
+#include "HDF5_Reader.hpp"
 #include "Hex_Tools.hpp"
 #include "QuadPts_vis_quad4.hpp"
 #include "QuadPts_Gauss_Quad.hpp"

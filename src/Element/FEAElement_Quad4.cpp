@@ -3,26 +3,16 @@
 FEAElement_Quad4::FEAElement_Quad4( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R = new double [4*numQuapts];
-  dR_dx = new double [4*numQuapts];
-  dR_dy = new double [4*numQuapts];
-  
-  Jac = new double [9*numQuapts];
+  R.resize(8 * numQuapts);
 
-  d2R_dxx = new double [4 * numQuapts];
-  d2R_dyy = new double [4 * numQuapts];
-  d2R_dxy = new double [4 * numQuapts];
-}
+  dR_dx.resize(8 * numQuapts);
+  dR_dy.resize(8 * numQuapts);
 
-FEAElement_Quad4::~FEAElement_Quad4()
-{
-  delete [] R;             R = nullptr;
-  delete [] dR_dx;     dR_dx = nullptr;
-  delete [] dR_dy;     dR_dy = nullptr;
-  delete [] Jac;         Jac = nullptr;
-  delete [] d2R_dxx; d2R_dxx = nullptr;
-  delete [] d2R_dyy; d2R_dyy = nullptr;
-  delete [] d2R_dxy; d2R_dxy = nullptr;
+  d2R_dxx.resize(8 * numQuapts);
+  d2R_dyy.resize(8 * numQuapts);
+  d2R_dxy.resize(8 * numQuapts);
+
+  Jac.resize(9 * numQuapts);
 }
 
 void FEAElement_Quad4::print_info() const
@@ -30,13 +20,6 @@ void FEAElement_Quad4::print_info() const
   SYS_T::commPrint("Quad4: ");
   SYS_T::commPrint("4-node quadrilateral element with up to 2nd derivatives. \n");
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Quad4::get_memory_usage() const
-{
-  double double_size = 33 * numQuapts;
-  double int_size = 1;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
@@ -186,18 +169,6 @@ void FEAElement_Quad4::get_R_gradR( const int &quaindex,
   }
 }
 
-std::vector<double> FEAElement_Quad4::get_dR_dx( const int &quaindex ) const
-{
-  const int offset = quaindex * 4;
-  return { dR_dx[offset], dR_dx[offset+1], dR_dx[offset+2], dR_dx[offset+3] };
-}
-
-std::vector<double> FEAElement_Quad4::get_dR_dy( const int &quaindex ) const
-{
-  const int offset = quaindex * 4;
-  return { dR_dy[offset], dR_dy[offset+1], dR_dy[offset+2], dR_dy[offset+3] };
-}
-
 void FEAElement_Quad4::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
@@ -205,27 +176,6 @@ void FEAElement_Quad4::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xy ) const
 {
   SYS_T::print_fatal("Error: FEAElement_Quad4::get_2D_R_dR_d2R is not implemented. \n");
-}
-
-std::vector<double> FEAElement_Quad4::get_d2R_dxx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad4::get_d2R_dxx function error.\n" );
-  const int offset = quaindex * 4;
-  return { d2R_dxx[offset],  d2R_dxx[offset+1], d2R_dxx[offset+2], d2R_dxx[offset+3] };
-}
-
-std::vector<double> FEAElement_Quad4::get_d2R_dyy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad4::get_d2R_dyy function error.\n" );
-  const int offset = quaindex * 4;
-  return { d2R_dyy[offset],  d2R_dyy[offset+1], d2R_dyy[offset+2], d2R_dyy[offset+3] };
-}
-
-std::vector<double> FEAElement_Quad4::get_d2R_dxy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad4::get_d2R_dxy function error.\n" );
-  const int offset = quaindex * 4;
-  return { d2R_dxy[offset],  d2R_dxy[offset+1], d2R_dxy[offset+2], d2R_dxy[offset+3] };
 }
 
 void FEAElement_Quad4::get_Jacobian(const int &quaindex,
