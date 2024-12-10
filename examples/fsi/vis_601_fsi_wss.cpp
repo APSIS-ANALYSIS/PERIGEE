@@ -66,7 +66,8 @@ int main( int argc, char * argv[] )
 
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_f_file_wall");
-  const int elemType = cmd_h5r -> read_intScalar("/", "elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
   
@@ -81,7 +82,7 @@ int main( int argc, char * argv[] )
   delete ana_h5r; H5Fclose(anacmd_file);
 
   // Enforce the element to be trilinear hex for now
-  if( elemType != 601 ) SYS_T::print_fatal("Error: element type should be 601 trilinear hex element.\n");
+  if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be trilinear hex element.\n");
 
   SYS_T::GetOptionInt("-time_start", time_start);
   SYS_T::GetOptionInt("-time_step", time_step);
