@@ -1,5 +1,5 @@
 // ============================================================================
-// vis_p1_wss.cpp
+// vis_tet4_wss.cpp
 //
 // This is a visualization driver for Wall Shear Stress, which is
 // defined on the wall elements only.
