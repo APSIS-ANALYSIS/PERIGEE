@@ -303,10 +303,8 @@ int main(int argc, char *argv[])
   FEAElement * elementvs = nullptr;
 
   SYS_T::commPrint("===> Build quadrature rules. \n");
-  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ?
-                      nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
-  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ? 
-                      nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
+  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
   IQuadPts * quadv = nullptr;
   IQuadPts * quads = nullptr;

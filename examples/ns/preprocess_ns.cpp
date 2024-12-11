@@ -101,7 +101,7 @@ int main( int argc, char * argv[] )
   {  
     if(elemType == FEType::Tet4 || elemType == FEType::Hex8)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" );   
-    else if(elemType == FEType::Tet10 ||elemType == FEType::Hex27)
+    else if(elemType == FEType::Tet10 || elemType == FEType::Hex27)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" );
     else
       SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
