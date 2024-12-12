@@ -258,15 +258,14 @@ void VIS_T::setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
   
   vtkCell * cell = vtkHexahedron::New();
 
-  cell->GetPointIds()->SetId( 0, ptoffset + 0);
-  cell->GetPointIds()->SetId( 1, ptoffset + 1);
-  cell->GetPointIds()->SetId( 2, ptoffset + 2);
-  cell->GetPointIds()->SetId( 3, ptoffset + 3);
-
-  cell->GetPointIds()->SetId( 4, ptoffset + 4);
-  cell->GetPointIds()->SetId( 5, ptoffset + 5);
-  cell->GetPointIds()->SetId( 6, ptoffset + 6);
-  cell->GetPointIds()->SetId( 7, ptoffset + 7);
+  cell->GetPointIds()->SetId( 0, ptoffset + 0 );
+  cell->GetPointIds()->SetId( 1, ptoffset + 1 );
+  cell->GetPointIds()->SetId( 2, ptoffset + 2 );
+  cell->GetPointIds()->SetId( 3, ptoffset + 3 );
+  cell->GetPointIds()->SetId( 4, ptoffset + 4 );
+  cell->GetPointIds()->SetId( 5, ptoffset + 5 );
+  cell->GetPointIds()->SetId( 6, ptoffset + 6 );
+  cell->GetPointIds()->SetId( 7, ptoffset + 7 );
 
   gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
   cell->Delete();

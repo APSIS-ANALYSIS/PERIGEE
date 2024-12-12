@@ -106,16 +106,16 @@ namespace VIS_T
   //    --- setQuadelem     ===> Insert vtkQuad to grid
   // ================================================================
   // ----------------------------------------------------------------
-  // ! setHexelem : build the Hexahedron element connectivity with the
-  //   vtkPoints.  There are 8 points in thsi element.
+  // ! setHexelem: build Hexahedron element connectivity with the
+  //   vtkPoints.  There are 8 points in this element.
   //   \para ptoffset: offset for this element
   //   \gridData: the Grid object that stores the connectivity
   // ----------------------------------------------------------------
   void setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
-  // ! setHexelem: build Hexa element connectivity using the specified
-  //                 point index.
+  // ! setHexelem: build Hexahedron element connectivity using the
+  //   specified point index.
   // ----------------------------------------------------------------
   void setHexelem( const int &ptid0, const int &ptid1,
       const int &ptid2, const int &ptid3, const int &ptid4,
@@ -123,16 +123,16 @@ namespace VIS_T
       vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
-  // ! setTriQuadHexelem : build the Hexahedron element connectivity with the
-  //   vtkPoints.  There are 27 points in thsi element.
+  // ! setTriQuadHexelem: build triquadratic Hex element connectivity
+  //   with the vtkPoints.  There are 27 points in this element.
   //   \para ptoffset: offset for this element
   //   \gridData: the Grid object that stores the connectivity
   // ----------------------------------------------------------------
   void setTriQuadHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
-  // ! setTriQuadTetraelem: build triquadratic hex element connectivity
-  //   using the specified point index. There are 27 points in the element.
+  // ! setTriQuadHexelem: build triquadratic Hex element connectivity
+  //   using the specified point index.
   // ----------------------------------------------------------------
   void setTriQuadHexelem( const int &ptid0, const int &ptid1,
       const int &ptid2, const int &ptid3, const int &ptid4,
@@ -155,17 +155,23 @@ namespace VIS_T
 
   // ----------------------------------------------------------------
   // ! setTetraelem: build Tetra element connectivity using the specified
-  //                 point index.
+  //   point index.
   // ----------------------------------------------------------------
   void setTetraelem( const int &ptid0, const int &ptid1, const int &ptid2,
       const int &ptid3, vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
   // ! setQuadTetraelem: build quadratic Tetra element connectivity
-  //   with vtkPoints. There are 10 points in the element.
+  //   with the vtkPoints. There are 10 points in the element.
+  //   \para ptoffset: the offset for this element
+  //   \para gridData: the Grid object that stores the connectivity
   // ----------------------------------------------------------------
   void setQuadTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
+  // ----------------------------------------------------------------
+  // ! setQuadTetraelem: build quadratic Tetra element connectivity 
+  //   using the specified point index.
+  // ----------------------------------------------------------------
   void setQuadTetraelem( const int &ptid0, const int &ptid1,
       const int &ptid2, const int &ptid3, const int &ptid4,
       const int &ptid5, const int &ptid6, const int &ptid7,
