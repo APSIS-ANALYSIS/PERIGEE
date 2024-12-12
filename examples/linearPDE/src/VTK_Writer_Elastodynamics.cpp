@@ -88,9 +88,9 @@ void VTK_Writer_Elastodynamics::writeOutput(
     else if( elemptr->get_Type() == FEType::Tet10 )
       VIS_T::setQuadTetraelem( ptOffset, gridData );
     else if( elemptr->get_Type() == FEType::Hex8 )
-      VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
+      VIS_T::setHexelem( ptOffset, gridData );
     else if( elemptr->get_Type() == FEType::Hex27 )
-      VIS_T::setHexelem( 3, 3, 3, ptOffset, gridData );
+      VIS_T::setTriQuadHexelem( ptOffset, gridData );
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     ptOffset += elemptr->get_nLocBas();

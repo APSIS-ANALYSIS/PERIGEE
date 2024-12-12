@@ -253,33 +253,24 @@ void VIS_T::writepvdFile( const std::string &baseName,
   }
 }
 
-void VIS_T::setHexelem( const int &segs, const int &segt, const int &segu,
-    const int &ptoffset, vtkUnstructuredGrid * gridData )
+void VIS_T::setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
-  for(int ii=0; ii<segs-1; ++ii)
-  {
-    for(int jj=0; jj<segt-1; ++jj)
-    {
-      for(int kk=0; kk<segu-1; ++kk)
-      {
-        vtkCell * cell = vtkHexahedron::New();
+  
+  vtkCell * cell = vtkHexahedron::New();
 
-        cell->GetPointIds()->SetId( 0, ptoffset + kk*segs*segt + jj*segs + ii);
-        cell->GetPointIds()->SetId( 1, ptoffset + kk*segs*segt + jj*segs + ii + 1);
-        cell->GetPointIds()->SetId( 2, ptoffset + kk*segs*segt + (jj+1)*segs + ii + 1);
-        cell->GetPointIds()->SetId( 3, ptoffset + kk*segs*segt + (jj+1)*segs + ii);
+  cell->GetPointIds()->SetId( 0, ptoffset + 0);
+  cell->GetPointIds()->SetId( 1, ptoffset + 1);
+  cell->GetPointIds()->SetId( 2, ptoffset + 2);
+  cell->GetPointIds()->SetId( 3, ptoffset + 3);
 
-        cell->GetPointIds()->SetId( 4, ptoffset + (kk+1)*segs*segt + jj*segs + ii);
-        cell->GetPointIds()->SetId( 5, ptoffset + (kk+1)*segs*segt + jj*segs + ii + 1);
-        cell->GetPointIds()->SetId( 6, ptoffset + (kk+1)*segs*segt + (jj+1)*segs + ii + 1);
-        cell->GetPointIds()->SetId( 7, ptoffset + (kk+1)*segs*segt + (jj+1)*segs + ii);
+  cell->GetPointIds()->SetId( 4, ptoffset + 4);
+  cell->GetPointIds()->SetId( 5, ptoffset + 5);
+  cell->GetPointIds()->SetId( 6, ptoffset + 6);
+  cell->GetPointIds()->SetId( 7, ptoffset + 7);
 
-        gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
-
-        cell->Delete();
-      }
-    }
-  }
+  gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
+  cell->Delete();
+  
 }
 
 void VIS_T::setHexelem( const int &ptid0, const int &ptid1,
@@ -297,6 +288,42 @@ void VIS_T::setHexelem( const int &ptid0, const int &ptid1,
   cell->GetPointIds()->SetId( 5, ptid5 );
   cell->GetPointIds()->SetId( 6, ptid6 );
   cell->GetPointIds()->SetId( 7, ptid7 );
+
+  gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
+  cell->Delete();
+}
+
+void VIS_T::setTriQuadHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
+{
+  vtkCell * cell = vtkTriQuadraticHexahedron::New();
+  
+  cell->GetPointIds()->SetId( 0, ptoffset + 0 );
+  cell->GetPointIds()->SetId( 1, ptoffset + 1 );
+  cell->GetPointIds()->SetId( 2, ptoffset + 2 );
+  cell->GetPointIds()->SetId( 3, ptoffset + 3 );
+  cell->GetPointIds()->SetId( 4, ptoffset + 4 );
+  cell->GetPointIds()->SetId( 5, ptoffset + 5 );
+  cell->GetPointIds()->SetId( 6, ptoffset + 6 );
+  cell->GetPointIds()->SetId( 7, ptoffset + 7 );
+  cell->GetPointIds()->SetId( 8, ptoffset + 8 );
+  cell->GetPointIds()->SetId( 9, ptoffset + 9 );  
+  cell->GetPointIds()->SetId( 10, ptoffset + 10 );
+  cell->GetPointIds()->SetId( 11, ptoffset + 11 );
+  cell->GetPointIds()->SetId( 12, ptoffset + 12 );
+  cell->GetPointIds()->SetId( 13, ptoffset + 13 );
+  cell->GetPointIds()->SetId( 14, ptoffset + 14 );
+  cell->GetPointIds()->SetId( 15, ptoffset + 15 );
+  cell->GetPointIds()->SetId( 16, ptoffset + 16 );
+  cell->GetPointIds()->SetId( 17, ptoffset + 17 );
+  cell->GetPointIds()->SetId( 18, ptoffset + 18 );
+  cell->GetPointIds()->SetId( 19, ptoffset + 19 );
+  cell->GetPointIds()->SetId( 20, ptoffset + 20 );
+  cell->GetPointIds()->SetId( 21, ptoffset + 21 );
+  cell->GetPointIds()->SetId( 22, ptoffset + 22 );
+  cell->GetPointIds()->SetId( 23, ptoffset + 23 );
+  cell->GetPointIds()->SetId( 24, ptoffset + 24 );
+  cell->GetPointIds()->SetId( 25, ptoffset + 25 );
+  cell->GetPointIds()->SetId( 26, ptoffset + 26 );
 
   gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
   cell->Delete();

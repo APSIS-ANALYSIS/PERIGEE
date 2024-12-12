@@ -107,17 +107,11 @@ namespace VIS_T
   // ================================================================
   // ----------------------------------------------------------------
   // ! setHexelem : build the Hexahedron element connectivity with the
-  //   vtkPoints. In each element, there are nqp = segs * segt * segu
-  //   sampling points. These points are indexed as
-  //          ii_s + ii_t * segs + ii_u * seg_s * seg_t.
-  //   \para segs: number of sampling points in s direction
-  //   \para segt: number of sampling points in t direction
-  //   \para segu: number of sampling points in u direction
+  //   vtkPoints.  There are 8 points in thsi element.
   //   \para ptoffset: offset for this element
   //   \gridData: the Grid object that stores the connectivity
   // ----------------------------------------------------------------
-  void setHexelem( const int &segs, const int &segt, const int &segu,
-      const int &ptoffset, vtkUnstructuredGrid * gridData );
+  void setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
   // ! setHexelem: build Hexa element connectivity using the specified
@@ -129,7 +123,15 @@ namespace VIS_T
       vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
-  // ! setQuadTetraelem: build triquadratic hex element connectivity
+  // ! setTriQuadHexelem : build the Hexahedron element connectivity with the
+  //   vtkPoints.  There are 27 points in thsi element.
+  //   \para ptoffset: offset for this element
+  //   \gridData: the Grid object that stores the connectivity
+  // ----------------------------------------------------------------
+  void setTriQuadHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
+
+  // ----------------------------------------------------------------
+  // ! setTriQuadTetraelem: build triquadratic hex element connectivity
   //   using the specified point index. There are 27 points in the element.
   // ----------------------------------------------------------------
   void setTriQuadHexelem( const int &ptid0, const int &ptid1,
