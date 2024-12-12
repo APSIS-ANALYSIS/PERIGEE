@@ -142,20 +142,7 @@ namespace VIS_T
       const int &ptid20, const int &ptid21, const int &ptid22,
       const int &ptid23, const int &ptid24, const int &ptid25,
       const int &ptid26, vtkUnstructuredGrid * gridData );
-
-  // --------------------------------------------------------------
-  // ! setQuadelem: build Quad element connectivity with vtkPoints
-  //   in element, there are nqp = segs * segt elements; these points 
-  //   are indexed as:
-  //                ii_s + ii_t * seg_s
-  //   \para segs: number of sampling points in s direction
-  //   \para segt: number of sampling points in t direction
-  //   \para ptoffset: the offset for this element
-  //   \para gridData: the Grid object that stores the connectivity
-  // --------------------------------------------------------------
-  void setQuadelem( const int &segs, const int &segt,
-      const int &ptoffset, vtkUnstructuredGrid * gridData );
-
+ 
   // ----------------------------------------------------------------
   // ! setTetraelem: build Tetra element connectivity with vtkPoints
   //   in element. There are 4 points in this element.

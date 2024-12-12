@@ -415,25 +415,6 @@ void VIS_T::setQuadTetraelem( const int &ptid0, const int &ptid1,
   cell->Delete();
 }
 
-void VIS_T::setQuadelem( const int &segs, const int &segt, 
-    const int &ptoffset, vtkUnstructuredGrid * gridData )
-{
-  for(int ii=0; ii<segs-1; ++ii)
-  {
-    for(int jj=0; jj<segt-1; ++jj)
-    {
-      vtkCell * cell = vtkQuad::New();
-      cell->GetPointIds()->SetId(0, ptoffset + jj*segs + ii);
-      cell->GetPointIds()->SetId(1, ptoffset + jj*segs + ii + 1);
-      cell->GetPointIds()->SetId(2, ptoffset + (jj+1)*segs + ii + 1);
-      cell->GetPointIds()->SetId(3, ptoffset + (jj+1)*segs + ii);
-
-      gridData->InsertNextCell( cell->GetCellType(), cell->GetPointIds() );
-      cell->Delete();
-    }
-  }
-}
-
 void VIS_T::read_epart( const std::string &epart_file, const int &esize,
     std::vector<int> &elem_part )
 {
