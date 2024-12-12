@@ -85,7 +85,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
-  ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
+  ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
@@ -152,19 +152,19 @@ ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns3d ns_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
-ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
-ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
-ADD_EXECUTABLE( vis_601_p1_wss vis_601_p1_wss.cpp)
-ADD_EXECUTABLE( vis_602_p2_wss vis_602_p2_wss.cpp)
+ADD_EXECUTABLE( vis_tet4_wss vis_tet4_wss.cpp)
+ADD_EXECUTABLE( vis_tet10_wss vis_tet10_wss.cpp)
+ADD_EXECUTABLE( vis_hex8_wss vis_hex8_wss.cpp)
+ADD_EXECUTABLE( vis_hex27_wss vis_hex27_wss.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_601_p1_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_602_p2_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_tet4_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_tet10_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_hex8_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_hex27_wss perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

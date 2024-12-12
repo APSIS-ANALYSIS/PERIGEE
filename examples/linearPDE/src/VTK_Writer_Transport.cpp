@@ -77,16 +77,16 @@ void VTK_Writer_Transport::writeOutput(
         elemptr, dataVecs[0] );
 
     // Set mesh connectivity
-    if( elemptr->get_Type() == 501 )
+    if( elemptr->get_Type() == FEType::Tet4 )
       VIS_T::setTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], gridData );
-    else if( elemptr->get_Type() == 502 )
+    else if( elemptr->get_Type() == FEType::Tet10 )
       VIS_T::setQuadTetraelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
           IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
           gridData );
-    else if( elemptr->get_Type() == 601 )
+    else if( elemptr->get_Type() == FEType::Hex8 )
       VIS_T::setHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
         IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], gridData );
-    else if( elemptr->get_Type() == 602 )
+    else if( elemptr->get_Type() == FEType::Hex27 )
       VIS_T::setTriQuadHexelem( IEN_e[0], IEN_e[1], IEN_e[2], IEN_e[3], 
         IEN_e[4], IEN_e[5], IEN_e[6], IEN_e[7], IEN_e[8], IEN_e[9],
         IEN_e[10], IEN_e[11], IEN_e[12], IEN_e[13], IEN_e[14], IEN_e[15],

@@ -1,14 +1,14 @@
 #ifndef FEAELEMENT_TET4_HPP
 #define FEAELEMENT_TET4_HPP
-// ==================================================================
+// ============================================================================
 // FEAElement_Tet4.hpp
-// Element routine for the linear tetrahedral element, with evaluation
-// of shape functions and their derivatives.
+// Element routine for the linear tetrahedral element, with evaluation of shape
+// functions and their derivatives.
 // 
 // Tet4 means 4-node tet, aka linear tets.
 //
 // Date Created: Jan 19 2017
-// ==================================================================
+// ============================================================================
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
@@ -22,15 +22,13 @@ class FEAElement_Tet4 : public FEAElement
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element.
-    virtual int get_Type() const {return 501;}
+    virtual FEType get_Type() const {return FEType::Tet4;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 
     virtual int get_nLocBas() const {return 4;}
 
     virtual void print_info() const;
-
-    virtual double get_memory_usage() const;
 
     // Given the quadrature points and nodal coordinates, evaluate the basis 
     // functions and their derivatives up to second order

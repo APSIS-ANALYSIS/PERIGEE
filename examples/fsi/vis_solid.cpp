@@ -124,12 +124,12 @@ int main ( int argc , char * argv[] )
   FEAElement * element = nullptr; 
 
   // We assume that the same element type is used for pressure and velocity
-  if( GMIptr_v->get_elemType() == 501 )
+  if( GMIptr_v->get_elemType() == FEType::Tet4 )
   {
     quad = new QuadPts_vis_tet4();
     element = new FEAElement_Tet4( quad-> get_num_quadPts() );
   }
-  else if( GMIptr_v->get_elemType() == 601 )
+  else if( GMIptr_v->get_elemType() == FEType::Hex8 )
   {
     quad = new QuadPts_vis_hex8();
     element = new FEAElement_Hex8( quad-> get_num_quadPts() );

@@ -86,7 +86,8 @@ int main( int argc, char *argv[] )
   const std::string part_v_file = pcmd_h5r -> read_string(    "/", "part_file_v" );
   const std::string part_p_file = pcmd_h5r -> read_string(    "/", "part_file_p" );
   const int fsiBC_type          = pcmd_h5r -> read_intScalar( "/", "fsiBC_type" );
-  const int elemType            = pcmd_h5r -> read_intScalar("/","elemType");
+  const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 
@@ -212,9 +213,9 @@ int main( int argc, char *argv[] )
 
   ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
 
-  const int nqp_vol { (elemType == 501) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
+  const int nqp_vol { (elemType == FEType::Tet4) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
 
-  const int nqp_sur { (elemType == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+  const int nqp_sur { (elemType == FEType::Tet4) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
   Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, ps_file_name);
  
@@ -242,7 +243,7 @@ int main( int argc, char *argv[] )
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
 
-  if( elemType == 501 )
+  if( elemType == FEType::Tet4 )
   {
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
@@ -250,7 +251,7 @@ int main( int argc, char *argv[] )
     elementv = new FEAElement_Tet4( nqp_vol );
     elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
   }
-  else if( elemType == 601 )
+  else if( elemType == FEType::Hex8 )
   {
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );

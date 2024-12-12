@@ -92,7 +92,7 @@ class FEAElement_Hex27 : public FEAElement
     virtual int get_elemDim() const {return 3;}
 
     // A unique number for this element.
-    virtual int get_Type() const {return 602;}
+    virtual FEType get_Type() const {return FEType::Hex27;}
 
     virtual int get_numQuapts() const {return numQuapts;}
 

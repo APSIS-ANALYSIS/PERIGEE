@@ -83,14 +83,14 @@ void VTK_Writer_Elastodynamics::writeOutput(
     interpolateCauchy( ptOffset, &inputInfo[0], elemptr, dataVecs[1] );
 
     // Set mesh connectivity
-    if( elemptr->get_Type() == 501 )
+    if( elemptr->get_Type() == FEType::Tet4 )
       VIS_T::setTetraelem( ptOffset, gridData );
-    else if( elemptr->get_Type() == 502 )
+    else if( elemptr->get_Type() == FEType::Tet10 )
       VIS_T::setQuadTetraelem( ptOffset, gridData );
-    else if( elemptr->get_Type() == 601 )
-      VIS_T::setHexelem( 2, 2, 2, ptOffset, gridData );
-    else if( elemptr->get_Type() == 602 )
-      VIS_T::setHexelem( 3, 3, 3, ptOffset, gridData );
+    else if( elemptr->get_Type() == FEType::Hex8 )
+      VIS_T::setHexelem( ptOffset, gridData );
+    else if( elemptr->get_Type() == FEType::Hex27 )
+      VIS_T::setTriQuadHexelem( ptOffset, gridData );
     else SYS_T::print_fatal("Error: unknown element type.\n");
 
     ptOffset += elemptr->get_nLocBas();
