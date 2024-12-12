@@ -255,7 +255,6 @@ void VIS_T::writepvdFile( const std::string &baseName,
 
 void VIS_T::setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData )
 {
-  
   vtkCell * cell = vtkHexahedron::New();
 
   cell->GetPointIds()->SetId( 0, ptoffset + 0 );
