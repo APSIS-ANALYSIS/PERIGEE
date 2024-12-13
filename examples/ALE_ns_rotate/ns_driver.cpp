@@ -15,6 +15,7 @@
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_InflowBC.hpp"
+#include "ALocal_RotatedBC.hpp"
 #include "ALocal_Interface.hpp"
 #include "Sliding_Interface_Tools.hpp"
 #include "Matrix_Free_Tools.hpp"
@@ -71,7 +72,7 @@ int main(int argc, char *argv[])
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
-  double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
+  double inflow_thd_time = 0.01; // prescribed time for inflow to reach steadness
   double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
 
   // Turbulence intensity for the purtabation at inlets, 3% ==> 0.03
@@ -114,7 +115,8 @@ int main(int argc, char *argv[])
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Angular velocity
-  double angular_velo = -250 * MATH_T::PI / 3; //(rad/s)
+  double angular_velo = 250 * MATH_T::PI; //(rad/s)
+  double angular_thd_time = 1.5; // prescribed time for rotating part to reach angular velocity // 1.5 1.0
 
   // Yaml options
   bool is_loadYaml = true;
@@ -156,6 +158,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
   SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
   SYS_T::GetOptionReal("-inflow_TI_perturbation", inflow_TI_perturbation);
+  SYS_T::GetOptionReal("-angular_velo", angular_velo);
+  SYS_T::GetOptionReal("-angular_thd_time", angular_thd_time);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -286,6 +290,9 @@ int main(int argc, char *argv[])
   // Local sub-domain's inflow bc
   ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
+  // Local sub-domain's rotated bc
+  ALocal_RotatedBC * locrotnbc = new ALocal_RotatedBC(part_file, rank);
+
   // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
@@ -296,14 +303,14 @@ int main(int argc, char *argv[])
   // Interfaces info
   ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
   SYS_T::commPrint("Interfaces: %d\n", locitf->get_num_itf());
-  //locitf -> print_info();
+  locitf -> print_info();
 
   SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
 
   // Local sub-domain's nodal indices
   APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
 
-  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, point_rotated, angular_direction);
+  SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, angular_thd_time, point_rotated, angular_direction);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
@@ -513,6 +520,8 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
+  SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
+
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, anchor_elementv, opposite_elementv, quads, free_quad,
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc, nz_estimate );
 
@@ -665,7 +674,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh, velo_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
       pmat, elementv, elements, anchor_elementv, opposite_elementv,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
 
@@ -675,7 +684,7 @@ int main(int argc, char *argv[])
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info;
+  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info; delete locrotnbc;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;

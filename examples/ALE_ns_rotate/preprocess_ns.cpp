@@ -15,11 +15,13 @@
 #include "Part_FEM_Rotated.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
+#include "NodalBC_3D_rotated.hpp"
 #include "ElemBC_3D_outflow.hpp"
 #include "ElemBC_3D_turbulence_wall_model.hpp"
 #include "Interface_pair.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
+#include "NBC_Partition_rotated.hpp"
 #include "EBC_Partition_outflow.hpp"
 #include "EBC_Partition_turbulence_wall_model.hpp"
 #include "Interface_Partition.hpp"
@@ -53,11 +55,14 @@ int main( int argc, char * argv[] )
   const int num_outlet                = paras["num_outlet"].as<int>();
   const std::string geo_file          = paras["geo_file"].as<std::string>();
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
-  const std::string sur_file_wall     = paras["sur_file_wall"].as<std::string>();
+  const std::string sur_file_inner_wall     = paras["sur_file_inner_wall"].as<std::string>();
+  const std::string sur_file_outer_wall     = paras["sur_file_outer_wall"].as<std::string>();
+
   const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
 
   const int num_interface_pair        = paras["num_interface_pair"].as<int>();
   const std::string rotated_geo_file  = paras["rotated_geo_file"].as<std::string>();
+  const std::string rotated_sur_file  = paras["rotated_sur_file"].as<std::string>();
   const std::string fixed_interface_base   = paras["fixed_interface_base"].as<std::string>();
   const std::string rotated_interface_base = paras["rotated_interface_base"].as<std::string>();
 
@@ -95,7 +100,8 @@ int main( int argc, char * argv[] )
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
-  cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
+  cout<<" -sur_file_inner_wall: "<<sur_file_inner_wall<<endl;
+  cout<<" -sur_file_outer_wall: "<<sur_file_outer_wall<<endl;
   cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
   cout<<" -fixed_interface_base: "<<fixed_interface_base<<endl;
   cout<<" -rotated_interface_base: "<<rotated_interface_base<<endl;
@@ -112,7 +118,9 @@ int main( int argc, char * argv[] )
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
 
-  SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
+  SYS_T::file_check(sur_file_inner_wall); cout<<sur_file_outer_wall<<" found. \n";
+
+  SYS_T::file_check(sur_file_outer_wall); cout<<sur_file_inner_wall<<" found. \n";
 
   // Generate the inlet file names and check existance
   std::vector< std::string > sur_file_in;
@@ -190,7 +198,8 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
-  cmdh5w->write_string("sur_file_wall", sur_file_wall);
+  cmdh5w->write_string("sur_file_inner_wall", sur_file_inner_wall);
+  cmdh5w->write_string("sur_file_outer_wall", sur_file_outer_wall);
   cmdh5w->write_string("fixed_interface_base", fixed_interface_base);
   cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
   cmdh5w->write_string("part_file", part_file);
@@ -360,19 +369,23 @@ int main( int argc, char * argv[] )
   
   if (wall_model_type == 0)
   {
-    dir_list.push_back( sur_file_wall );
+    dir_list.push_back( sur_file_outer_wall );
   }
   else if (wall_model_type == 1 || wall_model_type == 2)
   {
-    weak_list.push_back( sur_file_wall );
+    weak_list.push_back( sur_file_outer_wall );
   }
   else
     SYS_T::print_fatal("Unknown wall model type.");
 
   NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, nFunc );
+  NBC_list[1] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, geo_file, nFunc );
+  NBC_list[2] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, geo_file, nFunc );
+  NBC_list[3] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, geo_file, nFunc );
+
+  // Rotated BC info
+  INodalBC * RotBC = new NodalBC_3D_rotated( rotated_sur_file, geo_file,
+      nFunc, elemType );  
 
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
@@ -390,7 +403,7 @@ int main( int argc, char * argv[] )
   else
     SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the inflow boundary condition. \n");
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
+  INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_outer_wall,
       nFunc, inlet_outvec, elemType );
 
   InFBC -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
@@ -420,20 +433,17 @@ int main( int argc, char * argv[] )
   ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
-  std::vector<double> intervals_0 {-0.6, -0.2};
+  std::vector<double> intervals_0 {0.0, 6.0};
 
   Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_fixed_itf.h5", "epart_000_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, 0);
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, Vector_3(18.5, 0.0, 0.0));
 
-  std::vector<double> intervals_12 {0.0, 0.4};
+  std::vector<double> intervals_1 {-4.5, 4.5};
 
   Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_fixed_itf.h5", "epart_001_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.6, 0.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_1, 0);
 
-  Interface_pair itf_2(fixed_interface_file[2], rotated_interface_file[2], "epart_002_fixed_itf.h5", "epart_002_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_12, Vector_3(-0.2, 0.0, 0.0));
-
-  std::vector<Interface_pair> interfaces {itf_0, itf_1, itf_2};
+  std::vector<Interface_pair> interfaces {itf_0, itf_1};
  
   // Start partition the mesh for each cpu_rank 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
@@ -485,10 +495,15 @@ int main( int argc, char * argv[] )
     
     nbcpart -> write_hdf5( part_file );
 
+    //Partition Nodal Rotated BC and write to h5 file
+    NBC_Partition_rotated * rotpart = new NBC_Partition_rotated(part, mnindex, RotBC);
+
+    rotpart -> write_hdf5( part_file );
+
     // Partition Nodal Inflow BC and write to h5 file
     NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
     
-    infpart->write_hdf5( part_file );
+    infpart -> write_hdf5( part_file );
     
     // Partition Elemental BC and write to h5 file
     EBC_Partition * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
@@ -538,7 +553,7 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; delete itfpart;
+    delete part; delete nbcpart; delete rotpart; delete infpart; delete ebcpart; delete wbcpart; delete itfpart;
   }
 
   // Combine the fixed/rotated_node_vol_part_tag and rotated_node_loc_pos
@@ -640,7 +655,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto &it_nbc : NBC_list) delete it_nbc;
 
-  delete InFBC; delete ebc; delete wbc; delete mytimer;
+  delete InFBC; delete RotBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete mesh; delete IEN;
 
   return EXIT_SUCCESS;

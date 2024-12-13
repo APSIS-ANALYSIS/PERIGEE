@@ -43,6 +43,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const FEANode * const &feanode_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_RotatedBC * const &rotnbc_part,
     const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
@@ -70,8 +71,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
   PDNSolution * pre_disp_mesh = new PDNSolution(*init_mdisp);
   PDNSolution * cur_disp_mesh = new PDNSolution(*init_mdisp);
+  PDNSolution * alpha_disp_mesh = new PDNSolution(*init_mdisp);
   PDNSolution * pre_velo_mesh = new PDNSolution(*init_mvelo);
   PDNSolution * cur_velo_mesh = new PDNSolution(*init_mvelo);
+  PDNSolution * alpha_velo_mesh = new PDNSolution(*init_mvelo);  
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -94,6 +97,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
+  const double alpha_f = tmga_ptr->get_alpha_f();
+
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
@@ -102,21 +107,30 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   while( time_info->get_time() < final_time )
   {
     //Calculate the cur_velo_mesh and cur_disp_mesh
-    Vec lvelo_mesh, ldisp_mesh;
-    double * array_cur_velo_mesh, *array_cur_disp_mesh;
+    Vec lvelo_mesh, ldisp_mesh, lvelo_alp_mesh, ldisp_alp_mesh;
+    double * array_cur_velo_mesh, * array_cur_disp_mesh;
+    double * array_alp_velo_mesh, * array_alp_disp_mesh;
     VecGhostGetLocalForm(cur_velo_mesh->solution, &lvelo_mesh);
     VecGhostGetLocalForm(cur_disp_mesh->solution, &ldisp_mesh);
+    VecGhostGetLocalForm(alpha_velo_mesh->solution, &lvelo_alp_mesh);
+    VecGhostGetLocalForm(alpha_disp_mesh->solution, &ldisp_alp_mesh);    
     VecGetArray(lvelo_mesh, &array_cur_velo_mesh);
     VecGetArray(ldisp_mesh, &array_cur_disp_mesh);
+    VecGetArray(lvelo_alp_mesh, &array_alp_velo_mesh);
+    VecGetArray(ldisp_alp_mesh, &array_alp_disp_mesh);
 
     for( int ii=0; ii<pNode_ptr->get_nlocalnode_rotated(); ++ii )
     { 
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
       const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info, 0); //get_currPts() may be writtern into Sl_tools
+      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info, 0);
 
-      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info); //get_radius() may be writtern into Sl_tools
-      const Vector_3 velo_mesh_curr = Vec3::cross_product(rot_info->get_angular_velo()*rot_info->get_direction_rotated(), radius_curr);
+      const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, rot_info); 
+      const Vector_3 velo_mesh_alpha = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*rot_info->get_direction_rotated(), radius_alpha);
+
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info); //get_radius() may be writtern into Sl_tools  
+      const Vector_3 velo_mesh_curr = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + time_info->get_step())*rot_info->get_direction_rotated(), radius_curr);
 
       const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
 
@@ -124,16 +138,25 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       {
         array_cur_velo_mesh[offset + jj] = velo_mesh_curr(jj);
         array_cur_disp_mesh[offset + jj] = curr_pt_xyz(jj)-init_pt_xyz(jj);  
+
+        array_alp_velo_mesh[offset + jj] = velo_mesh_alpha(jj);
+        array_alp_disp_mesh[offset + jj] = aplha_pt_xyz(jj)-init_pt_xyz(jj);  
       }
     }
 
     VecRestoreArray(lvelo_mesh, &array_cur_velo_mesh);
     VecRestoreArray(ldisp_mesh, &array_cur_disp_mesh);
+    VecRestoreArray(lvelo_alp_mesh, &array_alp_velo_mesh);
+    VecRestoreArray(ldisp_alp_mesh, &array_alp_disp_mesh);    
     VecGhostRestoreLocalForm(cur_velo_mesh->solution, &lvelo_mesh);
     VecGhostRestoreLocalForm(cur_disp_mesh->solution, &ldisp_mesh);
+    VecGhostRestoreLocalForm(alpha_velo_mesh->solution, &lvelo_alp_mesh);
+    VecGhostRestoreLocalForm(alpha_disp_mesh->solution, &ldisp_alp_mesh);
 
     cur_velo_mesh->GhostUpdate();
     cur_disp_mesh->GhostUpdate();
+    alpha_velo_mesh->GhostUpdate();
+    alpha_disp_mesh->GhostUpdate();
 
     if(time_info->get_index() % renew_tang_freq == 0 || rest_flag )
     {
@@ -150,10 +173,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         sol_base, pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh, tmga_ptr, flr_ptr,
-        alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
+        alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part, rotnbc_part,
         ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, bc_mat, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
-        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, conv_flag, nl_counter, shell );
+        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -242,7 +265,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   }
 
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol; 
-  delete pre_velo_mesh; delete cur_velo_mesh; delete pre_disp_mesh; delete cur_disp_mesh;
+  delete pre_velo_mesh; delete cur_velo_mesh; delete pre_disp_mesh; 
+  delete cur_disp_mesh; delete alpha_velo_mesh; delete alpha_disp_mesh;
 }
 
 // EOF

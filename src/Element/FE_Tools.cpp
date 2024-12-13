@@ -211,7 +211,7 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
 
   // SYS_T::commPrint("      init_dist: %e\n", init_dist);
   if (init_dist < 1e-9) return true;  // lucky enouugh 
-  if (init_dist > 2e-1) return false;
+  if (init_dist > 8) return false;
 
   // initialize the nonlinear iteration
   double curr_dist = init_dist;
