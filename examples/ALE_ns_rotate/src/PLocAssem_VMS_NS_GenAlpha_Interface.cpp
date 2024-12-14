@@ -5,7 +5,7 @@ PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
   const int &in_nlocbas, const int &in_nqp,
   const int &in_snlocbas, const double &in_rho, 
   const double &in_vis_mu, const double &in_beta,
-  const int &elemtype, const double &angular,
+  const FEType &elemtype, const double &angular,
   const Vector_3 &point_xyz, const Vector_3 &angular_direc,
   const double &in_ct, const double &in_ctauc,
   const double &in_C_bI)
