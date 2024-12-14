@@ -26,7 +26,7 @@ class NodalBC_3D_rotated : public INodalBC
         const std::string &rotated_file,
         const std::string &fixed_file,
         const int &nFunc,
-        const int &elemtype );
+        const FEType &elemtype );
 
     virtual ~NodalBC_3D_rotated() = default;
 
@@ -98,7 +98,7 @@ class NodalBC_3D_rotated : public INodalBC
     unsigned int num_dir_nodes; 
 
     // number of moving surfaces and element type
-    const int elem_type;
+    const FEType elem_type;
 
     // number of nodes and cells on rotated surface.
     // Note: num_node equal num_dir_nodes in this class.

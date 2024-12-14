@@ -3,7 +3,7 @@
 NodalBC_3D_rotated::NodalBC_3D_rotated( 
     const std::string &rotated_file,
     const std::string &fixed_file,
-    const int &nFunc, const int &elemtype )
+    const int &nFunc, const FEType &elemtype )
 : elem_type( elemtype )
 {
   // Prepare the numbers that need to be shifted
@@ -23,13 +23,13 @@ NodalBC_3D_rotated::NodalBC_3D_rotated(
   SYS_T::file_check( rotated_file );
   SYS_T::file_check( fixed_file );
 
-  if( elemtype == 501 )
+  if( elem_type == FEType::Tet4 )
     nLocBas = 3;
-  else if( elemtype == 502 )
+  else if( elem_type == FEType::Tet10 )
     nLocBas = 6;
-  else if( elemtype == 601 )
+  else if( elem_type == FEType::Hex8 )
     nLocBas = 4;
-  else if( elemtype == 602 )
+  else if( elem_type == FEType::Hex27 )
     nLocBas = 9;
   else 
     SYS_T::print_fatal("Error: NodalBC_3D_rotated::NodalBC_3D_rotated: unknown element type.\n");
