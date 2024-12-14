@@ -3,7 +3,7 @@
 Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::string &rotated_vtkfile,
   const std::string &fixed_h5file, const std::string &rotated_h5file, 
   const int &total_num_fixed_elem, const int &total_num_fixed_pt,
-  const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const int &elemtype_in,
+  const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const FEType &elemtype_in,
   const std::vector<double> &intervals_in, const int &direction_in) :
   interface_type {0}, T0_axial_direction{direction_in}, T1_surface_centroid{Vector_3(0,0,0)}
 {
@@ -14,7 +14,7 @@ Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::stri
 Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::string &rotated_vtkfile,
   const std::string &fixed_h5file, const std::string &rotated_h5file, 
   const int &total_num_fixed_elem, const int &total_num_fixed_pt,
-  const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const int &elemtype_in,
+  const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const FEType &elemtype_in,
   const std::vector<double> &intervals_in, const Vector_3 &centroid_in) :
   interface_type {1}, T0_axial_direction{-1}, T1_surface_centroid{centroid_in}
 {
@@ -30,7 +30,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
                     const int &total_num_fixed_pt,
                     const std::vector<double> &all_vol_ctrlPts,
                     const IIEN * const &VIEN,
-                    const int &elemtype_in,
+                    const FEType &elemtype_in,
                     const std::vector<double> &intervals_in)
 { 
   // Read the vtk files
@@ -53,19 +53,19 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
   switch (elemtype_in)
   {
-    case 501:
+    case FEType::Tet4:
       s_nLocBas = 3; v_nLocBas = 4;
     break;
 
-    case 502:
+    case FEType::Tet10:
       s_nLocBas = 6; v_nLocBas = 10;
     break;
 
-    case 601:
+    case FEType::Hex8:
       s_nLocBas = 6; v_nLocBas = 8;
     break;
 
-    case 602:
+    case FEType::Hex27:
       s_nLocBas = 9; v_nLocBas = 27;
     break;
     
@@ -86,7 +86,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   rotated_cpu_rank = HDF5_T::read_intVector( rotated_h5file.c_str(), "/", "part");
 
   // Generate the face id and layer's ien array
-  if(elemtype_in == 501 || elemtype_in == 502)
+  if(elemtype_in == FEType::Tet4 || elemtype_in == FEType::Tet10)
   {
     TET_T::Tet4 * tetcell = new TET_T::Tet4();
     
@@ -132,7 +132,7 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
 
     delete tetcell;
   }
-  else if(elemtype_in == 601 || elemtype_in == 602)
+  else if(elemtype_in == FEType::Hex8 || elemtype_in == FEType::Hex27)
   {
     HEX_T::Hex8 * hexcell = new HEX_T::Hex8();
 
