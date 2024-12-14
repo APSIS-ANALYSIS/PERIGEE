@@ -70,7 +70,7 @@ int main( int argc, char * argv[] )
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
   const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
 
-  const FEType elemType = FEType::Tet10;
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
