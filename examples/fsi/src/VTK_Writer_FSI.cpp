@@ -63,12 +63,12 @@ void VTK_Writer_FSI::writeOutput(
         const std::string &outputName,
         const bool &isXML )
 {
-  if(nLocBas == 4)  // elemType 501
+  if(nLocBas == 4)  // elemType Tet4
   {
     // This routine requires nqp = 4
     SYS_T::print_fatal_if(quad->get_num_quadPts() != 4, "Error: VTK_Writer requires 4 quadrature points for Tet4.\n");
   }
-  else if(nLocBas == 8)  // elemType 601
+  else if(nLocBas == 8)  // elemType Hex8
   {
     // This routine requires nqp = 8
     SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 8 quadrature points for Hex8.\n");    
