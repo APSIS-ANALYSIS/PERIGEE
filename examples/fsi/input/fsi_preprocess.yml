@@ -1,5 +1,5 @@
-# Element options: 501 linear tet, 601 trilinear hex
-elem_type: 601
+# Element options: Tet4 linear tet, Hex8 trilinear hex
+elem_type: Hex8
 # Wall options: 0 deformable wall, 1 rigid wall, 2 prestress generation
 fsiBC_type: 0
 # The ring nodes: 0 fully clamped
