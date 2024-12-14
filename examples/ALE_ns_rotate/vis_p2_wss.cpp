@@ -1,15 +1,15 @@
-// ==================================================================
-// vis_p2_wss.cpp
+// ============================================================================
+// vis_tet10_wss.cpp
 //
 // WSS visualization for ten-node tet elements.
 //
 // Date: March 2nd 2020
-// ==================================================================
+// ============================================================================
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tri6.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
-#include "QuadPts_vis_tet10_v2.hpp"
-#include "FEAElement_Tet10_v2.hpp"
+#include "QuadPts_vis_tet10.hpp"
+#include "FEAElement_Tet10.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
 
 std::vector<int> range_generator( const int &ii );
@@ -68,7 +68,9 @@ int main( int argc, char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
   const std::string geo_file  = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
-  const int elemType = cmd_h5r -> read_intScalar("/", "elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
+
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -82,7 +84,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // Enforce the element to be quadratic tet for now
-  if( elemType != 502 ) SYS_T::print_fatal("Error: element type should be 502 quadratic tet element.\n");
+  if( elemType != FEType::Tet10 ) SYS_T::print_fatal("Error: element type should be quadratic tet element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -101,7 +103,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<" geo_file: "<<geo_file<<endl;
   cout<<" wall_file: "<<wall_file<<endl;
-  cout<<" elemType: "<<elemType<<endl;
+  cout<<" elemType: "<<elemType_str<<endl;
   cout<<" out_bname: "<<out_bname<<endl;
   cout<<" fl_mu: "<<fluid_mu<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
@@ -173,11 +175,11 @@ int main( int argc, char * argv[] )
   }
 
   // Volumetric element visualization sampling point 
-  IQuadPts * quad = new QuadPts_vis_tet10_v2();
+  IQuadPts * quad = new QuadPts_vis_tet10();
 
   quad -> print_info();
 
-  FEAElement * element = new FEAElement_Tet10_v2( quad-> get_num_quadPts() );
+  FEAElement * element = new FEAElement_Tet10( quad-> get_num_quadPts() );
 
   double * v_ectrl_x = new double [v_nLocBas];
   double * v_ectrl_y = new double [v_nLocBas];
