@@ -3,14 +3,14 @@
 FEAElement_Quad4::FEAElement_Quad4( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(8 * numQuapts);
+  R.resize(4 * numQuapts);
 
-  dR_dx.resize(8 * numQuapts);
-  dR_dy.resize(8 * numQuapts);
+  dR_dx.resize(4 * numQuapts);
+  dR_dy.resize(4 * numQuapts);
 
-  d2R_dxx.resize(8 * numQuapts);
-  d2R_dyy.resize(8 * numQuapts);
-  d2R_dxy.resize(8 * numQuapts);
+  d2R_dxx.resize(4 * numQuapts);
+  d2R_dyy.resize(4 * numQuapts);
+  d2R_dxy.resize(4 * numQuapts);
 
   Jac.resize(9 * numQuapts);
 }
