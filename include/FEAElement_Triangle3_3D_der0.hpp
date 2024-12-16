@@ -22,7 +22,7 @@
 #include "FEAElement.hpp"
 #include "Math_Tools.hpp"
 
-class FEAElement_Triangle3_3D_der0 : public FEAElement
+class FEAElement_Triangle3_3D_der0 final : public FEAElement
 {
   public:
     FEAElement_Triangle3_3D_der0( const int &in_nqua );

@@ -12,7 +12,7 @@
 #include "FEAElement.hpp"
 #include "FE_Tools.hpp"
 
-class FEAElement_Quad4 : public FEAElement
+class FEAElement_Quad4 final : public FEAElement
 {
   public:
     FEAElement_Quad4( const int &in_nqua );
