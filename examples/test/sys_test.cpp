@@ -211,9 +211,9 @@ void generateHex8_Quad4_der0(double * x, double * y, double * z,
 
     for (size_t i = 0; i < 4; ++i)
     {
-	    x_der0[i] = x[i];
-	    y_der0[i] = y[i];
-	    z_der0[i] = z[i];
+        x_der0[i] = x[i];
+        y_der0[i] = y[i];
+        z_der0[i] = z[i];
     }
 }
 
@@ -264,13 +264,13 @@ void generateHex27_Quad9_der0(double * x, double * y, double * z,
 
     for (size_t i = 0; i < 4; ++i)
     {
-	    x_der0[i] = x[i];
-	    y_der0[i] = y[i];
-	    z_der0[i] = z[i];
+        x_der0[i] = x[i];
+        y_der0[i] = y[i];
+        z_der0[i] = z[i];
 
-	    x_der0[4+i] = x[8+i];
-	    y_der0[4+i] = y[8+i];
-	    z_der0[4+i] = z[8+i];
+        x_der0[4+i] = x[8+i];
+        y_der0[4+i] = y[8+i];
+        z_der0[4+i] = z[8+i];
     }
 
     x_der0[8] = x[24];
