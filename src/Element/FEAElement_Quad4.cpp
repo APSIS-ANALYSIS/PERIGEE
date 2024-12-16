@@ -181,8 +181,8 @@ void FEAElement_Quad4::get_2D_R_dR_d2R( const int &quaindex,
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
     basis_y[ii] = dR_dy[offset + ii];
-    basis_xx[ii] = d2R_dxx[offset + ii];
-    basis_yy[ii] = d2R_dyy[offset + ii];
+    basis_xx[ii] = 0.0;
+    basis_yy[ii] = 0.0;
     basis_xy[ii] = d2R_dxy[offset + ii];
   }
 }
