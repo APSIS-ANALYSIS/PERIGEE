@@ -127,7 +127,7 @@ int main( int argc, char * argv[] )
     cout<<sur_file_out[ii]<<" found. \n";
   }
 
-  // // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
+  // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
   HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
