@@ -78,14 +78,16 @@ double POST_ERROR_E::get_manu_sol_errorH1(
 {
   double errorH1 = 0.0;
 
+  double * R = new double[element->get_nLocBas()];
+  double * R_dx = new double[element->get_nLocBas()];
+  double * R_dy = new double[element->get_nLocBas()];
+  double * R_dz = new double[element->get_nLocBas()];
+
   for(int qua=0; qua<quad->get_num_quadPts(); ++qua)
   {
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    const std::vector<double> R = element -> get_R( qua );
-    const std::vector<double> Rx = element -> get_dR_dx( qua );
-    const std::vector<double> Ry = element -> get_dR_dy( qua );
-    const std::vector<double> Rz = element -> get_dR_dz( qua );
+    element->get_R_gradR(qua, R, R_dx, R_dy, R_dz);
     
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     Vector_3 sol(0.0, 0.0, 0.0);
@@ -125,6 +127,11 @@ double POST_ERROR_E::get_manu_sol_errorH1(
     errorH1 += (sol.y() - exact.y()) * (sol.y() - exact.y()) * gwts;
     errorH1 += (sol.z() - exact.z()) * (sol.z() - exact.z()) * gwts;
   }
+
+  delete [] R; R = nullptr;
+  delete [] R_dx; R_dx = nullptr;
+  delete [] R_dy; R_dy = nullptr;
+  delete [] R_dz; R_dz = nullptr;
 
   return errorH1;
 }
