@@ -30,17 +30,7 @@ class AGlobal_Mesh_Info
       nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
       probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
       elemType_str = h5r -> read_string("Global_Mesh_Info", "elemType");
-
-      if (elemType_str==std::string("Tet4"))
-        elemType = FEType::Tet4;
-      else if (elemType_str==std::string("Tet10"))
-        elemType = FEType::Tet10;
-      else if (elemType_str==std::string("Hex8"))
-        elemType = FEType::Hex8;
-      else if(elemType_str==std::string("Hex27"))
-        elemType = FEType::Hex27;
-      else 
-        elemType = FEType::Unknown;
+      elemType = FE_T::to_FEType(elemType_str);
 
       H5Fclose( file_id );
     }
