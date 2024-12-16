@@ -58,17 +58,7 @@ void ElemBC_3D::print_info() const
 {
   std::cout<<"========================= \n";
   std::cout<<"ElemBC_3D : ";
-  //std::cout<<" elem_type = "<<elem_type<<'\t';
-  if(elem_type == FEType::Tet4)
-    std::cout<<" elem_type = Tet4"<<'\t';
-  else if(elem_type == FEType::Tet10)
-    std::cout<<" elem_type = Tet10"<<'\t';
-  else if(elem_type == FEType::Hex8)
-    std::cout<<" elem_type = Hex8"<<'\t';
-  else if(elem_type == FEType::Hex27)
-    std::cout<<" elem_type = Hex27"<<'\t';
-  else
-    std::cout<< " elem_type = Unknown"<<'\t';
+  std::cout<<" elem_type = "<<FE_T::to_string(elem_type)<<'\t';
   std::cout<<" num_ebc = "<<num_ebc<<std::endl;
   for(int ii=0; ii<num_ebc; ++ii)
   {
