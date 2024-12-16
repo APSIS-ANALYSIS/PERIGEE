@@ -21,7 +21,6 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "FEType.hpp"
 
 class NodalBC_3D_inflow : public INodalBC
 {
