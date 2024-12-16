@@ -76,7 +76,6 @@ int main( int argc, char * argv[] )
   
   IMesh * mesh = nullptr;
 
-
   switch( elemType )
   {
     case FEType::Tet4:

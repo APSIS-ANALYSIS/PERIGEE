@@ -65,7 +65,6 @@ int main( int argc, char * argv[] )
   //                  2 strongly enforced in wall-normal direction,
   //                   and weakly enforced in wall-tangent direction
 
-  
   if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27)
     SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
