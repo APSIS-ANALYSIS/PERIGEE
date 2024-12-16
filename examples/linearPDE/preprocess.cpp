@@ -45,6 +45,7 @@ int main( int argc, char * argv[] )
   const std::vector<std::string> neu_list = paras["Neumann"].as<std::vector<std::string>>();
   const std::vector<std::vector<std::string>> dir_list = paras["Dirichlet"].as<std::vector<std::vector<std::string>>>();
   const FEType elemType = FE_T::to_FEType(elemType_str);
+
   // Check if the element type is valid
   if( elemType != FEType::Tet4 && elemType != FEType::Tet10 && elemType != FEType::Hex8 && elemType != FEType::Hex27 ) 
     SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());

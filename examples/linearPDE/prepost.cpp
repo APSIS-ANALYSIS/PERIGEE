@@ -42,7 +42,6 @@ int main( int argc, char * argv[] )
   const int dofNum     = cmd_h5r -> read_intScalar("/","dof_num");
   const int dofMat     = cmd_h5r -> read_intScalar("/","dof_mat");
   int in_ncommon       = cmd_h5r -> read_intScalar("/","in_ncommon");
-
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
