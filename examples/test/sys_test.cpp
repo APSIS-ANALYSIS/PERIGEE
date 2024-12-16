@@ -442,7 +442,7 @@ void generateTri6(double * x, double * y) {
 
 void outputVector(double * const vec, size_t size)
 {
-	for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         std::cout << vec[i];
         if (i < size - 1) std::cout << " ";
@@ -452,7 +452,7 @@ void outputVector(double * const vec, size_t size)
 
 void outputVector(const std::vector<double> vec, size_t size)
 {
-	for (size_t i = 0; i < size; ++i)
+    for (size_t i = 0; i < size; ++i)
     {
         std::cout << vec[i];
         if (i < size - 1) std::cout << " ";
@@ -462,7 +462,7 @@ void outputVector(const std::vector<double> vec, size_t size)
 
 void outputArray(const std::array<double, 9> arr)
 {
-	for (size_t i = 0; i < 9; ++i)
+    for (size_t i = 0; i < 9; ++i)
     {
         std::cout << arr[i];
         if (i < 8) std::cout << " ";
@@ -472,7 +472,7 @@ void outputArray(const std::array<double, 9> arr)
 
 void outputArray(const std::array<double, 4> arr)
 {
-	for (size_t i = 0; i < 4; ++i)
+    for (size_t i = 0; i < 4; ++i)
     {
         std::cout << arr[i];
         if (i < 3) std::cout << " ";
