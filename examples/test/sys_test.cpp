@@ -631,8 +631,8 @@ void testMemberFunction(FEAElement * const &elementv, FEAElement * const &elemen
 
     for(int qua=0; qua<numQuapts_der0; ++qua)
     {
-        elements->get_R(qua, R);
-        outputVector(R, nLocBas_der0);
+        elements->get_R(qua, R_der0);
+        outputVector(R_der0, nLocBas_der0);
 
         std::vector<double> RR = elements->get_R(qua);
         outputVector(RR, nLocBas_der0);
@@ -673,6 +673,14 @@ void testMemberFunction(FEAElement * const &elementv, FEAElement * const &elemen
         std::cout << area << std::endl;
         std::cout << outwardnormal.x() << ' ' << outwardnormal.y() << ' ' << outwardnormal.z() << std::endl;
     }
+
+    // for(int ii=0; ii<nLocBas; ++ii)
+    // {
+    //     std::array<std::vector<double>, 3> face_ctrlPts = elementv->get_face_ctrlPts( ii, ctrl_x, ctrl_y, ctrl_z );
+    //     outputVector(face_ctrlPts[0], nLocBas_der0);
+    //     outputVector(face_ctrlPts[1], nLocBas_der0);
+    //     outputVector(face_ctrlPts[2], nLocBas_der0);
+    // }
 
     delete quadv; quadv = nullptr;
     delete quads; quads = nullptr;
@@ -982,8 +990,6 @@ int main(int argc, char *argv[])
 
     delete [] ctrl_x_tri6; ctrl_x_tri6 = nullptr;
     delete [] ctrl_y_tri6; ctrl_y_tri6 = nullptr;
-
-    delete [] outfile; outfile = nullptr;
 
     return 0;
 }
