@@ -16,83 +16,59 @@ class FEAElement_Triangle3 final : public FEAElement
   public:
     FEAElement_Triangle3( const int &in_nqua );
 
-    virtual ~FEAElement_Triangle3();
+    ~FEAElement_Triangle3() override = default;
 
-    virtual int get_elemDim() const {return 2;}
+    int get_elemDim() const override {return 2;}
 
-    virtual FEType get_Type() const {return FEType::Tri3;}
+    FEType get_Type() const override {return FEType::Tri3;}
 
-    virtual int get_numQuapts() const {return numQuapts;}
+    int get_numQuapts() const override {return numQuapts;}
 
-    virtual int get_nLocBas() const {return 3;}
+    int get_nLocBas() const override {return 3;}
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual double get_memory_usage() const;
-
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
+    void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
-        const double * const &ctrl_y );
+        const double * const &ctrl_y ) override;
 
-    virtual double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y ) const;
+    double get_h( const double * const &ctrl_x,
+        const double * const &ctrl_y ) const override;
 
-    virtual void get_R( const int &quaindex, double * const &basis ) const;
+    void get_R( const int &quaindex, double * const &basis ) const override;
     
-    virtual std::vector<double> get_R( const int &quaindex ) const;
+    std::vector<double> get_R( const int &quaindex ) const override;
 
-    virtual void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y ) const;
+    void get_gradR( const int &quaindex, double * const &basis_x,
+        double * const &basis_y ) const override;
 
-    virtual void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y ) const;
+    void get_R_gradR( const int &quaindex, double * const &basis,
+        double * const &basis_x, double * const &basis_y ) const override;
 
-    virtual std::vector<double> get_dR_dx( const int &quaindex ) const;
-
-    virtual std::vector<double> get_dR_dy( const int &quaindex ) const;
-
-    virtual void get_2D_R_dR_d2R( const int &quaindex, 
+    void get_2D_R_dR_d2R( const int &quaindex, 
         double * const &basis, 
         double * const &basis_x, double * const &basis_y, 
         double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_xy ) const;
+        double * const &basis_xy ) const override;
 
-    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_d2R_dxx function error.\n" );
-      return { 0.0, 0.0, 0.0 };
-    }
+    void get_Jacobian(const int &quaindex, double * const &jac_value) const override;
 
-    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_d2R_dyy function error.\n" );
-      return { 0.0, 0.0, 0.0 };
-    }
+    void get_invJacobian(const int &quaindex, double * const &jac_value) const override;
 
-    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
-    {
-      ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_d2R_dxy function error.\n" );
-      return { 0.0, 0.0, 0.0 };
-    }
-
-    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const;
-
-    virtual void get_invJacobian(const int &quaindex, double * const &jac_value) const;
-
-    virtual double get_detJac(const int &quaindex) const {return detJac;}
+    double get_detJac(const int &quaindex) const override {return detJac;}
 
   private:
     const int numQuapts;
 
-    double * R;
+    std::vector<double> R {};
 
     // tri3 is linear element, hence the derivatives are constant
-    double dR_dx[3], dR_dy[3];
+    std::array<double, 3> dR_dx, dR_dy;
 
     // Container for 
     // dx_dr : 0 <= ii < 4
     // dr_dx : 4 <= ii < 8
-    double Jac[8];
+    std::array<double, 8> Jac;
 
     double detJac;
 };

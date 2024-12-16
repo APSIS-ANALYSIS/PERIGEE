@@ -27,83 +27,81 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
   public:
     FEAElement_Triangle3_3D_der0( const int &in_nqua );
 
-    virtual ~FEAElement_Triangle3_3D_der0();
+    ~FEAElement_Triangle3_3D_der0() override = default;
 
-    virtual int get_elemDim() const {return 2;}
+    int get_elemDim() const override {return 2;}
 
     // element type : 521
     // 5: simplicial element
     // 2: 2D element
-    virtual FEType get_Type() const {return FEType::Tri3_der0;}
+    FEType get_Type() const override {return FEType::Tri3_der0;}
 
-    virtual int get_numQuapts() const {return numQuapts;}
+    int get_numQuapts() const override {return numQuapts;}
 
-    virtual int get_nLocBas() const {return 3;}
+    int get_nLocBas() const override {return 3;}
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual double get_memory_usage() const;
-
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
+    void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z );
+        const double * const &ctrl_z ) override;
 
-    virtual void get_R( const int &quaindex, double * const &basis ) const;
+    void get_R( const int &quaindex, double * const &basis ) const override;
 
-    virtual std::vector<double> get_R( const int &quaindex ) const;
+    std::vector<double> get_R( const int &quaindex ) const override;
 
     // Assumes the triangle nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
-    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const;
+    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override;
 
     // If the triangle nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction.
-    virtual Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
-        const Vector_3 &int_pt, double &area ) const;
+    Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
+        const Vector_3 &int_pt, double &area ) const override;
 
-    virtual double get_detJac(const int &quaindex) const {return detJac;}
+    double get_detJac(const int &quaindex) const override {return detJac;}
 
     // Return the derivatives of the physical coordinates with respect to the
     // element reference coordinate.
     // These functions are needed in the FE_T::search_closest_point function,
     // which is called inside the sliding interface formulation.
-    virtual Vector_3 get_dx_dr( const int &quaindex,
+    Vector_3 get_dx_dr( const int &quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z ) const
+        const double * const &ctrl_z ) const override
     {
       return Vector_3( - ctrl_x[0] + ctrl_x[1],
                        - ctrl_y[0] + ctrl_y[1],
                        - ctrl_z[0] + ctrl_z[1] );
     }
     
-    virtual Vector_3 get_dx_ds( const int &quaindex,
+    Vector_3 get_dx_ds( const int &quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z ) const
+        const double * const &ctrl_z ) const override
     {
       return Vector_3( - ctrl_x[0] + ctrl_x[2],
                        - ctrl_y[0] + ctrl_y[2],
                        - ctrl_z[0] + ctrl_z[2] );
     }
 
-    virtual Vector_3 get_d2x_drr( const int &quaindex,
+    Vector_3 get_d2x_drr( const int &quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z ) const
+        const double * const &ctrl_z ) const override
     {return Vector_3(0.0, 0.0, 0.0);}
 
-    virtual Vector_3 get_d2x_dss( const int &quaindex,
+    Vector_3 get_d2x_dss( const int &quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z ) const
+        const double * const &ctrl_z ) const override
     {return Vector_3(0.0, 0.0, 0.0);}
 
-    virtual Vector_3 get_d2x_drs( const int &quaindex,
+    Vector_3 get_d2x_drs( const int &quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z ) const
+        const double * const &ctrl_z ) const override
     {return Vector_3(0.0, 0.0, 0.0);}
 
   private:
@@ -111,7 +109,7 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
 
     // container for R0 = 1 - r - s, R1 = r, R2 = s :
     // 0 <= ii < 3 x numQuapts
-    double * R;
+    std::vector<double> R {};
 
     // unit outward normal vector
     Vector_3 un;
