@@ -3,12 +3,7 @@
 FEAElement_Triangle3_3D_der0::FEAElement_Triangle3_3D_der0( 
     const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R = new double [ 3 * numQuapts ];
-}
-
-FEAElement_Triangle3_3D_der0::~FEAElement_Triangle3_3D_der0()
-{
-  delete [] R; R = nullptr;
+  R.resize(3 * numQuapts);
 }
 
 void FEAElement_Triangle3_3D_der0::print_info() const
@@ -16,13 +11,6 @@ void FEAElement_Triangle3_3D_der0::print_info() const
   SYS_T::commPrint("Triangle3_3D_der0: ");
   SYS_T::commPrint("3-node triangle element with no derivative evaluated. \n ");
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
-}
-
-double FEAElement_Triangle3_3D_der0::get_memory_usage() const
-{
-  double double_size = 3 * numQuapts + 10.0;
-  double int_size = 2;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
