@@ -27,7 +27,7 @@ void writeCoordinatesToFile(const char* filename, double* x, double* y, double* 
         std::cerr << "Invalid filename: " << filename << std::endl;
         return;
     }
-	file << std::fixed << std::setprecision(15);
+    file << std::fixed << std::setprecision(15);
 
     for (size_t i = 0; i < size; ++i) {
         file << x[i];
