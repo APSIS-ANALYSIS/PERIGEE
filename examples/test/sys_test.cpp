@@ -195,7 +195,7 @@ void generateHex8_Quad4_der0(double * x, double * y, double * z,
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
     for (size_t i = 0; i < 8; ++i) 
-	{
+    {
         double length = dist_length(gen);
         double theta = dist_angle(gen);
         double phi = dist_angle(gen);
@@ -209,45 +209,46 @@ void generateHex8_Quad4_der0(double * x, double * y, double * z,
         z[i] = baseZ[i] + dz;
     }
 
-	for (size_t i = 0; i < 4; ++i)
-	{
-		x_der0[i] = x[i];
-		y_der0[i] = y[i];
-		z_der0[i] = z[i];
-	}
+    for (size_t i = 0; i < 4; ++i)
+    {
+	    x_der0[i] = x[i];
+	    y_der0[i] = y[i];
+	    z_der0[i] = z[i];
+    }
 }
 
 void generateHex27_Quad9_der0(double * x, double * y, double * z,
 	double * x_der0, double * y_der0, double * z_der0) 
 {
     double baseX[27] = {0, 1, 1, 0, 
-						0, 1, 1, 0, 
-						0.5, 1, 0.5, 0, 
-						0.5, 1, 0.5, 0, 
-						0, 1, 1, 0, 
-						0, 0.5, 1, 0.5, 
-						0.5, 0.5, 0.5};
+                        0, 1, 1, 0, 
+                        0.5, 1, 0.5, 0, 
+                        0.5, 1, 0.5, 0, 
+                        0, 1, 1, 0, 
+                        0, 0.5, 1, 0.5, 
+                        0.5, 0.5, 0.5};
     double baseY[27] = {0, 0, 1, 1, 
-						0, 0, 1, 1, 
-						0, 0.5, 1, 0.5, 
-						0, 0.5, 1, 0.5, 
-						0, 0, 1, 1, 
-						0.5, 0.5, 0, 1,
-						0.5, 0.5, 0.5};
+                        0, 0, 1, 1, 
+                        0, 0.5, 1, 0.5, 
+                        0, 0.5, 1, 0.5, 
+                        0, 0, 1, 1, 
+                        0.5, 0.5, 0, 1,
+                        0.5, 0.5, 0.5};
     double baseZ[27] = {0, 0, 0, 0, 
-						1, 1, 1, 1,
-						0, 0, 0, 0,
-						1, 1, 1, 1,
-						0.5, 0.5, 0.5, 0.5,
-						0.5, 0.5, 0.5, 0.5,
-						0, 0.5, 1};
+                        1, 1, 1, 1,
+                        0, 0, 0, 0,
+                        1, 1, 1, 1,
+                        0.5, 0.5, 0.5, 0.5,
+                        0.5, 0.5, 0.5, 0.5,
+                        0, 0.5, 1};
 
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dist_length(0.0, 0.15);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 27; ++i) {
+    for (size_t i = 0; i < 27; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
         double phi = dist_angle(gen);
@@ -261,20 +262,20 @@ void generateHex27_Quad9_der0(double * x, double * y, double * z,
         z[i] = baseZ[i] + dz;
     }
 
-	for (size_t i = 0; i < 4; ++i)
-	{
-		x_der0[i] = x[i];
-		y_der0[i] = y[i];
-		z_der0[i] = z[i];
+    for (size_t i = 0; i < 4; ++i)
+    {
+	    x_der0[i] = x[i];
+	    y_der0[i] = y[i];
+	    z_der0[i] = z[i];
 
-		x_der0[4+i] = x[8+i];
-		y_der0[4+i] = y[8+i];
-		z_der0[4+i] = z[8+i];
-	}
+	    x_der0[4+i] = x[8+i];
+	    y_der0[4+i] = y[8+i];
+	    z_der0[4+i] = z[8+i];
+    }
 
-	x_der0[8] = x[24];
-	y_der0[8] = y[24];
-	z_der0[8] = z[24];
+    x_der0[8] = x[24];
+    y_der0[8] = y[24];
+    z_der0[8] = z[24];
 }
 
 void generateTet4_Tri3_der0(double * x, double * y, double * z,
@@ -289,7 +290,8 @@ void generateTet4_Tri3_der0(double * x, double * y, double * z,
     std::uniform_real_distribution<double> dist_length(0.0, 0.15);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < 4; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
         double phi = dist_angle(gen);
@@ -303,12 +305,12 @@ void generateTet4_Tri3_der0(double * x, double * y, double * z,
         z[i] = baseZ[i] + dz;
     }
 
-	for (size_t i = 0; i < 3; ++i)
-	{
-		x_der0[i] = x[i];
-		y_der0[i] = y[i];
-		z_der0[i] = z[i];
-	}
+    for (size_t i = 0; i < 3; ++i)
+    {
+        x_der0[i] = x[i];
+        y_der0[i] = y[i];
+        z_der0[i] = z[i];
+    }
 }
 
 void generateTet10_Tri6_der0(double * x, double * y, double * z,
@@ -323,7 +325,8 @@ void generateTet10_Tri6_der0(double * x, double * y, double * z,
     std::uniform_real_distribution<double> dist_length(0.0, 0.1);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 10; ++i) {
+    for (size_t i = 0; i < 10; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
         double phi = dist_angle(gen);
@@ -337,16 +340,16 @@ void generateTet10_Tri6_der0(double * x, double * y, double * z,
         z[i] = baseZ[i] + dz;
     }
 
-	for (size_t i = 0; i < 3; ++i)
-	{
-		x_der0[i] = x[i];
-		y_der0[i] = y[i];
-		z_der0[i] = z[i];
+    for (size_t i = 0; i < 3; ++i)
+    {
+        x_der0[i] = x[i];
+        y_der0[i] = y[i];
+        z_der0[i] = z[i];
 
-		x_der0[3+i] = x[4+i];
-		y_der0[3+i] = y[4+i];
-		z_der0[3+i] = z[4+i];
-	}
+        x_der0[3+i] = x[4+i];
+        y_der0[3+i] = y[4+i];
+        z_der0[3+i] = z[4+i];
+    }
 }
 
 void generateQuad4(double * x, double * y) {
@@ -358,7 +361,8 @@ void generateQuad4(double * x, double * y) {
     std::uniform_real_distribution<double> dist_length(0.0, 0.2);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < 4; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
 
@@ -379,7 +383,8 @@ void generateQuad9(double * x, double * y) {
     std::uniform_real_distribution<double> dist_length(0.0, 0.1);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 9; ++i) {
+    for (size_t i = 0; i < 9; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
 
@@ -400,7 +405,8 @@ void generateTri3(double * x, double * y) {
     std::uniform_real_distribution<double> dist_length(0.0, 0.2);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 3; ++i) {
+    for (size_t i = 0; i < 3; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
 
@@ -421,7 +427,8 @@ void generateTri6(double * x, double * y) {
     std::uniform_real_distribution<double> dist_length(0.0, 0.1);
     std::uniform_real_distribution<double> dist_angle(0.0, 2 * M_PI);
 
-    for (size_t i = 0; i < 6; ++i) {
+    for (size_t i = 0; i < 6; ++i)
+	{
         double length = dist_length(gen);
         double theta = dist_angle(gen);
 
@@ -435,7 +442,8 @@ void generateTri6(double * x, double * y) {
 
 void outputVector(double * const vec, size_t size)
 {
-	for (size_t i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i)
+	{
         std::cout << vec[i];
         if (i < size - 1) std::cout << " ";
     }
@@ -444,7 +452,8 @@ void outputVector(double * const vec, size_t size)
 
 void outputVector(const std::vector<double> vec, size_t size)
 {
-	for (size_t i = 0; i < size; ++i) {
+	for (size_t i = 0; i < size; ++i)
+	{
         std::cout << vec[i];
         if (i < size - 1) std::cout << " ";
     }
@@ -453,7 +462,8 @@ void outputVector(const std::vector<double> vec, size_t size)
 
 void outputArray(const std::array<double, 9> arr)
 {
-	for (size_t i = 0; i < 9; ++i) {
+	for (size_t i = 0; i < 9; ++i)
+	{
         std::cout << arr[i];
         if (i < 8) std::cout << " ";
     }
@@ -462,7 +472,8 @@ void outputArray(const std::array<double, 9> arr)
 
 void outputArray(const std::array<double, 4> arr)
 {
-	for (size_t i = 0; i < 4; ++i) {
+	for (size_t i = 0; i < 4; ++i)
+	{
         std::cout << arr[i];
         if (i < 3) std::cout << " ";
     }
