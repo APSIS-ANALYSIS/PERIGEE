@@ -65,13 +65,7 @@ class FEAElement_Triangle6 final : public FEAElement
     const int numQuapts;
 
     // length 6 x numQuapts
-    std::vector<double> R {};
-    std::vector<double> dR_dx {};
-    std::vector<double> dR_dy {};
-    std::vector<double> dR_dz {};
-    std::vector<double> d2R_dxx {};
-    std::vector<double> d2R_dyy {};
-    std::vector<double> d2R_dxy {};
+    std::vector<double> R{}, dR_dx{}, dR_dy{}, d2R_dxx{}, d2R_dyy{}, d2R_dxy{};
 
     // length 9 x numQuapts
     // dx_ds : 0             <= ii < 4 * numQuapts

@@ -171,16 +171,9 @@ class FEAElement_Hex27 final : public FEAElement
     const int numQuapts;
 
     // R : 0 <= ii < 27 x numQuapts
-    std::vector<double> R {};
-    std::vector<double> dR_dx {};
-    std::vector<double> dR_dy {};
-    std::vector<double> dR_dz {};
-    std::vector<double> d2R_dxx {};
-    std::vector<double> d2R_dyy {};
-    std::vector<double> d2R_dzz {};
-    std::vector<double> d2R_dxy {};
-    std::vector<double> d2R_dxz {};
-    std::vector<double> d2R_dyz {};
+    std::vector<double> R{}, dR_dx{}, dR_dy{}, dR_dz {},
+        d2R_dxx{}, d2R_dyy{}, d2R_dzz{}, d2R_dxy{}, d2R_dxz{}, d2R_dyz{};
+
     // Container for
     // dx_dr : 0 <= ii < 9 numQuapts
     std::vector<double> dx_dr {};
