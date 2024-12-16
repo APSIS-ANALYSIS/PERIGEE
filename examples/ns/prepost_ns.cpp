@@ -34,6 +34,7 @@ int main( int argc, char * argv[] )
   const std::string elemType_str = cmd_h5r -> read_string("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -75,7 +76,6 @@ int main( int argc, char * argv[] )
   
   IMesh * mesh = nullptr;
 
-  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   switch( elemType )
   {

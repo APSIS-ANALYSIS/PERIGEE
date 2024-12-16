@@ -56,6 +56,7 @@ int main( int argc, char * argv[] )
   const int cpu_size                  = paras["cpu_size"].as<int>();
   const int in_ncommon                = paras["in_ncommon"].as<int>();
   const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
+  const FEType elemType               = FE_T::to_FEType(elemType_str);
 
   // Optional:
   const int wall_model_type               = paras["wall_model_type"].as<int>();
@@ -64,7 +65,6 @@ int main( int argc, char * argv[] )
   //                  2 strongly enforced in wall-normal direction,
   //                   and weakly enforced in wall-tangent direction
 
-  const FEType elemType = FE_T::to_FEType(elemType_str);
   
   if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27)
     SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
