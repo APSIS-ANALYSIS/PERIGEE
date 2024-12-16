@@ -36,13 +36,13 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
 
     VTK_T::read_grid( vtkfileList[ii], num_node[ii], num_cell[ii], pt_xyz[ii], sur_ien[ii] );
     
-    if(elem_type == FEType::Tet4)
+    if(elemtype == FEType::Tet4)
       cell_nLocBas[ii] = 3; // linear triangle
-    else if(elem_type == FEType::Tet10)
+    else if(elemtype == FEType::Tet10)
       cell_nLocBas[ii] = 6; // quadratic triangle
-    else if(elem_type == FEType::Hex8)
+    else if(elemtype == FEType::Hex8)
       cell_nLocBas[ii] = 4; // bilinear quadrangle
-    else if(elem_type == FEType::Hex27) 
+    else if(elemtype == FEType::Hex27)
       cell_nLocBas[ii] = 9; // biquadratic quadrangle
     else
       SYS_T::print_fatal("Error: ElemBC_3D constructor: unknown element type. \n");
