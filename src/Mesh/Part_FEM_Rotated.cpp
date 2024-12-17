@@ -10,7 +10,7 @@ Part_FEM_Rotated::Part_FEM_Rotated( const IMesh * const &mesh,
     const std::vector<int> &node_r,
     const int &in_cpu_rank, 
     const int &in_cpu_size,
-    const int &in_elemType,
+    const FEType &in_elemType,
     const Field_Property &fp ) 
 : Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp )
 {

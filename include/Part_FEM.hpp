@@ -14,6 +14,7 @@
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
 #include "Field_Property.hpp"
+#include "FEType.hpp"
 
 class Part_FEM : public IPart
 {
@@ -24,7 +25,7 @@ class Part_FEM : public IPart
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_elemType, 
+        const FEType &in_elemType, 
         const Field_Property &in_fp );
 
     Part_FEM( const IMesh * const &mesh,
@@ -34,7 +35,7 @@ class Part_FEM : public IPart
         const std::vector<double> &ctrlPts,
         const std::vector<int> &rotatedtag,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_elemType, 
+        const FEType &in_elemType, 
         const Field_Property &in_fp );
 
     // Constructor that load the partition info from h5 file on disk
@@ -115,8 +116,8 @@ class Part_FEM : public IPart
     int cpu_rank, cpu_size;
 
     // 4. global mesh info
-    int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
-    int probDim, elemType;
+    int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas, probDim;
+    FEType elemType;
 
     // 5. LIEN
     int ** LIEN;

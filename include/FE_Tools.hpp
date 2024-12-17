@@ -11,6 +11,7 @@
 #include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 #include "FEAElement.hpp"
+#include "FEType.hpp"
 
 namespace FE_T
 {
@@ -253,7 +254,7 @@ namespace FE_T
       // Input: \para vol_eleType     : the element type of the volume element
       //        \para boundary_id     : the boundary index defined specifically
       //        \para lower_quad_rule : the quadrature rlue of the lower-dimensional element
-      QuadPts_on_face(const int &vol_elemType, const int &face_id, 
+      QuadPts_on_face(const FEType &vol_elemType, const int &face_id, 
           const IQuadPts * const lower_quad_rule);
 
       ~QuadPts_on_face() override = default;

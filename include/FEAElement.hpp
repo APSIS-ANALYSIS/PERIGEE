@@ -13,6 +13,7 @@
 // ============================================================================
 #include "IQuadPts.hpp"
 #include "FEANode.hpp"
+#include "FEType.hpp"
 
 class FEAElement
 {
@@ -28,12 +29,8 @@ class FEAElement
 
     // Return this element's Type, which defines the type of different 
     // elements defined on this single element domain.
-    virtual int get_Type() const
-    {SYS_T::commPrint("Warning: get_Type is not implemented. \n"); return -1;}
-
-    // Return the element's type name
-    virtual std::string get_TypeName() const
-    {SYS_T::commPrint("Warning: get_TypeName is not implemented. \n"); return "undetermined";}
+    virtual FEType get_Type() const
+    {SYS_T::commPrint("Warning: get_Type is not implemented. \n"); return FEType::Unknown;}
 
     // Return the number of nodes for each type elements
     virtual int get_nLocBas() const = 0;
@@ -46,9 +43,6 @@ class FEAElement
     // ------------------------------------------------------------------------
     virtual void print_info() const 
     {SYS_T::commPrint("Warning: print is not implemented. \n");}
-
-    // Return the memory usage of this class in bytes
-    virtual double get_memory_usage() const = 0; 
 
     // ------------------------------------------------------------------------
     // Calculate the element size

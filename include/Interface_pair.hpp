@@ -23,7 +23,7 @@
 // Gauss quadrature point generated on the fixed surface. The terms including 
 // the test function on the rotated surface will use the Gauss quadrature
 // point generated on the rotated surface, and they need a similar data structure. 
-// Author: Xuanming Huag
+// Author: Xuanming Huang
 // Date: Jun 24 2024
 // ============================================================================
 #include "HDF5_Tools.hpp"
@@ -41,7 +41,7 @@ class Interface_pair
                     const int &total_num_fixed_pt,
                     const std::vector<double> &all_vol_ctrlPts,
                     const IIEN * const &VIEN,
-                    const int &elemtype_in,
+                    const FEType &elemtype_in,
                     const std::vector<double> &intervals_in,
                     const int &direction_in );
 
@@ -54,7 +54,7 @@ class Interface_pair
                     const int &total_num_fixed_pt,
                     const std::vector<double> &all_vol_ctrlPts,
                     const IIEN * const &VIEN,
-                    const int &elemtype_in,
+                    const FEType &elemtype_in,
                     const std::vector<double> &intervals_in,
                     const Vector_3 &centroid_in );
 
@@ -166,7 +166,7 @@ class Interface_pair
       const int &total_num_fixed_pt,
       const std::vector<double> &all_vol_ctrlPts,
       const IIEN * const &VIEN,
-      const int &elemtype_in,
+      const FEType &elemtype_in,
       const std::vector<double> &intervals_in);
 
     // Check the validity of the input interval

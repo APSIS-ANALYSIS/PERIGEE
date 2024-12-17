@@ -27,7 +27,7 @@ class ElemBC_3D_outflow : public ElemBC_3D
     // \para outlet_normal_vec: the outward normal vectors for the surfaces
     ElemBC_3D_outflow( const std::vector<std::string> &vtkfileList,
        const std::vector< Vector_3 > &outlet_normal_vec,
-       const int &elemtype );
+       const FEType &elemtype );
 
     virtual ~ElemBC_3D_outflow() = default;
 

@@ -26,7 +26,7 @@ class Part_FEM_Rotated : public Part_FEM
         const std::vector<int> &node_r,
         const int &in_cpu_rank, 
         const int &in_cpu_size,
-        const int &in_elemType,
+        const FEType &in_elemType,
         const Field_Property &in_fp );
 
     virtual ~Part_FEM_Rotated() = default;

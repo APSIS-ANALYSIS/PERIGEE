@@ -324,9 +324,9 @@ int main(int argc, char *argv[])
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
-  const int nqp_vol { (GMIptr->get_elemType() == 501) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
+  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
 
-  const int nqp_sur { (GMIptr->get_elemType() == 501) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
 
   Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
@@ -373,22 +373,22 @@ int main(int argc, char *argv[])
   IQuadPts * quadv = nullptr;
   IQuadPts * quads = nullptr;
 
-  if( GMIptr->get_elemType() == 501 )
+  if( GMIptr->get_elemType() == FEType::Tet4 )
   {
     if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
     if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
 
-    elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
+    elementv = new FEAElement_Tet4( nqp_vol ); // elem type Tet4
     elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
     quads = new QuadPts_Gauss_Triangle( nqp_sur );
   }
-  else if( GMIptr->get_elemType() == 601 )
+  else if( GMIptr->get_elemType() == FEType::Hex8 )
   {
     SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
     SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
 
-    elementv = new FEAElement_Hex8( nqp_vol ); // elem type 601
+    elementv = new FEAElement_Hex8( nqp_vol ); // elem type Hex8
     elements = new FEAElement_Quad4_3D_der0( nqp_sur );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
     quads = new QuadPts_Gauss_Quad( nqp_sur_1D );

@@ -1,6 +1,6 @@
 cpu_size: 2
 in_ncommon: 2
-elem_type: 601
+elem_type: Hex8
 dof_num: 6
 dof_mat: 3
 is_dualgraph: true

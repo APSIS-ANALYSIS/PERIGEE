@@ -50,7 +50,7 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  const int elemType                          = paras["elem_type"].as<int>();
+  const std::string elemType_str              = paras["elem_type"].as<std::string>();
   const int fsiBC_type                        = paras["fsiBC_type"].as<int>();
   const int ringBC_type                       = paras["ringBC_type"].as<int>();
   const int num_inlet                         = paras["num_inlet"].as<int>();
@@ -78,12 +78,13 @@ int main( int argc, char * argv[] )
   const bool isPrintMeshQual                  = paras["is_printmeshqual"].as<bool>();
   const double critical_val_aspect_ratio      = paras["critical_val_aspect_ratio"].as<double>();
 
-  SYS_T::print_fatal_if( elemType != 501 && elemType != 601 , "ERROR: unknown element type %d.\n", elemType );
+  const FEType elemType = FE_T::to_FEType(elemType_str);
+  SYS_T::print_fatal_if( elemType != FEType::Tet4 && elemType != FEType::Hex8 , "ERROR: unknown element type %s.\n", elemType_str.c_str() );
   SYS_T::print_fatal_if( fsiBC_type != 0 && fsiBC_type != 1 && fsiBC_type != 2, "Error: fsiBC_type should be 0, 1, or 2.\n" );
   SYS_T::print_fatal_if( ringBC_type != 0, "Error: ringBC_type should be 0.\n" );
 
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
-  std::cout<<" -elem_type: "          <<elemType           <<std::endl;
+  std::cout<<" -elem_type: "          <<elemType_str       <<std::endl;
   std::cout<<" -fsiBC_type: "         <<fsiBC_type         <<std::endl;
   std::cout<<" -ringBC_type: "        <<ringBC_type        <<std::endl;
   std::cout<<" -num_inlet: "          <<num_inlet          <<std::endl;
@@ -108,7 +109,7 @@ int main( int argc, char * argv[] )
   else std::cout<<" -isPrintMeshQual: false \n";
   std::cout<<" -critical_val_aspect_ratio: "<<critical_val_aspect_ratio<<std::endl;
   std::cout<<"----------------------------------\n";
-  std::cout<<" elemType: "<<elemType<<std::endl;
+  std::cout<<" elemType: "<<elemType_str<<std::endl;
   std::cout<<" part_file_p: "<<part_file_p<<std::endl;
   std::cout<<" part_file_v: "<<part_file_v<<std::endl;
   std::cout<<"===== Command Line Arguments ====="<<std::endl;
@@ -169,7 +170,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("num_inlet",        num_inlet);
   cmdh5w->write_intScalar("cpu_size",         cpu_size);
   cmdh5w->write_intScalar("in_ncommon",       in_ncommon);
-  cmdh5w->write_intScalar("elemType",         elemType);
+  cmdh5w->write_string("elemType",            elemType_str);
   cmdh5w->write_intScalar("fsiBC_type",       fsiBC_type);
   cmdh5w->write_intScalar("ringBC_type",      ringBC_type);
   cmdh5w->write_string("geo_file",            geo_file);
@@ -229,7 +230,7 @@ int main( int argc, char * argv[] )
     {
       // In solid element, loop over its IEN and correct if the node is on the
       // interface
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii)
         {
@@ -237,7 +238,7 @@ int main( int argc, char * argv[] )
           if( pos >=0 ) vecIEN_p[ee*4+ii] = nFunc_v + pos;     
         }
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii)
         {
@@ -246,7 +247,7 @@ int main( int argc, char * argv[] )
         }
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating a new IEN array for the pressure variable. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating a new IEN array for the pressure variable. \n", elemType_str.c_str());
     }
   }
 
@@ -261,29 +262,29 @@ int main( int argc, char * argv[] )
   {
     if( phy_tag[ee] == 0 )
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) v_node_f.push_back( IEN_v->get_IEN(ee, ii) );
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for fluid during the preprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of velocity nodes for fluid during the preprocessing. \n", elemType_str.c_str());
     }
     else
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) v_node_s.push_back( IEN_v->get_IEN(ee, ii) );
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of velocity nodes for solid during the preprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of velocity nodes for solid during the preprocessing. \n", elemType_str.c_str());
     }
   }
 
@@ -294,29 +295,29 @@ int main( int argc, char * argv[] )
   {
     if( phy_tag[ee] == 0 )
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) p_node_f.push_back( IEN_p->get_IEN(ee, ii) );
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for fluid during the preprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of pressure nodes for fluid during the preprocessing. \n", elemType_str.c_str());
     }
     else
     {
-      if(elemType == 501)
+      if(elemType == FEType::Tet4)
       {
         for(int ii=0; ii<4; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
       }
-      else if(elemType == 601)
+      else if(elemType == FEType::Hex8)
       {
         for(int ii=0; ii<8; ++ii) p_node_s.push_back( IEN_p->get_IEN(ee, ii) );
       }
       else
-        SYS_T::print_fatal("Error: elemType %d is not supported when generating the list of pressure nodes for solid during the preprocessing. \n", elemType);
+        SYS_T::print_fatal("Error: elemType %s is not supported when generating the list of pressure nodes for solid during the preprocessing. \n", elemType_str.c_str());
     }
   }
 
@@ -326,16 +327,16 @@ int main( int argc, char * argv[] )
   if( isPrintMeshQual )
   {
     std::cout<<"Check the mesh quality... \n";
-    if(elemType == 501)
+    if(elemType == FEType::Tet4)
     {
       TET_T::tetmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
     }
-    else if(elemType == 601)
+    else if(elemType == FEType::Hex8)
     {
       HEX_T::hexmesh_check( ctrlPts, IEN_v, nElem, critical_val_aspect_ratio );
     }
     else
-      SYS_T::print_fatal("Error: elemType %d is not supported when checking the mesh of kinematics. \n", elemType);
+      SYS_T::print_fatal("Error: elemType %s is not supported when checking the mesh of kinematics. \n", elemType_str.c_str());
   }
 
   // Generate the mesh for kinematics
@@ -346,16 +347,16 @@ int main( int argc, char * argv[] )
 
   switch( elemType )
   {
-    case 501:
+    case FEType::Tet4:
       mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
       mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
       break;
-    case 601:
+    case FEType::Hex8:
       mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
       mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
       break;   
     default:
-      SYS_T::print_fatal("Error: elemType %d is not supported when generating the mesh.\n", elemType);
+      SYS_T::print_fatal("Error: elemType %s is not supported when generating the mesh.\n", elemType_str.c_str());
       break;
   }
 
@@ -476,18 +477,18 @@ int main( int argc, char * argv[] )
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
   std::vector<Vector_3> inlet_outvec( num_inlet );
-  if(elemType == 501)
+  if(elemType == FEType::Tet4)
   {
     for(int ii=0; ii<num_inlet; ++ii)
       inlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
   }
-  else if(elemType == 601)
+  else if(elemType == FEType::Hex8)
   {
     for(int ii=0; ii<num_inlet; ++ii)
       inlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_in[ii], ctrlPts, IEN_v );
   }
   else
-    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType);
+    SYS_T::print_fatal("Error: elemType %s is not supported when obtaining the outward normal vector for the inflow boundary condition. \n", elemType_str.c_str());
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_f_file_in, sur_f_file_wall, nFunc_v, inlet_outvec, elemType );
 
@@ -497,18 +498,18 @@ int main( int argc, char * argv[] )
   cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
-  if(elemType == 501)
+  if(elemType == FEType::Tet4)
   {
     for(int ii=0; ii<num_outlet; ++ii)
       outlet_outvec[ii] = TET_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );
   }
-  else if(elemType == 601)
+  else if(elemType == FEType::Hex8)
   {
     for(int ii=0; ii<num_outlet; ++ii)
       outlet_outvec[ii] = HEX_T::get_out_normal( sur_f_file_out[ii], ctrlPts, IEN_v );    
   }
   else
-    SYS_T::print_fatal("Error: elemType %d is not supported when obtaining the outward normal vector for the elemental boundary conditions. \n", elemType);
+    SYS_T::print_fatal("Error: elemType %s is not supported when obtaining the outward normal vector for the elemental boundary conditions. \n", elemType_str.c_str());
 
   std::vector< std::string > ebclist {sur_f_file_wall};
 

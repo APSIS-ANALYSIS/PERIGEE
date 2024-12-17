@@ -31,8 +31,6 @@ class ALocal_Interface
 
     virtual void print_info() const;
 
-    virtual void print_info() const;
-
     int get_num_itf() const {return num_itf;}
 
     int get_nLocBas() const {return nLocBas;}

@@ -1,10 +1,10 @@
-// ==================================================================
+// ============================================================================
 // prepost_ns_tets.cpp
 //
 // This is the partitioning routine for parallel postprocessors.
 //
 // Date: Jan. 24 2017
-// ==================================================================
+// ============================================================================
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
 #include "Mesh_Tet.hpp"
@@ -31,9 +31,10 @@ int main( int argc, char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
-  const int elemType = cmd_h5r -> read_intScalar("/","elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/","elemType");
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -57,7 +58,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<"part_file: "<<part_file<<endl;
   cout<<"geo_file: "<<geo_file<<endl;
-  cout<<"elemType: "<<elemType<<endl;
+  cout<<"elemType: "<<elemType_str<<endl;
   cout<<"dof_num: "<<dofNum<<endl;
 
   // Read the geo_file
@@ -77,16 +78,16 @@ int main( int argc, char * argv[] )
 
   switch( elemType )
   {
-    case 501:
+    case FEType::Tet4:
       mesh = new Mesh_Tet(nFunc, nElem, 1);
       break;
-    case 502:
+    case FEType::Tet10:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
-    case 601:
+    case FEType::Hex8:
       mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
       break;
-    case 602:
+    case FEType::Hex27:
       mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;
     default:
