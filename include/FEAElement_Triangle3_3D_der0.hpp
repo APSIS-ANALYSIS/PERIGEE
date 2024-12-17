@@ -31,9 +31,6 @@ class FEAElement_Triangle3_3D_der0 : public FEAElement
 
     virtual int get_elemDim() const {return 2;}
 
-    // element type : 521
-    // 5: simplicial element
-    // 2: 2D element
     virtual FEType get_Type() const {return FEType::Tri3_der0;}
 
     virtual int get_numQuapts() const {return numQuapts;}
