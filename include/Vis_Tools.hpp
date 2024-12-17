@@ -103,7 +103,6 @@ namespace VIS_T
   // ================================================================
   // The 2nd set of tools contains 
   //    --- setHexelem      ===> Insert vtkHexahedron to gird
-  //    --- setQuadelem     ===> Insert vtkQuad to grid
   // ================================================================
   // ----------------------------------------------------------------
   // ! setHexelem: build Hexahedron element connectivity with the
