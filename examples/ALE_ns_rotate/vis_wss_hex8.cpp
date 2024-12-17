@@ -1,5 +1,5 @@
 // ============================================================================
-// vis_hex8_wss.cpp
+// vis_wss_hex8.cpp
 //
 // WSS visualization for 8-node hex elements.
 //

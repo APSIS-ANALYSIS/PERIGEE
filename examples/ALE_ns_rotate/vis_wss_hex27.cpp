@@ -1,5 +1,5 @@
 // ============================================================================
-// vis_hex27_wss.cpp
+// vis_wss_hex27.cpp
 //
 // WSS visualization for 27-node hex elements.
 //

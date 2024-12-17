@@ -1,5 +1,5 @@
 // ============================================================================
-// vis_tet10_wss.cpp
+// vis_wss_tet10.cpp
 //
 // WSS visualization for ten-node tet elements.
 //
