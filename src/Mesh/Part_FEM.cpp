@@ -387,17 +387,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
-
-  if(elemType == FEType::Tet4)
-    h5w->write_string( group_id_3, "elemType", std::string("Tet4") );
-  else if(elemType == FEType::Tet10)
-    h5w->write_string( group_id_3, "elemType", std::string("Tet10") );
-  else if(elemType == FEType::Hex8)
-    h5w->write_string( group_id_3, "elemType", std::string("Hex8") );
-  else if(elemType == FEType::Hex27)
-    h5w->write_string( group_id_3, "elemType", std::string("Hex27") );
-  else
-    h5w->write_string( group_id_3, "elemType", std::string("Unknown") );
+  h5w->write_string( group_id_3, "elemType", FE_T::to_string(elemType) );
 
   h5w->write_intScalar( group_id_3, "field_id", field_id );
   h5w->write_intScalar( group_id_3, "is_geo_field", (is_geo_field ? 1 : 0) );
