@@ -173,21 +173,11 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
   field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
   field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
+  elemType = FE_T::to_FEType(elemType_str);
   
   const int temp = h5r -> read_intScalar("Global_Mesh_Info", "is_geo_field");
   if(temp == 1) is_geo_field = true;
   else is_geo_field = false;
-
-  if (elemType_str==std::string("Tet4"))
-    elemType =  FEType::Tet4;
-  else if (elemType_str==std::string("Tet10"))
-    elemType =  FEType::Tet10;
-  else if (elemType_str==std::string("Hex8"))
-    elemType =  FEType::Hex8;
-  else if(elemType_str==std::string("Hex27"))
-    elemType =  FEType::Hex27;
-  else 
-    elemType =  FEType::Unknown;
 
   // LIEN
   int num_row, num_col;
