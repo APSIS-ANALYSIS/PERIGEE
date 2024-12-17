@@ -45,7 +45,6 @@ class FEAElement_Hex8 : public FEAElement
 
     virtual int get_elemDim() const {return 3;}
 
-    // A unique number for this element.
     virtual FEType get_Type() const {return FEType::Hex8;}
 
     virtual int get_numQuapts() const {return numQuapts;}
