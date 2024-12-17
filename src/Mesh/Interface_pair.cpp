@@ -55,23 +55,23 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   {
     case FEType::Tet4:
       s_nLocBas = 3; v_nLocBas = 4;
-    break;
+      break;
 
     case FEType::Tet10:
       s_nLocBas = 6; v_nLocBas = 10;
-    break;
+      break;
 
     case FEType::Hex8:
       s_nLocBas = 6; v_nLocBas = 8;
-    break;
+      break;
 
     case FEType::Hex27:
       s_nLocBas = 9; v_nLocBas = 27;
-    break;
+      break;
     
     default:
       SYS_T::print_fatal("Error, Interface_pair: unknown element type.\n");
-    break;
+      break;
   }
 
   fixed_face_id.resize(num_fixed_ele);
