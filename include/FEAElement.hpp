@@ -12,7 +12,7 @@
 // Date created: Nov. 6 2013
 // ============================================================================
 #include "IQuadPts.hpp"
-#include "FEANode.hpp"
+#include "SymmTensor2_3D.hpp"
 #include "FEType.hpp"
 
 class FEAElement
@@ -122,15 +122,6 @@ class FEAElement
         double * const &basis_x, double * const &basis_y, double * const &basis_z ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
 
-    virtual std::vector<double> get_dR_dx( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dx is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_dR_dy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_dR_dz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dz is not implemented. \n");return {};}
-
     // ------------------------------------------------------------------------    
     // R, gradR, and Laplacian R
     // ------------------------------------------------------------------------    
@@ -159,28 +150,11 @@ class FEAElement
         double * const &basis_xy, double * const &basis_xz, double * const &basis_yz ) 
       const {SYS_T::commPrint("Warning: get_3D_R_dR_d2R is not implemented. \n");}
 
-    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxx is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dyy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dzz is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxz is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dyz is not implemented. \n");return {};}
-
     // ------------------------------------------------------------------------    
     // Return the Jacobian determinant
     // ------------------------------------------------------------------------    
-    virtual double get_detJac(const int &quaindex) const = 0;
+    virtual double get_detJac(const int &quaindex) const
+    {SYS_T::commPrint("Warning: get_detJac is not implemented.\n"); return 0.0;}
 
     // ------------------------------------------------------------------------    
     // Return the Jacobian matrix in rows, i.e. dx_dxi, dx_deta, dx_dzeta,
@@ -251,7 +225,7 @@ class FEAElement
     // This function is, for example, called in FEAElement_Line2_3D_der0.
     // ------------------------------------------------------------------------
     virtual Vector_3 get_normal_out( const int &quaindex,
-        const std::vector< Vector_3> &sur_pt, const Vector_3 &int_pt, 
+        const std::vector<Vector_3> &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
     {
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");

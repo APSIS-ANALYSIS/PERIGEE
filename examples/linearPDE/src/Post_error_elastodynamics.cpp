@@ -103,17 +103,17 @@ double POST_ERROR_E::get_manu_sol_errorH1(
       sol.y() += soluy[ii] * R[ii];
       sol.z() += soluz[ii] * R[ii];
 
-      grad_sol(0,0) += solux[ii] * Rx[ii];
-      grad_sol(0,1) += solux[ii] * Ry[ii];
-      grad_sol(0,2) += solux[ii] * Rz[ii];
+      grad_sol(0,0) += solux[ii] * R_dx[ii];
+      grad_sol(0,1) += solux[ii] * R_dy[ii];
+      grad_sol(0,2) += solux[ii] * R_dz[ii];
 
-      grad_sol(1,0) += soluy[ii] * Rx[ii];
-      grad_sol(1,1) += soluy[ii] * Ry[ii];
-      grad_sol(1,2) += soluy[ii] * Rz[ii];
+      grad_sol(1,0) += soluy[ii] * R_dx[ii];
+      grad_sol(1,1) += soluy[ii] * R_dy[ii];
+      grad_sol(1,2) += soluy[ii] * R_dz[ii];
 
-      grad_sol(2,0) += soluz[ii] * Rx[ii];
-      grad_sol(2,1) += soluz[ii] * Ry[ii];
-      grad_sol(2,2) += soluz[ii] * Rz[ii];
+      grad_sol(2,0) += soluz[ii] * R_dx[ii];
+      grad_sol(2,1) += soluz[ii] * R_dy[ii];
+      grad_sol(2,2) += soluz[ii] * R_dz[ii];
     }
 
     const Vector_3 exact = exact_disp(coor_x, coor_y, coor_z, time );

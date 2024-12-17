@@ -5,6 +5,7 @@
 //
 // Date: March 2nd 2020
 // ============================================================================
+#include "HDF5_Reader.hpp"
 #include "Tet_Tools.hpp"
 #include "QuadPts_vis_tri6.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
