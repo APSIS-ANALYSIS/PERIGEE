@@ -7,6 +7,7 @@ PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics ana
 - [Install](#Install)
 - [Build](#Build)
 - [Tutorial](#Tutorial)
+- [Contributing](#Contributing)
 - [Simulation Samples](#Simulation-Samples)
 - [References](#References)
 
@@ -56,6 +57,60 @@ In general, one has to go through the following steps for simulation.
 * Run a finite element analysis code to solve the partial differential equations. The solutions will be saved on disk in the binary format.
 * Run a preprocessor for postprocessing. This step re-partition the mesh to make preparations for postprocessing, such as visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in *serial* and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
+
+## Contributing
+We welcome contributions from the community! If you're interested in contributing to this project, please follow the guidelines below.
+
+### How to Contribute
+1. **Fork the Repository**: Start by forking the repository to your GitHub account.
+2. **Clone the Repository**: Clone the forked repository to your local machine.
+    ```sh
+    git clone https://github.com/your-username/PERIGEE.git
+    cd PERIGEE
+    ```
+3. **Create a Branch**: Create a new branch for your feature or bug fix.
+    ```sh
+    git checkout -b feature-or-bugfix/specific-name
+    ```
+4. **Make Changes**: Make your changes to the codebase. Ensure that your code follows the project's coding standards and conventions.
+5. **Commit Changes**: Commit your changes with a meaningful commit message.
+    ```sh
+    git add .
+    git commit -m "Description of your changes"
+    ```
+6. **Push Changes**: Push your changes to your forked repository.
+    ```sh
+    git push origin feature-or-bugfix/specific-name
+    ```
+7. **Create a Pull Request**: Open a pull request to the main repository. Provide a detailed description of your changes and any relevant information.
+
+### Code Style
+Please follow these guidelines when contributing to the codebase:
+
+- Follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).
+- Ensure your code is well-documented with comments explaining the purpose and functionality.
+- Write clear and concise commit messages.
+- Keep your changes focused on a single feature or bug fix.
+
+### Testing
+- Ensure that your changes are covered by tests.
+- Run all tests to verify that your changes do not break existing functionality.
+- If adding new features, add appropriate tests to cover the new functionality.
+
+### Issues and Bugs
+- If you find a bug, please report it by opening an issue.
+- Provide as much detail as possible, including steps to reproduce the issue and any relevant error messages or logs.
+
+### Pull Request Process
+1. Ensure your changes pass all tests and adhere to the project's coding standards.
+2. Update the README.md file if necessary to reflect your changes.
+3. Open a pull request and provide a detailed description of your changes.
+4. A project maintainer will review your pull request and provide feedback if necessary.
+5. Once approved, your changes will be merged into the main branch.
+
+### Community
+- Be respectful and considerate in your interactions with others.
+- Follow the [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a welcoming and inclusive environment for all contributors.
 
 ## Simulation Samples
 The vortex-induced vibration of an elastic plate with Re $\approx$ 3 $\times$ 10^4. The mesh consists of 18 million linear tetrahedral elements for the fluid and 0.7 million elements for the solid. The variational multiscale formulation provides the LES technique in the flow problem, and the time integration is based on the generalized-&alpha; scheme.
