@@ -59,41 +59,18 @@ In general, one has to go through the following steps for simulation.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
 ## Contributing
-We welcome contributions from the community! If you're interested in contributing to this project, please follow the guidelines below.
-
-### How to Contribute
-1. **Fork the Repository**: Start by forking the repository to your GitHub account.
-2. **Clone the Repository**: Clone the forked repository to your local machine.
-    ```sh
-    git clone https://github.com/your-username/PERIGEE.git
-    cd PERIGEE
-    ```
-3. **Create a Branch**: Create a new branch for your feature or bug fix.
-    ```sh
-    git checkout -b feature-or-bugfix/specific-name
-    ```
-4. **Make Changes**: Make your changes to the codebase. Ensure that your code follows the project's coding standards and conventions.
-5. **Commit Changes**: Commit your changes with a meaningful commit message.
-    ```sh
-    git add .
-    git commit -m "Description of your changes"
-    ```
-6. **Push Changes**: Push your changes to your forked repository.
-    ```sh
-    git push origin feature-or-bugfix/specific-name
-    ```
-7. **Create a Pull Request**: Open a pull request to the main repository. Provide a detailed description of your changes and any relevant information.
+We welcome contributions from the community! If you are interested in contributing to this project, please follow the guidelines below.
 
 ### Code Style
 Please follow these guidelines when contributing to the codebase:
 
 - Follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).
-- Ensure your code is well-documented with comments explaining the purpose and functionality.
+- Make sure your code is well-documented with comments explaining the purpose and functionality.
 - Write clear and concise commit messages.
 - Keep your changes focused on a single feature or bug fix.
 
 ### Testing
-- Ensure that your changes are covered by tests.
+- Please make sure that your changes are covered by tests.
 - Run all tests to verify that your changes do not break existing functionality.
 - If adding new features, add appropriate tests to cover the new functionality.
 
@@ -105,7 +82,7 @@ Please follow these guidelines when contributing to the codebase:
 1. Ensure your changes pass all tests and adhere to the project's coding standards.
 2. Update the README.md file if necessary to reflect your changes.
 3. Open a pull request and provide a detailed description of your changes.
-4. A project maintainer will review your pull request and provide feedback if necessary.
+4. A project maintainer will review your pull request and provide feedback.
 5. Once approved, your changes will be merged into the main branch.
 
 ### Community
