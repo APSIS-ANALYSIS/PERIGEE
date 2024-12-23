@@ -3,8 +3,8 @@
 ElemBC_3D_outflow::ElemBC_3D_outflow(
     const std::vector<std::string> &vtkfileList,
     const std::vector< Vector_3 > &outlet_normal_vec,
-    const FEType &elemtype )
-: ElemBC_3D( vtkfileList, elemtype )
+    const FEType &in_elemtype )
+: ElemBC_3D( vtkfileList, in_elemtype )
 {
   SYS_T::print_fatal_if(outlet_normal_vec.size() != static_cast<unsigned int>( num_ebc ),
       "Error: ElemBC_3D_outflow constructor: the input normal vector length does not match the number of outlets.\n");
