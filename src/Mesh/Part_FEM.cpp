@@ -161,7 +161,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 
   // global mesh info
   std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
-  std::string elemType_str;
 
   sDegree = vdeg[0]; tDegree = vdeg[1]; uDegree = vdeg[2];
 
@@ -169,11 +168,10 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
   nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
   probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
-  elemType_str = h5r -> read_string("Global_Mesh_Info", "elemType");
+  elemType = FE_T::to_FEType(h5r -> read_string("Global_Mesh_Info", "elemType"));
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
   field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
   field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
-  elemType = FE_T::to_FEType(elemType_str);
   
   const int temp = h5r -> read_intScalar("Global_Mesh_Info", "is_geo_field");
   if(temp == 1) is_geo_field = true;
