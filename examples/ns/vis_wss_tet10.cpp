@@ -60,7 +60,7 @@ int main( int argc, char * argv[] )
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
 #endif
   
-  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_p2_wss is a serial program! \n");
+  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_wss_tet10 is a serial program! \n");
 
   // Read the geometry file name from preprocessor hdf5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
