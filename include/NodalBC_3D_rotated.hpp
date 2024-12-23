@@ -26,7 +26,7 @@ class NodalBC_3D_rotated : public INodalBC
         const std::string &rotated_file,
         const std::string &fixed_file,
         const int &nFunc,
-        const FEType &elemtype );
+        const FEType &in_elemtype );
 
     virtual ~NodalBC_3D_rotated() = default;
 
