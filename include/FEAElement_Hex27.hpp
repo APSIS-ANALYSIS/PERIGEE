@@ -137,13 +137,9 @@ class FEAElement_Hex27 final : public FEAElement
         double * const &basis_zz ) const override;
     
     // Get the Jacobian matrix dx/dr
-    void get_Jacobian(const int &quaindex, double * const &jac_value) const override;
-
     std::array<double,9> get_Jacobian( const int &quaindex ) const override;
 
     // Get the inverse Jacobian matrix dr/dx
-    void get_invJacobian(const int &quaindex, double * const &jac_value) const override;
-
     std::array<double,9> get_invJacobian( const int &quaindex ) const override;
 
     // Get the determinant of the Jacobian matrix
