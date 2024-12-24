@@ -29,8 +29,7 @@ class AGlobal_Mesh_Info
       nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
       nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
       probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
-      elemType_str = h5r -> read_string("Global_Mesh_Info", "elemType");
-      elemType = FE_T::to_FEType(elemType_str);
+      elemType = FE_T::to_FEType(h5r -> read_string("Global_Mesh_Info", "elemType"));
 
       H5Fclose( file_id );
     }
@@ -82,14 +81,13 @@ class AGlobal_Mesh_Info
       std::cout<<"nFunc: "<<nFunc<<'\n';
       std::cout<<"nLocBas: "<<nLocBas<<std::endl;
       std::cout<<"probDim: "<<probDim<<std::endl;
-      std::cout<<"elemType: "<<elemType_str<<std::endl;
+      std::cout<<"elemType: "<<FE_T::to_string(elemType)<<std::endl;
     }
 
   private:
     int xdegree, ydegree, zdegree;
     int nElem, nFunc, nLocBas, probDim;
     FEType elemType;
-    std::string elemType_str;
 
     AGlobal_Mesh_Info() = delete;
 };

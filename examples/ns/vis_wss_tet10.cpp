@@ -1,38 +1,41 @@
-// ==================================================================
-// vis_hex8_fsi_wss.cpp
+// ============================================================================
+// vis_wss_tet10.cpp
 //
-// WSS visualization for 8-node hex elements.
+// WSS visualization for ten-node tet elements.
 //
-// Date: Nov 7 2023
-// ==================================================================
-#include "HDF5_Tools.hpp"
-#include "Hex_Tools.hpp"
-#include "QuadPts_vis_quad4.hpp"
-#include "QuadPts_Gauss_Quad.hpp"
-#include "QuadPts_vis_hex8.hpp"
-#include "FEAElement_Hex8.hpp"
-#include "FEAElement_Quad4_3D_der0.hpp"
+// Date: March 2nd 2020
+// ============================================================================
+#include "HDF5_Reader.hpp"
+#include "Tet_Tools.hpp"
+#include "QuadPts_vis_tri6.hpp"
+#include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_vis_tet10.hpp"
+#include "FEAElement_Tet10.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
 
-std::vector<int> range_generator( const int &ii, const int &jj, const int &kk, const int &ll );
+std::vector<int> range_generator( const int &ii );
+
+std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
+    const char * const &mapping_type, const int &node_size );
 
 std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
     const int &vec_size, const int &in_dof );
 
-int get_quad_local_id( const double * const &coor_x,
+int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,
     const double * const &coor_z,
     const int &len,
     const double &x, const double &y, const double &z,
     const double &tol = 1.0e-8 );
 
-void write_quad_grid_wss( const std::string &filename,
+void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node );
 
-void write_quad_grid_tawss_osi( const std::string &filename,
+void write_triangle_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
@@ -41,139 +44,142 @@ void write_quad_grid_tawss_osi( const std::string &filename,
 
 int main( int argc, char * argv[] )
 {
-  // visualization sampling pattern over time
+  std::string sol_bname("SOL_");
+
   int time_start = 0;
   int time_step = 1;
   int time_end = 1;
 
-  constexpr int nLocBas = 4;
-  constexpr int v_nLocBas = 8;
+  constexpr int nLocBas = 6;
+  constexpr int v_nLocBas = 10;
 
-  constexpr int dof_v = 3;
+  constexpr int dof = 4; 
 
 #if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
 #else
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
 #endif
-
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
   
-  // Read in the mesh file
+  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_wss_tet10 is a serial program! \n");
+
+  // Read the geometry file name from preprocessor hdf5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
-
-  const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
-  const std::string wall_file = cmd_h5r -> read_string("/", "sur_f_file_wall");
+  const std::string geo_file  = cmd_h5r -> read_string("/", "geo_file");
+  const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
   const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
-  
-  hid_t anacmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT );
-  
-  HDF5_Reader * ana_h5r = new HDF5_Reader( anacmd_file );
-  
-  const std::string sol_bname = ana_h5r -> read_string("/", "sol_bName");
-  
-  const double fluid_mu = ana_h5r -> read_doubleScalar("/", "fl_mu");
 
-  delete ana_h5r; H5Fclose(anacmd_file);
+  // Read the material property from the solver HDF5 file
+  prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  // Enforce the element to be trilinear hex for now
-  if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be trilinear hex element.\n");
+  cmd_h5r = new HDF5_Reader( prepcmd_file );
 
+  const double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
+
+  delete cmd_h5r; H5Fclose(prepcmd_file);
+
+  // Enforce the element to be quadratic tet for now
+  if( elemType != FEType::Tet10 ) SYS_T::print_fatal("Error: element type should be quadratic tet element.\n");
+
+  SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
   SYS_T::GetOptionInt("-time_step", time_step);
-  SYS_T::GetOptionInt("-time_end", time_end);  
+  SYS_T::GetOptionInt("-time_end", time_end);
 
   std::string out_bname = sol_bname;
   out_bname.append("WSS_");
 
+  // Print the command line argument on screen
   cout<<"==== Command Line Arguments ===="<<endl;
+  cout<<" -sol_bname: "<<sol_bname<<endl;
   cout<<" -time_start: "<<time_start<<endl;
   cout<<" -time_step: "<<time_step<<endl;
   cout<<" -time_end: "<<time_end<<endl;
   cout<<"----------------------------------\n";
-  cout<<" sol_bname: "<<sol_bname<<endl;
-  cout<<" fl_mu: "    <<fluid_mu<<endl;
-  cout<<" geo_file: " <<geo_file<<endl;
+  cout<<" geo_file: "<<geo_file<<endl;
   cout<<" wall_file: "<<wall_file<<endl;
+  cout<<" elemType: "<<elemType_str<<endl;
   cout<<" out_bname: "<<out_bname<<endl;
+  cout<<" fl_mu: "<<fluid_mu<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;
 
+  // Make sure the geometry files exist
   SYS_T::file_check( geo_file );
   SYS_T::file_check( wall_file );
 
-  // ----------------------------------------------------------------
-  // Read in the whole FSI volumetric mesh
+  // Read the volumetric mesh
   int v_nFunc, v_nElem;
   std::vector<int> v_vecIEN;
   std::vector<double> v_ctrlPts;
 
   VTK_T::read_vtu_grid(geo_file, v_nFunc, v_nElem, v_ctrlPts, v_vecIEN);
 
-  const std::vector<int> phy_tag = VTK_T::read_int_CellData(geo_file, "Physics_tag");
-
-  cout<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
+  cout<<endl<<"Volumetric mesh contains "<<v_nElem<<" elements and "<<v_nFunc<<" vertices.\n";
 
   // Read the wall surface mesh
   int nFunc, nElem;
   std::vector<double> ctrlPts;
   std::vector<int> vecIEN;
 
-  VTK_T::read_vtp_grid( wall_file, nFunc, nElem, ctrlPts, vecIEN );
-
-  // They store the coordinates of the control points before deformation
-  const std::vector<double> v_ctrlPts_origin(v_ctrlPts);
-  const std::vector<double> ctrlPts_origin(ctrlPts);
-
-  const std::vector<int> global_node_idx = VTK_T::read_int_PointData(wall_file, "GlobalNodeID");
-  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData(wall_file, "GlobalElementID");
+  VTK_T::read_vtu_grid(wall_file, nFunc, nElem, ctrlPts, vecIEN);
+  
+  const std::vector<int> global_node_idx = VTK_T::read_int_PointData( wall_file, "GlobalNodeID");
+  const std::vector<int> global_ele_idx = VTK_T::read_int_CellData( wall_file, "GlobalElementID");
 
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
-  // Each surface quadrangle element requires 4 additional nodes: interior_node
-  std::vector<int> interior_node{};
+  // Now calculate the outward normal vector and element area
+  std::vector<int> interior_node( nElem, -1 );
 
-  // The local indices of nodes on the wall surface  
-  std::vector<int> interior_node_local_index{};
+  std::vector<double> interior_node_coord(3*nElem, 0.0);
 
-  // Identify the interior node for surface elements
+  // take values 0, 1, 2, or 3, it determines the side of the surface in the
+  // tetrahedron
+  std::vector<int> interior_node_local_index( nElem, -1 );
+
   for(int ee=0; ee<nElem; ++ee)
   {
-    const std::vector<int> quadn { global_node_idx[ vecIEN[nLocBas*ee+0] ], global_node_idx[ vecIEN[nLocBas*ee+1] ],
-                                   global_node_idx[ vecIEN[nLocBas*ee+2] ], global_node_idx[ vecIEN[nLocBas*ee+3] ] };
-
-    const int hexn[8] { v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ],
-                        v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ],
-                        v_vecIEN[ global_ele_idx[ee]*v_nLocBas+4 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+5 ],
-                        v_vecIEN[ global_ele_idx[ee]*v_nLocBas+6 ], v_vecIEN[ global_ele_idx[ee]*v_nLocBas+7 ] };    
+    std::vector<int> trn { global_node_idx[ vecIEN[nLocBas*ee+0] ],
+      global_node_idx[ vecIEN[nLocBas*ee+1] ], global_node_idx[ vecIEN[nLocBas*ee+2] ] };
+    
+    const int ten[4] { v_vecIEN[ global_ele_idx[ee]*v_nLocBas+0 ],
+      v_vecIEN[ global_ele_idx[ee]*v_nLocBas+1 ],
+      v_vecIEN[ global_ele_idx[ee]*v_nLocBas+2 ],
+      v_vecIEN[ global_ele_idx[ee]*v_nLocBas+3 ] };
 
     int node_check = 0;
-    for(int ii=0; ii<8; ++ii)
+    for(int ii=0; ii<4; ++ii)
     {
-      if( !VEC_T::is_invec( quadn, hexn[ii] ) ) 
+      const bool gotnode = VEC_T::is_invec( trn, ten[ii] );
+
+      if(!gotnode) 
       {
-      	interior_node.push_back(hexn[ii]);
-        interior_node_local_index.push_back(ii);    
+        interior_node[ee] = ten[ii]; // interior node's global volumetric mesh nodal index
+        interior_node_local_index[ee] = ii; // interior node's local tetrahedral element index
       }
       else node_check += 1;
     }
 
-    SYS_T::print_fatal_if(node_check!=4, "Error: the associated hex element is incompatible with the quad element.\n");
+    SYS_T::print_fatal_if(node_check != 3, "Error: the associated tet element is incompatible with the triangle element.\n");
+
+    // Now we have found the interior node's volumetric mesh index, record its
+    // spatial xyz coordinate
+    interior_node_coord[3*ee+0] = v_ctrlPts[ 3*interior_node[ee] + 0 ];
+    interior_node_coord[3*ee+1] = v_ctrlPts[ 3*interior_node[ee] + 1 ];
+    interior_node_coord[3*ee+2] = v_ctrlPts[ 3*interior_node[ee] + 2 ];
   }
 
-  SYS_T::print_fatal_if(VEC_T::get_size(interior_node) != 4*nElem, "Error: the length of the interior_node vector is incorrect.\n");
-  SYS_T::print_fatal_if(VEC_T::get_size(interior_node_local_index) != 4*nElem, "Error: the length of the interior_node_local_index vector is incorrect.\n");
-
-  // Volumetric element visualization sampling points and element container
-  IQuadPts * quad = new QuadPts_vis_hex8();
+  // Volumetric element visualization sampling point 
+  IQuadPts * quad = new QuadPts_vis_tet10();
 
   quad -> print_info();
 
-  FEAElement * element = new FEAElement_Hex8( quad-> get_num_quadPts() );
+  FEAElement * element = new FEAElement_Tet10( quad-> get_num_quadPts() );
 
   double * v_ectrl_x = new double [v_nLocBas];
   double * v_ectrl_y = new double [v_nLocBas];
@@ -182,72 +188,46 @@ int main( int argc, char * argv[] )
   double * esol_v  = new double [v_nLocBas];
   double * esol_w  = new double [v_nLocBas];
 
-  IQuadPts * quad_vis = new QuadPts_vis_quad4();
+  IQuadPts * quad_tri_vis = new QuadPts_vis_tri6();
 
-  quad_vis -> print_info();
+  quad_tri_vis -> print_info();
 
-  IQuadPts * quad_gau = new QuadPts_Gauss_Quad( quad_vis->get_num_quadPts_x(), quad_vis->get_num_quadPts_y() );
+  IQuadPts * quad_tri_gau = new QuadPts_Gauss_Triangle( quad_tri_vis->get_num_quadPts() );
 
-  quad_gau -> print_info();
+  quad_tri_gau -> print_info();
 
-  FEAElement * element_quad = new FEAElement_Quad4_3D_der0( quad_vis->get_num_quadPts() );
+  FEAElement * element_tri = new FEAElement_Triangle6_3D_der0( quad_tri_vis-> get_num_quadPts() );
 
-  // Read the node mappings
-  const std::vector<int> analysis_new2old = HDF5_T::read_intVector( "node_mapping_v.h5",
-      "/", "new_2_old" );
+  // Read the mappings of the nodal indices
+  const std::vector<int> analysis_new2old = ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
   double * Rz = new double [v_nLocBas];
 
-  // Container for TAWSS & OSI
+  // Container for Time averaged WSS and OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
   std::vector<double> osi( nFunc, 0.0 ); 
   std::vector< Vector_3 > osi_top( nFunc, Vector_3(0.0, 0.0, 0.0) );
 
   const double inv_T = 1.0 / ( static_cast<double>((time_end - time_start)/time_step) + 1.0 );
 
+  // Loop over time
   for(int time = time_start; time <= time_end; time += time_step)
   {
-    // Read solution files
-    std::string disp_sol_name(sol_bname), velo_sol_name(sol_bname);
-    disp_sol_name.append("disp_");
-    velo_sol_name.append("velo_");
+    // Generate the file name
+    std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
+    std::ostringstream time_index;
+    time_index.str("");
+    time_index << 900000000 + time;
+    name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
 
-    std::ostringstream time_idx;
-    time_idx << 900000000 + time;
-    
-    disp_sol_name.append(time_idx.str());
-    velo_sol_name.append(time_idx.str());
-    name_to_write.append(time_idx.str());  
+    SYS_T::commPrint("Time %d: Read %s and Write %s \n", time, name_to_read.c_str(), name_to_write.c_str());
 
-    SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
-        velo_sol_name.c_str(), name_to_write.c_str() );
-
-    const std::vector<double> disp_sol = ReadPETSc_Vec( disp_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
-    const std::vector<double> velo_sol = ReadPETSc_Vec( velo_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );  
-
-    // Ensure that the coordinates of the control points remain in the undeformed state
-    v_ctrlPts = v_ctrlPts_origin;
-    ctrlPts = ctrlPts_origin;
-
-    // Use the solution displacement field to update the control points
-    for(int ii=0; ii<v_nFunc; ++ii)
-    {
-      v_ctrlPts[3*ii+0] += disp_sol[3*ii+0];
-      v_ctrlPts[3*ii+1] += disp_sol[3*ii+1];
-      v_ctrlPts[3*ii+2] += disp_sol[3*ii+2];
-    }
-
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      // use global_node_idx to extract the correct solution entry for this
-      // surface node
-      ctrlPts[3*ii+0] += disp_sol[3*global_node_idx[ii]+0];
-      ctrlPts[3*ii+1] += disp_sol[3*global_node_idx[ii]+1];
-      ctrlPts[3*ii+2] += disp_sol[3*global_node_idx[ii]+2];
-    }
+    // Read the solution vector and renumber them based on the nodal mappings
+    const auto sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
 
     // Container for (averaged) WSS
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
@@ -260,7 +240,7 @@ int main( int argc, char * argv[] )
       // ee element's volumetric element id
       const int ee_vol_id = global_ele_idx[ ee ];
 
-      // get the hexahedron's control points and associated solution nodal
+      // get the tetrahedron's control points and associated solution nodal
       // value
       for(int ii=0; ii<v_nLocBas; ++ii)
       {
@@ -268,16 +248,16 @@ int main( int argc, char * argv[] )
         v_ectrl_y[ii] = v_ctrlPts[ 3 * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 1 ];
         v_ectrl_z[ii] = v_ctrlPts[ 3 * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 2 ];
 
-        esol_u[ii] = velo_sol[ dof_v * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 0 ];
-        esol_v[ii] = velo_sol[ dof_v * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 1 ];
-        esol_w[ii] = velo_sol[ dof_v * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 2 ];
+        esol_u[ii] = sol[ dof * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 1 ];
+        esol_v[ii] = sol[ dof * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 2 ];
+        esol_w[ii] = sol[ dof * v_vecIEN[ee_vol_id*v_nLocBas + ii] + 3 ];
       }
 
-      // Construct the trilinear hexahedron element
+      // Construct the quadratic tetrahedral element
       element -> buildBasis(quad, v_ectrl_x, v_ectrl_y, v_ectrl_z);
 
       // Obtain the local indices of nodes on the wall surface based on the local indices of the four interior nodes
-      const std::vector<int> id_range = range_generator( interior_node_local_index[4*ee], interior_node_local_index[4*ee + 1], interior_node_local_index[4*ee + 2], interior_node_local_index[4*ee + 3] );
+      const std::vector<int> id_range = range_generator( interior_node_local_index[ee] );
 
       // Obtain the control point coordinates for this element
       double * ectrl_x = new double [nLocBas];
@@ -294,42 +274,30 @@ int main( int argc, char * argv[] )
       }
 
       // Build a basis based on the visualization sampling point for wall
-      // quad element
-      element_quad -> buildBasis(quad_vis, ectrl_x, ectrl_y, ectrl_z);
+      // triangle element
+      element_tri -> buildBasis(quad_tri_vis, ectrl_x, ectrl_y, ectrl_z);
 
       std::vector< Vector_3 > outnormal( nLocBas, Vector_3(0.0, 0.0, 0.0) );
 
-      std::vector<double> interior_node_coord(3*4*nElem, 0.0); // 4 means that each wall surface element has 4 interior nodes, 3 means x-y-z
-
-      // Now we have found the interior node's volumetric mesh index, record its
-      // spatial xyz coordinate
-      for (int ii=0; ii<4; ++ii)
-      {
-        for (int jj=0; jj<3; ++jj)
-        {
-          interior_node_coord[3*(4*ee + ii )+jj] = v_ctrlPts[ 3*interior_node[4*ee + ii] + jj ];
-        }
-      }
-
       // For each nodal point, calculate the outward normal vector using the
-      // bilinear quad element. The quad element's ii-th basis corresponds to the
-      // hex element's id_range[ii]-th basis
+      // triangle element. The triangle element's ii-th basis corresponds to the
+      // tetrahedral element's id_range[ii]-th basis
       for(int ii=0; ii<nLocBas; ++ii)
       {
         double len;
         const Vector_3 sur_pt( ectrl_x[ii], ectrl_y[ii], ectrl_z[ii] );
-        const Vector_3 int_pt( interior_node_coord[3*(4*ee)+0], interior_node_coord[3*(4*ee)+1], interior_node_coord[3*(4*ee)+2] );
+        const Vector_3 int_pt( interior_node_coord[3*ee+0], interior_node_coord[3*ee+1], interior_node_coord[3*ee+2] );
 
         // id_range[ii] 's outward normal
-        outnormal[ii] = element_quad -> get_normal_out( ii, sur_pt, int_pt, len );
+        outnormal[ii] = element_tri -> get_normal_out( ii, sur_pt, int_pt, len );
       }
 
       // Now calcualte the element surface area
-      element_quad -> buildBasis( quad_gau, ectrl_x, ectrl_y, ectrl_z );
+      element_tri -> buildBasis( quad_tri_gau, ectrl_x, ectrl_y, ectrl_z );
 
-      double quad_area = 0.0;
-      for(int qua=0; qua<quad_gau->get_num_quadPts(); ++qua)
-        quad_area += element_quad->get_detJac(qua) * quad_gau->get_qw(qua);
+      double tri_area = 0.0;
+      for(int qua=0; qua<quad_tri_gau->get_num_quadPts(); ++qua)
+        tri_area += element_tri->get_detJac(qua) * quad_tri_gau->get_qw(qua);
 
       // Here the coordinates of the control points read through the surface-IEN 
       // are just used to find out their global number on the wall
@@ -340,10 +308,10 @@ int main( int argc, char * argv[] )
         ectrl_z[ii] = ctrlPts[ 3*vecIEN[nLocBas * ee + ii ] + 2 ];
       }
 
-      // Loop over the 4 sampling points on the wall bilinear quadrangle element
+      // Loop over the 6 sampling points on the wall quadratic triangle element
       for(int qua=0; qua<nLocBas; ++qua)
       {
-        // Obtain the 8 basis function's value at the wall boundary points
+        // Obtain the 10 basis function's value at the wall boundary points
         element -> get_gradR( id_range[qua], Rx, Ry, Rz );
 
         double ux = 0.0, uy = 0.0, uz = 0.0;
@@ -365,7 +333,7 @@ int main( int argc, char * argv[] )
           wz += esol_w[ii] * Rz[ii];
         }
 
-        // obtain the hex element's id_range[qua] node's outward normal vector 
+        // obtain the tet element's id_range[qua] node's outward normal vector 
         const double nx = outnormal[qua].x();
         const double ny = outnormal[qua].y();
         const double nz = outnormal[qua].z();
@@ -380,14 +348,14 @@ int main( int argc, char * argv[] )
         const double wss_y = fluid_mu * ( ay - b * ny );
         const double wss_z = fluid_mu * ( az - b * nz );
 
-        const int quad_local_id = get_quad_local_id( ectrl_x, ectrl_y, ectrl_z,
+        const int tri_local_id = get_tri_local_id( ectrl_x, ectrl_y, ectrl_z,
             nLocBas, v_ectrl_x[ id_range[qua] ], v_ectrl_y[ id_range[qua] ], 
             v_ectrl_z[ id_range[qua] ], 1.0e-8 );
        
-        const int quad_global_id = vecIEN[nLocBas * ee + quad_local_id];
+        const int tri_global_id = vecIEN[nLocBas * ee + tri_local_id];
 
-        wss_ave[ quad_global_id ]   += quad_area * Vector_3(wss_x, wss_y, wss_z);
-        node_area[ quad_global_id ] += quad_area;
+        wss_ave[ tri_global_id ]   += tri_area * Vector_3(wss_x, wss_y, wss_z);
+        node_area[ tri_global_id ] += tri_area;
 
       } // loop over the sampling points (on surface)
 
@@ -395,24 +363,20 @@ int main( int argc, char * argv[] )
 
     } // End of loop over element
 
-    // Do the averaging by dividing by the area owned by this node
-    for(int ii=0; ii<nFunc; ++ii)
-    {
-      wss_ave[ii].x() /= node_area[ii];
-      wss_ave[ii].y() /= node_area[ii];
-      wss_ave[ii].z() /= node_area[ii];
-    }
+    for(int ii=0; ii<nFunc; ++ii) wss_ave[ii] *= (1.0 / node_area[ii]);
 
-    // write the wall shear stress at this time instance
-    write_quad_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
+    // Write the wall shear stress at this time instance
+    write_triangle_grid_wss( name_to_write, nFunc, nElem, ctrlPts, vecIEN, wss_ave );
 
     for(int ii=0; ii<nFunc; ++ii)
     {
       tawss[ii]   += inv_T * wss_ave[ii].norm2();
       osi_top[ii] += inv_T * wss_ave[ii];
-    } 
+    }
 
-  }// Loop over each time instance
+  } // End of loop over time
+
+  MPI_Barrier(PETSC_COMM_WORLD);
 
   for(int ii=0; ii<nFunc; ++ii)
   {
@@ -425,79 +389,62 @@ int main( int argc, char * argv[] )
       osi[ii] = 0.0;
   }
 
-  // write time averaged wss and osi
+  // write the TAWSS and OSI
   std::string tawss_osi_file("SOL_TAWSS_OSI" );
-  write_quad_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
+  write_triangle_grid_tawss_osi( tawss_osi_file, nFunc, nElem, ctrlPts, vecIEN, tawss, osi );
 
   delete [] v_ectrl_x; delete [] v_ectrl_y; delete [] v_ectrl_z;
   delete [] esol_u; delete [] esol_v; delete [] esol_w;
   delete [] Rx; delete [] Ry; delete [] Rz; 
   delete quad; delete element;
-  delete quad_vis; delete quad_gau; delete element_quad;
+  delete quad_tri_vis; delete quad_tri_gau; delete element_tri;
+
   PetscFinalize();
   return EXIT_SUCCESS;
 }
 
-std::vector<int> range_generator( const int &ii, const int &jj, const int &kk, const int &ll )
+std::vector<int> range_generator( const int &ii )
 {
-  std::vector<int> surface_id_range(4, -1);
-
-  int interior_id_range[4] {ii, jj, kk, ll};
-
-  std::sort(interior_id_range, interior_id_range + 4);
-
-  const int zeroth[4] {0,1,2,3};
-  const int first [4] {4,5,6,7};
-  const int second[4] {0,1,4,5};
-  const int third [4] {1,2,5,6};
-  const int fourth[4] {2,3,6,7};
-  const int fifth [4] {0,3,4,7};
-
-  if (std::equal(interior_id_range, interior_id_range + 4, zeroth))
+  std::vector<int> surface_id_range(6, -1);
+  switch (ii)
   {
-    surface_id_range[0] = 4;
-    surface_id_range[1] = 5;
-    surface_id_range[2] = 6;
-    surface_id_range[3] = 7;
+    case 0:
+      surface_id_range[0] = 1;
+      surface_id_range[1] = 2;
+      surface_id_range[2] = 3;
+      surface_id_range[3] = 5;
+      surface_id_range[4] = 9;
+      surface_id_range[5] = 8;
+      break;
+    case 1:
+      surface_id_range[0] = 0;
+      surface_id_range[1] = 2;
+      surface_id_range[2] = 3;
+      surface_id_range[3] = 6;
+      surface_id_range[4] = 9;
+      surface_id_range[5] = 7;
+      break;
+    case 2:
+      surface_id_range[0] = 0;
+      surface_id_range[1] = 1;
+      surface_id_range[2] = 3;
+      surface_id_range[3] = 4;
+      surface_id_range[4] = 8;
+      surface_id_range[5] = 7;
+      break;
+    case 3:
+      surface_id_range[0] = 0;
+      surface_id_range[1] = 1;
+      surface_id_range[2] = 2;
+      surface_id_range[3] = 4;
+      surface_id_range[4] = 5;
+      surface_id_range[5] = 6;
+      break;
+    default:
+      SYS_T::print_fatal("Error: the interior node index is wrong!\n");
+      break;
   }
-  else if(std::equal(interior_id_range, interior_id_range + 4, first))
-  {
-    surface_id_range[0] = 0;
-    surface_id_range[1] = 3;
-    surface_id_range[2] = 2;
-    surface_id_range[3] = 1;
-  }
-  else if(std::equal(interior_id_range, interior_id_range + 4, second))
-  {
-    surface_id_range[0] = 2;
-    surface_id_range[1] = 3;
-    surface_id_range[2] = 7;
-    surface_id_range[3] = 6;
-  }
-  else if(std::equal(interior_id_range, interior_id_range + 4, third))
-  {
-    surface_id_range[0] = 0;
-    surface_id_range[1] = 4;
-    surface_id_range[2] = 7;
-    surface_id_range[3] = 3;
-  }
-  else if(std::equal(interior_id_range, interior_id_range + 4, fourth))
-  {
-    surface_id_range[0] = 0;
-    surface_id_range[1] = 1;
-    surface_id_range[2] = 5;
-    surface_id_range[3] = 4;
-  }
-  else if(std::equal(interior_id_range, interior_id_range + 4, fifth))
-  {
-    surface_id_range[0] = 1;
-    surface_id_range[1] = 2;
-    surface_id_range[2] = 6;
-    surface_id_range[3] = 5;
-  }
-  else
-    SYS_T::print_fatal("Error: the interior node index is wrong!\n");
-
+  
   return surface_id_range;
 }
 
@@ -594,7 +541,7 @@ std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
   return sol;
 }
 
-int get_quad_local_id( const double * const &coor_x,
+int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,
     const double * const &coor_z,
     const int &len,
@@ -613,21 +560,21 @@ int get_quad_local_id( const double * const &coor_x,
     if(dist < tol) return ii;
   }
 
-  SYS_T::print_fatal("Error in get_quad_local_id.\n");
+  SYS_T::print_fatal("Error in get_tri_local_id.\n");
 
   return -1;
 }
 
-void write_quad_grid_wss( const std::string &filename,
+void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
     const std::vector< Vector_3 > &wss_on_node )
 {
-  vtkPolyData * grid_w = vtkPolyData::New();
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-  // generate the quad grid
-  HEX_T::gen_quad_grid(grid_w, numpts, numcels, pt, ien_array);
+  // generate the triangle grid
+  TET_T::gen_quadratic_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write wss
   VTK_T::add_Vector3_PointData(grid_w, wss_on_node, "WSS");
@@ -638,17 +585,17 @@ void write_quad_grid_wss( const std::string &filename,
   grid_w->Delete();
 }
 
-void write_quad_grid_tawss_osi( const std::string &filename,
+void write_triangle_grid_tawss_osi( const std::string &filename,
     const int &numpts, const int &numcels,
     const std::vector<double> &pt,
     const std::vector<int> &ien_array,
     const std::vector<double> &tawss,
     const std::vector<double> &osi )
 {
-  vtkPolyData * grid_w = vtkPolyData::New();
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
 
-  // generate the quad grid
-  HEX_T::gen_quad_grid(grid_w, numpts, numcels, pt, ien_array);
+  // generate the triangle grid
+  TET_T::gen_quadratic_triangle_grid(grid_w, numpts, numcels, pt, ien_array);
 
   // write tawss
   VTK_T::add_double_PointData(grid_w, tawss, "TAWSS");

@@ -103,13 +103,15 @@ namespace VIS_T
   // ================================================================
   // The 2nd set of tools contains 
   //    --- setHexelem      ===> Insert vtkHexahedron to gird
-  //    --- setQuadelem     ===> Insert vtkQuad to grid
   // ================================================================
   // ----------------------------------------------------------------
   // ! setHexelem: build Hexahedron element connectivity with the
   //   vtkPoints.  There are 8 points in this element.
   //   \para ptoffset: offset for this element
   //   \gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Hex element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
   void setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
@@ -127,6 +129,9 @@ namespace VIS_T
   //   with the vtkPoints.  There are 27 points in this element.
   //   \para ptoffset: offset for this element
   //   \gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Hex element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
   void setTriQuadHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
@@ -150,6 +155,9 @@ namespace VIS_T
   //   in element. There are 4 points in this element.
   //   \para ptoffset: the offset for this element
   //   \para gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Tet element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
   void setTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
@@ -165,6 +173,9 @@ namespace VIS_T
   //   with the vtkPoints. There are 10 points in the element.
   //   \para ptoffset: the offset for this element
   //   \para gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Tet element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
   void setQuadTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 

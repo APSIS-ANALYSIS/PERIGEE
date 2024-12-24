@@ -12,8 +12,6 @@
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
-#include "FEAElement.hpp"
-#include "FEType.hpp"
 
 class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 {

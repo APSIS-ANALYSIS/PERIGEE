@@ -4,10 +4,10 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const FEType &elemtype ) 
-: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( elemtype )
+    const FEType &in_elemtype ) 
+: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( in_elemtype )
 {
-  init( inffileList, wallfile, nFunc, in_outnormal, elemtype );
+  init( inffileList, wallfile, nFunc, in_outnormal, elem_type );
 }
 
 void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,

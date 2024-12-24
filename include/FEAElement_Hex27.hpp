@@ -91,7 +91,6 @@ class FEAElement_Hex27 final : public FEAElement
 
     int get_elemDim() const override {return 3;}
 
-    // A unique number for this element.
     FEType get_Type() const override {return FEType::Hex27;}
 
     int get_numQuapts() const override {return numQuapts;}

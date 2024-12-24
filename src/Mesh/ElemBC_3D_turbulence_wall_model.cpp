@@ -3,8 +3,8 @@
 ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model( 
     const std::vector<std::string> &vtkfileList,
     const int &in_wall_model_type, const IIEN * const &VIEN, 
-    const FEType &elemtype )
-: ElemBC_3D ( vtkfileList, elemtype ), 
+    const FEType &in_elemtype )
+: ElemBC_3D ( vtkfileList, in_elemtype ), 
   wall_model_type {in_wall_model_type}
 {
   SYS_T::print_fatal_if(VEC_T::get_size(vtkfileList) > 1, "Error, ElemBC_3D_turbulence_wall_model: The number of wall file should not be more than 1.\n");

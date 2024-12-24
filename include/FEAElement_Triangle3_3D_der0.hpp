@@ -31,9 +31,6 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
 
     int get_elemDim() const override {return 2;}
 
-    // element type : 521
-    // 5: simplicial element
-    // 2: 2D element
     FEType get_Type() const override {return FEType::Tri3_der0;}
 
     int get_numQuapts() const override {return numQuapts;}

@@ -1,7 +1,7 @@
 #include "ElemBC_3D.hpp"
 
-ElemBC_3D::ElemBC_3D( const FEType &elemtype ) 
-: elem_type( elemtype ), num_ebc( 0 )
+ElemBC_3D::ElemBC_3D( const FEType &in_elemtype )
+: elem_type( in_elemtype ), num_ebc( 0 )
 {
   num_node.clear();
   num_cell.clear();
@@ -16,7 +16,7 @@ ElemBC_3D::ElemBC_3D( const FEType &elemtype )
 }
 
 ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
-    const FEType &elemtype ) : elem_type( elemtype ), 
+    const FEType &in_elemtype ) : elem_type( in_elemtype ),
   num_ebc( static_cast<int>( vtkfileList.size() ) )
 {
   num_node.resize(num_ebc);  
@@ -42,7 +42,7 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
       cell_nLocBas[ii] = 6; // quadratic triangle
     else if(elem_type == FEType::Hex8)
       cell_nLocBas[ii] = 4; // bilinear quadrangle
-    else if(elem_type == FEType::Hex27) 
+    else if(elem_type == FEType::Hex27)
       cell_nLocBas[ii] = 9; // biquadratic quadrangle
     else
       SYS_T::print_fatal("Error: ElemBC_3D constructor: unknown element type. \n");

@@ -1,5 +1,5 @@
 // ============================================================================
-// vis_tet4_wss.cpp
+// vis_wss_tet4.cpp
 //
 // This is a visualization driver for Wall Shear Stress, which is
 // defined on the wall elements only.
@@ -51,7 +51,7 @@ int main( int argc, char * argv[] )
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
 #endif
   
-  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: vis_p1_wss is a serial program! \n");
+  SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: vis_wss_tet4 is a serial program! \n");
 
   // Directly read in the volumetric and wall file from the file
   // that record the preprocessor command lines.

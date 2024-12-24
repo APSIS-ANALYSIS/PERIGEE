@@ -3,8 +3,8 @@
 NodalBC_3D_rotated::NodalBC_3D_rotated( 
     const std::string &rotated_file,
     const std::string &fixed_file,
-    const int &nFunc, const FEType &elemtype )
-: elem_type( elemtype )
+    const int &nFunc, const FEType &in_elemtype )
+: elem_type( in_elemtype )
 {
   // Prepare the numbers that need to be shifted
   const int fixed_nFunc = VTK_T::read_num_pt(fixed_file);
