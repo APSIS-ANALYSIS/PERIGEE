@@ -12,8 +12,8 @@
 // Date created: Nov. 6 2013
 // ============================================================================
 #include "IQuadPts.hpp"
-#include "SymmTensor2_3D.hpp"
 #include "FEType.hpp"
+#include "Vector_3.hpp"
 
 class FEAElement
 {
@@ -182,18 +182,6 @@ class FEAElement
     {
       SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
-    }
-
-    // ------------------------------------------------------------------------    
-    // Return the global-to-lamina rotation matrix for transforming between the
-    // global and local lamina coordinates. This routine is used in membrane
-    // and shell elements.
-    // Reference: TJRH Linear finite element book page 386.
-    // ------------------------------------------------------------------------    
-    virtual Tensor2_3D get_rotationMatrix( const int &quaindex ) const 
-    {
-      SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n"); 
-      return Tensor2_3D();
     }
 
     // ------------------------------------------------------------------------
