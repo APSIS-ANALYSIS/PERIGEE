@@ -96,11 +96,7 @@ class FEAElement_Tet10 final : public FEAElement
         double * const &basis_xx, double * const &basis_yy,
         double * const &basis_zz ) const override;
 
-    void get_Jacobian(const int &quaindex, double * const &jac_value) const override;
-
     std::array<double,9> get_Jacobian( const int &quaindex ) const override;
-
-    void get_invJacobian(const int &quaindex, double * const &jac_value) const override;
 
     std::array<double,9> get_invJacobian( const int &quaindex ) const override;
 

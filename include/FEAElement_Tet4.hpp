@@ -70,8 +70,6 @@ class FEAElement_Tet4 final : public FEAElement
         double * const &basis_zz ) const override;
 
     // Get the Jacobian matrix dx/dr
-    void get_Jacobian(const int &quaindex, double * const &jac_value) const override;
-
     std::array<double,9> get_Jacobian( const int &quaindex ) const override
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_Jacobian function error.\n"  );
@@ -79,8 +77,6 @@ class FEAElement_Tet4 final : public FEAElement
     }
 
     // Get the inverse Jacobian matrix dr/dx
-    void get_invJacobian(const int &quaindex, double * const &jac_value) const override;
-
     std::array<double,9> get_invJacobian( const int &quaindex ) const override
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_invJacobian function error.\n"  );

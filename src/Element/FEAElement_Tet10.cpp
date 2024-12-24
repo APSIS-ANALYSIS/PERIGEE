@@ -272,24 +272,12 @@ void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-void FEAElement_Tet10::get_Jacobian(const int &quaindex,
-    double * const &jac_value) const
-{
-  for(int ii=0; ii<9; ++ii) jac_value[ii] = dx_dr[9*quaindex + ii];
-}
-
 std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_Jacobian function error.\n" );
   return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2],
     dx_dr[9*quaindex+3], dx_dr[9*quaindex+4], dx_dr[9*quaindex+5],
     dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
-}
-
-void FEAElement_Tet10::get_invJacobian(const int &quaindex,
-    double * const &jac_value) const
-{
-  for(int ii=0; ii<9; ++ii) jac_value[ii] = dr_dx[9*quaindex + ii];
 }
 
 std::array<double,9> FEAElement_Tet10::get_invJacobian(const int &quaindex) const

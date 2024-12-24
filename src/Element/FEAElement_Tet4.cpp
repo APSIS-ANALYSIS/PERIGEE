@@ -167,18 +167,6 @@ void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-void FEAElement_Tet4::get_Jacobian(const int &quaindex,
-    double * const &jac_value) const
-{
-  for( int ii=0; ii<9; ++ii ) jac_value[ii] = Jac[ii];
-}
-
-void FEAElement_Tet4::get_invJacobian(const int &quaindex,
-    double * const &jac_value) const
-{
-  for(int ii=0; ii<9; ++ii) jac_value[ii] = Jac[9+ii];
-}
-
 double FEAElement_Tet4::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z ) const
