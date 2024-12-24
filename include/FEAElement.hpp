@@ -167,6 +167,12 @@ class FEAElement
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     }
 
+    virtual std::array<double,4> get_Jacobian( const int &quaindex ) const
+    {
+      SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
+      return {{0.0, 0.0, 0.0, 0.0}};
+    }
+
     // ------------------------------------------------------------------------    
     // Return the inversion of the Jacobian matrix, the 9(4) components are
     // given. The output array dxi_dx is a 9 or 4 component array for 3D / 2D
@@ -176,6 +182,12 @@ class FEAElement
     {
       SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    }
+
+    virtual std::array<double,4> get_invJacobian( const int &quaindex ) const
+    {
+      SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
+      return {{0.0, 0.0, 0.0, 0.0}};
     }
 
     // ------------------------------------------------------------------------
