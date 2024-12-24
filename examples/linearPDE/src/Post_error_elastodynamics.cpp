@@ -78,16 +78,16 @@ double POST_ERROR_E::get_manu_sol_errorH1(
 {
   double errorH1 = 0.0;
 
-  double * R = new double[element->get_nLocBas()];
-  double * R_dx = new double[element->get_nLocBas()];
-  double * R_dy = new double[element->get_nLocBas()];
-  double * R_dz = new double[element->get_nLocBas()];
+  double * R = new double [element->get_nLocBas()];
+  double * Rx = new double [element->get_nLocBas()];
+  double * Ry = new double [element->get_nLocBas()];
+  double * Rz = new double [element->get_nLocBas()];
 
   for(int qua=0; qua<quad->get_num_quadPts(); ++qua)
   {
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    element->get_R_gradR(qua, R, R_dx, R_dy, R_dz);
+    element->get_R_gradR(qua, R, Rx, Ry, Rz);
     
     double coor_x = 0.0, coor_y = 0.0, coor_z = 0.0;
     Vector_3 sol(0.0, 0.0, 0.0);
@@ -103,17 +103,17 @@ double POST_ERROR_E::get_manu_sol_errorH1(
       sol.y() += soluy[ii] * R[ii];
       sol.z() += soluz[ii] * R[ii];
 
-      grad_sol(0,0) += solux[ii] * R_dx[ii];
-      grad_sol(0,1) += solux[ii] * R_dy[ii];
-      grad_sol(0,2) += solux[ii] * R_dz[ii];
+      grad_sol(0,0) += solux[ii] * Rx[ii];
+      grad_sol(0,1) += solux[ii] * Ry[ii];
+      grad_sol(0,2) += solux[ii] * Rz[ii];
 
-      grad_sol(1,0) += soluy[ii] * R_dx[ii];
-      grad_sol(1,1) += soluy[ii] * R_dy[ii];
-      grad_sol(1,2) += soluy[ii] * R_dz[ii];
+      grad_sol(1,0) += soluy[ii] * Rx[ii];
+      grad_sol(1,1) += soluy[ii] * Ry[ii];
+      grad_sol(1,2) += soluy[ii] * Rz[ii];
 
-      grad_sol(2,0) += soluz[ii] * R_dx[ii];
-      grad_sol(2,1) += soluz[ii] * R_dy[ii];
-      grad_sol(2,2) += soluz[ii] * R_dz[ii];
+      grad_sol(2,0) += soluz[ii] * Rx[ii];
+      grad_sol(2,1) += soluz[ii] * Ry[ii];
+      grad_sol(2,2) += soluz[ii] * Rz[ii];
     }
 
     const Vector_3 exact = exact_disp(coor_x, coor_y, coor_z, time );
@@ -129,9 +129,9 @@ double POST_ERROR_E::get_manu_sol_errorH1(
   }
 
   delete [] R; R = nullptr;
-  delete [] R_dx; R_dx = nullptr;
-  delete [] R_dy; R_dy = nullptr;
-  delete [] R_dz; R_dz = nullptr;
+  delete [] Rx; Rx = nullptr;
+  delete [] Ry; Ry = nullptr;
+  delete [] Rz; Rz = nullptr;
 
   return errorH1;
 }

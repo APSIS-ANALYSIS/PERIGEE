@@ -70,10 +70,10 @@ double POST_ERROR_T::get_manu_sol_errorH1(
 {
   double errorH1 = 0.0;
 
-  double * R = new double[element->get_nLocBas()];
-  double * R_dx = new double[element->get_nLocBas()];
-  double * R_dy = new double[element->get_nLocBas()];
-  double * R_dz = new double[element->get_nLocBas()];
+  double * R = new double [element->get_nLocBas()];
+  double * R_dx = new double [element->get_nLocBas()];
+  double * R_dy = new double [element->get_nLocBas()];
+  double * R_dz = new double [element->get_nLocBas()];
 
   for(int qua=0; qua<quad->get_num_quadPts(); ++qua)
   {
