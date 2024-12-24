@@ -9,7 +9,6 @@
 //
 // Date created: Sep. 2023
 // ==================================================================
-#include "FEAElement.hpp"
 #include "FE_Tools.hpp"
 
 class FEAElement_Quad4 final : public FEAElement

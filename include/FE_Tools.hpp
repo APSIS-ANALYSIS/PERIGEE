@@ -7,11 +7,7 @@
 // Date Created: Sep. 22 2023
 // ============================================================================
 #include "Math_Tools.hpp"
-#include "Vector_3.hpp"
-#include "Vec_Tools.hpp"
-#include "IQuadPts.hpp"
 #include "FEAElement.hpp"
-#include "FEType.hpp"
 
 namespace FE_T
 {

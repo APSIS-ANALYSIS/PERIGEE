@@ -78,7 +78,6 @@
 //
 // Date Created: Sep 6 2023
 // ==================================================================
-#include "FEAElement.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "FE_Tools.hpp"
 
