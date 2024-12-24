@@ -5,7 +5,7 @@ PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const int &elemtype, 
+        const double &in_beta, const FEType &elemtype, 
         const double &in_ct, const double &in_ctauc,
         const double &in_C_bI )
 : PLocAssem_VMS_NS_GenAlpha(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,

@@ -32,7 +32,7 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype );
+        const FEType &in_elemtype );
 
     virtual ~NodalBC_3D_inflow() = default;
 
@@ -112,24 +112,24 @@ class NodalBC_3D_inflow : public INodalBC
     virtual int get_global_cell(const int &nbc_id, const int &cell_idx) const
     {return global_cell[nbc_id][cell_idx];}
 
-    // For linear element (type 501), the face node numbering is
+    // For linear element (type Tet4), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3
     //   Tet-Face-1 : Node 0 3 2
     //   Tet-Face-2 : Node 0 1 3
     //   Tet-Face-3 : Node 0 2 1
-    // For quadratic element (type 502), the face node numbering is
+    // For quadratic element (type Tet10), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3 5 9 8
     //   Tet-Face-1 : Node 0 3 2 7 9 6
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
-    // For trilinear element (type 601), the face node numbering is
+    // For trilinear element (type Hex8), the face node numbering is
     //   Hex-Face-0 : Node 0 3 2 1
     //   Hex-Face-1 : Node 4 5 6 7
     //   Hex-Face-2 : Node 0 1 5 4
     //   Hex-Face-3 : Node 1 2 6 5
     //   Hex-Face-4 : Node 2 3 7 6
     //   Hex-Face-5 : Node 0 4 7 3
-    // For triquadratic element (type 602), the face node numbering is
+    // For triquadratic element (type Hex27), the face node numbering is
     //   Hex-Face-0 : Node 0 3 2 1 11 10 9 8 24
     //   Hex-Face-1 : Node 4 5 6 7 12 13 14 15 25
     //   Hex-Face-2 : Node 0 1 5 4 8 17 12 16 22
@@ -153,7 +153,8 @@ class NodalBC_3D_inflow : public INodalBC
     unsigned int num_dir_nodes;
 
     // number of inlet surfaces and element type
-    const int num_nbc, elem_type;
+    const int num_nbc;
+    const FEType elem_type;
     
     // This is the area calculated by setting the wall nodes to be zero.
     // It is designed to compute the area to give a plug flow profile with
@@ -211,7 +212,7 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype );
+        const FEType &elemtype );
 
     // Reset function for the IEN array of different element types.
     void reset501IEN_outwardnormal( const IIEN * const &VIEN );

@@ -7,7 +7,7 @@ Part_FEM::Part_FEM(
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_elemType, const Field_Property &fp )
+    const FEType &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -68,7 +68,7 @@ Part_FEM::Part_FEM(
     const std::vector<double> &ctrlPts,
     const std::vector<int> &rotatedtag,
     const int &in_cpu_rank, const int &in_cpu_size,
-    const int &in_elemType, const Field_Property &fp )
+    const FEType &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
   sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
   uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
@@ -168,7 +168,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
   nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
   probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
-  elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
+  elemType = FE_T::to_FEType(h5r -> read_string("Global_Mesh_Info", "elemType"));
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
   field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
   field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
@@ -385,7 +385,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "probDim", probDim );
   h5w->write_intScalar( group_id_3, "dofNum", dofNum );
-  h5w->write_intScalar( group_id_3, "elemType", elemType );
+  h5w->write_string( group_id_3, "elemType", FE_T::to_string(elemType) );
 
   h5w->write_intScalar( group_id_3, "field_id", field_id );
   h5w->write_intScalar( group_id_3, "is_geo_field", (is_geo_field ? 1 : 0) );

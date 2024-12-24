@@ -8,7 +8,7 @@
 //
 // We use [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], 
 // [0.5, 0, 0], [0.5, 0.5, 0], [0, 0.5, 0], [0, 0, 0.5], 
-// [0, 0.5, 0.5], [0.5, 0, 0.5]. 
+// [0.5, 0, 0.5], [0, 0.5, 0.5]. 
 // They are the vertex points for the quadratic tetrahedron.
 //
 // Note: We store them in area-coordinates, like what we did in the
@@ -26,7 +26,7 @@ class QuadPts_vis_tet10 final : public IQuadPts
 
     ~QuadPts_vis_tet10() override = default;
 
-    void print_info() const override
+    void print_info() const override 
     {
       SYS_T::commPrint("\n===== Visualization Points for Tet10 ===== \n");
       IQuadPts::print_info();
@@ -51,8 +51,9 @@ class QuadPts_vis_tet10 final : public IQuadPts
       0.5, 0.5, 0.0, 0.0,
       0.0, 0.5, 0.0, 0.5,
       0.0, 0.0, 0.5, 0.5,
-      0.0, 0.5, 0.5, 0.0,
-      0.5, 0.0, 0.5, 0.0 };
+      0.5, 0.0, 0.5, 0.0,
+      0.0, 0.5, 0.5, 0.0 };
+
 };
 
 #endif

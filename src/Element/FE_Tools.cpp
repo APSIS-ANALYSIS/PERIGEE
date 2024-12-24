@@ -675,11 +675,11 @@ namespace FE_T
     std::cout<<'\n'<<std::endl;
   }
 
-  QuadPts_on_face::QuadPts_on_face(const int &vol_elemType, const int &face_id, 
+  QuadPts_on_face::QuadPts_on_face(const FEType &vol_elemType, const int &face_id, 
       const IQuadPts * const lower_quad_rule)
     : dim(lower_quad_rule->get_dim() + 1), num_pts( lower_quad_rule -> get_num_quadPts() )
   {
-    if(vol_elemType == 501 || vol_elemType == 502) // Tet element
+    if(vol_elemType == FEType::Tet4 || vol_elemType == FEType::Tet10) // Tet element
     {
       //                     t
       //                     ^
@@ -751,7 +751,7 @@ namespace FE_T
           break;
       }
     }
-    else if (vol_elemType == 601 || vol_elemType == 602) // Hex element
+    else if (vol_elemType == FEType::Hex8 || vol_elemType == FEType::Hex27) // Hex element
     {
       //                    t
       //                    ^

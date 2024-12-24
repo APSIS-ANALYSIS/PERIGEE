@@ -1,5 +1,5 @@
 // ============================================================================
-// vis_501_fsi_wss.cpp
+// vis_fsi_wss_tet4.cpp
 //
 // WSS visualization for 4-node tet elements.
 //

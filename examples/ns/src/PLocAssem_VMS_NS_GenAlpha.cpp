@@ -5,17 +5,17 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas,
         const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const int &elemtype, 
+        const double &in_beta, const FEType &elemtype, 
         const double &in_ct, const double &in_ctauc )
 : rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
-  CI( (elemtype == 501 || elemtype == 601) ? 36.0 : 60.0 ),
+  CI( (elemtype == FEType::Tet4 || elemtype == FEType::Hex8) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
   vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
-  coef( (elemtype == 501 || elemtype == 502) ? 0.6299605249474365 : 1.0 ),
-  mm( (elemtype == 501 || elemtype == 502) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
+  coef( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
+  mm( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
   Tangent = new PetscScalar[vec_size * vec_size];

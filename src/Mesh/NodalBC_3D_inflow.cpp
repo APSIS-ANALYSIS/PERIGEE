@@ -4,17 +4,17 @@ NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileLis
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const int &elemtype ) 
-: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( elemtype )
+    const FEType &in_elemtype ) 
+: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( in_elemtype )
 {
-  init( inffileList, wallfile, nFunc, in_outnormal, elemtype );
+  init( inffileList, wallfile, nFunc, in_outnormal, elem_type );
 }
 
 void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const int &elemtype )
+    const FEType &elemtype )
 { 
   // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
@@ -59,13 +59,13 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
     VTK_T::read_grid( inffileList[ii], num_node[ii], num_cell[ii], pt_xyz[ii], sur_ien[ii] );
 
-    if( elemtype == 501 )
+    if( elemtype == FEType::Tet4 )
       nLocBas[ii] = 3;
-    else if( elemtype == 502 )
+    else if( elemtype == FEType::Tet10 )
       nLocBas[ii] = 6;
-    else if( elemtype == 601 )
+    else if( elemtype == FEType::Hex8 )
       nLocBas[ii] = 4;
-    else if( elemtype == 602 )
+    else if( elemtype == FEType::Hex27 )
       nLocBas[ii] = 9;
     else 
       SYS_T::print_fatal("Error: NodalBC_3D_inflow::init function: unknown element type.\n");
@@ -144,7 +144,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     // zero the container
     for(int jj=0; jj<num_node[ii]; ++jj) intNA[ii][jj] = 0.0;
 
-    if( elemtype == 501 )
+    if( elemtype == FEType::Tet4 )
     {
       const int nqp_tri = 3;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
@@ -182,7 +182,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else if( elemtype == 502 )
+    else if( elemtype == FEType::Tet10 )
     {
       const int nqp_tri = 6;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
@@ -220,7 +220,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else if( elemtype == 601 )
+    else if( elemtype == FEType::Hex8 )
     {
       const int nqp_quad = 2;                              // num qua points
       QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
@@ -258,7 +258,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else if( elemtype == 602 )
+    else if( elemtype == FEType::Hex27 )
     {
       const int nqp_quad = 4;                              // num qua points
       QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
@@ -326,13 +326,13 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
 void NodalBC_3D_inflow::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
 {
-  if(elem_type == 501)
+  if(elem_type == FEType::Tet4)
     reset501IEN_outwardnormal(VIEN); 
-  else if(elem_type == 502)
+  else if(elem_type == FEType::Tet10)
     reset502IEN_outwardnormal(VIEN); 
-  else if(elem_type == 601)
+  else if(elem_type == FEType::Hex8)
     reset601IEN_outwardnormal(VIEN);     
-  else if(elem_type == 602)
+  else if(elem_type == FEType::Hex27)
     reset602IEN_outwardnormal(VIEN);  
   else SYS_T::print_fatal("Error: NodalBC_3D_inflow::resetSurIEN_outwardnormal function: unknown element type.\n");
 }

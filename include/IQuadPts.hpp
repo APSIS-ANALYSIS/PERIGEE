@@ -22,17 +22,17 @@ class IQuadPts
       if( get_dim() == 4 )
       {
         for(int ii=0; ii<get_num_quadPts(); ++ii) SYS_T::commPrint( "%d \t qw = %e \t qp = [%e \t %e \t %e \t %e] \n", 
-            get_qw(ii), get_qp(ii,0), get_qp(ii,1), get_qp(ii,2), get_qp(ii,3) );
+            ii, get_qw(ii), get_qp(ii,0), get_qp(ii,1), get_qp(ii,2), get_qp(ii,3) );
       }
       else if( get_dim() == 3 )
       {
         for(int ii=0; ii<get_num_quadPts(); ++ii) SYS_T::commPrint( "%d \t qw = %e \t qp = [%e \t %e \t %e] \n", 
-            get_qw(ii), get_qp(ii,0), get_qp(ii,1), get_qp(ii,2) );
+            ii, get_qw(ii), get_qp(ii,0), get_qp(ii,1), get_qp(ii,2) );
       }
       else if( get_dim() == 2 )
       {
         for(int ii=0; ii<get_num_quadPts(); ++ii) SYS_T::commPrint( "%d \t qw = %e \t qp = [%e \t %e] \n", 
-            get_qw(ii), get_qp(ii,0), get_qp(ii,1) );
+            ii, get_qw(ii), get_qp(ii,0), get_qp(ii,1) );
       }
       else
       {

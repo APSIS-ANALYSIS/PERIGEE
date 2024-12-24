@@ -28,7 +28,6 @@ void FEAElement_Quad9::print_info() const
 {
   SYS_T::commPrint("Quad9: ");
   SYS_T::commPrint("9-node quadrilateral element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
