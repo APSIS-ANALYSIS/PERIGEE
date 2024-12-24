@@ -206,6 +206,7 @@ void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xx, double * const &basis_yy,
     double * const &basis_xy ) const
 {
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle6::get_2D_R_dR_d2R function error.\n" );
   const int offset = quaindex * 6;
   for( int ii=0; ii<6; ++ii )
   {
