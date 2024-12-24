@@ -20,7 +20,6 @@
 // Date Created: Jan. 19 2017
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
 
 class FEAElement_Triangle3_3D_der0 final : public FEAElement
 {
