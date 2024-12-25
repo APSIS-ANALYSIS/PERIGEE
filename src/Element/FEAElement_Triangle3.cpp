@@ -133,16 +133,14 @@ void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Triangle3::get_Jacobian(const int &quaindex,
-    double * const &jac_value) const
+std::array<double,4> FEAElement_Triangle3::get_Jacobian_2D(const int &quaindex) const
 {
-  for(int ii=0; ii<4; ++ii) jac_value[ii] = Jac[ii];
+  return {{ Jac[0], Jac[1], Jac[2], Jac[3] }};
 }
 
-void FEAElement_Triangle3::get_invJacobian(const int &quaindex,
-    double * const &jac_value) const
+std::array<double,4> FEAElement_Triangle3::get_invJacobian_2D(const int &quaindex) const
 {
-  for(int ii=0; ii<4; ++ii) jac_value[ii] = Jac[4+ii];
+  return {{ Jac[4], Jac[5], Jac[6], Jac[7] }};
 }
 
 // EOF
