@@ -228,23 +228,16 @@ void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Quad9::get_Jacobian(const int &quaindex,
-    double * const &jac_value) const
+std::array<double,4> FEAElement_Quad9::get_Jacobian_2D(const int &quaindex) const
 {
-  jac_value[0] = Jac[4*quaindex];
-  jac_value[1] = Jac[4*quaindex+1];
-  jac_value[2] = Jac[4*quaindex+2];
-  jac_value[3] = Jac[4*quaindex+3];
+  return {{ Jac[4*quaindex], Jac[4*quaindex+1],
+    Jac[4*quaindex+2], Jac[4*quaindex+3] }};
 }
 
-void FEAElement_Quad9::get_invJacobian(const int &quaindex,
-    double * const &jac_value) const
+std::array<double,4> FEAElement_Quad9::get_invJacobian_2D(const int &quaindex) const
 {
   const int offset = 4 * numQuapts + 4 * quaindex;
-  jac_value[0] = Jac[offset];
-  jac_value[1] = Jac[offset+1];
-  jac_value[2] = Jac[offset+2];
-  jac_value[3] = Jac[offset+3];
+  return {{ Jac[offset], Jac[offset+1], Jac[offset+2], Jac[offset+3] }};
 }
 
 // EOF
