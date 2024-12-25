@@ -167,7 +167,7 @@ class FEAElement
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     }
 
-    virtual std::array<double,4> get_Jacobian( const int &quaindex ) const
+    virtual std::array<double,4> get_Jacobian_2D( const int &quaindex ) const
     {
       SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0}};
@@ -184,7 +184,7 @@ class FEAElement
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     }
 
-    virtual std::array<double,4> get_invJacobian( const int &quaindex ) const
+    virtual std::array<double,4> get_invJacobian_2D( const int &quaindex ) const
     {
       SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0}};
