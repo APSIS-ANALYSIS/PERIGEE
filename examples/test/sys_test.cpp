@@ -550,9 +550,6 @@ void testMemberFunction(FEAElement * const &elementv, FEAElement * const &elemen
     double * R_dxz = new double[nLocBas];
     double * R_dyz = new double[nLocBas];
 
-    double * dx_dr = new double[9];
-    double * dr_dx = new double[9];
-
     double detJac = 0.0;
 	
     for(int qua=0; qua<numQuapts; ++qua)
@@ -590,15 +587,8 @@ void testMemberFunction(FEAElement * const &elementv, FEAElement * const &elemen
         outputVector(R_dyy, nLocBas);
         outputVector(R_dzz, nLocBas);
 
-        elementv->get_Jacobian(qua, dx_dr);
-
-        outputVector(dx_dr, 9);
-		
         const std::array<double, 9> Jacobian = elementv->get_Jacobian(qua);
         outputArray(Jacobian);
-
-        elementv->get_invJacobian(qua, dr_dx);
-        outputVector(dr_dx, 9);
 
         const std::array<double, 9> invJacobian = elementv->get_invJacobian(qua);
         outputArray(invJacobian);
@@ -696,9 +686,6 @@ void testMemberFunction(FEAElement * const &elementv, FEAElement * const &elemen
     delete [] R_dxz; R_dxz = nullptr;
     delete [] R_dyz; R_dyz = nullptr;
 
-    delete [] dx_dr; dx_dr = nullptr;
-    delete [] dr_dx; dr_dx = nullptr;
-
     delete [] R_der0; R_der0 = nullptr;
 }
 
@@ -754,9 +741,6 @@ void testMemberFunction(FEAElement * const &element, const double * const &ctrl_
     double * R_dyy = new double[nLocBas];
     double * R_dxy = new double[nLocBas];
 
-    double * dx_dr = new double[4];
-    double * dr_dx = new double[4];
-
     double detJac = 0.0;
 
     for(int qua=0; qua<numQuapts; ++qua)
@@ -779,11 +763,11 @@ void testMemberFunction(FEAElement * const &element, const double * const &ctrl_
         outputVector(R_dyy, nLocBas);
         outputVector(R_dxy, nLocBas);
 
-        element->get_Jacobian(qua, dx_dr);
-        outputVector(dx_dr, 4);
+        auto dx_dr = element->get_Jacobian_2D(qua);
+        outputArray(dx_dr);
 		
-        element->get_invJacobian(qua, dr_dx);
-        outputVector(dr_dx, 4);
+        auto dr_dx = element->get_invJacobian_2D(qua);
+        outputArray(dr_dx);
 
         detJac = element->get_detJac(qua);
         std::cout << detJac << std::endl;
@@ -797,9 +781,6 @@ void testMemberFunction(FEAElement * const &element, const double * const &ctrl_
     delete [] R_dxx; R_dxx = nullptr;
     delete [] R_dyy; R_dyy = nullptr;
     delete [] R_dxy; R_dxy = nullptr;
-
-    delete [] dx_dr; dx_dr = nullptr;
-    delete [] dr_dx; dr_dx = nullptr;
 }
 
 int main(int argc, char *argv[])
