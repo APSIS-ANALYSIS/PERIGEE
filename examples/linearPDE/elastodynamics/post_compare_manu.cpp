@@ -10,6 +10,7 @@
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
 #include "APart_Node.hpp"
+#include "FEANode.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
