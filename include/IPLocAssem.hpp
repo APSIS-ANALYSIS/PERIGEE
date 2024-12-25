@@ -565,8 +565,7 @@ class IPLocAssem
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo)
+      const double * const &rotated_local_sol)
       {SYS_T::commPrint("Warning: this Assem_Residual_itf_fixed is not implemented.\n");}
 
     virtual void Assem_Residual_itf_rotated(
@@ -587,8 +586,7 @@ class IPLocAssem
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo)
+      const double * const &rotated_local_sol)
       {SYS_T::commPrint("Warning: this Assem_Diag_Tangent_Residual_itf_fixed is not implemented.\n");}
 
     virtual void Assem_Diag_Tangent_Residual_itf_rotated(
@@ -609,8 +607,7 @@ class IPLocAssem
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol,
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo)
+      const double * const &rotated_local_sol)
       {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_itf_MF_fixed is not implemented.\n");}
 
     virtual void Assem_Tangent_itf_MF_rotated(
