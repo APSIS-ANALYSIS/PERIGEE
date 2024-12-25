@@ -26,7 +26,7 @@ class Part_FEM_FSI : public Part_FEM
         const std::vector<int> &node_s,
         const int &in_cpu_rank, 
         const int &in_cpu_size,
-        const int &in_elemType,
+        const FEType &in_elemType,
         const int &in_start_idx,
         const Field_Property &in_fp );
 

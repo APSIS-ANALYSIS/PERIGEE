@@ -37,7 +37,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
-  ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp  
   ${perigee_source}/Mesh/Part_FEM_Rotated.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
@@ -95,7 +94,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
-  ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
+  ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
@@ -164,19 +163,19 @@ ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
 ADD_EXECUTABLE( ns3d ns_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
 ADD_EXECUTABLE( vis_ns vis_ns.cpp)
-ADD_EXECUTABLE( vis_p1_wss vis_p1_wss.cpp)
-ADD_EXECUTABLE( vis_p2_wss vis_p2_wss.cpp)
-ADD_EXECUTABLE( vis_601_p1_wss vis_601_p1_wss.cpp)
-ADD_EXECUTABLE( vis_602_p2_wss vis_602_p2_wss.cpp)
+ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
+ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
+ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
+ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p1_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p2_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_601_p1_wss perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_602_p2_wss perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_hex8 perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_hex27 perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

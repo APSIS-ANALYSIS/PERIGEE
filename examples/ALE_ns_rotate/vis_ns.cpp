@@ -9,11 +9,11 @@
 #include "AGlobal_Mesh_Info.hpp"
 #include "APart_Basic_Info.hpp"
 #include "QuadPts_vis_tet4.hpp"
-#include "QuadPts_vis_tet10_v2.hpp"
+#include "QuadPts_vis_tet10.hpp"
 #include "QuadPts_vis_hex8.hpp"
 #include "QuadPts_vis_hex27.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Tet10.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
 #include "VisDataPrep_NS.hpp"
@@ -108,22 +108,22 @@ int main( int argc, char * argv[] )
   IQuadPts * quad = nullptr;
   FEAElement * element = nullptr; 
 
-  if( GMIptr->get_elemType() == 501 )
+  if( GMIptr->get_elemType() == FEType::Tet4 )
   {
     quad = new QuadPts_vis_tet4();
     element = new FEAElement_Tet4( quad-> get_num_quadPts() );
   }
-  else if( GMIptr->get_elemType() == 502 )
+  else if( GMIptr->get_elemType() == FEType::Tet10 )
   {
-    quad = new QuadPts_vis_tet10_v2();
-    element = new FEAElement_Tet10_v2( quad-> get_num_quadPts() );
+    quad = new QuadPts_vis_tet10();
+    element = new FEAElement_Tet10( quad-> get_num_quadPts() );
   }
-  else if( GMIptr->get_elemType() == 601 )
+  else if( GMIptr->get_elemType() == FEType::Hex8 )
   {
     quad = new QuadPts_vis_hex8();
     element = new FEAElement_Hex8( quad-> get_num_quadPts() );
   }
-  else if( GMIptr->get_elemType() == 602 )
+  else if( GMIptr->get_elemType() == FEType::Hex27 )
   {
     quad = new QuadPts_vis_hex27();
     element = new FEAElement_Hex27( quad-> get_num_quadPts() );

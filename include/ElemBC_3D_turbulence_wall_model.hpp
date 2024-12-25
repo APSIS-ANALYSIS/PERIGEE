@@ -31,7 +31,7 @@ class ElemBC_3D_turbulence_wall_model : public ElemBC_3D
     ElemBC_3D_turbulence_wall_model( const std::vector<std::string> &vtkfileList,
         const int &in_wall_model_type,
         const IIEN * const &VIEN,
-        const int &elemtype );
+        const FEType &in_elemtype );
 
     virtual ~ElemBC_3D_turbulence_wall_model() = default;
 

@@ -11,7 +11,7 @@
 #include "QuadPts_Gauss_Tet.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Tet10.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
 #include "PLocAssem_Stress_Recovery.hpp"
@@ -107,32 +107,32 @@ int main(int argc, char *argv[])
   FEAElement * elementv = nullptr;
   IQuadPts * quadv = nullptr;
 
-  if( GMIptr->get_elemType() == 501 )
+  if( GMIptr->get_elemType() == FEType::Tet4 )
   {
     if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
     
-    elementv = new FEAElement_Tet4( nqp_vol ); // elem type 501
+    elementv = new FEAElement_Tet4( nqp_vol ); // elem type Tet4
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
   }
-  else if( GMIptr->get_elemType() == 502 )
+  else if( GMIptr->get_elemType() == FEType::Tet10 )
   {
     SYS_T::print_fatal_if( nqp_vol < 29, "Error: not enough quadrature points for tets.\n" );
 
-    elementv = new FEAElement_Tet10_v2( nqp_vol ); // elem type 502
+    elementv = new FEAElement_Tet10( nqp_vol ); // elem type Tet10
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
   }
-  else if( GMIptr->get_elemType() == 601 )
+  else if( GMIptr->get_elemType() == FEType::Hex8 )
   {
     SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
   
-    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 601
+    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type Hex8
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
   }
-  else if( GMIptr->get_elemType() == 602 )
+  else if( GMIptr->get_elemType() == FEType::Hex27 )
   {
     SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
   
-    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type 602
+    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type Hex27
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");

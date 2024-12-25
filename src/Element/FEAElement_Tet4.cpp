@@ -1,32 +1,16 @@
 #include "FEAElement_Tet4.hpp"
 
-FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua )
+FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua ) ,
+  triangle_face( SYS_T::make_unique<FEAElement_Triangle3_3D_der0>(numQuapts) )
 {
-  R = new double [4 * numQuapts];
-
-  triangle_face = new FEAElement_Triangle3_3D_der0( numQuapts );
-}
-
-FEAElement_Tet4::~FEAElement_Tet4()
-{
-  delete [] R; R = nullptr;
-
-  delete triangle_face; triangle_face = nullptr;
+  R.resize(4 * numQuapts);
 }
 
 void FEAElement_Tet4::print_info() const
 {
   SYS_T::commPrint("Tet4: ");
   SYS_T::commPrint("4-node tetrahedral element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Tet4::get_memory_usage() const
-{
-  const double double_size = 4 * numQuapts + 31;
-  const double int_size = 1;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
@@ -124,24 +108,6 @@ void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-std::vector<double> FEAElement_Tet4::get_dR_dx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_dR_dx function error.\n" );
-  return { dR_dx[0], dR_dx[1], dR_dx[2], dR_dx[3] };
-}
-
-std::vector<double> FEAElement_Tet4::get_dR_dy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_dR_dy function error.\n" );
-  return { dR_dy[0], dR_dy[1], dR_dy[2], dR_dy[3] };
-}
-
-std::vector<double> FEAElement_Tet4::get_dR_dz( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_dR_dz function error.\n" );
-  return { dR_dz[0], dR_dz[1], dR_dz[2], dR_dz[3] };
-}
-
 void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
@@ -201,18 +167,6 @@ void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-void FEAElement_Tet4::get_Jacobian(const int &quaindex,
-    double * const &jac_value) const
-{
-  for( int ii=0; ii<9; ++ii ) jac_value[ii] = Jac[ii];
-}
-
-void FEAElement_Tet4::get_invJacobian(const int &quaindex,
-    double * const &jac_value) const
-{
-  for(int ii=0; ii<9; ++ii) jac_value[ii] = Jac[9+ii];
-}
-
 double FEAElement_Tet4::get_h( const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z ) const
@@ -242,7 +196,7 @@ void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &qu
 std::array<std::vector<double>, 3> FEAElement_Tet4::get_face_ctrlPts( const int &face_id,
     const double * const &vol_ctrl_x,
     const double * const &vol_ctrl_y,
-    const double * const &vol_ctrl_z )
+    const double * const &vol_ctrl_z ) const
 {
   std::array<std::vector<double>, 3> out;
 

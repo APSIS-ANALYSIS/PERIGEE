@@ -33,6 +33,7 @@
 // ==================================================================
 #include "FEAElement.hpp"
 #include "IQuadPts.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class IPLocAssem_2x2Block
 {

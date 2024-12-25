@@ -18,9 +18,9 @@ class Mesh_FEM : public IMesh
         const int &in_deg) : nFunc(in_nfunc), nElem(in_nelem), 
     nLocBas(in_nlocbas), sdeg(in_deg), tdeg(in_deg), udeg(in_deg) {}
 
-    virtual ~Mesh_FEM() = default;
+    ~Mesh_FEM() override = default;
 
-    virtual void print_info() const
+    void print_info() const override
     {
       std::cout<<'\n';
       std::cout<<"======= Mesh_FEM ======="<<std::endl;
@@ -31,15 +31,15 @@ class Mesh_FEM : public IMesh
       std::cout<<"========================="<<std::endl;
     }
 
-    virtual int get_s_degree() const {return sdeg;}
-    virtual int get_t_degree() const {return tdeg;}
-    virtual int get_u_degree() const {return udeg;}
+    int get_s_degree() const override {return sdeg;}
+    int get_t_degree() const override {return tdeg;}
+    int get_u_degree() const override {return udeg;}
 
-    virtual int get_nFunc() const {return nFunc;}
+    int get_nFunc() const override {return nFunc;}
 
-    virtual int get_nElem() const {return nElem;}
+    int get_nElem() const override {return nElem;}
 
-    virtual int get_nLocBas() const {return nLocBas;}
+    int get_nLocBas() const override {return nLocBas;}
 
   private:
     const int nFunc, nElem, nLocBas, sdeg, tdeg, udeg;

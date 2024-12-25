@@ -3,29 +3,16 @@
 FEAElement_Quad4_3D_der0::FEAElement_Quad4_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R = new double [4*numQuapts];
-  detJac = new double [numQuapts];
-  un.resize( numQuapts );
-}
-
-FEAElement_Quad4_3D_der0::~FEAElement_Quad4_3D_der0()
-{
-  delete [] R;         R = nullptr;
-  delete [] detJac; detJac = nullptr;
+  R.resize(4 * numQuapts);
+  detJac.resize(numQuapts);
+  un.resize(numQuapts);
 }
 
 void FEAElement_Quad4_3D_der0::print_info() const
 {
   SYS_T::commPrint("Quad4_3D_der0: ");
   SYS_T::commPrint("4-node quad element with no derivative evaluated. \n ");
-  SYS_T::commPrint("elemType: %d. \n", get_Type());
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
-}
-
-double FEAElement_Quad4_3D_der0::get_memory_usage() const
-{
-  const double dsize = 8 * numQuapts;
-  return dsize * 8.0 + 4.0;
 }
 
 void FEAElement_Quad4_3D_der0::buildBasis( const IQuadPts * const &quad,

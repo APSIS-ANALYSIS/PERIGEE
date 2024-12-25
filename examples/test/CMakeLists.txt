@@ -43,22 +43,17 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
-  ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/Part_FEM_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_wall.cpp
   ${perigee_source}/Mesh/ElemBC_3D_turbulence_wall_model.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
-  ${perigee_source}/Mesh/NodalBC_3D_ring.cpp
-  ${perigee_source}/Mesh/NodalBC_3D_wall.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
-  ${perigee_source}/Mesh/EBC_Partition_wall.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
   ${perigee_source}/Mesh/EBC_Partition_turbulence_wall_model.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
@@ -87,18 +82,13 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/ALocal_InflowBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC.cpp
   ${perigee_source}/Analysis_Tool/ALocal_EBC_outflow.cpp
-  ${perigee_source}/Analysis_Tool/ALocal_EBC_wall.cpp
   ${perigee_source}/Analysis_Tool/ALocal_WeakBC.cpp
   ${perigee_source}/Analysis_Tool/APart_Node.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
   ${perigee_source}/Element/FEAElement_Hex27.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
-  ${perigee_source}/Element/FEAElement_Tet_P2_P1.cpp
-  ${perigee_source}/Element/FEAElement_MINI_P1_3D.cpp
-  ${perigee_source}/Element/FEAElement_MINI_P1_2D.cpp
   ${perigee_source}/Element/FEAElement_Tet10.cpp
-  ${perigee_source}/Element/FEAElement_Tet10_v2.cpp
   ${perigee_source}/Element/FEAElement_Triangle3.cpp
   ${perigee_source}/Element/FEAElement_Triangle6.cpp
   ${perigee_source}/Element/FEAElement_Quad4.cpp

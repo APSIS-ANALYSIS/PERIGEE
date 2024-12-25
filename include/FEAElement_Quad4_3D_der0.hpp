@@ -31,60 +31,56 @@
 // Date Created: Sep. 12 2023.
 // ==================================================================
 #include "FEAElement.hpp"
-#include "Math_Tools.hpp"
-#include "Vector_3.hpp"
 
-class FEAElement_Quad4_3D_der0 : public FEAElement
+class FEAElement_Quad4_3D_der0 final : public FEAElement
 {
   public:
     FEAElement_Quad4_3D_der0( const int &in_nqua );
 
-    virtual ~FEAElement_Quad4_3D_der0();
+    ~FEAElement_Quad4_3D_der0() override = default;
 
-    virtual int get_elemDim() const {return 2;}
+    int get_elemDim() const override {return 2;}
 
-    virtual int get_Type() const {return 621;}
+    FEType get_Type() const override {return FEType::Quad4_der0;}
 
-    virtual int get_numQuapts() const {return numQuapts;}
+    int get_numQuapts() const override {return numQuapts;}
 
-    virtual int get_nLocBas() const {return 4;}
+    int get_nLocBas() const override {return 4;}
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual double get_memory_usage() const;
-
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
+    void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
-        const double * const &ctrl_z );
+        const double * const &ctrl_z ) override;
 
-    virtual void get_R( const int &quaindex, double * const &basis ) const;
+    void get_R( const int &quaindex, double * const &basis ) const override;
 
-    virtual std::vector<double> get_R( const int &quaindex ) const;
+    std::vector<double> get_R( const int &quaindex ) const override;
 
     // Assuming the quad nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
-    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const;
+    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override;
     
     // If the quad nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction. 
-    virtual Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
-        const Vector_3 &int_pt, double &len ) const;
+    Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
+        const Vector_3 &int_pt, double &len ) const override;
 
-    virtual double get_detJac(const int &quaindex) const {return detJac[quaindex];}
+    double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
 
   private:
     const int numQuapts;
 
     // Container for R0, R1, R2, R3
     // 0 <= ii < 4 x numQuapts
-    double * R;
+    std::vector<double> R {};
 
     // unit normal vector components, each of length numQuapts
     std::vector<Vector_3> un;
 
     // Jacobian determinant, length numQuapts
-    double * detJac; 
+    std::vector<double> detJac {};
 };
 
 #endif

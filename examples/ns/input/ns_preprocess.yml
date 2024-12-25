@@ -1,5 +1,5 @@
-# Element options: 501 linear tet, 502 quadratic tet, 601 trilinear hex, 602 triquadratic hex
-elem_type: 602
+# Element options: Tet4 linear tet, Tet10 quadratic tet, Hex8 trilinear hex, Hex27 triquadratic hex
+elem_type: Hex27
 # Numbers of inlets and outlets
 num_inlet: 1
 num_outlet: 1

@@ -46,7 +46,7 @@ class HDF5_Reader
     //   constructor will pass the given fild_id in to make it its 
     //   own variable.
     // --------------------------------------------------------------
-    HDF5_Reader( const hid_t &in_file_id );
+    HDF5_Reader( const hid_t &in_file_id ) : file_id(in_file_id) {}
     
     // --------------------------------------------------------------
     // ! ~HDF5_Reader : Destructor.
@@ -57,7 +57,10 @@ class HDF5_Reader
     // !check_data: return a bool value that determines if the data
     //              with the specified name exists in the file.
     // --------------------------------------------------------------
-    bool check_data( const char * const &name ) const;
+    bool check_data( const char * const &name ) const
+    {
+      return H5Lexists(file_id, name, H5P_DEFAULT);
+    }
     
     // --------------------------------------------------------------
     // !read_intScalar: return the integer scalar data by specifing 

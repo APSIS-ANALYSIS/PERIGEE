@@ -7,6 +7,7 @@ PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics ana
 - [Install](#Install)
 - [Build](#Build)
 - [Tutorial](#Tutorial)
+- [Contributing](#Contributing)
 - [Simulation Samples](#Simulation-Samples)
 - [References](#References)
 
@@ -57,6 +58,37 @@ In general, one has to go through the following steps for simulation.
 * Run a preprocessor for postprocessing. This step re-partition the mesh to make preparations for postprocessing, such as visualization, error calculation, etc. Similar to the preprocessor, this routine should be run in *serial* and may consume a lot memory if your mesh is fine. With this routine, we are able to run the postprocessing routine with different number of CPUs. For example, we run FEM analysis with, say, 360 CPUs; visualizing the solution is much less intensive in computing and may only need, say, 24 CPUs. So you should repartition the domain into 24 sub-domains in this step.
 * Run a postprocessor in parallel. Often, this step refers to the visualization of the solutions. The visualzation routine will read the binary solution files and write the data into (parallel) vtu/vtp format. Then the data can be visualized in Paraview.
 
+## Contributing
+We welcome contributions from the community! If you are interested in contributing to this project, please follow the guidelines below.
+
+### Code Style
+Please follow these guidelines when contributing to the codebase:
+
+- Follow the [Google C++ Style Guide](https://google.github.io/styleguide/cppguide.html).
+- Make sure your code is well-documented with comments explaining the purpose and functionality.
+- Write clear and concise commit messages.
+- Keep your changes focused on a single feature or bug fix.
+
+### Testing
+- Please make sure that your changes are covered by tests.
+- Run all tests to verify that your changes do not break existing functionality.
+- If adding new features, add appropriate tests to cover the new functionality.
+
+### Issues and Bugs
+- If you find a bug, please report it by opening an issue.
+- Provide as much detail as possible, including steps to reproduce the issue and any relevant error messages or logs.
+
+### Pull Request Process
+1. Ensure your changes pass all tests and adhere to the project's coding standards.
+2. Update the README.md file if necessary to reflect your changes.
+3. Open a pull request and provide a detailed description of your changes.
+4. A project maintainer will review your pull request and provide feedback.
+5. Once approved, your changes will be merged into the main branch.
+
+### Community
+- Be respectful and considerate in your interactions with others.
+- Follow the [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a welcoming and inclusive environment for all contributors.
+
 ## Simulation Samples
 The vortex-induced vibration of an elastic plate with Re $\approx$ 3 $\times$ 10^4. The mesh consists of 18 million linear tetrahedral elements for the fluid and 0.7 million elements for the solid. The variational multiscale formulation provides the LES technique in the flow problem, and the time integration is based on the generalized-&alpha; scheme.
 
@@ -93,7 +125,7 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 Dr. Ju Liu, liujuy@gmail.com, liuj36@sustech.edu.cn
 
 ## Acknowledgement
-National Natural Science Foundation of China, Grant number 12172160
+National Natural Science Foundation of China, Grant numbers 12172160, 12472201
 
 Shenzhen Science and Technology Program, Grant number JCYJ20220818100600002
 

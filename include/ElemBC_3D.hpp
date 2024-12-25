@@ -14,9 +14,9 @@ class ElemBC_3D : public ElemBC
 {
   public:
     // Default constructor: prescribe an elembc class with no surface mesh data.
-    ElemBC_3D( const int &elemtype );
+    ElemBC_3D( const FEType &in_elemtype );
 
-    ElemBC_3D( const std::vector<std::string> &vtkfileList, const int &elemtype );
+    ElemBC_3D( const std::vector<std::string> &vtkfileList, const FEType &in_elemtype );
 
     virtual ~ElemBC_3D() = default;
 
@@ -48,24 +48,24 @@ class ElemBC_3D : public ElemBC
 
     virtual void print_info() const;
 
-    // For linear element (type 501), the face node numbering is
+    // For linear element (type Tet4), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3
     //   Tet-Face-1 : Node 0 3 2
     //   Tet-Face-2 : Node 0 1 3
     //   Tet-Face-3 : Node 0 2 1
-    // For quadratic element (type 502), the face node numbering is
+    // For quadratic element (type Tet10), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3 5 9 8
     //   Tet-Face-1 : Node 0 3 2 7 9 6
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
-    // For trilinear element (type 601), the face node numbering is
+    // For trilinear element (type Hex8), the face node numbering is
     //   Hex-Face-0 : Node 0 3 2 1
     //   Hex-Face-1 : Node 4 5 6 7
     //   Hex-Face-2 : Node 0 1 5 4
     //   Hex-Face-3 : Node 1 2 6 5
     //   Hex-Face-4 : Node 2 3 7 6
     //   Hex-Face-5 : Node 0 4 7 3
-    // For triquadratic element (type 602), the face node numbering is
+    // For triquadratic element (type Hex27), the face node numbering is
     //   Hex-Face-0 : Node 0 3 2 1 11 10 9 8 24
     //   Hex-Face-1 : Node 4 5 6 7 12 13 14 15 25
     //   Hex-Face-2 : Node 0 1 5 4 8 17 12 16 22
@@ -82,26 +82,6 @@ class ElemBC_3D : public ElemBC
     virtual std::vector<double> get_intNA( const int &ebc_id ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 
-    // Access the data in ElemBC_3D_wall, wall thickness used in CMM
-    virtual std::vector<double> get_wall_thickness() const
-    {SYS_T::commPrint("Warning: get_wall_thickness is not implemented. \n"); return {};}
-
-    // Access the data in ElemBC_3D_wall, wall youngs modulus used in CMM
-    virtual std::vector<double> get_wall_youngsmod() const
-    {SYS_T::commPrint("Warning: get_wall_youngsmod is not implemented. \n"); return {};}
-
-    // Access the data in ElemBC_3D_wall, wall spring constant used in CMM
-    virtual std::vector<double> get_wall_springconst() const
-    {SYS_T::commPrint("Warning: get_wall_springconst is not implemented. \n"); return {};}
-
-    // Access the data in ElemBC_3D_wall, wall damping constant used in CMM
-    virtual std::vector<double> get_wall_dampingconst() const
-    {SYS_T::commPrint("Warning: get_wall_dampingconst is not implemented. \n"); return {};}
-
-    // Access the data in ElemBC_3D_wall, fluid density used for CMM young's modulus
-    virtual double get_fluid_density() const
-    {SYS_T::commPrint("Warning: get_fluid_density is not implemented. \n"); return -1.0;}
-
     // Access the data in ElemBC_3D_wall_turbulence, wall model type
     virtual int get_wall_model_type() const
     {SYS_T::commPrint("Warning: get_wall_model_type is not implemented. \n"); return -1;}
@@ -110,18 +90,9 @@ class ElemBC_3D : public ElemBC
     virtual int get_faceID( const int &cell_index ) const
     {SYS_T::commPrint("Warning: get_faceID is not implemented. \n"); return {};}
 
-    // Overwrite ElemBC_3D_wall properties from a vtp/vtu file
-    virtual void overwrite_from_vtk( const std::string &wallprop_vtk, 
-        const int &type, const std::string &vtk_fieldname )
-    {SYS_T::commPrint("Warning: overwrite_from_vtk is not implemented. \n");}
-
-    // write the boundary surface to a vtk/vtu format for visualization
-    virtual void write_vtk( const int &ebc_id, 
-        const std::string &filename="elembc_surface" ) const
-    {SYS_T::commPrint("Warning: write_vtk is not implemented. \n");}
-
   protected:
-    const int elem_type, num_ebc;
+    const FEType elem_type;
+    const int num_ebc;
     
     std::vector<int> num_node;     // length num_ebc
     std::vector<int> num_cell;     // length num_ebc

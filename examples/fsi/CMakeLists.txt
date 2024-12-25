@@ -40,7 +40,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
-  ${perigee_source}/Mesh/IEN_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
@@ -176,8 +175,8 @@ ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
 ADD_EXECUTABLE( vis_solid vis_solid.cpp )
 ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
-ADD_EXECUTABLE( vis_501_fsi_wss vis_501_fsi_wss.cpp )
-ADD_EXECUTABLE( vis_601_fsi_wss vis_601_fsi_wss.cpp )
+ADD_EXECUTABLE( vis_fsi_wss_tet4 vis_fsi_wss_tet4.cpp )
+ADD_EXECUTABLE( vis_fsi_wss_hex8 vis_fsi_wss_hex8.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
@@ -188,8 +187,8 @@ TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fluid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_solid ${EXTRA_LINK_LIBS} perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_501_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_601_fsi_wss ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fsi_wss_tet4 ${EXTRA_LINK_LIBS} perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_fsi_wss_hex8 ${EXTRA_LINK_LIBS} perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

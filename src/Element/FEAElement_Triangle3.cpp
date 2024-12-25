@@ -3,27 +3,14 @@
 FEAElement_Triangle3::FEAElement_Triangle3( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R = new double [3 * numQuapts];
-}
-
-FEAElement_Triangle3::~FEAElement_Triangle3()
-{
-  delete [] R; R = nullptr;
+  R.resize(3 * numQuapts);
 }
 
 void FEAElement_Triangle3::print_info() const
 {
   SYS_T::commPrint("Tri3: ");
   SYS_T::commPrint("3-node triangle element with up to 2nd derivatives. \n");
-  PetscPrintf(PETSC_COMM_WORLD, "elemType: %d \n", get_Type());
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
-}
-
-double FEAElement_Triangle3::get_memory_usage() const
-{
-  double double_size = 3 * numQuapts + 15;
-  double int_size = 1;
-  return double_size * 8.0 + int_size * 4.0;
 }
 
 void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
@@ -114,18 +101,6 @@ void FEAElement_Triangle3::get_gradR( const int &quaindex,
   } 
 }
 
-std::vector<double> FEAElement_Triangle3::get_dR_dx( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_dR_dx function error.\n" );
-  return { dR_dx[0], dR_dx[1], dR_dx[2] };
-}
-
-std::vector<double> FEAElement_Triangle3::get_dR_dy( const int &quaindex ) const
-{
-  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_dR_dy function error.\n" );
-  return { dR_dy[0], dR_dy[1], dR_dy[2] };
-} 
-
 void FEAElement_Triangle3::get_R_gradR( const int &quaindex, 
     double * const &basis,
     double * const &basis_x, double * const &basis_y ) const
@@ -145,6 +120,7 @@ void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xx, double * const &basis_yy,
     double * const &basis_xy ) const
 {
+  ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_2D_R_dR_d2R function error.\n" );
   const int offset = quaindex * 3;
   for(int ii=0; ii < 3; ++ ii)
   {
@@ -157,16 +133,14 @@ void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Triangle3::get_Jacobian(const int &quaindex,
-    double * const &jac_value) const
+std::array<double,4> FEAElement_Triangle3::get_Jacobian_2D(const int &quaindex) const
 {
-  for(int ii=0; ii<4; ++ii) jac_value[ii] = Jac[ii];
+  return {{ Jac[0], Jac[1], Jac[2], Jac[3] }};
 }
 
-void FEAElement_Triangle3::get_invJacobian(const int &quaindex,
-    double * const &jac_value) const
+std::array<double,4> FEAElement_Triangle3::get_invJacobian_2D(const int &quaindex) const
 {
-  for(int ii=0; ii<4; ++ii) jac_value[ii] = Jac[4+ii];
+  return {{ Jac[4], Jac[5], Jac[6], Jac[7] }};
 }
 
 // EOF

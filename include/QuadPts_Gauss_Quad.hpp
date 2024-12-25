@@ -9,7 +9,7 @@
 // ============================================================================
 #include "QuadPts_Gauss_1D.hpp"
 
-class QuadPts_Gauss_Quad : public IQuadPts
+class QuadPts_Gauss_Quad final : public IQuadPts
 {
   public:
     // Construct a quadrature rule with in_num_pts_x points in the r-direction 
@@ -24,22 +24,22 @@ class QuadPts_Gauss_Quad : public IQuadPts
         const double &r_min = 0.0, const double &r_max = 1.0, 
         const double &s_min = 0.0, const double &s_max = 1.0 );
    
-    virtual ~QuadPts_Gauss_Quad() = default;
+    ~QuadPts_Gauss_Quad() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual int get_dim() const {return 2;}
+    int get_dim() const override {return 2;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return num_pts;}
 
-    virtual int get_num_quadPts_x() const {return num_pts_x;}
+    int get_num_quadPts_x() const override {return num_pts_x;}
 
-    virtual int get_num_quadPts_y() const {return num_pts_y;}
+    int get_num_quadPts_y() const override {return num_pts_y;}
 
-    virtual double get_qp(const int &ii, const int &comp) const
+    double get_qp(const int &ii, const int &comp) const override 
     {return qp[2*ii+comp];}
 
-    virtual double get_qw(const int &ii) const {return qw[ii];}
+    double get_qw(const int &ii) const override {return qw[ii];}
 
   private:
     const int num_pts, num_pts_x, num_pts_y;

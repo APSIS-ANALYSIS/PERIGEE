@@ -1,10 +1,11 @@
-// ==================================================================
-// vis_601_p1_wss.cpp
+// ============================================================================
+// vis_wss_hex8.cpp
 //
 // WSS visualization for 8-node hex elements.
 //
 // Date: Oct 24 2023
-// ==================================================================
+// ============================================================================
+#include "HDF5_Reader.hpp"
 #include "Hex_Tools.hpp"
 #include "QuadPts_vis_quad4.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
@@ -60,7 +61,7 @@ int main( int argc, char * argv[] )
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
 #endif
 
-  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_601_p1_wss is a serial program! \n");
+  SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_wss_hex8 is a serial program! \n");
 
   // Read the geometry file name from preprocessor hdf5 file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
@@ -68,7 +69,8 @@ int main( int argc, char * argv[] )
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
   const std::string geo_file  = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
-  const int elemType = cmd_h5r -> read_intScalar("/", "elemType");
+  const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
+  const FEType elemType = FE_T::to_FEType(elemType_str);
 
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
@@ -82,7 +84,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r; H5Fclose(prepcmd_file);
 
   // Enforce the element to be trilinear hex for now
-  if( elemType != 601 ) SYS_T::print_fatal("Error: element type should be 601 trilinear hex element.\n");
+  if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be trilinear hex element.\n");
 
   SYS_T::GetOptionString("-sol_bname", sol_bname);
   SYS_T::GetOptionInt("-time_start", time_start);
@@ -101,7 +103,7 @@ int main( int argc, char * argv[] )
   cout<<"----------------------------------\n";
   cout<<" geo_file: "<<geo_file<<endl;
   cout<<" wall_file: "<<wall_file<<endl;
-  cout<<" elemType: "<<elemType<<endl;
+  cout<<" elemType: "<<elemType_str<<endl;
   cout<<" out_bname: "<<out_bname<<endl;
   cout<<" fl_mu: "<<fluid_mu<<endl;
   cout<<"==== Command Line Arguments ===="<<endl;

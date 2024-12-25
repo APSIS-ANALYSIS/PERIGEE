@@ -1,11 +1,11 @@
-// ==================================================================
+// ============================================================================
 // preprocess_ns.cpp
 //
 // This is a preprocessor code for handling Navier-Stokes equations 
 // discretized by tetradedral elements.
 //
 // Date Created: Jan 01 2020
-// ==================================================================
+// ============================================================================
 #include "Math_Tools.hpp"
 #include "Mesh_Tet.hpp"
 #include "Mesh_FEM.hpp"
@@ -45,7 +45,7 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  const int elemType                  = paras["elem_type"].as<int>();
+  const std::string elemType_str      = paras["elem_type"].as<std::string>();
   const int num_inlet                 = paras["num_inlet"].as<int>();
   const int num_outlet                = paras["num_outlet"].as<int>();
   const std::string geo_file          = paras["geo_file"].as<std::string>();
@@ -56,6 +56,7 @@ int main( int argc, char * argv[] )
   const int cpu_size                  = paras["cpu_size"].as<int>();
   const int in_ncommon                = paras["in_ncommon"].as<int>();
   const bool isDualGraph              = paras["is_dualgraph"].as<bool>();
+  const FEType elemType               = FE_T::to_FEType(elemType_str);
 
   // Optional:
   const int wall_model_type               = paras["wall_model_type"].as<int>();
@@ -64,11 +65,12 @@ int main( int argc, char * argv[] )
   //                  2 strongly enforced in wall-normal direction,
   //                   and weakly enforced in wall-tangent direction
 
-  if( elemType != 501 && elemType != 502 && elemType != 601 && elemType != 602 ) SYS_T::print_fatal("ERROR: unknown element type %d.\n", elemType);
+  if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27)
+    SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   // Print the command line arguments
   cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType<<endl;
+  cout<<" -elem_type: "<<elemType_str<<endl;
   cout<<" -wall_model_type: "<<wall_model_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
@@ -96,9 +98,9 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_inlet; ++ii)
   {  
-    if(elemType == 501 || elemType == 601)
+    if(elemType == FEType::Tet4 || elemType == FEType::Hex8)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtp" );   
-    else if(elemType == 502 || elemType == 602)
+    else if(elemType == FEType::Tet10 || elemType == FEType::Hex27)
       sur_file_in[ii] = SYS_T::gen_capfile_name( sur_file_in_base, ii, ".vtu" );
     else
       SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
@@ -113,9 +115,9 @@ int main( int argc, char * argv[] )
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
-    if(elemType == 501 || elemType == 601)
+    if(elemType == FEType::Tet4 || elemType == FEType::Hex8)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtp" ); 
-    else if(elemType == 502 || elemType == 602)
+    else if(elemType == FEType::Tet10 || elemType == FEType::Hex27)
       sur_file_out[ii] = SYS_T::gen_capfile_name( sur_file_out_base, ii, ".vtu" ); 
     else
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
@@ -134,7 +136,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("in_ncommon", in_ncommon);
   cmdh5w->write_intScalar("dofNum", dofNum);
   cmdh5w->write_intScalar("dofMat", dofMat);
-  cmdh5w->write_intScalar("elemType", elemType);
+  cmdh5w->write_string("elemType", elemType_str);
   cmdh5w->write_string("geo_file", geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
@@ -157,16 +159,16 @@ int main( int argc, char * argv[] )
 
   switch( elemType )
   {
-    case 501:
+    case FEType::Tet4:
       mesh = new Mesh_Tet(nFunc, nElem, 1);
       break;
-    case 502:
+    case FEType::Tet10:
       mesh = new Mesh_Tet(nFunc, nElem, 2);
       break;
-    case 601:
+    case FEType::Hex8:
       mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
       break;
-    case 602:
+    case FEType::Hex27:
       mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
       break;      
     default:
@@ -214,12 +216,12 @@ int main( int argc, char * argv[] )
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
 
-  if(elemType == 501 || elemType == 502)
+  if(elemType == FEType::Tet4 || elemType == FEType::Tet10)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
       inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );    
   }
-  else if(elemType == 601 || elemType == 602)
+  else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
       inlet_outvec[ii] = HEX_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );  
@@ -236,12 +238,12 @@ int main( int argc, char * argv[] )
   // Obtain the outward normal vector
   std::vector< Vector_3 > outlet_outvec( sur_file_out.size() );
   
-  if(elemType == 501 || elemType == 502)
+  if(elemType == FEType::Tet4 || elemType == FEType::Tet10)
   {
     for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
       outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );  
   }
-  else if(elemType == 601 || elemType == 602)
+  else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
       outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );

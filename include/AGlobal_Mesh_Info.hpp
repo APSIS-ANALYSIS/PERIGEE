@@ -8,6 +8,7 @@
 // Date Created: Jan 21 2017
 // ==================================================================
 #include "HDF5_Reader.hpp"
+#include "FEType.hpp"
 
 class AGlobal_Mesh_Info
 {
@@ -28,7 +29,7 @@ class AGlobal_Mesh_Info
       nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
       nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
       probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
-      elemType = h5r -> read_intScalar("Global_Mesh_Info", "elemType");
+      elemType = FE_T::to_FEType(h5r -> read_string("Global_Mesh_Info", "elemType"));
 
       H5Fclose( file_id );
     }
@@ -70,7 +71,7 @@ class AGlobal_Mesh_Info
     // --------------------------------------------------------------
     // Get an integer that indicate the element type.
     // --------------------------------------------------------------
-    int get_elemType() const {return elemType;}
+    FEType get_elemType() const {return elemType;}
 
     void print_info() const
     {
@@ -80,12 +81,13 @@ class AGlobal_Mesh_Info
       std::cout<<"nFunc: "<<nFunc<<'\n';
       std::cout<<"nLocBas: "<<nLocBas<<std::endl;
       std::cout<<"probDim: "<<probDim<<std::endl;
-      std::cout<<"elemType: "<<get_elemType()<<std::endl;
+      std::cout<<"elemType: "<<FE_T::to_string(elemType)<<std::endl;
     }
 
   private:
     int xdegree, ydegree, zdegree;
-    int nElem, nFunc, nLocBas, probDim, elemType;
+    int nElem, nFunc, nLocBas, probDim;
+    FEType elemType;
 
     AGlobal_Mesh_Info() = delete;
 };

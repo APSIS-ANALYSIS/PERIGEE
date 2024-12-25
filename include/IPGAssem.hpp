@@ -22,7 +22,6 @@
 #include "PDNSolution.hpp"
 #include "ALocal_NBC.hpp"
 #include "ALocal_InflowBC.hpp"
-#include "ALocal_RingBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_Interface.hpp"
@@ -152,20 +151,6 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
-    // Nonzero pattern estimate for the CMM equations with ring BC
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_RingBC * const &ringnbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_f_ptr,
@@ -255,24 +240,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
-
-    // Assemble mass matrix and residual vector for CMM with ring BC
-    virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_RingBC * const &ringnbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
@@ -422,33 +389,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
-    // Assemble residual for the CMM equations with ring BC
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &sol_wall_disp,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementw,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_RingBC * const &ringnbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const ALocal_EBC * const &ebc_wall_part,
-        const IGenBC * const &gbc )
-        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
 
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
@@ -708,33 +648,6 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
-
-    // Assemble the residual vector and tangent matrix for CMM with ring BC
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &sol_wall_disp,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementw,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_RingBC * const &ringnbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const ALocal_EBC * const &ebc_wall_part,
-        const IGenBC * const &gbc )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
@@ -750,7 +663,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -770,7 +682,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -792,7 +703,6 @@ class IPGAssem
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -816,7 +726,6 @@ class IPGAssem
         const IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -1006,7 +915,6 @@ class IPGAssem
       return 0.0;
     }
 
-
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the
@@ -1064,7 +972,6 @@ class IPGAssem
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
     }
-
 
     // Update wall prestress at all surface quadrature points
     virtual void Update_Wall_Prestress(

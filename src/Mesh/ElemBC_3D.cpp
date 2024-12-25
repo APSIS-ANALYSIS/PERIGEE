@@ -1,7 +1,7 @@
 #include "ElemBC_3D.hpp"
 
-ElemBC_3D::ElemBC_3D( const int &elemtype ) 
-: elem_type( elemtype ), num_ebc( 0 )
+ElemBC_3D::ElemBC_3D( const FEType &in_elemtype )
+: elem_type( in_elemtype ), num_ebc( 0 )
 {
   num_node.clear();
   num_cell.clear();
@@ -16,7 +16,7 @@ ElemBC_3D::ElemBC_3D( const int &elemtype )
 }
 
 ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
-    const int &elemtype ) : elem_type( elemtype ), 
+    const FEType &in_elemtype ) : elem_type( in_elemtype ),
   num_ebc( static_cast<int>( vtkfileList.size() ) )
 {
   num_node.resize(num_ebc);  
@@ -36,13 +36,13 @@ ElemBC_3D::ElemBC_3D( const std::vector<std::string> &vtkfileList,
 
     VTK_T::read_grid( vtkfileList[ii], num_node[ii], num_cell[ii], pt_xyz[ii], sur_ien[ii] );
     
-    if(elemtype == 501)
+    if(elem_type == FEType::Tet4)
       cell_nLocBas[ii] = 3; // linear triangle
-    else if(elemtype == 502)
+    else if(elem_type == FEType::Tet10)
       cell_nLocBas[ii] = 6; // quadratic triangle
-    else if(elemtype == 601)
+    else if(elem_type == FEType::Hex8)
       cell_nLocBas[ii] = 4; // bilinear quadrangle
-    else if(elemtype == 602) 
+    else if(elem_type == FEType::Hex27)
       cell_nLocBas[ii] = 9; // biquadratic quadrangle
     else
       SYS_T::print_fatal("Error: ElemBC_3D constructor: unknown element type. \n");
@@ -58,7 +58,7 @@ void ElemBC_3D::print_info() const
 {
   std::cout<<"========================= \n";
   std::cout<<"ElemBC_3D : ";
-  std::cout<<" elem_type = "<<elem_type<<'\t';
+  std::cout<<" elem_type = "<<FE_T::to_string(elem_type)<<'\t';
   std::cout<<" num_ebc = "<<num_ebc<<std::endl;
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -78,13 +78,13 @@ void ElemBC_3D::print_info() const
 
 void ElemBC_3D::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
 {
-  if(elem_type == 501)
+  if(elem_type == FEType::Tet4)
     reset501IEN_outwardnormal(VIEN); 
-  else if(elem_type == 502)
+  else if(elem_type == FEType::Tet10)
     reset502IEN_outwardnormal(VIEN); 
-  else if(elem_type == 601)
+  else if(elem_type == FEType::Hex8)
     reset601IEN_outwardnormal(VIEN);     
-  else if(elem_type == 602)
+  else if(elem_type == FEType::Hex27)
     reset602IEN_outwardnormal(VIEN);     
   else SYS_T::print_fatal("Error: ElemBC_3D::resetSurIEN_outwardnormal function: unknown element type.\n");
 }

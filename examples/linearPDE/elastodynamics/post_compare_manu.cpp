@@ -10,10 +10,11 @@
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
 #include "APart_Node.hpp"
+#include "FEANode.hpp"
 #include "QuadPts_Gauss_Tet.hpp"
 #include "QuadPts_Gauss_Hex.hpp"
 #include "FEAElement_Tet4.hpp"
-#include "FEAElement_Tet10_v2.hpp"
+#include "FEAElement_Tet10.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Hex27.hpp"
 #include "PostVectSolution.hpp"
@@ -66,24 +67,24 @@ int main( int argc, char * argv[] )
 
   IQuadPts * quadv = nullptr;
   FEAElement * elementv = nullptr;
-  const int elemType = GMIptr -> get_elemType();
+  const FEType elemType = GMIptr -> get_elemType();
 
-  if( elemType == 501 )
+  if( elemType == FEType::Tet4 )
   {
     quadv = new QuadPts_Gauss_Tet( nqp_tet );
     elementv = new FEAElement_Tet4( nqp_tet );
   }
-  else if( elemType == 502 )
+  else if( elemType == FEType::Tet10 )
   {
     quadv = new QuadPts_Gauss_Tet( nqp_tet );
-    elementv = new FEAElement_Tet10_v2( nqp_tet );
+    elementv = new FEAElement_Tet10( nqp_tet );
   }
-  else if( elemType == 601 )
+  else if( elemType == FEType::Hex8 )
   {
     quadv = new QuadPts_Gauss_Hex( nqp_hex_1D );
     elementv = new FEAElement_Hex8( nqp_hex_1D * nqp_hex_1D * nqp_hex_1D );
   }
-  else if( elemType == 602 )
+  else if( elemType == FEType::Hex27 )
   {
     quadv = new QuadPts_Gauss_Hex( nqp_hex_1D );
     elementv = new FEAElement_Hex27( nqp_hex_1D * nqp_hex_1D * nqp_hex_1D );
