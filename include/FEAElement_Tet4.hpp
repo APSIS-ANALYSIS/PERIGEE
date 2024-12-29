@@ -25,7 +25,7 @@ class FEAElement_Tet4 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 4;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -111,6 +111,8 @@ class FEAElement_Tet4 final : public FEAElement
         const double * const &volctrl_z ) const override;
 
   private:
+    static constexpr int nLocBas = 4;
+
     // Number of quadrature points
     const int numQuapts;
 
