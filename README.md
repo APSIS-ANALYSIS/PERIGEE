@@ -112,6 +112,9 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 * I.S. Lan, J. Liu, W. Yang, J. Zimmermann, D.B. Ennis, and A.L. Marsden, [Validation of the reduced unified continuum formulation against in vitro 4D-flow MRI](https://doi.org/10.1007/s10439-022-03038-4), Annals of Biomedical Engineering, 51:377-393, 2023.
 * J. Liu, W. Yang, I.S. Lan, and A.L. Marsden, [Fluid-structure interaction modeling of blood flow in the pulmonary arteries using the unified continuum and variational multiscale formulation](https://doi.org/10.1016/j.mechrescom.2020.103556), Mechanics Research Communications, 107:103556, 2020.
 
+### Application
+* Y. Sun, J. Huang, Q. Lu, X. Yue, X. Huang, W. He, Y. Shi, and J. Liu, [Modeling fibrous tissue in vascular fluid-structure interaction: a morphology-based pipeline and biomechanical significance](https://doi.org/10.1002/cnm.3892), International Journal for Numerical Methods in Biomedical Engineering 41(1):e3892, 2025.
+
 ### HPC
 * D. Goldberg, What every computer scientist should know about floating-point arithmetic.
 * U. Drepper, What every programmer should know about memory.
