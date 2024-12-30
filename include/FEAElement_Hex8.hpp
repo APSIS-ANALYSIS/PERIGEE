@@ -48,7 +48,7 @@ class FEAElement_Hex8 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 8;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -115,6 +115,8 @@ class FEAElement_Hex8 final : public FEAElement
     {return quadrilateral_face->get_2d_normal_out( quaindex, area );}
 
   private:
+    static constexpr int nLocBas = 8;
+
     // Number of quadrature points
     const int numQuapts;
 
