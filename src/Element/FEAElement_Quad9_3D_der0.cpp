@@ -3,15 +3,9 @@
 FEAElement_Quad9_3D_der0::FEAElement_Quad9_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R = new double [9*numQuapts];
-  detJac = new double [numQuapts];
-  un.resize( numQuapts );
-}
-
-FEAElement_Quad9_3D_der0::~FEAElement_Quad9_3D_der0()
-{
-  delete [] R;         R = nullptr;
-  delete [] detJac; detJac = nullptr;
+  R.resize(9 * numQuapts);
+  detJac.resize(numQuapts);
+  un.resize(numQuapts);
 }
 
 void FEAElement_Quad9_3D_der0::print_info() const
@@ -19,12 +13,6 @@ void FEAElement_Quad9_3D_der0::print_info() const
   SYS_T::commPrint("Quad9_3D_der0: ");
   SYS_T::commPrint("9-node quad element with no derivative evaluated. \n ");
   SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
-}
-
-double FEAElement_Quad9_3D_der0::get_memory_usage() const
-{
-  const double dsize = 13 * numQuapts;
-  return dsize * 8.0 + 4.0;
 }
 
 void FEAElement_Quad9_3D_der0::buildBasis( const IQuadPts * const &quad,
@@ -97,7 +85,7 @@ std::vector<double> FEAElement_Quad9_3D_der0::get_R(
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Quad9_3D_der0::get_R function error.\n" );
   const int offset = quaindex * 9;
-  std::vector<double> vec(R + offset, R + offset + 9);
+  std::vector<double> vec(R.begin() + offset, R.begin() + offset + 9);
   return vec;
 }
 

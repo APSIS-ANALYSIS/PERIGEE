@@ -12,8 +12,8 @@
 // Date created: Nov. 6 2013
 // ============================================================================
 #include "IQuadPts.hpp"
-#include "FEANode.hpp"
 #include "FEType.hpp"
+#include "Vector_3.hpp"
 
 class FEAElement
 {
@@ -122,15 +122,6 @@ class FEAElement
         double * const &basis_x, double * const &basis_y, double * const &basis_z ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
 
-    virtual std::vector<double> get_dR_dx( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dx is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_dR_dy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_dR_dz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_dR_dz is not implemented. \n");return {};}
-
     // ------------------------------------------------------------------------    
     // R, gradR, and Laplacian R
     // ------------------------------------------------------------------------    
@@ -159,41 +150,27 @@ class FEAElement
         double * const &basis_xy, double * const &basis_xz, double * const &basis_yz ) 
       const {SYS_T::commPrint("Warning: get_3D_R_dR_d2R is not implemented. \n");}
 
-    virtual std::vector<double> get_d2R_dxx( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxx is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dyy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dyy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dzz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dzz is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dxy( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxy is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dxz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dxz is not implemented. \n");return {};}
-
-    virtual std::vector<double> get_d2R_dyz( const int &quaindex ) const
-    {SYS_T::commPrint("Warning: get_d2R_dyz is not implemented. \n");return {};}
-
     // ------------------------------------------------------------------------    
     // Return the Jacobian determinant
     // ------------------------------------------------------------------------    
-    virtual double get_detJac(const int &quaindex) const = 0;
+    virtual double get_detJac(const int &quaindex) const
+    {SYS_T::commPrint("Warning: get_detJac is not implemented.\n"); return 0.0;}
 
     // ------------------------------------------------------------------------    
     // Return the Jacobian matrix in rows, i.e. dx_dxi, dx_deta, dx_dzeta,
     // dy_dxi, ... dz_deta, dz_dzeta. The size of teh return vector is 9 for 3d,
     // and 4 for 2d, for exampel. 
     // ------------------------------------------------------------------------    
-    virtual void get_Jacobian(const int &quaindex, double * const &jac_value) const 
-    {SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");} 
-
     virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
     {
       SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
+    }
+
+    virtual std::array<double,4> get_Jacobian_2D( const int &quaindex ) const
+    {
+      SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
+      return {{0.0, 0.0, 0.0, 0.0}};
     }
 
     // ------------------------------------------------------------------------    
@@ -201,25 +178,16 @@ class FEAElement
     // given. The output array dxi_dx is a 9 or 4 component array for 3D / 2D
     // case.
     // ------------------------------------------------------------------------    
-    virtual void get_invJacobian(const int &quaindex, double * const &dxi_dx) const 
-    {SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");} 
-
     virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
     {
-      SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
+      SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     }
 
-    // ------------------------------------------------------------------------    
-    // Return the global-to-lamina rotation matrix for transforming between the
-    // global and local lamina coordinates. This routine is used in membrane
-    // and shell elements.
-    // Reference: TJRH Linear finite element book page 386.
-    // ------------------------------------------------------------------------    
-    virtual Tensor2_3D get_rotationMatrix( const int &quaindex ) const 
+    virtual std::array<double,4> get_invJacobian_2D( const int &quaindex ) const
     {
-      SYS_T::commPrint("Warning: get_rotationMatrix is not implemented. \n"); 
-      return Tensor2_3D();
+      SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
+      return {{0.0, 0.0, 0.0, 0.0}};
     }
 
     // ------------------------------------------------------------------------
@@ -251,7 +219,7 @@ class FEAElement
     // This function is, for example, called in FEAElement_Line2_3D_der0.
     // ------------------------------------------------------------------------
     virtual Vector_3 get_normal_out( const int &quaindex,
-        const std::vector< Vector_3> &sur_pt, const Vector_3 &int_pt, 
+        const std::vector<Vector_3> &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
     {
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
@@ -339,7 +307,7 @@ class FEAElement
     virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
         const double * const &volctrl_x,
         const double * const &volctrl_y,
-        const double * const &volctrl_z )
+        const double * const &volctrl_z ) const
     {
       SYS_T::commPrint("Warning: get_face_ctrlPts is not implemented. \n");
     
