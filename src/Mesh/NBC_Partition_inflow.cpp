@@ -148,9 +148,9 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
     h5w->write_intScalar( group_id, "cell_nLocBas", cell_nLocBas[ii] );
 
-    h5w->write_Vector_3( group_id, "Outward_normal_vector", outvec[ii] );
+    h5w->write_Vector_3( group_id, "Outward_normal_vector", outvec[ii].to_std_array() );
 
-    h5w->write_Vector_3( group_id, "centroid", centroid[ii] );
+    h5w->write_Vector_3( group_id, "centroid", centroid[ii].to_std_array() );
 
     h5w->write_doubleVector( group_id, "outline_pts", outline_pts[ii] );
 
