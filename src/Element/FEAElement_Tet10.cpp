@@ -24,8 +24,9 @@ FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua ) : numQuapts( in_nqua ) 
 void FEAElement_Tet10::print_info() const
 {
   SYS_T::commPrint("Tet10: ");
-  SYS_T::commPrint("10-node tetrahedral element with up to 2nd derivatives. Compatible with vtk format \n");
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
+  SYS_T::commPrint("Ten-node tetrahedral element with up to 2nd derivatives.\n");
+  SYS_T::commPrint("Note: Node numbering is compatible with vtk format.\n");
+  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
 void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
