@@ -45,7 +45,7 @@ class FEAElement_Triangle6_3D_der0 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 6;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -70,6 +70,8 @@ class FEAElement_Triangle6_3D_der0 final : public FEAElement
     double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
 
   private:
+    static constexpr int nLocBas = 6;
+
     const int numQuapts;
 
     // Container for R0, R1, R2, R3, R4, R5

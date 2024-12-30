@@ -3,7 +3,7 @@
 FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(6 * numQuapts);
+  R.resize(nLocBas * numQuapts);
   detJac.resize(numQuapts);
   un.resize(numQuapts);
 }
@@ -28,7 +28,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
     const double qua_s = quad -> get_qp( qua, 1 );
     const double qua_t = quad -> get_qp( qua, 2 );
 
-    const int offset = 6 * qua;
+    const int offset = nLocBas * qua;
 
     R[offset + 0] = qua_t * (2.0 * qua_t - 1.0);
     R[offset + 1] = qua_r * (2.0 * qua_r - 1.0);
@@ -48,7 +48,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
     Vector_3 dx_dr( 0.0, 0.0, 0.0 );
     Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
-    for( int ii=0; ii<6; ++ii )
+    for( int ii=0; ii<nLocBas; ++ii )
     {
       dx_dr += Vector_3( ctrl_x[ii] * Rr[ii], ctrl_y[ii] * Rr[ii], ctrl_z[ii] * Rr[ii] );
       dx_ds += Vector_3( ctrl_x[ii] * Rs[ii], ctrl_y[ii] * Rs[ii], ctrl_z[ii] * Rs[ii] );
@@ -63,7 +63,7 @@ void FEAElement_Triangle6_3D_der0::get_R(
     const int &quaindex, double * const &basis ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
-  const int offset = quaindex * 6;
+  const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
@@ -76,7 +76,7 @@ std::vector<double> FEAElement_Triangle6_3D_der0::get_R(
     const int &quaindex ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
-  const int offset = quaindex * 6;
+  const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3], R[offset+4], R[offset+5] };
 }
 
