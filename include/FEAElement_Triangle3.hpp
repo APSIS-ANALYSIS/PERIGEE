@@ -24,7 +24,7 @@ class FEAElement_Triangle3 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 3;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -58,6 +58,7 @@ class FEAElement_Triangle3 final : public FEAElement
     double get_detJac(const int &quaindex) const override {return detJac;}
 
   private:
+    static constexpr int nLocBas = 3;
     const int numQuapts;
 
     std::vector<double> R {};
