@@ -24,8 +24,8 @@ FEAElement_Hex8::FEAElement_Hex8( const int &in_nqua ) : numQuapts( in_nqua ) ,
 void FEAElement_Hex8::print_info() const
 {
   SYS_T::commPrint("Hex8: ");
-  SYS_T::commPrint("8-node hexagon element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
+  SYS_T::commPrint("Eight-node hexagon element with up to 2nd derivatives.\n");
+  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
 void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,

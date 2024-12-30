@@ -11,8 +11,8 @@ FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
 void FEAElement_Triangle6_3D_der0::print_info() const
 {
   SYS_T::commPrint("Triangle6_3D_der0: ");
-  SYS_T::commPrint("6-node triangle element with no derivative evaluated. \n ");
-  SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
+  SYS_T::commPrint("Six-node triangle element with no derivative evaluated.\n ");
+  SYS_T::commPrint("Note: This element is designed for natural BC integrals.\n ");
 }
 
 void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
