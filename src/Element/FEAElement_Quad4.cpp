@@ -3,14 +3,14 @@
 FEAElement_Quad4::FEAElement_Quad4( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(4 * numQuapts);
+  R.resize(nLocBas * numQuapts);
 
-  dR_dx.resize(4 * numQuapts);
-  dR_dy.resize(4 * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts);
+  dR_dy.resize(nLocBas * numQuapts);
 
-  d2R_dxx.resize(4 * numQuapts);
-  d2R_dyy.resize(4 * numQuapts);
-  d2R_dxy.resize(4 * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts);
+  d2R_dyy.resize(nLocBas * numQuapts);
+  d2R_dxy.resize(nLocBas * numQuapts);
 
   Jac.resize(9 * numQuapts);
 }
@@ -18,8 +18,8 @@ FEAElement_Quad4::FEAElement_Quad4( const int &in_nqua )
 void FEAElement_Quad4::print_info() const
 {
   SYS_T::commPrint("Quad4: ");
-  SYS_T::commPrint("4-node quadrilateral element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
+  SYS_T::commPrint("Four-node quadrilateral element with up to 2nd derivatives.\n");
+  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
 void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
@@ -32,7 +32,7 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
 
   double xrs = 0.0, yrs = 0.0;
 
-  for(int ii=0; ii<4; ++ii)
+  for(int ii=0; ii<nLocBas; ++ii)
   {
     xrs += ctrl_x[ii] * d2R_drs[ii];
     yrs += ctrl_y[ii] * d2R_drs[ii];
@@ -43,7 +43,7 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
     const double qua_r = quad -> get_qp( qua, 0 );
     const double qua_s = quad -> get_qp( qua, 1 );
 
-    const int offset = 4 * qua;
+    const int offset = nLocBas * qua;
 
     R[offset + 0] = (1.0 - qua_r) * (1.0 - qua_s);
     R[offset + 1] = qua_r * (1.0 - qua_s);
@@ -54,7 +54,7 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
     const double dR_ds[4] { qua_r - 1.0, -qua_r, qua_r, 1.0 - qua_r };  
     
     double dx_dr = 0.0, dx_ds = 0.0, dy_dr = 0.0, dy_ds = 0.0;
-    for(int ii=0; ii<4; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       dx_dr += ctrl_x[ii] * dR_dr[ii];
       dx_ds += ctrl_x[ii] * dR_ds[ii];
@@ -81,7 +81,7 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
     Jac[4*numQuapts + 4*qua + 2] = ds_dx;
     Jac[4*numQuapts + 4*qua + 3] = ds_dy;
   
-    for(int ii=0; ii<4; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       dR_dx[offset+ii] = dR_dr[ii] * dr_dx + dR_ds[ii] * ds_dx;
       dR_dy[offset+ii] = dR_dr[ii] * dr_dy + dR_ds[ii] * ds_dy;
@@ -103,7 +103,7 @@ void FEAElement_Quad4::buildBasis( const IQuadPts * const &quad,
     // LU factorization
     LHS.LU_fac();
 
-    for(int ii=0; ii<4; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       const std::array<double, 3> RHS {{ 0.0,
         d2R_drs[ii] - dR_dx[offset+ii] * xrs - dR_dy[offset+ii] * yrs,
@@ -134,22 +134,22 @@ double FEAElement_Quad4::get_h( const double * const &ctrl_x,
 void FEAElement_Quad4::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  const int offset = quaindex * 4;
+  const int offset = quaindex * nLocBas;
   basis[0] = R[offset];   basis[1] = R[offset+1];
   basis[2] = R[offset+2]; basis[3] = R[offset+3];
 }
 
 std::vector<double> FEAElement_Quad4::get_R( const int &quaindex ) const
 {
-  const int offset = quaindex * 4;
+  const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3] };
 }
 
 void FEAElement_Quad4::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y ) const
 {
-  const int offset = quaindex * 4;
-  for(int ii=0; ii<4; ++ii)
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii<nLocBas; ++ii)
   {
     basis_x[ii] = dR_dx[offset + ii];
     basis_y[ii] = dR_dy[offset + ii];
@@ -160,8 +160,8 @@ void FEAElement_Quad4::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, 
     double * const &basis_y ) const
 {
-  const int offset = quaindex * 4;
-  for(int ii=0; ii<4; ++ii)
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii<nLocBas; ++ii)
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
@@ -176,8 +176,8 @@ void FEAElement_Quad4::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xy ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad4::get_2D_R_dR_d2R function error.\n" );
-  const int offset = quaindex * 4;
-  for( int ii=0; ii<4; ++ii )
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
