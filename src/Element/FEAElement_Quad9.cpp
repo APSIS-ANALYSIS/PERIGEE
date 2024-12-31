@@ -2,14 +2,14 @@
 
 FEAElement_Quad9::FEAElement_Quad9( const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R.resize(9 * numQuapts);
+  R.resize(nLocBas * numQuapts);
 
-  dR_dx.resize(9 * numQuapts);
-  dR_dy.resize(9 * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts);
+  dR_dy.resize(nLocBas * numQuapts);
 
-  d2R_dxx.resize(9 * numQuapts);
-  d2R_dyy.resize(9 * numQuapts);
-  d2R_dxy.resize(9 * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts);
+  d2R_dyy.resize(nLocBas * numQuapts);
+  d2R_dxy.resize(nLocBas * numQuapts);
   
   Jac.resize(9 * numQuapts);
 }
@@ -32,7 +32,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     const double qua_r = quad -> get_qp( qua, 0 );
     const double qua_s = quad -> get_qp( qua, 1 );
 
-    const int offset = 9 * qua;
+    const int offset = nLocBas * qua;
 
     const double Nr[3] = { (2.0 * qua_r - 1.0) * (qua_r - 1.0),
         - 4.0 * qua_r * (qua_r - 1.0), qua_r * (2.0 * qua_r - 1.0) };
@@ -86,7 +86,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     double xrr = 0.0, xss = 0.0, yrr = 0.0, yss = 0.0;
     double xrs = 0.0, yrs = 0.0;
 
-    for(int ii=0; ii<9; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       dx_dr += ctrl_x[ii] * dR_dr[ii];
       dx_ds += ctrl_x[ii] * dR_ds[ii];
@@ -121,7 +121,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     Jac[4*numQuapts + 4*qua + 2] = ds_dx;
     Jac[4*numQuapts + 4*qua + 3] = ds_dy;
   
-    for(int ii=0; ii<9; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       dR_dx[offset+ii] = dR_dr[ii] * dr_dx + dR_ds[ii] * ds_dx;
       dR_dy[offset+ii] = dR_dr[ii] * dr_dy + dR_ds[ii] * ds_dy;
@@ -143,7 +143,7 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
     // LU factorization
     LHS.LU_fac();
 
-    for(int ii=0; ii<9; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       const std::array<double, 3> RHS {{ d2R_drr[ii] - dR_dx[offset+ii] * xrr - dR_dy[offset+ii] * yrr,
         d2R_drs[ii] - dR_dx[offset+ii] * xrs - dR_dy[offset+ii] * yrs,
@@ -174,13 +174,13 @@ double FEAElement_Quad9::get_h( const double * const &ctrl_x,
 void FEAElement_Quad9::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  const int offset = quaindex * 9;
-  for(int ii=0; ii<9; ++ii) basis[ii] = R[offset+ii];
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
 std::vector<double> FEAElement_Quad9::get_R( const int &quaindex ) const
 {
-  const int offset = quaindex * 9;
+  const int offset = quaindex * nLocBas;
   std::vector<double> vec(R.begin() + offset, R.begin() + offset + 9);
   return vec;
 }
@@ -188,8 +188,8 @@ std::vector<double> FEAElement_Quad9::get_R( const int &quaindex ) const
 void FEAElement_Quad9::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y ) const
 {
-  const int offset = quaindex * 9;
-  for(int ii=0; ii<9; ++ii)
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii<nLocBas; ++ii)
   {
     basis_x[ii] = dR_dx[offset + ii];
     basis_y[ii] = dR_dy[offset + ii];
@@ -200,8 +200,8 @@ void FEAElement_Quad9::get_R_gradR( const int &quaindex,
     double * const &basis, double * const &basis_x, 
     double * const &basis_y ) const
 {
-  const int offset = quaindex * 9;
-  for(int ii=0; ii<9; ++ii)
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii<nLocBas; ++ii)
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
@@ -216,8 +216,8 @@ void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xy ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad9::get_2D_R_dR_d2R function error.\n" );
-  const int offset = quaindex * 9;
-  for( int ii=0; ii<9; ++ii )
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];

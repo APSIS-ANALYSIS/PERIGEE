@@ -24,7 +24,7 @@ class FEAElement_Quad9 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 9;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -59,6 +59,8 @@ class FEAElement_Quad9 final : public FEAElement
     {return Jac[8*numQuapts + quaindex];}
 
   private:
+    static constexpr int nLocBas = 9;
+    
     const int numQuapts;
 
     // length 9 x numQuapts
