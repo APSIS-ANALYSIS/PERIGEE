@@ -25,7 +25,7 @@ class FEAElement_Triangle6 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 6;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -60,6 +60,8 @@ class FEAElement_Triangle6 final : public FEAElement
     {return Jac[8*numQuapts + quaindex];}
 
   private:
+    static constexpr int nLocBas = 6;
+    
     const int numQuapts;
 
     // length 6 x numQuapts
