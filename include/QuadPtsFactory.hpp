@@ -1,10 +1,10 @@
 #ifndef QUADPTSFACTORY_HPP
 #define QUADPTSFACTORY_HPP
 // ============================================================================
-// FEAElementFactory.hpp
+// QuadptsFactory.hpp
 //
-// This is the factory that construct an element class based on the FEType and
-// number of quadrature points.
+// This is the factory that construct an QuadPts class based on the FEType and
+// number of quadrature/visualization points.
 //
 // Author: Ju Liu, liujuy@gmail.com
 // Date: Jan. 1st 2025
