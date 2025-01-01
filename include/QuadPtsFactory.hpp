@@ -54,6 +54,21 @@ class QuadPtsFactory
           return nullptr;
       }
     }
+
+  private:
+    // Check if a number is a perfect cube
+    static bool isPerfectCube(const int &nn, int &root)
+    {
+      root = static_cast<int>(std::round(std::cbrt(static_cast<double>(nn))));
+      return (root * root * root == nn);
+    }
+
+    // Check if a number is a perfect square
+    static bool isPerfectSquare(const int &nn, int &root)
+    {
+      root = static_cast<int>(std::round(std::sqrt(static_cast<double>(nn))));
+      return (root * root == nn);
+    }
 };
 
 #endif
