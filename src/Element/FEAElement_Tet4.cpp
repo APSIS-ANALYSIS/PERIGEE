@@ -3,7 +3,7 @@
 FEAElement_Tet4::FEAElement_Tet4( const int &in_nqua ) : numQuapts( in_nqua ),
   triangle_face( SYS_T::make_unique<FEAElement_Triangle3_3D_der0>(numQuapts) )
 {
-  R.resize(nLocBas * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 }
 
 void FEAElement_Tet4::print_info() const
