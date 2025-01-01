@@ -34,8 +34,8 @@ class QuadPtsFactory
         return SYS_T::make_unique<QuadPts_Gauss_Tet>(nqp_vol);
       else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
       {
-        // For hexahedral elements, check if the volume quadrature points is a perfect 
-        // cube
+        // For hexahedral elements, check if the volume quadrature points is 
+        // a perfect cube
         bool flg = false; 
         const int nqp_vol_1D = isPerfectCube(nqp_vol, flg)
         if(flg == false)
@@ -65,8 +65,8 @@ class QuadPtsFactory
         return SYS_T::make_unique<QuadPts_Gauss_Triangle>(nqp_sur);
       else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
       {
-        // For hexahedral elements, check if the surface quadrature points is a perfect 
-        // square
+        // For hexahedral elements, check if the surface quadrature points is 
+        // a perfect square
         bool flg = false; 
         const int nqp_vol_1D = isPerfectSquare(nqp_sur, flg)
         if(flg == false)
