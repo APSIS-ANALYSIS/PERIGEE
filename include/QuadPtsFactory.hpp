@@ -20,54 +20,64 @@ class QuadPtsFactory
     static std::unique_ptr<IQuadPts> createVolumeQuadrature(const FEType &elemType, 
         const int &nqp_vol)
     {
-      switch (elemType)
+      if (elemType == FEType::Tet4 || elemType == FEType::Tet10)
+        return SYS_T::make_unique<QuadPts_Gauss_Tet>(nqp_vol);
+      else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
       {
-        case FEType::Tet4:
-          return SYS_T::make_unique<QuadPts_Gauss_Tet>(nqp_vol);
-        case FEType::Tet10:
-          return SYS_T::make_unique<QuadPts_Gauss_Tet>(nqp_vol);
-        case FEType::Hex8:
-          return SYS_T::make_unique<QuadPts_Gauss_Hex>(nqp_vol_1D);
-        case FEType::Hex27:
-          return SYS_T::make_unique<QuadPts_Gauss_Hex>(nqp_vol_1D);
-        default:
-          SYS_T::print_fatal("Error: Volume quadrature type not supported for this element.\n");
+        bool flg = false; 
+        const int nqp_vol_1D = isPerfectCube(nqp_vol, flg)
+        if(flg == false)
+        {
+          SYS_T::print_fatal("Error: Invalid volume quadrature points count for Hex element (cube check).\n");
           return nullptr;
+        }
+        return SYS_T::make_unique<QuadPts_Gauss_Hex>(nqp_vol_1D);
+      }
+      else
+      {
+        SYS_T::print_fatal("Error: Volume quadrature type not supported for this element.\n");
+        return nullptr;
       }
     }
 
     static std::unique_ptr<IQuadPts> createSurfaceQuadrature(const FEType &elemType, 
         const int &nqp_sur)
     {
-      switch (elemType)
+      if (elemType == FEType::Tet4 || elemType == FEType::Tet10)
+        return SYS_T::make_unique<QuadPts_Gauss_Triangle>(nqp_sur);
+      else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
       {
-        case FEType::Tet4:
-          return SYS_T::make_unique<QuadPts_Gauss_Triangle>(nqp_sur);
-        case FEType::Tet10:
-          return SYS_T::make_unique<QuadPts_Gauss_Triangle>(nqp_sur);
-        case FEType::Hex8:
-          return SYS_T::make_unique<QuadPts_Gauss_Quad>(nqp_sur_1D);
-        case FEType::Hex27:
-          return SYS_T::make_unique<QuadPts_Gauss_Quad>(nqp_sur_1D);
-        default:
-          SYS_T::print_fatal("Error: Surface quadrature type not supported for this element.\n");
+        bool flg = false; 
+        const int nqp_vol_1D = isPerfectSquare(nqp_sur, flg)
+        if(flg == false)
+        {
+          SYS_T::print_fatal("Error: Invalid surface quadrature points count for Hex element (square check).\n");
           return nullptr;
+        }
+        return SYS_T::make_unique<QuadPts_Gauss_Quad>(nqp_vol_1D);
+      }
+      else
+      {
+        SYS_T::print_fatal("Error: Surface quadrature type not supported for this element.\n");
+        return nullptr;
       }
     }
 
   private:
     // Check if a number is a perfect cube
-    static bool isPerfectCube(const int &nn, int &root)
+    static int isPerfectCube(const int &nn, bool &flg)
     {
-      root = static_cast<int>(std::round(std::cbrt(static_cast<double>(nn))));
-      return (root * root * root == nn);
+      const int root = static_cast<int>(std::round(std::cbrt(static_cast<double>(nn))));
+      flg = (root * root * root == nn);
+      return root;
     }
 
     // Check if a number is a perfect square
-    static bool isPerfectSquare(const int &nn, int &root)
+    static int isPerfectSquare(const int &nn, bool &flg)
     {
-      root = static_cast<int>(std::round(std::sqrt(static_cast<double>(nn))));
-      return (root * root == nn);
+      const int root = static_cast<int>(std::round(std::sqrt(static_cast<double>(nn))));
+      flg = (root * root == nn);
+      return root;
     }
 };
 
