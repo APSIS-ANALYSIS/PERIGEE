@@ -3,8 +3,8 @@
 FEAElement_Quad4_3D_der0::FEAElement_Quad4_3D_der0( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(nLocBas * numQuapts);
-  detJac.resize(numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
+  detJac.resize(numQuapts, 0.0);
   un.resize(numQuapts);
 }
 
