@@ -113,7 +113,7 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
     Vector_3 un;
     
     // Jacobian determinant 
-    double detJac;
+    double detJac {};
 };
 
 #endif

@@ -3,22 +3,22 @@
 FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua ) : numQuapts( in_nqua ) ,
   triangle_face( SYS_T::make_unique<FEAElement_Triangle6_3D_der0>(numQuapts) )
 {
-  R.resize(nLocBas * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 
-  dR_dx.resize(nLocBas * numQuapts);
-  dR_dy.resize(nLocBas * numQuapts);
-  dR_dz.resize(nLocBas * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts, 0.0);
+  dR_dy.resize(nLocBas * numQuapts, 0.0);
+  dR_dz.resize(nLocBas * numQuapts, 0.0);
 
-  d2R_dxx.resize(nLocBas * numQuapts);
-  d2R_dyy.resize(nLocBas * numQuapts);
-  d2R_dzz.resize(nLocBas * numQuapts);
-  d2R_dxy.resize(nLocBas * numQuapts);
-  d2R_dxz.resize(nLocBas * numQuapts);
-  d2R_dyz.resize(nLocBas * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dzz.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxz.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyz.resize(nLocBas * numQuapts, 0.0);
 
-  dx_dr.resize(9 * numQuapts);
-  dr_dx.resize(9 * numQuapts);
-  detJac.resize(numQuapts);
+  dx_dr.resize(9 * numQuapts, 0.0);
+  dr_dx.resize(9 * numQuapts, 0.0);
+  detJac.resize(numQuapts, 0.0);
 }
 
 void FEAElement_Tet10::print_info() const
