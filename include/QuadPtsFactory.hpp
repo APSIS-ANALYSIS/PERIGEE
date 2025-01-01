@@ -20,10 +20,18 @@ class QuadPtsFactory
     static std::unique_ptr<IQuadPts> createVolumeQuadrature(const FEType &elemType, 
         const int &nqp_vol)
     {
+      if (nqp_vol <= 0)
+      {
+        SYS_T::print_fatal("Error: Invalid number of volume quadrature points. nqp_vol must be positive.\n");
+        return nullptr;
+      }
+
       if (elemType == FEType::Tet4 || elemType == FEType::Tet10)
         return SYS_T::make_unique<QuadPts_Gauss_Tet>(nqp_vol);
       else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
       {
+        // For hexahedral elements, check if the volume quadrature points is a perfect 
+        // cube
         bool flg = false; 
         const int nqp_vol_1D = isPerfectCube(nqp_vol, flg)
         if(flg == false)
@@ -43,10 +51,18 @@ class QuadPtsFactory
     static std::unique_ptr<IQuadPts> createSurfaceQuadrature(const FEType &elemType, 
         const int &nqp_sur)
     {
+      if (nqp_sur <= 0)
+      {
+        SYS_T::print_fatal("Error: Invalid number of surface quadrature points. nqp_sur must be positive.\n");
+        return nullptr;
+      }
+
       if (elemType == FEType::Tet4 || elemType == FEType::Tet10)
         return SYS_T::make_unique<QuadPts_Gauss_Triangle>(nqp_sur);
       else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
       {
+        // For hexahedral elements, check if the surface quadrature points is a perfect 
+        // square
         bool flg = false; 
         const int nqp_vol_1D = isPerfectSquare(nqp_sur, flg)
         if(flg == false)
