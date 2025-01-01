@@ -3,7 +3,7 @@
 FEAElement_Triangle3::FEAElement_Triangle3( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(nLocBas * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 }
 
 void FEAElement_Triangle3::print_info() const
