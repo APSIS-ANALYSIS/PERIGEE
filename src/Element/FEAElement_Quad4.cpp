@@ -3,16 +3,16 @@
 FEAElement_Quad4::FEAElement_Quad4( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(nLocBas * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 
-  dR_dx.resize(nLocBas * numQuapts);
-  dR_dy.resize(nLocBas * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts, 0.0);
+  dR_dy.resize(nLocBas * numQuapts, 0.0);
 
-  d2R_dxx.resize(nLocBas * numQuapts);
-  d2R_dyy.resize(nLocBas * numQuapts);
-  d2R_dxy.resize(nLocBas * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxy.resize(nLocBas * numQuapts, 0.0);
 
-  Jac.resize(9 * numQuapts);
+  Jac.resize(9 * numQuapts, 0.0);
 }
 
 void FEAElement_Quad4::print_info() const

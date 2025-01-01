@@ -2,23 +2,23 @@
 
 FEAElement_Quad9::FEAElement_Quad9( const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R.resize(nLocBas * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 
-  dR_dx.resize(nLocBas * numQuapts);
-  dR_dy.resize(nLocBas * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts, 0.0);
+  dR_dy.resize(nLocBas * numQuapts, 0.0);
 
-  d2R_dxx.resize(nLocBas * numQuapts);
-  d2R_dyy.resize(nLocBas * numQuapts);
-  d2R_dxy.resize(nLocBas * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxy.resize(nLocBas * numQuapts, 0.0);
   
-  Jac.resize(9 * numQuapts);
+  Jac.resize(9 * numQuapts, 0.0);
 }
 
 void FEAElement_Quad9::print_info() const
 {
   SYS_T::commPrint("Quad9: ");
-  SYS_T::commPrint("9-node quadrilateral element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
+  SYS_T::commPrint("Nine-node quadrilateral element with up to 2nd derivatives.\n");
+  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
 void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
