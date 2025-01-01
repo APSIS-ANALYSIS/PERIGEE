@@ -1,12 +1,28 @@
 #ifndef FEAELEMENTFACTORY_HPP
 #define FEAELEMENTFACTORY_HPP
-
-#include "FEAElement.hpp"
+// ============================================================================
+// FEAElementFactory.hpp
+//
+// This is the factory that construct an element class based on the FEType and
+// number of quadrature points.
+//
+// Author: Ju Liu, liujuy@gmail.com
+// Date: Jan. 1st 2025
+// ============================================================================
+#include "FEAElement_Tet4.hpp"
+#include "FEAElement_Tet10.hpp"
+#include "FEAElement_Hex8.hpp"
+#include "FEAElement_Hex27.hpp"
+#include "FEAElement_Triangle3_3D_der0.hpp"
+#include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 
 class ElementFactory
 {
   public:
-    static std::unique_ptr<FEAElement> createVolumeElement(FEType elemType, const int &nqp)
+    static std::unique_ptr<FEAElement> createVolumeElement(const FEType &elemType,
+        const int &nqp)
     {
       switch(elemType)
       {
@@ -24,7 +40,8 @@ class ElementFactory
       }
     }
 
-    static std::unique_ptr<FEAElement> createSurfaceElement(FEType elemType, const int &nqp)
+    static std::unique_ptr<FEAElement> createSurfaceElement(const FEType &elemType,
+        const int &nqp)
     {
       switch (elemType)
       {
