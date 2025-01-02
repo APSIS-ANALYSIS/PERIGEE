@@ -154,9 +154,9 @@ class HDF5_Writer
     // Vector_3
     // --------------------------------------------------------------
     void write_Vector_3( const hid_t &group_id, const char * const &data_name,
-        const Vector_3 &value ) const;
+        const std::array<double, 3> &value ) const;
 
-    void write_Vector_3( const char * const &data_name, const Vector_3 &value ) const;
+    void write_Vector_3( const char * const &data_name, const std::array<double, 3> &value ) const;
 
     // --------------------------------------------------------------
     // Tensor2_3D
