@@ -71,7 +71,7 @@ class FEAElement_Triangle3 final : public FEAElement
     // dr_dx : 4 <= ii < 8
     std::array<double, 8> Jac {};
 
-    double detJac;
+    double detJac {};
 };
 
 #endif
