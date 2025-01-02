@@ -3,14 +3,14 @@
 FEAElement_Triangle3_3D_der0::FEAElement_Triangle3_3D_der0( 
     const int &in_nqua ) : numQuapts( in_nqua )
 {
-  R.resize(3 * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 }
 
 void FEAElement_Triangle3_3D_der0::print_info() const
 {
   SYS_T::commPrint("Triangle3_3D_der0: ");
-  SYS_T::commPrint("3-node triangle element with no derivative evaluated. \n ");
-  SYS_T::commPrint("Note: This element is designed for natural BC integrals. \n ");
+  SYS_T::commPrint("Three-node triangle element with no derivative evaluated.\n ");
+  SYS_T::commPrint("Note: This element is designed for natural BC integrals.\n ");
 }
 
 void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
@@ -46,7 +46,7 @@ void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex,
     double * const &basis ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_3D_der0::get_R function error.\n" );
-  const int offset = quaindex * 3;
+  const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
@@ -55,7 +55,7 @@ void FEAElement_Triangle3_3D_der0::get_R( const int &quaindex,
 std::vector<double> FEAElement_Triangle3_3D_der0::get_R( const int &quaindex ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle3_3D_der0::get_R function error.\n" );
-  const int offset = quaindex * 3;
+  const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2] };
 }
 

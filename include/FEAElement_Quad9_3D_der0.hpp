@@ -45,7 +45,7 @@ class FEAElement_Quad9_3D_der0 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 9;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -70,6 +70,8 @@ class FEAElement_Quad9_3D_der0 final : public FEAElement
     double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
 
   private:
+    static constexpr int nLocBas = 9;
+    
     const int numQuapts;
 
     // Container for R

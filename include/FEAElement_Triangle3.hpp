@@ -24,7 +24,7 @@ class FEAElement_Triangle3 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 3;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -58,19 +58,20 @@ class FEAElement_Triangle3 final : public FEAElement
     double get_detJac(const int &quaindex) const override {return detJac;}
 
   private:
+    static constexpr int nLocBas = 3;
     const int numQuapts;
 
     std::vector<double> R {};
 
     // tri3 is linear element, hence the derivatives are constant
-    std::array<double, 3> dR_dx, dR_dy;
+    std::array<double, 3> dR_dx {}, dR_dy {};
 
     // Container for 
     // dx_dr : 0 <= ii < 4
     // dr_dx : 4 <= ii < 8
-    std::array<double, 8> Jac;
+    std::array<double, 8> Jac {};
 
-    double detJac;
+    double detJac {};
 };
 
 #endif
