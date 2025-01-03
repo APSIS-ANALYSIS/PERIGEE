@@ -110,6 +110,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/Runge_Kutta_Butcher.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_HERK.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp

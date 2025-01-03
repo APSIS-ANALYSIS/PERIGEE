@@ -218,7 +218,7 @@ class PLocAssem_VMS_NS_HERK : public IPLocAssem
       return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
-    typedef Vector_3 ( PLocAssem_VMS_NS_GenAlpha::*locassem_vms_ns_funs )( 
+    typedef Vector_3 ( PLocAssem_VMS_NS_HERK::*locassem_vms_ns_funs )( 
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_vms_ns_funs * flist;

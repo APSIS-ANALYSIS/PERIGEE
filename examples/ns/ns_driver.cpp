@@ -36,6 +36,7 @@
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
+#include "PLocAssem_VMS_NS_HERK.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
@@ -391,23 +392,34 @@ int main(int argc, char *argv[])
 
   tm_galpha_ptr->print_info();
 
+  //===== RK Butcher Table =====
+  Runge_Kutta_Butcher * tm_RK_ptr = new Runge_Kutta_Butcher(3, 3, false);
+
+  tm_RK_ptr->printCoefficients();
+
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
-  if( locwbc->get_wall_model_type() == 0 )
-  {
-    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-      tm_galpha_ptr, elementv->get_nLocBas(),
-      quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
-  }
-  else if( locwbc->get_wall_model_type() == 1 )
-  {
-    locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-      tm_galpha_ptr, elementv->get_nLocBas(),
-      quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
-  }
-  else SYS_T::print_fatal("Error: Unknown wall model type.\n");
+
+  locAssem_ptr = new PLocAssem_VMS_NS_HERK(
+    tm_RK_ptr, elementv->get_nLocBas(),
+    quadv->get_num_quadPts(), elements->get_nLocBas(),
+    fluid_density, fluid_mu, GMIptr->get_elemType(), c_ct, c_tauc );
+  
+  // if( locwbc->get_wall_model_type() == 0 )
+  // {
+  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
+  //     tm_galpha_ptr, elementv->get_nLocBas(),
+  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
+  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+  // }
+  // else if( locwbc->get_wall_model_type() == 1 )
+  // {
+  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
+  //     tm_galpha_ptr, elementv->get_nLocBas(),
+  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
+  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+  // }
+  // else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
@@ -423,11 +435,6 @@ int main(int argc, char *argv[])
   PDNSolution * pres = new PDNSolution_P( pNode, 0, 1, true, "pres" );
 
   PDNSolution * dot_velo = new PDNSolution_V( pNode, 0, 3, true, "dot_velo" );
-
-  //===== RK Butcher Table =====
-  Runge_Kutta_Butcher * tm_RK_ptr = new Runge_Kutta_Butcher(3, 3, false);
-
-  tm_RK_ptr->printCoefficients();
 
   // int m = 4;
   // PDNSolution** solutions = new PDNSolution*[m];
