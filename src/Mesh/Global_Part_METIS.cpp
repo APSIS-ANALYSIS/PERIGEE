@@ -2,7 +2,7 @@
 
 Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
     const int &in_ncommon, const bool &isDualGraph,
-    const IMesh * const &mesh,
+    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas, 
     const IIEN * const &IEN,
     const std::string &element_part_name,
     const std::string &node_part_name )
@@ -12,9 +12,9 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   field_offset.resize(1);
   field_offset[0] = 0;
 
-  const idx_t nElem = mesh->get_nElem();
-  const idx_t nFunc = mesh->get_nFunc();
-  const idx_t nLocBas = mesh->get_nLocBas();
+  const idx_t nElem   = in_nelem;
+  const idx_t nFunc   = in_nfunc;
+  const idx_t nLocBas = in_nlocbas;
   
   if(cpu_size <= 1)
   {

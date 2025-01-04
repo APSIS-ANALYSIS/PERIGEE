@@ -153,23 +153,21 @@ int main( int argc, char * argv[] )
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
   
-  IMesh * mesh = new IMesh( nFunc, nElem, FE_T::to_nLocBas(elemType) );
+  const int nLocBas = FE_T::to_nLocBas(elemType);
 
-  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas() );
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas() );
 
-  mesh -> print_info();
-  
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, mesh, IEN, "epart", "npart" );
+        isDualGraph, nElem, nFunc, nLocBas, IEN, "epart", "npart" );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh, "epart", "npart" );
+    global_part = new Global_Part_Serial( nElem, nFunc, "epart", "npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering
-  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
+  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
@@ -250,7 +248,7 @@ int main( int argc, char * argv[] )
   {
     mytimer->Reset();
     mytimer->Start();
-    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM( nElem, nFunc, nLocBas, global_part, mnindex, IEN,
         ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
@@ -309,7 +307,7 @@ int main( int argc, char * argv[] )
   for(auto &it_nbc : NBC_list) delete it_nbc;
 
   delete InFBC; delete ebc; delete wbc; delete mytimer;
-  delete mnindex; delete global_part; delete mesh; delete IEN;
+  delete mnindex; delete global_part; delete IEN;
 
   return EXIT_SUCCESS;
 }

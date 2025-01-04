@@ -16,7 +16,7 @@
 class Global_Part_Serial : public IGlobal_Part
 {
   public:
-    Global_Part_Serial( const IMesh * const &mesh,
+    Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 

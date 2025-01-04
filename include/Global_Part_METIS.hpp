@@ -25,7 +25,7 @@ class Global_Part_METIS : public IGlobal_Part
     // ------------------------------------------------------------------------
     Global_Part_METIS( const int &cpu_size,
         const int &in_ncommon, const bool &isDualGraph,
-        const IMesh * const &mesh,
+        const int &in_nelem, const int &in_nfunc, const int &in_nlocbas, 
         const IIEN * const &IEN,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );

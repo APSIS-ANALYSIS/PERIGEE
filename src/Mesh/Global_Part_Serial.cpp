@@ -1,14 +1,14 @@
 #include "Global_Part_Serial.hpp"
 
-Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
+Global_Part_Serial::Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
    const std::string &element_part_name, const std::string &node_part_name )
 {
   // This is a partition for a single mesh (field)
   field_offset.resize(1);
   field_offset[0] = 0;
 
-  const int nElem = mesh->get_nElem();
-  const int nFunc = mesh->get_nFunc();
+  const int nElem = in_nelem;
+  const int nFunc = in_nfunc;
  
   epart = new idx_t [nElem];
   npart = new idx_t [nFunc];
