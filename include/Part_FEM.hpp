@@ -134,8 +134,7 @@ class Part_FEM : public IPart
 
     // ------------------------------------------------------------------------
     // Function
-    void Generate_Partition( const IMesh * const &mesh,
-        const IGlobal_Part * const &gpart,
+    void Generate_Partition( const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const int &field );

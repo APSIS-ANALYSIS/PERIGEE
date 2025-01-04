@@ -25,7 +25,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
+  Generate_Partition( gpart, mnindex, IEN, field_id );
 
   // Generate group 6, if the field is tagged as is_geo_field == true
   // local copy of control points
@@ -85,7 +85,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
+  Generate_Partition( gpart, mnindex, IEN, field_id );
 
   // Generate group 6, if the field is tagged as is_geo_field == true
   // local copy of control points
@@ -204,8 +204,7 @@ Part_FEM::~Part_FEM()
   delete [] LIEN;
 }
 
-void Part_FEM::Generate_Partition( const IMesh * const &mesh,
-    const IGlobal_Part * const &gpart,
+void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
     const int &field )
