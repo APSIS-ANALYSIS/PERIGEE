@@ -1,15 +1,14 @@
 #include "Part_FEM.hpp"
 
 Part_FEM::Part_FEM(
-    const IMesh * const &mesh,
+    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
     const FEType &in_elemType, const Field_Property &fp )
-: nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  nLocBas( mesh->get_nLocBas() ),
+: nElem( in_nelem ), nFunc( in_nfunc ), nLocBas( in_nlocbas ),
   probDim(3), elemType(in_elemType),
   field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
   is_geo_field( fp.get_is_geo_field() ),
@@ -60,7 +59,7 @@ Part_FEM::Part_FEM(
 }
 
 Part_FEM::Part_FEM(
-    const IMesh * const &mesh,
+    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -68,8 +67,7 @@ Part_FEM::Part_FEM(
     const std::vector<int> &rotatedtag,
     const int &in_cpu_rank, const int &in_cpu_size,
     const FEType &in_elemType, const Field_Property &fp )
-: nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  nLocBas( mesh->get_nLocBas() ),
+: nElem( in_nelem ), nFunc( in_nfunc ), nLocBas( in_nlocbas ),
   probDim(3), elemType(in_elemType),
   field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
   is_geo_field( fp.get_is_geo_field() ),

@@ -9,7 +9,6 @@
 // Date: Jan. 12 2017
 // ============================================================================
 #include "Vec_Tools.hpp"
-#include "IMesh.hpp"
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
@@ -19,7 +18,7 @@
 class Part_FEM : public IPart
 {
   public:
-    Part_FEM( const IMesh * const &mesh,
+    Part_FEM( const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -28,7 +27,7 @@ class Part_FEM : public IPart
         const FEType &in_elemType, 
         const Field_Property &in_fp );
 
-    Part_FEM( const IMesh * const &mesh,
+    Part_FEM( const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
