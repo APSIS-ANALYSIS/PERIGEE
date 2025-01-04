@@ -153,7 +153,7 @@ int main( int argc, char * argv[] )
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
   
-  IMesh * mesh = new IMesh(nFunc, nElem, elemType);
+  IMesh * mesh = new IMesh( nFunc, nElem, FE_T::to_nLocBas(elemType) );
 
   SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas() );
 

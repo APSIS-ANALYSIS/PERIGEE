@@ -7,14 +7,12 @@
 // Date: Sept 23rd 2013.
 // ==================================================================
 #include "Sys_Tools.hpp"
-#include "FEType.hpp"
 
 class IMesh
 {
   public:
-    IMesh( const int &in_nFunc, const int &in_nElem, 
-        const FEType &in_type) : type(in_type), nFunc(in_nFunc), 
-    nElem(in_nElem), nLocBas(FE_T::to_nLocBas(type)) {};
+    IMesh( const int &in_nFunc, const int &in_nElem, const int &in_nlocbas) 
+      : nFunc(in_nFunc), nElem(in_nElem), nLocBas(in_nlocbas) {};
     
     virtual ~IMesh() = default;
 
@@ -34,7 +32,6 @@ class IMesh
     int get_nLocBas() const {return nLocBas;}
 
   private:
-    const FEType type;
     const int nFunc, nElem, nLocBas;
 };
 
