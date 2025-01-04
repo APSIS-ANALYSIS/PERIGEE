@@ -24,17 +24,17 @@ Global_Part_Serial::Global_Part_Serial( const int &in_nelem, const int &in_nfunc
 }
 
 Global_Part_Serial::Global_Part_Serial( const int &num_fields,
-    const std::vector<int> &in_nelem_list,
-    const std::vector<int> &in_nfunc_list,
+    const std::vector<int> &nelem_list,
+    const std::vector<int> &nfunc_list,
     const std::string &element_part_name, const std::string &node_part_name )
 {
-  if(num_fields != static_cast<int>( in_nelem_list.size() ) )
+  if(num_fields != static_cast<int>( nelem_list.size() ) )
   {
     std::cerr<<"ERROR: input num_fields is incompatible with nelem list.\n";
     exit(1);
   }
 
-  if(num_fields != static_cast<int>( in_nfunc_list.size() ) )
+  if(num_fields != static_cast<int>( nfunc_list.size() ) )
   {
     std::cerr<<"ERROR: input num_fields is incompatible with nfunc list.\n";
     exit(1);
@@ -44,19 +44,19 @@ Global_Part_Serial::Global_Part_Serial( const int &num_fields,
   field_offset[0] = 0;
 
   for(int ii=1; ii<num_fields; ++ii)
-    field_offset[ii] = field_offset[ii-1] + in_nfunc_list[ii-1];
+    field_offset[ii] = field_offset[ii-1] + nfunc_list[ii-1];
 
-  const idx_t nElem = in_nelem_list[0];
+  const idx_t nElem = nelem_list[0];
   idx_t nFunc = 0;
 
   for(int ii=0; ii<num_fields; ++ii)
   {
-    if( nElem != static_cast<idx_t>( in_nelem_list[ii] ) )
+    if( nElem != static_cast<idx_t>( nelem_list[ii] ) )
     {
       std::cerr<<"ERROR: nelem list objects are incompatible with nElem.\n";
       exit(1);
     }
-    nFunc += in_nfunc_list[ii];
+    nFunc += nfunc_list[ii];
   }
 
   epart = new idx_t [nElem];
