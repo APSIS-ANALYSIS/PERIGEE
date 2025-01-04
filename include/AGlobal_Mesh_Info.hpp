@@ -21,10 +21,6 @@ class AGlobal_Mesh_Info
 
       std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
-      const auto vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
-
-      xdegree = vdeg[0]; ydegree = vdeg[1]; zdegree = vdeg[2];
-
       nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
       nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
       nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
@@ -35,16 +31,6 @@ class AGlobal_Mesh_Info
     }
 
     ~AGlobal_Mesh_Info() = default;
-
-    // --------------------------------------------------------------
-    // Get the polynomial degree for the discretization method. For
-    // unstructured mesh, the three function should return the same
-    // value since one cannot differentiate the xyz direction in, e.g.,
-    // tet mesh.
-    // --------------------------------------------------------------
-    int get_xdegree() const {return xdegree;}
-    int get_ydegree() const {return ydegree;}
-    int get_zdegree() const {return zdegree;}
 
     // --------------------------------------------------------------
     // Get the total number of element of the whole mesh. 
@@ -76,7 +62,6 @@ class AGlobal_Mesh_Info
     void print_info() const
     {
       std::cout<<"AGlobal_Mesh_Info:"<<std::endl;
-      std::cout<<"degree: "<<xdegree<<'\t'<<ydegree<<'\t'<<zdegree<<'\n';
       std::cout<<"nElem: "<<nElem<<'\n';
       std::cout<<"nFunc: "<<nFunc<<'\n';
       std::cout<<"nLocBas: "<<nLocBas<<std::endl;
@@ -85,7 +70,6 @@ class AGlobal_Mesh_Info
     }
 
   private:
-    int xdegree, ydegree, zdegree;
     int nElem, nFunc, nLocBas, probDim;
     FEType elemType;
 
