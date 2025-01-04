@@ -37,7 +37,7 @@ class QuadPtsFactory
         // For hexahedral elements, check if the volume quadrature points is 
         // a perfect cube
         bool flg = false; 
-        const int nqp_vol_1D = isPerfectCube(nqp_vol, flg)
+        const int nqp_vol_1D = isPerfectCube(nqp_vol, flg);
         if(flg == false)
         {
           SYS_T::print_fatal("Error: Invalid nqp_vol for Hex element (cube check).\n");
@@ -68,7 +68,7 @@ class QuadPtsFactory
         // For hexahedral elements, check if the surface quadrature points is 
         // a perfect square
         bool flg = false; 
-        const int nqp_vol_1D = isPerfectSquare(nqp_sur, flg)
+        const int nqp_vol_1D = isPerfectSquare(nqp_sur, flg);
         if(flg == false)
         {
           SYS_T::print_fatal("Error: Invalid nqp_sur for Hex element (square check).\n");
@@ -88,13 +88,13 @@ class QuadPtsFactory
       switch (elemType)
       {
         case FEType::Tet4:
-          return std::make_unique<QuadPts_vis_Tet4>();
+          return SYS_T::make_unique<QuadPts_vis_tet4>();
         case FEType::Tet10:
-          return std::make_unique<QuadPts_vis_Tet10>();
+          return SYS_T::make_unique<QuadPts_vis_tet10>();
         case FEType::Hex8:
-          return std::make_unique<QuadPts_vis_Hex8>();
+          return SYS_T::make_unique<QuadPts_vis_hex8>();
         case FEType::Hex27:
-          return std::make_unique<QuadPts_vis_Hex27>();
+          return SYS_T::make_unique<QuadPts_vis_hex27>();
         default:
           SYS_T::print_fatal("Error: FEType not supported.\n");
           return nullptr;
