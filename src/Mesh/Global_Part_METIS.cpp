@@ -339,7 +339,7 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
   // file creation
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
   h5w->write_intScalar("part_size", part_size);
   h5w->write_intScalar("cpu_size", cpu_size);
@@ -354,7 +354,7 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
 
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 
-  delete h5w; H5Fclose(file_id);
+  H5Fclose(file_id);
 }
 
 void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
@@ -364,8 +364,8 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
   std::string fName( fileName ); fName.append( ".h5" );
 
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
   h5w->write_int64Scalar("part_size", part_size);
   h5w->write_intScalar("cpu_size", cpu_size);
@@ -380,7 +380,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
 
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 
-  delete h5w; H5Fclose(file_id);
+  H5Fclose(file_id);
 }
 
 // EOF
