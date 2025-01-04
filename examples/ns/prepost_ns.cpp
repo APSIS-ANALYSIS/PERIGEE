@@ -71,22 +71,20 @@ int main( int argc, char * argv[] )
   
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
+
+  const int nLocBas = FE_T::to_nLocBas(elemType);
   
-  IMesh * mesh = new IMesh( nFunc, nElem, FE_T::to_nLocBas(elemType) );
-
-  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas());
-
-  mesh -> print_info();
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas());
 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, mesh, IEN, "post_epart", "post_npart" );
+        isDualGraph, nElem, nFunc, nLocBas, IEN, "post_epart", "post_npart" );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh, "post_epart", "post_npart" );
+    global_part = new Global_Part_Serial( nElem, nFunc, "post_epart", "post_npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
-  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
+  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
   mnindex->write_hdf5("post_node_mapping");
 
   cout<<"=== Start Partition ... \n";
@@ -95,7 +93,7 @@ int main( int argc, char * argv[] )
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
   {
     mytimer->Reset(); mytimer->Start();
-    IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM( nElem, nFunc, nLocBas, global_part, mnindex, IEN,
         ctrlPts, proc_rank, proc_size, elemType, {0, dofNum, true, "NS"} );
     part->write(part_file.c_str());
     mytimer->Stop();
@@ -105,7 +103,7 @@ int main( int argc, char * argv[] )
 
   // Clean memory
   cout<<"=== Clean memory. \n";
-  delete mnindex; delete global_part; delete mesh; delete IEN; delete mytimer;
+  delete mnindex; delete global_part; delete IEN; delete mytimer;
   return EXIT_SUCCESS;
 }
 
