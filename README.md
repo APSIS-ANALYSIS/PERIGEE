@@ -114,6 +114,7 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 
 ### Application
 * Y. Sun, J. Huang, Q. Lu, X. Yue, X. Huang, W. He, Y. Shi, and J. Liu, [Modeling fibrous tissue in vascular fluid-structure interaction: a morphology-based pipeline and biomechanical significance](https://doi.org/10.1002/cnm.3892), International Journal for Numerical Methods in Biomedical Engineering 41(1):e3892, 2025.
+* X. Yue, J. Huang, and J. Liu, [Fluid-structure interaction analysis for abdominal aortic aneurysms: the role of multi-layered tissue architecture and intraluminal thrombus](https://doi.org/10.3389/fbioe.2025.1519608), Frontiers in Bioengineering and Biotechnology 13:1519608, 2025. 
 
 ### HPC
 * D. Goldberg, What every computer scientist should know about floating-point arithmetic.
