@@ -104,15 +104,6 @@ class IPart
     virtual int get_nFunc() const
     {SYS_T::print_fatal("Error: get_nFunc is not implemented. \n"); return 0;}
 
-    virtual int get_sDegree() const
-    {SYS_T::print_fatal("Error: get_sDegree is not implemented. \n"); return 0;}
-
-    virtual int get_tDegree() const
-    {SYS_T::print_fatal("Error: get_tDegree is not implemented. \n"); return 0;}
-
-    virtual int get_uDegree() const
-    {SYS_T::print_fatal("Error: get_uDegree is not implemented. \n"); return 0;}
-
     virtual int get_nLocBas() const
     {SYS_T::print_fatal("Error: get_nLocBas is not implemented. \n"); return 0;}
 

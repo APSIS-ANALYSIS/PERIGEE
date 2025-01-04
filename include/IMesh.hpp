@@ -2,49 +2,40 @@
 #define IMESH_HPP
 // ==================================================================
 // IMesh.hpp
-// The Interface for Mesh classes, pure virtual to all different mesh.
+// The Mesh class storet the basic parameters of the global FEM mesh.
 // 
-// In principle, an unstructured mesh only contains the polynomial 
-// degree, the number of nodes, and the number of cells.
-//
-// The additional get funcitons with _x/y/z is designed for 
-// structured mesh.
-// 
-// The additional get_patch_ is designed for multi-patch geometries.
-//
 // Date: Sept 23rd 2013.
 // ==================================================================
 #include "Sys_Tools.hpp"
+#include "FEType.hpp"
 
 class IMesh
 {
   public:
-    IMesh() = default;
+    IMesh( const int &in_nFunc, const int &in_nElem, 
+        const FEType &in_type) : type(in_type), nFunc(in_nFunc), 
+    nElem(in_nElem), nLocBas(FE_T::to_nLocBas(type)) {};
     
     virtual ~IMesh() = default;
 
-    virtual void print_info() const = 0;
+    void print_info() const
+    {
+      std::cout<<"========= IMesh ========="<<std::endl;
+      std::cout<<"Total Elem: "<<get_nElem()<<std::endl;
+      std::cout<<"Total Func: "<<get_nFunc()<<std::endl;
+      std::cout<<"Local Basis Functions: "<<get_nLocBas()<<std::endl;
+      std::cout<<"========================="<<std::endl;
+    }
 
-    virtual int get_s_degree() const {return get_degree();}
-    
-    virtual int get_t_degree() const {return get_degree();}
-    
-    virtual int get_u_degree() const {return get_degree();}
-  
-    // ------------------------------------------------------------------------ 
-    // For unstructured meshes, there is no intrinsic definition of direction
-    // we may return the degree in either s, t, or u direction, and the
-    // underlying assumption is that get_s_degree(), get_t_degree(), and
-    // get_u_degree() return the same value. 
-    // ------------------------------------------------------------------------ 
-    virtual int get_degree() const
-    {SYS_T::print_fatal("Error: IMesh::get_degree is not implemented.\n"); return -1;}
-    
-    virtual int get_nFunc() const = 0;
-    
-    virtual int get_nElem() const = 0;
-    
-    virtual int get_nLocBas() const = 0;
+    int get_nFunc() const {return nFunc;}
+
+    int get_nElem() const {return nElem;}
+
+    int get_nLocBas() const {return nLocBas;}
+
+  private:
+    const FEType type;
+    const int nFunc, nElem, nLocBas;
 };
 
 #endif

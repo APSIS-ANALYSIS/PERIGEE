@@ -15,7 +15,7 @@ class Mesh_Tet : public IMesh
 {
   public:
     Mesh_Tet(const int &in_nFunc, const int &in_nElem, const int &in_deg) 
-      : nFunc(in_nFunc), nElem(in_nElem), deg(in_deg)
+      : nFunc(in_nFunc), nElem(in_nElem)
     {
       switch(deg)
       {
@@ -37,7 +37,6 @@ class Mesh_Tet : public IMesh
     void print_info() const override
     {
       std::cout<<"======= Mesh_Tet ======="<<std::endl;
-      std::cout<<"Degree: "       <<get_degree()<<std::endl;
       std::cout<<"Total Elem: "   <<get_nElem()<<std::endl;
       std::cout<<"Total Func: "   <<get_nFunc()<<std::endl;
       std::cout<<"Local Basis #: "<<get_nLocBas()<<std::endl;
@@ -53,7 +52,7 @@ class Mesh_Tet : public IMesh
     int get_nLocBas() const override {return nLocBas;}
 
   private:
-    const int nFunc, nElem, deg;
+    const int nFunc, nElem;
 
     // ------------------------------------------------------------------------ 
     // In this class, nLocBas is determined by the element type, and since we

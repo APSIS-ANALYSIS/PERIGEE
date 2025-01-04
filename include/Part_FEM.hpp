@@ -87,9 +87,6 @@ class Part_FEM : public IPart
 
     virtual int get_nElem() const {return nElem;}
     virtual int get_nFunc() const {return nFunc;}
-    virtual int get_sDegree() const {return sDegree;}
-    virtual int get_tDegree() const {return tDegree;}
-    virtual int get_uDegree() const {return uDegree;}
     virtual int get_nLocBas() const {return nLocBas;}
     virtual int get_LIEN(const int &ee, const int &ii) const {return LIEN[ee][ii];}
 
