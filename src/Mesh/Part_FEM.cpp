@@ -9,8 +9,7 @@ Part_FEM::Part_FEM(
     const int &in_cpu_rank, const int &in_cpu_size,
     const FEType &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
-  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
+  nLocBas( mesh->get_nLocBas() ),
   probDim(3), elemType(in_elemType),
   field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
   is_geo_field( fp.get_is_geo_field() ),
@@ -70,8 +69,7 @@ Part_FEM::Part_FEM(
     const int &in_cpu_rank, const int &in_cpu_size,
     const FEType &in_elemType, const Field_Property &fp )
 : nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
-  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
+  nLocBas( mesh->get_nLocBas() ),
   probDim(3), elemType(in_elemType),
   field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
   is_geo_field( fp.get_is_geo_field() ),
@@ -160,10 +158,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
 
   // global mesh info
-  std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
-
-  sDegree = vdeg[0]; tDegree = vdeg[1]; uDegree = vdeg[2];
-
   nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
   nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
@@ -376,10 +370,6 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "nElem", nElem );
   h5w->write_intScalar( group_id_3, "nFunc", nFunc );
-
-  const std::vector<int> vdeg { sDegree, tDegree, uDegree };
-
-  h5w->write_intVector( group_id_3, "degree", vdeg );
 
   h5w->write_intScalar( group_id_3, "nLocBas", nLocBas );
 

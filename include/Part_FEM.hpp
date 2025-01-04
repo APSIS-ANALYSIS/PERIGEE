@@ -116,7 +116,7 @@ class Part_FEM : public IPart
     int cpu_rank, cpu_size;
 
     // 4. global mesh info
-    int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas, probDim;
+    int nElem, nFunc, nLocBas, probDim;
     FEType elemType;
 
     // 5. LIEN
