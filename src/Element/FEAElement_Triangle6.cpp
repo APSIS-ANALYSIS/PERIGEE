@@ -3,23 +3,23 @@
 FEAElement_Triangle6::FEAElement_Triangle6( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(nLocBas * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 
-  dR_dx.resize(nLocBas * numQuapts);
-  dR_dy.resize(nLocBas * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts, 0.0);
+  dR_dy.resize(nLocBas * numQuapts, 0.0);
 
-  d2R_dxx.resize(nLocBas * numQuapts);
-  d2R_dyy.resize(nLocBas * numQuapts);
-  d2R_dxy.resize(nLocBas * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxy.resize(nLocBas * numQuapts, 0.0);
   
-  Jac.resize(9 * numQuapts);
+  Jac.resize(9 * numQuapts, 0.0);
 }
 
 void FEAElement_Triangle6::print_info() const
 {
   SYS_T::commPrint("Tri6: ");
-  SYS_T::commPrint("6-node triangle element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
+  SYS_T::commPrint("Six-node triangle element with up to 2nd derivatives.\n");
+  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
 void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,

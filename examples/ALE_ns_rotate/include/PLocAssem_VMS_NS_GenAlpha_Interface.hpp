@@ -72,8 +72,7 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo );
+      const double * const &rotated_local_sol );
 
     virtual void Assem_Residual_itf_rotated(
       const int &rotated_qua,
@@ -92,8 +91,7 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol, 
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo );
+      const double * const &rotated_local_sol );
 
     virtual void Assem_Diag_Tangent_Residual_itf_rotated(
       const int &rotated_qua,
@@ -112,8 +110,7 @@ class PLocAssem_VMS_NS_GenAlpha_Interface : public PLocAssem_VMS_NS_GenAlpha_Wea
       const FEAElement * const &fixed_elementv,
       const FEAElement * const &rotated_elementv,
       const double * const &fixed_local_sol,
-      const double * const &rotated_local_sol,
-      const double * const &rotated_local_mvelo );
+      const double * const &rotated_local_sol );
 
     virtual void Assem_Tangent_itf_MF_rotated(
       const int &rotated_qua,

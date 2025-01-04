@@ -64,14 +64,14 @@ class FEAElement_Triangle3 final : public FEAElement
     std::vector<double> R {};
 
     // tri3 is linear element, hence the derivatives are constant
-    std::array<double, 3> dR_dx, dR_dy;
+    std::array<double, 3> dR_dx {}, dR_dy {};
 
     // Container for 
     // dx_dr : 0 <= ii < 4
     // dr_dx : 4 <= ii < 8
-    std::array<double, 8> Jac;
+    std::array<double, 8> Jac {};
 
-    double detJac;
+    double detJac {};
 };
 
 #endif
