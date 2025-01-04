@@ -125,7 +125,7 @@ ADD_EXECUTABLE( preprocess3d ../preprocess.cpp)
 ADD_EXECUTABLE( transport_3d driver.cpp)
 ADD_EXECUTABLE( prepost ../prepost.cpp)
 ADD_EXECUTABLE( post_error post_compare_manu.cpp )
-ADD_EXECUTABLE( vis_transport_3d vis_transport.cpp )
+ADD_EXECUTABLE( vis_transport_3d vis.cpp )
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( transport_3d perigee_analysis )
