@@ -77,6 +77,28 @@ namespace FE_T
     else
       return FEType::Unknown;
   }
+  
+  // Convert FEType to its number of local basis functions
+  inline int to_nLocBas(const FEType &type) 
+  {
+    switch (type) 
+    {
+      case FEType::Unknown: return 0;
+      case FEType::Tet4: return 4;
+      case FEType::Tet10: return 10;
+      case FEType::Hex8: return 8;
+      case FEType::Hex27: return 27;
+      case FEType::Tri3: return 3;
+      case FEType::Tri6: return 6;
+      case FEType::Quad4: return 4;
+      case FEType::Quad9: return 9;
+      case FEType::Tri3_der0: return 3;
+      case FEType::Tri6_der0: return 6;
+      case FEType::Quad4_der0: return 4;
+      case FEType::Quad9_der0: return 9;
+      default: return 0;
+    }
+  }
 }
 
 #endif
