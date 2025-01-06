@@ -227,10 +227,10 @@ void HDF5_Writer::write_Vector_3( const char * const &data_name, const std::arra
 }
 
 void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
-    const Tensor2_3D &value ) const
+    const std::array<double, 9> &value ) const
 {
   // First convert Tensor2_3D to a double array
-  const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
+  const double val[9] = { value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8] };
 
   hsize_t dims[1] = { 9 };
   hid_t dataspace = H5Screate_simple(1, dims, NULL);
@@ -245,10 +245,10 @@ void HDF5_Writer::write_Tensor2_3D( const hid_t &group_id, const char * const &d
   H5Sclose( dataspace );
 }
 
-void HDF5_Writer::write_Tensor2_3D( const char * const &data_name, const Tensor2_3D &value ) const
+void HDF5_Writer::write_Tensor2_3D( const char * const &data_name, const std::array<double, 9> &value ) const
 {
   // First convert Tensor2_3D to a double array
-  const double val[9] = { value(0), value(1), value(2), value(3), value(4), value(5), value(6), value(7), value(8) };
+  const double val[9] = { value[0], value[1], value[2], value[3], value[4], value[5], value[6], value[7], value[8] };
 
   hsize_t dims[1] = { 9 };
   hid_t dataspace = H5Screate_simple(1, dims, NULL);
