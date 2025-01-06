@@ -91,7 +91,7 @@ void EBC_Partition_outflow_MF::write_hdf5( const std::string &FileName,
 
       h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );
       h5w->write_intVector( subgroup_id, "LID_all_face_nodes", LID_all_face_nodes[ii] );
-      h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii] );
+      h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii].to_std_array() );
 
       H5Gclose( subgroup_id );
     }
