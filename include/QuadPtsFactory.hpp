@@ -21,7 +21,7 @@
 class QuadPtsFactory
 {
   public:
-    static std::unique_ptr<IQuadPts> createVolumeQuadrature(const FEType &elemType, 
+    static std::unique_ptr<IQuadPts> createVolQuadrature(const FEType &elemType, 
         const int &nqp_vol)
     {
       if (nqp_vol <= 0)
@@ -52,7 +52,7 @@ class QuadPtsFactory
       }
     }
 
-    static std::unique_ptr<IQuadPts> createSurfaceQuadrature(const FEType &elemType, 
+    static std::unique_ptr<IQuadPts> createSurQuadrature(const FEType &elemType, 
         const int &nqp_sur)
     {
       if (nqp_sur <= 0)

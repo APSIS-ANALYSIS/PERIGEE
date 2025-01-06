@@ -21,7 +21,7 @@
 class ElementFactory
 {
   public:
-    static std::unique_ptr<FEAElement> createVolumeElement(const FEType &elemType,
+    static std::unique_ptr<FEAElement> createVolElement(const FEType &elemType,
         const int &nqp)
     {
       switch(elemType)
@@ -40,7 +40,7 @@ class ElementFactory
       }
     }
 
-    static std::unique_ptr<FEAElement> createSurfaceElement(const FEType &elemType,
+    static std::unique_ptr<FEAElement> createSurElement(const FEType &elemType,
         const int &nqp)
     {
       switch (elemType)
