@@ -44,6 +44,11 @@ Vector_3& Vector_3::operator*=( const double &val )
   return *this;
 }
 
+Vector_3 Vector_3::operator-() const
+{
+  return Vector_3( -vec[0], -vec[1], -vec[2] );
+}
+
 void Vector_3::print(std::ostream& os, const std::string& delimiter) const
 {
   os<<std::setprecision(12);

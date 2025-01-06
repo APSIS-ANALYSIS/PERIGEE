@@ -140,9 +140,11 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( sys_test sys_test.cpp )
 ADD_EXECUTABLE( mod_test matmodel_test.cpp )
+ADD_EXECUTABLE( tool_test tool_test.cpp )
 
 TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
+TARGET_LINK_LIBRARIES( tool_test perigee_preprocess perigee_analysis )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
