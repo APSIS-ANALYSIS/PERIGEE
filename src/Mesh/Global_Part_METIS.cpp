@@ -12,9 +12,9 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   field_offset.resize(1);
   field_offset[0] = 0;
 
-  const idx_t nElem   = in_nelem;
-  const idx_t nFunc   = in_nfunc;
-  const idx_t nLocBas = in_nlocbas;
+  const idx_t nElem   = static_cast<idx_t>(in_nelem);
+  const idx_t nFunc   = static_cast<idx_t>(in_nfunc);
+  const idx_t nLocBas = static_cast<idx_t>(in_nlocbas);
   
   if(cpu_size <= 1)
   {
@@ -187,7 +187,7 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
   // The number of elements for an mesh object should be the same.
   // nFunc here is the total number of basis functions, summing over fields
   // nLocBas here is the total number of local basis, summing over fields
-  const idx_t nElem = nelem_list[0];
+  const idx_t nElem = static_cast<idx_t>(nelem_list[0]);
   idx_t nFunc = 0, nLocBas = 0;
 
   for(int ii=0; ii<num_fields; ++ii)
@@ -197,8 +197,8 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
       std::cerr<<"ERROR: mesh list objects are incompatible with nElem list.\n";
       exit(1);
     }
-    nFunc   += nfunc_list[ii];
-    nLocBas += nlocbas_list[ii];
+    nFunc   += static_cast<idx_t>(nfunc_list[ii]);
+    nLocBas += static_cast<idx_t>(nlocbas_list[ii]);
   }
 
   if(isDualGraph)
