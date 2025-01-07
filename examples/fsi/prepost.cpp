@@ -7,8 +7,6 @@
 // ==================================================================
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
-#include "Mesh_Tet.hpp"
-#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -200,32 +198,10 @@ int main( int argc, char * argv[] )
 
   VEC_T::sort_unique_resize( p_node_f ); VEC_T::sort_unique_resize( p_node_s );
 
-  // Generate the mesh for kinematics
-  IMesh * mesh_v = nullptr;
+  const int nLocBas = FE_T::to_nLocBas(elemType);
 
-  // Generate the mesh for pressure (discontinuous over interface)
-  IMesh * mesh_p = nullptr;
-
-  switch( elemType )
-  {
-    case FEType::Tet4:
-      mesh_v = new Mesh_Tet(nFunc_v, nElem, 1);
-      mesh_p = new Mesh_Tet(nFunc_p, nElem, 1);
-      break;
-    case FEType::Hex8:
-      mesh_v = new Mesh_FEM(nFunc_v, nElem, 8, 1);
-      mesh_p = new Mesh_FEM(nFunc_p, nElem, 8, 1);
-      break;
-    default:
-      SYS_T::print_fatal("Error: elemType %s is not supported when generating the mesh.\n", elemType_str.c_str());
-      break;
-  }
-
-  std::vector<IMesh const *> mlist;
-  mlist.push_back(mesh_p); mlist.push_back(mesh_v);
-
-  mlist[0]->print_info();
-  mlist[1]->print_info();
+  SYS_T::print_fatal_if( IEN_v->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN_v %d classes do not match. \n", nLocBas, IEN_v->get_nLocBas() );
+  SYS_T::print_fatal_if( IEN_p->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN_p %d classes do not match. \n", nLocBas, IEN_p->get_nLocBas() );
 
   std::cout<<"Fluid domain: "<<v_node_f.size()<<" nodes.\n";
   std::cout<<"Solid domain: "<<v_node_s.size()<<" nodes.\n";
@@ -234,15 +210,20 @@ int main( int argc, char * argv[] )
   std::vector<IIEN const *> ienlist;
   ienlist.push_back(IEN_p); ienlist.push_back(IEN_v);
 
+  const std::vector<int> nelem_list{ nElem, nElem };
+  const std::vector<int> nfunc_list{ nFunc_p, nFunc_v };
+  const std::vector<int> nlocbas_list{ nLocBas, nLocBas };
+
   // Partition the mesh
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
   {
     global_part = new Global_Part_METIS( num_fields, cpu_size, in_ncommon, isDualGraph,
-        mlist, ienlist, "post_epart", "post_npart" );
+        nelem_list, nfunc_list, nlocbas_list, ienlist, "post_epart", "post_npart" );
   }
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( num_fields, mlist, "post_epart", "post_npart" );
+    global_part = new Global_Part_Serial( num_fields, nelem_list, nfunc_list,
+        "post_epart", "post_npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Re-ordering nodal indices
@@ -258,12 +239,12 @@ int main( int argc, char * argv[] )
   {
     // list stores the number of velo/pres nodes in each cpu
     list_nn_p[proc_rank] = 0; list_nn_v[proc_rank] = 0;
-    for(int nn=0; nn<mesh_p -> get_nFunc(); ++nn)
+    for(int nn=0; nn<nFunc_p; ++nn)
     {
       if(global_part->get_npart(nn,0) == proc_rank) list_nn_p[proc_rank] += 1;
     }
 
-    for(int nn=0; nn<mesh_v -> get_nFunc(); ++nn)
+    for(int nn=0; nn<nFunc_v; ++nn)
     {
       if(global_part->get_npart(nn,1) == proc_rank) list_nn_v[proc_rank] += 1;
     }
@@ -306,14 +287,14 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     
-    IPart * part_p = new Part_FEM_FSI( mesh_p, global_part, mnindex_p, IEN_p,
+    IPart * part_p = new Part_FEM_FSI( nElem, nFunc_p, nLocBas, global_part, mnindex_p, IEN_p,
         ctrlPts, phy_tag, p_node_f, p_node_s, proc_rank, cpu_size, elemType,
         start_idx_p[proc_rank], {0, dof_fields[0], false, "pressure"} );
 
     part_p -> write( part_file_p );
     delete part_p;
 
-    IPart * part_v = new Part_FEM_FSI( mesh_v, global_part, mnindex_v, IEN_v,
+    IPart * part_v = new Part_FEM_FSI( nElem, nFunc_v, nLocBas, global_part, mnindex_v, IEN_v,
         ctrlPts, phy_tag, v_node_f, v_node_s, proc_rank, cpu_size, elemType,
         start_idx_v[proc_rank], {1, dof_fields[1], true, "velocity"} );
 
@@ -325,7 +306,7 @@ int main( int argc, char * argv[] )
   }
 
   // Clean up Memory
-  delete mnindex_p; delete mnindex_v; delete mesh_p; delete mesh_v;
+  delete mnindex_p; delete mnindex_v;
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part;
   return EXIT_SUCCESS;
 }
