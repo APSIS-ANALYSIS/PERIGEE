@@ -4,10 +4,10 @@
 int main( int argc, char * argv[] )
 {
   const FEType type = FEType::Hex27; 
-  const int nqp_vol = 216;
-  const int nqp_sur = 36;
-  const int nqp_vol_1D = 6;
-  const int nqp_sur_1D = 6;
+  const int nqp_vol = 8;
+  const int nqp_sur = 4;
+  const int nqp_vol_1D = 2;
+  const int nqp_sur_1D = 2;
 
   FEAElement * elementv = nullptr;
   FEAElement * elements = nullptr;
@@ -26,9 +26,6 @@ int main( int argc, char * argv[] )
   }
   else if( type == FEType::Tet10 )
   {
-    SYS_T::print_fatal_if( nqp_vol < 29, "Error: not enough quadrature points for tets.\n" );
-    SYS_T::print_fatal_if( nqp_sur < 13, "Error: not enough quadrature points for triangles.\n" );
-
     elementv = new FEAElement_Tet10( nqp_vol ); // elem type Tet10
     elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
     quadv = new QuadPts_Gauss_Tet( nqp_vol );
@@ -36,9 +33,6 @@ int main( int argc, char * argv[] )
   }
   else if( type == FEType::Hex8 )
   {
-    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
-
     elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type Hex8
     elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
@@ -46,9 +40,6 @@ int main( int argc, char * argv[] )
   }
   else if( type == FEType::Hex27 )
   {
-    SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
-
     elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type Hex27
     elements = new FEAElement_Quad9_3D_der0( nqp_sur_1D * nqp_sur_1D );
     quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
@@ -57,23 +48,19 @@ int main( int argc, char * argv[] )
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // print the information of element and quadrature rule
-  elementv->print_info();
-  //quadv->print_info();
-  //quads->print_info();
+  //elementv->print_info();
+  quadv->print_info();
 
   // new appraoch
-  const auto ev = ElementFactory::createVolumeElement( type, nqp_vol );
+  auto qv = QuadPtsFactory::createVolQuadrature(type, nqp_vol);
+  qv -> print_info();
 
-  ev -> print_info();
+  quads->print_info();
+  auto qs = QuadPtsFactory::createSurQuadrature(type, nqp_sur);
+  qs->print_info();
 
-  std::cout<<elementv->get_nLocBas()<<'\t'<<FE_T::to_nLocBas(type)<<'\n';
-  std::cout<<elementv->get_numQuapts()<<'\t'<<ev->get_numQuapts()<<'\n';
-
-  elements->print_info();
-  const auto es = ElementFactory::createSurfaceElement( type, nqp_sur );
-  es -> print_info();
-  std::cout<<elements->get_nLocBas()<<'\t'<<es->get_nLocBas()<<'\n';
-  std::cout<<elements->get_numQuapts()<<'\t'<<es->get_numQuapts()<<'\n';
+  auto qq = QuadPtsFactory::createVisQuadrature(type);
+  qq->print_info();
 
   delete elementv; delete elements; delete quadv; delete quads;
   return EXIT_SUCCESS;
