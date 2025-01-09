@@ -93,14 +93,12 @@ int main( int argc, char * argv[] )
   ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
   
   AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
-  
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
  
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
   
   APart_Node * pNode = new APart_Node(part_file, rank);
   
-  SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(), "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != APart_Basic_Info::get_cpu_size(part_file, rank), "Error: number of processors does not match with prepost! \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
 
@@ -182,7 +180,7 @@ int main( int argc, char * argv[] )
     delete [] solArrays[ii];
   delete [] solArrays;
   
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete locElem;
+  delete fNode; delete locIEN; delete GMIptr; delete locElem;
   delete pNode; delete quad; delete element; delete visprep; delete vtk_w;
   PetscFinalize();
   return EXIT_SUCCESS;

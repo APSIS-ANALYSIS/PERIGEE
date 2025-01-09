@@ -95,9 +95,7 @@ int main( int argc, char * argv[] )
     SYS_T::execute("rm -rf VIS_F_.pvd");
   }
   
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
-
-  SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(), "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != APart_Basic_Info::get_cpu_size(part_v_file, 0), "Error: number of processors does not match with prepost! \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned.", size);
 
@@ -200,7 +198,7 @@ int main( int argc, char * argv[] )
   // Clean up memory
   delete quad; delete element; delete visprep;
   delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p;
-  delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;
+  delete locElem; delete pNode_v; delete pNode_p;
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
   delete [] pointArrays; delete vtk_w;
   PetscFinalize();

@@ -197,8 +197,6 @@ int main( int argc, char *argv[] )
 
   ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
 
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, rank);
-
   ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
 
   APart_Node * pNode_v = new APart_Node_FSI(part_v_file, rank);
@@ -229,7 +227,7 @@ int main( int argc, char *argv[] )
   std::vector<APart_Node *> pNode_m_list { pNode_v };
 
   // ===== Basic Checking =====
-  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+  SYS_T::print_fatal_if( size!= APart_Basic_Info::get_cpu_size(part_v_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
@@ -406,7 +404,7 @@ int main( int argc, char *argv[] )
 
   // ==========================================================================
   // Clean the memory
-  delete fNode; delete locIEN_v; delete locIEN_p; delete PartBasic; delete locElem;
+  delete fNode; delete locIEN_v; delete locIEN_p; delete locElem;
   delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; 
   delete locnbc_v; delete locnbc_p;
   delete ps_data; delete quadv; delete quads; delete elementv; delete elements;
