@@ -1,15 +1,24 @@
 #include "PLocAssem_Transport_GenAlpha.hpp"
 
 PLocAssem_Transport_GenAlpha::PLocAssem_Transport_GenAlpha(
+    const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const double &in_rho, const double &in_cap, const double &in_kappa,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nlocbas, const int &in_snlocbas, 
     const int &in_num_ebc_fun )
-: rho( in_rho ), cap( in_cap ), kappa( in_kappa ), 
-  alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), num_ebc_fun( in_num_ebc_fun ),
-  nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-  vec_size( in_nlocbas ), sur_size( in_snlocbas )
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s), 
+  elementv( ElementFactory::createVolElement(elemType, nqpv) ),
+  elements( ElementFactory::createSurElement(elemType, nqps) ),
+  quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
+  quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
+  rho( in_rho ), cap( in_cap ), kappa( in_kappa ), 
+  alpha_f(tm_gAlpha->get_alpha_f()),
+  alpha_m(tm_gAlpha->get_alpha_m()),
+  gamma(tm_gAlpha->get_gamma()), 
+  num_ebc_fun( in_num_ebc_fun ),
+  nLocBas( elementv->get_nLocBas() ), 
+  snLocBas(elements->get_nLocBas() ),
+  vec_size( nLocBas ), 
+  sur_size( snLocBas )
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -42,15 +51,7 @@ void PLocAssem_Transport_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional transport equation: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 10)
-    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
-  else if(nLocBas == 27)
-    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
+  elementv->print_info();
   SYS_T::commPrint("  Spatial: finite element \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Consistent tangent matrix used. \n");
@@ -61,15 +62,11 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  const int nqp = quad -> get_num_quadPts();
-
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
   
   const double curr = time + alpha_f * dt;
 
@@ -77,13 +74,13 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -97,7 +94,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quad->get_qw(qua);
     
     const double ff = get_f(coor, curr);
 
@@ -113,15 +110,11 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol,
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  const int nqp = quad -> get_num_quadPts();
-  
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
   
   const double curr = time + alpha_f * dt;
 
@@ -129,13 +122,13 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -149,7 +142,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quad->get_qw(qua);
     
     const double ff = get_f(coor, curr);
 
@@ -173,15 +166,11 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
 
 void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  const int nqp = quad -> get_num_quadPts();
-  
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = 0.0;
 
@@ -189,12 +178,12 @@ void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u_x = 0.0, u_y = 0.0, u_z = 0.0;
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -207,7 +196,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quad->get_qw(qua);
 
     const double ff = get_f(coor, curr);
 
@@ -226,26 +215,22 @@ void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
 void PLocAssem_Transport_GenAlpha::Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_sur_Residual();
 
   const double curr = time + alpha_f * dt;
 
-  for(int qua=0; qua < face_nqp; ++qua)
+  for(int qua=0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
