@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 
   // number of quadrature points
   int nqp_vol = 5, nqp_sur = 4;
-  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
@@ -87,8 +86,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-kap", kap);
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
-  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
-  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionBool("-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
@@ -115,8 +112,6 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
   SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
-  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
-  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   if( is_backward_Euler )
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
@@ -207,9 +202,8 @@ int main(int argc, char *argv[])
 
   // ===== Local Assembly Routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Transport_GenAlpha(
-      rho, cap, kap, tm_galpha_ptr,
-      elementv->get_nLocBas(), elements->get_nLocBas(), 
-      locebc -> get_num_ebc());
+      GMIptr->get_elemType(), nqp_vol, nqp_sur,
+      rho, cap, kap, tm_galpha_ptr, locebc -> get_num_ebc());
 
   // ===== Initial condition =====
   PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
@@ -272,8 +266,8 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, fNode, locnbc, locebc );
+    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr,
+        locIEN, fNode, locnbc, locebc );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
   
@@ -305,8 +299,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol,
       tm_galpha_ptr, timeinfo, locElem, locIEN, pNode, fNode,
-      locnbc, locebc, pmat, elementv, elements, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+      locnbc, locebc, pmat, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();

@@ -316,6 +316,16 @@ class IPGAssem
         const SI_T::SI_quad_point * const &SI_qp )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &sol,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
@@ -583,6 +593,19 @@ class IPGAssem
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    virtual void Assem_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
@@ -854,6 +877,19 @@ class IPGAssem
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const double &curr_time,
+        const double &dt,
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        const ALocal_IEN * const &lien_ptr,
+        const FEANode * const &fnode_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
     // Assembly boundary integrals
