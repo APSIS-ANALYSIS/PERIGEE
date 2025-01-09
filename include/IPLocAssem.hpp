@@ -174,6 +174,15 @@ class IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
+
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
         const double * const &mvelo,
         const double * const &mdisp,
         FEAElement * const &element,
@@ -229,6 +238,17 @@ class IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
+        const double * const &mvelo,
+        const double * const &mdisp,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
+
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &vec_a,
+        const double * const &vec_b,
         FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
@@ -262,6 +282,13 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
 
+    virtual void Assem_Mass_Residual(
+        const double * const &vec_b,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Mass_Residual(...) is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // Perform Elemental BC surface integration for elemental BC id ebc_id.
     // Based on ebc_id, the traction forcing function will be called accordingly
@@ -278,6 +305,14 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC is not implemented.\n");}
+
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC is not implemented.\n");}
 
     virtual void Assem_Residual_EBC(
