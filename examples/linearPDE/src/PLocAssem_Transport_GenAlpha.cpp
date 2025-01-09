@@ -66,7 +66,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
 {
-  elementv->buildBasis( quadv, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
   
   const double curr = time + alpha_f * dt;
 
@@ -94,7 +94,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
-    const double gwts = elementv->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
     
     const double ff = get_f(coor, curr);
 
@@ -114,7 +114,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
 {
-  elementv->buildBasis( quadv, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
   
   const double curr = time + alpha_f * dt;
 
@@ -142,7 +142,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
-    const double gwts = elementv->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
     
     const double ff = get_f(coor, curr);
 
@@ -170,7 +170,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
 {
-  elementv->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = 0.0;
 
@@ -196,7 +196,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Mass_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = elementv->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const double ff = get_f(coor, curr);
 
@@ -219,7 +219,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual_EBC(
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z )
 {
-  elements->buildBasis( quads, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_sur_Residual();
 
@@ -243,7 +243,7 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual_EBC(
 
     const double gg = get_ebc_fun( ebc_id, coor, curr );
 
-    const double gwts = surface_area * quad -> get_qw( qua );
+    const double gwts = surface_area * quads -> get_qw( qua );
 
     for(int A=0; A<snLocBas; ++A)
       sur_Residual[A] -= gwts * R[A] * gg;

@@ -238,8 +238,6 @@ class IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
-        const double * const &mvelo,
-        const double * const &mdisp,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z )

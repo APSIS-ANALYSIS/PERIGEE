@@ -314,7 +314,7 @@ int main(int argc, char *argv[])
   delete tsolver; delete nsolver;
   delete lsolver; delete gloAssem_ptr; delete dot_sol; delete timeinfo;
   delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
-  delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
+  delete locnbc; delete locebc;
   delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;
   PetscFinalize();
   return EXIT_SUCCESS;
