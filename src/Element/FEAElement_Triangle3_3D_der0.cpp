@@ -9,8 +9,8 @@ FEAElement_Triangle3_3D_der0::FEAElement_Triangle3_3D_der0(
 void FEAElement_Triangle3_3D_der0::print_info() const
 {
   SYS_T::commPrint("Triangle3_3D_der0: ");
-  SYS_T::commPrint("Three-node triangle element with no derivative evaluated.\n ");
-  SYS_T::commPrint("Note: This element is designed for natural BC integrals.\n ");
+  SYS_T::commPrint("Three-node triangle element with no derivative evaluated.\n");
+  SYS_T::commPrint("Note: This element is designed for natural BC integrals.\n");
 }
 
 void FEAElement_Triangle3_3D_der0::buildBasis( const IQuadPts * const &quad,
