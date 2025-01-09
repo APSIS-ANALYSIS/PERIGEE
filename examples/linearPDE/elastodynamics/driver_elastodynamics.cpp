@@ -189,8 +189,6 @@ int main(int argc, char *argv[])
 
   AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
 
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
-
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   APart_Node * pNode = new APart_Node(part_file, rank);
@@ -201,7 +199,7 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
-  SYS_T::print_fatal_if( size != PartBasic->get_cpu_size(),
+  SYS_T::print_fatal_if( size != APart_Basic_Info::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis.\n", size);
@@ -405,7 +403,7 @@ int main(int argc, char *argv[])
 
   delete tsolver; delete nsolver;
   delete lsolver; delete gloAssem_ptr; delete dot_disp; delete dot_velo; delete timeinfo;
-  delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode; delete PartBasic;
+  delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode;
   delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
   delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete disp; delete velo;
   PetscFinalize();

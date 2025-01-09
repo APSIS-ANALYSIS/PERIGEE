@@ -53,13 +53,11 @@ int main( int argc, char * argv[] )
 
   AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
 
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
-
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  SYS_T::print_fatal_if( size != PartBasic->get_cpu_size(),
+  SYS_T::print_fatal_if( size != APart_Basic_Info::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
@@ -135,7 +133,7 @@ int main( int argc, char * argv[] )
   SYS_T::commPrint("Error in H1 norm is : %e \n", H1_error);
 
   delete elementv; delete quadv; delete locElem; delete pNode;
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
+  delete fNode; delete locIEN; delete GMIptr;
   delete [] IEN_e; IEN_e = nullptr;
   delete [] ectrl_x; ectrl_x = nullptr;
   delete [] ectrl_y; ectrl_y = nullptr;
