@@ -106,6 +106,9 @@ class IPGAssem
     // ! Assem_nonzero_estimate : Assembly nonzero estimate matrix for K.
     //                            Insert 1.0 to every possible nonzero locations.
     // ------------------------------------------------------------------------
+    virtual void Assem_nonzero_estimate( IPLocAssem * const &lassem_ptr )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -318,12 +321,7 @@ class IPGAssem
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
+        IPLocAssem * const &lassem_ptr );
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -599,12 +597,7 @@ class IPGAssem
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
+        IPLocAssem * const &lassem_ptr )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -883,12 +876,7 @@ class IPGAssem
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
+        IPLocAssem * const &lassem_ptr )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------

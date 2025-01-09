@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
       GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr, locIEN, locnbc );
+  gloAssem_ptr->Assem_nonzero_estimate( locAssem_ptr );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -266,8 +266,7 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr,
-        locIEN, fNode, locnbc, locebc );
+    gloAssem_ptr->Assem_mass_residual( sol, locAssem_ptr );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
   
