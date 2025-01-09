@@ -33,12 +33,6 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
     const TimeMethod_GenAlpha * const &tmga_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
     const Matrix_PETSc * const &bc_mat,
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
@@ -78,8 +72,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
     gassem_ptr->Clear_KG();
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
-        curr_time, dt, alelem_ptr, lassem_ptr,
-        lien_ptr, feanode_ptr, nbc_part, ebc_part );
+        curr_time, dt, lassem_ptr );
 
     SYS_T::commPrint("  --- M updated");
 
@@ -92,8 +85,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
     gassem_ptr->Clear_G();
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,
-        curr_time, dt, alelem_ptr, lassem_ptr,
-        lien_ptr, feanode_ptr, nbc_part, ebc_part );
+        curr_time, dt, lassem_ptr );
   }
 
   VecNorm( gassem_ptr->G, NORM_2, &initial_norm );
@@ -123,8 +115,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
       gassem_ptr->Clear_KG();
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
-          curr_time, dt, alelem_ptr, lassem_ptr,
-          lien_ptr, feanode_ptr, nbc_part, ebc_part );
+          curr_time, dt, lassem_ptr );
 
       SYS_T::commPrint("  --- M updated");
       lsolver_ptr->SetOperator(gassem_ptr->K);
@@ -134,8 +125,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
       gassem_ptr->Clear_G();
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,
-          curr_time, dt, alelem_ptr, lassem_ptr,
-          lien_ptr, feanode_ptr, nbc_part, ebc_part );
+          curr_time, dt, lassem_ptr );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);

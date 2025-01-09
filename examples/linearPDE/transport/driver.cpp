@@ -298,8 +298,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, locElem, locIEN, pNode, fNode,
-      locnbc, locebc, pmat, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+      tm_galpha_ptr, timeinfo, pmat, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
 
   // ===== Print complete solver info =====
   lsolver -> print_info();

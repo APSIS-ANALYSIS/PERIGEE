@@ -25,10 +25,7 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
     // Nonzero pattern estimate
     virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const ALocal_NBC * const &nbc_part );
+        IPLocAssem * const &lassem_ptr );
 
     // Assembly the residual vector
     virtual void Assem_residual(
@@ -36,12 +33,7 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        IPLocAssem * const &lassem_ptr );
 
     // Assembly the residual vector and tangent matrix 
     virtual void Assem_tangent_residual(
@@ -49,22 +41,13 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        IPLocAssem * const &lassem_ptr );
 
     // Assembly the residual and mass matrix
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol,
         const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        IPLocAssem * const &lassem_ptr );
 
   private:
     // Private data
@@ -78,9 +61,7 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
     // Natural boundary condition
     void NatBC_G( const double &curr_time, const double &dt,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        IPLocAssem * const &lassem_ptr );
 
     void GetLocal( const double * const &array, const int * const &IEN,
         double * const &local_array ) const

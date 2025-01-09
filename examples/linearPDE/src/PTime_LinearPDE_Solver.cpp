@@ -54,12 +54,6 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const PDNSolution * const &init_sol,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
     const Matrix_PETSc * const &bc_mat,
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
@@ -107,9 +101,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_Transport( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        pre_dot_sol, pre_sol, tmga_ptr,
-        alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part,
-        ebc_part, bc_mat, lassem_ptr,
+        pre_dot_sol, pre_sol, tmga_ptr, bc_mat, lassem_ptr,
         gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
 
     // Update the time step information
