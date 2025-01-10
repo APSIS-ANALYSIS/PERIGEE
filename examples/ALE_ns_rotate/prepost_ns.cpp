@@ -28,7 +28,7 @@ int main( int argc, char * argv[] )
 
   HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
 
-  std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
+  std::string fixed_geo_file = cmd_h5r -> read_string("/", "fixed_geo_file");
   std::string rotated_geo_file = cmd_h5r -> read_string("/", "rotated_geo_file");
 
   const std::string elemType_str = cmd_h5r -> read_string("/","elemType");
@@ -57,21 +57,21 @@ int main( int argc, char * argv[] )
   else cout<<" -METIS_isDualGraph: false \n";
   cout<<"----------------------------------\n";
   cout<<"part_file: "<<part_file<<endl;
-  cout<<"geo_file: "<<geo_file<<endl;
+  cout<<"fixed_geo_file: "<<fixed_geo_file<<endl;
   cout<<"rotated_geo_file: "<<rotated_geo_file<<endl;
   cout<<"elemType: "<<elemType_str<<endl;
   cout<<"dof_num: "<<dofNum<<endl;
 
-  // Read the geo_file
+  // Read the fixed_geo_file
   int nFunc, nElem;
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
   // Check if the given geo file exist
-  SYS_T::file_check( geo_file );
+  SYS_T::file_check( fixed_geo_file );
   SYS_T::file_check( rotated_geo_file );
 
-  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(fixed_geo_file, nFunc, nElem, ctrlPts, vecIEN);
   const int fixed_nFunc = nFunc;  
 
   int rotated_nFunc, rotated_nElem;
