@@ -16,7 +16,9 @@
 class Part_FEM_Rotated : public Part_FEM
 {
   public:
-    Part_FEM_Rotated( const IMesh * const &mesh,
+    Part_FEM_Rotated( const int &in_nelem,
+        const int &in_nfunc,
+        const int &in_nlocbas,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
