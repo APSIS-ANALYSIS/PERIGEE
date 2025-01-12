@@ -10,7 +10,7 @@
 // ==================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "APart_Node_Rotated.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
@@ -311,7 +311,7 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
-  SYS_T::print_fatal_if( size!= APart_Basic_Info::get_cpu_size(part_file, rank),
+  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
