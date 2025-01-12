@@ -1,4 +1,4 @@
-#ifndef ANL_TOLLS_HPP
+#ifndef ANL_TOOLS_HPP
 #define ANL_TOOLS_HPP
 // ==================================================================
 // ANL_Tools.hpp
@@ -13,16 +13,6 @@
 
 namespace ANL_T
 {
-    int get_cpu_rank(const std::string &fbasename, const int &in_rank)
-    {
-      return get_int_data(fbasename, in_rank, "Part_Info", "cpu_rank");
-    }
-
-    int get_cpu_size(const std::string &fbasename, const int &in_rank)
-    {
-      return get_int_data(fbasename, in_rank, "Part_Info", "cpu_size");
-    }
-
     int get_int_data(const std::string &fbasename, const int &in_rank, 
         const std::string &partname, const std::string &dataname )
     {
@@ -36,6 +26,16 @@ namespace ANL_T
 
       H5Fclose(file_id);
       return val;
+    }
+
+    int get_cpu_rank(const std::string &fbasename, const int &in_rank)
+    {
+      return get_int_data(fbasename, in_rank, "Part_Info", "cpu_rank");
+    }
+
+    int get_cpu_size(const std::string &fbasename, const int &in_rank)
+    {
+      return get_int_data(fbasename, in_rank, "Part_Info", "cpu_size");
     }
 
 } // END OF ANL_T

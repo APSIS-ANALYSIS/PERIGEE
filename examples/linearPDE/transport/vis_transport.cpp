@@ -6,7 +6,7 @@
 // Date Created: Nov. 4 2023
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_tet10.hpp"
 #include "QuadPts_vis_hex8.hpp"
@@ -91,7 +91,7 @@ int main( int argc, char * argv[] )
 
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  SYS_T::print_fatal_if(size != APart_Basic_Info::get_cpu_size(part_file, rank), "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != ANL_T::get_cpu_size(part_file, rank), "Error: number of processors does not match with prepost! \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
 
