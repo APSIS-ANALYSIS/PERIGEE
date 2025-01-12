@@ -6,7 +6,7 @@
 // Date: Jan 18 2022
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "ALocal_Elem.hpp"
 #include "APart_Node_FSI.hpp"
 #include "QuadPts_vis_tet4.hpp"
@@ -100,7 +100,7 @@ int main ( int argc , char * argv[] )
     SYS_T::execute("rm -rf VIS_S_.pvd");
   }
   
-  SYS_T::print_fatal_if(size != APart_Basic_Info::get_cpu_size(part_v_file, 0), "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != ANL_T::get_cpu_size(part_v_file, 0), "Error: number of processors does not match with prepost! \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned.", size);
 

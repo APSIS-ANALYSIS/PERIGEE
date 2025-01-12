@@ -7,7 +7,7 @@
 // ============================================================================
 #include "HDF5_Tools.hpp"
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "APart_Node_FSI.hpp"
 #include "PGAssem_Wall_Prestress.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
@@ -227,7 +227,7 @@ int main( int argc, char *argv[] )
   std::vector<APart_Node *> pNode_m_list { pNode_v };
 
   // ===== Basic Checking =====
-  SYS_T::print_fatal_if( size!= APart_Basic_Info::get_cpu_size(part_v_file, rank),
+  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_v_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
