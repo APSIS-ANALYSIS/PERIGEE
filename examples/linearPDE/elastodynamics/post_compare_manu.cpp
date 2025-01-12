@@ -6,7 +6,6 @@
 // Data: Oct. 25 2023
 // ==================================================================
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
 #include "APart_Node.hpp"
@@ -57,7 +56,7 @@ int main( int argc, char * argv[] )
 
   APart_Node * pNode = new APart_Node(part_file, rank);
 
-  SYS_T::print_fatal_if( size != APart_Basic_Info::get_cpu_size(part_file, rank),
+  SYS_T::print_fatal_if( size != ANL_T::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
