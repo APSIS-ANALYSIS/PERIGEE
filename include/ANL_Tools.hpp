@@ -15,19 +15,16 @@ namespace ANL_T
 {
     int get_cpu_rank(const std::string &fbasename, const int &in_rank)
     {
-      const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
-
-      hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
-
-      auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
-
-      const int cpu_rank = h5r->read_intScalar("Part_Info", "cpu_rank");
-
-      H5Fclose(file_id);
-      return cpu_rank;
+      return get_int_data(fbasename, in_rank, "Part_Info", "cpu_rank");
     }
 
     int get_cpu_size(const std::string &fbasename, const int &in_rank)
+    {
+      return get_int_data(fbasename, in_rank, "Part_Info", "cpu_size");
+    }
+
+    int get_int_data(const std::string &fbasename, const int &in_rank, 
+        const std::string &partname, const std::string &dataname )
     {
       const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
 
@@ -35,10 +32,10 @@ namespace ANL_T
 
       auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
-      const int cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
+      const int val = h5r->read_intScalar(partname.c_str(), dataname.c_str());
 
       H5Fclose(file_id);
-      return cpu_size;
+      return val;
     }
 
 } // END OF ANL_T
