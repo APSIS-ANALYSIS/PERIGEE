@@ -34,7 +34,6 @@
 // ==================================================================
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
-#include "SymmTensor2_3D.hpp"
 #include "hdf5.h"
 
 class HDF5_Reader
@@ -91,15 +90,15 @@ class HDF5_Reader
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
-    // ! read_Vector_3 : output the Vector_3 object.
+    // ! read_Vector_3 : output the std::array<double, 3>.
     // --------------------------------------------------------------
-    Vector_3 read_Vector_3( const char * const &group_name,
+    std::array<double, 3> read_Vector_3(const char* const& group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
-    // ! read_Tensor2_3D : output the Tensor2_3D object.
+    // ! read_Tensor2_3D : output the std::array<double, 9>.
     // --------------------------------------------------------------
-    Tensor2_3D read_Tensor2_3D( const char * const &group_name,
+    std::array<double, 9> read_Tensor2_3D(const char* const& group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
