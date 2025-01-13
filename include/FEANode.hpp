@@ -19,6 +19,7 @@
 // Date Modified: Jan. 20 2017 
 // ============================================================================
 #include "HDF5_Reader.hpp"
+#include "Vector_3.hpp"
 
 class FEANode
 {
