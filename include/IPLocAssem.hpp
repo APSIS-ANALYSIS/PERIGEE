@@ -15,6 +15,7 @@
 // ============================================================================
 #include "FEAElement.hpp"
 #include "ALocal_IEN.hpp"
+#include "SymmTensor2_3D.hpp"
 
 class IPLocAssem
 {
