@@ -79,8 +79,16 @@ int main(int argc, char *argv[])
   // back flow stabilization
   double bs_beta = 0.2;
 
+  // time scheme
+  std::string time_scheme("Generalized-alpha");
+  // std::string time_scheme("HERK");
+  
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
+
+  // RK parameters
+  int RK_order = 3;
+  int RK_stages = 3;
 
   // part file location
   std::string part_file("part");
@@ -138,6 +146,9 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
   SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
+  SYS_T::GetOptionString("-time_scheme", time_scheme);
+  SYS_T::GetOptionInt("-RK_order", RK_order);
+  SYS_T::GetOptionInt("-RK_stages", RK_stages);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
@@ -310,11 +321,10 @@ int main(int argc, char *argv[])
     // inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
     //     inflow_file );
     // dot_inflow_rate_ptr = new CVFlowRateDot_Sine2Zero( inflow_thd_time, inflow_TI_perturbation, 
-    //     inflow_file );
+    //     dot_inflow_file );
 
     inflow_rate_ptr = new CVFlowRate_Cosine2Steady( 1, inflow_thd_time, inflow_tgt_rate, inflow_TI_perturbation );
     dot_inflow_rate_ptr = new CVFlowRateDot_Sine2Zero( 1, inflow_thd_time, inflow_tgt_rate, inflow_TI_perturbation );
-
   }
 
   inflow_rate_ptr->print_info();
@@ -384,42 +394,56 @@ int main(int argc, char *argv[])
 
   pmat->gen_perm_bc(pNode, locnbc);
 
-  // ===== Generalized-alpha =====
-  SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
+  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
-      genA_rho_inf, false );
+  Runge_Kutta_Butcher * tm_RK_ptr = nullptr;
 
-  tm_galpha_ptr->print_info();
-
-  //===== RK Butcher Table =====
-  Runge_Kutta_Butcher * tm_RK_ptr = new Runge_Kutta_Butcher(3, 3, false);
-
-  tm_RK_ptr->printCoefficients();
-
-  // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
 
-  locAssem_ptr = new PLocAssem_VMS_NS_HERK(
-    tm_RK_ptr, elementv->get_nLocBas(),
-    quadv->get_num_quadPts(), elements->get_nLocBas(),
-    fluid_density, fluid_mu, GMIptr->get_elemType(), c_ct, c_tauc );
-  
-  // if( locwbc->get_wall_model_type() == 0 )
-  // {
-  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-  //     tm_galpha_ptr, elementv->get_nLocBas(),
-  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
-  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
-  // }
-  // else if( locwbc->get_wall_model_type() == 1 )
-  // {
-  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-  //     tm_galpha_ptr, elementv->get_nLocBas(),
-  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
-  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
-  // }
-  // else SYS_T::print_fatal("Error: Unknown wall model type.\n");
+  if (time_scheme == "Generalized-alpha")
+  {
+    // ===== Generalized-alpha =====
+    SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
+
+    tm_galpha_ptr = new TimeMethod_GenAlpha(
+        genA_rho_inf, false );
+
+    tm_galpha_ptr->print_info();
+
+    // ===== Generalized-alpha Local Assembly routine =====
+    if( locwbc->get_wall_model_type() == 0 )
+    {
+      locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
+        tm_galpha_ptr, elementv->get_nLocBas(),
+        quadv->get_num_quadPts(), elements->get_nLocBas(),
+        fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+    }
+    else if( locwbc->get_wall_model_type() == 1 )
+    {
+      locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
+        tm_galpha_ptr, elementv->get_nLocBas(),
+        quadv->get_num_quadPts(), elements->get_nLocBas(),
+        fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+    }
+    else SYS_T::print_fatal("Error: Unknown wall model type.\n");
+  }
+  else if (time_scheme == "HERK")
+  {
+    //===== RK Butcher Table =====
+    tm_RK_ptr = new Runge_Kutta_Butcher(RK_stages, RK_order, false);
+
+    tm_RK_ptr->printCoefficients();
+
+    // ===== HERK Local Assembly routine =====
+    locAssem_ptr = new PLocAssem_VMS_NS_HERK(
+      tm_RK_ptr, elementv->get_nLocBas(),
+      quadv->get_num_quadPts(), elements->get_nLocBas(),
+      fluid_density, fluid_mu, GMIptr->get_elemType(), c_ct, c_tauc );
+  }
+  else 
+  {
+    SYS_T::print_fatal("Error: Unknown time scheme.\n");
+  }
 
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
@@ -428,7 +452,7 @@ int main(int argc, char *argv[])
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
-  // PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );  // unused
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );  // It is unused in HERK.
 
   PDNSolution * velo = new PDNSolution_V( pNode, 0, 3, true, "velo" );
 
@@ -443,6 +467,8 @@ int main(int argc, char *argv[])
   // solutions[2] = dot_sol;
   // solutions[3] = sol1;
 
+  bool is_generalized_alpha = (time_scheme == "Generalized-alpha");
+
   if( is_restart )
   {
     initial_index = restart_index;
@@ -454,16 +480,22 @@ int main(int argc, char *argv[])
     sol->ReadBinary(restart_name);
 
     // generate the corresponding dot_sol file name
-    // std::string restart_dot_name = "dot_";
-    // restart_dot_name.append(restart_name);
+    std::string restart_dot_name = "dot_";
+    restart_dot_name.append(restart_name);
 
-    // Read dot_sol file
-    // SYS_T::file_check(restart_dot_name);
-    // dot_sol->ReadBinary(restart_dot_name);
+    if (is_generalized_alpha) 
+    {
+      // Read dot_sol file
+      SYS_T::file_check(restart_dot_name);
+      dot_sol->ReadBinary(restart_dot_name);
+    }
 
     SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
     SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    // SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    if (is_generalized_alpha) 
+    {
+      SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    }
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
@@ -507,34 +539,37 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
 
-  // ===== Initialize the dot_sol vector by solving mass matrix =====
-  // if( is_restart == false )
-  // {
-  //   SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-  //   PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-  //       1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+  if (is_generalized_alpha)
+  {
+    // ===== Initialize the dot_sol vector by solving mass matrix =====
+    if( is_restart == false )
+    {
+      SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+      PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+          1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
-  //   KSPSetType(lsolver_acce->ksp, KSPGMRES);
-  //   KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-  //       KSPGMRESModifiedGramSchmidtOrthogonalization);
-  //   KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+      KSPSetType(lsolver_acce->ksp, KSPGMRES);
+      KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+          KSPGMRESModifiedGramSchmidtOrthogonalization);
+      KSPGMRESSetRestart(lsolver_acce->ksp, 500);
 
-  //   PC preproc; lsolver_acce->GetPC(&preproc);
-  //   PCSetType( preproc, PCHYPRE );
-  //   PCHYPRESetType( preproc, "boomeramg" );
+      PC preproc; lsolver_acce->GetPC(&preproc);
+      PCSetType( preproc, PCHYPRE );
+      PCHYPRESetType( preproc, "boomeramg" );
 
-  //   gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-  //       elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
+      gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
+          elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
 
-  //   lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+      lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
-  //   dot_sol -> ScaleValue(-1.0);
+      dot_sol -> ScaleValue(-1.0);
 
-  //   SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-  //   lsolver_acce -> print_info();
-  //   delete lsolver_acce;
-  //   SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  // }
+      SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+      lsolver_acce -> print_info();
+      delete lsolver_acce;
+      SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
+    }
+  }
 
   // ===== Linear solver context =====
   PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
@@ -632,18 +667,29 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====
-  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  if (time_scheme == "Generalized-alpha")
+  {  
+    SYS_T::commPrint("===> Start Finite Element Analysis Using Generalized-alpha:\n");
 
-  // tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
-  //     tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-  //     locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
-  //     locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+    tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
+        tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+        locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
+        locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+  }
+  else if (time_scheme == "HERK")
+  {
+    SYS_T::commPrint("===> Start Finite Element Analysis Using HERK:\n");
 
-  tsolver->TM_NS_HERK(is_restart, base, dot_base, sol, velo, dot_velo, pres,
-      tm_RK_ptr, timeinfo, inflow_rate_ptr, dot_inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
-      locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
-
+    tsolver->TM_NS_HERK(is_restart, base, dot_base, sol, velo, dot_velo, pres,
+        tm_RK_ptr, timeinfo, inflow_rate_ptr, dot_inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+        locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
+        locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+  }
+  else 
+  {
+    SYS_T::print_fatal("Error: The time scheme for the finite element analysis is unknown.\n");
+  }
+  
   // ===== Print complete solver info =====
   lsolver -> print_info();
 
