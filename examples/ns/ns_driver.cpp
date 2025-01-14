@@ -595,8 +595,15 @@ int main(int argc, char *argv[])
   // ===== Outlet data recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
-    // const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-    //     dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+    double dot_lpn_flowrate = 0.0;  
+
+    if (is_generalized_alpha) 
+    {
+      const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+          dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+
+      dot_lpn_flowrate = dot_face_flrate;
+    }
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
         sol, locAssem_ptr, elements, quads, locebc, ff );
@@ -607,10 +614,8 @@ int main(int argc, char *argv[])
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
 
-    // const double dot_lpn_flowrate = dot_face_flrate;
     const double lpn_flowrate = face_flrate;
-    const double dot_lpn_flowrate = 0.0; 
-    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() ); // dot_lpn_flowrate is useless
+    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() ); // dot_lpn_flowrate is useless for HERK
 
     // Create the txt files and write the initial flow rates
     if(rank == 0)
@@ -696,12 +701,11 @@ int main(int argc, char *argv[])
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete PartBasic;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
+  delete tm_galpha_ptr; delete tm_RK_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
   delete quads; delete quadv; delete inflow_rate_ptr; delete dot_inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete dot_base; delete sol; delete velo; delete dot_velo; 
-  delete pres; delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
-
-  delete tm_RK_ptr;
+  delete base; delete dot_base; delete sol; delete dot_sol; delete velo; delete dot_velo; delete pres; 
+  delete locAssem_ptr; delete gloAssem_ptr; 
+  delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;
