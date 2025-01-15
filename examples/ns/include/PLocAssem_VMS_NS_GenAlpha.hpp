@@ -168,85 +168,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
-    virtual void Assem_Tangent_Residual_Substep_Init(
-        const double &time, const double &dt,
-        const int &subindex,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
-        const std::vector<std::vector<double>>& cur_velo_sols,
-        const std::vector<std::vector<double>>& cur_pres_sols,
-        const std::vector<std::vector<double>>& pre_velo_sols,
-        const std::vector<std::vector<double>>& pre_pres_sols,
-        const std::vector<double>& pre_velo,
-        const std::vector<double>& pre_velo_before,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_Laststep_Init(
-        const double &time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
-        const std::vector<std::vector<double>>& cur_velo_sols,
-        const std::vector<double>& cur_velo,
-        const std::vector<std::vector<double>>& cur_pres_sols,
-        const std::vector<std::vector<double>>& pre_velo_sols,
-        const std::vector<double>& pre_velo,
-        const std::vector<std::vector<double>>& pre_pres_sols,
-        const std::vector<double>& pre_velo_before,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_Substep(
-        const double &time, const double &dt,
-        const int &subindex,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
-        const std::vector<std::vector<double>>& cur_velo_sols,
-        const std::vector<std::vector<double>>& cur_pres_sols,
-        const std::vector<std::vector<double>>& pre_velo_sols,
-        const std::vector<std::vector<double>>& pre_pres_sols,
-        const std::vector<double>& pre_velo,
-        const std::vector<double>& pre_velo_before,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_Laststep(
-        const double &time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
-        const std::vector<std::vector<double>>& cur_velo_sols,
-        const std::vector<double>& cur_velo,
-        const std::vector<std::vector<double>>& cur_pres_sols,
-        const std::vector<std::vector<double>>& pre_velo_sols,
-        const std::vector<double>& pre_velo,
-        const std::vector<std::vector<double>>& pre_pres_sols,
-        const std::vector<double>& pre_velo_before,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
-    virtual void Assem_Tangent_Residual_Finalstep(
-        const double &time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
-        const std::vector<double>& cur_dot_velo,
-        const std::vector<std::vector<double>>& cur_velo_sols,
-        const std::vector<double>& cur_velo,
-        const std::vector<std::vector<double>>& cur_pres_sols,
-        const std::vector<double>& pre_velo,
-        const std::vector<double>& cur_pres,
-        FEAElement * const &element,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
-
   protected:
     // Private data
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
@@ -273,11 +194,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     // Return tau_m and tau_c in RB-VMS
     std::array<double, 2> get_tau( const double &dt, 
-        const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
-
-    // Return tau_m_dot and tau_c_dot in RB-VMS
-    std::array<double, 2> get_tau_dot( const double &dt, 
         const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
