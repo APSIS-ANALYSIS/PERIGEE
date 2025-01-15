@@ -309,6 +309,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
 
+    bc_mat->MatMultSol( dot_step );
+
     SYS_T::commPrint(" --- substep = %d is solved. \n", ii+1);
 
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
@@ -329,6 +331,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
 
+    bc_mat->MatMultSol( dot_step );
+
     SYS_T::commPrint(" --- laststep is solved. \n");
 
     Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
@@ -348,6 +352,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
 
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
+
+    bc_mat->MatMultSol( dot_step );
 
     SYS_T::commPrint(" --- finalstep is solved. \n");
 
@@ -432,6 +438,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
 
+    bc_mat->MatMultSol( dot_step );
+
     SYS_T::commPrint(" --- substep = %d is solved. \n", ii+1);
 
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
@@ -452,6 +460,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
 
+    bc_mat->MatMultSol( dot_step );
+
     SYS_T::commPrint(" --- laststep is solved. \n");
 
     Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
@@ -471,6 +481,8 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
 
     lsolver_ptr->SetOperator(gassem_ptr->K);
     lsolver_ptr->Solve(gassem_ptr->G, dot_step);
+
+    bc_mat->MatMultSol( dot_step );
 
     SYS_T::commPrint(" --- finalstep is solved. \n");
 
