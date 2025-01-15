@@ -2595,7 +2595,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
   }
 }
 
-double PLocAssem_VMS_NS_HERK::get_flowrate( const double * const &cur_velo,
+double PLocAssem_VMS_NS_HERK::get_flowrate( const double * const &cur_sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -2618,8 +2618,9 @@ double PLocAssem_VMS_NS_HERK::get_flowrate( const double * const &cur_velo,
     Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
     {
-      velo.y() += cur_velo[ii*3+1] * R[ii];
-      velo.z() += cur_velo[ii*3+2] * R[ii];
+      velo.x() += cur_sol[ii*4+1] * R[ii];        
+      velo.y() += cur_sol[ii*4+2] * R[ii];
+      velo.z() += cur_sol[ii*4+3] * R[ii];
     }
 
     flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
@@ -2629,7 +2630,7 @@ double PLocAssem_VMS_NS_HERK::get_flowrate( const double * const &cur_velo,
 }
 
 void PLocAssem_VMS_NS_HERK::get_pressure_area( 
-    const double * const &cur_pres,
+    const double * const &cur_sol,
     FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -2649,7 +2650,7 @@ void PLocAssem_VMS_NS_HERK::get_pressure_area(
     const std::vector<double> R = element->get_R(qua);
 
     double pp = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii) pp += cur_pres[ii] * R[ii];
+    for(int ii=0; ii<snLocBas; ++ii) pp += cur_sol[4*ii+0] * R[ii];
 
     pres += element->get_detJac(qua) * quad->get_qw(qua) * pp;
     area += element->get_detJac(qua) * quad->get_qw(qua);

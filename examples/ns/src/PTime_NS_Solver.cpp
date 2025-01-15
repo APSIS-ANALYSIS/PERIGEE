@@ -338,6 +338,60 @@ void PTime_NS_Solver::TM_NS_HERK(
       cur_sol->WriteBinary(sol_name);
     }
 
+    // Calculate the flow rate & averaged pressure on all outlets
+    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
+    {
+      // Calculate the 3D dot flow rate on the outlet
+      const double dot_face_flrate = 0.0;
+
+      // Calculate the 3D flow rate on the outlet
+      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+
+      // Calculate the 3D averaged pressure on the outlet
+      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
+          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
+
+      // Calculate the 0D pressure from LPN model
+      const double dot_lpn_flowrate = dot_face_flrate;
+      const double lpn_flowrate = face_flrate;
+      const double lpn_pressure = 0.0;
+
+      // Update the initial values in genbc
+      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
+
+      // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
+      // calculated pressure into the txt file, which is first generated in the
+      // driver
+      if( SYS_T::get_MPI_rank() == 0 )
+      {
+        std::ofstream ofile;
+        ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
+        ofile.close();
+      }
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
+   
+    // Calcualte the inlet data
+    for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
+    {
+      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
+          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face ); 
+
+      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
+          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
+
+      if( SYS_T::get_MPI_rank() == 0 )
+      {
+        std::ofstream ofile;
+        ofile.open( infnbc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
+        ofile.close();
+      } 
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
+
     // Prepare for next time step
     pre_velo_before->Copy(pre_velo);
     pre_velo->Copy(cur_velo);
