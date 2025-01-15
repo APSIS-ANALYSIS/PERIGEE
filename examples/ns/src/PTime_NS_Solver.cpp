@@ -246,45 +246,45 @@ void PTime_NS_Solver::TM_NS_HERK(
 {
   const int ss = tm_RK_ptr->get_RK_step();
 
-  // n+1 步的子步速度解
+  // The velo solutions in each sub-step at the (n+1)-th time step
   PDNSolution** cur_velo_sols = new PDNSolution*[ss];
   for(int ii = 0; ii < ss; ++ii)
     cur_velo_sols[ii] = new PDNSolution(*init_velo);
 
-  // n+1 步的终步速度解
+  // The velo solution in the final step at the (n+1)-th time step
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
-  // n+1 步的最终步dot速度解
+  // The dot_velo solution in the final step at the (n+1)-th time step
   PDNSolution * cur_dot_velo = new PDNSolution(*init_dot_velo);
 
-  // n+1 步的子步压强解
+  // The pres solutions in each sub-step at the (n+1)-th time step
   PDNSolution** cur_pres_sols = new PDNSolution*[ss];
   for(int ii = 0; ii < ss; ++ii)
     cur_pres_sols[ii] = new PDNSolution(*init_pres);
 
-  // n+1 步的终步压强解
+  // The pres solution in the final step at the (n+1)-th time step
   PDNSolution * cur_pres = new PDNSolution(*init_pres);
 
-  // n+1 步的解
+  // The solution in the final step at the (n+1)-th time step
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
 
-  // n 步的子步速度解
+  // The velo solutions in each sub-step at the n-th time step
   PDNSolution** pre_velo_sols = new PDNSolution*[ss];
   for(int ii = 0; ii < ss; ++ii)
     pre_velo_sols[ii] = new PDNSolution(*init_velo);
 
-  // n 步的子步压强解
+  // The pres solutions in each sub-step at the n-th time step
   PDNSolution** pre_pres_sols = new PDNSolution*[ss];
   for(int ii = 0; ii < ss; ++ii)
     pre_pres_sols[ii] = new PDNSolution(*init_pres);    
 
-  // n 步的终步速度解
+  // The velo solution in the final step at the n-th time step
   PDNSolution * pre_velo = new PDNSolution(*init_velo);
 
-  // n 步的终步压强解
+  // The pres solution in the final step at the n-th time step
   PDNSolution * pre_pres = new PDNSolution(*init_pres);
 
-  // n-1 步的终步速度解
+  // The velo solution in the final step at the (n-1)-th time step
   PDNSolution * pre_velo_before = new PDNSolution(*init_velo);
 
   // If this is a restart run, do not re-write the solution binaries
@@ -406,24 +406,24 @@ void PTime_NS_Solver::TM_NS_HERK(
     // for(int ii = 0; ii < ss; ++ii)
     //   VecView(cur_velo_sols[ii]->solution, PETSC_VIEWER_STDOUT_WORLD);
 
-    // // n+1 步的子步速度解
+    // // The velo solutions in each sub-step at the (n+1)-th time step
     // for(int ii = 0; ii < ss; ++ii)
     //   cur_velo_sols[ii]->Copy(*init_velo);
 
-    // // n+1 步的终步速度解
+    // // The velo solution in the final step at the (n+1)-th time step
     // cur_velo->Copy(*init_velo);
 
-    // // n+1 步的最终步dot速度解
+    // // The dot_velo solution in the final step at the (n+1)-th time step
     // cur_dot_velo->Copy(*init_dot_velo);
 
-    // // n+1 步的子步压强解
+    // // The pres solutions in each sub-step at the (n+1)-th time step
     // for(int ii = 0; ii < ss; ++ii)
     //   cur_pres_sols[ii]->Copy(*init_pres);
 
-    // // n+1 步的终步压强解
+    // // The pres solution in the final step at the (n+1)-th time step
     // cur_pres->Copy(*init_pres);
 
-    // // n+1 步的解
+    // // The solution in the final step at the (n+1)-th time step
     // cur_sol->Copy(*init_sol);    
   }
 

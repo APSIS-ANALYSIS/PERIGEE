@@ -285,18 +285,18 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
   PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
 #endif
 
-  // HERK steps
+  // HERK's number of steps
   const int ss = tm_RK_ptr->get_RK_step();
 
-  // 第一个子步, u_1 = u_n
+  // The first sub-step, u_1 = u_n
   cur_velo_sols[0] -> Copy(*pre_velo);
   
   SYS_T::commPrint(" ==> Start solving the SubStep -- substep = 1 is solved. \n");
 
-  // 子步（从第二个子步开始）
+  // Sub-step (starting from the second sub-step)
   for(int ii = 1; ii < ss; ++ii)
   {
-    // 使得每个子步的速度满足Dirchlet边界
+    // Make the velo in each sub step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + tm_RK_ptr->get_RK_c(ii) * dt, infnbc_part, flr_ptr, sol_base, cur_velo_sols[ii]);
 
     gassem_ptr->Clear_KG();
@@ -315,10 +315,10 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
 
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
   }
-  // 终步
+  // Last step
     SYS_T::commPrint(" ==> Start solving the LastStep: \n");
 
-    // 使得终步的速度满足Dirchlet边界
+    // Make the velo in the last step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + dt, infnbc_part, flr_ptr, sol_base, cur_velo);
 
     gassem_ptr->Clear_KG();
@@ -337,10 +337,10 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
 
     Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
 
-  // 最终步
+  // Final step
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
 
-    // 使得终步的dot速度满足Dirchlet边界
+   //Make the dot_velo in the final step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + dt, infnbc_part, dot_flr_ptr, dot_sol_base, cur_dot_velo);
 
     gassem_ptr->Clear_KG();
@@ -359,7 +359,7 @@ void PNonlinear_NS_Solver::HERK_Solve_NS_init(
 
     Update_pressure_velocity(anode_ptr, cur_dot_velo, cur_pres, dot_step);
 
-  // 将n+1步速度和压强组装为解向量
+  // Assemble velo and pres at the (n+1)-th time step into a solution vector
     Update_solutions(anode_ptr, cur_velo, cur_pres, cur_sol);
 }
 
@@ -414,18 +414,18 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
   PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
 #endif
 
-  // HERK steps
+  // HERK's number of steps
   const int ss = tm_RK_ptr->get_RK_step();
 
-  // 第一个子步, u_1 = u_n
+  // The first sub-step, u_1 = u_n
   cur_velo_sols[0] -> Copy(*pre_velo);
   
   SYS_T::commPrint(" ==> Start solving the SubStep -- substep = 1 is solved. \n");
 
-  // 子步（从第二个子步开始）
+  // Sub-step (starting from the second sub-step)
   for(int ii = 1; ii < ss; ++ii)
   {
-    // 使得每个子步的速度满足Dirchlet边界
+    // Make the velo in each sub step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + tm_RK_ptr->get_RK_c(ii) * dt, infnbc_part, flr_ptr, sol_base, cur_velo_sols[ii]);
 
     gassem_ptr->Clear_KG();
@@ -444,10 +444,10 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
 
     Update_pressure_velocity(anode_ptr, cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step);
   }
-  // 终步
+  // Last step
     SYS_T::commPrint(" ==> Start solving the LastStep: \n");
 
-    // 使得终步的速度满足Dirchlet边界
+    // Make the velo in the last step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + dt, infnbc_part, flr_ptr, sol_base, cur_velo);
 
     gassem_ptr->Clear_KG();
@@ -466,10 +466,10 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
 
     Update_pressure_velocity(anode_ptr, cur_velo, cur_pres_sols[ss-1], dot_step);
 
-  // 最终步
+  // Final step
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
 
-    // 使得终步的dot速度满足Dirchlet边界
+   //Make the dot_velo in the final step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + dt, infnbc_part, dot_flr_ptr, dot_sol_base, cur_dot_velo);
 
     gassem_ptr->Clear_KG();
@@ -488,7 +488,7 @@ void PNonlinear_NS_Solver::HERK_Solve_NS(
 
     Update_pressure_velocity(anode_ptr, cur_dot_velo, cur_pres, dot_step);
 
-  // 将n+1步速度和压强组装为解向量
+  // Assemble velo and pres at the (n+1)-th time step into a solution vector
     Update_solutions(anode_ptr, cur_velo, cur_pres, cur_sol);
 }
 
