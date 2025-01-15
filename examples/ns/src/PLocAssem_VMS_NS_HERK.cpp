@@ -330,7 +330,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
     double v_n = 0.0, v_nm1 = 0.0;
     double w_n = 0.0, w_nm1 = 0.0;
     
-    // 当前及之前子步
+    // The known sub steps under the current time step
     std::vector<double> u(subindex+1, 0); std::vector<double> v(subindex+1, 0); 
     std::vector<double> w(subindex+1, 0); std::vector<double> p(subindex+1, 0); 
 
@@ -351,7 +351,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
     std::vector<double> u_xz(subindex+1, 0); std::vector<double> v_xz(subindex+1, 0); std::vector<double> w_xz(subindex+1, 0); 
     std::vector<double> u_yz(subindex+1, 0); std::vector<double> v_yz(subindex+1, 0); std::vector<double> w_yz(subindex+1, 0);
 
-    // 前一所有子步
+    // All sub steps of the previous time step
     std::vector<double> u_pre(num_steps, 0); std::vector<double> v_pre(num_steps, 0); 
     std::vector<double> w_pre(num_steps, 0); std::vector<double> p_pre(num_steps, 0); 
 
@@ -495,7 +495,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
 
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );  // 这里应该用u[subindex], 但u[subindex]未知？
+    // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );  // We should use u[subindex] here, but u[subindex] is unknown？
     // const double tau_m = tau_sub[0];
     // const double tau_c = tau_sub[1];
 
@@ -554,9 +554,9 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
     std::vector<double> u_prime(subindex+1, 0); std::vector<double> v_prime(subindex+1, 0); 
     std::vector<double> w_prime(subindex+1, 0); std::vector<double> p_prime(subindex, 0); 
     
-    // subindex = 3, 需要遍历 0，1，2，分别计算subindex = 0 ，1， 2时的sum_u_advec, sum_u_advec需要变成vector?, 所以外面还有再套一个大循环？
-    
-    // 第0个子步的细尺度为0
+    // If subindex = 3, we need to iterate through 0, 1, and 2, and calculate the sum_u_advec when subindex = 0, 1, and 2 respectively. So there's another big loop out there?
+
+    // The fine scale velo in the 0-th sub step is 0.
     // sum_u_advec[0] = 0.0, sum_u_diffu[0] = 0.0, sum_a_fx[0] = 0.0, sum_p_x[0] = 0;
     // sum_v_advec[0] = 0.0, sum_v_diffu[0] = 0.0, sum_a_fy[0] = 0.0, sum_p_y[0] = 0;
     // sum_w_advec[0] = 0.0, sum_w_diffu[0] = 0.0, sum_a_fz[0] = 0.0, sum_p_z[0] = 0;
@@ -650,7 +650,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
 
     for(int jj=0; jj<subindex; ++jj)
     {
-       // 扩散项1
+       // Diffusion item 1
        u_diffu1_1 += tm_RK_ptr->get_RK_a(subindex, jj) * (u_x[jj] + u_x[jj]);
        u_diffu1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (u_y[jj] + v_x[jj]);
        u_diffu1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (u_z[jj] + w_x[jj]);
@@ -663,12 +663,12 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
        w_diffu1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (v_z[jj] + w_y[jj]);
        w_diffu1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (w_z[jj] + w_z[jj]);
 
-       // 扩散项2
+       // Diffusion item 2
        u_diffu2_1 += tm_RK_ptr->get_RK_a(subindex, jj) * u_prime[jj];
        v_diffu2_2 += tm_RK_ptr->get_RK_a(subindex, jj) * v_prime[jj];
        w_diffu2_3 += tm_RK_ptr->get_RK_a(subindex, jj) * w_prime[jj];
 
-       // 交叉应力1 + 对流项
+       // Cross stress term 1 + Convective term
        u_stab1_1 += tm_RK_ptr->get_RK_a(subindex, jj) * (u[jj] + u_prime[jj]) * u_x[jj];
        u_stab1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (v[jj] + v_prime[jj]) * u_y[jj];
        u_stab1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (w[jj] + w_prime[jj]) * u_z[jj];
@@ -681,7 +681,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep_Init(
        w_stab1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (v[jj] + v_prime[jj]) * w_y[jj];
        w_stab1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (w[jj] + w_prime[jj]) * w_z[jj];
 
-       // 交叉应力2 + 雷诺应力
+       // Cross stress term 2 + reynolds stress
        u_stab2_1 += tm_RK_ptr->get_RK_a(subindex, jj) * u_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_2 += tm_RK_ptr->get_RK_a(subindex, jj) * v_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_3 += tm_RK_ptr->get_RK_a(subindex, jj) * w_prime[jj] * (u[jj] + u_prime[jj]);
@@ -814,7 +814,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep_Init(
     double v_n = 0.0, v_nm1 = 0.0, v_np1 = 0.0, v_np1_x = 0.0, v_np1_y = 0.0, v_np1_z = 0.0;
     double w_n = 0.0, w_nm1 = 0.0, w_np1 = 0.0, w_np1_x = 0.0, w_np1_y = 0.0, w_np1_z = 0.0;
 
-    // 当前所有子步
+    // All sub steps at the current time step
     std::vector<double> u(num_steps, 0); std::vector<double> v(num_steps, 0); 
     std::vector<double> w(num_steps, 0); std::vector<double> p(num_steps, 0); 
 
@@ -835,7 +835,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep_Init(
     std::vector<double> u_xz(num_steps, 0); std::vector<double> v_xz(num_steps, 0); std::vector<double> w_xz(num_steps, 0); 
     std::vector<double> u_yz(num_steps, 0); std::vector<double> v_yz(num_steps, 0); std::vector<double> w_yz(num_steps, 0);
 
-    // 前一所有子步
+    // All sub steps at the previous time step
     std::vector<double> u_pre(num_steps, 0); std::vector<double> v_pre(num_steps, 0); 
     std::vector<double> w_pre(num_steps, 0); std::vector<double> p_pre(num_steps, 0); 
 
@@ -1122,7 +1122,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep_Init(
 
     for(int jj=0; jj<num_steps; ++jj)
     {
-       // 扩散项1
+       // Diffusion item 1
        u_diffu1_1 += tm_RK_ptr->get_RK_b(jj) * (u_x[jj] + u_x[jj]);
        u_diffu1_2 += tm_RK_ptr->get_RK_b(jj) * (u_y[jj] + v_x[jj]);
        u_diffu1_3 += tm_RK_ptr->get_RK_b(jj) * (u_z[jj] + w_x[jj]);
@@ -1135,12 +1135,12 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep_Init(
        w_diffu1_2 += tm_RK_ptr->get_RK_b(jj) * (v_z[jj] + w_y[jj]);
        w_diffu1_3 += tm_RK_ptr->get_RK_b(jj) * (w_z[jj] + w_z[jj]);
 
-       // 扩散项2
+       // Diffusion item 2
        u_diffu2_1 += tm_RK_ptr->get_RK_b(jj) * u_prime[jj];
        v_diffu2_2 += tm_RK_ptr->get_RK_b(jj) * v_prime[jj];
        w_diffu2_3 += tm_RK_ptr->get_RK_b(jj) * w_prime[jj];
 
-       // 交叉应力1 + 对流项
+       // Cross stress term 1 + Convective term
        u_stab1_1 += tm_RK_ptr->get_RK_b(jj) * (u[jj] + u_prime[jj]) * u_x[jj];
        u_stab1_2 += tm_RK_ptr->get_RK_b(jj) * (v[jj] + v_prime[jj]) * u_y[jj];
        u_stab1_3 += tm_RK_ptr->get_RK_b(jj) * (w[jj] + w_prime[jj]) * u_z[jj];
@@ -1153,7 +1153,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep_Init(
        w_stab1_2 += tm_RK_ptr->get_RK_b(jj) * (v[jj] + v_prime[jj]) * w_y[jj];
        w_stab1_3 += tm_RK_ptr->get_RK_b(jj) * (w[jj] + w_prime[jj]) * w_z[jj];
 
-       // 交叉应力2 + 雷诺应力
+       // Cross stress term 2 + Reynolds stress
        u_stab2_1 += tm_RK_ptr->get_RK_b(jj) * u_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_2 += tm_RK_ptr->get_RK_b(jj) * v_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_3 += tm_RK_ptr->get_RK_b(jj) * w_prime[jj] * (u[jj] + u_prime[jj]);
@@ -1295,7 +1295,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
     double v_n = 0.0, v_nm1 = 0.0;
     double w_n = 0.0, w_nm1 = 0.0;
     
-    // 当前及之前子步
+    // The known sub steps under the current time step
     std::vector<double> u(subindex+1, 0); std::vector<double> v(subindex+1, 0); 
     std::vector<double> w(subindex+1, 0); std::vector<double> p(subindex+1, 0); 
 
@@ -1316,7 +1316,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
     std::vector<double> u_xz(subindex+1, 0); std::vector<double> v_xz(subindex+1, 0); std::vector<double> w_xz(subindex+1, 0); 
     std::vector<double> u_yz(subindex+1, 0); std::vector<double> v_yz(subindex+1, 0); std::vector<double> w_yz(subindex+1, 0);
 
-    // 前一所有子步
+    // All sub steps at the previous time step
     std::vector<double> u_pre(num_steps, 0); std::vector<double> v_pre(num_steps, 0); 
     std::vector<double> w_pre(num_steps, 0); std::vector<double> p_pre(num_steps, 0); 
 
@@ -1519,9 +1519,9 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
     std::vector<double> u_prime(subindex+1, 0); std::vector<double> v_prime(subindex+1, 0); 
     std::vector<double> w_prime(subindex+1, 0); std::vector<double> p_prime(subindex, 0); 
     
-    // subindex = 3, 需要遍历 0，1，2，分别计算subindex = 0 ，1， 2时的sum_u_advec, sum_u_advec需要变成vector?, 所以外面还有再套一个大循环？
+    // If subindex = 3, we need to iterate through 0, 1, and 2, and calculate the sum_u_advec when subindex = 0, 1, and 2 respectively. So there's another big loop out there?
     
-    // 第0个子步的细尺度为0
+    // The fine scale velo in the 0-th sub step is 0.
     // sum_u_advec[0] = 0.0, sum_u_diffu[0] = 0.0, sum_a_fx[0] = 0.0, sum_p_x[0] = 0;
     // sum_v_advec[0] = 0.0, sum_v_diffu[0] = 0.0, sum_a_fy[0] = 0.0, sum_p_y[0] = 0;
     // sum_w_advec[0] = 0.0, sum_w_diffu[0] = 0.0, sum_a_fz[0] = 0.0, sum_p_z[0] = 0;
@@ -1619,7 +1619,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
 
     for(int jj=0; jj<subindex; ++jj)
     {
-       // 扩散项1
+       // Diffusion item 1
        u_diffu1_1 += tm_RK_ptr->get_RK_a(subindex, jj) * (u_x[jj] + u_x[jj]);
        u_diffu1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (u_y[jj] + v_x[jj]);
        u_diffu1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (u_z[jj] + w_x[jj]);
@@ -1632,12 +1632,12 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
        w_diffu1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (v_z[jj] + w_y[jj]);
        w_diffu1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (w_z[jj] + w_z[jj]);
 
-       // 扩散项2
+       // Diffusion item 2
        u_diffu2_1 += tm_RK_ptr->get_RK_a(subindex, jj) * u_prime[jj];
        v_diffu2_2 += tm_RK_ptr->get_RK_a(subindex, jj) * v_prime[jj];
        w_diffu2_3 += tm_RK_ptr->get_RK_a(subindex, jj) * w_prime[jj];
 
-       // 交叉应力1 + 对流项
+       // Cross stress term 1 + Convective term
        u_stab1_1 += tm_RK_ptr->get_RK_a(subindex, jj) * (u[jj] + u_prime[jj]) * u_x[jj];
        u_stab1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (v[jj] + v_prime[jj]) * u_y[jj];
        u_stab1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (w[jj] + w_prime[jj]) * u_z[jj];
@@ -1650,7 +1650,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
        w_stab1_2 += tm_RK_ptr->get_RK_a(subindex, jj) * (v[jj] + v_prime[jj]) * w_y[jj];
        w_stab1_3 += tm_RK_ptr->get_RK_a(subindex, jj) * (w[jj] + w_prime[jj]) * w_z[jj];
 
-       // 交叉应力2 + 雷诺应力
+       // Cross stress term 2 + Reynolds stress
        u_stab2_1 += tm_RK_ptr->get_RK_a(subindex, jj) * u_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_2 += tm_RK_ptr->get_RK_a(subindex, jj) * v_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_3 += tm_RK_ptr->get_RK_a(subindex, jj) * w_prime[jj] * (u[jj] + u_prime[jj]);
@@ -1783,7 +1783,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
     double v_n = 0.0, v_nm1 = 0.0, v_np1 = 0.0, v_np1_x = 0.0, v_np1_y = 0.0, v_np1_z = 0.0;
     double w_n = 0.0, w_nm1 = 0.0, w_np1 = 0.0, w_np1_x = 0.0, w_np1_y = 0.0, w_np1_z = 0.0;
 
-    // 当前所有子步
+    // All sub steps at the current time step
     std::vector<double> u(num_steps, 0); std::vector<double> v(num_steps, 0); 
     std::vector<double> w(num_steps, 0); std::vector<double> p(num_steps, 0); 
 
@@ -1804,7 +1804,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
     std::vector<double> u_xz(num_steps, 0); std::vector<double> v_xz(num_steps, 0); std::vector<double> w_xz(num_steps, 0); 
     std::vector<double> u_yz(num_steps, 0); std::vector<double> v_yz(num_steps, 0); std::vector<double> w_yz(num_steps, 0);
 
-    // 前一所有子步
+    // All sub steps at the previous time step
     std::vector<double> u_pre(num_steps, 0); std::vector<double> v_pre(num_steps, 0); 
     std::vector<double> w_pre(num_steps, 0); std::vector<double> p_pre(num_steps, 0); 
 
@@ -2096,7 +2096,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
 
     for(int jj=0; jj<num_steps; ++jj)
     {
-       // 扩散项1
+       // Diffusion item 1
        u_diffu1_1 += tm_RK_ptr->get_RK_b(jj) * (u_x[jj] + u_x[jj]);
        u_diffu1_2 += tm_RK_ptr->get_RK_b(jj) * (u_y[jj] + v_x[jj]);
        u_diffu1_3 += tm_RK_ptr->get_RK_b(jj) * (u_z[jj] + w_x[jj]);
@@ -2109,12 +2109,12 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
        w_diffu1_2 += tm_RK_ptr->get_RK_b(jj) * (v_z[jj] + w_y[jj]);
        w_diffu1_3 += tm_RK_ptr->get_RK_b(jj) * (w_z[jj] + w_z[jj]);
 
-       // 扩散项2
+       // Diffusion item 2
        u_diffu2_1 += tm_RK_ptr->get_RK_b(jj) * u_prime[jj];
        v_diffu2_2 += tm_RK_ptr->get_RK_b(jj) * v_prime[jj];
        w_diffu2_3 += tm_RK_ptr->get_RK_b(jj) * w_prime[jj];
 
-       // 交叉应力1 + 对流项
+       // Cross stress term 1 + Convective term
        u_stab1_1 += tm_RK_ptr->get_RK_b(jj) * (u[jj] + u_prime[jj]) * u_x[jj];
        u_stab1_2 += tm_RK_ptr->get_RK_b(jj) * (v[jj] + v_prime[jj]) * u_y[jj];
        u_stab1_3 += tm_RK_ptr->get_RK_b(jj) * (w[jj] + w_prime[jj]) * u_z[jj];
@@ -2127,7 +2127,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
        w_stab1_2 += tm_RK_ptr->get_RK_b(jj) * (v[jj] + v_prime[jj]) * w_y[jj];
        w_stab1_3 += tm_RK_ptr->get_RK_b(jj) * (w[jj] + w_prime[jj]) * w_z[jj];
 
-       // 交叉应力2 + 雷诺应力
+       // Cross stress term 2 + Reynolds stress
        u_stab2_1 += tm_RK_ptr->get_RK_b(jj) * u_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_2 += tm_RK_ptr->get_RK_b(jj) * v_prime[jj] * (u[jj] + u_prime[jj]);
        u_stab2_3 += tm_RK_ptr->get_RK_b(jj) * w_prime[jj] * (u[jj] + u_prime[jj]);
@@ -2274,7 +2274,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
 
     double p_np1 = 0.0, p_np1_x = 0.0, p_np1_y = 0.0, p_np1_z = 0.0;
 
-    // 当前所有子步
+    // All sub steps at the current time step
     std::vector<double> u(num_steps, 0); std::vector<double> v(num_steps, 0); 
     std::vector<double> w(num_steps, 0); std::vector<double> p(num_steps, 0); 
 
@@ -2479,7 +2479,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
     const double div_dot_vel_np1 = dot_u_np1_x + dot_v_np1_y + dot_w_np1_z;
     const double p_np1_prime = -1.0 * tau_c * div_dot_vel_np1;
 
-    // 扩散项1
+    // Diffusion item 1
     const double u_diffu1_1 = u_np1_x + u_np1_x;
     const double u_diffu1_2 = u_np1_y + v_np1_x;
     const double u_diffu1_3 = u_np1_z + w_np1_x;
@@ -2492,12 +2492,12 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
     const double w_diffu1_2 = v_np1_z + w_np1_y;
     const double w_diffu1_3 = w_np1_z + w_np1_z;
 
-    // 扩散项2
+    // Diffusion item 2
     const double u_diffu2_1 = u_np1_prime;
     const double v_diffu2_2 = v_np1_prime;
     const double w_diffu2_3 = w_np1_prime;
 
-    // 交叉应力1 + 对流项
+    // Cross stress term 1 + Convective term
     const double u_stab1_1 = (u_np1 + u_np1_prime) * u_np1_x;
     const double u_stab1_2 = (v_np1 + v_np1_prime) * u_np1_y;
     const double u_stab1_3 = (w_np1 + w_np1_prime) * u_np1_z;
@@ -2510,7 +2510,7 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
     const double w_stab1_2 = (v_np1 + v_np1_prime) * w_np1_y;
     const double w_stab1_3 = (w_np1 + w_np1_prime) * w_np1_z;
 
-    // 交叉应力2 + 雷诺应力
+    // Cross stress term 2 + Reynolds stress
     const double u_stab2_1 = u_np1_prime * (u_np1 + u_np1_prime);
     const double u_stab2_2 = v_np1_prime * (u_np1 + u_np1_prime);
     const double u_stab2_3 = w_np1_prime * (u_np1 + u_np1_prime);
