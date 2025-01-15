@@ -2594,4 +2594,65 @@ void PLocAssem_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
     }
   }
 }
+
+double PLocAssem_VMS_NS_HERK::get_flowrate( const double * const &cur_velo,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  double flrate = 0.0;
+
+  for(int qua =0; qua< face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double surface_area;
+    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+
+    Vector_3 velo(0.0, 0.0, 0.0);
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      velo.y() += cur_velo[ii*3+1] * R[ii];
+      velo.z() += cur_velo[ii*3+2] * R[ii];
+    }
+
+    flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
+  }
+
+  return flrate;
+}
+
+void PLocAssem_VMS_NS_HERK::get_pressure_area( 
+    const double * const &cur_pres,
+    FEAElement * const &element,
+    const double * const &eleCtrlPts_x,
+    const double * const &eleCtrlPts_y,
+    const double * const &eleCtrlPts_z,
+    const IQuadPts * const &quad,
+    double &pres, double &area )
+{
+  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+
+  const int face_nqp = quad -> get_num_quadPts();
+
+  // Initialize the two variables to be passed out
+  pres = 0.0; area = 0.0;
+
+  for(int qua =0; qua < face_nqp; ++qua)
+  {
+    const std::vector<double> R = element->get_R(qua);
+
+    double pp = 0.0;
+    for(int ii=0; ii<snLocBas; ++ii) pp += cur_pres[ii] * R[ii];
+
+    pres += element->get_detJac(qua) * quad->get_qw(qua) * pp;
+    area += element->get_detJac(qua) * quad->get_qw(qua);
+  }
+}
 // EOF

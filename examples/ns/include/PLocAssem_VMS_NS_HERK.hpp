@@ -165,6 +165,21 @@ class PLocAssem_VMS_NS_HERK : public IPLocAssem
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad );
 
+    virtual double get_flowrate( const double * const &cur_velo,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad );
+
+    virtual void get_pressure_area( const double * const &cur_pres,
+        FEAElement * const &element,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const IQuadPts * const &quad,
+        double &pres, double &area );
+
   protected:
     // Private data
     const double rho0, vis_mu;
