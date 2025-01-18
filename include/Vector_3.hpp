@@ -30,6 +30,8 @@ class Vector_3
     constexpr Vector_3( const double &v0, const double &v1, const double &v2 ) 
       : vec{{ v0, v1, v2 }} {}
 
+    constexpr Vector_3( const std::array<double,3> input ) : vec(input) {}
+
     ~Vector_3() = default;
 
     // Assignment operator
