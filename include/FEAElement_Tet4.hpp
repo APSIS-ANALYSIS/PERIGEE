@@ -25,7 +25,7 @@ class FEAElement_Tet4 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 4;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -111,6 +111,8 @@ class FEAElement_Tet4 final : public FEAElement
         const double * const &volctrl_z ) const override;
 
   private:
+    static constexpr int nLocBas = 4;
+
     // Number of quadrature points
     const int numQuapts;
 
@@ -118,14 +120,14 @@ class FEAElement_Tet4 final : public FEAElement
     std::vector<double> R {};
 
     // tet4 is linear, thus the first-order derivatives are constant
-    std::array<double,4> dR_dx, dR_dy, dR_dz;
+    std::array<double,4> dR_dx {}, dR_dy {}, dR_dz {};
 
     // Container for
     // dx_dr : 0 <= ii < 9
     // dr_dx : 9 <= ii < 18
-    std::array<double,18> Jac; 
+    std::array<double,18> Jac {}; 
 
-    double detJac;
+    double detJac {};
 
     std::unique_ptr<FEAElement> triangle_face;
 };

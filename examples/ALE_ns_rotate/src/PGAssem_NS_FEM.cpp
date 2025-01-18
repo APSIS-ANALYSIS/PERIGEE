@@ -1306,7 +1306,7 @@ void PGAssem_NS_FEM::Interface_KG(
 
         // Assembly
         lassem_ptr->Assem_Diag_Tangent_Residual_itf_fixed(qua, qw, dt, anchor_elementv, opposite_elementv,
-          anchor_local_sol, opposite_local_sol, rotated_local_mvelo);
+          anchor_local_sol, opposite_local_sol);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1487,7 +1487,7 @@ void PGAssem_NS_FEM::Interface_G(
 
         // Assembly
         lassem_ptr->Assem_Residual_itf_fixed(qua, qw, dt, anchor_elementv, opposite_elementv, anchor_local_sol,
-          opposite_local_sol, rotated_local_mvelo);
+          opposite_local_sol);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {
@@ -1652,7 +1652,7 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
 
         // Assembly
         anci.A_lassemptr->Assem_Tangent_itf_MF_fixed(qua, qw, anci.A_dt, anci.A_anchor_elementv, anci.A_opposite_elementv,
-          anchor_local_sol, opposite_local_sol, rotated_local_mvelo);
+          anchor_local_sol, opposite_local_sol);
 
         for(int ii{0}; ii < nLocBas; ++ii)
         {

@@ -1,6 +1,0 @@
-# Mesh partition setting
-cpu_size: 4
-in_ncommon: 2
-is_dualgraph: true
-part_file_p: ./ppart/postpart_p
-part_file_v: ./ppart/postpart_v

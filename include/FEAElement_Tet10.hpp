@@ -51,7 +51,7 @@ class FEAElement_Tet10 final : public FEAElement
 
     int get_numQuapts() const override {return numQuapts;}
 
-    int get_nLocBas() const override {return 10;}
+    int get_nLocBas() const override {return nLocBas;}
 
     void print_info() const override;
 
@@ -116,6 +116,8 @@ class FEAElement_Tet10 final : public FEAElement
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
   private:
+    static constexpr int nLocBas = 10;
+
     const int numQuapts;
 
     // R: 0 <= ii < 10 numQuapts

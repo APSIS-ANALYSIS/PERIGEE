@@ -3,7 +3,7 @@
 FEAElement_Triangle3::FEAElement_Triangle3( const int &in_nqua )
 : numQuapts( in_nqua )
 {
-  R.resize(3 * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 }
 
 void FEAElement_Triangle3::print_info() const
@@ -78,7 +78,7 @@ double FEAElement_Triangle3::get_h( const double * const &ctrl_x,
 void FEAElement_Triangle3::get_R( const int &quaindex, 
     double * const &basis ) const
 {
-  const int offset = quaindex * 3;
+  const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
   basis[1] = R[offset+1];
   basis[2] = R[offset+2];
@@ -86,7 +86,7 @@ void FEAElement_Triangle3::get_R( const int &quaindex,
 
 std::vector<double> FEAElement_Triangle3::get_R( const int &quaindex ) const
 {
-  const int offset = quaindex * 3;
+  const int offset = quaindex * nLocBas;
 
   return { R[offset], R[offset+1], R[offset+2] };
 }
@@ -94,7 +94,7 @@ std::vector<double> FEAElement_Triangle3::get_R( const int &quaindex ) const
 void FEAElement_Triangle3::get_gradR( const int &quaindex, 
     double * const &basis_x, double * const &basis_y ) const
 {
-  for(int ii=0; ii<3; ++ii)
+  for(int ii=0; ii<nLocBas; ++ii)
   {
     basis_x[ii] = dR_dx[ii];
     basis_y[ii] = dR_dy[ii];
@@ -105,8 +105,8 @@ void FEAElement_Triangle3::get_R_gradR( const int &quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y ) const
 {
-  const int offset = quaindex * 3;
-  for(int ii=0; ii < 3; ++ ii)
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii < nLocBas; ++ ii)
   {
     basis[ii] = R[offset + ii];
     basis_x[ii] = dR_dx[ii];
@@ -121,8 +121,8 @@ void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
     double * const &basis_xy ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_2D_R_dR_d2R function error.\n" );
-  const int offset = quaindex * 3;
-  for(int ii=0; ii < 3; ++ ii)
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii < nLocBas; ++ ii)
   {
     basis[ii] = R[offset + ii];
     basis_x[ii] = dR_dx[ii];

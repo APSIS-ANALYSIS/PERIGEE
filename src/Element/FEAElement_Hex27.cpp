@@ -3,29 +3,29 @@
 FEAElement_Hex27::FEAElement_Hex27( const int &in_nqua ) : numQuapts( in_nqua ) ,
   quadrilateral_face( SYS_T::make_unique<FEAElement_Quad9_3D_der0>(numQuapts) )
 {
-  R.resize(27 * numQuapts);
+  R.resize(nLocBas * numQuapts, 0.0);
 
-  dR_dx.resize(27 * numQuapts);
-  dR_dy.resize(27 * numQuapts);
-  dR_dz.resize(27 * numQuapts);
+  dR_dx.resize(nLocBas * numQuapts, 0.0);
+  dR_dy.resize(nLocBas * numQuapts, 0.0);
+  dR_dz.resize(nLocBas * numQuapts, 0.0);
 
-  d2R_dxx.resize(27 * numQuapts);
-  d2R_dyy.resize(27 * numQuapts);
-  d2R_dzz.resize(27 * numQuapts);
-  d2R_dxy.resize(27 * numQuapts);
-  d2R_dxz.resize(27 * numQuapts);
-  d2R_dyz.resize(27 * numQuapts);
+  d2R_dxx.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dzz.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxy.resize(nLocBas * numQuapts, 0.0);
+  d2R_dxz.resize(nLocBas * numQuapts, 0.0);
+  d2R_dyz.resize(nLocBas * numQuapts, 0.0);
 
-  dx_dr.resize(9 * numQuapts);
-  dr_dx.resize(9 * numQuapts);
-  detJac.resize(numQuapts);
+  dx_dr.resize(9 * numQuapts, 0.0);
+  dr_dx.resize(9 * numQuapts, 0.0);
+  detJac.resize(numQuapts, 0.0);
 }
 
 void FEAElement_Hex27::print_info() const
 {
   SYS_T::commPrint("Hex27: ");
-  SYS_T::commPrint("27-node hexagon element with up to 2nd derivatives. \n");
-  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
+  SYS_T::commPrint("Twenty-Seven-node hexagon element with up to 2nd derivatives.\n");
+  SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
 void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
@@ -37,7 +37,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
 
   for(int qua=0; qua<numQuapts; ++qua)
   {
-    const int q27 = qua * 27;
+    const int q27 = qua * nLocBas;
 
     const double qua_r = quad -> get_qp( qua, 0 );
     const double qua_s = quad -> get_qp( qua, 1 );
@@ -209,7 +209,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     double yrs = 0.0, yrt = 0.0, yst = 0.0;
     double zrs = 0.0, zrt = 0.0, zst = 0.0;
 
-    for(int ii=0; ii<27; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       xr += ctrl_x[ii] * dR_dr[ii];
       xs += ctrl_x[ii] * dR_ds[ii];
@@ -269,7 +269,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     dr_dx[q9+7] = mdrdx(7); // dt_dy
     dr_dx[q9+8] = mdrdx(8); // dt_dz
 
-    for(int ii=0; ii<27; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       dR_dx[q27+ii] = dR_dr[ii]*mdrdx(0) + dR_ds[ii]*mdrdx(3) + dR_dt[ii]*mdrdx(6); 
       dR_dy[q27+ii] = dR_dr[ii]*mdrdx(1) + dR_ds[ii]*mdrdx(4) + dR_dt[ii]*mdrdx(7); 
@@ -282,7 +282,7 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
     // LU factorization
     LHS.LU_fac();
 
-    for(int ii=0; ii<27; ++ii)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
       const std::array<double, 6> RHS {{ d2R_drr[ii] - dR_dx[q27+ii] * xrr - dR_dy[q27+ii] * yrr - dR_dz[q27+ii] * zrr,
         d2R_drs[ii] - dR_dx[q27+ii] * xrs - dR_dy[q27+ii] * yrs - dR_dz[q27+ii] * zrs,
@@ -328,14 +328,14 @@ double FEAElement_Hex27::get_h( const double * const &ctrl_x,
 void FEAElement_Hex27::get_R( const int &quaindex, double * const &basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R function error.\n" );
-  const int offset = quaindex * 27;
-  for(int ii=0; ii<27; ++ii) basis[ii] = R[offset+ii];
+  const int offset = quaindex * nLocBas;
+  for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
 std::vector<double> FEAElement_Hex27::get_R( const int &quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R function error.\n" );
-  const int offset = quaindex * 27;
+  const int offset = quaindex * nLocBas;
   std::vector<double> vec(R.begin() + offset, R.begin() + offset + 27);
   return vec;
 }
@@ -344,8 +344,8 @@ void FEAElement_Hex27::get_gradR( const int &quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_gradR function error.\n" );
-  const int offset = quaindex * 27;
-  for( int ii=0; ii<27; ++ii )
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
   {
     basis_x[ii] = dR_dx[offset + ii];
     basis_y[ii] = dR_dy[offset + ii];
@@ -358,8 +358,8 @@ void FEAElement_Hex27::get_R_gradR( const int &quaindex, double * const &basis,
     double * const &basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R_gradR function error.\n" );
-  const int offset = quaindex * 27;
-  for( int ii=0; ii<27; ++ii )
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
   {
     basis[ii]   = R[offset+ ii];
     basis_x[ii] = dR_dx[offset + ii];
@@ -376,8 +376,8 @@ void FEAElement_Hex27::get_3D_R_dR_d2R( const int &quaindex,
     double * const &basis_xz, double * const &basis_yz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_3D_R_dR_d2R function error.\n" );
-  const int offset = quaindex * 27;
-  for( int ii=0; ii<27; ++ii )
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];
@@ -399,8 +399,8 @@ void FEAElement_Hex27::get_3D_R_gradR_LaplacianR( const int &quaindex,
     double * const &basis_zz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_3D_R_gradR_LaplacianR function error.\n" );
-  const int offset = quaindex * 27;
-  for( int ii=0; ii<27; ++ii )
+  const int offset = quaindex * nLocBas;
+  for( int ii=0; ii<nLocBas; ++ii )
   {
     basis[ii]   = R[offset + ii];
     basis_x[ii] = dR_dx[offset + ii];

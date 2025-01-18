@@ -53,7 +53,7 @@ int main( int argc, char * argv[] )
   const std::string elemType_str      = paras["elem_type"].as<std::string>();
   const int num_inlet                 = paras["num_inlet"].as<int>();
   const int num_outlet                = paras["num_outlet"].as<int>();
-  const std::string geo_file          = paras["geo_file"].as<std::string>();
+  const std::string fixed_geo_file          = paras["fixed_geo_file"].as<std::string>();
   const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
   const std::string sur_file_inner_wall     = paras["sur_file_inner_wall"].as<std::string>();
   const std::string sur_file_outer_wall     = paras["sur_file_outer_wall"].as<std::string>();
@@ -99,7 +99,8 @@ int main( int argc, char * argv[] )
   cout<<" -elem_type: "<<elemType_str<<endl;
   cout<<" -wall_model_type: "<<wall_model_type<<endl;
   cout<<" -num_outlet: "<<num_outlet<<endl;
-  cout<<" -geo_file: "<<geo_file<<endl;
+  cout<<" -fixed_geo_file: "<<fixed_geo_file<<endl;
+  cout<<" -rotated_geo_file: "<<fixed_geo_file<<endl;
   cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
   cout<<" -sur_file_inner_wall: "<<sur_file_inner_wall<<endl;
   cout<<" -sur_file_outer_wall: "<<sur_file_outer_wall<<endl;
@@ -117,7 +118,9 @@ int main( int argc, char * argv[] )
   cout<<"====  Command Line Arguments/ ===="<<endl;
 
   // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
+  SYS_T::file_check(fixed_geo_file); cout<<fixed_geo_file<<" found. \n";
+
+  SYS_T::file_check(rotated_geo_file); cout<<rotated_geo_file<<" found. \n";
 
   SYS_T::file_check(sur_file_inner_wall); cout<<sur_file_outer_wall<<" found. \n";
 
@@ -157,9 +160,6 @@ int main( int argc, char * argv[] )
     cout<<sur_file_out[ii]<<" found. \n";
   }
 
-  // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(rotated_geo_file); cout<<rotated_geo_file<<" found. \n";
-
   std::vector< std::string > fixed_interface_file(num_interface_pair);
   std::vector< std::string > rotated_interface_file(num_interface_pair);
   for(int ii=0; ii<num_interface_pair; ++ii)
@@ -195,7 +195,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dofNum", dofNum);
   cmdh5w->write_intScalar("dofMat", dofMat);
   cmdh5w->write_string("elemType", elemType_str);
-  cmdh5w->write_string("geo_file", geo_file);
+  cmdh5w->write_string("fixed_geo_file", fixed_geo_file);
   cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
   cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
@@ -207,12 +207,12 @@ int main( int argc, char * argv[] )
 
   delete cmdh5w; H5Fclose(cmd_file_id);
 
-  // Read the volumetric mesh file from the vtu file: geo_file
+  // Read the volumetric mesh file from the vtu file: fixed_geo_file
   int nFunc, nElem;
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
   
-  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(fixed_geo_file, nFunc, nElem, ctrlPts, vecIEN);
   const int fixed_nFunc = nFunc, fixed_nElem = nElem;
 
   int rotated_nFunc, rotated_nElem;
@@ -242,7 +242,7 @@ int main( int argc, char * argv[] )
   VEC_T::clean( rotated_ctrlPts );
 
   // Generate the list of fixed and rotated nodes
-  std::vector<int> node_f = VTK_T::read_int_PointData( geo_file, "GlobalNodeID" );
+  std::vector<int> node_f = VTK_T::read_int_PointData( fixed_geo_file, "GlobalNodeID" );
 
   std::vector<int> node_r = VTK_T::read_int_PointData( rotated_geo_file, "GlobalNodeID" );
   
@@ -380,12 +380,12 @@ int main( int argc, char * argv[] )
     SYS_T::print_fatal("Unknown wall model type.");
 
   NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, geo_file, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, geo_file, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, geo_file, nFunc );
+  NBC_list[1] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[2] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[3] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
 
   // Rotated BC info
-  INodalBC * RotBC = new NodalBC_3D_rotated( rotated_sur_file, geo_file,
+  INodalBC * RotBC = new NodalBC_3D_rotated( rotated_sur_file, fixed_geo_file,
       nFunc, elemType );  
 
   // Inflow BC info

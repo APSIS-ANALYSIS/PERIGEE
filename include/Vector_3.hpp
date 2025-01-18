@@ -53,6 +53,9 @@ class Vector_3
 
     Vector_3& operator*=( const double &val );
 
+    // unary minus operator
+    Vector_3 operator-() const;
+
     std::vector<double> to_std_vector() const 
     {return std::vector<double>(std::begin(vec), std::end(vec));}
 
