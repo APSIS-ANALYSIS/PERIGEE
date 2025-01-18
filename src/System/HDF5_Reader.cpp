@@ -199,7 +199,7 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  std::array<double, 3> out = { ddata[0], ddata[1], ddata[2] };
+  std::array<double, 3> out {{ ddata[0], ddata[1], ddata[2] }};
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
@@ -222,7 +222,7 @@ std::array<double, 9> HDF5_Reader::read_Tensor2_3D( const char * const &group_na
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  std::array<double, 9> out = { ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] } ;
+  std::array<double, 9> out {{ ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] }} ;
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
