@@ -7,7 +7,7 @@ int main( int argc, char * argv[] )
 
   const Vector_3 bb(aa);
 
-  std::cout<<bb<<'\n';
+  bb.print();
 
   return EXIT_SUCCESS;
 }
