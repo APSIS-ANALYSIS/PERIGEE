@@ -93,13 +93,13 @@ class HDF5_Reader
     // --------------------------------------------------------------
     // ! read_Vector_3 : output the std::array<double, 3>.
     // --------------------------------------------------------------
-    std::array<double, 3> read_Vector_3(const char* const& group_name,
+    std::array<double, 3> read_Vector_3( const char * const &group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
     // ! read_Tensor2_3D : output the std::array<double, 9>.
     // --------------------------------------------------------------
-    std::array<double, 9> read_Tensor2_3D(const char* const& group_name,
+    std::array<double, 9> read_Tensor2_3D( const char * const &group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
