@@ -265,10 +265,8 @@ int main(int argc, char *argv[])
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   HDF5_Reader * h5r = new HDF5_Reader( file_id );
   const std::string gname("/rotation");
-  const std::array<double, 3> point_rotated_temp = h5r->read_Vector_3( gname.c_str(), "point_rotated");
-  const Vector_3 point_rotated = {point_rotated_temp[0], point_rotated_temp[1], point_rotated_temp[2]};
-  const std::array<double, 3> angular_direction_temp = h5r->read_Vector_3(gname.c_str(), "angular_direction");
-  const Vector_3 angular_direction = {angular_direction_temp[0], angular_direction_temp[1], angular_direction_temp[2]};
+  const Vector_3 point_rotated( h5r->read_Vector_3( gname.c_str(), "point_rotated" ) );
+  const Vector_3 angular_direction( h5r->read_Vector_3( gname.c_str(), "angular_direction" ) );
   delete h5r; H5Fclose( file_id );
 
   // Control points' xyz coordinates

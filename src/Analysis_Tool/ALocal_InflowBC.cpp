@@ -59,10 +59,8 @@ ALocal_InflowBC::ALocal_InflowBC(
     act_area[nbc_id]       = h5r -> read_doubleScalar( subgroup_name.c_str(), "Inflow_active_area" );
     ful_area[nbc_id]       = h5r -> read_doubleScalar( subgroup_name.c_str(), "Inflow_full_area" );
     num_out_bc_pts[nbc_id] = h5r -> read_intScalar(    subgroup_name.c_str(), "num_out_bc_pts" );
-    const std::array<double, 3> centroid_temp = h5r -> read_Vector_3(     subgroup_name.c_str(), "centroid" );
-    centroid[nbc_id] = Vector_3(centroid_temp[0], centroid_temp[1], centroid_temp[2]);
-    const std::array<double, 3> outnormal_temp = h5r -> read_Vector_3(     subgroup_name.c_str(), "Outward_normal_vector" );
-    outnormal[nbc_id]      = Vector_3(outnormal_temp[0], outnormal_temp[1], outnormal_temp[2]);
+    centroid[nbc_id]       = Vector_3( h5r -> read_Vector_3( subgroup_name.c_str(), "centroid" ) );
+    outnormal[nbc_id]      = Vector_3( h5r -> read_Vector_3( subgroup_name.c_str(), "Outward_normal_vector" ) );
     // Cell-related data
     cell_nLocBas[nbc_id]   = h5r->read_intScalar( subgroup_name.c_str(), "cell_nLocBas" );
     num_local_cell[nbc_id] = h5r->read_intScalar( subgroup_name.c_str(), "num_local_cell" );
