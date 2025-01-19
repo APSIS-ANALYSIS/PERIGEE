@@ -1,6 +1,8 @@
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
 
 PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
+    const std::string &part_file_name,
+    const int &in_rank,
     IPLocAssem * const &locassem_ptr,
     const AGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -15,6 +17,9 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   dof_mat( locassem_ptr->get_dof_mat() ),
   nlgn( pnode_ptr->get_nlocghonode() )
 {
+
+
+
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
       "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
@@ -109,11 +114,7 @@ void PGAssem_LinearPDE_GenAlpha::EssBC_G(
   }
 }
 
-void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const ALocal_NBC * const &nbc_part )
+void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
 {
   const int nElem = alelem_ptr->get_nlocalele();
   
@@ -149,7 +150,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
 
 void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
     const double &curr_time, const double &dt,
-    IPLocAssem * const &lassem_ptr,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
@@ -193,13 +193,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
-    const double &dt,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const double &dt )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -262,13 +256,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
-    const double &dt,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part)
+    const double &dt )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -333,13 +321,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 }
 
 void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
-    const PDNSolution * const &sol,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const PDNSolution * const &sol )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 

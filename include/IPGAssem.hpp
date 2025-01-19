@@ -321,7 +321,7 @@ class IPGAssem
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr );
+        IPLocAssem * const &lassem_ptr )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------

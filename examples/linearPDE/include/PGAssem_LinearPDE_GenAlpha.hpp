@@ -11,46 +11,42 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
   public:
     // Constructor for equations
     PGAssem_LinearPDE_GenAlpha(
-        IPLocAssem * const &locassem_ptr,
-        const AGlobal_Mesh_Info * const &agmi_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &aien_ptr,
-        const APart_Node * const &pnode_ptr,
-        const ALocal_NBC * const &part_nbc,
-        const ALocal_EBC * const &part_ebc,
         const int &in_nz_estimate = 60 );
 
     // Destructor
     virtual ~PGAssem_LinearPDE_GenAlpha();
 
     // Nonzero pattern estimate
-    virtual void Assem_nonzero_estimate(
-        IPLocAssem * const &lassem_ptr );
+    virtual void Assem_nonzero_estimate();
 
     // Assembly the residual vector
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
-        const double &dt,
-        IPLocAssem * const &lassem_ptr );
+        const double &dt );
 
     // Assembly the residual vector and tangent matrix 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
-        const double &dt,
-        IPLocAssem * const &lassem_ptr );
+        const double &dt );
 
     // Assembly the residual and mass matrix
     virtual void Assem_mass_residual(
-        const PDNSolution * const &sol,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr );
+        const PDNSolution * const &sol )
 
   private:
     // Private data
+    std::unique_ptr<const ALocal_IEN> const locien;
+    std::unique_ptr<const ALocal_Elem> const locelem;
+    std::unique_ptr<const FEANode> const fnode;
+    std::unique_ptr<const APart_Node> const pnode;
+    std::unique_ptr<const ALocal_NBC> const nbc;
+    std::unique_ptr<const ALocal_EBC> const ebc;
+    std::unique_ptr<IPLocAssem> const locassem;
+
     const int num_ebc, nLocBas, snLocBas, dof_mat, nlgn;
 
     // Private function
