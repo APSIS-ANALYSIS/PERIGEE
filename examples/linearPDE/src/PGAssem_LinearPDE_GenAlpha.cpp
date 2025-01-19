@@ -1,6 +1,8 @@
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
 
 PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
+    const std::string &part_file_name,
+    const int &in_rank,
     IPLocAssem * const &locassem_ptr,
     const AGlobal_Mesh_Info * const &agmi_ptr,
     const ALocal_Elem * const &alelem_ptr,
@@ -15,6 +17,9 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   dof_mat( locassem_ptr->get_dof_mat() ),
   nlgn( pnode_ptr->get_nlocghonode() )
 {
+
+
+
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
       "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
@@ -109,11 +114,7 @@ void PGAssem_LinearPDE_GenAlpha::EssBC_G(
   }
 }
 
-void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const ALocal_NBC * const &nbc_part )
+void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
 {
   const int nElem = alelem_ptr->get_nlocalele();
   
@@ -149,9 +150,6 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate(
 
 void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
     const double &curr_time, const double &dt,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &element_s,
-    const IQuadPts * const &quad_s,
     const ALocal_NBC * const &nbc_part,
     const ALocal_EBC * const &ebc_part )
 {
@@ -172,7 +170,7 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_G(
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+          sctrl_x, sctrl_y, sctrl_z);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -195,17 +193,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
-    const double &dt,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const double &dt )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -231,7 +219,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
     lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
-        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+        ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -253,7 +241,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
   delete [] row_index; row_index = nullptr;
 
   // Resistance type boundary condition
-  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  NatBC_G( curr_time, dt, lassem_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -268,17 +256,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     const PDNSolution * const &dot_sol,
     const PDNSolution * const &sol,
     const double &curr_time,
-    const double &dt,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part)
+    const double &dt )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -304,7 +282,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
     lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
-        elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+        ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -329,7 +307,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Natural type boundary condition
-  NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  NatBC_G( curr_time, dt, lassem_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -343,17 +321,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 }
 
 void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
-    const PDNSolution * const &sol,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const PDNSolution * const &sol )
 {
   const int nElem = alelem_ptr->get_nlocalele();
 
@@ -373,7 +341,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Mass_Residual( local_a, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
+    lassem_ptr->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -396,7 +364,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
   delete [] row_index; row_index = nullptr;
 
   // Natural type boundary condition
-  NatBC_G( 0.0, 0.0, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+  NatBC_G( 0.0, 0.0, lassem_ptr, nbc_part, ebc_part );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
