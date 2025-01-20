@@ -11,6 +11,7 @@
 #include "FEAElement.hpp"
 #include "IQuadPts.hpp"
 #include "Math_Tools.hpp"
+#include "Tensor2_3D.hpp"
 
 namespace POST_ERROR_E
 {

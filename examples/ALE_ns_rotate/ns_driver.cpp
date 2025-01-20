@@ -10,7 +10,7 @@
 // ==================================================================
 #include "HDF5_Writer.hpp"
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "APart_Node_Rotated.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
@@ -278,9 +278,6 @@ int main(int argc, char *argv[])
   // Global mesh info
   AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
 
-  // Mesh partition info
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_file, rank);
-
   // Local sub-domain's element indices
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
@@ -314,7 +311,7 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
-  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
@@ -684,7 +681,7 @@ int main(int argc, char *argv[])
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete PartBasic; delete sir_info; delete locrotnbc;
+  delete fNode; delete locIEN; delete GMIptr; delete sir_info; delete locrotnbc;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
