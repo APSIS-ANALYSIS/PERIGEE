@@ -1,4 +1,4 @@
-#include "ElemBC_3D_turbulence_wall_model.hpp"
+#include "ElemBC_3D_WallModel.hpp"
 
 ElemBC_3D_turbulence_wall_model::ElemBC_3D_turbulence_wall_model( 
     const std::vector<std::string> &vtkfileList,

@@ -1,4 +1,4 @@
-#include "EBC_Partition_turbulence_wall_model.hpp"
+#include "EBC_Partition_WallModel.hpp"
 
 EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)

@@ -14,11 +14,11 @@
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_turbulence_wall_model.hpp"
+#include "ElemBC_3D_WallModel.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "EBC_Partition_outflow.hpp"
-#include "EBC_Partition_turbulence_wall_model.hpp"
+#include "EBC_Partition_WallModel.hpp"
 #include "yaml-cpp/yaml.h"
 
 int main( int argc, char * argv[] )
