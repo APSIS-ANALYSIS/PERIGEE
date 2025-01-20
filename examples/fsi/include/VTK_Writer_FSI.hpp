@@ -8,6 +8,7 @@
 //
 // Date: Jan 17 2022
 // ============================================================================
+#include "Tensor2_3D.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_IEN.hpp"
 #include "FEANode.hpp"

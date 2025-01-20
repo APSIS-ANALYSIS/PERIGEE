@@ -6,7 +6,7 @@
 // ============================================================================
 #include "HDF5_Tools.hpp"
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "APart_Node_FSI.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
@@ -296,8 +296,6 @@ int main(int argc, char *argv[])
   // field.
   AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_v_file, rank);
 
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, rank);
-
   ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
   
   ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
@@ -340,7 +338,7 @@ int main(int argc, char *argv[])
   std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc };
 
   // ===== Basic Checking =====
-  SYS_T::print_fatal_if( size!= PartBasic->get_cpu_size(),
+  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_v_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
@@ -769,7 +767,7 @@ int main(int argc, char *argv[])
   delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
-  delete GMIptr; delete PartBasic; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
+  delete GMIptr; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 
   delete locIEN_v; delete locIEN_p; delete ps_data;
