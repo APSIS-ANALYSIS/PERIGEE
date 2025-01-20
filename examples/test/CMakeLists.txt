@@ -47,7 +47,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Part_FEM_FSI.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_turbulence_wall_model.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_WallModel.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Triangle.cpp
@@ -55,7 +55,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
-  ${perigee_source}/Mesh/EBC_Partition_turbulence_wall_model.cpp
+  ${perigee_source}/Mesh/EBC_Partition_WallModel.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
   ${perigee_source}/Mesh/Global_Part_Serial.cpp
