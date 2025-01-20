@@ -9,6 +9,7 @@
 // Date: Jan. 16 2017
 // ============================================================================
 #include "HDF5_Reader.hpp"
+#include "Vector_3.hpp"
 
 class ALocal_EBC
 {

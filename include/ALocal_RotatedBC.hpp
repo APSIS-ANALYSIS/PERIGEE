@@ -10,6 +10,7 @@
 // ============================================================================
 #include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
+#include "Vector_3.hpp"
 
 class ALocal_RotatedBC
 {

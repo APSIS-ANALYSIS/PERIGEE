@@ -23,7 +23,7 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
 
       intNA[ii]  = h5r -> read_doubleVector( subgroup_name.c_str(), "intNA" );
       LID[ii]    = h5r -> read_intVector(    subgroup_name.c_str(), "LID_all_face_nodes" );
-      outvec[ii] = h5r -> read_Vector_3(     subgroup_name.c_str(), "out_normal" );
+      outvec[ii] = Vector_3( h5r -> read_Vector_3( subgroup_name.c_str(), "out_normal" ) );
     
       num_face_nodes[ii] = static_cast<int>(intNA[ii].size());
     }

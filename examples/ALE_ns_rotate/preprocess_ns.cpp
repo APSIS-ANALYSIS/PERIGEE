@@ -521,8 +521,8 @@ int main( int argc, char * argv[] )
     hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
     hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * h5w = new HDF5_Writer( file_id );
-    h5w -> write_Vector_3( g_id, "point_rotated", point_rotated );
-    h5w -> write_Vector_3( g_id, "angular_direction", angular_direction );
+    h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
+    h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
 
     delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 
