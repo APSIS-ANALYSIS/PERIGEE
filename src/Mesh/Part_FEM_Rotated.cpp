@@ -1,6 +1,8 @@
 #include "Part_FEM_Rotated.hpp"
 
-Part_FEM_Rotated::Part_FEM_Rotated( const IMesh * const &mesh,
+Part_FEM_Rotated::Part_FEM_Rotated( const int &in_nelem,
+    const int &in_nfunc,
+    const int &in_nlocbas,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -12,7 +14,7 @@ Part_FEM_Rotated::Part_FEM_Rotated( const IMesh * const &mesh,
     const int &in_cpu_size,
     const FEType &in_elemType,
     const Field_Property &fp ) 
-: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp )
+: Part_FEM( in_nelem, in_nfunc, in_nlocbas, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp )
 {
   // Generate the local array tagging the element's property.
   elem_tag.resize( nlocalele );

@@ -1,16 +1,14 @@
 #include "Part_FEM.hpp"
 
 Part_FEM::Part_FEM(
-    const IMesh * const &mesh,
+    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
     const std::vector<double> &ctrlPts,
     const int &in_cpu_rank, const int &in_cpu_size,
     const FEType &in_elemType, const Field_Property &fp )
-: nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
-  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
+: nElem( in_nelem ), nFunc( in_nfunc ), nLocBas( in_nlocbas ),
   probDim(3), elemType(in_elemType),
   field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
   is_geo_field( fp.get_is_geo_field() ),
@@ -26,7 +24,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
+  Generate_Partition( gpart, mnindex, IEN, field_id );
 
   // Generate group 6, if the field is tagged as is_geo_field == true
   // local copy of control points
@@ -61,7 +59,7 @@ Part_FEM::Part_FEM(
 }
 
 Part_FEM::Part_FEM(
-    const IMesh * const &mesh,
+    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -69,9 +67,7 @@ Part_FEM::Part_FEM(
     const std::vector<int> &rotatedtag,
     const int &in_cpu_rank, const int &in_cpu_size,
     const FEType &in_elemType, const Field_Property &fp )
-: nElem( mesh->get_nElem() ), nFunc( mesh->get_nFunc() ),
-  sDegree( mesh->get_s_degree() ), tDegree( mesh->get_t_degree() ),
-  uDegree( mesh->get_u_degree() ), nLocBas( mesh->get_nLocBas() ),
+: nElem( in_nelem ), nFunc( in_nfunc ), nLocBas( in_nlocbas ),
   probDim(3), elemType(in_elemType),
   field_id( fp.get_id() ), dofNum( fp.get_dofNum() ),
   is_geo_field( fp.get_is_geo_field() ),
@@ -87,7 +83,7 @@ Part_FEM::Part_FEM(
   SYS_T::print_fatal_if(cpu_rank < 0, "Error: Part_FEM input cpu_rank is wrong! \n");
 
   // Generate group 1, 2, and 5.
-  Generate_Partition( mesh, gpart, mnindex, IEN, field_id );
+  Generate_Partition( gpart, mnindex, IEN, field_id );
 
   // Generate group 6, if the field is tagged as is_geo_field == true
   // local copy of control points
@@ -160,10 +156,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   cpu_size = h5r->read_intScalar("Part_Info", "cpu_size");
 
   // global mesh info
-  std::vector<int> vdeg = h5r -> read_intVector("Global_Mesh_Info", "degree");
-
-  sDegree = vdeg[0]; tDegree = vdeg[1]; uDegree = vdeg[2];
-
   nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
   nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
   nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
@@ -210,8 +202,7 @@ Part_FEM::~Part_FEM()
   delete [] LIEN;
 }
 
-void Part_FEM::Generate_Partition( const IMesh * const &mesh,
-    const IGlobal_Part * const &gpart,
+void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
     const int &field )
@@ -376,10 +367,6 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   h5w->write_intScalar( group_id_3, "nElem", nElem );
   h5w->write_intScalar( group_id_3, "nFunc", nFunc );
-
-  const std::vector<int> vdeg { sDegree, tDegree, uDegree };
-
-  h5w->write_intVector( group_id_3, "degree", vdeg );
 
   h5w->write_intScalar( group_id_3, "nLocBas", nLocBas );
 

@@ -9,7 +9,6 @@
 // Date: Jan. 12 2017
 // ============================================================================
 #include "Vec_Tools.hpp"
-#include "IMesh.hpp"
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
@@ -19,7 +18,7 @@
 class Part_FEM : public IPart
 {
   public:
-    Part_FEM( const IMesh * const &mesh,
+    Part_FEM( const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -28,7 +27,7 @@ class Part_FEM : public IPart
         const FEType &in_elemType, 
         const Field_Property &in_fp );
 
-    Part_FEM( const IMesh * const &mesh,
+    Part_FEM( const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
@@ -87,9 +86,6 @@ class Part_FEM : public IPart
 
     virtual int get_nElem() const {return nElem;}
     virtual int get_nFunc() const {return nFunc;}
-    virtual int get_sDegree() const {return sDegree;}
-    virtual int get_tDegree() const {return tDegree;}
-    virtual int get_uDegree() const {return uDegree;}
     virtual int get_nLocBas() const {return nLocBas;}
     virtual int get_LIEN(const int &ee, const int &ii) const {return LIEN[ee][ii];}
 
@@ -116,7 +112,7 @@ class Part_FEM : public IPart
     int cpu_rank, cpu_size;
 
     // 4. global mesh info
-    int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas, probDim;
+    int nElem, nFunc, nLocBas, probDim;
     FEType elemType;
 
     // 5. LIEN
@@ -137,8 +133,7 @@ class Part_FEM : public IPart
 
     // ------------------------------------------------------------------------
     // Function
-    void Generate_Partition( const IMesh * const &mesh,
-        const IGlobal_Part * const &gpart,
+    void Generate_Partition( const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const int &field );

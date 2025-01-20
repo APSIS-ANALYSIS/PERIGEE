@@ -166,11 +166,11 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( preprocess_fsi preprocess_fsi.cpp)
+ADD_EXECUTABLE( preprocess_fsi preprocess.cpp)
 ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
-ADD_EXECUTABLE( fsi3d fsi_driver.cpp)
+ADD_EXECUTABLE( fsi3d driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
-ADD_EXECUTABLE( vis_fsi vis_driver.cpp )
+ADD_EXECUTABLE( vis_fsi vis.cpp )
 ADD_EXECUTABLE( vis_fluid vis_fluid.cpp )
 ADD_EXECUTABLE( vis_solid vis_solid.cpp )
 ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )

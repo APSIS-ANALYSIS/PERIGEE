@@ -1,6 +1,8 @@
 #include "Part_FEM_FSI.hpp"
 
-Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
+Part_FEM_FSI::Part_FEM_FSI( const int &in_nelem,
+    const int &in_nfunc,
+    const int &in_nlocbas,
     const IGlobal_Part * const &gpart,
     const Map_Node_Index * const &mnindex,
     const IIEN * const &IEN,
@@ -13,7 +15,7 @@ Part_FEM_FSI::Part_FEM_FSI( const IMesh * const &mesh,
     const FEType &in_elemType,
     const int &in_start_idx,
     const Field_Property &fp ) 
-: Part_FEM( mesh, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp ), 
+: Part_FEM( in_nelem, in_nfunc, in_nlocbas, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp ), 
   start_idx( in_start_idx )
 {
   // Generate the local array tagging the element's property.

@@ -7,8 +7,6 @@
 // Date Created: Jan 01 2020
 // ==================================================================
 #include "Math_Tools.hpp"
-#include "Mesh_Tet.hpp"
-#include "Mesh_FEM.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
@@ -251,42 +249,21 @@ int main( int argc, char * argv[] )
 
   VEC_T::sort_unique_resize( node_f ); VEC_T::sort_unique_resize( node_r );
 
-  IMesh * mesh = nullptr;
+  const int nLocBas = FE_T::to_nLocBas(elemType);
 
-  switch( elemType )
-  {
-    case FEType::Tet4:
-      mesh = new Mesh_Tet(nFunc, nElem, 1);
-      break;
-    case FEType::Tet10:
-      mesh = new Mesh_Tet(nFunc, nElem, 2);
-      break;
-    case FEType::Hex8:
-      mesh = new Mesh_FEM(nFunc, nElem, 8, 1);
-      break;
-    case FEType::Hex27:
-      mesh = new Mesh_FEM(nFunc, nElem, 27, 2);
-      break;      
-    default:
-      SYS_T::print_fatal("Error: elemType %s is not supported.\n", elemType_str.c_str());
-      break;
-  }
-
-  SYS_T::print_fatal_if( IEN->get_nLocBas() != mesh->get_nLocBas(), "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", mesh->get_nLocBas(), IEN->get_nLocBas() );
-
-  mesh -> print_info();
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas() );
   
   // Call METIS to partition the mesh 
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, mesh, IEN, "epart", "npart" );
+        isDualGraph, nElem, nFunc, nLocBas, IEN, "epart", "npart" );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( mesh, "epart", "npart" );
+    global_part = new Global_Part_Serial( nElem, nFunc, "epart", "npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering
-  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, mesh->get_nFunc());
+  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
   // Partition the interfaces
@@ -305,31 +282,8 @@ int main( int argc, char * argv[] )
     IIEN * sur_rotated_IEN = new IEN_FEM(sur_rotated_nElem, sur_rotated_vecIEN);
     VEC_T::clean(sur_rotated_vecIEN);
 
-    IMesh * sur_fixed_mesh = nullptr;
-    IMesh * sur_rotated_mesh = nullptr;
-
-    switch( elemType )
-    {
-      case FEType::Tet4:
-        sur_fixed_mesh = new Mesh_FEM(sur_fixed_nFunc, sur_fixed_nElem, 3, 1);
-        sur_rotated_mesh = new Mesh_FEM(sur_rotated_nFunc, sur_rotated_nElem, 3, 1);
-        break;
-      case FEType::Tet10:
-        sur_fixed_mesh = new Mesh_FEM(sur_fixed_nFunc, sur_fixed_nElem, 6, 2);
-        sur_rotated_mesh = new Mesh_FEM(sur_rotated_nFunc, sur_rotated_nElem, 6, 2);
-        break;
-      case FEType::Hex8:
-        sur_fixed_mesh = new Mesh_FEM(sur_fixed_nFunc, sur_fixed_nElem, 4, 1);
-        sur_rotated_mesh = new Mesh_FEM(sur_rotated_nFunc, sur_rotated_nElem, 4, 1);
-        break;
-      case FEType::Hex27:
-        sur_fixed_mesh = new Mesh_FEM(sur_fixed_nFunc, sur_fixed_nElem, 9, 2);
-        sur_rotated_mesh = new Mesh_FEM(sur_rotated_nFunc, sur_rotated_nElem, 9, 2);
-        break;      
-      default:
-        SYS_T::print_fatal("Error: elemType %s is not supported.\n", elemType_str.c_str());
-        break;
-    }
+    // Assume sur_fixed_nLocBas = sur_rotated_nLocBas
+    const int sur_nLocBas = sur_fixed_IEN->get_nLocBas();
     
     std::string epart_base = "epart_", npart_base = "npart_";
     std::string fixed_epart = SYS_T::gen_capfile_name(epart_base, ii, "_fixed_itf");
@@ -342,21 +296,21 @@ int main( int argc, char * argv[] )
     if(cpu_size > 1)
     {
       global_part_fixed_itf = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, sur_fixed_mesh, sur_fixed_IEN, fixed_epart, fixed_npart );
+        isDualGraph, sur_fixed_nElem, sur_fixed_nFunc, sur_nLocBas, sur_fixed_IEN, fixed_epart, fixed_npart );
 
       global_part_rotated_itf = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, sur_rotated_mesh, sur_rotated_IEN, rotated_epart, rotated_npart );
+        isDualGraph, sur_rotated_nElem, sur_rotated_nFunc, sur_nLocBas, sur_rotated_IEN, rotated_epart, rotated_npart );
     }
     else if(cpu_size == 1)
     {
-      global_part_fixed_itf = new Global_Part_Serial( sur_fixed_mesh, fixed_epart, fixed_npart );
+      global_part_fixed_itf = new Global_Part_Serial( sur_fixed_nElem, sur_fixed_nFunc, fixed_epart, fixed_npart );
 
-      global_part_rotated_itf = new Global_Part_Serial( sur_rotated_mesh, rotated_epart, rotated_npart );
+      global_part_rotated_itf = new Global_Part_Serial( sur_rotated_nElem, sur_rotated_nFunc, rotated_epart, rotated_npart );
     }
     else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
     delete global_part_fixed_itf; delete global_part_rotated_itf;
-    delete sur_fixed_mesh; delete sur_rotated_mesh; delete sur_fixed_IEN; delete sur_rotated_IEN;
+    delete sur_fixed_IEN; delete sur_rotated_IEN;
   }
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
@@ -479,7 +433,7 @@ int main( int argc, char * argv[] )
     // IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
     //     ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
 
-    IPart * part = new Part_FEM_Rotated( mesh, global_part, mnindex, IEN,
+    IPart * part = new Part_FEM_Rotated( nElem, nFunc, nLocBas, global_part, mnindex, IEN,
         ctrlPts, rotated_tag, node_f, node_r, proc_rank, cpu_size, elemType, 
         {0, dofNum, true, "ROTATED_NS"} );
     
@@ -657,7 +611,7 @@ int main( int argc, char * argv[] )
   for(auto &it_nbc : NBC_list) delete it_nbc;
 
   delete InFBC; delete RotBC; delete ebc; delete wbc; delete mytimer;
-  delete mnindex; delete global_part; delete mesh; delete IEN;
+  delete mnindex; delete global_part; delete IEN;
 
   return EXIT_SUCCESS;
 }

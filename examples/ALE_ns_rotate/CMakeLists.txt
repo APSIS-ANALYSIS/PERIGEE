@@ -158,10 +158,10 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
-ADD_EXECUTABLE( ns3d ns_driver.cpp)
-ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
-ADD_EXECUTABLE( vis_ns vis_ns.cpp)
+ADD_EXECUTABLE( preprocess3d preprocess.cpp)
+ADD_EXECUTABLE( ns3d driver.cpp)
+ADD_EXECUTABLE( prepost3d prepost.cpp)
+ADD_EXECUTABLE( vis_ns vis.cpp)
 ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)

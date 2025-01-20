@@ -1,14 +1,14 @@
 #include "Global_Part_Serial.hpp"
 
-Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
+Global_Part_Serial::Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
    const std::string &element_part_name, const std::string &node_part_name )
 {
   // This is a partition for a single mesh (field)
   field_offset.resize(1);
   field_offset[0] = 0;
 
-  const int nElem = mesh->get_nElem();
-  const int nFunc = mesh->get_nFunc();
+  const int nElem = in_nelem;
+  const int nFunc = in_nfunc;
  
   epart = new idx_t [nElem];
   npart = new idx_t [nFunc];
@@ -24,12 +24,19 @@ Global_Part_Serial::Global_Part_Serial( const class IMesh * const &mesh,
 }
 
 Global_Part_Serial::Global_Part_Serial( const int &num_fields,
-    const std::vector<IMesh const *> &mesh_list,
+    const std::vector<int> &nelem_list,
+    const std::vector<int> &nfunc_list,
     const std::string &element_part_name, const std::string &node_part_name )
 {
-  if(num_fields != static_cast<int>( mesh_list.size() ) )
+  if(num_fields != static_cast<int>( nelem_list.size() ) )
   {
-    std::cerr<<"ERROR: input num_fields is incompatible with mesh list.\n";
+    std::cerr<<"ERROR: input num_fields is incompatible with nelem list.\n";
+    exit(1);
+  }
+
+  if(num_fields != static_cast<int>( nfunc_list.size() ) )
+  {
+    std::cerr<<"ERROR: input num_fields is incompatible with nfunc list.\n";
     exit(1);
   }
 
@@ -37,19 +44,19 @@ Global_Part_Serial::Global_Part_Serial( const int &num_fields,
   field_offset[0] = 0;
 
   for(int ii=1; ii<num_fields; ++ii)
-    field_offset[ii] = field_offset[ii-1] + mesh_list[ii-1] -> get_nFunc();
+    field_offset[ii] = field_offset[ii-1] + nfunc_list[ii-1];
 
-  const idx_t nElem = mesh_list[0]->get_nElem();
+  const idx_t nElem = nelem_list[0];
   idx_t nFunc = 0;
 
   for(int ii=0; ii<num_fields; ++ii)
   {
-    if( nElem != static_cast<idx_t>( mesh_list[ii]->get_nElem() ) )
+    if( nElem != static_cast<idx_t>( nelem_list[ii] ) )
     {
-      std::cerr<<"ERROR: mesh list objects are incompatible with nElem.\n";
+      std::cerr<<"ERROR: nelem list objects are incompatible with nElem.\n";
       exit(1);
     }
-    nFunc   += mesh_list[ii] -> get_nFunc();
+    nFunc += nfunc_list[ii];
   }
 
   epart = new idx_t [nElem];
@@ -78,10 +85,10 @@ void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
   // file creation
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
-  h5w -> write_intScalar("part_size", part_size);
-  h5w -> write_intScalar("cpu_size", 1);
+  h5w->write_intScalar("part_size", part_size);
+  h5w->write_intScalar("cpu_size", 1);
   h5w->write_intVector("part", part_in, part_size );
   h5w->write_intVector("field_offset", field_offset );
 
@@ -91,7 +98,7 @@ void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
   
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 
-  delete h5w; H5Fclose(file_id);
+  H5Fclose(file_id);
 }
 
 // EOF
