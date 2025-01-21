@@ -15,13 +15,13 @@
 #include "NodalBC_3D_inflow.hpp"
 #include "NodalBC_3D_rotated.hpp"
 #include "ElemBC_3D_outflow.hpp"
-#include "ElemBC_3D_turbulence_wall_model.hpp"
+#include "ElemBC_3D_WallModel.hpp"
 #include "Interface_pair.hpp"
 #include "NBC_Partition.hpp"
 #include "NBC_Partition_inflow.hpp"
 #include "NBC_Partition_rotated.hpp"
 #include "EBC_Partition_outflow.hpp"
-#include "EBC_Partition_turbulence_wall_model.hpp"
+#include "EBC_Partition_WallModel.hpp"
 #include "Interface_Partition.hpp"
 #include "yaml-cpp/yaml.h"
 
@@ -385,7 +385,7 @@ int main( int argc, char * argv[] )
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
-  ElemBC * wbc = new ElemBC_3D_turbulence_wall_model( weak_list, wall_model_type, IEN, elemType );
+  ElemBC * wbc = new ElemBC_3D_WallModel( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
   std::vector<double> intervals_0 {0.0, 6.0};
@@ -466,7 +466,7 @@ int main( int argc, char * argv[] )
     ebcpart -> write_hdf5( part_file );
 
     // Partition Weak BC and write to h5 file
-    EBC_Partition * wbcpart = new EBC_Partition_turbulence_wall_model(part, mnindex, wbc);
+    EBC_Partition * wbcpart = new EBC_Partition_WallModel(part, mnindex, wbc);
 
     wbcpart -> write_hdf5( part_file );
 
