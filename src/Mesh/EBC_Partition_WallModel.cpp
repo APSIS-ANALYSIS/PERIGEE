@@ -1,6 +1,6 @@
-#include "EBC_Partition_turbulence_wall_model.hpp"
+#include "EBC_Partition_WallModel.hpp"
 
-EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const IPart * const &part,
+EBC_Partition_WallModel::EBC_Partition_WallModel(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)
 : EBC_Partition(part, mnindex, ebc), wall_model_type {ebc->get_wall_model_type()}
 {
@@ -19,13 +19,13 @@ EBC_Partition_turbulence_wall_model::EBC_Partition_turbulence_wall_model(const I
       }
     }
 
-    SYS_T::print_fatal_if( num_local_cell[0] != VEC_T::get_size(part_vol_ele_id), "Error: EBC_Partition_turbulence_wall_model the part_vol_ele_id vector size does not match with the number of local cell given in EBC_Partition.\n" ); 
+    SYS_T::print_fatal_if( num_local_cell[0] != VEC_T::get_size(part_vol_ele_id), "Error: EBC_Partition_WallModel the part_vol_ele_id vector size does not match with the number of local cell given in EBC_Partition.\n" ); 
   }
   else
-    SYS_T::print_fatal("Error: EBC_Partition_turbulence_wall_model, unknown wall model type.\n");
+    SYS_T::print_fatal("Error: EBC_Partition_WallModel, unknown wall model type.\n");
 }
 
-void EBC_Partition_turbulence_wall_model::write_hdf5(const std::string &FileName) const
+void EBC_Partition_WallModel::write_hdf5(const std::string &FileName) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 

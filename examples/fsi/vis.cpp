@@ -6,7 +6,7 @@
 // Date: Jan 17 2021
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
-#include "APart_Basic_Info.hpp"
+#include "ANL_Tools.hpp"
 #include "ALocal_Elem.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_hex8.hpp"
@@ -95,9 +95,7 @@ int main( int argc, char * argv[] )
     SYS_T::execute("rm -rf VIS_FSI_.pvd");
   }
 
-  APart_Basic_Info * PartBasic = new APart_Basic_Info(part_v_file, 0);
-  
-  SYS_T::print_fatal_if(size != PartBasic->get_cpu_size(), "Error: number of processors does not match with prepost! \n");
+  SYS_T::print_fatal_if(size != ANL_T::get_cpu_size(part_v_file, 0), "Error: number of processors does not match with prepost! \n");
   
   SYS_T::commPrint("===> %d processor(s) are assigned.", size);
 
@@ -181,7 +179,7 @@ int main( int argc, char * argv[] )
   // Clean up memory
   delete quad; delete element; delete visprep;
   delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p; 
-  delete PartBasic; delete locElem; delete pNode_v; delete pNode_p;  
+  delete locElem; delete pNode_v; delete pNode_p;  
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
   delete [] pointArrays; delete vtk_w;
   PetscFinalize();

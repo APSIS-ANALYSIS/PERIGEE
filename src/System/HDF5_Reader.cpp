@@ -182,7 +182,7 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
   return out;
 }
 
-Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
+  std::array<double, 3> HDF5_Reader::read_Vector_3( const char * const &group_name,
     const char * const &data_name ) const
 {
   hid_t drank;
@@ -199,13 +199,13 @@ Vector_3 HDF5_Reader::read_Vector_3( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  const Vector_3 out( ddata[0], ddata[1], ddata[2] );
+  std::array<double, 3> out {{ ddata[0], ddata[1], ddata[2] }};
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;
 }
 
-Tensor2_3D HDF5_Reader::read_Tensor2_3D( const char * const &group_name,
+std::array<double, 9> HDF5_Reader::read_Tensor2_3D( const char * const &group_name,
     const char * const &data_name ) const
 {
   hid_t drank;
@@ -222,7 +222,7 @@ Tensor2_3D HDF5_Reader::read_Tensor2_3D( const char * const &group_name,
     SYS_T::print_fatal( oss.str().c_str() );
   }
 
-  const Tensor2_3D out( ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] );
+  std::array<double, 9> out {{ ddata[0], ddata[1], ddata[2], ddata[3], ddata[4], ddata[5], ddata[6], ddata[7], ddata[8] }} ;
 
   delete [] ddims; delete [] ddata; ddims = nullptr; ddata = nullptr;
   return out;

@@ -39,7 +39,9 @@
 #include <string>
 #include <cstdlib>
 #include <climits>
-#include "Tensor2_3D.hpp"
+#include <iostream>
+#include <vector>
+#include <array>
 #include "hdf5.h"
 
 class HDF5_Writer
@@ -154,17 +156,17 @@ class HDF5_Writer
     // Vector_3
     // --------------------------------------------------------------
     void write_Vector_3( const hid_t &group_id, const char * const &data_name,
-        const Vector_3 &value ) const;
+        const std::array<double, 3> &value ) const;
 
-    void write_Vector_3( const char * const &data_name, const Vector_3 &value ) const;
+    void write_Vector_3( const char * const &data_name, const std::array<double, 3> &value ) const;
 
     // --------------------------------------------------------------
     // Tensor2_3D
     // --------------------------------------------------------------
     void write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
-        const Tensor2_3D &value ) const;
+        const std::array<double, 9> &value ) const;
 
-    void write_Tensor2_3D( const char * const &data_name, const Tensor2_3D &value ) const;
+    void write_Tensor2_3D( const char * const &data_name, const std::array<double, 9> &value ) const;
 
     // --------------------------------------------------------------
     // Matrix writer

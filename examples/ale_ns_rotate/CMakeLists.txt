@@ -31,7 +31,6 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Vector_3.cpp
-  ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
@@ -41,7 +40,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/Part_FEM_Rotated.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
   ${perigee_source}/Mesh/ElemBC_3D_outflow.cpp
-  ${perigee_source}/Mesh/ElemBC_3D_turbulence_wall_model.cpp
+  ${perigee_source}/Mesh/ElemBC_3D_WallModel.cpp
   ${perigee_source}/Mesh/Interface_pair.cpp
   ${perigee_source}/Mesh/NodalBC.cpp
   ${perigee_source}/Mesh/NodalBC_3D_inflow.cpp
@@ -54,7 +53,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/NBC_Partition_rotated.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
-  ${perigee_source}/Mesh/EBC_Partition_turbulence_wall_model.cpp
+  ${perigee_source}/Mesh/EBC_Partition_WallModel.cpp
   ${perigee_source}/Mesh/Interface_Partition.cpp
   ${perigee_source}/Mesh/Map_Node_Index.cpp
   ${perigee_source}/Mesh/Global_Part_METIS.cpp
@@ -159,10 +158,10 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( preprocess3d preprocess_ns.cpp)
-ADD_EXECUTABLE( ns3d ns_driver.cpp)
-ADD_EXECUTABLE( prepost3d prepost_ns.cpp)
-ADD_EXECUTABLE( vis_ns vis_ns.cpp)
+ADD_EXECUTABLE( preprocess3d preprocess.cpp)
+ADD_EXECUTABLE( ns3d driver.cpp)
+ADD_EXECUTABLE( prepost3d prepost.cpp)
+ADD_EXECUTABLE( vis_ns vis.cpp)
 ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)

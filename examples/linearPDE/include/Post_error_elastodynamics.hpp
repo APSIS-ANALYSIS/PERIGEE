@@ -7,6 +7,7 @@
 //
 // Date: Oct. 26 2023
 // ==================================================================
+#include "Tensor2_3D.hpp"
 #include "FEAElement.hpp"
 #include "IQuadPts.hpp"
 #include "Math_Tools.hpp"
