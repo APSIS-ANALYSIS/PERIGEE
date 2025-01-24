@@ -42,7 +42,6 @@ class PNonlinear_LinearPDE_Solver
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
         const TimeMethod_GenAlpha * const &tmga_ptr,
-        const Matrix_PETSc * const &bc_mat,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
         bool &conv_flag, int &nl_counter ) const;
