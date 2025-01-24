@@ -51,13 +51,12 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
     // Private function
     // Essential boundary condition
-    void EssBC_KG( const ALocal_NBC * const &nbc_part, const int &field );
+    void EssBC_KG( const int &field );
 
-    void EssBC_G( const ALocal_NBC * const &nbc_part, const int &field );
+    void EssBC_G( const int &field );
 
     // Natural boundary condition
-    void NatBC_G( const double &curr_time, const double &dt,
-        IPLocAssem * const &lassem_ptr );
+    void NatBC_G( const double &curr_time, const double &dt );
 
     void GetLocal( const double * const &array, const int * const &IEN,
         double * const &local_array ) const

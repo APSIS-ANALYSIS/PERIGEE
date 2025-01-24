@@ -18,10 +18,10 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   nlgn( pnode->get_nlocghonode() )
 {
   // Make sure the data structure is compatible
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
-      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
+  SYS_T::print_fatal_if(dof_mat != nbc->get_dof_LID(),
+      "PGAssem_NS_FEM::dof_mat != nbc->get_dof_LID(). \n");
   
-  const int nlocrow = dof_mat * pnode_ptr -> get_nlocalnode();
+  const int nlocrow = dof_mat * pnode -> get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
@@ -57,29 +57,28 @@ PGAssem_LinearPDE_GenAlpha::~PGAssem_LinearPDE_GenAlpha()
   MatDestroy(&K);
 }
 
-void PGAssem_LinearPDE_GenAlpha::EssBC_KG( 
-    const ALocal_NBC * const &nbc_part, const int &field )
+void PGAssem_LinearPDE_GenAlpha::EssBC_KG( const int &field )
 {
-  const int local_dir = nbc_part -> get_Num_LD(field);
+  const int local_dir = nbc -> get_Num_LD(field);
 
   if(local_dir > 0)
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LDN(field, ii) * dof_mat + field;
 
       VecSetValue(G, row, 0.0, INSERT_VALUES);
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   }
 
-  const int local_sla = nbc_part->get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(field);
   if(local_sla > 0)
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
-      const int col = nbc_part->get_LPMN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LPSN(field, ii) * dof_mat + field;
+      const int col = nbc->get_LPMN(field, ii) * dof_mat + field;
       MatSetValue(K, row, col, 1.0, ADD_VALUES);
       MatSetValue(K, row, row, -1.0, ADD_VALUES);
       VecSetValue(G, row, 0.0, INSERT_VALUES);
@@ -87,25 +86,24 @@ void PGAssem_LinearPDE_GenAlpha::EssBC_KG(
   }
 }
 
-void PGAssem_LinearPDE_GenAlpha::EssBC_G( 
-    const ALocal_NBC * const &nbc_part, const int &field )
+void PGAssem_LinearPDE_GenAlpha::EssBC_G( const int &field )
 {
-  const int local_dir = nbc_part->get_Num_LD(field);
+  const int local_dir = nbc->get_Num_LD(field);
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LDN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
 
-  const int local_sla = nbc_part->get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(field);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LPSN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
@@ -113,7 +111,7 @@ void PGAssem_LinearPDE_GenAlpha::EssBC_G(
 
 void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   
   lassem_ptr->Assem_Estimate();
 
@@ -192,7 +190,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
     const double &curr_time,
     const double &dt )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
 
   double * array_a = new double [nlgn * dof_mat];
   double * array_b = new double [nlgn * dof_mat];
@@ -255,7 +253,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     const double &curr_time,
     const double &dt )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
 
   double * array_a = new double [nlgn * dof_mat];
   double * array_b = new double [nlgn * dof_mat];
@@ -320,7 +318,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     const PDNSolution * const &sol )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
 
   double * array_a = new double [nlgn * dof_mat];
   double * local_a = new double [nLocBas * dof_mat];
