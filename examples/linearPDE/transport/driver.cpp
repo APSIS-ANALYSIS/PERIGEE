@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
   }
 
   // ===== Time step info =====
-  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
@@ -282,12 +282,12 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol, timeinfo);
+  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol, timeinfo.get());
 
   // ===== Print complete solver info =====
   //lsolver -> print_info();
 
-  delete dot_sol; delete sol; delete timeinfo;
+  delete dot_sol; delete sol;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

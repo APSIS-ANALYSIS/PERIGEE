@@ -2,7 +2,6 @@
 #define PGASSEM_LINEARPDE_GENALPHA_HPP
 
 #include "IPGAssem.hpp"
-#include "ANL_Tools.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_Elastodynamics.hpp"
 #include "PDNSolution_Transport.hpp"
