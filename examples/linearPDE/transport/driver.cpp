@@ -6,9 +6,9 @@
 // Date: Oct. 24 2023
 // ============================================================================
 #include "HDF5_Writer.hpp"
+#include "ANL_Tools.hpp"
 #include "PLocAssem_Transport_GenAlpha.hpp"
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
-#include "PNonlinear_LinearPDE_Solver.hpp"
 #include "PTime_LinearPDE_Solver.hpp"
 
 int main(int argc, char *argv[])
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol, timeinfo.get());
+  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol, std::move(timeinfo));
 
   // ===== Print complete solver info =====
   //lsolver -> print_info();

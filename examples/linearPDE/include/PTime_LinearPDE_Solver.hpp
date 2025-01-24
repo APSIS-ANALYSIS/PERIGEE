@@ -27,7 +27,7 @@ class PTime_LinearPDE_Solver
         const bool &restart_init_assembly_flag,
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
-        PDNTimeStep * const &time_info ) const;
+        std::unique_ptr<PDNTimeStep> time_info ) const;
    
    /* 
     void TM_GenAlpha_Elastodynamics(

@@ -10,6 +10,7 @@
 // Date: Nov. 8th 2013
 // ==================================================================
 #include "HDF5_Reader.hpp"
+#include "FEType.hpp"
 
 namespace ANL_T
 {

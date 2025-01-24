@@ -52,7 +52,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
-    PDNTimeStep * const &time_info ) const
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
