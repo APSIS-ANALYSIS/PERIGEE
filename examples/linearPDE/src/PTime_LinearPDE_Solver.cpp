@@ -1,13 +1,13 @@
 #include "PTime_LinearPDE_Solver.hpp"
 
-PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( const std::string &input_name,
-        const int &input_record_freq, const int &input_renew_tang_freq,
-        const double &input_final_time )
+PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( 
+    std::unique_ptr<PNonlinear_LinearPDE_Solver> in_nsolver,
+    const std::string &input_name,
+    const int &input_record_freq, const int &input_renew_tang_freq,
+    const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
-{}
-
-PTime_LinearPDE_Solver::~PTime_LinearPDE_Solver()
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
+  nsolver(std::move(in_nsolver))
 {}
 
 void PTime_LinearPDE_Solver::print_info() const
@@ -53,12 +53,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
     const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const Matrix_PETSc * const &bc_mat,
-    IPLocAssem * const &lassem_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const
+    PDNTimeStep * const &time_info ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
   PDNSolution * cur_sol = new PDNSolution(*init_sol);
@@ -99,10 +94,10 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_Transport( renew_flag,
+    nsolver->GenAlpha_Solve_Transport( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        pre_dot_sol, pre_sol, tmga_ptr, bc_mat, lassem_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        pre_dot_sol, pre_sol, tmga_ptr,
+        cur_dot_sol, cur_sol, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();

@@ -6,11 +6,6 @@
 // Date: Oct. 24 2023
 // ============================================================================
 #include "HDF5_Writer.hpp"
-#include "AGlobal_Mesh_Info.hpp"
-#include "ANL_Tools.hpp"
-#include "ALocal_Elem.hpp"
-#include "ALocal_EBC.hpp"
-#include "ALocal_NBC.hpp"
 #include "PLocAssem_Transport_GenAlpha.hpp"
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
 #include "PNonlinear_LinearPDE_Solver.hpp"
@@ -158,50 +153,33 @@ int main(int argc, char *argv[])
 
   MPI_Barrier(PETSC_COMM_WORLD);
 
-  // ===== Data from Files =====
-  // Control points' xyz coordinates
-  FEANode * fNode = new FEANode(part_file, rank);
-
-  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
-
-  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
-
-  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
-
-  APart_Node * pNode = new APart_Node(part_file, rank);
-
-  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
-
-  ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
-
-  SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
-
   SYS_T::print_fatal_if( size != ANL_T::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis.\n", size);
 
+  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
+
+  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc);
 
   pmat->gen_perm_bc(pNode, locnbc);
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+  auto tm_galpha = is_backward_Euler
+    ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
+    : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
-  if( is_backward_Euler )
-    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
-  else
-    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
-
-  tm_galpha_ptr->print_info();
+  tm_galpha->print_info();
 
   // ===== Local Assembly Routine =====
   IPLocAssem * locAssem_ptr = new PLocAssem_Transport_GenAlpha(
-      GMIptr->get_elemType(), nqp_vol, nqp_sur,
-      rho, cap, kap, tm_galpha_ptr, locebc -> get_num_ebc());
+      ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
+      rho, cap, kap, tm_galpha.get(), locebc -> get_num_ebc());
 
   // ===== Initial condition =====
   PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
@@ -239,20 +217,20 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_LinearPDE_GenAlpha( locAssem_ptr,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
+  unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>( 
+      part_file, rank, std::move(locAssem_ptr), nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locAssem_ptr );
+  gloAssem->Assem_nonzero_estimate();
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  gloAssem_ptr->Fix_nonzero_err_str();
-  gloAssem_ptr->Clear_KG();
+  gloAssem->Fix_nonzero_err_str();
+  gloAssem->Clear_KG();
   
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )
   {
-    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
         1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
     KSPSetType(lsolver_acce->ksp, KSPGMRES);
@@ -264,29 +242,31 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem_ptr->Assem_mass_residual( sol, locAssem_ptr );
+    gloAssem->Assem_mass_residual( sol );
 
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
+    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol );
   
     dot_sol -> ScaleValue( -1.0 );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
-    delete lsolver_acce;
     SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
   // ===== Linear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
   
   // ===== Nonlinear solver context =====
-  PNonlinear_LinearPDE_Solver * nsolver = new PNonlinear_LinearPDE_Solver(
+  auto nsolver = SYS_T::make_unique<PNonlinear_LinearPDE_Solver>(
+      std::move(gloAssem), std::move(lsolver), std::move(pmat),
+      std::move(tm_galpha),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_LinearPDE_Solver * tsolver = new PTime_LinearPDE_Solver( sol_bName,
+  auto tsolver = SYS_T::make_unique<PTime_LinearPDE_Solver>( 
+      std::move(nsolver), sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
@@ -294,17 +274,12 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol,
-      tm_galpha_ptr, timeinfo, pmat, locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
+  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol, timeinfo);
 
   // ===== Print complete solver info =====
-  lsolver -> print_info();
+  //lsolver -> print_info();
 
-  delete tsolver; delete nsolver;
-  delete lsolver; delete gloAssem_ptr; delete dot_sol; delete timeinfo;
-  delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode;
-  delete locnbc; delete locebc;
-  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete sol;
+  delete dot_sol; delete sol; delete timeinfo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

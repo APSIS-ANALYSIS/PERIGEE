@@ -13,11 +13,13 @@
 class PTime_LinearPDE_Solver
 {
   public:
-    PTime_LinearPDE_Solver( const std::string &input_name,
+    PTime_LinearPDE_Solver( 
+        std::unique_ptr<PNonlinear_LinearPDE_Solver> in_nsolver,
+        const std::string &input_name,
         const int &input_record_freq, const int &input_renew_tang_freq,
         const double &input_final_time );
 
-    ~PTime_LinearPDE_Solver();
+    ~PTime_LinearPDE_Solver() = default;
 
     void print_info() const;
 
@@ -25,13 +27,7 @@ class PTime_LinearPDE_Solver
         const bool &restart_init_assembly_flag,
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        PDNTimeStep * const &time_info,
-        const Matrix_PETSc * const &bc_mat,
-        IPLocAssem * const &lassem_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const;
+        PDNTimeStep * const &time_info ) const;
     
     void TM_GenAlpha_Elastodynamics(
         const bool &restart_init_assembly_flag,
@@ -62,6 +58,8 @@ class PTime_LinearPDE_Solver
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
+
+    const std::unique_ptr<PNonlinear_LinearPDE_Solver> nsolver;
 
     std::string Name_Generator( const std::string &middle_name,
         const int &counter ) const;

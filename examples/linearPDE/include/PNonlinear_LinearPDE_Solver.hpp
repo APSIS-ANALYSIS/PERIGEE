@@ -20,6 +20,8 @@ class PNonlinear_LinearPDE_Solver
     PNonlinear_LinearPDE_Solver( 
         std::unique_ptr<IPGAssem> in_gassem,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
+        std::unique_ptr<Matrix_PETSc> in_bc_mat,
+        std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
         const double &input_nrtol, const double &input_natol,
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq,
@@ -86,6 +88,7 @@ class PNonlinear_LinearPDE_Solver
     const std::unique_ptr<IPGAssem> gassem;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<Matrix_PETSc> bc_mat;
+    const std::unique_ptr<TimeMethod_GenAlpha> tmga;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const

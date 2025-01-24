@@ -4,6 +4,7 @@ PNonlinear_LinearPDE_Solver::PNonlinear_LinearPDE_Solver(
     std::unique_ptr<IPGAssem> in_gassem,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
+    std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
     const int &input_renew_freq,
@@ -13,7 +14,8 @@ PNonlinear_LinearPDE_Solver::PNonlinear_LinearPDE_Solver(
   nrenew_threshold(input_renew_threshold),
   gassem(std::move(in_gassem)),
   lsolver(std::move(in_lsolver)),
-  bc_mat(std::move(in_bc_mat))
+  bc_mat(std::move(in_bc_mat)),
+  tmga(std::move(in_tmga))
 {}
 
 void PNonlinear_LinearPDE_Solver::print_info() const
