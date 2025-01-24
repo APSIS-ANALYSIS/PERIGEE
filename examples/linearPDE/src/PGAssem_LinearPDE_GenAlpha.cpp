@@ -113,7 +113,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
 {
   const int nElem = locelem->get_nlocalele();
   
-  lassem_ptr->Assem_Estimate();
+  locassm->Assem_Estimate();
 
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
@@ -124,10 +124,10 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
       const int loc_index = lien_ptr -> get_LIEN(ee, ii);
       
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat * ii + mm] = dof_mat * nbc_part->get_LID( mm, loc_index ) + mm;
+        row_index[dof_mat * ii + mm] = dof_mat * nbc->get_LID( mm, loc_index ) + mm;
     }
 
-    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index, lassem_ptr->Tangent, ADD_VALUES);
+    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index, locassm->Tangent, ADD_VALUES);
   }
   
   delete [] row_index; row_index = nullptr;
@@ -135,7 +135,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -144,9 +144,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
 }
 
 void PGAssem_LinearPDE_GenAlpha::NatBC_G( 
-    const double &curr_time, const double &dt,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part )
+    const double &curr_time, const double &dt )
 {
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -156,24 +154,24 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_G(
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
+    const int num_sele = ebc -> get_num_local_cell(ebc_id);
 
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc -> get_SIEN(ebc_id, ee, LSIEN);
 
-      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
+      locassm->Assem_Residual_EBC(ebc_id, curr_time, dt,
           sctrl_x, sctrl_y, sctrl_z);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
         for(int mm=0; mm<dof_mat; ++mm)
-          srow_index[dof_mat * ii + mm] = dof_mat * nbc_part -> get_LID(mm, LSIEN[ii]) + mm;
+          srow_index[dof_mat * ii + mm] = dof_mat * nbc -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, dof_mat*snLocBas, srow_index, lassem_ptr->sur_Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, locassm->sur_Residual, ADD_VALUES);
     }
   }
 
@@ -213,16 +211,16 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Residual(curr_time, dt, local_a, local_b,
+    locassm->Assem_Residual(curr_time, dt, local_a, local_b,
         ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+        row_index[dof_mat*ii+mm] = dof_mat * nbc -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    VecSetValues(G, dof_mat * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, locassm->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -236,12 +234,12 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
   delete [] row_index; row_index = nullptr;
 
   // Resistance type boundary condition
-  NatBC_G( curr_time, dt, lassem_ptr, nbc_part, ebc_part );
+  NatBC_G( curr_time, dt );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_G( nbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_G( ii );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -276,19 +274,19 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+    locassm->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
         ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat*ii + mm] = dof_mat * nbc_part->get_LID(mm, IEN_e[ii]) + mm;
+        row_index[dof_mat*ii + mm] = dof_mat * nbc->get_LID(mm, IEN_e[ii]) + mm;
     }
 
     MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
+        locassm->Tangent, ADD_VALUES);
 
-    VecSetValues(G, dof_mat * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, locassm->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -302,12 +300,12 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Natural type boundary condition
-  NatBC_G( curr_time, dt, lassem_ptr, nbc_part, ebc_part );
+  NatBC_G( curr_time, dt );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -336,18 +334,18 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
+    locassm->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+        row_index[dof_mat*ii+mm] = dof_mat * nbc -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
     MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
+        locassm->Tangent, ADD_VALUES);
 
-    VecSetValues(G, dof_mat * nLocBas, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, locassm->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -359,12 +357,12 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
   delete [] row_index; row_index = nullptr;
 
   // Natural type boundary condition
-  NatBC_G( 0.0, 0.0, lassem_ptr, nbc_part, ebc_part );
+  NatBC_G( 0.0, 0.0 );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
