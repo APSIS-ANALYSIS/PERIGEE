@@ -161,11 +161,12 @@ int main(int argc, char *argv[])
   auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
 
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+  auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
 
-  pmat->gen_perm_bc(pNode, locnbc);
+  pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
@@ -177,14 +178,15 @@ int main(int argc, char *argv[])
   tm_galpha->print_info();
 
   // ===== Local Assembly Routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Transport_GenAlpha(
-      ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
-      rho, cap, kap, tm_galpha.get(), locebc -> get_num_ebc());
+  std::unique_ptr<IPLocAssem> locAssem_ptr = 
+    SYS_T::make_unique<PLocAssem_Transport_GenAlpha>(
+        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
+        rho, cap, kap, tm_galpha.get(), locebc -> get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * sol = new PDNSolution_Transport( pNode, 0 );
+  PDNSolution * sol = new PDNSolution_Transport( pNode.get(), 0 );
   
-  PDNSolution * dot_sol = new PDNSolution_Transport( pNode, 0 );
+  PDNSolution * dot_sol = new PDNSolution_Transport( pNode.get(), 0 );
   
   if( is_restart )
   {
@@ -217,7 +219,7 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>( 
+  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>( 
       part_file, rank, std::move(locAssem_ptr), nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");

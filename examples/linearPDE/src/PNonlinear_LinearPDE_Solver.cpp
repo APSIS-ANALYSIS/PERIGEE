@@ -37,7 +37,6 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
     const double &dt,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     bool &conv_flag, int &nl_counter ) const
@@ -47,9 +46,9 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
   // Gen-alpha parameters
-  const double gamma   = tmga_ptr->get_gamma();
-  const double alpha_m = tmga_ptr->get_alpha_m();
-  const double alpha_f = tmga_ptr->get_alpha_f();
+  const double gamma   = tmga->get_gamma();
+  const double alpha_m = tmga->get_alpha_m();
+  const double alpha_f = tmga->get_alpha_f();
 
   // Same-Y predictor
   sol     -> Copy(*pre_sol);
@@ -149,6 +148,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
   delete dot_step;
 }
 
+/*
 void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
     const bool &new_tangent_flag,
     const double &curr_time,
@@ -298,5 +298,5 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Elastodynamics(
 
   delete dot_step; delete dot_velo_alpha; delete disp_alpha;
 }
-
+*/
 // EOF

@@ -13,7 +13,7 @@
 
 namespace ANL_T
 {
-  int get_int_data(const std::string &fbasename, const int &in_rank, 
+  inline int get_int_data(const std::string &fbasename, const int &in_rank, 
       const std::string &partname, const std::string &dataname )
   {
     const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
@@ -28,22 +28,22 @@ namespace ANL_T
     return val;
   }
 
-  int get_cpu_rank(const std::string &fbasename, const int &in_rank)
+  inline int get_cpu_rank(const std::string &fbasename, const int &in_rank)
   {
     return get_int_data(fbasename, in_rank, "Part_Info", "cpu_rank");
   }
 
-  int get_cpu_size(const std::string &fbasename, const int &in_rank)
+  inline int get_cpu_size(const std::string &fbasename, const int &in_rank)
   {
     return get_int_data(fbasename, in_rank, "Part_Info", "cpu_size");
   }
 
-  int get_nLocBas(const std::string &fbasename, const int &in_rank)
+  inline int get_nLocBas(const std::string &fbasename, const int &in_rank)
   {
     return get_int_data(fbasename, in_rank, "Global_Mesh_Info", "nLocBas");
   }
 
-  FE_Typle get_elemType(const std::string &fbasename, const int &in_rank)
+  inline FEType get_elemType(const std::string &fbasename, const int &in_rank)
   {
     const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
 

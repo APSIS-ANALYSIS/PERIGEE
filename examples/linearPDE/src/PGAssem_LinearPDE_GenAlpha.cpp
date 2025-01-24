@@ -14,7 +14,7 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   num_ebc( ebc->get_num_ebc() ),
   nLocBas( ANL_T::get_nLocBas(in_part_file, in_rank) ),
   snLocBas( num_ebc>0 ? ebc -> get_cell_nLocBas(0) : 0 ),
-  dof_mat( locassem_ptr->get_dof_mat() ),
+  dof_mat( locassem->get_dof_mat() ),
   nlgn( pnode->get_nlocghonode() )
 {
   // Make sure the data structure is compatible

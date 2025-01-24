@@ -28,7 +28,8 @@ class PTime_LinearPDE_Solver
         const PDNSolution * const &init_dot_sol,
         const PDNSolution * const &init_sol,
         PDNTimeStep * const &time_info ) const;
-    
+   
+   /* 
     void TM_GenAlpha_Elastodynamics(
         const bool &restart_init_assembly_flag,
         const PDNSolution * const &init_dot_disp,
@@ -52,7 +53,7 @@ class PTime_LinearPDE_Solver
         IPGAssem * const &gassem_ptr,
         PLinear_Solver_PETSc * const &lsolver_ptr,
         PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const;
-
+*/
   private:
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions

@@ -2,6 +2,7 @@
 #define PGASSEM_LINEARPDE_GENALPHA_HPP
 
 #include "IPGAssem.hpp"
+#include "ANL_Tools.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_Elastodynamics.hpp"
 #include "PDNSolution_Transport.hpp"
@@ -37,7 +38,7 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
     // Assembly the residual and mass matrix
     virtual void Assem_mass_residual(
-        const PDNSolution * const &sol )
+        const PDNSolution * const &sol );
 
   private:
     // Private data

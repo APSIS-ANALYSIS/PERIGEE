@@ -52,7 +52,6 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
@@ -96,7 +95,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     // Call the nonlinear equation solver
     nsolver->GenAlpha_Solve_Transport( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        pre_dot_sol, pre_sol, tmga_ptr,
+        pre_dot_sol, pre_sol,
         cur_dot_sol, cur_sol, conv_flag, nl_counter );
 
     // Update the time step information
@@ -124,6 +123,7 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
   delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
 }
 
+/*
 void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     const bool &restart_init_assembly_flag,
     const PDNSolution * const &init_dot_disp,
@@ -239,5 +239,5 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
   delete pre_disp; delete cur_disp; delete pre_dot_disp; delete cur_dot_disp;
   delete pre_velo; delete cur_velo; delete pre_dot_velo; delete cur_dot_velo;
 }
-
+*/
 // EOF
