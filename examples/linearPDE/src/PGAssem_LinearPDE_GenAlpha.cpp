@@ -113,7 +113,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
 {
   const int nElem = locelem->get_nlocalele();
   
-  locassm->Assem_Estimate();
+  locassem->Assem_Estimate();
 
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
@@ -121,13 +121,13 @@ void PGAssem_LinearPDE_GenAlpha::Assem_nonzero_estimate()
   {
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int loc_index = lien_ptr -> get_LIEN(ee, ii);
+      const int loc_index = locien -> get_LIEN(ee, ii);
       
       for(int mm=0; mm<dof_mat; ++mm)
         row_index[dof_mat * ii + mm] = dof_mat * nbc->get_LID( mm, loc_index ) + mm;
     }
 
-    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index, locassm->Tangent, ADD_VALUES);
+    MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index, locassem->Tangent, ADD_VALUES);
   }
   
   delete [] row_index; row_index = nullptr;
@@ -162,7 +162,7 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_G(
 
       ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-      locassm->Assem_Residual_EBC(ebc_id, curr_time, dt,
+      locassem->Assem_Residual_EBC(ebc_id, curr_time, dt,
           sctrl_x, sctrl_y, sctrl_z);
 
       for(int ii=0; ii<snLocBas; ++ii)
@@ -171,7 +171,7 @@ void PGAssem_LinearPDE_GenAlpha::NatBC_G(
           srow_index[dof_mat * ii + mm] = dof_mat * nbc -> get_LID(mm, LSIEN[ii]) + mm;
       }
 
-      VecSetValues(G, dof_mat*snLocBas, srow_index, locassm->sur_Residual, ADD_VALUES);
+      VecSetValues(G, dof_mat*snLocBas, srow_index, locassem->sur_Residual, ADD_VALUES);
     }
   }
 
@@ -205,13 +205,13 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
 
   for( int ee=0; ee<nElem; ++ee )
   {
-    lien_ptr -> get_LIEN(ee, IEN_e);
+    locien -> get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
-    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    fnode->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    locassm->Assem_Residual(curr_time, dt, local_a, local_b,
+    locassem->Assem_Residual(curr_time, dt, local_a, local_b,
         ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -220,7 +220,7 @@ void PGAssem_LinearPDE_GenAlpha::Assem_residual(
         row_index[dof_mat*ii+mm] = dof_mat * nbc -> get_LID(mm, IEN_e[ii]) + mm;
     }
 
-    VecSetValues(G, dof_mat * nLocBas, row_index, locassm->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, locassem->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -268,13 +268,13 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
+    locien->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
 
-    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    fnode->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    locassm->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+    locassem->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
         ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -284,9 +284,9 @@ void PGAssem_LinearPDE_GenAlpha::Assem_tangent_residual(
     }
 
     MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index,
-        locassm->Tangent, ADD_VALUES);
+        locassem->Tangent, ADD_VALUES);
 
-    VecSetValues(G, dof_mat * nLocBas, row_index, locassm->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, locassem->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -330,11 +330,11 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
+    locien->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
-    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    fnode->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    locassm->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
+    locassem->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -343,9 +343,9 @@ void PGAssem_LinearPDE_GenAlpha::Assem_mass_residual(
     }
 
     MatSetValues(K, dof_mat * nLocBas, row_index, dof_mat * nLocBas, row_index,
-        locassm->Tangent, ADD_VALUES);
+        locassem->Tangent, ADD_VALUES);
 
-    VecSetValues(G, dof_mat * nLocBas, row_index, locassm->Residual, ADD_VALUES);
+    VecSetValues(G, dof_mat * nLocBas, row_index, locassem->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
