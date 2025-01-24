@@ -18,12 +18,14 @@ class PNonlinear_LinearPDE_Solver
 {
   public:
     PNonlinear_LinearPDE_Solver( 
+        std::unique_ptr<IPGAssem> in_gassem,
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         const double &input_nrtol, const double &input_natol,
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq,
         const int &input_renew_threshold = 4 );
 
-    ~PNonlinear_LinearPDE_Solver();
+    ~PNonlinear_LinearPDE_Solver() = default;
 
     int get_non_max_its() const {return nmaxits;}
 
@@ -41,9 +43,6 @@ class PNonlinear_LinearPDE_Solver
         const PDNSolution * const &pre_sol,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         const Matrix_PETSc * const &bc_mat,
-        IPLocAssem * const &lassem_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
         bool &conv_flag, int &nl_counter ) const;
@@ -85,11 +84,16 @@ class PNonlinear_LinearPDE_Solver
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
+    const std::unique_ptr<IPGAssem> gassem;
+    const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
+    const std::unique_ptr<Matrix_PETSc> bc_mat;
+
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
-    {PetscPrintf(PETSC_COMM_WORLD,
-        "  === NR ite: %d, r_error: %e, a_error: %e \n",
-        count, rel_err, abs_err);}
+    {
+      SYS_T::commPrint("  === NR ite: %d, r_error: %e, a_error: %e \n",
+          count, rel_err, abs_err);
+    }
 
 };
 

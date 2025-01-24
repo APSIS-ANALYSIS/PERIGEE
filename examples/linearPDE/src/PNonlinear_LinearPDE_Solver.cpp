@@ -1,16 +1,19 @@
 #include "PNonlinear_LinearPDE_Solver.hpp"
 
 PNonlinear_LinearPDE_Solver::PNonlinear_LinearPDE_Solver(
+    std::unique_ptr<IPGAssem> in_gassem,
+    std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
+    std::unique_ptr<Matrix_PETSc> in_bc_mat,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
     const int &input_renew_freq,
     const int &input_renew_threshold )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
-  nrenew_threshold(input_renew_threshold)
-{}
-
-PNonlinear_LinearPDE_Solver::~PNonlinear_LinearPDE_Solver()
+  nrenew_threshold(input_renew_threshold),
+  gassem(std::move(in_gassem)),
+  lsolver(std::move(in_lsolver)),
+  bc_mat(std::move(in_bc_mat))
 {}
 
 void PNonlinear_LinearPDE_Solver::print_info() const
@@ -33,10 +36,6 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
     const TimeMethod_GenAlpha * const &tmga_ptr,
-    const Matrix_PETSc * const &bc_mat,
-    IPLocAssem * const &lassem_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     bool &conv_flag, int &nl_counter ) const
@@ -69,26 +68,26 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
   {
-    gassem_ptr->Clear_KG();
+    gassem->Clear_KG();
 
-    gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
-        curr_time, dt, lassem_ptr );
+    gassem->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
+        curr_time, dt );
 
     SYS_T::commPrint("  --- M updated");
 
     // SetOperator will pass the tangent matrix to the linear solver and the
     // linear solver will generate the preconditioner based on the new matrix.
-    lsolver_ptr->SetOperator( gassem_ptr->K );
+    lsolver->SetOperator( gassem->K );
   }
   else
   {
-    gassem_ptr->Clear_G();
+    gassem->Clear_G();
 
-    gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,
-        curr_time, dt, lassem_ptr );
+    gassem->Assem_residual( &dot_sol_alpha, &sol_alpha,
+        curr_time, dt );
   }
 
-  VecNorm( gassem_ptr->G, NORM_2, &initial_norm );
+  VecNorm( gassem->G, NORM_2, &initial_norm );
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
   PDNSolution * dot_step = new PDNSolution( pre_sol );
@@ -97,7 +96,7 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
   do
   {
     // solve the equation : K dot_step = G
-    lsolver_ptr->Solve( gassem_ptr->G, dot_step );
+    lsolver->Solve( gassem->G, dot_step );
 
     bc_mat -> MatMultSol( dot_step );
 
@@ -112,23 +111,23 @@ void PNonlinear_LinearPDE_Solver::GenAlpha_Solve_Transport(
     // Assembly residual (& tangent if condition satisfied)
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
-      gassem_ptr->Clear_KG();
+      gassem->Clear_KG();
 
-      gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
-          curr_time, dt, lassem_ptr );
+      gassem->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha,
+          curr_time, dt );
 
       SYS_T::commPrint("  --- M updated");
-      lsolver_ptr->SetOperator(gassem_ptr->K);
+      lsolver->SetOperator(gassem->K);
     }
     else
     {
-      gassem_ptr->Clear_G();
+      gassem->Clear_G();
 
-      gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha,
-          curr_time, dt, lassem_ptr );
+      gassem->Assem_residual( &dot_sol_alpha, &sol_alpha,
+          curr_time, dt );
     }
 
-    VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
+    VecNorm(gassem->G, NORM_2, &residual_norm);
 
     SYS_T::print_fatal_if( residual_norm != residual_norm, "Error: nonlinear solver residual norm is NaN. Job killed.\n" );
 

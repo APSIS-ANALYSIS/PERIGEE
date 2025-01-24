@@ -39,13 +39,13 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 
   private:
     // Private data
-    std::unique_ptr<const ALocal_IEN> const locien;
-    std::unique_ptr<const ALocal_Elem> const locelem;
-    std::unique_ptr<const FEANode> const fnode;
-    std::unique_ptr<const APart_Node> const pnode;
-    std::unique_ptr<const ALocal_NBC> const nbc;
-    std::unique_ptr<const ALocal_EBC> const ebc;
-    std::unique_ptr<IPLocAssem> const locassem;
+    const std::unique_ptr<const ALocal_IEN> locien;
+    const std::unique_ptr<const ALocal_Elem> locelem;
+    const std::unique_ptr<const FEANode> fnode;
+    const std::unique_ptr<const APart_Node> pnode;
+    const std::unique_ptr<const ALocal_NBC> nbc;
+    const std::unique_ptr<const ALocal_EBC> ebc;
+    const std::unique_ptr<IPLocAssem> locassem;
 
     const int num_ebc, nLocBas, snLocBas, dof_mat, nlgn;
 
