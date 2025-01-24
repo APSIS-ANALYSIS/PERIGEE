@@ -11,9 +11,15 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
 {
   public:
     // Constructor for equations
-    PGAssem_LinearPDE_GenAlpha( const std::string &in_part_file,
-        const int &in_rank,
+    PGAssem_LinearPDE_GenAlpha(
+        std::unique_ptr<ALocal_IEN> in_locien,
+        std::unique_ptr<ALocal_Elem> in_locelem,
+        std::unique_ptr<FEANode> in_fnode,
+        std::unique_ptr<APart_Node> in_pnode,
+        std::unique_ptr<ALocal_NBC> in_nbc,
+        std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<IPLocAssem> in_locassem,
+        const int &in_nlocbas,
         const int &in_nz_estimate = 60 );
 
     // Destructor

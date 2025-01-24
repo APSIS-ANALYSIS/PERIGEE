@@ -1,18 +1,24 @@
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
 
 PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
-    const std::string &in_part_file, const int &in_rank,
+    std::unique_ptr<ALocal_IEN> in_locien,
+    std::unique_ptr<ALocal_Elem> in_locelem,
+    std::unique_ptr<FEANode> in_fnode,
+    std::unique_ptr<APart_Node> in_pnode,
+    std::unique_ptr<ALocal_NBC> in_nbc,
+    std::unique_ptr<ALocal_EBC> in_ebc,
     std::unique_ptr<IPLocAssem> in_locassem,
+    const int &in_nlocbas,
     const int &in_nz_estimate )
-: locien(SYS_T::make_unique<ALocal_IEN>(in_part_file, in_rank)),
-  locelem(SYS_T::make_unique<ALocal_Elem>(in_part_file, in_rank)),
-  fnode(SYS_T::make_unique<FEANode>(in_part_file, in_rank)),
-  pnode(SYS_T::make_unique<APart_Node>(in_part_file,in_rank)),
-  nbc(SYS_T::make_unique<ALocal_NBC>(in_part_file,in_rank)),
-  ebc(SYS_T::make_unique<ALocal_EBC>(in_part_file,in_rank)),
+: locien( std::move(in_locien) ),
+  locelem( std::move(in_locelem) ),
+  fnode( std::move(in_fnode) ),
+  pnode( std::move(in_pnode) ),
+  nbc( std::move(in_nbc) ),
+  ebc( std::move(in_ebc) ),
   locassem(std::move(in_locassem)),
   num_ebc( ebc->get_num_ebc() ),
-  nLocBas( ANL_T::get_nLocBas(in_part_file, in_rank) ),
+  nLocBas( in_nlocbas ),
   snLocBas( num_ebc>0 ? ebc -> get_cell_nLocBas(0) : 0 ),
   dof_mat( locassem->get_dof_mat() ),
   nlgn( pnode->get_nlocghonode() )

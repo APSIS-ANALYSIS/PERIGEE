@@ -158,10 +158,12 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis.\n", size);
 
-  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
-
-  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
-  auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
+  auto locIEN  = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
+  auto fNode   = SYS_T::make_unique<FEANode>(part_file, rank);
+  auto pNode   = SYS_T::make_unique<APart_Node>(part_file, rank);
+  auto locnbc  = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+  auto locebc  = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
@@ -181,7 +183,7 @@ int main(int argc, char *argv[])
   std::unique_ptr<IPLocAssem> locAssem_ptr = 
     SYS_T::make_unique<PLocAssem_Transport_GenAlpha>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
-        rho, cap, kap, tm_galpha.get(), locebc -> get_num_ebc());
+        rho, cap, kap, tm_galpha.get(), locebc->get_num_ebc());
 
   // ===== Initial condition =====
   PDNSolution * sol = new PDNSolution_Transport( pNode.get(), 0 );
@@ -219,8 +221,12 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>( 
-      part_file, rank, std::move(locAssem_ptr), nz_estimate );  
+  std::unique_ptr<IPGAssem> gloAssem 
+    = SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>( 
+      std::move(locIEN), std::move(locElem), std::move(fNode),
+      std::move(pNode), std::move(locnbc), std::move(locebc),
+      std::move(locAssem_ptr), 
+      ANL_T::get_nLocBas(part_file, rank), nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem->Assem_nonzero_estimate();
