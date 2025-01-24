@@ -11,7 +11,8 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
     const ALocal_NBC * const &part_nbc,
     const ALocal_EBC * const &part_ebc,
     const int &in_nz_estimate )
-: num_ebc( part_ebc->get_num_ebc() ),
+: locIEN(SYS_T::make_unique<ALocal_IEN>(part_file, rank)),
+  num_ebc( part_ebc->get_num_ebc() ),
   nLocBas( agmi_ptr->get_nLocBas() ),
   snLocBas( num_ebc>0 ? part_ebc -> get_cell_nLocBas(0) : 0 ),
   dof_mat( locassem_ptr->get_dof_mat() ),
@@ -41,7 +42,7 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, aien_ptr, part_nbc );
+  Assem_nonzero_estimate();
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;

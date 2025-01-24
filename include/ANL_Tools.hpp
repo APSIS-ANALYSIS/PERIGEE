@@ -38,6 +38,25 @@ namespace ANL_T
     return get_int_data(fbasename, in_rank, "Part_Info", "cpu_size");
   }
 
+  int get_nLocBas(const std::string &fbasename, const int &in_rank)
+  {
+    return get_int_data(fbasename, in_rank, "Global_Mesh_Info", "nLocBas");
+  }
+
+  FE_Typle get_elemType(const std::string &fbasename, const int &in_rank)
+  {
+    const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
+
+    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
+
+    auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+
+    auto elemType = FE_T::to_FEType(h5r->read_string("Global_Mesh_Info", "elemType"));
+
+    H5Fclose(file_id);
+    return elemType;
+  }
+
 } // END OF ANL_T
 
 #endif
