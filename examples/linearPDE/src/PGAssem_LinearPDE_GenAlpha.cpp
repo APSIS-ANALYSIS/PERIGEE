@@ -1,26 +1,22 @@
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
 
 PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
-    const std::string &part_file_name,
-    const int &in_rank,
-    IPLocAssem * const &locassem_ptr,
-    const AGlobal_Mesh_Info * const &agmi_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &aien_ptr,
-    const APart_Node * const &pnode_ptr,
-    const ALocal_NBC * const &part_nbc,
-    const ALocal_EBC * const &part_ebc,
+    const std::string &in_part_file, const int &in_rank,
+    std::unique_ptr<IPLocAssem> in_locassem,
     const int &in_nz_estimate )
-: locIEN(SYS_T::make_unique<ALocal_IEN>(part_file, rank)),
-  num_ebc( part_ebc->get_num_ebc() ),
-  nLocBas( agmi_ptr->get_nLocBas() ),
-  snLocBas( num_ebc>0 ? part_ebc -> get_cell_nLocBas(0) : 0 ),
+: locien(SYS_T::make_unique<ALocal_IEN>(in_part_file, in_rank)),
+  locelem(SYS_T::make_unique<ALocal_Elem>(in_part_file, in_rank)),
+  fnode(SYS_T::make_unique<FEANode>(in_part_file, in_rank)),
+  pnode(SYS_T::make_unique<APart_Node>(in_part_file,in_rank)),
+  nbc(SYS_T::make_unique<ALocal_NBC>(in_part_file,in_rank)),
+  ebc(SYS_T::make_unique<ALocal_EBC>(in_part_file,in_rank)),
+  locassem(std::move(in_locassem)),
+  num_ebc( ebc->get_num_ebc() ),
+  nLocBas( ANL_T::get_nLocBas(in_part_file, in_rank) ),
+  snLocBas( num_ebc>0 ? ebc -> get_cell_nLocBas(0) : 0 ),
   dof_mat( locassem_ptr->get_dof_mat() ),
-  nlgn( pnode_ptr->get_nlocghonode() )
+  nlgn( pnode->get_nlocghonode() )
 {
-
-
-
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
       "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
