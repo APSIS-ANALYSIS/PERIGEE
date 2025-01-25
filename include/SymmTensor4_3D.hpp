@@ -140,7 +140,7 @@ class SymmTensor4_3D
     // This is often used in the evaluation of the stiffness tensor.
     // E.G., partial C^{-1}_AB / partial C_CD
     //     = -0.5 (C^{-1}_AC C^{-1}_BD + C^{-1}_AD C^{-1}_{BC})
-    //     = SymmProduct(-0.5, invC, invC )
+    //     = SymmProduct(-1.0, invC, invC )
     // for invertible and symmetric 2nd-order tensor C.
     // Holzapfel book, p. 254, eqn. (6.165).
     // ------------------------------------------------------------------------
@@ -166,15 +166,33 @@ class SymmTensor4_3D
     // ------------------------------------------------------------------------
     void add_SymmOutProduct( const double &val, const SymmTensor2_3D &mleft,
         const SymmTensor2_3D &mright );
-   
+
     // ------------------------------------------------------------------------
     // Tensor Left and Right Multiplication modification with the same
     // tensor P. See Holzapfel p. 255, the first term in eqn. (6.168) for
-    // an example of this function.
-    // ten_IJKL = P_IJMN ten_MNST P_KLST
-    // Note: Here the tensor P is assumed to have minor symmetry.
+    // an example of this function. Expand the tensor P in terms of rank-four 
+    // identity tensor I and rank-two right Cauchy-Green tensor C
+    // ten_IJKL = ten_IJKL - 1/3 ten_IJMN C_MN Cinv_KL - 1/3 Cinv_IJ C_MN ten_MNKL 
+    //                     + 1/9 Cinv_IJ C_MN ten_MNMPQ C_PQ Cinv_KL
+    // Note: Here the tensor C is assumed to have symmetry.
     // ------------------------------------------------------------------------
-    void TenPMult( const Tensor4_3D &P );
+    void TenPMult( const SymmTensor2_3D &C); 
+
+    // ------------------------------------------------------------------------
+    // The function is used to calculate QQ:EE:QQ, which occurs in the eq (3.10)
+    // and eq (3.13) from Liu et al., CMAME 430 (2024) 117248. The component 
+    // expression is QQ_IJMN ten_MNST QQ_STKL.
+    // Note: Here, QQ is a symmetric tensor with both major and minor symmetry. 
+    // ------------------------------------------------------------------------    
+    void TenQMult( const SymmTensor4_3D &QQ );
+
+    // ------------------------------------------------------------------------
+    // Pull-back for contravariant rank-four tensor (like elasticity tensor)
+    // defined as invF_Ii invF_Jj (object)_ijkl invF_Kk invF_Ll, which is  
+    // analogous to push_back_stress in SymmTensor2_3D, only with two more 
+    // pull-back operation. Examples see Holzapfel book p. 253.
+    // ------------------------------------------------------------------------
+    void pull_back_stiffness( const Tensor2_3D &invF );
 
     // ------------------------------------------------------------------------
     // transform the natural indices of forth-order symmetric tensor to Voigt 
@@ -202,6 +220,9 @@ class SymmTensor4_3D
 };
 
 SymmTensor4_3D operator*( const double &val, const SymmTensor4_3D &input );
+  
+// out_kl = mleft_ij : mright_ijkl
+SymmTensor2_3D operator*( const SymmTensor2_3D &mleft, const SymmTensor4_3D &mright );
 
 // These functions behave in an identical manner to the member function of the
 // same function name.
@@ -221,6 +242,8 @@ namespace STen4
   // ------------------------------------------------------------------------
   SymmTensor4_3D gen_symm_id();
 
+  SymmTensor4_3D gen_symm_part( const Tensor4_3D &input );
+
   SymmTensor4_3D gen_rand(const double &left = -1.0, const double &right = 1.0);
 
   // ------------------------------------------------------------------------
@@ -230,6 +253,11 @@ namespace STen4
   // see Holzapfel book p. 255, eqn. (6.170).
   // ------------------------------------------------------------------------
   SymmTensor4_3D gen_Ptilde( const SymmTensor2_3D &invC );
+
+  // ------------------------------------------------------------------------
+  // Generate out with out_ijmn = input_ijkl * input_klmn
+  // ------------------------------------------------------------------------
+  SymmTensor4_3D gen_dyad( const SymmTensor4_3D &input );
 }
 
 #endif
