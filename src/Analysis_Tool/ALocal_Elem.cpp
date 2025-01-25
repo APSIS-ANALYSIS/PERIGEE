@@ -6,7 +6,7 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
   elem_loc = h5r->read_intVector( "/Local_Elem", "elem_loc" );
 
@@ -22,7 +22,7 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
   else
     elem_tag.clear();
     
-  delete h5r; H5Fclose( file_id );
+  H5Fclose( file_id );
 }
 
 int ALocal_Elem::get_nlocalele( const int &tag_val ) const
