@@ -29,7 +29,7 @@ SymmTensor2_3D& SymmTensor2_3D::operator+=( const SymmTensor2_3D &source )
   return *this; 
 }
 
- SymmTensor2_3D& SymmTensor2_3D::operator-=( const SymmTensor2_3D &source )
+SymmTensor2_3D& SymmTensor2_3D::operator-=( const SymmTensor2_3D &source )
 {
   for(int ii=0; ii<6; ++ii) mat[ii] -= source(ii);
   return *this; 
