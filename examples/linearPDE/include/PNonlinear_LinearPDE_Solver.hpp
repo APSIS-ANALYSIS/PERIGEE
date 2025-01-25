@@ -33,6 +33,8 @@ class PNonlinear_LinearPDE_Solver
 
     void print_info() const;
 
+    void print_lsolver_info() const {lsolver->print_info();}
+
     // --------------------------------------------------------------
     // GenAlpha_Solve_Transport:
     // This is a solver for transport equation.

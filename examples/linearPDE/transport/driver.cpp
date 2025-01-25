@@ -252,9 +252,9 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem->Assem_mass_residual( sol );
+    gloAssem->Assem_mass_residual( sol.get() );
 
-    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol );
+    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol.get() );
   
     dot_sol -> ScaleValue( -1.0 );
 
@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
       std::move(sol), std::move(timeinfo) );
 
   // ===== Print complete solver info =====
-  //lsolver -> print_info();
+  tsolver -> print_lsolver_info();
 
   PetscFinalize();
   return EXIT_SUCCESS;

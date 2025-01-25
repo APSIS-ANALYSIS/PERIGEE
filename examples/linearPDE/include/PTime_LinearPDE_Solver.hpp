@@ -23,6 +23,8 @@ class PTime_LinearPDE_Solver
 
     void print_info() const;
 
+    void print_lsolver_info() const {nsolver -> print_lsolver_info();}
+
     void TM_GenAlpha_Transport(
         const bool &restart_init_assembly_flag,
         std::unique_ptr<PDNSolution> init_dot_sol,
