@@ -121,7 +121,7 @@ class Tensor4_3D
 
     // Transpose a rank-four tensor ten_ijkl to be ten_klij, refered to the 
     // equation (1.160 ) in Holzapfel book, p.23.
-    void transpose();    
+    void transpose();  
 
     // ------------------------------------------------------------------------
     // add an outer product with scaling factor:
@@ -165,7 +165,7 @@ class Tensor4_3D
     // This is often used in the evaluation of the stiffness tensor.
     // E.G., partial C^{-1}_AB / partial C_CD 
     //     = -0.5 (C^{-1}_AC C^{-1}_BD + C^{-1}_AD C^{-1}_{BC})
-    //     = SymmProduct(-0.5, invC, invC )
+    //     = SymmProduct(-1.0, invC, invC )
     // for invertible and symmetric 2nd-order tensor C.
     // Holzapfel book, p. 254
     // ------------------------------------------------------------------------
