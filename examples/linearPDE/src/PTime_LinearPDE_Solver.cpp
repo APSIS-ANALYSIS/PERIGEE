@@ -50,22 +50,22 @@ std::string PTime_LinearPDE_Solver::Name_dot_Generator( const std::string &middl
 
 void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const bool &restart_init_assembly_flag,
-    const PDNSolution * const &init_dot_sol,
-    const PDNSolution * const &init_sol,
+    std::unique_ptr<PDNSolution> init_dot_sol,
+    std::unique_ptr<PDNSolution> init_sol,
     std::unique_ptr<PDNTimeStep> time_info ) const
 {
-  PDNSolution * pre_sol = new PDNSolution(*init_sol);
-  PDNSolution * cur_sol = new PDNSolution(*init_sol);
-  PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+  auto pre_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto cur_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto pre_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+  auto cur_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
-    const std::string sol_name = Name_Generator("temp_", time_info->get_index());
+    const auto sol_name = Name_Generator("temp_", time_info->get_index());
     cur_sol->WriteBinary(sol_name.c_str());
 
-    const std::string sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
+    const auto sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name.c_str());
   }
 
@@ -95,8 +95,9 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     // Call the nonlinear equation solver
     nsolver->GenAlpha_Solve_Transport( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        pre_dot_sol, pre_sol,
-        cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        pre_dot_sol.get(), pre_sol.get(),
+        cur_dot_sol.get(), cur_sol.get(), 
+        conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -108,10 +109,10 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
-      const std::string sol_name = Name_Generator("temp_", time_info->get_index() );
+      const auto sol_name = Name_Generator("temp_", time_info->get_index() );
       cur_sol->WriteBinary(sol_name.c_str());
 
-      const std::string sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
+      const auto sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name.c_str());
     }
 
@@ -119,8 +120,6 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
   } 
-
-  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
 }
 
 /*

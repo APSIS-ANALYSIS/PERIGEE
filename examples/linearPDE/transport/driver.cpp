@@ -186,9 +186,11 @@ int main(int argc, char *argv[])
         rho, cap, kap, tm_galpha.get(), locebc->get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * sol = new PDNSolution_Transport( pNode.get(), 0 );
+  std::unique_ptr<PDNSolution> sol = SYS_T::make_unique<PDNSolution_Transport>( 
+      pNode.get(), 0 );
   
-  PDNSolution * dot_sol = new PDNSolution_Transport( pNode.get(), 0 );
+  std::unique_ptr<PDNSolution> dot_sol = SYS_T::make_unique<PDNSolution_Transport>(
+      pNode.get(), 0 );
   
   if( is_restart )
   {
@@ -282,12 +284,12 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha_Transport(is_restart, dot_sol, sol, std::move(timeinfo));
+  tsolver->TM_GenAlpha_Transport( is_restart, std::move(dot_sol), 
+      std::move(sol), std::move(timeinfo) );
 
   // ===== Print complete solver info =====
   //lsolver -> print_info();
 
-  delete dot_sol; delete sol;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
