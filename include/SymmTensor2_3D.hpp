@@ -139,11 +139,20 @@ class SymmTensor2_3D
     // defined as F (object) Ft, see Holzapfel book p. 83
     void push_forward_stress( const Tensor2_3D &F );
 
-    // Matrix contraction
+    // Pull-back for contravariant tensor (like stress)
+    // defined as invF (object) invFt, see Holzapfel book (2.87) 
+    // in p. 83.
+    void pull_back_stress( const Tensor2_3D &invF );    
+
+    // Contraction
     // return mat_ij source_ij
     double MatContraction( const Tensor2_3D &source ) const;
     
     double MatContraction( const SymmTensor2_3D &source ) const;
+
+    // Contraction
+    // return source_ij source_ij
+    double MatContraction() const;
 
     // Obtain the Voigt notation for a regular matrix index
     // 0 <= index < 9

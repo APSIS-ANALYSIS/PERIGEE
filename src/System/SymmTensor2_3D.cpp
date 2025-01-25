@@ -29,7 +29,7 @@ SymmTensor2_3D& SymmTensor2_3D::operator+=( const SymmTensor2_3D &source )
   return *this; 
 }
 
-SymmTensor2_3D& SymmTensor2_3D::operator-=( const SymmTensor2_3D &source )
+ SymmTensor2_3D& SymmTensor2_3D::operator-=( const SymmTensor2_3D &source )
 {
   for(int ii=0; ii<6; ++ii) mat[ii] -= source(ii);
   return *this; 
@@ -147,6 +147,23 @@ void SymmTensor2_3D::push_forward_stress( const Tensor2_3D &F )
   mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
 }
 
+void SymmTensor2_3D::pull_back_stress( const Tensor2_3D &invF )
+{
+  double temp[9] = {0.0};
+  for(int ii=0; ii<3; ++ii)
+  {
+    for(int jj=ii; jj<3; ++jj)
+    {
+      temp[ii*3+jj] = invF(ii,0) * ( mat[0]*invF(jj,0) + mat[5]*invF(jj,1) + mat[4]*invF(jj,2) )
+                    + invF(ii,1) * ( mat[5]*invF(jj,0) + mat[1]*invF(jj,1) + mat[3]*invF(jj,2) )
+                    + invF(ii,2) * ( mat[4]*invF(jj,0) + mat[3]*invF(jj,1) + mat[2]*invF(jj,2) );
+    }
+  }
+  
+  mat[0] = temp[0]; mat[5] = temp[1]; mat[4] = temp[2];
+  mat[1] = temp[4]; mat[3] = temp[5]; mat[2] = temp[8];
+}
+
 double SymmTensor2_3D::MatContraction( const Tensor2_3D &source ) const
 {
   return mat[0] * source(0) + mat[5] * source(1) + mat[4] * source(2) + mat[5] * source(3)
@@ -158,6 +175,12 @@ double SymmTensor2_3D::MatContraction( const SymmTensor2_3D &source ) const
 {
   return mat[0] * source(0) + mat[1] * source(1) + mat[2] * source(2)
     + 2.0 * ( mat[3] * source(3) + mat[4] * source(4) + mat[5] * source(5) );
+}
+
+double SymmTensor2_3D::MatContraction() const
+{
+  return mat[0] * mat[0] + mat[1] * mat[1] + mat[2] * mat[2]
+    + 2.0 * ( mat[3] * mat[3] + mat[4] * mat[4] + mat[5] * mat[5] );
 }
 
 void SymmTensor2_3D::print() const
