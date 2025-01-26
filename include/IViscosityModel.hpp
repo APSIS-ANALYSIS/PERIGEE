@@ -13,9 +13,9 @@
 class IViscosityModel
 {
   public:
-    IViscosityModel(){}
+    IViscosityModel() = default;
 
-    virtual ~IViscosityModel(){}
+    virtual ~IViscosityModel() = default;
 
     virtual void print_info() const = 0;
 
