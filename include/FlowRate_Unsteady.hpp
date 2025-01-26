@@ -1,7 +1,7 @@
-#ifndef CVFLOWRATE_UNSTEADY_HPP
-#define CVFLOWRATE_UNSTEADY_HPP
+#ifndef FLOWRATE_UNSTEADY_HPP
+#define FLOWRATE_UNSTEADY_HPP
 // ==================================================================
-// CVFlowRate_Unsteady.hpp
+// FlowRate_Unsteady.hpp
 //
 // Unsteady flow for inflow condition.
 // 
@@ -21,14 +21,14 @@
 // ==================================================================
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
-#include "ICVFlowRate.hpp"
+#include "IFlowRate.hpp"
 
-class CVFlowRate_Unsteady : public ICVFlowRate
+class FlowRate_Unsteady : public IFlowRate
 {
   public:
-    CVFlowRate_Unsteady( const std::string &filename );
+    FlowRate_Unsteady( const std::string &filename );
 
-    virtual ~CVFlowRate_Unsteady() = default;
+    virtual ~FlowRate_Unsteady() = default;
 
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 
