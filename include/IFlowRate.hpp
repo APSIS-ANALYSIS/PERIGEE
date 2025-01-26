@@ -1,7 +1,7 @@
-#ifndef ICVFLOWRATE_HPP
-#define ICVFLOWRATE_HPP
+#ifndef IFLOWRATE_HPP
+#define IFLOWRATE_HPP
 // ============================================================================
-// ICVFlowRate.hpp
+// IFlowRate.hpp
 //
 // Interface file for the cardiovascular inflow flow rate function.
 //
@@ -13,12 +13,12 @@
 #include <sstream>
 #include <string>
 
-class ICVFlowRate
+class IFlowRate
 {
   public:
-    ICVFlowRate() = default;
+    IFlowRate() = default;
 
-    virtual ~ICVFlowRate() = default;
+    virtual ~IFlowRate() = default;
 
     // Return the flow rate
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
