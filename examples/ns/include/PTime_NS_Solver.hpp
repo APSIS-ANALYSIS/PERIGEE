@@ -29,7 +29,7 @@ class PTime_NS_Solver
         const PDNSolution * const &init_sol,
         const TimeMethod_GenAlpha * const &tmga_ptr,
         PDNTimeStep * const &time_info,
-        const ICVFlowRate * const flr_ptr,
+        const IFlowRate * const flr_ptr,
         const APart_Node * const &pNode_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
