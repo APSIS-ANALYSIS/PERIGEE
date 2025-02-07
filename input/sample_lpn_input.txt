@@ -1,7 +1,0 @@
-# This is a test file
-# The first line gives bc type and number of faces
-RESISTANCE 1
-
-# define face values for each face
-# format face-id, C, distal pressure
-0 1.0e5 0.0

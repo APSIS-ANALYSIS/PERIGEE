@@ -108,12 +108,6 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename, const double &i
     P0[ebc_id] = get_P( ebc_id, 0.0, 0.0, init_time );
 }
 
-GenBC_Pressure::~GenBC_Pressure()
-{
-  VEC_T::clean(coef_a); VEC_T::clean(coef_b);
-  VEC_T::clean(num_of_mode); VEC_T::clean(w); VEC_T::clean(period);
-}
-
 void GenBC_Pressure::print_info() const
 {
   SYS_T::commPrint("===> GenBC_Pressure: \n");

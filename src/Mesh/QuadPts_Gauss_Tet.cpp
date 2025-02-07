@@ -1,7 +1,6 @@
 #include "QuadPts_Gauss_Tet.hpp"
 
-QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
-: num_pts( in_num_pts )
+QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_pts )
 {
   qp.resize( 4 * num_pts );
   qw.resize( num_pts );
@@ -9,7 +8,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
   int offset;
   double a,b,c,w;
   std::vector<double> temp;
-  
+
   switch( num_pts )
   {
     case 1:
@@ -40,7 +39,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
       a = 0.1325810999384657;
       b = 0.02454003792903;
       c = (1.0 - a - b) / 2.0;
-      gen_permutations(a,b,c, temp);
+      temp = gen_permutations(a,b,c);
       for(int ii=0; ii<48; ++ii) qp[ii] = temp[ii];
       
       for(int ii=0; ii<12; ++ii) qw[ii] = 0.04528559236327399;
@@ -73,7 +72,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
       b = 0.4860510285706072;
       c = (1.0 - a - b) * 0.5;
       w = 0.04361493840666568;
-      gen_permutations(a,b,c, temp);
+      temp = gen_permutations(a,b,c);
       for(int ii=0; ii<48; ++ii) qp[ii] = temp[ii];
 
       for(int ii=0; ii<12; ++ii) qw[ii] = w;
@@ -82,7 +81,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
       b = 0.6081079894015281;
       c = (1.0 - a - b) * 0.5;
       w = 0.02581167596199161;
-      gen_permutations(a,b,c, temp);
+      temp = gen_permutations(a,b,c);
       offset = 48;
       for(int ii=0; ii<48; ++ii) qp[offset+ii] = temp[ii];
       
@@ -122,49 +121,33 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts )
   for(int ii=0; ii<num_pts; ++ii) qw[ii] /= 6.0;
 }
 
-
-QuadPts_Gauss_Tet::~QuadPts_Gauss_Tet()
-{
-  VEC_T::clean(qp); VEC_T::clean(qw);
-}
-
-
 void QuadPts_Gauss_Tet::print_info() const
 {
-  std::cout<<std::endl;
-  std::cout<<"====== Gauss Points for Tetrahedron ======="<<std::endl;
-  std::cout<<"Num of pt = "<<num_pts<<std::endl;
-  std::cout<<"qp.size() = "<<qp.size()<<std::endl;
-  std::cout<<"qw.size() = "<<qw.size()<<std::endl;
+  SYS_T::commPrint("====== Gauss Points for Tetrahedron =======\n");
+  SYS_T::commPrint("Number of points = %d\n", num_pts);
+  SYS_T::commPrint("qp.size() = %d\n", qp.size());
+  SYS_T::commPrint("qw.size() = %d\n", qw.size());
   for(int ii=0; ii<num_pts; ++ii)
-    std::cout<<std::setprecision(16)<<qp[4*ii]
-      <<'\t'<<qp[4*ii+1]<<'\t'<<qp[4*ii+2]
-      <<'\t'<<qp[4*ii+3]<<'\t'<<qw[ii]<<'\n';
-  std::cout<<"==========================================="<<std::endl;
+    SYS_T::commPrint("  %.15f %.15f %.15f %.15f %.15f\n", 
+        qp[4*ii], qp[4*ii+1], qp[4*ii+2], qp[4*ii+3], qw[ii]);
+  SYS_T::commPrint("===========================================\n");
 }
 
-
-void QuadPts_Gauss_Tet::gen_permutations(const double &a,
-    const double &b, const double &c, std::vector<double> &out ) const
+std::vector<double> QuadPts_Gauss_Tet::gen_permutations(const double &a,
+    const double &b, const double &c ) const
 {
-  out.clear();
-  out.push_back(a); out.push_back(b); out.push_back(c); out.push_back(c);
-  out.push_back(a); out.push_back(c); out.push_back(b); out.push_back(c);
-  out.push_back(a); out.push_back(c); out.push_back(c); out.push_back(b);
-  
-  out.push_back(b); out.push_back(a); out.push_back(c); out.push_back(c);
-  out.push_back(b); out.push_back(c); out.push_back(a); out.push_back(c);
-  out.push_back(b); out.push_back(c); out.push_back(c); out.push_back(a);
-  
-  out.push_back(c); out.push_back(a); out.push_back(b); out.push_back(c);
-  out.push_back(c); out.push_back(b); out.push_back(a); out.push_back(c);
-  
-  out.push_back(c); out.push_back(a); out.push_back(c); out.push_back(b);
-  out.push_back(c); out.push_back(b); out.push_back(c); out.push_back(a);
-  
-  out.push_back(c); out.push_back(c); out.push_back(a); out.push_back(b);
-  out.push_back(c); out.push_back(c); out.push_back(b); out.push_back(a);
+  return {a,b,c,c,
+    a,c,b,c,
+    a,c,c,b,
+    b,a,c,c,
+    b,c,a,c,
+    b,c,c,a,
+    c,a,b,c,
+    c,b,a,c,
+    c,a,c,b,
+    c,b,c,a,
+    c,c,a,b,
+    c,c,b,a };
 }
-
 
 // EOF

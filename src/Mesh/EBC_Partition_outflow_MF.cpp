@@ -55,7 +55,7 @@ EBC_Partition_outflow_MF::EBC_Partition_outflow_MF(
       }
 
       // Outward normal vector
-      ebc -> get_normal_vec(ii, outvec[ii].x(), outvec[ii].y(), outvec[ii].z());
+      outvec[ii] = ebc -> get_normal_vec(ii);
     }
     else
     {
@@ -64,18 +64,6 @@ EBC_Partition_outflow_MF::EBC_Partition_outflow_MF(
       outvec[ii] = Vector_3( 0.0, 0.0, 0.0 );
     }
   }
-}
-
-EBC_Partition_outflow_MF::~EBC_Partition_outflow_MF()
-{
-  for(int ii=0; ii<num_ebc; ++ii)
-  {
-    VEC_T::clean( face_int_NA[ii] );
-    VEC_T::clean( LID_all_face_nodes[ii] );
-  }
-  VEC_T::clean( face_int_NA );
-  VEC_T::clean( LID_all_face_nodes );
-  VEC_T::clean( outvec );
 }
 
 void EBC_Partition_outflow_MF::write_hdf5( const std::string &FileName,
@@ -103,7 +91,7 @@ void EBC_Partition_outflow_MF::write_hdf5( const std::string &FileName,
 
       h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );
       h5w->write_intVector( subgroup_id, "LID_all_face_nodes", LID_all_face_nodes[ii] );
-      h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii] );
+      h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii].to_std_array() );
 
       H5Gclose( subgroup_id );
     }

@@ -8,7 +8,6 @@
 // Author: Ju Liu
 // Date Created: May 1 2021
 // ============================================================================
-#include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "ICVFlowRate.hpp"
@@ -20,7 +19,7 @@ class CVFlowRate_Steady : public ICVFlowRate
 
     CVFlowRate_Steady( const int &input_num_nbc, const double &in_flowrate );
 
-    virtual ~CVFlowRate_Steady();
+    virtual ~CVFlowRate_Steady() = default;
 
     virtual double get_flow_rate(const int &nbc_id, const double &time) const;
 
@@ -30,6 +29,7 @@ class CVFlowRate_Steady : public ICVFlowRate
 
   private:
     int num_nbc;
+    
     std::vector<double> flowrate;
 };
 

@@ -127,9 +127,9 @@ class PDNSolution
     // ------------------------------------------------------------------------
     // ! Write and Read the solution vector in PETSc binary format
     // ------------------------------------------------------------------------
-    virtual void WriteBinary(const char * const &file_name) const;
+    virtual void WriteBinary(const std::string &file_name) const;
     
-    virtual void ReadBinary(const char * const &file_name) const;
+    virtual void ReadBinary(const std::string &file_name) const;
 
     // ------------------------------------------------------------------------
     // ! Get the number of local and ghost nodes for the parallel vector's 
@@ -167,7 +167,7 @@ class PDNSolution
     // ------------------------------------------------------------------------
     friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
 
-  private:
+  protected:
     // ------------------------------------------------------------------------
     // dof_num default value is apart_node -> get_dof, but user may reset its value.
     //     nlocalnode := apart_node -> get_nlocalnode

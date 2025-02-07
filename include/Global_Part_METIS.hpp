@@ -10,7 +10,7 @@
 // Author: Ju Liu
 // Date Created: Oct 2nd 2013
 // ============================================================================
-#include "IMesh.hpp"
+#include "Sys_Tools.hpp"
 #include "IIEN.hpp"
 #include "IGlobal_Part.hpp"
 #include "HDF5_Writer.hpp"
@@ -25,7 +25,7 @@ class Global_Part_METIS : public IGlobal_Part
     // ------------------------------------------------------------------------
     Global_Part_METIS( const int &cpu_size,
         const int &in_ncommon, const bool &isDualGraph,
-        const IMesh * const &mesh,
+        const int &in_nelem, const int &in_nfunc, const int &in_nlocbas, 
         const IIEN * const &IEN,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
@@ -42,7 +42,9 @@ class Global_Part_METIS : public IGlobal_Part
     // ------------------------------------------------------------------------
     Global_Part_METIS( const int &num_fields, const int &cpu_size,
         const int &in_ncommon, const bool &isDualGraph,
-        const std::vector<IMesh const *> &mesh_list,
+        const std::vector<int> &in_nelem_list,
+        const std::vector<int> &in_nfunc_list,
+        const std::vector<int> &in_nlocbas_list,
         const std::vector<IIEN const *> &IEN_list,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );

@@ -1,6 +1,6 @@
-PROJECT(perigee)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
+
+PROJECT(perigee)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -37,9 +37,9 @@ SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
 SET( perigee_lib_src 
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/SV_Tools.cpp
+  ${perigee_source}/System/FE_Tools.cpp
+  ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
   )
 
 # ===============================================

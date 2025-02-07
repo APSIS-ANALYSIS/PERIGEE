@@ -32,10 +32,9 @@
 // Author: Ju Liu
 // Date: July 2 2015
 // ==================================================================
+#include <array>
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
-#include "Vector_3.hpp"
-#include "Matrix_3x3.hpp"
 #include "hdf5.h"
 
 class HDF5_Reader
@@ -47,18 +46,21 @@ class HDF5_Reader
     //   constructor will pass the given fild_id in to make it its 
     //   own variable.
     // --------------------------------------------------------------
-    HDF5_Reader( const hid_t &in_file_id );
+    HDF5_Reader( const hid_t &in_file_id ) : file_id(in_file_id) {}
     
     // --------------------------------------------------------------
     // ! ~HDF5_Reader : Destructor.
     // --------------------------------------------------------------
-    virtual ~HDF5_Reader();
+    virtual ~HDF5_Reader() = default;
 
     // --------------------------------------------------------------
     // !check_data: return a bool value that determines if the data
     //              with the specified name exists in the file.
     // --------------------------------------------------------------
-    bool check_data( const char * const &name ) const;
+    bool check_data( const char * const &name ) const
+    {
+      return H5Lexists(file_id, name, H5P_DEFAULT);
+    }
     
     // --------------------------------------------------------------
     // !read_intScalar: return the integer scalar data by specifing 
@@ -89,15 +91,15 @@ class HDF5_Reader
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
-    // ! read_Vector_3 : output the Vector_3 object.
+    // ! read_Vector_3 : output the std::array<double, 3>.
     // --------------------------------------------------------------
-    Vector_3 read_Vector_3( const char * const &group_name,
+    std::array<double, 3> read_Vector_3( const char * const &group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
-    // ! read_Matrix_3x3 : output the Matrix_3x3 object.
+    // ! read_Tensor2_3D : output the std::array<double, 9>.
     // --------------------------------------------------------------
-    Matrix_3x3 read_Matrix_3x3( const char * const &group_name,
+    std::array<double, 9> read_Tensor2_3D( const char * const &group_name,
         const char * const &data_name ) const;
 
     // --------------------------------------------------------------
@@ -184,7 +186,7 @@ class HDF5_Reader
         std::ostringstream ss;
         ss<<"Error: HDF5_Reader::"<<funname
           <<" : status ="<<status<<" !"<<std::endl;
-        SYS_T::print_exit( ss.str().c_str() );
+        SYS_T::print_fatal( ss.str().c_str() );
       }
     }
 };

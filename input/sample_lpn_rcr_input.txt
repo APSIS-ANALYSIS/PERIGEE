@@ -1,9 +1,0 @@
-# This is a test file
-# The first line gives bc type and number of faces
-# RCR, rcr, or Rcr can be accepted
-RCR 2
-
-# define face values for each face
-# format face-id, Rp, C, Rd, Pd
-0 1000.0 7.0e-5 4000.0 1.0e3
-1 1000.0 7.0e-5 4000.0 1.0e3

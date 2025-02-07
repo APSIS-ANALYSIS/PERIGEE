@@ -22,7 +22,7 @@ class ALocal_NBC
     ALocal_NBC( const std::string &fileBaseName, 
         const int &cpu_rank, const std::string &gname="/nbc" );
 
-    virtual ~ALocal_NBC();
+    virtual ~ALocal_NBC() = default;
 
     // ------------------------------------------------------------------------
     // print information
@@ -135,6 +135,8 @@ class ALocal_NBC
     std::vector<int> Num_LD, Num_LPS, Num_LPM;
 
     std::vector<int> LD_offset, LPS_offset, LPM_offset;
+    
+    ALocal_NBC() = delete; 
 };
 
 #endif

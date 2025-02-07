@@ -1,0 +1,6 @@
+solid_vtu: 0002_0001.vtu
+centerline_vtp: scaled.vtp
+lumen_wall_vtp: lumen-normal.vtp
+tissue_wall_vtp: tissue-normal.vtp
+local_radius_scale_factor: 10
+dot_product: 0.05

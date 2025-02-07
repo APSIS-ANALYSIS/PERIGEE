@@ -1,46 +1,63 @@
 #ifndef PART_FEM_HPP
 #define PART_FEM_HPP
-// ==================================================================
+// ============================================================================
 // Part_FEM.hpp
 //
-// Object: Partition finite element mesh into subdomains, and record
-//         the partition information in hdf5 files.
+// Object: Partition 3D finite element mesh into subdomains, and record each 
+//         subdomain in hdf5 file format.
 //
-// Date: Nov. 20 2017
-// ==================================================================
-#include "IMesh.hpp"
+// Date: Jan. 12 2017
+// ============================================================================
+#include "Vec_Tools.hpp"
 #include "IPart.hpp"
+#include "Map_Node_Index.hpp"
+#include "IIEN.hpp"
+#include "Field_Property.hpp"
+#include "FEType.hpp"
 
 class Part_FEM : public IPart
 {
   public:
-    Part_FEM( const IMesh * const &mesh,
+    Part_FEM( const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
         const IGlobal_Part * const &gpart,
         const Map_Node_Index * const &mnindex,
         const IIEN * const &IEN,
         const std::vector<double> &ctrlPts,
         const int &in_cpu_rank, const int &in_cpu_size,
-        const int &in_dofNum, const int &in_dofMat,
-        const int &in_probdim, const int &in_etype, 
-        const bool &isPrintInfo );
+        const FEType &in_elemType, 
+        const Field_Property &in_fp );
+
+    Part_FEM( const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
+        const IGlobal_Part * const &gpart,
+        const Map_Node_Index * const &mnindex,
+        const IIEN * const &IEN,
+        const std::vector<double> &ctrlPts,
+        const std::vector<int> &rotatedtag,
+        const int &in_cpu_rank, const int &in_cpu_size,
+        const FEType &in_elemType, 
+        const Field_Property &in_fp );
+
+    // Constructor that load the partition info from h5 file on disk
+    Part_FEM( const std::string &fileName, const int &in_cpu_rank );
 
     virtual ~Part_FEM();
 
-    virtual void write( const char * inputFileName ) const;
-
-    virtual bool isElemInPart(int gloindex) const
+    virtual void write( const std::string &inputFileName ) const;
+    
+    virtual bool isElemInPart(const int &gloindex) const
     {return VEC_T::is_invec(elem_loc, gloindex);}
-
-    virtual bool isNodeInPart(int gloindex) const
+    
+    virtual bool isNodeInPart(const int &gloindex) const
     {return VEC_T::is_invec(node_loc, gloindex);}
-
+   
+    // Determine the position of a given index in the elem_loc array 
     virtual int get_elemLocIndex(const int &gloindex) const
     {return VEC_T::get_pos(elem_loc, gloindex);}
 
+    // Determine the position of a given index in the local_to_global array
     virtual int get_nodeLocGhoIndex(const int &gloindex) const
     {return VEC_T::get_pos(local_to_global, gloindex);}
 
-    // Print functions
     virtual void print_part_ele() const;
 
     virtual void print_part_node() const;
@@ -53,13 +70,12 @@ class Part_FEM : public IPart
 
     virtual void print_part_loadbalance_edgecut() const;
 
-    // Get functions
-    virtual int get_elem_loc(int pos) const {return elem_loc[pos];}
+    virtual int get_elem_loc(const int &pos) const {return elem_loc[pos];}
     virtual int get_nlocalele() const {return nlocalele;}
-    virtual int get_node_loc(int pos) const {return node_loc[pos];}
-    virtual int get_node_loc_original(int pos) const {return node_loc_original[pos];}
-    virtual int get_node_ghost(int pos) const {return node_ghost[pos];}
-    virtual int get_local_to_global(int pos) const {return local_to_global[pos];}
+    virtual int get_node_loc(const int &pos) const {return node_loc[pos];}
+    virtual int get_node_loc_original(const int &pos) const {return node_loc_original[pos];}
+    virtual int get_node_ghost(const int &pos) const {return node_ghost[pos];}
+    virtual int get_local_to_global(const int &pos) const {return local_to_global[pos];}
     virtual int get_nlocalnode() const {return nlocalnode;}
     virtual int get_nghostnode() const {return nghostnode;}
     virtual int get_ntotalnode() const {return ntotalnode;}
@@ -67,50 +83,62 @@ class Part_FEM : public IPart
     virtual int get_nlocghonode() const {return nlocghonode;}
     virtual int get_cpu_rank() const {return cpu_rank;}
     virtual int get_cpu_size() const {return cpu_size;}
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
 
     virtual int get_nElem() const {return nElem;}
     virtual int get_nFunc() const {return nFunc;}
-    virtual int get_sDegree() const {return sDegree;}
-    virtual int get_tDegree() const {return tDegree;}
-    virtual int get_uDegree() const {return uDegree;}
     virtual int get_nLocBas() const {return nLocBas;}
-    virtual int get_LIEN(int ee, int ii) const {return LIEN[ee][ii];}
+    virtual int get_LIEN(const int &ee, const int &ii) const {return LIEN[ee][ii];}
 
-    virtual double get_ctrlPts_x_loc(int pos) const {return ctrlPts_x_loc[pos];}
-    virtual double get_ctrlPts_y_loc(int pos) const {return ctrlPts_y_loc[pos];}
-    virtual double get_ctrlPts_z_loc(int pos) const {return ctrlPts_z_loc[pos];}
+    virtual double get_ctrlPts_x_loc(const int &pos) const {return ctrlPts_x_loc[pos];}
+    virtual double get_ctrlPts_y_loc(const int &pos) const {return ctrlPts_y_loc[pos];}
+    virtual double get_ctrlPts_z_loc(const int &pos) const {return ctrlPts_z_loc[pos];}
 
   protected:
+    // ------------------------------------------------------------------------
+    // Data
     // 1. local element
-    std::vector<int> elem_loc;
+    std::vector<int> elem_loc {};
     int nlocalele;
 
     // 2. local node
-    std::vector<int> node_loc;
-    std::vector<int> node_loc_original;
-    std::vector<int> node_ghost;
-    std::vector<int> local_to_global;
+    std::vector<int> node_loc {};
+    std::vector<int> node_loc_original {};
+    std::vector<int> node_ghost {};
+    std::vector<int> local_to_global {};
 
-    int nlocalnode;
-    int nghostnode;
-    int ntotalnode;
-    int nbadnode;
-    int nlocghonode;
+    int nlocalnode, nghostnode, ntotalnode, nbadnode, nlocghonode;
 
     // 3. CPU info and partition parameters
-    const int cpu_rank, cpu_size;
-    const int dual_edge_ncommon;
+    int cpu_rank, cpu_size;
 
     // 4. global mesh info
-    const int nElem, nFunc, sDegree, tDegree, uDegree, nLocBas;
-    const int probDim, dofNum, dofMat, elemType;
+    int nElem, nFunc, nLocBas, probDim;
+    FEType elemType;
 
     // 5. LIEN
-    std::vector<std::vector<int> > LIEN;
+    int ** LIEN;
 
-    // 6. local node coordinates
-    std::vector<double> ctrlPts_x_loc, ctrlPts_y_loc, ctrlPts_z_loc;
+    // 6. local point coordinates (i.e. control point geometry)
+    std::vector<double> ctrlPts_x_loc {};
+    std::vector<double> ctrlPts_y_loc {};
+    std::vector<double> ctrlPts_z_loc {};
+
+    // 7. Field info
+    int field_id, dofNum;
+    bool is_geo_field; // tag is true for geometry-related field
+    std::string field_name;
+
+    // 8. rotated element tag
+    std::vector<int> elem_rotated_tag {};
+
+    // ------------------------------------------------------------------------
+    // Function
+    void Generate_Partition( const IGlobal_Part * const &gpart,
+        const Map_Node_Index * const &mnindex,
+        const IIEN * const &IEN,
+        const int &field );
+    
+    Part_FEM() = delete;
 };
 
 #endif

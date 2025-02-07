@@ -9,37 +9,40 @@
 //        [0.5 , 0.0], [0.5 , 0.5], [0.0 , 0.5].
 // These are the vertex points for the quadratic triangle elements.
 // ==================================================================
-#include <vector>
 #include "IQuadPts.hpp"
 
-class QuadPts_vis_tri6 : public IQuadPts
+class QuadPts_vis_tri6 final : public IQuadPts
 {
   public:
-    QuadPts_vis_tri6();
+    QuadPts_vis_tri6() = default;
 
-    virtual ~QuadPts_vis_tri6();
+    ~QuadPts_vis_tri6() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override 
+    {
+      SYS_T::commPrint("\n===== Visualization Points for Tri6 ===== \n");
+      IQuadPts::print_info();
+      SYS_T::commPrint("========================================= \n");
+    }
 
-    virtual int get_dim() const {return 3;}
+    // it stores the area coordinate of the quadrature points 
+    // in the sequence of r-s-t, so the dim is 3
+    int get_dim() const override {return 3;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return 6;}
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    double get_qp(const int &ii, const int &comp) const override 
     {return qp[3*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const
-    {return qw[ii];}
+    double get_qw(const int &ii) const override {return 0.5/6.0;}
 
   private:
-    const int num_pts;
-
-    // qp : size 3 x num_pts. it stores the area coordinate of the
-    //      quadrature points in the sequence of r-s-t,
-    //      t = 1 - r - s.
-    // qw : size num_pts. it stores the quadrature weights for the
-    //      point.
-    std::vector<double> qp, qw;
+    const double qp[18] { 0.0, 0.0, 1.0,
+      1.0, 0.0, 0.0,
+      0.0, 1.0, 0.0,
+      0.5, 0.0, 0.5,
+      0.5, 0.5, 0.0,
+      0.0, 0.5, 0.5 };
 };
 
 #endif

@@ -24,6 +24,7 @@
 #include "vtkHexahedron.h"
 #include "vtkTetra.h"
 #include "vtkQuadraticTetra.h"
+#include "vtkTriQuadraticHexahedron.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
@@ -102,56 +103,86 @@ namespace VIS_T
   // ================================================================
   // The 2nd set of tools contains 
   //    --- setHexelem      ===> Insert vtkHexahedron to gird
-  //    --- setQuadelem     ===> Insert vtkQuad to grid
   // ================================================================
   // ----------------------------------------------------------------
-  // ! setHexelem : build the Hexahedron element connectivity with the
-  //   vtkPoints. In each element, there are nqp = segs * segt * segu
-  //   sampling points. These points are indexed as
-  //          ii_s + ii_t * segs + ii_u * seg_s * seg_t.
-  //   \para segs: number of sampling points in s direction
-  //   \para segt: number of sampling points in t direction
-  //   \para segu: number of sampling points in u direction
+  // ! setHexelem: build Hexahedron element connectivity with the
+  //   vtkPoints.  There are 8 points in this element.
   //   \para ptoffset: offset for this element
   //   \gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Hex element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
-  void setHexelem( const int &segs, const int &segt, const int &segu,
-      const int &ptoffset, vtkUnstructuredGrid * gridData );
+  void setHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
-  // --------------------------------------------------------------
-  // ! setQuadelem: build Quad element connectivity with vtkPoints
-  //   in element, there are nqp = segs * segt elements; these points 
-  //   are indexed as:
-  //                ii_s + ii_t * seg_s
-  //   \para segs: number of sampling points in s direction
-  //   \para segt: number of sampling points in t direction
-  //   \para ptoffset: the offset for this element
-  //   \para gridData: the Grid object that stores the connectivity
-  // --------------------------------------------------------------
-  void setQuadelem( const int &segs, const int &segt,
-      const int &ptoffset, vtkUnstructuredGrid * gridData );
+  // ----------------------------------------------------------------
+  // ! setHexelem: build Hexahedron element connectivity using the
+  //   specified point index.
+  // ----------------------------------------------------------------
+  void setHexelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      vtkUnstructuredGrid * gridData );
 
+  // ----------------------------------------------------------------
+  // ! setTriQuadHexelem: build triquadratic Hex element connectivity
+  //   with the vtkPoints.  There are 27 points in this element.
+  //   \para ptoffset: offset for this element
+  //   \gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Hex element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
+  // ----------------------------------------------------------------
+  void setTriQuadHexelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
+
+  // ----------------------------------------------------------------
+  // ! setTriQuadHexelem: build triquadratic Hex element connectivity
+  //   using the specified point index.
+  // ----------------------------------------------------------------
+  void setTriQuadHexelem( const int &ptid0, const int &ptid1,
+      const int &ptid2, const int &ptid3, const int &ptid4,
+      const int &ptid5, const int &ptid6, const int &ptid7,
+      const int &ptid8, const int &ptid9, const int &ptid10,
+      const int &ptid11, const int &ptid12, const int &ptid13,
+      const int &ptid14, const int &ptid15, const int &ptid16,
+      const int &ptid17, const int &ptid18, const int &ptid19,
+      const int &ptid20, const int &ptid21, const int &ptid22,
+      const int &ptid23, const int &ptid24, const int &ptid25,
+      const int &ptid26, vtkUnstructuredGrid * gridData );
+ 
   // ----------------------------------------------------------------
   // ! setTetraelem: build Tetra element connectivity with vtkPoints
   //   in element. There are 4 points in this element.
   //   \para ptoffset: the offset for this element
   //   \para gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Tet element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
   void setTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
   // ! setTetraelem: build Tetra element connectivity using the specified
-  //                 point index.
+  //   point index.
   // ----------------------------------------------------------------
   void setTetraelem( const int &ptid0, const int &ptid1, const int &ptid2,
       const int &ptid3, vtkUnstructuredGrid * gridData );
 
   // ----------------------------------------------------------------
   // ! setQuadTetraelem: build quadratic Tetra element connectivity
-  //   with vtkPoints. There are 10 points in the element.
+  //   with the vtkPoints. There are 10 points in the element.
+  //   \para ptoffset: the offset for this element
+  //   \para gridData: the Grid object that stores the connectivity
+  //   Note: this simply set up a single Tet element without node sharing
+  //   with any adjacent element. Visualization with this is like plotting
+  //   on discontinuous element, which could be heavy for memory.
   // ----------------------------------------------------------------
   void setQuadTetraelem( const int &ptoffset, vtkUnstructuredGrid * gridData );
 
+  // ----------------------------------------------------------------
+  // ! setQuadTetraelem: build quadratic Tetra element connectivity 
+  //   using the specified point index.
+  // ----------------------------------------------------------------
   void setQuadTetraelem( const int &ptid0, const int &ptid1,
       const int &ptid2, const int &ptid3, const int &ptid4,
       const int &ptid5, const int &ptid6, const int &ptid7,

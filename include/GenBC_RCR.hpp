@@ -19,7 +19,7 @@ class GenBC_RCR : public IGenBC
     GenBC_RCR( const std::string &lpn_filename, const int &in_N, 
         const double &dt3d );
 
-    virtual ~GenBC_RCR(); 
+    virtual ~GenBC_RCR() = default; 
 
     virtual void print_info() const;
 

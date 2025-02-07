@@ -9,7 +9,7 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
   num_local_cell.clear();
   cell_nLocBas.clear();
   local_cell_node_xyz.clear();
-  local_tri_ien.clear();
+  local_cell_ien.clear();
   local_cell_node_vol_id.clear();
   local_cell_node.clear();
   local_cell_node_pos.clear();
@@ -20,7 +20,7 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
   num_local_cell.resize( num_ebc );
   cell_nLocBas.resize( num_ebc );
   local_cell_node_xyz.resize( num_ebc );
-  local_tri_ien.resize( num_ebc );
+  local_cell_ien.resize( num_ebc );
   local_cell_node_vol_id.resize( num_ebc );
   local_cell_node.resize( num_ebc );
   local_cell_node_pos.resize( num_ebc );
@@ -75,6 +75,8 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
     local_cell_node_xyz[ii].resize(num_local_cell_node[ii] * 3);
     local_cell_node_vol_id[ii].resize( num_local_cell_node[ii] );
     local_cell_node_pos[ii].resize( num_local_cell_node[ii] );
+
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_cell_node[ii]; ++jj)
     {
       local_cell_node_xyz[ii][3*jj]   = ebc->get_pt_xyz( ii, local_cell_node[ii][jj], 0 );
@@ -87,32 +89,20 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
     }
 
     // now create the new IEN
-    local_tri_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
+    local_cell_ien[ii].resize( num_local_cell[ii] * cell_nLocBas[ii] );
+    
+    PERIGEE_OMP_PARALLEL_FOR
     for(int jj=0; jj<num_local_cell[ii]; ++jj)
     {
       for(int kk=0; kk<cell_nLocBas[ii]; ++kk)
       {
         const int temp_node = ebc->get_ien(ii, local_elem[jj], kk);
         const int temp_npos = VEC_T::get_pos( local_cell_node[ii], temp_node );
-        SYS_T::print_exit_if( temp_npos < 0, "Error: EBC_Partition, local_cell_node is incomplete. \n" );
-        local_tri_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
+        SYS_T::print_fatal_if( temp_npos < 0, "Error: EBC_Partition, local_cell_node is incomplete. \n" );
+        local_cell_ien[ii][jj*cell_nLocBas[ii] + kk] = temp_npos;
       }
     }
   } // end loop over num_ebc
-}
-
-
-EBC_Partition::~EBC_Partition()
-{
-  VEC_T::clean( num_local_cell_node );
-  VEC_T::clean( num_local_cell );
-  VEC_T::clean( cell_nLocBas );
-  VEC_T::clean( local_cell_node_xyz );
-  VEC_T::clean( local_tri_ien );
-  VEC_T::clean( local_cell_node_vol_id );
-  VEC_T::clean( local_cell_node );
-  VEC_T::clean( local_cell_node_pos );
-  VEC_T::clean( local_cell_vol_id );
 }
 
 void EBC_Partition::write_hdf5( const std::string &FileName, 
@@ -148,7 +138,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
 
       h5w->write_doubleVector( group_id, "local_cell_node_xyz", local_cell_node_xyz[ii] );
 
-      h5w->write_intVector( group_id, "local_tri_ien", local_tri_ien[ii] );
+      h5w->write_intVector( group_id, "local_cell_ien", local_cell_ien[ii] );
 
       h5w->write_intVector( group_id, "local_cell_node_vol_id", local_cell_node_vol_id[ii] );
 
@@ -183,8 +173,8 @@ void EBC_Partition::print_info() const
     VEC_T::print( local_cell_node_xyz[ii] );
     std::cout<<"   local_cell_vol_id : \n";
     VEC_T::print( local_cell_vol_id[ii] );
-    std::cout<<"   local_tri_ien : \n";
-    VEC_T::print( local_tri_ien[ii] );
+    std::cout<<"   local_cell_ien : \n";
+    VEC_T::print( local_cell_ien[ii] );
   } 
   std::cout<<"=========================================== \n";
 }

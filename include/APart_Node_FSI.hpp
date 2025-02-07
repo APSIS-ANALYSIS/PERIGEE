@@ -31,7 +31,7 @@ class APart_Node_FSI : public APart_Node
   public:
     APart_Node_FSI(const std::string &fileBaseName, const int &rank );
 
-    virtual ~APart_Node_FSI();
+    virtual ~APart_Node_FSI() = default;
 
     virtual void print_info() const;
 

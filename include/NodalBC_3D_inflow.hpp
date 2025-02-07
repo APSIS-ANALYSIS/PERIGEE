@@ -14,22 +14,17 @@
 // ============================================================================
 #include "INodalBC.hpp"
 #include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
+#include "QuadPts_Gauss_Quad.hpp"
 #include "FEAElement_Triangle3_3D_der0.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
+#include "FEAElement_Quad4_3D_der0.hpp"
+#include "FEAElement_Quad9_3D_der0.hpp"
 
 class NodalBC_3D_inflow : public INodalBC
 {
   public:
-    // ------------------------------------------------------------------------
-    // Generate the inflow bc given by the inffile.
-    // ------------------------------------------------------------------------
-    NodalBC_3D_inflow( const std::string &inffile,
-        const std::string &wallfile,
-        const int &nFunc,
-        const Vector_3 &in_outnormal,
-        const int &elemtype = 501 );
-
     // ------------------------------------------------------------------------
     // Generate the inflow bc given by a list of inffiles.
     // ------------------------------------------------------------------------
@@ -37,22 +32,22 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype = 501 );
+        const FEType &in_elemtype );
 
-    virtual ~NodalBC_3D_inflow() {};
+    virtual ~NodalBC_3D_inflow() = default;
 
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
 
     virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const
     {
-      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_inflow.\n");
+      SYS_T::print_fatal("Error: NodalBC_3D_inflow::get_per_slave_nodes: periodic nodes are not defined.\n");
       return 0;
     }
 
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
     {
-      SYS_T::print_fatal("Error: periodic nodes are not defined in NodalBC_3D_inflow.\n");
+      SYS_T::print_fatal("Error: NodalBC_3D_inflow::get_per_master_nodes: periodic nodes are not defined.\n");
       return 0;
     }
 
@@ -101,7 +96,7 @@ class NodalBC_3D_inflow : public INodalBC
 
     // Access to (surface) ien
     virtual int get_ien(const int &nbc_id, const int &cell, const int &lnode) const
-    {return tri_ien[nbc_id][ nLocBas[nbc_id] * cell + lnode ];}
+    {return sur_ien[nbc_id][ nLocBas[nbc_id] * cell + lnode ];}
 
     // Access to point coordinates, 
     // node = 0, ..., num_node-1.
@@ -117,21 +112,36 @@ class NodalBC_3D_inflow : public INodalBC
     virtual int get_global_cell(const int &nbc_id, const int &cell_idx) const
     {return global_cell[nbc_id][cell_idx];}
 
-    // For linear element (type 501), the face node numbering is
+    // For linear element (type Tet4), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3
     //   Tet-Face-1 : Node 0 3 2
     //   Tet-Face-2 : Node 0 1 3
     //   Tet-Face-3 : Node 0 2 1
-    // For quadratic element (type 502), the face node numbering is
+    // For quadratic element (type Tet10), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3 5 9 8
     //   Tet-Face-1 : Node 0 3 2 7 9 6
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
-    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN );
+    // For trilinear element (type Hex8), the face node numbering is
+    //   Hex-Face-0 : Node 0 3 2 1
+    //   Hex-Face-1 : Node 4 5 6 7
+    //   Hex-Face-2 : Node 0 1 5 4
+    //   Hex-Face-3 : Node 1 2 6 5
+    //   Hex-Face-4 : Node 2 3 7 6
+    //   Hex-Face-5 : Node 0 4 7 3
+    // For triquadratic element (type Hex27), the face node numbering is
+    //   Hex-Face-0 : Node 0 3 2 1 11 10 9 8 24
+    //   Hex-Face-1 : Node 4 5 6 7 12 13 14 15 25
+    //   Hex-Face-2 : Node 0 1 5 4 8 17 12 16 22
+    //   Hex-Face-3 : Node 1 2 6 5 9 18 13 17 21
+    //   Hex-Face-4 : Node 2 3 7 6 10 19 14 18 23
+    //   Hex-Face-5 : Node 0 4 7 3 16 15 19 11 20
+    virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN );
 
   private:
-    NodalBC_3D_inflow() : num_nbc(0), elem_type(501) {};
-
+    // Disallow default constructor
+    NodalBC_3D_inflow() = delete;
+    
     // The dirichlet nodes on each inlet surface
     // length num_nbc x num_dir_nodes_on_inlet[ii]
     std::vector< std::vector<unsigned int> > dir_nodes_on_inlet;
@@ -143,7 +153,8 @@ class NodalBC_3D_inflow : public INodalBC
     unsigned int num_dir_nodes;
 
     // number of inlet surfaces and element type
-    const int num_nbc, elem_type;
+    const int num_nbc;
+    const FEType elem_type;
     
     // This is the area calculated by setting the wall nodes to be zero.
     // It is designed to compute the area to give a plug flow profile with
@@ -175,12 +186,12 @@ class NodalBC_3D_inflow : public INodalBC
 
     // number of nodes and cells on each surface. Length num_nbc.
     // Note: num_node[ii] does not equal num_dir_nodes[ii] in this class.
-    // nLocBas[ii] is either 3 or 6.
+    // nLocBas[ii] is 3, 6, 4 or 9.
     std::vector<int> num_node, num_cell, nLocBas;
 
     // IEN for each surface.
     // num_nbc times ( nLocBas[ii] x num_cell[ii] ) in size.
-    std::vector< std::vector<int> > tri_ien;
+    std::vector< std::vector<int> > sur_ien;
 
     // coordinates of all nodes on each surface
     // num_nbc times ( 3 x num_node[ii] ) in size.
@@ -201,7 +212,16 @@ class NodalBC_3D_inflow : public INodalBC
         const std::string &wallfile,
         const int &nFunc,
         const std::vector<Vector_3> &in_outnormal,
-        const int &elemtype = 501 );
+        const FEType &elemtype );
+
+    // Reset function for the IEN array of different element types.
+    void reset501IEN_outwardnormal( const IIEN * const &VIEN );
+
+    void reset502IEN_outwardnormal( const IIEN * const &VIEN );
+
+    void reset601IEN_outwardnormal( const IIEN * const &VIEN );
+
+    void reset602IEN_outwardnormal( const IIEN * const &VIEN );
 };
 
 #endif

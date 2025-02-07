@@ -3,10 +3,10 @@
 // ============================================================================
 // APart_Node.hpp
 // Class storing information of partitioned node indices, including:
-// 1. re-ordered global indices of nodes;
-// 2. number of local nodes, ghost nodes, etc.
-// 3. dof : dofNum in the preprocessor. The total degrees of freedom
-//    in the physical problem.
+// 1. The re-ordered global indices of {local, ghost, local+ghost} nodes;
+// 2. number of local, ghost, local+ghost nodes, etc.
+// 3. dof : dofNum in the preprocessor, i.e., the degrees of freedom attached to
+//    the nodes.
 // 
 // In the local_to_global array, there are 
 //             nlocghonode = nlocalnode + nghostnode
@@ -31,7 +31,7 @@ class APart_Node
     // ------------------------------------------------------------------------
     // Destructor    
     // ------------------------------------------------------------------------
-    virtual ~APart_Node();
+    virtual ~APart_Node() = default;
 
     // ------------------------------------------------------------------------
     // This returns dofNum in the preprocessor, the total number of dof.
@@ -115,6 +115,33 @@ class APart_Node
       return -1;
     }
     
+    // ------------------------------------------------------------------------
+    // Virtual functions for the _Rotated derived class
+    // ------------------------------------------------------------------------
+    virtual int get_nlocalnode_rotated() const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_rotated is not implemented.\n");
+      return -1;
+    }
+
+    virtual int get_node_loc_rotated(const int &index) const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_node_loc_rotated is not implemented.\n");
+      return -1;
+    }
+
+    virtual int get_nlocalnode_fixed() const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_nlocalnode_fixed is not implemented.\n");
+      return -1;
+    }
+
+    virtual int get_node_loc_fixed(const int &index) const
+    {
+      SYS_T::print_fatal("Error: APart_Node::get_node_loc_fixed is not implemented.\n");
+      return -1;
+    }
+
   protected:
     // ------------------------------------------------------------------------
     // rank of the CPU that identifies the subdomain
@@ -132,7 +159,9 @@ class APart_Node
     // local_to_global = [ node_loc ] appended by [ node_ghost ].
     // The three vectors have lengths nlocghonode, nlocalnode, nghostnode, resp.
     // ------------------------------------------------------------------------
-    std::vector<int> local_to_global, node_ghost, node_loc;
+    std::vector<int> local_to_global {}, node_ghost {}, node_loc {};
+
+    APart_Node() = delete;
 };
 
 #endif

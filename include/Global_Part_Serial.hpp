@@ -9,19 +9,20 @@
 //
 // Date: Oct 2nd 2013
 // ==================================================================
+#include "Sys_Tools.hpp"
 #include "IGlobal_Part.hpp"
-#include "IMesh.hpp"
 #include "HDF5_Writer.hpp"
 
 class Global_Part_Serial : public IGlobal_Part
 {
   public:
-    Global_Part_Serial( const IMesh * const &mesh,
+    Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
     Global_Part_Serial( const int &num_fields,
-        const std::vector<IMesh const *> &mesh_list,
+        const std::vector<int> &in_nelem_list,
+        const std::vector<int> &in_nfunc_list,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 

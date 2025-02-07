@@ -1,16 +1,16 @@
 #ifndef EBC_PARTITION_HPP
 #define EBC_PARTITION_HPP
-// ==================================================================
+// ============================================================================
 // EBC_Partition.hpp
 //
-// Elemental boundary condition partition implementation for data 
-// structures readed from .vtp files. This is used mainly for
-// unstructured meshes.
+// Elemental boundary condition partition implementation for data structures 
+// readed from .vtp files. This is used mainly for unstructured meshes.
 //
 // Author: Ju Liu
 // Date: Jan. 15 2017
-// ==================================================================
+// ============================================================================
 #include "IPart.hpp"
+#include "Map_Node_Index.hpp"
 #include "ElemBC.hpp"
 #include "HDF5_Writer.hpp"
 
@@ -21,7 +21,7 @@ class EBC_Partition
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition();
+    virtual ~EBC_Partition() = default;
 
     // Write the data to hdf5 file in group /GroupName
     virtual void write_hdf5( const std::string &FileName,
@@ -46,8 +46,8 @@ class EBC_Partition
     virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
     {return local_cell_node_xyz[ii][jj];}
 
-    virtual int get_local_tri_ien(const int &ii, const int &jj) const
-    {return local_tri_ien[ii][jj];}
+    virtual int get_local_cell_ien(const int &ii, const int &jj) const
+    {return local_cell_ien[ii][jj];}
 
     virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
     {return local_cell_node_vol_id[ii][jj];}
@@ -71,7 +71,7 @@ class EBC_Partition
 
     // local cell's IEN array, 
     // num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) in size
-    std::vector< std::vector<int> > local_tri_ien;
+    std::vector< std::vector<int> > local_cell_ien;
 
     // local cell node's global index, num_ebc x num_local_cell_node[ii] in size
     // local means local to the CPU's subdomain

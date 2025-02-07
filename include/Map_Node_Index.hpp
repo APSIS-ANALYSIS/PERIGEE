@@ -30,7 +30,7 @@ class Map_Node_Index
     // Load the index mapping from file on disk
     Map_Node_Index( const char * const &fileName );
 
-    virtual ~Map_Node_Index();
+    virtual ~Map_Node_Index() = default;
 
     // Map the natural node numbering to the new numbering based on
     // mesh partition

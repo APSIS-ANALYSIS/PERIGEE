@@ -1,9 +1,0 @@
-#!/bin/bash
-#SBATCH -J prepost    # Job Name
-#SBATCH -o prepost    # Name of the output and error file (%j expands to jobID)
-#SBATCH -N 1 -n 1  # Total number of mpi tasks requested
-#SBATCH -p skx-dev  # Queue (partition) name  -- normal, development, gpu, etc.
-#SBATCH -t 00:03:00  # Run time (hh:mm:ss) - 1.5 hours
-#SBATCH -A TG-CTS130034
-
-ibrun $HOME/build_p1/vis3d_coupled -time_start 0 -time_step 1 -time_end 10 -dt 0.1

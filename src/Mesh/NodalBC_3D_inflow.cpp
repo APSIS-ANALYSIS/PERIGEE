@@ -1,31 +1,20 @@
 #include "NodalBC_3D_inflow.hpp"
 
-NodalBC_3D_inflow::NodalBC_3D_inflow( const std::string &inffile,
-    const std::string &wallfile, const int &nFunc,
-    const Vector_3 &in_outnormal,
-    const int &elemtype ) : num_nbc( 1 ), elem_type( elemtype )
-{
-  const std::vector<std::string> inffileList { inffile };
-  const std::vector<Vector_3> outnormalList { in_outnormal };
-
-  init( inffileList, wallfile, nFunc, outnormalList, elemtype );
-}
-
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileList,
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const int &elemtype ) 
-: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( elemtype )
+    const FEType &in_elemtype ) 
+: num_nbc( static_cast<int>( inffileList.size() ) ), elem_type( in_elemtype )
 {
-  init( inffileList, wallfile, nFunc, in_outnormal, elemtype );
+  init( inffileList, wallfile, nFunc, in_outnormal, elem_type );
 }
 
 void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     const std::string &wallfile,
     const int &nFunc,
     const std::vector<Vector_3> &in_outnormal,
-    const int &elemtype )
+    const FEType &elemtype )
 { 
   // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
@@ -41,7 +30,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   num_cell.resize( num_nbc );
   nLocBas.resize(  num_nbc );
 
-  tri_ien.resize(num_nbc );
+  sur_ien.resize(num_nbc );
   pt_xyz.resize( num_nbc );
 
   global_node.resize(  num_nbc );
@@ -61,48 +50,33 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   // Read the wall file
   SYS_T::file_check(wallfile);
 
-  int wall_numpts, wall_numcels;
-  std::vector<double> wall_pts;
-  std::vector<int> wall_ien, wall_gnode, wall_gelem;
-
-  if( elemtype == 501 )
-  {
-    TET_T::read_vtp_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien, wall_gnode, wall_gelem );
-
-  }
-  else if( elemtype == 502 )
-  {
-    TET_T::read_vtu_grid( wallfile, wall_numpts, wall_numcels, wall_pts, 
-        wall_ien, wall_gnode, wall_gelem );
-  }
-  else SYS_T::print_fatal("Error: unknown element type.\n");
+  const std::vector<int> wall_gnode = VTK_T::read_int_PointData(wallfile, "GlobalNodeID");
 
   // Loop over each surface with id ii
   for( int ii=0; ii<num_nbc; ++ii )
   {
     SYS_T::file_check( inffileList[ii] );
 
-    if( elemtype == 501 )
-    {
+    VTK_T::read_grid( inffileList[ii], num_node[ii], num_cell[ii], pt_xyz[ii], sur_ien[ii] );
+
+    if( elemtype == FEType::Tet4 )
       nLocBas[ii] = 3;
-
-      TET_T::read_vtp_grid( inffileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
-    }
-    else if( elemtype == 502 )
-    {
+    else if( elemtype == FEType::Tet10 )
       nLocBas[ii] = 6;
+    else if( elemtype == FEType::Hex8 )
+      nLocBas[ii] = 4;
+    else if( elemtype == FEType::Hex27 )
+      nLocBas[ii] = 9;
+    else 
+      SYS_T::print_fatal("Error: NodalBC_3D_inflow::init function: unknown element type.\n");
 
-      TET_T::read_vtu_grid( inffileList[ii], num_node[ii], num_cell[ii],
-          pt_xyz[ii], tri_ien[ii], global_node[ii], global_cell[ii] );
-    }
-    else SYS_T::print_fatal("Error: unknown element type.\n");
+    global_node[ii] = VTK_T::read_int_PointData(inffileList[ii], "GlobalNodeID");
+    global_cell[ii] = VTK_T::read_int_CellData(inffileList[ii], "GlobalElementID");
 
     // Generate the dir-node list. Nodes belonging to the wall are excluded.
     for(unsigned int jj=0; jj<global_node[ii].size(); ++jj)
     {
-      SYS_T::print_fatal_if( global_node[ii][jj]<0, "Error: negative nodal index! \n");
+      SYS_T::print_fatal_if( global_node[ii][jj]<0, "Error: NodalBC_3D_inflow::init function: negative nodal index! \n");
 
       if( !VEC_T::is_invec( wall_gnode, global_node[ii][jj]) )
       {
@@ -114,14 +88,14 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     num_dir_nodes_on_inlet[ii] = dir_nodes_on_inlet[ii].size();
 
     // Calculate the centroid of the surface
-    centroid[ii].gen_zero();
+    centroid[ii] = Vec3::gen_zero();
     for(int jj=0; jj<num_node[ii]; ++jj)
     {
       centroid[ii](0) += pt_xyz[ii][3*jj+0];
       centroid[ii](1) += pt_xyz[ii][3*jj+1];
       centroid[ii](2) += pt_xyz[ii][3*jj+2];
     }
-    centroid[ii].scale( 1.0 / (double) num_node[ii] );
+    centroid[ii] *= (1.0 / (double) num_node[ii]);
 
     // assign outward normal vector from the input
     outnormal[ii] = in_outnormal[ii];
@@ -158,7 +132,9 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     // mesh contains the inlet surface. This is a common error when
     // adopting sv files, where the user uses the combined exterior surface
     // as the wall mesh. We will throw an error message if detected.
-    if( num_out_bc_pts[ii] == num_node[ii] ) SYS_T::print_fatal( "Error: the number of outline points is %d and the number of total points on the surface is %d. This is likely due to an improper wall mesh. \n", num_out_bc_pts[ii], num_node[ii] );
+    SYS_T::print_fatal_if( num_out_bc_pts[ii] == num_node[ii], "Error: NodalBC_3D_inflow::init function:"
+                          "the number of outline points is %d and the number of total points on the surface is %d."
+                          "This is likely due to an improper wall mesh. \n", num_out_bc_pts[ii], num_node[ii] );
 
     inf_active_area[ii] = 0.0;
     face_area[ii] = 0.0;
@@ -168,20 +144,20 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     // zero the container
     for(int jj=0; jj<num_node[ii]; ++jj) intNA[ii][jj] = 0.0;
 
-    if( elemtype == 501 )
+    if( elemtype == FEType::Tet4 )
     {
-      double eptx[3]; double epty[3]; double eptz[3];
-      int node_idx[3]; double R[3];
-
       const int nqp_tri = 3;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
       FEAElement_Triangle3_3D_der0 ele( nqp_tri ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
       {
+        double eptx[3]{}; double epty[3]{}; double eptz[3]{};
+        int node_idx[3]{}; 
+
         for(int jj=0; jj<3; ++jj)
         {
-          node_idx[jj] = tri_ien[ii][3*ee+jj];
+          node_idx[jj] = sur_ien[ii][3*ee+jj];
           eptx[jj] = pt_xyz[ii][ 3*node_idx[jj]+0 ];
           epty[jj] = pt_xyz[ii][ 3*node_idx[jj]+1 ];
           eptz[jj] = pt_xyz[ii][ 3*node_idx[jj]+2 ];
@@ -191,13 +167,14 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         for(int qua=0; qua<nqp_tri; ++qua)
         {
+          double R[3]{};
           ele.get_R( qua, R );
 
           const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
 
           for(int jj=0; jj<3; ++jj)
           {
-            inf_active_area[ii] += gwts * R[jj] * temp_sol[ tri_ien[ii][3*ee+jj] ];
+            inf_active_area[ii] += gwts * R[jj] * temp_sol[ sur_ien[ii][3*ee+jj] ];
             face_area[ii] += gwts * R[jj];
 
             intNA[ii][node_idx[jj]] += gwts * R[jj];
@@ -205,20 +182,20 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else if( elemtype == 502 )
+    else if( elemtype == FEType::Tet10 )
     {
-      double eptx[6]; double epty[6]; double eptz[6]; 
-      int node_idx[6]; double R[6];
-
       const int nqp_tri = 6;                       // num qua points
       QuadPts_Gauss_Triangle quad( nqp_tri );      // quadrature rule
       FEAElement_Triangle6_3D_der0 ele( nqp_tri ); // element
 
       for(int ee=0; ee<num_cell[ii]; ++ee)
       {
+        double eptx[6]{}; double epty[6]{}; double eptz[6]{}; 
+        int node_idx[6]{};
+
         for(int jj=0; jj<6; ++jj)
         {
-          node_idx[jj] = tri_ien[ii][6*ee+jj];
+          node_idx[jj] = sur_ien[ii][6*ee+jj];
           eptx[jj] = pt_xyz[ii][ 3*node_idx[jj]+0 ];
           epty[jj] = pt_xyz[ii][ 3*node_idx[jj]+1 ];
           eptz[jj] = pt_xyz[ii][ 3*node_idx[jj]+2 ];
@@ -228,13 +205,14 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
         for(int qua=0; qua<nqp_tri; ++qua)
         {
+          double R[6]{};
           ele.get_R( qua, R );
 
           const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
 
           for(int jj=0; jj<6; ++jj)
           {
-            inf_active_area[ii] += gwts * R[jj] * temp_sol[ tri_ien[ii][6*ee+jj] ];
+            inf_active_area[ii] += gwts * R[jj] * temp_sol[ sur_ien[ii][6*ee+jj] ];
             face_area[ii] += gwts * R[jj];
 
             intNA[ii][node_idx[jj]] += gwts * R[jj];
@@ -242,7 +220,83 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         } // end qua-loop
       } // end ee-loop
     }
-    else SYS_T::print_fatal("Error: unknown element type.\n");
+    else if( elemtype == FEType::Hex8 )
+    {
+      const int nqp_quad = 2;                              // num qua points
+      QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
+      FEAElement_Quad4_3D_der0 ele( nqp_quad * nqp_quad ); // element
+
+      for(int ee=0; ee<num_cell[ii]; ++ee)
+      {
+        double eptx[4]{}; double epty[4]{}; double eptz[4]{}; 
+        int node_idx[4]{};
+
+        for(int jj=0; jj<4; ++jj)
+        {
+          node_idx[jj] = sur_ien[ii][4*ee+jj];
+          eptx[jj] = pt_xyz[ii][ 3*node_idx[jj]+0 ];
+          epty[jj] = pt_xyz[ii][ 3*node_idx[jj]+1 ];
+          eptz[jj] = pt_xyz[ii][ 3*node_idx[jj]+2 ];
+        }
+
+        ele.buildBasis(&quad, eptx, epty, eptz);
+
+        for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
+        {
+          double R[4]{};
+          ele.get_R( qua, R );
+
+          const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
+
+          for(int jj=0; jj<4; ++jj)
+          {
+            inf_active_area[ii] += gwts * R[jj] * temp_sol[ sur_ien[ii][4*ee+jj] ];
+            face_area[ii] += gwts * R[jj];
+
+            intNA[ii][node_idx[jj]] += gwts * R[jj];
+          }
+        } // end qua-loop
+      } // end ee-loop
+    }
+    else if( elemtype == FEType::Hex27 )
+    {
+      const int nqp_quad = 4;                              // num qua points
+      QuadPts_Gauss_Quad quad( nqp_quad );                 // quadrature rule
+      FEAElement_Quad9_3D_der0 ele( nqp_quad * nqp_quad ); // element
+
+      for(int ee=0; ee<num_cell[ii]; ++ee)
+      {
+        double eptx[9]{}; double epty[9]{}; double eptz[9]{}; 
+        int node_idx[9]{};
+
+        for(int jj=0; jj<9; ++jj)
+        {
+          node_idx[jj] = sur_ien[ii][9*ee+jj];
+          eptx[jj] = pt_xyz[ii][ 3*node_idx[jj]+0 ];
+          epty[jj] = pt_xyz[ii][ 3*node_idx[jj]+1 ];
+          eptz[jj] = pt_xyz[ii][ 3*node_idx[jj]+2 ];
+        }
+
+        ele.buildBasis(&quad, eptx, epty, eptz);
+
+        for(int qua=0; qua<nqp_quad * nqp_quad; ++qua)
+        {
+          double R[9]{};
+          ele.get_R( qua, R );
+
+          const double gwts = ele.get_detJac(qua) * quad.get_qw(qua);
+
+          for(int jj=0; jj<9; ++jj)
+          {
+            inf_active_area[ii] += gwts * R[jj] * temp_sol[ sur_ien[ii][9*ee+jj] ];
+            face_area[ii] += gwts * R[jj];
+
+            intNA[ii][node_idx[jj]] += gwts * R[jj];
+          }
+        } // end qua-loop
+      } // end ee-loop
+    }
+    else SYS_T::print_fatal("Error: NodalBC_3D_inflow::init function: unknown element type.\n");
 
     delete [] temp_sol; temp_sol = nullptr;
   } // end ii-loop
@@ -251,7 +305,7 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  SYS_T::print_fatal_if( num_dir_nodes != dir_nodes.size(), "Error: there are repeated nodes in the inflow file list.\n" );
+  SYS_T::print_fatal_if( num_dir_nodes != dir_nodes.size(), "Error: NodalBC_3D_inflow::init function: there are repeated nodes in the inflow file list.\n" );
 
   // Generate ID array
   Create_ID( nFunc );
@@ -270,161 +324,389 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
   }
 }
 
-void NodalBC_3D_inflow::resetTriIEN_outwardnormal( const IIEN * const &VIEN )
+void NodalBC_3D_inflow::resetSurIEN_outwardnormal( const IIEN * const &VIEN )
 {
-  if(elem_type == 501)
+  if(elem_type == FEType::Tet4)
+    reset501IEN_outwardnormal(VIEN); 
+  else if(elem_type == FEType::Tet10)
+    reset502IEN_outwardnormal(VIEN); 
+  else if(elem_type == FEType::Hex8)
+    reset601IEN_outwardnormal(VIEN);     
+  else if(elem_type == FEType::Hex27)
+    reset602IEN_outwardnormal(VIEN);  
+  else SYS_T::print_fatal("Error: NodalBC_3D_inflow::resetSurIEN_outwardnormal function: unknown element type.\n");
+}
+
+void NodalBC_3D_inflow::reset501IEN_outwardnormal( const IIEN * const &VIEN )
+{
+  for(int nbcid=0; nbcid<num_nbc; ++nbcid)
   {
-    for(int nbcid=0; nbcid < num_nbc; ++nbcid)
+    TET_T::Tet4 * tetcell = new TET_T::Tet4();
+
+    for(int ee=0; ee<num_cell[nbcid]; ++ee)
     {
-      TET_T::Tet4 * tetcell = new TET_T::Tet4();
+      // Triangle mesh node index
+      const int node_t[3] { get_ien(nbcid, ee, 0), get_ien(nbcid, ee, 1), get_ien(nbcid, ee, 2) };
 
-      for(int ee=0; ee<num_cell[nbcid]; ++ee)
-      {
-        // Triangle mesh node index
-        const int node_t[3] { get_ien(nbcid, ee, 0), get_ien(nbcid, ee, 1), get_ien(nbcid, ee, 2) };
+      // The triangle mesh node's volumetric index
+      const std::vector<int> node_t_gi { get_global_node(nbcid, node_t[0]), 
+        get_global_node(nbcid, node_t[1]), get_global_node(nbcid, node_t[2]) };
 
-        // The triangle mesh node's volumetric index
-        const std::vector<int> node_t_gi = { get_global_node(nbcid, node_t[0]),
-          get_global_node(nbcid, node_t[1]), get_global_node(nbcid, node_t[2]) };
+      // cell ee's global/volumetric index  
+      const int cell_gi = get_global_cell(nbcid, ee);
 
-        // cell ee's global/volumetric index
-        const int cell_gi = get_global_cell(nbcid, ee);
-
-        // tet mesh first four node's volumetric index
-        const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
+      // tet mesh first four node's volumetric index
+      const int tet_n[4] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
           VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3) };
 
-        // build the tet object
-        tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
+      // build the tet object
+      tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
 
-        // determine the face id for this triangle in the tet object
-        const int tet_face_id = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
+      // determine the face id for this triangle in the tet object 
+      const int tet_face_id = tetcell->get_face_id(node_t_gi[0], node_t_gi[1], node_t_gi[2]);
 
-        int pos0 = -1, pos1 = -1, pos2 = -1;
-        switch( tet_face_id )
-        {
-          case 0:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[1]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
-            break;
-          case 1:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[3]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[2]);
-            break;
-          case 2:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[1]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
-            break;
-          case 3:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
-            break;
-          default:
-            SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
-            break;
-        }
-        ASSERT(pos0 >=0 && pos0 <=2, "While elem_type == 501, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-        ASSERT(pos1 >=0 && pos1 <=2, "While elem_type == 501, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-        ASSERT(pos2 >=0 && pos2 <=2, "While elem_type == 501, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-
-        // Now we have got the corrected ordering of node_t, put them back into
-        // tri_ien.
-        tri_ien[nbcid][3*ee+0] = node_t[pos0];
-        tri_ien[nbcid][3*ee+1] = node_t[pos1];
-        tri_ien[nbcid][3*ee+2] = node_t[pos2];
-      }
-      delete tetcell;
-    }
-  }
-  else if(elem_type == 502)
-  {
-    for(int nbcid = 0; nbcid < num_nbc; ++nbcid)
-    {
-      std::vector<int> node_t(6, 0); // triange node index in 2D mesh
-      std::vector<int> node_t_gi(6, 0); // triange node index in 3D mesh
-      std::vector<int> tet_n(10,0); // tet node index in 3D mesh
-    
-      TET_T::Tet4 * tetcell = new TET_T::Tet4();
-    
-      for(int ee=0; ee<num_cell[nbcid]; ++ee)
+      int pos0 = -1, pos1 = -1, pos2 = -1;
+      switch( tet_face_id )
       {
-        for(int ii=0; ii<6; ++ii)
-        {
-          node_t[ii] = get_ien(nbcid, ee, ii);
-          node_t_gi[ii] = get_global_node(nbcid, node_t[ii]);
-        }
-
-        const int cell_gi = get_global_cell(nbcid, ee);
-
-        for(int ii=0; ii<10; ++ii) tet_n[ii] = VIEN->get_IEN(cell_gi, ii);
-
-        tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
-
-        const int tet_face_id = tetcell->get_face_id(node_t_gi[0],
-            node_t_gi[1], node_t_gi[2]);
-
-        int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1, pos5 = -1;
-
-        switch( tet_face_id )
-        {
-          case 0:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[1]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
-            pos3 = VEC_T::get_pos(node_t_gi, tet_n[5]);
-            pos4 = VEC_T::get_pos(node_t_gi, tet_n[9]);
-            pos5 = VEC_T::get_pos(node_t_gi, tet_n[8]);
-            break;
-          case 1:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[3]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[2]);
-            pos3 = VEC_T::get_pos(node_t_gi, tet_n[7]);
-            pos4 = VEC_T::get_pos(node_t_gi, tet_n[9]);
-            pos5 = VEC_T::get_pos(node_t_gi, tet_n[6]);
-            break;
-          case 2:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[1]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
-            pos3 = VEC_T::get_pos(node_t_gi, tet_n[4]);
-            pos4 = VEC_T::get_pos(node_t_gi, tet_n[8]);
-            pos5 = VEC_T::get_pos(node_t_gi, tet_n[7]);
-            break;
-          case 3:
-            pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
-            pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
-            pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
-            pos3 = VEC_T::get_pos(node_t_gi, tet_n[6]);
-            pos4 = VEC_T::get_pos(node_t_gi, tet_n[5]);
-            pos5 = VEC_T::get_pos(node_t_gi, tet_n[4]);
-            break;
-          default:
-            SYS_T::print_fatal("Error: resetTriIEN_outwardnormal : tet_face_id is out of range. \n");
-            break;
-        }
-        ASSERT(pos0 >=0 && pos0 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n"); 
-        ASSERT(pos1 >=0 && pos1 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-        ASSERT(pos2 >=0 && pos2 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-        ASSERT(pos3 >=0 && pos3 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-        ASSERT(pos4 >=0 && pos4 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-        ASSERT(pos5 >=0 && pos5 <=5, "While elem_type == 502, NodalBC_3D_inflow::resetTriIEN_outwardnormal function error.\n");
-
-        tri_ien[nbcid][6*ee+0] = node_t[pos0];
-        tri_ien[nbcid][6*ee+1] = node_t[pos1];
-        tri_ien[nbcid][6*ee+2] = node_t[pos2];
-        tri_ien[nbcid][6*ee+3] = node_t[pos3];
-        tri_ien[nbcid][6*ee+4] = node_t[pos4];
-        tri_ien[nbcid][6*ee+5] = node_t[pos5];
+        case 0:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          break;
+        case 1:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          break;
+        case 2:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          break;
+        case 3:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          break;
+        default:
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset501IEN_outwardnormal function: tet_face_id is out of range. \n");
+          break;
       }
-      delete tetcell;
+      ASSERT(pos0 >=0 && pos0 <=2, "Error: NodalBC_3D_inflow::reset501IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=2, "Error: NodalBC_3D_inflow::reset501IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=2, "Error: NodalBC_3D_inflow::reset501IEN_outwardnormal function logical error.\n" ); 
+
+      // Now we have got the corrected ordering of node_t, put them back into
+      // sur_ien.
+      sur_ien[nbcid][3*ee+0] = node_t[pos0];
+      sur_ien[nbcid][3*ee+1] = node_t[pos1];
+      sur_ien[nbcid][3*ee+2] = node_t[pos2];
     }
+    delete tetcell; 
   }
-  else SYS_T::print_fatal("Error: unknown element type.\n");
+}
+
+void NodalBC_3D_inflow::reset502IEN_outwardnormal( const IIEN * const &VIEN )
+{
+  for(int nbcid=0; nbcid<num_nbc; ++nbcid)
+  {
+    std::vector<int> node_t(6, 0);    // triange node index in 2D mesh
+    std::vector<int> node_t_gi(6, 0); // triange node index in 3D mesh
+    std::vector<int> tet_n(10, 0);    // tet node index in 3D mesh
+
+    TET_T::Tet4 * tetcell = new TET_T::Tet4();
+
+    for(int ee=0; ee<num_cell[nbcid]; ++ee)
+    {
+      for(int ii=0; ii<6; ++ii)
+      {
+        node_t[ii] = get_ien(nbcid, ee, ii);
+        node_t_gi[ii] = get_global_node(nbcid, node_t[ii]);
+      }
+
+      const int cell_gi = get_global_cell(nbcid, ee);
+
+      for(int ii=0; ii<10; ++ii) tet_n[ii] = VIEN->get_IEN(cell_gi, ii);
+
+      tetcell->reset(tet_n[0], tet_n[1], tet_n[2], tet_n[3]);
+
+      const int tet_face_id = tetcell->get_face_id(node_t_gi[0],
+          node_t_gi[1], node_t_gi[2]);
+
+      int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1, pos5 = -1;
+
+      switch( tet_face_id )
+      {
+        case 0:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          pos3 = VEC_T::get_pos(node_t_gi, tet_n[5]);
+          pos4 = VEC_T::get_pos(node_t_gi, tet_n[9]);
+          pos5 = VEC_T::get_pos(node_t_gi, tet_n[8]);
+          break;
+        case 1:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos3 = VEC_T::get_pos(node_t_gi, tet_n[7]);
+          pos4 = VEC_T::get_pos(node_t_gi, tet_n[9]);
+          pos5 = VEC_T::get_pos(node_t_gi, tet_n[6]);
+          break;
+        case 2:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[3]);
+          pos3 = VEC_T::get_pos(node_t_gi, tet_n[4]);
+          pos4 = VEC_T::get_pos(node_t_gi, tet_n[8]);
+          pos5 = VEC_T::get_pos(node_t_gi, tet_n[7]);
+          break;
+        case 3:
+          pos0 = VEC_T::get_pos(node_t_gi, tet_n[0]);
+          pos1 = VEC_T::get_pos(node_t_gi, tet_n[2]);
+          pos2 = VEC_T::get_pos(node_t_gi, tet_n[1]);
+          pos3 = VEC_T::get_pos(node_t_gi, tet_n[6]);
+          pos4 = VEC_T::get_pos(node_t_gi, tet_n[5]);
+          pos5 = VEC_T::get_pos(node_t_gi, tet_n[4]);
+          break;
+        default:
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function: tet_face_id is out of range. \n");
+          break;
+      }
+      ASSERT(pos0 >=0 && pos0 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos1 >=0 && pos1 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos3 >=0 && pos3 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos4 >=0 && pos4 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos5 >=0 && pos5 <=5, "Error: NodalBC_3D_inflow::reset502IEN_outwardnormal function logical error.\n" );
+
+      sur_ien[nbcid][6*ee+0] = node_t[pos0];
+      sur_ien[nbcid][6*ee+1] = node_t[pos1];
+      sur_ien[nbcid][6*ee+2] = node_t[pos2];
+      sur_ien[nbcid][6*ee+3] = node_t[pos3];
+      sur_ien[nbcid][6*ee+4] = node_t[pos4];
+      sur_ien[nbcid][6*ee+5] = node_t[pos5];
+    }
+    delete tetcell;
+  }
+}
+
+void NodalBC_3D_inflow::reset601IEN_outwardnormal( const IIEN * const &VIEN )
+{
+  for (int nbcid=0; nbcid<num_nbc; ++nbcid)
+  {
+    HEX_T::Hex8 * hexcell = new HEX_T::Hex8(); 
+
+    for (int ee=0; ee<num_cell[nbcid]; ++ee)
+    {
+      // Quad mesh node index
+      const int node_q[4] { get_ien(nbcid, ee, 0), get_ien(nbcid, ee, 1),  get_ien(nbcid, ee, 2), get_ien(nbcid, ee, 3) };  
+
+      // The quad mesh node's volumetric index
+      const std::vector<int> node_q_gi { get_global_node(nbcid, node_q[0]), get_global_node(nbcid, node_q[1]),  
+                                         get_global_node(nbcid, node_q[2]), get_global_node(nbcid, node_q[3]) }; 
+
+      // cell ee's global/volumetric index  
+      const int cell_gi = get_global_cell(nbcid, ee);
+
+      // hex mesh first eight node's volumetric index
+      const int hex_n[8] { VIEN->get_IEN(cell_gi, 0), VIEN->get_IEN(cell_gi, 1),
+        VIEN->get_IEN(cell_gi, 2), VIEN->get_IEN(cell_gi, 3),
+        VIEN->get_IEN(cell_gi, 4), VIEN->get_IEN(cell_gi, 5),
+        VIEN->get_IEN(cell_gi, 6), VIEN->get_IEN(cell_gi, 7) };
+
+      // build the hex object
+      hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
+                     hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
+
+      // determind the face id for this quadrangle in the hex object
+      const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]);  
+
+      int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1;
+
+      switch (hex_face_id)
+      {
+        case 0:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[0]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[2]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[1]); 
+          break;
+        case 1:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[4]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[5]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[6]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[7]); 
+          break;
+        case 2:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[0]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[1]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[5]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[4]); 
+          break;
+        case 3:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[1]); 
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[2]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[6]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[5]); 
+          break;
+        case 4:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[2]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[7]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[6]); 
+          break;
+        case 5:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[0]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[4]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[7]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
+          break;          
+        default:
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function: hex_face_id is out of range. \n");
+          break;
+      }
+      ASSERT(pos0 >=0 && pos0 <=3, "Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=3, "Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=3, "Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos3 >=0 && pos3 <=3, "Error: NodalBC_3D_inflow::reset601IEN_outwardnormal function logical error.\n" ); 
+
+      // Now we have got the corrected ordering of node_q, put them back into
+      // sur_ien.
+      sur_ien[nbcid][4*ee+0] = node_q[pos0];
+      sur_ien[nbcid][4*ee+1] = node_q[pos1];
+      sur_ien[nbcid][4*ee+2] = node_q[pos2];
+      sur_ien[nbcid][4*ee+3] = node_q[pos3];
+    }
+    delete hexcell; 
+  }
+}
+
+void NodalBC_3D_inflow::reset602IEN_outwardnormal( const IIEN * const &VIEN )
+{
+  for (int nbcid=0; nbcid<num_nbc; ++nbcid)
+  {
+    std::vector<int> node_q(9, 0);    // biquadratic quadrangle node index in 2D mesh
+    std::vector<int> node_q_gi(9, 0); // biquadratic quadrangle node index in 3D mesh
+    std::vector<int> hex_n(27, 0);    // triquadratic hex node index in 3D mesh
+
+    HEX_T::Hex8 * hexcell = new HEX_T::Hex8();  
+
+    for (int ee=0; ee<num_cell[nbcid]; ++ee)
+    {
+      for (int ii=0; ii<9; ++ii)
+      {
+        node_q[ii]    = get_ien(nbcid, ee, ii);
+        node_q_gi[ii] = get_global_node(nbcid, node_q[ii]);
+      }
+
+      const int cell_gi = get_global_cell(nbcid, ee);
+
+      for(int ii=0; ii<27; ++ii) hex_n[ii] = VIEN->get_IEN(cell_gi, ii);
+
+      // build the hex object
+      hexcell->reset(hex_n[0], hex_n[1], hex_n[2], hex_n[3],
+                     hex_n[4], hex_n[5], hex_n[6], hex_n[7]);
+
+      // determind the face id for this quadrangle in the hex object
+      const int hex_face_id = hexcell->get_face_id(node_q_gi[0], node_q_gi[1], node_q_gi[2], node_q_gi[3]); 
+
+      int pos0 = -1, pos1 = -1, pos2 = -1, pos3 = -1, pos4 = -1, pos5 = -1, pos6 = -1, pos7 = -1, pos8 = -1;
+
+      switch (hex_face_id)
+      {
+        case 0:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[0]); 
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[2]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[1]); 
+          pos4 = VEC_T::get_pos(node_q_gi, hex_n[11]); 
+          pos5 = VEC_T::get_pos(node_q_gi, hex_n[10]); 
+          pos6 = VEC_T::get_pos(node_q_gi, hex_n[9]); 
+          pos7 = VEC_T::get_pos(node_q_gi, hex_n[8]); 
+          pos8 = VEC_T::get_pos(node_q_gi, hex_n[24]); 
+          break;         
+        case 1:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[4]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[5]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[6]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[7]);
+          pos4 = VEC_T::get_pos(node_q_gi, hex_n[12]); 
+          pos5 = VEC_T::get_pos(node_q_gi, hex_n[13]); 
+          pos6 = VEC_T::get_pos(node_q_gi, hex_n[14]); 
+          pos7 = VEC_T::get_pos(node_q_gi, hex_n[15]); 
+          pos8 = VEC_T::get_pos(node_q_gi, hex_n[25]); 
+          break;
+        case 2:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[0]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[1]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[5]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[4]); 
+          pos4 = VEC_T::get_pos(node_q_gi, hex_n[8]); 
+          pos5 = VEC_T::get_pos(node_q_gi, hex_n[17]); 
+          pos6 = VEC_T::get_pos(node_q_gi, hex_n[12]); 
+          pos7 = VEC_T::get_pos(node_q_gi, hex_n[16]); 
+          pos8 = VEC_T::get_pos(node_q_gi, hex_n[22]); 
+          break;
+        case 3:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[1]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[2]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[6]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[5]);
+          pos4 = VEC_T::get_pos(node_q_gi, hex_n[9]); 
+          pos5 = VEC_T::get_pos(node_q_gi, hex_n[18]); 
+          pos6 = VEC_T::get_pos(node_q_gi, hex_n[13]); 
+          pos7 = VEC_T::get_pos(node_q_gi, hex_n[17]); 
+          pos8 = VEC_T::get_pos(node_q_gi, hex_n[21]);  
+          break;
+         case 4:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[2]); 
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[7]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[6]); 
+          pos4 = VEC_T::get_pos(node_q_gi, hex_n[10]); 
+          pos5 = VEC_T::get_pos(node_q_gi, hex_n[19]); 
+          pos6 = VEC_T::get_pos(node_q_gi, hex_n[14]); 
+          pos7 = VEC_T::get_pos(node_q_gi, hex_n[18]); 
+          pos8 = VEC_T::get_pos(node_q_gi, hex_n[23]); 
+          break;
+         case 5:
+          pos0 = VEC_T::get_pos(node_q_gi, hex_n[0]);  
+          pos1 = VEC_T::get_pos(node_q_gi, hex_n[4]); 
+          pos2 = VEC_T::get_pos(node_q_gi, hex_n[7]); 
+          pos3 = VEC_T::get_pos(node_q_gi, hex_n[3]); 
+          pos4 = VEC_T::get_pos(node_q_gi, hex_n[16]); 
+          pos5 = VEC_T::get_pos(node_q_gi, hex_n[15]); 
+          pos6 = VEC_T::get_pos(node_q_gi, hex_n[19]); 
+          pos7 = VEC_T::get_pos(node_q_gi, hex_n[11]); 
+          pos8 = VEC_T::get_pos(node_q_gi, hex_n[20]); 
+          break;         
+        default:
+          SYS_T::print_fatal("Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function: hex_face_id is out of range. \n");
+          break;
+      }
+      ASSERT(pos0 >=0 && pos0 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos1 >=0 && pos1 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos2 >=0 && pos2 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos3 >=0 && pos3 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos4 >=0 && pos4 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos5 >=0 && pos5 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" );
+      ASSERT(pos6 >=0 && pos6 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos7 >=0 && pos7 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" ); 
+      ASSERT(pos8 >=0 && pos8 <=8, "Error: NodalBC_3D_inflow::reset602IEN_outwardnormal function logical error.\n" ); 
+
+      sur_ien[nbcid][9*ee+0] = node_q[pos0];
+      sur_ien[nbcid][9*ee+1] = node_q[pos1];
+      sur_ien[nbcid][9*ee+2] = node_q[pos2];
+      sur_ien[nbcid][9*ee+3] = node_q[pos3];
+      sur_ien[nbcid][9*ee+4] = node_q[pos4];
+      sur_ien[nbcid][9*ee+5] = node_q[pos5];
+      sur_ien[nbcid][9*ee+6] = node_q[pos6];
+      sur_ien[nbcid][9*ee+7] = node_q[pos7];
+      sur_ien[nbcid][9*ee+8] = node_q[pos8];
+    }
+    delete hexcell; 
+  }
 }
 
 // EOF

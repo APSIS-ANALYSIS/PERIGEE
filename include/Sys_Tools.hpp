@@ -4,8 +4,6 @@
 // Sys_Tools.hpp
 // ----------------------------------------------------------------------------
 // The SYS_T namespace contains a suite of tools at the system level.
-//
-// Author: Ju Liu
 // ============================================================================
 #include <cstdlib>
 #include <iostream>
@@ -13,17 +11,58 @@
 #include <sstream>
 #include <string>
 #include <ctime>
+#include <memory>
 #include <sys/stat.h>
 #include "petsc.h"
-
-#if PetscDefined(USE_DEBUG)
-#define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
+#ifdef USE_OPENMP
+#include "omp.h"
+#endif
+#ifdef _OPENMP
+#define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
+#define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
+#define PERIGEE_OMP_SINGLE _Pragma("omp single")
 #else
-#define ASSERT(cond, ...) PetscAssume(cond)
+#define PERIGEE_OMP_PARALLEL_FOR
+#define PERIGEE_OMP_PARALLEL
+#define PERIGEE_OMP_SINGLE
+#endif
+
+// ================================================================
+// The following are used for backward compatibility like PetscDefined(USE_DEBUG).
+// ================================================================
+// Versions >= 3.14.x : PetscDefined(USE_DEBUG) is used to determine whether it is debug mode;
+//           < 3.14.x : defined(PETSC_USE_DEBUG) is used to determine whether it is debug mode.
+#if PETSC_VERSION_LT(3,14,6)
+  #define PETSC_DEFINED(def) defined(PETSC_ ## def)
+#else
+  #define PETSC_DEFINED(def) PetscDefined(def)
+#endif
+
+// ================================================================
+// The following are used for ASSERT.
+// ================================================================
+// In debug mode, ASSERT is called to determine a "cond" condition.
+#if PETSC_DEFINED(USE_DEBUG)
+  #define ASSERT(cond, message, ...) SYS_T::print_fatal_if_not(cond, message, ##__VA_ARGS__)
+#else
+  #define ASSERT(cond, ...) ((void)0)
 #endif
 
 namespace SYS_T
 {
+  // Implementation of make_unique for C++11
+  template <typename T, typename... Args> std::unique_ptr<T> make_unique(Args&&... args)
+  {
+    return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
+  }
+
+  // Return the OS environmental variable
+  inline std::string get_Env_Var( const std::string &key )
+  {
+    const char * val = std::getenv( key.c_str() );
+    return val == nullptr ? std::string("") : std::string(val);
+  }
+
   // Return the rank of the CPU
   inline PetscMPIInt get_MPI_rank()
   {
@@ -133,15 +172,38 @@ namespace SYS_T
   }
 
   // 2. print from processor 0, other preprocessors are ignored.
-  //    PetscPrintf() with PETSC_COMM_WORLD is used.
   inline void commPrint(const char output[], ...)
   {
-    if( !get_MPI_rank() )
+    int mpi_flag {-1};
+    MPI_Initialized(&mpi_flag);
+    if( mpi_flag )
     {
+      if( !get_MPI_rank() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        va_end(Argp);
+      }
+      MPI_Barrier(PETSC_COMM_WORLD);
+    }
+    else
+    {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf(stdout, output, Argp);
+        va_end(Argp);
+      }
+      #pragma omp barrier
+#else
       va_list Argp;
       va_start(Argp, output);
-      (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+      vfprintf(stdout, output, Argp);
       va_end(Argp);
+#endif
     }
   }
 
@@ -157,22 +219,10 @@ namespace SYS_T
 
   // 4. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
-  {
-    if( !get_MPI_rank() )
-    {
-      va_list Argp;
-      va_start(Argp, output);
-      (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-      va_end(Argp);
-    }
-
-    MPI_Barrier(PETSC_COMM_WORLD);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  inline void print_fatal_if( bool a, const char output[], ... )
-  {
-    if( a )
+  { 
+    int mpi_flag {-1};
+    MPI_Initialized(&mpi_flag);
+    if (mpi_flag)
     {
       if( !get_MPI_rank() )
       {
@@ -181,9 +231,73 @@ namespace SYS_T
         (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
         va_end(Argp);
       }
-
       MPI_Barrier(PETSC_COMM_WORLD);
       MPI_Abort(PETSC_COMM_WORLD, 1);
+    }
+    else
+    {
+#ifdef _OPENMP
+      if( !omp_get_thread_num() )
+      {
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+      }
+      else exit( EXIT_FAILURE );
+#else
+      va_list Argp;
+      va_start(Argp, output);
+      vfprintf (stderr, output, Argp);
+      va_end(Argp);
+
+      exit( EXIT_FAILURE );
+#endif
+    }
+  }
+
+  inline void print_fatal_if( bool a, const char output[], ... )
+  {
+    if( a )
+    {
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
+      {
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
+      }
+      else
+      {
+#ifdef _OPENMP
+        if( !omp_get_thread_num() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          vfprintf (stderr, output, Argp);
+          va_end(Argp);
+
+          exit( EXIT_FAILURE );
+        }
+        else exit( EXIT_FAILURE );
+#else
+        va_list Argp;
+        va_start(Argp, output);
+        vfprintf (stderr, output, Argp);
+        va_end(Argp);
+
+        exit( EXIT_FAILURE );
+#endif
+      }      
     }
   }
 
@@ -191,60 +305,71 @@ namespace SYS_T
   {
     if( !a )
     {
-      if( !get_MPI_rank() )
+      int mpi_flag {-1};
+      MPI_Initialized(&mpi_flag);
+      if (mpi_flag)
       {
+        if( !get_MPI_rank() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+          va_end(Argp);
+        }
+        MPI_Barrier(PETSC_COMM_WORLD);
+        MPI_Abort(PETSC_COMM_WORLD, 1);
+      }
+      else
+      {
+#ifdef _OPENMP
+        if( !omp_get_thread_num() )
+        {
+          va_list Argp;
+          va_start(Argp, output);
+          vfprintf (stderr, output, Argp);
+          va_end(Argp);
+
+          exit( EXIT_FAILURE );
+        }
+        else exit( EXIT_FAILURE );
+#else
         va_list Argp;
         va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
+        vfprintf (stderr, output, Argp);
         va_end(Argp);
-      }
 
-      MPI_Barrier(PETSC_COMM_WORLD);
-      MPI_Abort(PETSC_COMM_WORLD, 1);
+        exit( EXIT_FAILURE );
+#endif
+      }      
     }
   }
 
-  // 5. Print message (without termination the code) under conditions
-  inline void print_message_if( bool a, const char output[], ... )
+  // 5. print the number of threads used in openmp
+  inline void print_omp_info()
   {
-    if( a )
+#ifdef _OPENMP
+    PERIGEE_OMP_PARALLEL
     {
-      if( !get_MPI_rank() )
+      PERIGEE_OMP_SINGLE
       {
-        va_list Argp;
-        va_start(Argp, output);
-        (*PetscVFPrintf)(PETSC_STDOUT,output,Argp);
-        va_end(Argp);
+        std::cout<<"The number of threads used: "<<omp_get_num_threads()<<", and ";
+        std::cout<<"the number of processors on the machine: ";
+        std::cout<<omp_get_num_procs()<<".\n";
       }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
     }
+#else
+    std::cout<<"OpenMP is not invoked.\n";
+#endif
   }
 
-  // 6. Print exit message printers are used in terminating serial 
-  //    program when the communicator for MPI is not available.
-  inline void print_exit( const char * const &mesg )
+  // 6. set the number of threads used in openmp
+  inline void set_omp_num_threads()
   {
-    std::cout<<mesg<<std::endl;
-    exit( EXIT_FAILURE );
+#ifdef _OPENMP
+    omp_set_num_threads( omp_get_num_procs() );
+#endif
   }
-
-  inline void print_exit( const std::string &mesg )
-  {
-    std::cout<<mesg<<std::endl;
-    exit( EXIT_FAILURE );
-  }
-
-  inline void print_exit_if( bool a, const char * const &mesg )
-  {
-    if( a ) print_exit(mesg);
-  }
-
-  inline void print_exit_if( bool a, const std::string &mesg )
-  {
-    if( a ) print_exit(mesg);
-  }
-
+  
   // ================================================================
   // The following are system functions that access the system info.
   // ================================================================
@@ -374,8 +499,10 @@ namespace SYS_T
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetReal(PETSC_NULL, name, &outdata, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetReal(PETSC_NULL, PETSC_NULL, name, &outdata, PETSC_NULL);
+#else
+    PetscOptionsGetReal(PETSC_NULLPTR, PETSC_NULLPTR, name, &outdata, PETSC_NULLPTR);
 #endif
   }
 
@@ -383,8 +510,10 @@ namespace SYS_T
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetInt(PETSC_NULL, name, &outdata, PETSC_NULL);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetInt(PETSC_NULL, PETSC_NULL, name, &outdata, PETSC_NULL);
+#else
+    PetscOptionsGetInt(PETSC_NULLPTR, PETSC_NULLPTR, name, &outdata, PETSC_NULLPTR);
 #endif
   }
 
@@ -394,8 +523,10 @@ namespace SYS_T
     PetscBool flg;
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetBool(PETSC_NULL, name, &pdata, &flg);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetBool(PETSC_NULL, PETSC_NULL, name, &pdata, &flg);
+#else
+    PetscOptionsGetBool(PETSC_NULLPTR, PETSC_NULLPTR, name, &pdata, &flg);
 #endif
     if(flg)
     {
@@ -412,8 +543,10 @@ namespace SYS_T
     char char_outdata[PETSC_MAX_PATH_LEN];
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetString(PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
-#else
+#elif PETSC_VERSION_LT(3,19,0)
     PetscOptionsGetString(PETSC_NULL, PETSC_NULL, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
+#else
+    PetscOptionsGetString(PETSC_NULLPTR, PETSC_NULLPTR, name, char_outdata, PETSC_MAX_PATH_LEN, &flg);
 #endif
     if(flg) outdata = char_outdata;
   }
@@ -450,19 +583,30 @@ namespace SYS_T
 
       ~Timer() {};
 
-      void Start() {startedAt = clock();}
-
-      void Stop() {stoppedAt = clock();}
-
       void Reset() { startedAt = 0; stoppedAt = 0; }
 
+#ifdef _OPENMP
+      void Start() { startedAt = omp_get_wtime(); }
+      void Stop()  { stoppedAt = omp_get_wtime(); }
+      double get_sec() const
+      {
+        return (stoppedAt - startedAt);
+      }
+#else
+      void Start() { startedAt = clock(); }
+      void Stop()  { stoppedAt = clock(); }
       double get_sec() const
       {
         return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
       }
+#endif
 
     private:
+#ifdef _OPENMP
+      double startedAt, stoppedAt;
+#else
       clock_t startedAt, stoppedAt;
+#endif
   };
 
   // Print ASCII art text for the code
@@ -487,6 +631,15 @@ namespace SYS_T
   {
     commPrint("======================================================================\n");
   }
+
+  inline void print_system_info()
+  {
+    commPrint("Date: %s and time: %s.\n", get_date().c_str(), get_time().c_str());
+    commPrint("Machine: %s \n", get_Env_Var("MACHINE_NAME").c_str());
+    commPrint("User: %s \n", get_Env_Var("USER").c_str());
+    commPrint("The sizes of int, double, and long double are %zu byte, %zu byte, and %zu byte, resp.\n", sizeof(int), sizeof(double), sizeof(long double) );
+  }
+
 }
 
 #endif

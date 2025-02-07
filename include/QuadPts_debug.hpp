@@ -11,29 +11,26 @@
 #include "IQuadPts.hpp"
 #include "Vec_Tools.hpp"
 
-class QuadPts_debug : public IQuadPts
+class QuadPts_debug final : public IQuadPts
 {
   public:
-    QuadPts_debug( const int &len, const std::vector<double> &in_qp,
-        const std::vector<double> &in_qw );
+    QuadPts_debug( const std::vector<double> &in_qp,
+        const std::vector<double> &in_qw, const int &in_dim = 1 );
 
-    QuadPts_debug( const int &in_dim, const int &in_numpt, 
-        const std::vector<double> &in_qp, const std::vector<double> &in_qw );
+    ~QuadPts_debug() override = default;
 
-    virtual ~QuadPts_debug();
+    void print_info() const override;
 
-    virtual void print_info() const;
+    int get_dim() const override {return dim;}
 
-    virtual int get_dim() const {return dim;}
+    int get_num_quadPts() const override {return num_pts;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    double get_qp(const int &ii) const override {return qp[ii];}
 
-    virtual double get_qp(unsigned int ii) const {return qp[ii];}
-
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[dim*ii + comp];}
 
-    virtual double get_qw(unsigned int ii) const {return qw[ii];}
+    double get_qw(const int &ii) const override {return qw[ii];}
 
   private:
     const int num_pts, dim;

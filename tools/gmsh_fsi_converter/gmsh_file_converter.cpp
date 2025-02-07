@@ -1,167 +1,332 @@
 // ============================================================================
-// to be added
+// This is a file converter driver that reads in the vessel_wall vtu file format,
+// the centerline vtp, the lumen_wall vtp, and the tissue_wall vtp files,
+// and then define the local coordinate system of points on the vessel wall grid 
+// according to the centerline.
+// 
+// This drive will read in the files listed in yaml.
+// The yaml will have 4 lines.
+//
+// The following is very IMPORTANT!! 
+// Make sure the first line is the vtu volume file.
+// The second line represents the centerline vtp file, 
+// created by merging multiple branch centerline files, 
+// with each centerline having undergone trimming.
+// The third line refers to the lumen_wall vtp file, 
+// which contains the outward-facing surface normal vectors for each point.
+// The fourth line refers to the tissue_wall vtp file, 
+// which contains the outward-facing surface normal vectors for each point.
 //
 // Author: Jiayi Huang and Ju Liu
 // Date: Sept. 20 2022
 // ============================================================================
-#include "Tet_Tools.hpp"
-#include "ElemBC_3D_tet_wall.hpp"
+
+#include "Sys_Tools.hpp"
+#include "Vector_3.hpp"
+#include "VTK_Tools.hpp"
+#include <vtkDoubleArray.h>
+#include <vtkParametricFunctionSource.h>
+#include <vtkParametricSpline.h>
+#include <vtkPointData.h>
+#include <vtkPointLocator.h>
+#include <vtkPoints.h>
 #include <vtkPolyData.h>
-#include <vtkPolyDataMapper.h>
+#include <vtkSmartPointer.h>
+#include <vtkUnstructuredGrid.h>
 #include <vtkXMLPolyDataReader.h>
 #include <vtkXMLUnstructuredGridReader.h>
 #include <vtkXMLUnstructuredGridWriter.h>
-#include <fstream>
-#include <vtkKdTreePointLocator.h>
-#include <cmath>
-
-//normalize the vectors for comfortable visualization
-int normalization(double *normal)
-{
-  double total = sqrt(normal[0] * normal[0] + normal[1] * normal[1] + normal[2] * normal[2]);
-  for (int i = 0; i < 3; ++i)
-    normal[i] /= total;
-  return 0;
-}
+#include <yaml-cpp/yaml.h>
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  // ===== Yaml options ===== 
+  bool is_loadYaml = true;
+  std::string yaml_file("../config.yml");
 
-  // Parse command line arguments: read in the wall_vtu and centerline_vtp to output local_ref_vtu
-  if (argc != 3)
-  {
-    std::cerr << "Usage: " << argv[0] << " Filename to read wall_vtu"
-              << " Filename to read centerline_vtp"
-              << " Filename to write local_ref_vtu"
-              << std::endl;
-    return EXIT_FAILURE;
+  // ===== Yaml Arguments =====
+  SYS_T::GetOptionBool(  "-is_loadYaml",     is_loadYaml);
+  SYS_T::GetOptionString("-yaml_file",       yaml_file);
+
+  if (is_loadYaml) SYS_T::InsertFileYAML( yaml_file,  false );
+
+  // ===== Yaml vtu,vtp Arguments =====
+  YAML::Node config = YAML::LoadFile(yaml_file.c_str());
+  std::string solid_vtu_s = config["solid_vtu"].as<std::string>();               // solid_wall_vtu
+  std::string centerline_vtp_s = config["centerline_vtp"].as<std::string>();     // centerline_vtp
+  std::string lumen_wall_vtp_s = config["lumen_wall_vtp"].as<std::string>();     // lumen_wall_vtp
+  std::string tissue_wall_vtp_s = config["tissue_wall_vtp"].as<std::string>();   // tissue_wall_vtp
+
+  // ===== Read Command Line Arguments =====
+  SYS_T::commPrint("===> Reading command line arguments... \n");
+
+  SYS_T::GetOptionString(   "-solid_vtu_s",         solid_vtu_s);
+  SYS_T::GetOptionString(   "-centerline_vtp_s",    centerline_vtp_s);
+  SYS_T::GetOptionString(   "-lumen_wall_vtp_s",    lumen_wall_vtp_s);
+  SYS_T::GetOptionString(   "-tissue_wall_vtp_s",   tissue_wall_vtp_s);
+  
+  // // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint(   "-solid_vtu_s",         solid_vtu_s);
+  SYS_T::cmdPrint(   "-centerline_vtp_s",    centerline_vtp_s);
+  SYS_T::cmdPrint(   "-lumen_wall_vtp_s",    lumen_wall_vtp_s);
+  SYS_T::cmdPrint(   "-tissue_wall_vtp_s",   tissue_wall_vtp_s);
+
+  // ===== Read solid mesh ===== 
+  int nFunc_s, nElem_s;
+  std::vector<int> vecIEN_s;
+  std::vector<double> ctrlPts_s;
+  VTK_T::read_vtu_grid(solid_vtu_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
+  vtkNew<vtkXMLUnstructuredGridReader> solid_vtu;
+  solid_vtu->SetFileName(solid_vtu_s.c_str());
+  solid_vtu->Update();
+  vtkUnstructuredGrid *solid_grid = solid_vtu->GetOutput();
+
+  // ===== Read the lumen wall vtp ===== 
+  // This lumen vtp is assumed to consist of all normal pointing out.
+  vtkNew<vtkXMLPolyDataReader> lumen_wall_vtp;
+  lumen_wall_vtp->SetFileName(lumen_wall_vtp_s.c_str());
+  lumen_wall_vtp->Update();
+  vtkPolyData *lumen_wall_poly = lumen_wall_vtp->GetOutput();
+  vtkPoints *lumen_wall_points = lumen_wall_poly->GetPoints();
+  vtkDataArray *lumen_wall_normal = lumen_wall_poly->GetPointData()->GetArray("Normals");
+
+  // ===== Read the tissue wall vtp ===== 
+  // This tissue vtp is assumed to consist of all normal pointing out.
+  vtkNew<vtkXMLPolyDataReader> tissue_wall_vtp;
+  tissue_wall_vtp->SetFileName(tissue_wall_vtp_s.c_str());
+  tissue_wall_vtp->Update();
+  vtkPolyData *tissue_wall_poly = tissue_wall_vtp->GetOutput();
+  vtkPoints *tissue_wall_points = tissue_wall_poly->GetPoints();
+  vtkDataArray *tissue_wall_normal = tissue_wall_poly->GetPointData()->GetArray("Normals");
+  
+  // ===== Three normal vectors definition =====  
+  // Construct three arrays to save three local direction vecters. 
+  // Letters r, l, and c denotes the radial, longitudinal,
+  // and circumferential directions, respectively.
+  vtkNew<vtkDoubleArray> loc_r_vec_array, loc_l_vec_array, loc_c_vec_array;
+  loc_r_vec_array->SetName("loc_r_vec");
+  loc_r_vec_array->SetNumberOfComponents(3);
+  loc_r_vec_array->SetNumberOfTuples(nFunc_s);
+  loc_l_vec_array->SetName("loc_l_vec");
+  loc_l_vec_array->SetNumberOfComponents(3);
+  loc_l_vec_array->SetNumberOfTuples(nFunc_s);
+  loc_c_vec_array->SetName("loc_c_vec");
+  loc_c_vec_array->SetNumberOfComponents(3);
+  loc_c_vec_array->SetNumberOfTuples(nFunc_s);
+
+  // ===== Set the locator of lumen surface vtp for finding the closest point =====
+  vtkNew<vtkPointLocator> lumen_locator;
+  lumen_locator->Initialize();
+  lumen_locator->SetDataSet(lumen_wall_poly);
+  lumen_locator->BuildLocator();
+
+  // ===== Set the locator of tissue surface vtp for finding the closest point =====
+  vtkNew<vtkPointLocator> tissue_locator;
+  tissue_locator->Initialize();
+  tissue_locator->SetDataSet(tissue_wall_poly);
+  tissue_locator->BuildLocator();
+
+
+  // ===== Read the centerline vtp ===== 
+  // This centerline vtp is assumed to consist of all branch vessel centerline vtp.
+  vtkNew<vtkXMLPolyDataReader> centerline_vtp;
+  centerline_vtp->SetFileName(centerline_vtp_s.c_str());
+  centerline_vtp->Update();
+  vtkPolyData *centerline_poly = centerline_vtp->GetOutput();
+  vtkPointData* centerline_pointData = centerline_poly->GetPointData();
+
+  // ===== Create two containers to store the branches vtp ===== 
+  // PolyDatas contains the the points coordinates and Locators are used to find the ClosestPoint.  
+  std::vector<vtkSmartPointer<vtkPolyData>> PolyDatas;
+  std::vector<vtkSmartPointer<vtkPointLocator>> Locators;
+
+  // ===== Create one container to store relevant distance =====   
+  std::vector<double> dist_relevant;
+  for (int ii=0; ii<nFunc_s; ++ii) dist_relevant.push_back(10);
+
+  // ===== Traverse all data attributes and find all attributes starting with "radius_" =====
+  for (int ii = 0; ii < centerline_pointData->GetNumberOfArrays(); ++ii) {
+      std::string arrayName = centerline_pointData->GetArrayName(ii);
+      if (arrayName.find("radius_") == 0) {
+          vtkDataArray* dataArray = centerline_pointData->GetArray(arrayName.c_str());
+
+          double range[2];
+          centerline_pointData->GetRange(arrayName.c_str(),range,0);
+
+          vtkSmartPointer<vtkPoints> newPoints = vtkSmartPointer<vtkPoints>::New();
+
+          for (vtkIdType jj = 0; jj < dataArray->GetNumberOfTuples(); ++jj)
+          {
+            double pt[3];
+            centerline_poly->GetPoint(jj + range[0], pt);
+            newPoints->InsertNextPoint(pt);
+          }
+
+          vtkSmartPointer<vtkPolyData> newPolyData = vtkSmartPointer<vtkPolyData>::New();
+          newPolyData->SetPoints(newPoints);
+          newPolyData->GetPointData()->AddArray(dataArray);
+
+          vtkSmartPointer<vtkPointLocator> locator = vtkSmartPointer<vtkPointLocator>::New();
+          locator->SetDataSet(newPolyData);
+          locator->BuildLocator();
+
+          PolyDatas.push_back(newPolyData);
+          Locators.push_back(locator);
+      }
   }
 
-  std::string filename_vtu = argv[1]; // wall_vtu
-  std::string filename_vtp = argv[2]; // centerline_vtp
-
-  // Read all the data from the file
-  vtkNew<vtkXMLUnstructuredGridReader> reader_vtu;
-  reader_vtu->SetFileName(filename_vtu.c_str());
-  reader_vtu->Update();
-  vtkNew<vtkXMLUnstructuredGridReader> reader_vtu1;
-  reader_vtu1->SetFileName(filename_vtu.c_str());
-  reader_vtu1->Update();
-  vtkNew<vtkXMLUnstructuredGridReader> reader_vtu2;
-  reader_vtu2->SetFileName(filename_vtu.c_str());
-  reader_vtu2->Update();
-
-  //construct three gird containers to save three normals respectively
-  vtkUnstructuredGrid *grid = reader_vtu->GetOutput();
-  vtkUnstructuredGrid *grid1 = reader_vtu1->GetOutput();
-  vtkUnstructuredGrid *grid2 = reader_vtu2->GetOutput();
-
-  int nFunc = grid->GetNumberOfPoints();
-
-  vtkNew<vtkXMLPolyDataReader> reader_vtp;
-  reader_vtp->SetFileName(filename_vtp.c_str());
-  reader_vtp->Update();
-  vtkPolyData *poly = reader_vtp->GetOutput();
-  vtkPoints *polypoints = poly->GetPoints();
-
-
-  // Identify the closest point on the centerline
-  vtkNew<vtkCellLocator> locator;
-  locator->Initialize();
-  locator->SetDataSet(poly);
-  locator->BuildLocator();
-
-  // Find the closest points
-  vtkIdType cellId; // the cell id of the cell containing the closest point will be returned here
-  double cl_pt[3];
-  double nb_pt[3];
-  vtkNew<vtkGenericCell> cell;
-  int subId;
-  double dist;
-
-  // Create the tree
-  vtkSmartPointer<vtkKdTreePointLocator> pointTree =
-      vtkSmartPointer<vtkKdTreePointLocator>::New();
-  pointTree->SetDataSet(poly);
-  pointTree->BuildLocator();
-
-  // Find the k closest points to (0.5, 0.5, 0.5)
-  unsigned int k = 2;
-  vtkSmartPointer<vtkIdList> result =
-      vtkSmartPointer<vtkIdList>::New();
-
-  // Three normal vectors definition
-  vtkNew<vtkDoubleArray> radial_normal, longitudinal_normal, circumferential_normal;
-  radial_normal->SetName("radial_normal");
-  radial_normal->SetNumberOfComponents(3);
-  radial_normal->SetNumberOfTuples(nFunc);
-  longitudinal_normal->SetName("longitudinal_normal");
-  longitudinal_normal->SetNumberOfComponents(3);
-  longitudinal_normal->SetNumberOfTuples(nFunc);
-  circumferential_normal->SetName("circumferential_normal");
-  circumferential_normal->SetNumberOfComponents(3);
-  circumferential_normal->SetNumberOfTuples(nFunc);
-  double u[3], v[3], w[3];
-
-  for (int ii = 0; ii < nFunc; ++ii)
+  for (int ii = 0; ii < nFunc_s; ++ii)
   {
-    double pt[3];
-    grid->GetPoint(ii, pt);
-    locator->FindClosestPoint(&pt[0], &cl_pt[0], cell, cellId, subId, dist);//the clostest point
-    pointTree->FindClosestNPoints(k, &pt[0], result);          //two clostest point 
+    // ===== Read the ii_th point of solid mesh ===== 
+    double solid_pt[3]; 
+    solid_grid->GetPoint(ii, solid_pt);
 
-    //radial
+    // ===== Define and get the closest point from solid point to two surfaces =====
+    double lumen_closest_solid_pt[3], tissue_closest_solid_pt[3]; 
+    int id_lumen_closest_solid_pt=lumen_locator->FindClosestPoint(solid_pt);
+    int id_tissue_closest_solid_pt=tissue_locator->FindClosestPoint(solid_pt);    
+    lumen_wall_points->GetPoint(id_lumen_closest_solid_pt, lumen_closest_solid_pt);
+    tissue_wall_points->GetPoint(id_tissue_closest_solid_pt, tissue_closest_solid_pt);
+
+    // ===== Use Vector_3 store the closest point =====
+    Vector_3 lumen_closest_solid_vec(lumen_closest_solid_pt[0],lumen_closest_solid_pt[1],lumen_closest_solid_pt[2]);
+    Vector_3 tissue_closest_solid_vec(tissue_closest_solid_pt[0],tissue_closest_solid_pt[1],tissue_closest_solid_pt[2]);
+    Vector_3 solid_vec(solid_pt[0],solid_pt[1],solid_pt[2]);
+
+    // ===== Compute the distance from solid point to the closest point =====
+    double dist_lu_to_s = Vec3::dist(lumen_closest_solid_vec,solid_vec);
+    double dist_ti_to_s = Vec3::dist(tissue_closest_solid_vec,solid_vec);
+
+    // ===== Get the surface normal from the closest point =====
+    Vector_3 lumen_nor_vec;
+    Vector_3 tissue_nor_vec;
+    
+    double l_n_pt[3],t_n_pt[3];
+    
     for (int jj = 0; jj < 3; ++jj)
     {
-      u[jj] = pt[jj] - cl_pt[jj];
-      printf("pt[jj] - cl_pt[jj] = %lf - %lf\n", pt[jj], cl_pt[jj]);
+      l_n_pt[jj] = *(lumen_wall_normal->GetTuple3(id_lumen_closest_solid_pt) + jj);
+      t_n_pt[jj] = *(tissue_wall_normal->GetTuple3(id_tissue_closest_solid_pt) + jj);
     }
-    
-    //longitudinal
-    polypoints->GetPoint(result->GetId(1), nb_pt);
-    polypoints->GetPoint(result->GetId(0), cl_pt);
 
-    for (int jj = 0; jj < 3; ++jj)
+    lumen_nor_vec = l_n_pt;
+    tissue_nor_vec = t_n_pt;
+
+    lumen_nor_vec.normalize();
+    tissue_nor_vec.normalize();
+
+    // ===== Rescale the normals according to the weights =====
+    lumen_nor_vec*=dist_lu_to_s/(dist_lu_to_s+dist_ti_to_s);
+    tissue_nor_vec*=dist_ti_to_s/(dist_lu_to_s+dist_ti_to_s);
+
+    // ===== Define radial normals by adding up ===== 
+    Vector_3 loc_r_vec;
+
+    if (lumen_nor_vec.dot_product(tissue_nor_vec) < 0)
+      loc_r_vec = lumen_nor_vec - tissue_nor_vec;
+    else
+      loc_r_vec = lumen_nor_vec + tissue_nor_vec;
+    loc_r_vec.normalize();
+
+    loc_r_vec_array->InsertTuple3(ii, loc_r_vec.x(), loc_r_vec.y(), loc_r_vec.z());
+
+    // ===== Define longitudinal normals ===== 
+    Vector_3 temp_l_vec;
+
+    for (size_t jj = 0; jj < Locators.size(); ++jj) 
     {
-      v[jj] = nb_pt[jj] - cl_pt[jj];
-      printf("nb_pt[jj] - cl_pt[jj] = %lf - %lf\n", nb_pt[jj], cl_pt[jj]);
+      // Get the branch centerline vtp from containers
+      vtkSmartPointer<vtkPolyData> branch_poly = PolyDatas[jj];
+
+      // Ensure the vtp is valid
+      if (!branch_poly) {
+          SYS_T::print_fatal_if( !branch_poly, "Error: SV_T:: Invalid branch centerline vtp from containers. \n");
+          continue;
+      }
+
+      // Access the "radius_" data array
+      vtkDataArray* dataArray = nullptr;
+      for (int kk = 0; kk < branch_poly->GetPointData()->GetNumberOfArrays(); ++kk) {
+          std::string arrayName = branch_poly->GetPointData()->GetArrayName(kk);
+          if (arrayName.find("radius_") == 0) {
+              dataArray = branch_poly->GetPointData()->GetArray(arrayName.c_str());
+              break;
+          }
+      }
+
+      if (!dataArray) {
+          SYS_T::print_fatal_if( !dataArray, "Error: SV_T:: 'radius_' data array not found in dataset. \n");
+          continue;
+      }
+
+      // ===== Define and get the closest point from solid point to the centerline point =====
+      int id_centerline_closest_solid_pt=Locators[jj]->FindClosestPoint(solid_pt);
+      double centerline_closest_solid_pt[3]; 
+      branch_poly->GetPoint(id_centerline_closest_solid_pt, centerline_closest_solid_pt);
+
+      // ===== Use Vector_3 store the closest point =====
+      Vector_3 centerline_closest_solid_vec(centerline_closest_solid_pt[0],
+                                            centerline_closest_solid_pt[1],
+                                            centerline_closest_solid_pt[2]);
+
+      // ===== Create splines with vtkParametricSpline ===== 
+      vtkNew<vtkParametricSpline> spline;
+      spline->SetPoints(branch_poly->GetPoints());
+
+      // ===== Generate a geometric representation of the spline using vtkParametricFunctionSource ===== 
+      vtkNew<vtkParametricFunctionSource> functionSource;
+      functionSource->SetParametricFunction(spline);
+      functionSource->Update();
+
+
+      // ===== Compute the distance from solid point to the closest centerline =====
+      double dist_center_to_s = Vec3::dist(centerline_closest_solid_vec,solid_vec);
+      
+      // ===== Update when the relative distance has a smaller value =====
+      if ((dist_center_to_s / dataArray->GetComponent(id_centerline_closest_solid_pt, 0)) < dist_relevant[ii])
+      {
+        dist_relevant[ii] = dist_center_to_s / dataArray->GetComponent(id_centerline_closest_solid_pt, 0); 
+
+        // ===== Computes the tangent vector at the given parameters ===== 
+        double u[3], du[9];
+        // ===== Parameterized value, ranging from 0 to 1, here we take the middle point ===== 
+        u[0] = 0.5;  
+        u[1] = u[2] = 0.0;
+
+        spline->Evaluate(u, centerline_closest_solid_pt, du);
+        Vector_3 temp(du[0],du[1],du[2]); 
+        temp_l_vec = temp;
+      }
     }
 
-    //cross to get circumferential
-    w[0] = u[1] * v[2] - u[2] * v[1];
-    w[1] = u[2] * v[0] - u[0] * v[2];
-    w[2] = u[0] * v[1] - u[1] * v[0];
+    Vector_3 loc_l_vec;
+    Vector_3 loc_c_vec;
 
-    normalization(u);
-    normalization(v);
-    normalization(w);
-    
-    radial_normal->InsertTuple(ii, u);
-    longitudinal_normal->InsertTuple(ii, v);
-    circumferential_normal->InsertTuple(ii, w);
-    printf("normal ii = %d\n", ii);
+    // ===== Computes the circumferential direction vecters ===== 
+    loc_c_vec = Vec3::cross_product(temp_l_vec, loc_r_vec);
+    loc_c_vec.normalize();
+
+    // ===== Computes the correct longitudinal direction vecters ===== 
+    loc_l_vec = Vec3::cross_product(loc_r_vec, loc_c_vec);
+    loc_l_vec.normalize();
+
+    loc_l_vec_array->InsertTuple3(ii, loc_l_vec.x(), loc_l_vec.y(), loc_l_vec.z());
+    loc_c_vec_array->InsertTuple3(ii, loc_c_vec.x(), loc_c_vec.y(), loc_c_vec.z());
+    if (ii % 1000 == 0)
+      printf("normal ii = %d\n", ii);
   }
-
-  grid->GetPointData()->SetVectors(radial_normal);
-  grid1->GetPointData()->SetVectors(longitudinal_normal);
-  grid2->GetPointData()->SetVectors(circumferential_normal);
+  
+  solid_grid->GetPointData()->AddArray(loc_r_vec_array);
+  solid_grid->GetPointData()->AddArray(loc_l_vec_array);
+  solid_grid->GetPointData()->AddArray(loc_c_vec_array);
 
   vtkNew<vtkXMLUnstructuredGridWriter> writer;
-  vtkNew<vtkXMLUnstructuredGridWriter> writer1;
-  vtkNew<vtkXMLUnstructuredGridWriter> writer2;
+  std::string prefix_name_to_write = "out";
+  prefix_name_to_write.append(solid_vtu_s.c_str());
+  writer -> SetFileName( prefix_name_to_write.c_str() );
+  writer -> SetInputData( solid_grid );
+  writer -> Write();
 
-  writer->SetFileName("radial_normal.vtu");
-  writer->SetInputData(grid);
-  writer->Write();
-  writer1->SetFileName("longitudinal_normal.vtu");
-  writer1->SetInputData(grid1);
-  writer1->Write();
-  writer2->SetFileName("circumferential_normal.vtu");
-  writer2->SetInputData(grid2);
-  writer2->Write();
-
-  PetscFinalize();
   return 0;
 }
 

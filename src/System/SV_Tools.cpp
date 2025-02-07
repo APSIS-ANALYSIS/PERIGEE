@@ -8,7 +8,7 @@ void SV_T::update_sv_vtu( const std::string &filename,
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid(filename, nFunc, nElem, ctrlPts, vecIEN);
+  VTK_T::read_vtu_grid(filename, nFunc, nElem, ctrlPts, vecIEN);
 
   // Read element index
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
@@ -43,8 +43,18 @@ void SV_T::update_sv_vtu( const std::string &filename,
 
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
   if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
+  
+  std::vector<DataVecStr<int>> input_vtk_data {};
 
-  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN);
+  std::vector<int> temp_nid(nFunc, 0);
+  for(int ii=0; ii<nFunc; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(nElem, 0);
+  for(int ii=0; ii<nElem; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+
+  TET_T::write_tet_grid(fname, nFunc, nElem, ctrlPts, vecIEN, input_vtk_data);
 }
 
 
@@ -66,7 +76,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   std::vector<int> vecIEN_f;
   std::vector<double> ctrlPts_f;
 
-  TET_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
+  VTK_T::read_vtu_grid(filename_f, nFunc_f, nElem_f, ctrlPts_f, vecIEN_f);
 
   // The FSI mesh IEN and control points start from those in fluid sub-domain
   VEC_T::insert_end( wIEN, vecIEN_f );
@@ -78,17 +88,17 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   // Read the interface mesh
   // This surface mesh is assumed to be the UPDATED fluid wall vtp mesh.
   int nFunc_i, nElem_i;
-  std::vector<int> vecIEN_i, node_idx_i, elem_idx_i;
+  std::vector<int> vecIEN_i;
   std::vector<double> ctrlPts_i;
-  TET_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i,
-      vecIEN_i, node_idx_i, elem_idx_i );
+  VTK_T::read_vtp_grid( filename_f_wall, nFunc_i, nElem_i, ctrlPts_i, vecIEN_i );
+  std::vector<int> node_idx_i = VTK_T::read_int_PointData(filename_f_wall, "GlobalNodeID");
 
   // Read solid mesh
   int nFunc_s, nElem_s;
   std::vector<int> vecIEN_s;
   std::vector<double> ctrlPts_s;
 
-  TET_T::read_vtu_grid(filename_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
+  VTK_T::read_vtu_grid(filename_s, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s);
 
   // Create a node mapping for the solid nodes that maps the solid own
   // node index to the whole FSI mesh nodal index.
@@ -114,7 +124,7 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   SYS_T::print_fatal_if( counter != nFunc_s - nFunc_i, "Error: SV_T::merge_sv_vtus, there are points in the interface not located in the solid domain. \n");
 
   // Clean the interface data
-  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i); VEC_T::clean(elem_idx_i);
+  VEC_T::clean(ctrlPts_i); VEC_T::clean(node_idx_i);
 
   // adjust the solid IEN array in the FSI IEN array
   std::vector<int> tempIEN; tempIEN.resize( vecIEN_s.size() ); 
@@ -135,8 +145,19 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   // If the last four is .vtu, remove them for TET_T::write_tet_grid 
   if(fend.compare(".vtu") == 0) fname.erase( fname.end()-4, fname.end() );
 
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({wtag, "Physics_tag", AssociateObject::Cell});
+  
+  std::vector<int> temp_nid(nFunc_f + counter, 0);
+  for(int ii=0; ii<nFunc_f + counter; ++ii) temp_nid[ii] = ii;
+  input_vtk_data.push_back({temp_nid, "GlobalNodeID", AssociateObject::Node});
+
+  std::vector<int> temp_eid(nElem_f + nElem_s, 0);
+  for(int ii=0; ii<nElem_f + nElem_s; ++ii) temp_eid[ii] = ii;
+  input_vtk_data.push_back({temp_eid, "GlobalElementID", AssociateObject::Cell});
+  
   TET_T::write_tet_grid( fname, nFunc_f + counter, nElem_f + nElem_s,
-      ctrlPts, wIEN, wtag, true );
+      ctrlPts, wIEN, input_vtk_data, true );
 
   std::cout<<"Status: "<<writename_whole<<" is generated. \n";
 
@@ -148,8 +169,10 @@ void SV_T::gen_sv_fsi_vtus( const std::string &filename_f,
   map_s_elem.resize(nElem_s);
   for(int ii=0; ii<nElem_s; ++ii) map_s_elem[ii] = nElem_f + ii;
 
-  TET_T::write_tet_grid( fname, nFunc_s, nElem_s, 
-      ctrlPts_s, vecIEN_s, map_s_node, map_s_elem );
+  input_vtk_data.clear();
+  input_vtk_data.push_back({map_s_node, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({map_s_elem, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_tet_grid( fname, nFunc_s, nElem_s, ctrlPts_s, vecIEN_s, input_vtk_data );
 
   std::cout<<"Status: "<<filename_s<<" is updated to "<<writename_solid<<'\n';
 }
@@ -221,8 +244,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   if(fend.compare(".vtp") == 0)
     fname.erase(fname.end()-4, fname.end());
 
-  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array,
-      global_node_index, global_ele_index );
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, input_vtk_data );
 }
 
 
@@ -234,7 +259,7 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
   std::vector<int> vecIEN;
   std::vector<double> ctrlPts;
 
-  TET_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
+  VTK_T::read_vtu_grid( filename, nFunc, nElem, ctrlPts, vecIEN );
 
   vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
   reader -> SetFileName( filename.c_str() );
@@ -262,9 +287,11 @@ void SV_T::update_sv_sur_vtu( const std::string &filename,
   fend.assign( fname.end()-4 , fname.end() );
 
   if(fend.compare(".vtu") == 0) fname.erase(fname.end()-4, fname.end());
-
-  TET_T::write_quadratic_triangle_grid( fname, nFunc, nElem, ctrlPts,
-      vecIEN, nid, eid );
+  
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({nid, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({eid, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_quadratic_triangle_grid( fname, nFunc, nElem, ctrlPts, vecIEN, input_vtk_data );
 }
 
 
@@ -335,8 +362,10 @@ void SV_T::update_sv_vtp( const std::string &filename,
   if(fend.compare(".vtp") == 0)
     fname.erase(fname.end()-4, fname.end());
 
-  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array,
-      global_node_index, global_ele_index );
+  std::vector<DataVecStr<int>> input_vtk_data {};
+  input_vtk_data.push_back({global_node_index, "GlobalNodeID", AssociateObject::Node});
+  input_vtk_data.push_back({global_ele_index, "GlobalElementID", AssociateObject::Cell});
+  TET_T::write_triangle_grid( fname, numpts, numcels, pt, ien_array, input_vtk_data );
 }
 
 
@@ -360,8 +389,8 @@ void SV_T::compare_sv_vtp( const std::string &filename_1,
   std::vector<double> pt_1, pt_2;
   std::vector<int> ien_1, ien_2;
 
-  TET_T::read_vtp_grid( filename_1, numpts_1, numcels_1, pt_1, ien_1 );
-  TET_T::read_vtp_grid( filename_2, numpts_2, numcels_2, pt_2, ien_2 );
+  VTK_T::read_vtp_grid( filename_1, numpts_1, numcels_1, pt_1, ien_1 );
+  VTK_T::read_vtp_grid( filename_2, numpts_2, numcels_2, pt_2, ien_2 );
 
   SYS_T::print_fatal_if(numpts_1 != numpts_2, "Error: SV_T::compare_sv_vtp number of points does not match. \n");
 

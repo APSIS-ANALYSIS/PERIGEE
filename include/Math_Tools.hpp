@@ -4,23 +4,23 @@
 // Math_Tools.hpp
 // This file defines mathematical constants and functions.
 //
-// Author: Ju Liu
-// Date: Feb. 13 2016
+// Date Created: Feb. 13 2016
 // ============================================================================
-#include <stdio.h>
 #include <vector> 
-#include "Matrix_double_3by3_Array.hpp"
+#include <random> 
+#include <array>
+#include "Sys_Tools.hpp"
 
 namespace MATH_T
 {
   // --------------------------------------------------------------------------
   // Useful Constants:
   // --------------------------------------------------------------------------
-  // PI = 3.1415926
-  const double PI = atan(1.0) * 4.0;
+  // PI = 3.1415926......
+  constexpr long double PI = 3.14159265358979323846264338327950288419716939937510582;
 
-  // E = 2.71828
-  const double E  = exp(1.0);
+  // E = 2.71828......
+  constexpr long double E  = 2.71828182845904523536028747135266249775724709369995957;
 
   // Compute the binomial coefficient, e.g.
   // n = 0 : 1                  n = 1 : 1 1
@@ -28,7 +28,7 @@ namespace MATH_T
   // n = 4 : 1 4 6 4 1          n = 5 : 1 5 10 10 5 1
   inline double binomialCoefficient( const double &n, const double &k )
   {
-    if( (k<0) || (k>n) ) return 0;
+    if( (k<0) || (k>n) ) return 0.0;
 
     int m = k;
     if( k > n-k ) m = n-k;
@@ -71,94 +71,7 @@ namespace MATH_T
   {
     return ( std::abs(a-b)<tol );
   }
-
-  // --------------------------------------------------------------------------
-  // This function is used to determine if two vector object are identical
-  // up to a tolerance (default 1.0e-12).
-  // --------------------------------------------------------------------------
-  template<typename T> bool equals( const std::vector<T> &a, 
-      const std::vector<T> &b, const double &tol = 1.0e-12 )
-  {
-    if( a.size() != b.size() ) return false;
-    for(unsigned int ii=0; ii<a.size(); ++ii)
-    {
-      if( std::abs(a[ii]-b[ii]) >= tol ) return false;
-    }
-    return true;
-  }
   
-  // --------------------------------------------------------------------------
-  // Cross product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: uxv = (u2v3 - u3v2)i + (u3v1 - u1v3)j + (u1v2 - u2v1)k
-  // --------------------------------------------------------------------------
-  inline void cross3d(const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3,
-      double &w1, double &w2, double &w3 )
-  {
-    w1 = u2 * v3 - u3 * v2;
-    w2 = u3 * v1 - u1 * v3;
-    w3 = u1 * v2 - u2 * v1;
-  }
-
-  // --------------------------------------------------------------------------
-  // Dot product of two 3D vectors
-  // Input: u = (u1, u2, u3)
-  //        v = (v1, v2, v3)
-  // Output: u1*v1 + u2*v2 + u3*v3
-  // --------------------------------------------------------------------------
-  inline double dot3d( const double &u1, const double &u2, const double &u3,
-      const double &v1, const double &v2, const double &v3 )
-  {
-    return u1*v1 + u2*v2 + u3*v3; 
-  }
-
-  // --------------------------------------------------------------------------
-  // Normalize 3D vector
-  // Input: x, y, z
-  // Output: x/len, y/len, z/len, len = sqrt(x^2+y^2+z^2)
-  // --------------------------------------------------------------------------
-  inline double normalize3d( double &x, double &y, double &z )
-  {
-    const double len = sqrt(x*x + y*y + z*z);
-    x = x / len;
-    y = y / len;
-    z = z / len;
-
-    return len;
-  }
-
-  inline double norm2(const double &x, const double &y, const double &z)
-  {
-    return sqrt(x*x + y*y + z*z);
-  }
-
-  // ----------------------------------------------------------------
-  // Generate outward normal vector from a tangential vector.
-  // t : the tangential vector
-  // p0 : the starting point of the tangential vector
-  // p1 : the interior point 
-  // n : the normal vector
-  // Algorithm: p1->p0 gives the vector m,
-  //            n = m - (m,t) t / (t,t).
-  // ----------------------------------------------------------------
-  void get_n_from_t( const double &tx, const double &ty, const double &tz,
-      const double &p0_x, const double &p0_y, const double &p0_z,
-      const double &p1_x, const double &p1_y, const double &p1_z,
-      double &nx, double &ny, double &nz );
-
-
-  // ----------------------------------------------------------------
-  // Calculate the circumscribing sphere's centre point and radius
-  // of four given points
-  // ----------------------------------------------------------------
-  void get_tet_sphere_info( const double &x0, const double &x1,
-      const double &x2, const double &x3, const double &y0, 
-      const double &y1, const double &y2, const double &y3,
-      const double &z0, const double &z1, const double &z2, 
-      const double &z3, double &x, double &y, double &z, double &r );
-
   // ----------------------------------------------------------------
   // Statistical quantities
   // Mean value
@@ -166,8 +79,8 @@ namespace MATH_T
   inline double get_mean( const std::vector<double> &vec )
   {
     double sum = 0.0; double nn = 0.0;
-    const unsigned int len = vec.size();
-    for(unsigned int ii=0; ii<len; ++ii)
+
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
     {
       sum += vec[ii];
       nn  += 1.0;
@@ -178,257 +91,557 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Standard deviation
   // ----------------------------------------------------------------
-  double get_std_dev( const std::vector<double> &vec );
+  inline double get_std_dev( const std::vector<double> &vec )
+  {
+    const double mean_val = MATH_T::get_mean(vec);
+    double sum = 0.0; double nn = 0.0;
+    for(unsigned int ii=0; ii<vec.size(); ++ii)
+    {
+      sum += (vec[ii] - mean_val) * (vec[ii] - mean_val);
+      nn  += 1.0;
+    }
+    return std::sqrt( sum / nn );
+  }
   
   // ----------------------------------------------------------------
   // Generate a Gaussian distribution vector with length n, mean value
   // mean, and standard deviation dev, using Marsaglia algorithm
-  //
-  // Note: Call srand((unsigned int)time(NULL)) before calling this generator!
   // ----------------------------------------------------------------
-  void gen_Gaussian( const int &n, const double &mean, const double &std,
-      std::vector<double> &val );
-
-  // ----------------------------------------------------------------
-  // gen_random()
-  // Generate a random double in [min, max] domain for _closed;
-  // (min, max) for open.
-  // Gernerate a random int in [min, max] domain.
-  // NOTE: Users have to call srand(time(NULL)) before calling the
-  //       following three gen functions.
-  // E.G.: srand(time(NULL));
-  //       for-loop
-  //       {gen_randomD_xxx(...); ...}
-  // ----------------------------------------------------------------
-  inline double gen_randomD_closed( const double &min, const double &max )
+  inline double gen_double_rand_normal( const double &mean, const double &std )
   {
-    return ( rand() % 1000001 ) * 1.0e-6 * (max - min) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::normal_distribution<double> dis(mean, std);
+    return dis(gen);
   }
 
-  inline double gen_randomD_open( const double &min, const double &max )
+  // ----------------------------------------------------------------
+  // gen_int_rand and gen_double_rand
+  // Generate a random double in [min, max] domain for integer and double
+  // precision numbers, respectively. 
+  // ----------------------------------------------------------------
+  inline int gen_int_rand( const int &min, const int &max )
   {
-    return ( rand() % 999998 + 1 ) * 1.0e-6 * (max - min) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_int_distribution<int> dis(min, max);
+    return dis(gen);
   }
 
-  inline int gen_randomI_closed( const int &min, const int &max )
+  inline double gen_double_rand( const double &min = -1.0, const double &max = 1.0 )
   {
-    return ( rand() % (max - min + 1)) + min;
+    std::random_device rd;
+    std::mt19937_64 gen( rd() );
+    std::uniform_real_distribution<double> dis(min, max);
+    return dis(gen);
   }
-
+  
   // ----------------------------------------------------------------
   // Print Histogram of an array of random vector
   // ----------------------------------------------------------------
-  void print_Histogram( const std::vector<double> &val );
+  inline void print_Histogram( const std::vector<double> &val )
+  {
+    const int width = 50;
+    int max = 0;
 
-  // --------------------------------------------------------------------------
-  // Projection operator
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise constant (DGP0 space)
-  // f : the function f's value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the
-  //        quadrature weights.
-  // nqp : number of quadrature points
-  // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
-  //                          = sum(f * gwts) / sum(gwts)
-  // --------------------------------------------------------------------------
-  double L2Proj_DGP0( const double * const &f, 
-      const double * const &gwts, const int &nqp );
+    const double mean = MATH_T::get_mean(val);
+    const double std  = MATH_T::get_std_dev(val);
 
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise linear (DGP1 space) in 2D.
-  // f : the function value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
-  // qp_x : the quadrature points x-coordinates
-  // qp_y : the quadrature points y-coordinates
-  // nqp : the number of quadrature points
-  // output: coeff_0, coeff_x, coeff_y.
-  // The projected polynomial is
-  //         coeff_0 + coeff_x x + coeff_y y.
-  // --------------------------------------------------------------------------
-  void L2Proj_DGP1_2D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const int &nqp,
-      double &coeff_0, double &coeff_x, double &coeff_y );
+    const double low   = mean - 3.05 * std;
+    const double high  = mean + 3.05 * std;
+    const double delta =  0.1 * std;
 
-  // --------------------------------------------------------------------------
-  // L2-projection of a function to a piecewise linear (DGP1 space) in 3D.
-  // f : the function value evaluated at nqp quadrature points
-  // gwts : gwts = detJac(i) * w(i) the Jacobian for the element and the weights
-  // qp_x : the quadrature points x-coordinates
-  // qp_y : the quadrature points y-coordinates
-  // qp_z : the quadrature points z-coordinates
-  // nqp : the number of quadrature points
-  // output: coeff_0, coeff_x, coeff_y, coeff_z.
-  // The projected polynomial is
-  //         coeff_0 + coeff_x x + coeff_y y + coeff_z z.
-  // --------------------------------------------------------------------------
-  void L2Proj_DGP1_3D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const double * const &qp_z,
-      const int &nqp,
-      double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
+    const int n = (int)val.size();
 
-  // ================================================================
+    const int nbins = (int)((high - low) / delta);
+    int* bins = (int*)calloc(nbins,sizeof(int));
+    if ( bins != NULL )
+    {
+      for ( int i = 0; i < n; i++ )
+      {
+        int j = (int)( (val[i] - low) / delta );
+        if ( 0 <= j  &&  j < nbins ) bins[j]++;
+      }
+
+      for ( int j = 0; j < nbins; j++ )
+        if ( max < bins[j] ) max = bins[j];
+
+      for ( int j = 0; j < nbins; j++ )
+      {
+        printf("(%5.2f, %5.2f) |", low + j * delta, low + (j + 1) * delta );
+        int k = (int)( (double)width * (double)bins[j] / (double)max );
+        while(k-- > 0) putchar('*');
+        printf("  %-.1f%%", bins[j] * 100.0 / (double)n);
+        putchar('\n');
+      }
+      free(bins);
+    }
+  }
+
+  // ----------------------------------------------------------------
+  // Get the angle of the given 2d vector to the x-axis, range [0, 2 * PI)
+  // ----------------------------------------------------------------
+  inline double get_angle_2d(const double &xx, const double &yy)
+  {
+    const double rr = std::sqrt(xx * xx + yy * yy);
+
+    // If the radius is too short, we regard the angle as 0
+    if (rr <= 1e-14) return 0.0;
+
+    const double cos_theta = xx / rr;
+    const double sin_theta = yy / rr;
+
+    double theta = std::acos(cos_theta); // range [0, PI]
+    if (sin_theta < 0) theta = 2 * MATH_T::PI - theta; // range [0, 2 * PI)
+
+    return theta;
+  }
+
+  // ==========================================================================
   // Dense Matrix tool
   // This is an implementation of dense matrix in C++.
-  // The matrix has to be a square matrix with size N X N.
-  // The objective is to implement efficient, dense linear algebra,
-  // especially the LU factorization and LU-Solver.
-  // The matrix data is stored as a one-dimensional array in row-
-  // oriented manner.
+  // The matrix has to be a square matrix with size N X N, and the matrix
+  // entries are stoed in a 1D array in row-oriented manner.
+  // The objective is to implement efficient, dense linear algebra, especially
+  // the LU factorization and LU-Solver.
   // 
-  // A typical usage is, one should call
-  // LU_fac();
-  // LU_solve(b,x);
+  // A typical usage is, one should first call
+  //                  LU_fac();
+  // to obtain the LU factorization of the matrix. The L and U matrices are
+  // stored in the same 1D array by replacing the original matrix entries. This
+  // means the matrix content is changed after one calls LU_fac function. To
+  // solve with a RHS b, one just need to make a second function call as
+  //                  x = LU_solve(b);
   //
   // Ref. Numerical Linear Algebra by L.N. Trefethen and D. Bau, III, SIAM.
-  // ================================================================
-  class Matrix_dense
+  // ==========================================================================
+  
+  // forward declaration of the template class Matrix_SymPos_Dense
+  // needed for the implementation of equal operator in Matrix_Dense
+  template<int N> class Matrix_SymPos_Dense;   
+
+  template<int N> class Matrix_Dense
   {
     public:
-      // default constructor will generate a NULL object for all ptrs
-      Matrix_dense();
+      Matrix_Dense()
+      {
+        ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
 
-      // generate a in_msize x in_msize identity matrix
-      Matrix_dense(const int &in_msize);
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+        for(int ii=0; ii<N; ++ii)
+        {
+          mat[ii*N+ii] = 1.0;
+          pp[ii] = ii;
+        }
+        is_fac = false;
+      }
 
-      // copy constructor
-      Matrix_dense( const Matrix_dense * const & in_m );
+      Matrix_Dense( const std::array<double,N*N> &input )
+      {
+        ASSERT(N>=1, "Matrix_Dense<N> Error: The matrix size N must be positive.\n");      
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+        is_fac = false;
+      }
 
-      virtual ~Matrix_dense();
+      virtual ~Matrix_Dense() {};
 
-      // print the full matrix on screen
-      virtual void print_mat(const int &pre = 6) const;
+      void print_info() const
+      {
+        std::cout<<"N ="<<N<<'\n';
+        std::cout<<"Matrix :\n";
+        int counter = -1;
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+            std::cout<<mat[++counter]<<'\t';
+          std::cout<<'\n';
+        }
+        std::cout<<"p : \n";
+        for(int ii=0; ii<N; ++ii)
+          std::cout<<pp[ii]<<'\t';
+        std::cout<<std::endl;
 
-      // print the mat content as well as the p and invm array
-      virtual void print_info() const;
+        if(is_fac)
+          std::cout<<"Matrix is factorized.\n";
+        else
+          std::cout<<"Matrix is NOT factorized.\n";
+      }
+  
+      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
 
-      // get the size of the matrix
-      virtual int get_size() const;
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+      }
 
-      virtual double get_mat(const int &ii, const int &jj) const;
+      int get_p(const int &ii) const {return pp[ii];}
 
-      virtual double get_mat(const int &ii) const {return mat[ii];}
+      double& operator()(const int &index) {return mat[index];}
 
-      virtual int get_p(const int &ii) const;
+      const double& operator()(const int &index) const {return mat[index];}
 
-      virtual double get_invm(const int &ii) const;
+      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
 
-      // set all entries in matrix to be zero
-      virtual void zero_mat();
+      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
 
-      // set value at i, j
-      virtual void set_value(const int &ii, const int &jj, const double &val);
+      // Assignment operator
+      virtual Matrix_Dense<N>& operator= (const Matrix_Dense<N> &source)
+      {
+        // self-assignment guard
+        if(this == &source) return *this;
 
-      virtual void set_values( int const * const &index_i, 
-          int const * const &index_j,
-          double const * const &vals, const int &num );
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
 
-      virtual void set_values(double const * const &vals);
+        for(int ii=0; ii<N; ++ii) pp[ii] = source.get_p(ii);
 
-      // generate identity matrix
-      virtual void gen_id();
+        is_fac = source.get_is_fac();
 
-      // generate matrix with random entries
-      virtual void gen_rand();
+        return *this;             
+      }     
 
-      // generate Hilbert matrices
-      virtual void gen_hilb();
+      virtual Matrix_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
 
-      // multiply the mat with a vector
-      // b and x canNOT be the same vector.
-      virtual void Axb( double const * const &b, double * const &x ) const;
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
 
-      // ------------------------------------------------------------
+        is_fac = source.get_is_fac();
+
+        return *this;             
+      }
+
+      int get_size() const {return N;}
+
+      bool get_is_fac() const {return is_fac;}
+
+      // ----------------------------------------------------------------------
       // perform LU-factorization for the matrix. The mat object will be replaced
       // by the LU matrices. Only partial pivoting is performed. Complete pivoting
       // is not used because the improvement of stability is marginal and the
       // amount of time needed will increase.
-      virtual void LU_fac();
+      // ----------------------------------------------------------------------
+      void LU_fac()
+      {
+        for(int kk=0; kk<N-1; ++kk)
+        {
+          double max_value = std::abs(mat[kk*N+kk]);
+          int max_index = kk;
+          bool pivot_flag = false;
+          for(int ii=kk+1; ii<N; ++ii)
+          {
+            if( max_value < std::abs(mat[ii*N+kk]) )
+            {
+              max_value = std::abs(mat[ii*N+kk]);
+              max_index = ii;
+              pivot_flag = true;
+            }
+          }
 
+          if(pivot_flag)
+          {
+            std::swap( pp[kk] , pp[max_index] );
+
+            for(int ii=0; ii<N; ++ii)
+              std::swap( mat[kk*N+ii] , mat[max_index*N+ii] );
+          }
+
+          const double invAkk = 1.0 / mat[kk*N+kk];
+
+          for(int ii=kk+1; ii<N; ++ii)
+          {
+            mat[ii*N+kk] = mat[ii*N+kk] * invAkk;
+            for(int jj=kk+1; jj<N; ++jj)
+              mat[ii*N+jj] -= mat[ii*N+kk] * mat[kk*N+jj];
+          }
+        }
+
+        is_fac = true;
+      }
+
+      // ----------------------------------------------------------------------
       // with LU factorization performed, solve a linear problem with given RHS
       // users are responsible for allocating the b and x arrays.
-      virtual void LU_solve( double const * const &b, double * const &x ) const;
-      // ------------------------------------------------------------
-    
+      // ----------------------------------------------------------------------
+      std::array<double, N> LU_solve( const std::array<double, N> &bb ) const
+      {
+        std::array<double, N> xx {};
+        for(int ii=0; ii<N; ++ii) xx[ii] = bb[pp[ii]];
+
+        for(int ii=1; ii<N; ++ii)
+          for(int jj=0; jj<ii; ++jj)
+            xx[ii] -= mat[ii*N+jj] * xx[jj];
+
+        for(int ii=N-1; ii>=0; --ii)
+        {
+          for(int jj=N-1; jj>ii; --jj)
+              xx[ii] -= mat[ii*N+jj] * xx[jj];
+
+          xx[ii] = xx[ii] / mat[ii*N+ii];
+        }
+
+        return xx;
+      }
+
+      std::array<double,N> Mult( const std::array<double,N> &input ) const
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        std::array<double,N> out {};
+        for(int ii=0; ii<N; ++ii)
+        {
+          out[ii] = 0.0;
+          for(int jj=0; jj<N; ++jj)
+            out[ii] += mat[N*ii+jj] * input[jj];
+        }
+        return out;
+      }
+
+      void Mult( const Matrix_Dense<N> &left, const Matrix_Dense<N> &right ) 
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+          {
+            for(int kk=0; kk<N; ++kk)
+              mat[ii*N+jj] += left(ii, kk) * right(kk, jj);
+          }
+        }
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii; 
+
+        is_fac = false;
+      }
+
+      void transpose()
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+
+        double temp[N*N];
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj) temp[jj*N+ii] = mat[ii*N+jj];
+        }
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = temp[ii];
+
+        for(int ii=0; ii<N; ++ii) pp[ii] = ii;
+
+        is_fac = false;
+      }
+
     protected:
-      // Matrix size: N by N
-      const int N;
-
-      // Length of the mat array
-      const int NN;
-
-      // double array as a holder for the matrix
-      // size : N^2
-      double * mat;
+      // container for the matrix
+      double mat[N*N];
 
       // permutation infomation generated from LU-fac
-      // size : N
-      int * p;
-
-      // inverse of diagonal entries which are used for LU-solve
-      // size : N
-      double * invm;
+      int pp[N];
 
       // bool variable indicate if the matrix has been LU factorized.
       bool is_fac;
   };
 
-
-  // ================================================================
+  // ==========================================================================
   // Dense Symmetric Positive definite matrix tool.
-  // The user should be sure that the matrix is symmetric and positive
-  // definite.
+  // The user should be sure that the matrix is symmetric and positive definite.
   // The objective is to implement efficient LDL^t decomposition,
-  // which can be used to solve problems like inverting the normal
-  // equation.
-  // Typical usage is that one should call
-  // LDLt_fac();
-  // LDLt_solve(b,x);
+  // which can be used to solve problems like inverting the normal equation.
+  // Typical usage is that one should first call
+  //               LDLt_fac();
+  // and then call the following to solve with the RHS b.
+  //               x = LDLt_solve(b);
   //
   // Ref. Shufang Xu, Numerical Linear Algebra, Peking Univ.
-  // ================================================================
-  class Matrix_SymPos_dense : public Matrix_dense
+  // ==========================================================================
+  template<int N> class Matrix_SymPos_Dense
   {
     public:
-      // Default constructor, generate a NULL object for everything
-      Matrix_SymPos_dense();
+      Matrix_SymPos_Dense()
+      {
+        ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
 
-      // generate a msize x msize identity matrix
-      Matrix_SymPos_dense( const int &msize );
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = 0.0;
+        for(int ii=0; ii<N; ++ii) mat[ii*N+ii] = 1.0;
+        
+        is_fac = false;
+      }
 
-      // Copy constructor
-      Matrix_SymPos_dense( const Matrix_SymPos_dense * const &in_mat );
+      Matrix_SymPos_Dense(const std::array<double,N*N> &input)
+      {
+        ASSERT(N>=1, "Matrix_SymPos_Dense<N> Error: The matrix size N must be positive.\n");      
+        
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input[ii];
 
-      virtual ~Matrix_SymPos_dense();
+        // Check the symmetry of the matrix
+        check_symm();
 
-      // Check the symmetry of the matrix, throw an error if
-      // non-symmetriness is found.
-      virtual void check_symm() const;
+        is_fac = false;
+      }
 
-      // Copy the content of a matrix
-      // We assume that the input matrix and the object have the same
-      // size.
-      virtual void copy( const Matrix_SymPos_dense * const &in_mat );
+      // ----------------------------------------------------------------------
+      // We assume that the input matrix are the symmetry positive definite matrix
+      // and we do not check this in the constructor 
+      // ----------------------------------------------------------------------
+      Matrix_SymPos_Dense( const Matrix_Dense<N> &input )
+      { 
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = input(ii);
+        
+        // Check the symmetry of the matrix
+        check_symm();
 
-      // ------------------------------------------------------------
-      // Perform LDL^t transformation. The mat object will be replace
-      // by the entries of the L matrix and the D matrix. Pivoting is
-      // not used because this decomposition for symmetry positive
-      // definite matrix is stable.
-      virtual void LDLt_fac();
+        is_fac = input.get_is_fac();
+      }
 
-      // With the LDLt_fac() function performed, solve a linear problem
-      // with the given RHS.
-      // users are responsible for allocating the b and x arrays.
-      virtual void LDLt_solve( double const * const &b, 
-          double * const &x ) const;
-      // ------------------------------------------------------------
+      virtual ~Matrix_SymPos_Dense() {};
+
+      // ----------------------------------------------------------------------
+      // Check the symmetry of the matrix, throw an error if non-symmetriness is found.
+      // ----------------------------------------------------------------------
+      void check_symm() const
+      {
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<ii; ++jj)
+          {
+            if( !MATH_T::equals( mat[ii*N+jj], mat[jj*N+ii], 1.0e-15) ) 
+              std::cout<<"error: Matrix_SymPos entry ("<<ii<<","<<jj<<") does not match entry ("<<jj<<","<<ii<<"). \n";
+          }
+        }
+      }
+
+      void print_info() const
+      {
+        std::cout<<"N ="<<N<<'\n';
+        std::cout<<"Matrix :\n";
+        int counter = -1;
+        for(int ii=0; ii<N; ++ii)
+        {
+          for(int jj=0; jj<N; ++jj)
+            std::cout<<mat[++counter]<<'\t';
+          std::cout<<'\n';
+        }
+
+        if(is_fac)
+          std::cout<<"Matrix is factorized.\n";
+        else
+          std::cout<<"Matrix is NOT factorized.\n";
+      }
+
+      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      {
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
+
+        // symmetrize the random matrix: upper triangular part follows the lower
+        // triangular part
+        for(int ii=0; ii<N-1; ++ii)
+        {
+          for(int jj=ii+1; jj<N; ++jj) mat[ii*N+jj] = mat[jj*N+ii];
+        }
+      }
+
+      double& operator()(const int &index) {return mat[index];}
+
+      const double& operator()(const int &index) const {return mat[index];}
+
+      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
+
+      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+      
+      int get_size() const {return N;}
+
+      bool get_is_fac() const {return is_fac;}
+
+      // Assignment operator
+      Matrix_SymPos_Dense<N>& operator= (const Matrix_SymPos_Dense<N> &source)
+      {
+        // self-assignment guard
+        if(this == &source) return *this;
+
+        for(int ii=0; ii<N*N; ++ii) mat[ii] = source(ii);
+
+        is_fac = source.get_is_fac();
+
+        return *this;
+      }
+
+      // ----------------------------------------------------------------------
+      // Perform LDL^t transformation. The mat object will be replace by the 
+      // entries of the L matrix and the D matrix. Pivoting is NOT used because 
+      // this decomposition for symmetry positive definite matrix is stable.
+      // ----------------------------------------------------------------------
+      void LDLt_fac()
+      {
+        // This algorithm is given in Shufang XU's book, pp 31. 
+        std::array<double, N> v {}; 
+
+        for(int jj=0; jj<N; ++jj)
+        {
+          const int Njj = jj * N;
+          for(int kk=0; kk<jj; ++kk) v[kk] = mat[Njj+kk] * mat[kk*N+kk];
+
+          for(int kk=0; kk<jj; ++kk) mat[Njj+jj] -= v[kk] * mat[Njj+kk];
+
+          for(int ii=jj+1; ii<N; ++ii)
+          {
+            for(int kk=0; kk<jj; ++kk) mat[N*ii+jj] -= mat[ii*N+kk] * v[kk];
+
+            mat[N*ii+jj] /= mat[Njj+jj];
+          }
+        }
+
+        is_fac = true;
+      }
+
+      // ----------------------------------------------------------------------
+      // With the LDLt_fac() function performed, solve a linear problem with 
+      // the given RHS.
+      // ----------------------------------------------------------------------
+      std::array<double, N> LDLt_solve( const std::array<double, N> &bb ) const
+      {
+        std::array<double, N> xx {};
+
+        // Solve for Ly = b
+        for(int ii=0; ii<N; ++ii)
+        {
+          xx[ii] = bb[ii];
+          for(int jj=0; jj<ii; ++jj) xx[ii] -= mat[ii*N+jj] * xx[jj];
+        }
+
+        // Solve for D z = y;
+        for(int ii=0; ii<N; ++ii) xx[ii] *= 1.0 / mat[ii*N+ii];
+
+        // Solve L^t x = z
+        for(int ii=N-2; ii>=0; --ii)
+        {
+          for(int jj=ii+1; jj<N; ++jj) xx[ii] -= mat[jj*N+ii] * xx[jj];
+        }
+        return xx;
+      }
+
+      std::array<double,N> Mult( const std::array<double,N> &input ) const
+      {
+        ASSERT(is_fac == false, "Error: the matrix has been factroized.\n");
+        std::array<double,N> out {};
+        for(int ii=0; ii<N; ++ii)
+        {
+          out[ii] = 0.0;
+          for(int jj=0; jj<N; ++jj) out[ii] += mat[N*ii+jj] * input[jj];
+        }
+        return out;
+      }
+
+    private:
+      // container for the matrix
+      double mat[N*N];
+
+      // bool variable indicate if the matrix has been LU factorized.
+      bool is_fac;
   };
-}
+
+} // End of Math_T
 
 #endif

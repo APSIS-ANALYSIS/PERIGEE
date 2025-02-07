@@ -19,25 +19,25 @@
 class INodalBC
 {
   public:
-    INodalBC();
+    INodalBC() = default;
 
-    virtual ~INodalBC();
+    virtual ~INodalBC() = default;
 
     // ------------------------------------------------------------------------
     // get_dir_nodes returns the ii-th dirichlet node's global nodal index.
-    // The parameter ii runs 0 <= ii < get_num_dir_nodes(nbc_id).
+    // The parameter ii runs 0 <= ii < get_num_dir_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const = 0;
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's slave node's
-    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
+    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_slave_nodes(const unsigned int &ii) const = 0;
     
     // ------------------------------------------------------------------------
     // get_per_slave_nodes returns the ii-th master-slave pair's master node's
-    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes(nbc_id).
+    // global index. The parameter ii runs as 0 <= ii < get_num_per_nodes.
     // ------------------------------------------------------------------------
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const = 0;
     
@@ -68,8 +68,32 @@ class INodalBC
     // print_info() will print the content of dir_nodes, per_slave_nodes, and
     // per_master_nodes on screen.
     // ------------------------------------------------------------------------
-    virtual void print_info() const;
-   
+    virtual void print_info() const
+    {
+      std::cout<<std::endl;
+      std::cout<<"======== BC info ======="<<std::endl;
+      if( get_num_dir_nodes() > 0 )
+      {
+        std::cout<<"Dirichlet nodes: "<<std::endl;
+        for(unsigned int ii=0; ii<get_num_dir_nodes(); ++ii)
+          std::cout<<get_dir_nodes(ii)<<'\t';
+        std::cout<<std::endl;
+      }
+
+      if( get_num_per_nodes() > 0 )
+      {
+        std::cout<<"Periodic master - slave nodes: "<<std::endl;
+        for(unsigned int ii=0; ii<get_num_per_nodes(); ++ii)
+          std::cout<<get_per_master_nodes(ii)<<'\t'<<get_per_slave_nodes(ii)<<std::endl;
+      }
+
+      std::cout<<std::endl<<"ID array: "<<std::endl;
+      for(unsigned int ii=0; ii<ID.size(); ++ii)
+        std::cout<<ID[ii]<<'\t';
+      std::cout<<'\n';
+      std::cout<<std::endl<<"========================"<<std::endl;
+    }
+
     // ------------------------------------------------------------------------
     // get_inf_active_area() return inflow cap surface active area
     // ------------------------------------------------------------------------
@@ -107,7 +131,7 @@ class INodalBC
       SYS_T::print_fatal("Error: INodalBC::get_outnormal is not implemented.\n");
       return Vector_3();
     }
-  
+
     // ------------------------------------------------------------------------
     // get_num_out_bc_pts() return the number of outline boundary points
     // ------------------------------------------------------------------------
@@ -125,7 +149,7 @@ class INodalBC
       SYS_T::print_fatal("Error: INodalBC::get_centroid is not implemented.\n");
       return Vector_3();
     }
-    
+
     // ------------------------------------------------------------------------
     // get_outline_pts() return the outline points. ii ranges from 0 to 3 x
     // num_out_bc_pts[nbc_id]
@@ -135,7 +159,7 @@ class INodalBC
       SYS_T::print_fatal("Error: INodalBC::get_outline_pts is not implemented.\n");
       return 0.0;
     }
-    
+
     // ------------------------------------------------------------------------
     // get_face_area() return inflow cap surface face area
     // ------------------------------------------------------------------------
@@ -168,7 +192,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_num_node is not implemented. \n");
       return -1;
     }
-  
+
     // --------------------------------------------------------------
     // get_num_cell returns the number of cells on surface
     // --------------------------------------------------------------
@@ -177,7 +201,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_num_cell is not implemented. \n");
       return -1;
     }
-  
+
     // --------------------------------------------------------------
     // get_num_nLocBas returns the number of local basis on surface
     // --------------------------------------------------------------
@@ -186,7 +210,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
       return -1;
     }
-  
+
     // --------------------------------------------------------------
     // get_ien returns the surface mesh ien array
     // --------------------------------------------------------------
@@ -231,7 +255,7 @@ class INodalBC
       SYS_T::commPrint("Warning: get_num_caps in not implemented\n");
       return -1;
     }
-    
+
     // --------------------------------------------------------------
     // get_ring_bc_type returns essential bc type for ring nodes
     // --------------------------------------------------------------
@@ -252,7 +276,7 @@ class INodalBC
     // --------------------------------------------------------------
     virtual std::vector<double> get_outnormal() const
     {SYS_T::commPrint("Warning: get_outnormal is not implemented.\n"); return {};}
-  
+
     // --------------------------------------------------------------
     // get_rotation_matrix returns each cap's 3x3 rotation matrix for
     //                     skew boundary conditions
@@ -264,17 +288,94 @@ class INodalBC
     // Reset the triangle element's surface IEN so that the outward normal
     // vector is defined.
     // --------------------------------------------------------------
-    virtual void resetTriIEN_outwardnormal( const IIEN * const &VIEN )
-    {SYS_T::print_fatal("Warning: resetTriIEN_outwardnormal is not implemented. \n");}
+    virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN )
+    {SYS_T::print_fatal("Warning: resetSurIEN_outwardnormal is not implemented. \n");}
+
+    // --------------------------------------------------------------
+    // get the dirichlet-type nodal index on rotated surface
+    // --------------------------------------------------------------
+    virtual unsigned int get_dir_nodes_on_rotated_surface( const unsigned int &ii ) const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_dir_nodes_on_rotated_surface is not implemented. \n");
+      return 0;
+    }
+
+    virtual unsigned int get_num_dir_nodes_on_rotated_surface() const
+    {
+      SYS_T::print_fatal("Error: INodalBC::get_num_dir_nodes_on_rotated_surface is not implemented. \n");
+      return 0;
+    }   
+
+    // Access to num_node
+    virtual int get_num_node() const
+    {
+      SYS_T::commPrint("Warning: get_num_node is not implemented. \n");
+      return -1;
+    }
+
+    // Access to num_cell
+    virtual int get_num_cell() const
+    {
+      SYS_T::commPrint("Warning: get_num_cell is not implemented. \n");
+      return -1;
+    }
+
+    // Access to (surface) nLocBas
+    virtual int get_nLocBas() const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+
+    // Access to (surface) ien
+    virtual int get_ien(const int &cell, const int &lnode) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+
+    // Access to point coordinates, 
+    // node = 0, ..., num_node-1.
+    // dir  = 0, 1, 2.
+    virtual double get_pt_xyz(const int &node, const int &dir) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1.0;
+    }
+
+    // Access to volumetric nodal index
+    virtual int get_global_node(const int &node_idx) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
+
+    // Access to volumetric cell index
+    virtual int get_global_cell(const int &cell_idx) const
+    {
+      SYS_T::commPrint("Warning: get_nLocBas is not implemented. \n");
+      return -1;
+    }
 
   protected:
-    std::vector<int> ID;
+    std::vector<int> ID {};
 
     // ------------------------------------------------------------------------
     // Create_ID() will generate the ID array based on get_dir_nodes and
     // get_per_xxx_nodes.
     // ------------------------------------------------------------------------
-    virtual void Create_ID( const unsigned int &num_node );
+    virtual void Create_ID( const unsigned int &num_node )
+    {
+      ID.resize(num_node); VEC_T::shrink2fit(ID);
+
+      for(unsigned int ii = 0; ii<ID.size(); ++ii) ID[ii] = ii;
+
+      for(unsigned int ii = 0; ii<get_num_dir_nodes(); ++ii)
+        ID[ get_dir_nodes(ii) ] = -1;
+
+      for(unsigned int ii = 0; ii<get_num_per_nodes(); ++ii)
+        ID[ get_per_slave_nodes(ii) ] = get_per_master_nodes(ii);
+    }
 };
 
 #endif

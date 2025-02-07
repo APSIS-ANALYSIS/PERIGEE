@@ -19,9 +19,6 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &in_alpha_m,
 {
 }
 
-TimeMethod_GenAlpha::~TimeMethod_GenAlpha()
-{}
-
 TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
     const bool &input_is2ndorder )
 : rho_infty(input_spectral), is2nd( input_is2ndorder ), is_rho_set(true)

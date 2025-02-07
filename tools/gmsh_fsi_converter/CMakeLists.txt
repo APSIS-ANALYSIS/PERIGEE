@@ -1,18 +1,6 @@
-PROJECT(perigee)
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.10)
 
-find_package(VTK COMPONENTS 
-  CommonCore
-  IOXML
-)
-
-set(CMAKE_NINJA_FORCE_RESPONSE_FILE "ON" CACHE BOOL "Force Ninja to use response files.")
-
-
-if (NOT VTK_FOUND)
-  message(FATAL_ERROR "ReadPolyData: Unable to find the VTK build folder.")
-endif()
+PROJECT(perigee)
 
 IF(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
@@ -36,9 +24,6 @@ SET(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR}/lib)
 # binary location
 SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 
-# print makefile details or not
-SET(CMAKE_VERBOSE_MAKEFILE FALSE)
-
 INCLUDE(../../conf/basic_variable_log.cmake)
 INCLUDE(../../conf/system_lib_loading.cmake)
 
@@ -46,48 +31,54 @@ INCLUDE(../../conf/system_lib_loading.cmake)
 # Set my own source code
 # ===============================================
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
-
-SET( perigee_lib_src 
+# 1. Preprocessor source cpp
+SET( perigee_preprocess_lib_src
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/SV_Tools.cpp
-  ${perigee_source}/Mesh/Tet_Tools.cpp
-  ${perigee_source}/System/Math_Tools.cpp
-  ${perigee_source}/System/Matrix_double_3by3_Array.cpp
-  ${perigee_source}/System/HDF5_Writer.cpp
-  ${perigee_source}/System/HDF5_Reader.cpp
+  ${perigee_source}/Mesh/VTK_Tools.cpp
   )
 
 # ===============================================
 # Finish setting my own source code
 # ===============================================
 # INCLUDE MY OWN HEADER FILES
-
 INCLUDE_DIRECTORIES( ../../include )
+SET(YAML_DIR "${HOME_DIR}/lib/yaml-shared")
+SET(YAML_INC "${YAML_DIR}/include/")
+SET(YAML_LIB "${YAML_DIR}/lib/libyaml-cpp.so")
+INCLUDE_DIRECTORIES(${YAML_INC})
 
 # -------------------------------------------------------------------
-# MAKE MY OWN LIBRARY
-ADD_LIBRARY( perigee ${perigee_lib_src} )
-TARGET_LINK_LIBRARIES( perigee ${EXTRA_LINK_LIBS} )
+# MAKE MY OWN LIBRARIES
+# 1. Preprocess libs
+ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
+TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 # -------------------------------------------------------------------
 
 # Print compiler setup
 INCLUDE(../../conf/message_compiler_setup.cmake)
 
+FIND_PACKAGE(VTK COMPONENTS 
+  CommonComputationalGeometry
+  FiltersSources
+  IOXML
+)
+
+IF (NOT VTK_FOUND)
+  MESSAGE(FATAL_ERROR "gmsh_file_converter: Unable to find the VTK build folder.")
+ENDIF()
+
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-# 1. Make executable
-# 1.1 Preprocess
-ADD_EXECUTABLE( gmsh_converter MACOSX_BUNDLE gmsh_file_converter.cpp)
+ADD_EXECUTABLE( gmsh_file_converter MACOSX_BUNDLE gmsh_file_converter.cpp )
 
-# -------------------------------------------------------------------
-# 2. Link libraries
-TARGET_LINK_LIBRARIES( gmsh_converter ${EXTRA_LINK_LIBS} perigee  ${VTK_LIBRARIES})
+TARGET_LINK_LIBRARIES( gmsh_file_converter ${EXTRA_LINK_LIBS} perigee_preprocess ${VTK_LIBRARIES} ${YAML_LIB} )
 
-vtk_module_autoinit(
-  TARGETS gmsh_converter
+# VTK_MODULE_AUTOINIT is needed
+VTK_MODULE_AUTOINIT(
+  TARGETS gmsh_file_converter
   MODULES ${VTK_LIBRARIES}
 )
 
-#EOF
-
+# EOF

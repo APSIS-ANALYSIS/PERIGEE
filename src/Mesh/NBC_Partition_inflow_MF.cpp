@@ -10,7 +10,7 @@ NBC_Partition_inflow_MF::NBC_Partition_inflow_MF( const IPart * const &part,
 
   LDN_MF.resize(num_nbc);
 
-  // We the inflow has 3 dofs
+  // The inflow has 3 dofs
   for(int ii=0; ii<num_nbc; ++ii) LDN_MF[ii].resize(3*Num_LD[ii]);
 
   for(int ii=0; ii<num_nbc; ++ii)
@@ -22,11 +22,6 @@ NBC_Partition_inflow_MF::NBC_Partition_inflow_MF( const IPart * const &part,
       LDN_MF[ii][3*jj+2] = grid2id[2][ LDN[ii][jj] ];
     }
   }
-}
-
-NBC_Partition_inflow_MF::~NBC_Partition_inflow_MF()
-{
-  VEC_T::clean(LDN_MF);
 }
 
 void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const

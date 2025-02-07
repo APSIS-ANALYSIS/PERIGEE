@@ -11,13 +11,14 @@
 // inflow surface area and the inflow surface outward normal vector.
 // 
 // The data recorded in the HDF5 file by this class will be loaded
-// in the ALocal_Inflow_NodalBC class in the analysis code.
+// in the ALocal_InflowBC class in the analysis code.
 //
 // Date crated: Aug. 9 2017
 // Author: Ju Liu
 // ==================================================================
 #include "IPart.hpp"
 #include "INodalBC.hpp"
+#include "Map_Node_Index.hpp"
 
 class NBC_Partition_inflow
 {
@@ -26,7 +27,7 @@ class NBC_Partition_inflow
         const Map_Node_Index * const &mnindex,
         const INodalBC * const &nbc );
 
-    virtual ~NBC_Partition_inflow();
+    virtual ~NBC_Partition_inflow() = default;
 
     virtual void write_hdf5( const std::string &FileName ) const;
 
@@ -66,7 +67,7 @@ class NBC_Partition_inflow
 
     // local cell IEN array
     // num_nbc times (cell_nLocBas[ii] x num_local_cell[ii])
-    std::vector< std::vector<int> > local_tri_ien;
+    std::vector< std::vector<int> > local_cell_ien;
 
     // local node's global index
     // num_nbc x num_local_node[ii]

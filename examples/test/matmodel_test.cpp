@@ -1,37 +1,19 @@
-#include "MaterialModel_Guccione_Incompressible_Mixed.hpp"
+#include "ANL_Tools.hpp"
 
 int main( int argc, char * argv[] )
 {
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+  std::string part_file("part");
 
-  IMaterialModel * model = new MaterialModel_Guccione_Incompressible_Mixed(
-      2.1, 3.3, 22.0, -11.2, 15.2, 0.5, 0.3, 0.2, -0.2, 0.3, 0.6 );
-  
-  model -> print_info();
+  int size = ANL_T::get_cpu_size(part_file, 0);
 
-  Matrix_3x3 F, P, S;
-  Tensor4_3D CC;
+  for(int ii=0; ii<size; ++ii)
+  {
+    int rank = ANL_T::get_cpu_rank(part_file, ii);
+    size = ANL_T::get_cpu_size(part_file, ii);
+    std::cout<<rank<<'\t'<<size<<'\n';
+  }
 
-  F.xx() = 1.0; F.xy() = 0.3; F.xz() = 0.0;
-  F.yx() = 0.0; F.yy() = 1.0; F.yz() = -0.05;
-  F.zx() = 0.0; F.zy() = 0.1; F.zz() = 1.0;
-
-  model -> get_PK_Stiffness(F, P, S, CC);
-
-  P.print_in_row();
-  S.print_in_row();
-  CC.print();
-
-  model -> get_PK( F, P, S );
-
-  P.print_in_row();
-  S.print_in_row();
- 
-  std::cout<<model -> get_strain_energy( F )<<std::endl; 
-  
-  delete model;
-  PetscFinalize();
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 // EOF

@@ -3,7 +3,8 @@
 // ============================================================================
 // Vec_Tools.hpp
 // ----------------------------------------------------------------------------
-// VEC_T namespace contains a suite of functions for the std::vector object.
+// VEC_T namespace contains a suite of functions for the manipulation of the 
+// std::vector object.
 // ============================================================================
 #include <iomanip>
 #include <algorithm>
@@ -62,6 +63,21 @@ namespace VEC_T
     return static_cast<int>(vec.size());
   }
 
+  // --------------------------------------------------------------------------
+  // ! is_equal
+  // determine if two vector object are identical up to a tolerance.
+  // --------------------------------------------------------------------------
+  template<typename T> bool is_equal( const std::vector<T> &a, 
+      const std::vector<T> &b, const double &tol = 1.0e-12 )
+  {
+    if( a.size() != b.size() ) return false;
+    for(unsigned int ii=0; ii<a.size(); ++ii)
+    {
+      if( std::abs(a[ii]-b[ii]) >= tol ) return false;
+    }
+    return true;
+  }
+  
   // --------------------------------------------------------------------------
   // ! shrink2fit  
   //   trim the capacity of vector.
@@ -179,6 +195,20 @@ namespace VEC_T
   }
 
   // --------------------------------------------------------------------------
+  // ! intersection
+  //   return the intersection set of two given vectors
+  // --------------------------------------------------------------------------
+  template<typename T> std::vector<T> intersection( const std::vector<T> &vec_a,
+     const std::vector<T> &vec_b )
+  {
+    std::vector<T> out {};
+    for( const auto &val : vec_a )
+      if( VEC_T::is_invec(vec_b, val) ) out.push_back(val);
+
+    return out;
+  }
+
+  // --------------------------------------------------------------------------
   // ! get_pos
   //   find the position (pos) of the given val such that 
   //                 vec[pos] = val
@@ -195,9 +225,9 @@ namespace VEC_T
 
   // --------------------------------------------------------------------------
   // ! cast_to_unsigned_int
-  //   Convert a std::vector<int> to std::vector<unsigned int>.
+  //   Convert a std::vector<T> to std::vector<unsigned int>.
   // --------------------------------------------------------------------------
-  inline std::vector<unsigned int> cast_to_unsigned_int( const std::vector<int> &vec )
+  template<typename T> std::vector<unsigned int> cast_to_unsigned_int( const std::vector<T> &vec )
   {
     std::vector<unsigned int> output( vec.size() );
 
@@ -236,6 +266,17 @@ namespace VEC_T
     vfile.close();
     std::cout.precision(ss);
   }
+
+  // --------------------------------------------------------------------------
+  // ! erase_pos
+  //   erase the element stored in the vector vec at the position at begin() +
+  //   pos
+  // --------------------------------------------------------------------------
+  template<typename T> void erase_pos( std::vector<T> &vec, const int &pos )
+  {
+    vec.erase( vec.begin() + pos );
+  }
+
 }
 
 #endif

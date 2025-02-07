@@ -205,9 +205,6 @@ GenBC_Coronary::GenBC_Coronary( const std::string &lpn_filename,
   }
 }
 
-GenBC_Coronary::~GenBC_Coronary()
-{}
-
 void GenBC_Coronary::print_info() const
 {
   SYS_T::commPrint( "===> Coronary model: N = %d, h = %e, num_ebc = %d \n", N, h, num_ebc );
@@ -287,21 +284,14 @@ double GenBC_Coronary::get_P( const int &ii, const double &in_dot_Q,
     // Here, we know it is a coronary face.
     // Each coronary face is governed by num_odes = 2 ODEs.
     // initial pressures at Ca and Cim
-    double pi_m[num_odes];
+    std::vector<double> pi_m  = Pi0[ii];
 
     // auxiliary variables for RK4
-    double K1[num_odes], K2[num_odes], K3[num_odes], K4[num_odes];
-    double pi_tmp[num_odes];
-
-    for(int jj=0; jj<num_odes; ++jj)
-    {
-      pi_m[jj] = Pi0[ii][jj];
-      K1[jj] = 0.0;
-      K2[jj] = 0.0;
-      K3[jj] = 0.0;
-      K4[jj] = 0.0;
-      pi_tmp[jj] = 0.0;
-    }
+    std::vector<double> K1(num_odes, 0.0);
+    std::vector<double> K2(num_odes, 0.0);
+    std::vector<double> K3(num_odes, 0.0);
+    std::vector<double> K4(num_odes, 0.0);
+    std::vector<double> pi_tmp(num_odes, 0.0);
 
     // in_Q gives Q_N = Q_n+1, and Q0[ii] gives Q_0 = Q_n
     // do Runge-Kutta 4 with the 3/8 rule
@@ -363,8 +353,8 @@ void GenBC_Coronary::reset_initial_sol( const int &ii, const double &in_Q_0,
   if( num_Pim_data[ii]>0 ) get_dPim_dt(ii, curr_time, curr_time + N * h);
 }
 
-void GenBC_Coronary::F_coronary( const int &ii, const double * const &pi, const double &q,
-    const double &dPimdt, double * const &K ) const
+void GenBC_Coronary::F_coronary( const int &ii, const std::vector<double> &pi, const double &q,
+    const double &dPimdt, std::vector<double> &K ) const
 {
   // The Coronary LPM consists of two ODEs.
 

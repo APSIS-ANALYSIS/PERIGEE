@@ -14,7 +14,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
   for(int ii=0; ii<dof; ++ii)
   {
     Num_LD[ii] = 0;
-    
+      
     for(unsigned int jj=0; jj<nbc_list[ii]->get_num_dir_nodes(); ++jj)
     {
       unsigned int node_index = nbc_list[ii]->get_dir_nodes(jj);
@@ -59,7 +59,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
   const int totnode = part->get_nlocghonode();
 
   LID.resize(totnode * dof);
-
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ii=0; ii<dof; ++ii)
   {
     for(int jj=0; jj<totnode; ++jj)
@@ -69,26 +69,13 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
       LID[ii*totnode + jj] = nbc_list[ii]->get_ID(old_index);
     }
   }
-
+  PERIGEE_OMP_PARALLEL_FOR
   for(int ii=0; ii<dof*totnode; ++ii)
   {
     if(LID[ii] != -1) LID[ii] = mnindex->get_old2new(LID[ii]);
   }
 
   VEC_T::shrink2fit( LID );
-}
-
-NBC_Partition::~NBC_Partition()
-{
-  VEC_T::clean(LID);
-  VEC_T::clean(LDN);
-  VEC_T::clean(LPSN);
-  VEC_T::clean(LPMN);
-  VEC_T::clean(LocalMaster);
-  VEC_T::clean(LocalMasterSlave);
-  VEC_T::clean(Num_LD);
-  VEC_T::clean(Num_LPS);
-  VEC_T::clean(Num_LPM);
 }
 
 void NBC_Partition::write_hdf5( const std::string &FileName, 

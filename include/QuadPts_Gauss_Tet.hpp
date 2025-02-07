@@ -20,23 +20,23 @@
 #include "Vec_Tools.hpp"
 #include "IQuadPts.hpp"
 
-class QuadPts_Gauss_Tet : public IQuadPts
+class QuadPts_Gauss_Tet final : public IQuadPts
 {
   public:
     QuadPts_Gauss_Tet( const int &in_num_pts );
 
-    virtual ~QuadPts_Gauss_Tet();
+    ~QuadPts_Gauss_Tet() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual int get_dim() const {return 4;}
+    int get_dim() const override {return 4;}
 
-    virtual int get_num_quadPts() const {return num_pts;}
+    int get_num_quadPts() const override {return num_pts;}
 
-    virtual double get_qp(unsigned int ii, unsigned int comp) const
+    double get_qp(const int &ii, const int &comp) const override
     {return qp[4*ii+comp];}
 
-    virtual double get_qw(unsigned int ii) const
+    double get_qw(const int &ii) const override
     {return qw[ii];}
 
   private:
@@ -46,7 +46,8 @@ class QuadPts_Gauss_Tet : public IQuadPts
     //      quadrature points.
     //      u = 1 - r - s - t
     // qw : length num_pts. Stores the quadrature weights.
-    std::vector<double> qp, qw;
+    std::vector<double> qp {};
+    std::vector<double> qw {};
     
     // gen_permutations : generate permutations of a, b, c such that the
     //                    vector out includes the following 12 patterns.
@@ -55,8 +56,8 @@ class QuadPts_Gauss_Tet : public IQuadPts
     //                    c a b c; c b a c;
     //                    c a c b; c b c a;
     //                    c c a b; c c b a;
-    void gen_permutations( const double &a, const double &b, 
-        const double &c, std::vector<double> &out ) const;
+    std::vector<double> gen_permutations( const double &a, 
+        const double &b, const double &c ) const;
 };
 
 #endif

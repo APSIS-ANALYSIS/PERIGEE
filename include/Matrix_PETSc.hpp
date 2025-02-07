@@ -11,7 +11,6 @@
 // ============================================================================
 #include "PETSc_Tools.hpp"
 #include "ALocal_NBC.hpp"
-#include "ALocal_Ring_NodalBC.hpp"
 #include "PDNSolution.hpp"
 #include "petscmat.h"
 

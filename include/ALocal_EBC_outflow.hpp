@@ -18,7 +18,7 @@ class ALocal_EBC_outflow : public ALocal_EBC
     ALocal_EBC_outflow( const std::string &fileBaseName,
         const int &cpu_rank, const std::string &gname="/ebc" );
 
-    virtual ~ALocal_EBC_outflow();
+    virtual ~ALocal_EBC_outflow() = default;
 
     virtual void print_info() const;
 

@@ -2,7 +2,7 @@
 
 Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
     const int &in_ncommon, const bool &isDualGraph,
-    const IMesh * const &mesh,
+    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas, 
     const IIEN * const &IEN,
     const std::string &element_part_name,
     const std::string &node_part_name )
@@ -12,9 +12,9 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   field_offset.resize(1);
   field_offset[0] = 0;
 
-  const idx_t nElem = mesh->get_nElem();
-  const idx_t nFunc = mesh->get_nFunc();
-  const idx_t nLocBas = mesh->get_nLocBas();
+  const idx_t nElem   = static_cast<idx_t>(in_nelem);
+  const idx_t nFunc   = static_cast<idx_t>(in_nfunc);
+  const idx_t nLocBas = static_cast<idx_t>(in_nlocbas);
   
   if(cpu_size <= 1)
   {
@@ -138,15 +138,29 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
 
 Global_Part_METIS::Global_Part_METIS( const int &num_fields,
     const int &cpu_size, const int &in_ncommon, const bool &isDualGraph,
-    const std::vector<IMesh const *> &mesh_list,
+    const std::vector<int> &nelem_list,
+    const std::vector<int> &nfunc_list,
+    const std::vector<int> &nlocbas_list,
     const std::vector<IIEN const *>  &IEN_list,
     const std::string &element_part_name,
     const std::string &node_part_name ) : isDual( isDualGraph ), 
   dual_edge_ncommon( in_ncommon )
 {
-  if(num_fields != static_cast<int>( mesh_list.size() ) )
+  if(num_fields != static_cast<int>( nelem_list.size() ) )
   {
-    std::cerr<<"ERROR: input num_fields is incompatible with mesh list.\n";
+    std::cerr<<"ERROR: input num_fields is incompatible with nelem list.\n";
+    exit(1);
+  }
+
+  if(num_fields != static_cast<int>( nfunc_list.size() ) )
+  {
+    std::cerr<<"ERROR: input num_fields is incompatible with nfunc list.\n";
+    exit(1);
+  }
+
+  if(num_fields != static_cast<int>( nlocbas_list.size() ) )
+  {
+    std::cerr<<"ERROR: input num_fields is incompatible with nlocbas list.\n";
     exit(1);
   }
 
@@ -167,24 +181,24 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
   field_offset[0] = 0;
 
   for(int ii=1; ii<num_fields; ++ii) 
-    field_offset[ii] = field_offset[ii-1] + mesh_list[ii-1] -> get_nFunc();
+    field_offset[ii] = field_offset[ii-1] + nfunc_list[ii-1];
 
   // This is a partition code for mixed element over the whole domain.
   // The number of elements for an mesh object should be the same.
   // nFunc here is the total number of basis functions, summing over fields
   // nLocBas here is the total number of local basis, summing over fields
-  const idx_t nElem = mesh_list[0]->get_nElem();
+  const idx_t nElem = static_cast<idx_t>(nelem_list[0]);
   idx_t nFunc = 0, nLocBas = 0;
 
   for(int ii=0; ii<num_fields; ++ii)
   {
-    if( nElem != static_cast<idx_t>( mesh_list[ii]->get_nElem() ) )
+    if( nElem != static_cast<idx_t>( nelem_list[ii] ) )
     {
-      std::cerr<<"ERROR: mesh list objects are incompatible with nElem.\n";
+      std::cerr<<"ERROR: mesh list objects are incompatible with nElem list.\n";
       exit(1);
     }
-    nFunc   += mesh_list[ii] -> get_nFunc();
-    nLocBas += mesh_list[ii] -> get_nLocBas();
+    nFunc   += static_cast<idx_t>(nfunc_list[ii]);
+    nLocBas += static_cast<idx_t>(nlocbas_list[ii]);
   }
 
   if(isDualGraph)
@@ -226,13 +240,13 @@ Global_Part_METIS::Global_Part_METIS( const int &num_fields,
     int fidx = 0;
     for(int mm=0; mm<num_fields; ++mm)
     {
-      const int nlocbasmm = mesh_list[mm] -> get_nLocBas();
+      const int nlocbasmm = nlocbas_list[mm];
 
       for(int ii=0; ii<nlocbasmm; ++ii)
         eind[ee*nLocBas + midx + ii] = IEN_list[mm]->get_IEN(ee, ii) + fidx;
 
       midx += nlocbasmm;
-      fidx += mesh_list[mm] -> get_nFunc();
+      fidx += nfunc_list[mm];
     }
   }
 
@@ -325,10 +339,10 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
   // file creation
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
-  h5w -> write_intScalar("part_size", part_size);
-  h5w -> write_intScalar("cpu_size", cpu_size);
+  h5w->write_intScalar("part_size", part_size);
+  h5w->write_intScalar("cpu_size", cpu_size);
 
   h5w->write_intScalar("part_isdual", ( isDual ? 1 : 0 ) );
   h5w->write_intScalar("in_ncommon", dual_edge_ncommon);
@@ -340,7 +354,7 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
 
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 
-  delete h5w; H5Fclose(file_id);
+  H5Fclose(file_id);
 }
 
 void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
@@ -350,8 +364,8 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
   std::string fName( fileName ); fName.append( ".h5" );
 
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
   h5w->write_int64Scalar("part_size", part_size);
   h5w->write_intScalar("cpu_size", cpu_size);
@@ -366,7 +380,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
 
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
 
-  delete h5w; H5Fclose(file_id);
+  H5Fclose(file_id);
 }
 
 // EOF

@@ -9,6 +9,7 @@
 // Date: Jan. 16 2017
 // ============================================================================
 #include "HDF5_Reader.hpp"
+#include "Vector_3.hpp"
 
 class ALocal_EBC
 {
@@ -22,7 +23,7 @@ class ALocal_EBC
     ALocal_EBC( const std::string &fileBaseName, const int &cpu_rank, 
         const std::string &gname="/ebc" );
 
-    virtual ~ALocal_EBC();
+    virtual ~ALocal_EBC() = default;
 
     virtual void print_info() const
     {
@@ -73,8 +74,8 @@ class ALocal_EBC
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < cell_nLocBas[ii] x num_local_cell[ii]
     // ------------------------------------------------------------------------
-    virtual int get_local_tri_ien(const int &ii, const int &jj) const
-    {return local_tri_ien[ii][jj];}
+    virtual int get_local_cell_ien(const int &ii, const int &jj) const
+    {return local_cell_ien[ii][jj];}
 
     // ------------------------------------------------------------------------
     // ! get the local cell node's volumetric mesh index
@@ -202,109 +203,6 @@ class ALocal_EBC
       return Vector_3();
     }
 
-    // ------------------------------------------------------------------------
-    // The following functions are in the derived _wall classes and used to
-    // obtain wall properties at a given element's local nodes.
-    // Users are responsible for allocating & deleting the e_xxxxxxx arrays.
-    // Only one surface per the assumption in wall ebc.
-    // surface element id: 0 <= eindex < num_local_cell[0]
-    // ------------------------------------------------------------------------
-    // get_thickness : return the wall thickness, if this partition
-    //                 owns any cell on the wall.
-    // e_thickness : output thickness array, length is cell_nLocBas[0].
-    // ------------------------------------------------------------------------
-    virtual void get_thickness( const int &eindex, double * const &e_thickness ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_thickness is not implemented. \n");
-    }
-
-    // ------------------------------------------------------------------------
-    // get_youngsmod : return the wall young's modulus, if this partition
-    //                 owns any cell on the wall.
-    // e_youngsmod : output youngsmod array, length is cell_nLocBas[0].
-    // ------------------------------------------------------------------------
-    virtual void get_youngsmod( const int &eindex, double * const &e_youngsmod ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_youngsmod is not implemented. \n");
-    }
-
-    // ------------------------------------------------------------------------
-    // get_springconst : return the wall spring constant, if this partition
-    //                   owns any cell on the wall.
-    // e_springconst : output springconst array, length is cell_nLocBas[0].
-    // ------------------------------------------------------------------------
-    virtual void get_springconst( const int &eindex, double * const &e_springconst ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_springconst is not implemented. \n");
-    }
-
-    // ------------------------------------------------------------------------
-    // get_dampingconst : return the wall damping constant, if this partition
-    //                    owns any cell on the wall.
-    // e_dampingconst : output dampingconst array, length is cell_nLocBas[0].
-    // ------------------------------------------------------------------------
-    virtual void get_dampingconst( const int &eindex, double * const &e_dampingconst ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_dampingconst is not implemented. \n");
-    }
-
-    // ------------------------------------------------------------------------
-    // get_prestress, set_prestress : return / set the wall prestress, if this partition
-    //                                owns any cell on the wall.
-    // Users are responsible for allocating & deleting the e_quaprestress array.
-    // Only one surface per the assumption in wall ebc.
-    // surface element id: 0 <= eindex < num_local_cell[0]
-    // e_quaprestress : output/input prestress array, length is 6 x face_nqp.
-    // ------------------------------------------------------------------------
-    virtual void get_prestress( const int &eindex, double * const &e_quaprestress ) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_prestress is not implemented. \n");
-    }
-
-    virtual void set_prestress( const int &eindex, const double * const &e_quaprestress )
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::set_prestress is not implemented. \n");
-    }
-
-    // write_prestress_hdf5 : appends the wall prestress to the existing ebc_wall/ebcid_0
-    // data in the hdf5 file for the given cpu rank
-    virtual void write_prestress_hdf5() const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::write_prestress_hdf5 is not implemented. \n");
-    }
-
-    // ------------------------------------------------------------------------
-    // get_fluid_density : return the fluid density used to compute young's modulus 
-    // ------------------------------------------------------------------------
-    virtual double get_fluid_density() const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_fluid_density is not implemented. \n");
-      return -1.0;
-    }
-
-    // ------------------------------------------------------------------------
-    // ! get the number of (wall) surface nodes in this partition. 
-    //   There may be nodes on the surface that are not associated with any surface 
-    //   cell in this partition, which means 
-    //            get_num_local_node_on_sur <= get_num_local_cell_node
-    // ------------------------------------------------------------------------
-    virtual int get_num_local_node_on_sur() const 
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_num_local_node_on_sur is not implemented. \n");
-      return -1;
-    }
-    
-    // ------------------------------------------------------------------------
-    // ! get the location of the partition's (wall) surface node in the 
-    //   local_to_global array.
-    //   \para 0 <= ii < get_num_local_node_on_sur_pos()
-    // ------------------------------------------------------------------------
-    virtual int get_local_node_on_sur_pos(const int &ii) const
-    {
-      SYS_T::print_fatal("Error: ALocal_EBC::get_local_node_on_sur_pos is not implemented. \n");
-      return -1;
-    }
- 
   protected:
     // the number of different ebc domain on which one may prescribe different
     // elemental boundary conditions.
@@ -323,9 +221,9 @@ class ALocal_EBC
     // size: num_ebc x (3 x num_local_cell_node[ii])
     std::vector< std::vector<double> > local_cell_node_xyz;
 
-    // local_tri_ien[ii] gives the local cell's IEN array
+    // local_cell_ien[ii] gives the local cell's IEN array
     // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
-    std::vector< std::vector<int> > local_tri_ien;
+    std::vector< std::vector<int> > local_cell_ien;
 
     // local cell nodes' global indices
     // size: num_ebc x num_local_cell_node[ii]
@@ -338,6 +236,8 @@ class ALocal_EBC
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
     std::vector< std::vector<int> > local_cell_vol_id;
+    
+    ALocal_EBC() = delete; 
 };
 
 #endif

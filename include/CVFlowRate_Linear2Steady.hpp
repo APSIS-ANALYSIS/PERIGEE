@@ -1,15 +1,14 @@
 #ifndef CVFLOWRATE_LINEAR2STEADY_HPP
 #define CVFLOWRATE_LINEAR2STEADY_HPP
-// ==================================================================
+// ============================================================================
 // CVFlowRate_Linear2Steady.hpp
 //
-// Linear function starting from zero flow rate to a prescribed flow
-// rate at a prescribed time.
+// Linear function starting from zero flow rate to a prescribed flow rate at a
+// prescribed time.
 //
 // Author: Ju Liu
 // Date Created: Oct. 1 2017
-// ==================================================================
-#include "Sys_Tools.hpp"
+// ============================================================================
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "ICVFlowRate.hpp"
@@ -30,7 +29,7 @@ class CVFlowRate_Linear2Steady : public ICVFlowRate
     CVFlowRate_Linear2Steady( const double &in_thred_time, 
         const std::string &filename );
 
-    virtual ~CVFlowRate_Linear2Steady();
+    virtual ~CVFlowRate_Linear2Steady() = default;
 
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 

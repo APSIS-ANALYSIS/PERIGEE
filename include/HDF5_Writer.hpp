@@ -36,13 +36,12 @@
 // Author: Ju Liu
 // Date: Oct. 23 2013
 // ==================================================================
-#include <iostream>
 #include <string>
-#include <vector>
 #include <cstdlib>
 #include <climits>
-#include "Vector_3.hpp"
-#include "Matrix_3x3.hpp"
+#include <iostream>
+#include <vector>
+#include <array>
 #include "hdf5.h"
 
 class HDF5_Writer
@@ -54,9 +53,9 @@ class HDF5_Writer
     // valid file_id. After the writing, the user is also responsible 
     // to call H5Fclose to close the h5 file.
     // --------------------------------------------------------------
-    HDF5_Writer( const hid_t &in_file_id );
+    HDF5_Writer( const hid_t &in_file_id ) : file_id(in_file_id) {}
     
-    virtual ~HDF5_Writer();
+    virtual ~HDF5_Writer() = default;
   
     // --------------------------------------------------------------
     // Scalar writer 
@@ -157,17 +156,17 @@ class HDF5_Writer
     // Vector_3
     // --------------------------------------------------------------
     void write_Vector_3( const hid_t &group_id, const char * const &data_name,
-        const Vector_3 &value ) const;
+        const std::array<double, 3> &value ) const;
 
-    void write_Vector_3( const char * const &data_name, const Vector_3 &value ) const;
+    void write_Vector_3( const char * const &data_name, const std::array<double, 3> &value ) const;
 
     // --------------------------------------------------------------
-    // Matrix_3x3
+    // Tensor2_3D
     // --------------------------------------------------------------
-    void write_Matrix_3x3( const hid_t &group_id, const char * const &data_name,
-        const Matrix_3x3 &value ) const;
+    void write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
+        const std::array<double, 9> &value ) const;
 
-    void write_Matrix_3x3( const char * const &data_name, const Matrix_3x3 &value ) const;
+    void write_Tensor2_3D( const char * const &data_name, const std::array<double, 9> &value ) const;
 
     // --------------------------------------------------------------
     // Matrix writer
@@ -201,6 +200,21 @@ class HDF5_Writer
         exit( EXIT_FAILURE );
       }
     }
+
+    void write_string_impl(hid_t location_id, const char * const &data_name, 
+        const std::string& string_input ) const;
+
+    void write_intScalar_impl( hid_t location_id, const char * const &data_name, 
+        const int &value ) const; 
+
+    void write_doubleScalar_impl( hid_t location_id, const char * const &data_name, 
+        const double &value ) const; 
+
+    void write_intVector_impl( hid_t location_id, const char * const &data_name, 
+        const int * const &value, const int &length ) const;
+
+    void write_doubleVector_impl( hid_t location_id, const char * const &data_name,
+        const double * const &value, const int &length ) const;
 };
 
 #endif

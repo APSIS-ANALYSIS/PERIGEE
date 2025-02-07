@@ -21,7 +21,7 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     // Destructor
     // ------------------------------------------------------------------------
-    virtual ~ALocal_Elem();
+    virtual ~ALocal_Elem() = default;
 
     // ------------------------------------------------------------------------
     // Return the element index based on the local element index.
@@ -52,13 +52,13 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     // This is a virtual function for multiphysics simulations. A tag
     // is attached to each element to denote different physical domains,
-    // such as fluid vs. solid subdomains. For a single domain problem,
+    // such as fluid/fixed vs. solid/rotated subdomains. For a single domain problem,
     // this function is NOT needed, and returns a default value of 0.
     // ------------------------------------------------------------------------
     virtual int get_elem_tag(const int &ee) const
     {
-      if( isTagged ) return elem_tag[ee];
-      else return 0;
+      ASSERT(isTagged, "Error: get_elem_tag function 'isTagged' is false.\n");
+      return elem_tag[ee];
     }
 
   private:
@@ -71,20 +71,23 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     // Global indices of elements that belong to the local CPU.
     // ------------------------------------------------------------------------
-    std::vector<int> elem_loc;
+    std::vector<int> elem_loc {};
     
     // ------------------------------------------------------------------------
-    // Flag that determine if the element has an additional tag
+    // Flag that determine if the element has an additional physical tag
     // ------------------------------------------------------------------------
     bool isTagged;
 
     // ------------------------------------------------------------------------
     // A vector recording the tag of elements. Length is nlocalele.
-    // In FSI problems, we assume tag 0 gives fluid element; 
-    //                            tag 1 gives solid element.
+    // In FSI/ALE_rotated problems, we assume tag 0 gives fluid/fixed element; 
+    //                                        tag 1 gives solid/rotated element.
     // elem_tag is cleared if isTagged = false
     // ------------------------------------------------------------------------
-    std::vector<int> elem_tag;
+    std::vector<int> elem_tag {};
+
+    // Disallow default constructor
+    ALocal_Elem() = delete;
 };
 
 #endif
