@@ -9,15 +9,15 @@
 
 class ViscosityModel_Carreau : public IViscosityModel
 {
-	public:
-		ViscosityModel_Carreau() = delete;
+  public:
+    ViscosityModel_Carreau() = delete;
 
-		ViscosityModel_Carreau( const double &in_mu_inf, const double &in_mu_0,
-														const double &in_lambda, const double &in_n_pli );
+    ViscosityModel_Carreau( const double &in_mu_inf, const double &in_mu_0,
+                            const double &in_lambda, const double &in_n_pli );
 
-		ViscosityModel_Carreau( const char * const &fname = "viscosity_model.h5");
+    ViscosityModel_Carreau( const char * const &fname = "viscosity_model.h5");
 
-		virtual ~ViscosityModel_Carreau();
+    virtual ~ViscosityModel_Carreau();
     
     virtual void print_info() const;
 
