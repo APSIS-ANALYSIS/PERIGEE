@@ -25,6 +25,23 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
   H5Fclose( file_id );
 }
 
+ALocal_Elem::ALocal_Elem(const HDF5_Reader * const &h5r)
+{
+  elem_loc = h5r->read_intVector( "/Local_Elem", "elem_loc" );
+
+  nlocalele = h5r->read_intScalar( "/Local_Elem", "nlocalele" );
+
+  isTagged = h5r -> check_data("/Local_Elem/elem_phy_tag");
+
+  if( isTagged )
+  {
+    elem_tag = h5r->read_intVector("/Local_Elem", "elem_phy_tag");
+    SYS_T::print_fatal_if( VEC_T::get_size( elem_tag ) != nlocalele, "Error: ALocal_Elem::ALocal_Elem function elem_tag_length is not equal to nlocalele.\n");
+  }
+  else
+    elem_tag.clear();
+}
+
 int ALocal_Elem::get_nlocalele( const int &tag_val ) const
 {
   if( isTagged )
