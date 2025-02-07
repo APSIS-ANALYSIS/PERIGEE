@@ -7,26 +7,9 @@
 // Date: Oct. 24 2023
 // ============================================================================
 #include "HDF5_Writer.hpp"
-#include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
-#include "ALocal_Elem.hpp"
-#include "ALocal_EBC.hpp"
-#include "ALocal_NBC.hpp"
-#include "QuadPts_Gauss_Triangle.hpp"
-#include "QuadPts_Gauss_Quad.hpp"
-#include "QuadPts_Gauss_Tet.hpp"
-#include "QuadPts_Gauss_Hex.hpp"
-#include "FEAElement_Tet4.hpp"
-#include "FEAElement_Tet10.hpp"
-#include "FEAElement_Hex8.hpp"
-#include "FEAElement_Hex27.hpp"
-#include "FEAElement_Triangle3_3D_der0.hpp"
-#include "FEAElement_Triangle6_3D_der0.hpp"
-#include "FEAElement_Quad4_3D_der0.hpp"
-#include "FEAElement_Quad9_3D_der0.hpp"
 #include "PLocAssem_Elastodynamics_GenAlpha.hpp"
 #include "PGAssem_LinearPDE_GenAlpha.hpp"
-#include "PNonlinear_LinearPDE_Solver.hpp"
 #include "PTime_LinearPDE_Solver.hpp"
 
 int main(int argc, char *argv[])
@@ -36,7 +19,6 @@ int main(int argc, char *argv[])
 
   // number of quadrature points
   int nqp_vol = 5, nqp_sur = 4;
-  int nqp_vol_1D = 2, nqp_sur_1D = 2;
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
@@ -101,8 +83,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-poissons_ratio", nu);
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
-  SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
-  SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionBool("-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
@@ -130,8 +110,6 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
   SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
-  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
-  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   if( is_backward_Euler )
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
@@ -181,116 +159,50 @@ int main(int argc, char *argv[])
 
   MPI_Barrier(PETSC_COMM_WORLD);
 
-  // ===== Data from Files =====
-  // Control points' xyz coordinates
-  FEANode * fNode = new FEANode(part_file, rank);
-
-  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
-
-  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
-
-  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
-
-  APart_Node * pNode = new APart_Node(part_file, rank);
-
-  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
-
-  ALocal_EBC * locebc = new ALocal_EBC(part_file, rank);
-
-  SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
-
   SYS_T::print_fatal_if( size != ANL_T::get_cpu_size(part_file, rank),
       "Error: Assigned CPU number does not match the partition. \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis.\n", size);
 
-  // ===== Finite Element Container & Quadrature rules=====
-  SYS_T::commPrint("===> Setup element container. \n");
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  FEAElement * elementv = nullptr;
-  FEAElement * elements = nullptr;
-  IQuadPts * quadv = nullptr;
-  IQuadPts * quads = nullptr;
-
-  if( GMIptr->get_elemType() == FEType::Tet4 )
-  {
-    if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
-    if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
-
-    elementv = new FEAElement_Tet4( nqp_vol ); // elem type Tet4
-    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
-    quadv = new QuadPts_Gauss_Tet( nqp_vol );
-    quads = new QuadPts_Gauss_Triangle( nqp_sur );
-  }
-  else if( GMIptr->get_elemType() == FEType::Tet10 )
-  {
-    SYS_T::print_fatal_if( nqp_vol < 29, "Error: not enough quadrature points for tets.\n" );
-    SYS_T::print_fatal_if( nqp_sur < 13, "Error: not enough quadrature points for triangles.\n" );
-
-    elementv = new FEAElement_Tet10( nqp_vol ); // elem type Tet10
-    elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
-    quadv = new QuadPts_Gauss_Tet( nqp_vol );
-    quads = new QuadPts_Gauss_Triangle( nqp_sur );
-  }
-  else if( GMIptr->get_elemType() == FEType::Hex8 )
-  {
-    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
-
-    elementv = new FEAElement_Hex8( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type Hex8
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur_1D * nqp_sur_1D );
-    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
-    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
-  }
-  else if( GMIptr->get_elemType() == FEType::Hex27 )
-  {
-    SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
-
-    elementv = new FEAElement_Hex27( nqp_vol_1D * nqp_vol_1D * nqp_vol_1D ); // elem type Hex27
-    elements = new FEAElement_Quad9_3D_der0( nqp_sur_1D * nqp_sur_1D );
-    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
-    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
-  }
-  else SYS_T::print_fatal("Error: Element type not supported.\n");
-
-  // print the information of element and quadrature rule
-  elementv->print_info();
-  elements->print_info();
-  quadv->print_info();
-  quads->print_info();
+  auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
+  auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
+  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
+  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+  auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
 
-  pmat->gen_perm_bc(pNode, locnbc);
+  pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+  auto tm_galpha = is_backward_Euler
+    ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
+    : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
-  if( is_backward_Euler )
-    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
-  else
-    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
-
-  tm_galpha_ptr->print_info();
+  tm_galpha->print_info();
 
   // ===== Local Assembly Routine =====
-  IPLocAssem * locAssem_ptr = new PLocAssem_Elastodynamics_GenAlpha(
-      rho, module_E, nu, tm_galpha_ptr,
-      elementv->get_nLocBas(), elements->get_nLocBas(), 
-      locebc -> get_num_ebc());
+  std::unique_ptr<IPLocAssem> locAssem_ptr = 
+    SYS_T::make_unique<PLocAssem_Elastodynamics_GenAlpha>(
+      ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
+      rho, module_E, nu, tm_galpha.get(), locebc->get_num_ebc());
 
   // ===== Initial condition =====
-  PDNSolution * disp = new PDNSolution_Elastodynamics( pNode, 0 );
+  std::unique_ptr<PDNSolution> disp =
+    SYS_T::make_unique<PDNSolution_Elastodynamics>( pNode.get(), 0 );
   
-  PDNSolution * velo = new PDNSolution_Elastodynamics( pNode, 0 );
+  std::unique_ptr<PDNSolution> velo =
+    SYS_T::make_unique<PDNSolution_Elastodynamics>( pNode.get(), 0 );
 
-  PDNSolution * dot_disp = new PDNSolution_Elastodynamics( pNode, 0 );
+  std::unique_ptr<PDNSolution> dot_disp =
+    SYS_T::make_unique<PDNSolution_Elastodynamics>( pNode.get(), 0 );
 
-  PDNSolution * dot_velo = new PDNSolution_Elastodynamics( pNode, 0 );
+  std::unique_ptr<PDNSolution> dot_velo =
+    SYS_T::make_unique<PDNSolution_Elastodynamics>( pNode.get(), 0 );
   
   if( is_restart )
   {
@@ -329,24 +241,28 @@ int main(int argc, char *argv[])
   }
 
   // ===== Time step info =====
-  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_LinearPDE_GenAlpha( locAssem_ptr,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, nz_estimate );  
+  std::unique_ptr<IPGAssem> gloAssem =
+    SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>(
+      std::move(locIEN), std::move(locElem), std::move(fNode),
+      std::move(pNode), std::move(locnbc), std::move(locebc),
+      std::move(locAssem_ptr),
+      ANL_T::get_nLocBas(part_file, rank), nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr, locIEN, locnbc );
+  gloAssem->Assem_nonzero_estimate();
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  gloAssem_ptr->Fix_nonzero_err_str();
-  gloAssem_ptr->Clear_KG();
+  gloAssem->Fix_nonzero_err_str();
+  gloAssem->Clear_KG();
   
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )
   {
-    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
         1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
     KSPSetType(lsolver_acce->ksp, KSPGMRES);
@@ -358,33 +274,34 @@ int main(int argc, char *argv[])
     PCHYPRESetType( preproc, "boomeramg" );
    
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n"); 
-    gloAssem_ptr->Assem_mass_residual( disp, locElem, locAssem_ptr, elementv,
-        elements, quadv, quads, locIEN, fNode, locnbc, locebc );
+    gloAssem->Assem_mass_residual( disp.get() );
 
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_velo );
+    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_velo.get() );
   
     dot_velo -> ScaleValue( -1.0 );
 
     // dot_u = v
-    dot_disp -> Copy( velo );
+    dot_disp -> Copy( velo.get() );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
-    delete lsolver_acce;
     SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
   // ===== Linear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
   
   // ===== Nonlinear solver context =====
-  PNonlinear_LinearPDE_Solver * nsolver = new PNonlinear_LinearPDE_Solver(
+  auto nsolver = SYS_T::make_unique<PNonlinear_LinearPDE_Solver>(
+      std::move(gloAssem), std::move(lsolver), std::move(pmat),
+      std::move(tm_galpha),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_LinearPDE_Solver * tsolver = new PTime_LinearPDE_Solver( sol_bName,
+  auto tsolver = SYS_T::make_unique<PTime_LinearPDE_Solver>(
+      std::move(nsolver), sol_bName,
       sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
@@ -392,20 +309,13 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_GenAlpha_Elastodynamics(is_restart, dot_disp, 
-      dot_velo, disp, velo, tm_galpha_ptr, timeinfo, locElem,
-      locIEN, pNode, fNode, locnbc, locebc, pmat, elementv,
-      elements, quadv, quads, locAssem_ptr, gloAssem_ptr,
-      lsolver, nsolver);
+  tsolver->TM_GenAlpha_Elastodynamics(is_restart,
+      std::move(dot_disp), std::move(dot_velo),
+      std::move(disp), std::move(velo), std::move(timeinfo) );
 
   // ===== Print complete solver info =====
-  lsolver -> print_info();
+  tsolver -> print_lsolver_info();
 
-  delete tsolver; delete nsolver;
-  delete lsolver; delete gloAssem_ptr; delete dot_disp; delete dot_velo; delete timeinfo;
-  delete fNode; delete locIEN; delete GMIptr; delete locElem; delete pNode;
-  delete locnbc; delete locebc; delete quadv; delete quads; delete elementv; delete elements;
-  delete pmat; delete tm_galpha_ptr; delete locAssem_ptr; delete disp; delete velo;
   PetscFinalize();
   return EXIT_SUCCESS;
 }
