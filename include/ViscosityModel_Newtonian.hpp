@@ -9,14 +9,14 @@
 
 class ViscosityModel_Newtonian : public IViscosityModel
 {
-	public:
-		ViscosityModel_Newtonian() = delete;
+  public:
+    ViscosityModel_Newtonian() = delete;
 
-		ViscosityModel_Newtonian( const double &in_mu );
+    ViscosityModel_Newtonian( const double &in_mu );
 
-		ViscosityModel_Newtonian( const char * const &fname = "viscosity_model.h5");
+    ViscosityModel_Newtonian( const char * const &fname = "viscosity_model.h5");
 
-		virtual ~ViscosityModel_Newtonian();
+    virtual ~ViscosityModel_Newtonian();
 
     virtual void print_info() const;
 
@@ -74,8 +74,8 @@ class ViscosityModel_Newtonian : public IViscosityModel
     {
       return 0.0;
     }
-
-		private:
+    
+    private:
     // ------------------------------------------------------------------------
     // mu : viscosity
     // ------------------------------------------------------------------------
