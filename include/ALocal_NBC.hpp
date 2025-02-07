@@ -22,6 +22,9 @@ class ALocal_NBC
     ALocal_NBC( const std::string &fileBaseName, 
         const int &cpu_rank, const std::string &gname="/nbc" );
 
+    ALocal_NBC( const HDF5_Reader * const &h5r,
+        const std::string &gname="/nbc" );
+
     virtual ~ALocal_NBC() = default;
 
     // ------------------------------------------------------------------------
