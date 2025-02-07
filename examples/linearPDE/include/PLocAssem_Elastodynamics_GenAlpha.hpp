@@ -9,14 +9,16 @@
 // ============================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
 {
   public:
-    PLocAssem_Elastodynamics_GenAlpha( 
+    PLocAssem_Elastodynamics_GenAlpha(
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const double &in_rho, const double &in_module_E, const double &in_nu,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_snlocbas,
         const int &in_num_ebc_fun );
 
     virtual ~PLocAssem_Elastodynamics_GenAlpha();
@@ -55,41 +57,38 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
         const double &time, const double &dt,
         const double * const &dot_sol_velo,
         const double * const &sol_disp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol_velo,
         const double * const &sol_disp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Mass_Residual(
         const double * const &sol_disp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
   private:
     // Private data
+    const FEType elemType;
+    const int nqpv, nqps;
+    const std::unique_ptr<FEAElement> elementv, elements;
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
     const double rho, module_E, nu, lambda, mu;
     const double alpha_f, alpha_m, gamma;
     
