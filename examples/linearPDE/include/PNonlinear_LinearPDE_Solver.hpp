@@ -53,7 +53,6 @@ class PNonlinear_LinearPDE_Solver
     // GenAlpha_Solve_Elastodynamics:
     // This is a solver for elastodynamics equation.
     // --------------------------------------------------------------
-    /*
     void GenAlpha_Solve_Elastodynamics(
         const bool &new_tangent_flag,
         const double &curr_time,
@@ -62,27 +61,11 @@ class PNonlinear_LinearPDE_Solver
         const PDNSolution * const &pre_dot_velo,
         const PDNSolution * const &pre_disp,
         const PDNSolution * const &pre_velo,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &anode_ptr,
-        const FEANode * const &feanode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const Matrix_PETSc * const &bc_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        IPLocAssem * const &lassem_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_disp,
         PDNSolution * const &dot_velo,
         PDNSolution * const &disp,
         PDNSolution * const &velo,
         bool &conv_flag, int &nl_counter ) const;
-*/
 
   private:
     const double nr_tol, na_tol, nd_tol;
