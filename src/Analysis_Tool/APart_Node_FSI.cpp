@@ -23,6 +23,21 @@ APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, const int &rank 
   H5Fclose( file_id );
 }
 
+APart_Node_FSI::APart_Node_FSI(const HDF5_Reader * const &h5r)
+: APart_Node(h5r)
+{
+  const std::string gname("Local_Node");
+
+  nlocalnode_fluid = h5r -> read_intScalar( gname.c_str(), "nlocalnode_fluid" );
+  nlocalnode_solid = h5r -> read_intScalar( gname.c_str(), "nlocalnode_solid" );
+
+  if(nlocalnode_fluid > 0)
+    node_loc_fluid = h5r -> read_intVector( gname.c_str(), "node_loc_fluid" );
+
+  if(nlocalnode_solid > 0)
+    node_loc_solid = h5r -> read_intVector( gname.c_str(), "node_loc_solid" );
+}
+
 void APart_Node_FSI::print_info() const
 {
   APart_Node::print_info();
