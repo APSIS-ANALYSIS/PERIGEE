@@ -47,7 +47,7 @@ class ViscosityModel_Newtonian : public IViscosityModel
     {
       return 0.0;
     }
-         
+       
     private:
     // ------------------------------------------------------------------------
     // mu : viscosity

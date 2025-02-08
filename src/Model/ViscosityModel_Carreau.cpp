@@ -75,7 +75,7 @@ double ViscosityModel_Carreau::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
   const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
   const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * lambda 
                             * std::pow( pow_base, ( n_pli - 3.0 ) * 0.5 );
-  return dmu_dvelo; 
+  return dmu_dvelo;
 }
 
 double ViscosityModel_Carreau::get_dmu_dI3( const Tensor2_3D &grad_velo ) const

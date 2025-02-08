@@ -31,20 +31,6 @@ class IViscosityModel
       SYS_T::commPrint("Warning: IViscosityModel::write_hdf5() is not implemented. \n");
     }
 
-    // virtual double get_mu( const double &D_xx, const double &D_yy, const double &D_zz,
-    //    const double &D_yz, const double &D_xz, const double &D_xy ) const = 0;
-
-		// virtual double get_dmu_dI1( const double &D_xx, const double &D_yy,
-    //                             const double &D_zz ) const = 0;
-
-    // virtual double get_dmu_dI2( const double &D_xx, const double &D_yy,
-    //                             const double &D_zz, const double &D_yz,
-    //                             const double &D_xz, const double &D_xy ) const = 0;
-
-		// virtual double get_dmu_dI3( const double &D_xx, const double &D_yy,
-    //                             const double &D_zz, const double &D_yz,
-    //                             const double &D_xz, const double &D_xy ) const = 0;
-
     virtual double get_mu( const Tensor2_3D &grad_velo ) const = 0;
 
     virtual double get_dmu_dI1( const Tensor2_3D &grad_velo ) const = 0;
