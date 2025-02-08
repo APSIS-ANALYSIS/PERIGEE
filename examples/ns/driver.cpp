@@ -34,6 +34,9 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
+#include "ViscosityModel_Carreau.hpp"
+#include "ViscosityModel_Newtonian.hpp"
+#include "ViscosityModel_Power_Law.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
@@ -57,7 +60,7 @@ int main(int argc, char *argv[])
 
   // fluid properties
   double fluid_density = 1.065;
-  double fluid_mu = 3.5e-2;
+  // double fluid_mu = 3.5e-2;
   double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
   double c_ct = 4.0; // C_T parameter for defining tau_M
 
@@ -138,7 +141,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
-  SYS_T::GetOptionReal("-fl_mu", fluid_mu);
+  // SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
   SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
@@ -176,7 +179,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
-  SYS_T::cmdPrint("-fl_mu:", fluid_mu);
+  // SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
 
@@ -224,7 +227,7 @@ int main(int argc, char *argv[])
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
-    cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
+    // cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
@@ -365,21 +368,29 @@ int main(int argc, char *argv[])
 
   tm_galpha_ptr->print_info();
 
+  // ===== Generate a Carreau viscosity model =====
+  IViscosityModel * vismodel = nullptr;
+  const double mu_inf = 0.0345;
+  const double mu_0   = 0.56;
+  const double lambda = 3.313;
+  const double n_pli  = 0.3568; 
+  vismodel = new ViscosityModel_Carreau( mu_inf, mu_0, lambda, n_pli );
+
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
   if( locwbc->get_wall_model_type() == 0 )
   {
     locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-      tm_galpha_ptr, elementv->get_nLocBas(),
+      vismodel, tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+      fluid_density, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
   }
   else if( locwbc->get_wall_model_type() == 1 )
   {
     locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-      tm_galpha_ptr, elementv->get_nLocBas(),
+      vismodel, tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+      fluid_density, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
   }
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
@@ -595,6 +606,7 @@ int main(int argc, char *argv[])
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
   delete lsolver; delete nsolver; delete tsolver;
+  delete vismodel;
 
   PetscFinalize();
   return EXIT_SUCCESS;

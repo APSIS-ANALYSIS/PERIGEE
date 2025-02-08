@@ -1,13 +1,13 @@
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 
 PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
+        IViscosityModel * const &in_vismodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
+        const int &in_snlocbas, const double &in_rho,
         const double &in_beta, const FEType &elemtype, 
         const double &in_ct, const double &in_ctauc )
-: rho0( in_rho ), vis_mu( in_vis_mu ),
+: rho0( in_rho ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
   CI( (elemtype == FEType::Tet4 || elemtype == FEType::Hex8) ? 36.0 : 60.0 ),
@@ -16,7 +16,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
   coef( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
   mm( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
-                                             std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
+                                             std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} ),
+  vismodel( in_vismodel )                                          
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -55,8 +56,8 @@ void PLocAssem_VMS_NS_GenAlpha::print_info() const
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
-  SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
-  SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
+  // SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
+  // SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
   SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
   SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
   SYS_T::commPrint("  Scaling factor for tau_C = %e \n", Ctauc);
@@ -91,7 +92,8 @@ SymmTensor2_3D PLocAssem_VMS_NS_GenAlpha::get_metric(
 
 std::array<double, 2> PLocAssem_VMS_NS_GenAlpha::get_tau(
     const double &dt, const std::array<double, 9> &dxi_dx,
-    const double &u, const double &v, const double &w ) const
+    const double &u, const double &v, const double &w,
+    const double &vis_mu ) const
 {
   const SymmTensor2_3D G = get_metric( dxi_dx );
 
@@ -132,8 +134,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const IQuadPts * const &quad )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const double two_mu = 2.0 * vis_mu;
 
   const double curr = time + alpha_f * dt;
 
@@ -202,10 +202,16 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
+    // Get the viscosity
+    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
+
+    const double vis_mu = vismodel->get_mu( grad_velo );
+    const double two_mu = 2.0 * vis_mu;
+
     // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w, vis_mu );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -303,8 +309,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double two_mu = 2.0 * vis_mu;
-
   const double rho0_2 = rho0 * rho0;
 
   const double curr = time + alpha_f * dt;
@@ -376,9 +380,16 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
+    // Get the viscosity
+    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
+
+    const double vis_mu = vismodel->get_mu( grad_velo );
+    const double two_mu = 2.0 * vis_mu;
+
+    // Get the tau_m and tau_c
     const auto dxi_dx = element->get_invJacobian(qua);
 
-    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
+    const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w, vis_mu );
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
@@ -665,8 +676,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double two_mu = 2.0 * vis_mu;
-
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
@@ -709,6 +718,12 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
+
+    // Get the viscosity
+    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
+
+    const double vis_mu = vismodel->get_mu( grad_velo );
+    const double two_mu = 2.0 * vis_mu;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 

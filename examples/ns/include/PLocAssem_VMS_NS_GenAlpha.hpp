@@ -18,11 +18,11 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 {
   public:
     PLocAssem_VMS_NS_GenAlpha(
+        IViscosityModel * const &in_vismodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
-        const double &in_vis_mu, const double &in_beta,
-        const FEType &elemtype,
+        const double &in_beta, const FEType &elemtype,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
     virtual ~PLocAssem_VMS_NS_GenAlpha();
@@ -141,7 +141,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
   protected:
     // Private data
-    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
+    const double rho0, alpha_f, alpha_m, gamma, beta;
 
     const double CI, CT; // Constants for stabilization parameters
     
@@ -158,6 +158,9 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     const double coef;
     const std::array<double, 9> mm; 
 
+    // viscosity for general fluid models
+    IViscosityModel * vismodel;
+
     // Private functions
     virtual void print_info() const;
 
@@ -166,7 +169,8 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Return tau_m and tau_c in RB-VMS
     std::array<double, 2> get_tau( const double &dt, 
         const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
+        const double &u, const double &v, const double &w,
+        const double &vis_mu ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
