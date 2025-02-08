@@ -55,22 +55,6 @@ void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-// double ViscosityModel_Carreau::get_mu( const double &D_xx, const double &D_yy,
-//                                        const double &D_zz, const double &D_yz,
-//                                        const double &D_xz, const double &D_xy ) const
-// {
-//   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy);
-//   const double DII = D.MatContraction( D );
-//   const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
-//   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) * 0.5 );
-// }
-
-// double ViscosityModel_Carreau::get_mu( const Matrix_3x3 &grad_velo ) const
-// {
-//   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-//   return get_mu( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
-// }
-
 double ViscosityModel_Carreau::get_mu( const Tensor2_3D &grad_velo ) const
 {
   const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );  
@@ -79,40 +63,10 @@ double ViscosityModel_Carreau::get_mu( const Tensor2_3D &grad_velo ) const
   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) * 0.5 );
 }
 
-// double ViscosityModel_Carreau::get_dmu_dI1( const double &D_xx,
-//                         const double &D_yy, const double &D_zz ) const
-// {
-//   return 0.0;
-// }
-
-// double ViscosityModel_Carreau::get_dmu_dI1( const Matrix_3x3 &grad_velo ) const
-// {
-//   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-//   return get_dmu_dI1( D.xx(), D.yy(), D.zz() );
-// }
-
 double ViscosityModel_Carreau::get_dmu_dI1( const Tensor2_3D &grad_velo ) const
 {
   return 0.0;
 }
-
-// double ViscosityModel_Carreau::get_dmu_dI2( const double &D_xx,
-//     const double &D_yy, const double &D_zz, const double &D_yz,
-//     const double &D_xz, const double &D_xy ) const
-// {
-//   const SymmMatrix_3x3 D( D_xx, D_yy, D_zz, D_yz, D_xz, D_xy );
-//   const double DII = D.MatContraction( D );
-//   const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
-//   const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * lambda 
-//                             * std::pow( pow_base, ( n_pli - 3.0 ) * 0.5 );
-//   return dmu_dvelo;
-// }
-
-// double ViscosityModel_Carreau::get_dmu_dI2( const Matrix_3x3 &grad_velo ) const
-// {
-//   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-//   return get_dmu_dI2( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
-// }
 
 double ViscosityModel_Carreau::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
 {
@@ -123,19 +77,6 @@ double ViscosityModel_Carreau::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
                             * std::pow( pow_base, ( n_pli - 3.0 ) * 0.5 );
   return dmu_dvelo; 
 }
-
-// double ViscosityModel_Carreau::get_dmu_dI3( const double &D_xx,
-//          const double &D_yy, const double &D_zz, const double &D_yz,
-//          const double &D_xz, const double &D_xy ) const
-// {
-//   return 0.0;
-// }
-
-// double ViscosityModel_Carreau::get_dmu_dI3( const Matrix_3x3 &grad_velo ) const
-// {
-//   const SymmMatrix_3x3 D = gen_symm_part( grad_velo );
-//   return get_dmu_dI3( D.xx(), D.yy(), D.zz(), D.yz(), D.xz(), D.xy() );
-// }
 
 double ViscosityModel_Carreau::get_dmu_dI3( const Tensor2_3D &grad_velo ) const
 {
