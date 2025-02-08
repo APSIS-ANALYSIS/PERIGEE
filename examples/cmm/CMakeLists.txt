@@ -68,10 +68,12 @@ SET( perigee_preprocess_lib_src
 
 SET( perigee_analysis_lib_src
   ${perigee_source}/System/PETSc_Tools.cpp
-  ${perigee_source}/System/Matrix_3x3.cpp
+  # ${perigee_source}/System/Matrix_3x3.cpp
+  ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/Matrix_double_6by6_Array.cpp
   ${perigee_source}/System/Matrix_PETSc.cpp
-  ${perigee_source}/System/SymmMatrix_3x3.cpp
+  # ${perigee_source}/System/SymmMatrix_3x3.cpp
+  ${perigee_source}/System/SymmTensor2_3D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Tet.cpp
   ${perigee_source}/Analysis_Tool/AGlobal_Mesh_Info_FEM_3D.cpp
   ${perigee_source}/Analysis_Tool/APart_Basic_Info.cpp
@@ -115,14 +117,14 @@ SET( perigee_analysis_lib_src
 )
 
 SET( perigee_postprocess_lib_src
-  ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
-  ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
+  # ${perigee_source}/Mesh/QuadPts_vis_tri6.cpp
+  # ${perigee_source}/Mesh/QuadPts_vis_tet4.cpp
+  # ${perigee_source}/Mesh/QuadPts_vis_tet10_v2.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
-  ${perigee_SOURCE_DIR}/src/VisDataPrep_CMM.cpp
-  ${perigee_SOURCE_DIR}/src/VTK_Writer_CMM.cpp
+  # ${perigee_SOURCE_DIR}/src/VisDataPrep_CMM.cpp
+  # ${perigee_SOURCE_DIR}/src/VTK_Writer_CMM.cpp
   )
 
 #SET( perigee_test_lib_src
@@ -158,28 +160,28 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
-ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
-ADD_EXECUTABLE( preprocess3d  preprocess_tets.cpp)
-ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
+# ADD_EXECUTABLE( gmsh_p1_IO    gmsh_p1_process.cpp )
+# ADD_EXECUTABLE( gmsh_p2_IO    gmsh_p2_process.cpp )
+# ADD_EXECUTABLE( preprocess3d  preprocess_tets.cpp)
+# ADD_EXECUTABLE( wall_solver   wall_solver.cpp)
 ADD_EXECUTABLE( cmm_tet_3d    cmm_driver.cpp)
-ADD_EXECUTABLE( prepost       prepost_tets.cpp)
-ADD_EXECUTABLE( vis_cmm       vis_cmm.cpp)
-ADD_EXECUTABLE( vis_p1_wss    vis_p1_wss.cpp)
-ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
+# ADD_EXECUTABLE( prepost       prepost_tets.cpp)
+# ADD_EXECUTABLE( vis_cmm       vis_cmm.cpp)
+# ADD_EXECUTABLE( vis_p1_wss    vis_p1_wss.cpp)
+# ADD_EXECUTABLE( vis_p2_wss    vis_p2_wss.cpp)
 
 #ADD_EXECUTABLE( test test.cpp )
 #ADD_EXECUTABLE( test_element  test_membrane_element_routine.cpp )
 
-TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
-TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
-TARGET_LINK_LIBRARIES( preprocess3d  perigee_preprocess )
+# TARGET_LINK_LIBRARIES( gmsh_p1_IO    perigee_preprocess )
+# TARGET_LINK_LIBRARIES( gmsh_p2_IO    perigee_preprocess )
+# TARGET_LINK_LIBRARIES( preprocess3d  perigee_preprocess )
 TARGET_LINK_LIBRARIES( cmm_tet_3d    perigee_analysis )
-TARGET_LINK_LIBRARIES( wall_solver   perigee_analysis )
-TARGET_LINK_LIBRARIES( prepost       perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_cmm       perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
+# TARGET_LINK_LIBRARIES( wall_solver   perigee_analysis )
+# TARGET_LINK_LIBRARIES( prepost       perigee_preprocess )
+# TARGET_LINK_LIBRARIES( vis_cmm       perigee_postprocess )
+# TARGET_LINK_LIBRARIES( vis_p1_wss    perigee_postprocess )
+# TARGET_LINK_LIBRARIES( vis_p2_wss    perigee_postprocess )
 
 #TARGET_LINK_LIBRARIES( test perigee_preprocess )
 #TARGET_LINK_LIBRARIES( test_element  perigee_test )

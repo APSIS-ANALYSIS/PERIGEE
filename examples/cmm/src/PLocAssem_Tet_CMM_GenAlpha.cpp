@@ -289,10 +289,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Residual(
     }
 
     // Get the viscosity
-    const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
-                                          0.5 * ( v_z + w_y ), 
-                                          0.5 * ( u_z + w_x ), 
-                                          0.5 * ( u_y + v_x ) );
+    // const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
+    //                                       0.5 * ( v_z + w_y ), 
+    //                                       0.5 * ( u_z + w_x ), 
+    //                                       0.5 * ( u_y + v_x ) );
+
+    // Get the viscosity
+    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
+
+    const double vis_mu = vismodel->get_mu( grad_velo );
     const double two_mu = 2.0 * vis_mu;
 
     // Get the tau_m and tau_c
@@ -468,17 +473,25 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Tangent_Residual(
     }
 
     // Get the viscosity
-    const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
-                                          0.5 * ( v_z + w_y ), 
-                                          0.5 * ( u_z + w_x ), 
-                                          0.5 * ( u_y + v_x ) );
+    // const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
+    //                                       0.5 * ( v_z + w_y ), 
+    //                                       0.5 * ( u_z + w_x ), 
+    //                                       0.5 * ( u_y + v_x ) );
+
+    // Get the viscosity
+    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
+
+    const double vis_mu = vismodel->get_mu( grad_velo );
     const double two_mu = 2.0 * vis_mu;
 
     // Get dmu_dI2
-    const double dmu_dI2 = vismodel->get_dmu_dI2( u_x, v_y, w_z,
-                                                0.5 * ( v_z + w_y ), 
-                                                0.5 * ( u_z + w_x ), 
-                                                0.5 * ( u_y + v_x ) );
+    // const double dmu_dI2 = vismodel->get_dmu_dI2( u_x, v_y, w_z,
+    //                                             0.5 * ( v_z + w_y ), 
+    //                                             0.5 * ( u_z + w_x ), 
+    //                                             0.5 * ( u_y + v_x ) );
+
+    // Get dmu_dI2
+    const double dmu_dI2 = vismodel->get_dmu_dI2( grad_velo );
 
     get_tau(tau_m, tau_c, dt, dxi_dx, u, v, w, vis_mu);
 
@@ -822,10 +835,15 @@ void PLocAssem_Tet_CMM_GenAlpha::Assem_Mass_Residual(
     }
 
     // Get the viscosity
-    const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
-                                          0.5 * ( v_z + w_y ), 
-                                          0.5 * ( u_z + w_x ), 
-                                          0.5 * ( u_y + v_x ) );
+    // const double vis_mu = vismodel->get_mu( u_x, v_y, w_z,
+    //                                       0.5 * ( v_z + w_y ), 
+    //                                       0.5 * ( u_z + w_x ), 
+    //                                       0.5 * ( u_y + v_x ) );
+
+    // Get the viscosity
+    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
+
+    const double vis_mu = vismodel->get_mu( grad_velo );
     const double two_mu = 2.0 * vis_mu;
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
