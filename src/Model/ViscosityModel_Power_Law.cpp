@@ -5,25 +5,6 @@ ViscosityModel_Power_Law::ViscosityModel_Power_Law( const double &in_m_cons,
 : m_cons( in_m_cons ), n_pli( in_n_pli )
 {}
 
-ViscosityModel_Power_Law::ViscosityModel_Power_Law( const char * const &fname )
-{
-	hid_t h5file = H5Fopen( fname, H5F_ACC_RDONLY, H5P_DEFAULT);
-
-	HDF5_Reader * h5r = new HDF5_Reader( h5file );
-
-	SYS_T::print_fatal_if( h5r->read_string("/", "model_name") != get_model_name(),
-			"Error: ViscosityModel_Power_Law constructor does not match h5 file.\n");
-
-	m_cons = h5r -> read_doubleScalar("/", "m_cons");
-	n_pli  = h5r -> read_doubleScalar("/", "n_pli");
-
-	delete h5r;
-	H5Fclose(h5file);
-}
-
-ViscosityModel_Power_Law::~ViscosityModel_Power_Law()
-{}
-
 void ViscosityModel_Power_Law::print_info() const
 {
   SYS_T::commPrint("\t  ViscosityModel_Power_Law:: \n");

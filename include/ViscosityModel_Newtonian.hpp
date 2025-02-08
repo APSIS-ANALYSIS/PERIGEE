@@ -14,8 +14,6 @@ class ViscosityModel_Newtonian : public IViscosityModel
 
     ViscosityModel_Newtonian( const double &in_mu );
 
-    ViscosityModel_Newtonian( const char * const &fname = "viscosity_model.h5");
-
     virtual ~ViscosityModel_Newtonian() = default;
 
     virtual void print_info() const;
