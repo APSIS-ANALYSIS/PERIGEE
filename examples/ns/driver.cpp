@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
 
   // fluid properties
   double fluid_density = 1.065;
-  // double fluid_mu = 3.5e-2;
+  double fluid_mu = 3.5e-2;
   double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
   double c_ct = 4.0; // C_T parameter for defining tau_M
 
@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
-  // SYS_T::GetOptionReal("-fl_mu", fluid_mu);
+  SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
   SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
-  // SYS_T::cmdPrint("-fl_mu:", fluid_mu);
+  SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
 
@@ -375,6 +375,9 @@ int main(int argc, char *argv[])
   const double lambda = 3.313;
   const double n_pli  = 0.3568; 
   vismodel = new ViscosityModel_Carreau( mu_inf, mu_0, lambda, n_pli );
+
+  // ===== Generate a Newtonian viscosity model =====
+  // vismodel = new ViscosityModel_Newtonian( fluid_mu );
 
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
