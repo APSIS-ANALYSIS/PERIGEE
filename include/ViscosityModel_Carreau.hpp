@@ -14,10 +14,8 @@ class ViscosityModel_Carreau : public IViscosityModel
 
     ViscosityModel_Carreau( const double &in_mu_inf, const double &in_mu_0,
                             const double &in_lambda, const double &in_n_pli );
-
-    ViscosityModel_Carreau( const char * const &fname = "viscosity_model.h5");
-
-    virtual ~ViscosityModel_Carreau();
+                            
+    virtual ~ViscosityModel_Carreau() = default;
     
     virtual void print_info() const;
 
@@ -26,16 +24,14 @@ class ViscosityModel_Carreau : public IViscosityModel
       const std::string mname = "Carreau";
       return mname;
     }
-
-    virtual void write_hdf5( const char * const &fname = "viscosity_model.h5" ) const;
     
-    virtual double get_mu( const Tensor2_3D &grad_velo ) const;
+    virtual double get_mu( const SymmTensor2_3D &strain_rate ) const;
 
-    virtual double get_dmu_dI1( const Tensor2_3D &grad_velo ) const;
+    virtual double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const;
 
-    virtual double get_dmu_dI2( const Tensor2_3D &grad_velo ) const;
+    virtual double get_dmu_dI2( const SymmTensor2_3D &strain_rate ) const;
 
-    virtual double get_dmu_dI3( const Tensor2_3D &grad_velo ) const;
+    virtual double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const;
 
     private:
     // ----------------------------------------------------------------------------

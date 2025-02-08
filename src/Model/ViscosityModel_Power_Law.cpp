@@ -31,47 +31,27 @@ void ViscosityModel_Power_Law::print_info() const
   SYS_T::commPrint("\t  Power Law Index   n_pli   = %e \n", n_pli);
 }
 
-void ViscosityModel_Power_Law::write_hdf5( const char * const &fname ) const
+double ViscosityModel_Power_Law::get_mu( const SymmTensor2_3D &strain_rate ) const
 {
-  if( SYS_T::get_MPI_rank() == 0 )
-  {
-    hid_t file_id = H5Fcreate( fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-    HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-    h5w -> write_string("model_name", get_model_name());
-    h5w -> write_doubleScalar( "m_cons", m_cons);
-    h5w -> write_doubleScalar( "n_pli",  n_pli);
-
-    delete h5w;
-    H5Fclose(file_id);
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
+  const double strain_rate_II = strain_rate.MatContraction( strain_rate );
+  return m_cons * std::pow( std::sqrt( 2.0 * strain_rate_II ), n_pli - 1.0 ); 
 }
 
-double ViscosityModel_Power_Law::get_mu( const Tensor2_3D &grad_velo ) const
-{
-  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );
-  const double DII = D.MatContraction( D );
-  return m_cons * std::pow( std::sqrt( 2.0 * DII ), n_pli - 1.0 ); 
-}
-
-double ViscosityModel_Power_Law::get_dmu_dI1( const Tensor2_3D &grad_velo ) const
+double ViscosityModel_Power_Law::get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const
 {
   return 0.0;
 }
 
-double ViscosityModel_Power_Law::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
+double ViscosityModel_Power_Law::get_dmu_dI2( const SymmTensor2_3D &strain_rate ) const
 {
-  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );
-  const double DII = D.MatContraction( D );
+  const double strain_rate_II = strain_rate.MatContraction( strain_rate );
   const double dmu_dvelo = m_cons * ( n_pli - 1.0) * 
-                           std::pow( std::sqrt( 2.0 * DII ), n_pli - 2.0 ) /
-                           std::sqrt( 2.0 * DII );
+                           std::pow( std::sqrt( 2.0 * strain_rate_II ), n_pli - 2.0 ) /
+                           std::sqrt( 2.0 * strain_rate_II );
   return dmu_dvelo;   
 }
 
-double ViscosityModel_Power_Law::get_dmu_dI3( const Tensor2_3D &grad_velo ) const
+double ViscosityModel_Power_Law::get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const
 {
   return 0.0;    
 }

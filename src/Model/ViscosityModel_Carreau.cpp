@@ -35,50 +35,28 @@ void ViscosityModel_Carreau::print_info() const
   SYS_T::commPrint("\t  Power Law Index          n_pli   = %e \n", n_pli);
 }
 
-void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
+double ViscosityModel_Carreau::get_mu( const SymmTensor2_3D &strain_rate ) const
 {
-  if( SYS_T::get_MPI_rank() == 0 )
-  {
-    hid_t file_id = H5Fcreate( fname, H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-    HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-    h5w -> write_string("model_name", get_model_name());
-    h5w -> write_doubleScalar( "mu_inf", mu_inf);
-    h5w -> write_doubleScalar( "mu_0", mu_0);
-    h5w -> write_doubleScalar( "lambda", lambda);
-    h5w -> write_doubleScalar( "n_pli", n_pli);
-
-    delete h5w;
-    H5Fclose(file_id);
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
-}
-
-double ViscosityModel_Carreau::get_mu( const Tensor2_3D &grad_velo ) const
-{
-  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );  
-  const double DII = D.MatContraction( D );
-  const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
+  const double strain_rate_II = strain_rate.MatContraction( strain_rate );
+  const double pow_base = 1.0 + lambda * lambda * 2.0 * strain_rate_II;
   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) * 0.5 );
 }
 
-double ViscosityModel_Carreau::get_dmu_dI1( const Tensor2_3D &grad_velo ) const
+double ViscosityModel_Carreau::get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const
 {
   return 0.0;
 }
 
-double ViscosityModel_Carreau::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
+double ViscosityModel_Carreau::get_dmu_dI2( const SymmTensor2_3D &strain_rate ) const
 {
-  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );    
-  const double DII = D.MatContraction( D );
-  const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
+  const double strain_rate_II = strain_rate.MatContraction( strain_rate );
+  const double pow_base = 1.0 + lambda * lambda * 2.0 * strain_rate_II;
   const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * lambda 
                             * std::pow( pow_base, ( n_pli - 3.0 ) * 0.5 );
   return dmu_dvelo;
 }
 
-double ViscosityModel_Carreau::get_dmu_dI3( const Tensor2_3D &grad_velo ) const
+double ViscosityModel_Carreau::get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const
 {
   return 0.0;
 }

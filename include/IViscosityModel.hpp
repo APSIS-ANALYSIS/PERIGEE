@@ -31,13 +31,13 @@ class IViscosityModel
       SYS_T::commPrint("Warning: IViscosityModel::write_hdf5() is not implemented. \n");
     }
 
-    virtual double get_mu( const Tensor2_3D &grad_velo ) const = 0;
+    virtual double get_mu( const SymmTensor2_3D &strain_rate ) const = 0;
 
-    virtual double get_dmu_dI1( const Tensor2_3D &grad_velo ) const = 0;
+    virtual double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const = 0;
 
-    virtual double get_dmu_dI2( const Tensor2_3D &grad_velo ) const = 0;
+    virtual double get_dmu_dI2( const SymmTensor2_3D &strain_rate ) const = 0;
 
-    virtual double get_dmu_dI3( const Tensor2_3D &grad_velo ) const = 0;
+    virtual double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const = 0;
 };
 
 #endif

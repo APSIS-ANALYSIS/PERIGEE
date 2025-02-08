@@ -16,7 +16,7 @@ class ViscosityModel_Newtonian : public IViscosityModel
 
     ViscosityModel_Newtonian( const char * const &fname = "viscosity_model.h5");
 
-    virtual ~ViscosityModel_Newtonian();
+    virtual ~ViscosityModel_Newtonian() = default;
 
     virtual void print_info() const;
 
@@ -26,24 +26,22 @@ class ViscosityModel_Newtonian : public IViscosityModel
       return mname;
     }
 
-    virtual void write_hdf5( const char * const &fname = "viscosity_model.h5" ) const;
-
-    virtual double get_mu( const Tensor2_3D &grad_velo ) const
+    virtual double get_mu( const SymmTensor2_3D &strain_rate ) const
     {
       return mu;
     }
 
-    virtual double get_dmu_dI1( const Tensor2_3D &grad_velo ) const
+    virtual double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const
     {
       return 0.0;
     }
 
-    virtual double get_dmu_dI2( const Tensor2_3D &grad_velo) const
+    virtual double get_dmu_dI2( const SymmTensor2_3D &strain_rate) const
     {
       return 0.0;
     }
 
-    virtual double get_dmu_dI3( const Tensor2_3D &grad_velo ) const
+    virtual double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const
     {
       return 0.0;
     }

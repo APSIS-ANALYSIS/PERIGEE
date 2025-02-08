@@ -14,9 +14,7 @@ class ViscosityModel_Power_Law : public IViscosityModel
     
     ViscosityModel_Power_Law( const double &in_m_cons, const double &in_n_pli );
 
-    ViscosityModel_Power_Law( const char * const &fname = "viscosity_model.h5");
-
-    virtual ~ViscosityModel_Power_Law();
+    virtual ~ViscosityModel_Power_Law() = default;
 
     virtual void print_info() const;
 
@@ -25,16 +23,14 @@ class ViscosityModel_Power_Law : public IViscosityModel
       const std::string mname = "Power Law";
       return mname;
     }
-
-    virtual void write_hdf5( const char * const &fname = "viscosity_model.h5" ) const;
     
-    virtual double get_mu( const Tensor2_3D &grad_velo ) const;
+    virtual double get_mu( const SymmTensor2_3D &strain_rate ) const;
 
-    virtual double get_dmu_dI1( const Tensor2_3D &grad_velo ) const;
+    virtual double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const;
 
-    virtual double get_dmu_dI2( const Tensor2_3D &grad_velo ) const;
+    virtual double get_dmu_dI2( const SymmTensor2_3D &strain_rate ) const;
 
-    virtual double get_dmu_dI3( const Tensor2_3D &grad_velo ) const;
+    virtual double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const;
 
     private:
     // ------------------------------------------------------------------------
