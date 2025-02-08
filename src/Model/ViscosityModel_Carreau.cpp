@@ -73,7 +73,7 @@ void ViscosityModel_Carreau::write_hdf5( const char * const &fname ) const
 
 double ViscosityModel_Carreau::get_mu( const Tensor2_3D &grad_velo ) const
 {
-  const SymmTensor2_3D D = gen_symm_part( grad_velo );  
+  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );  
   const double DII = D.MatContraction( D );
   const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
   return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) * 0.5 );
@@ -116,7 +116,7 @@ double ViscosityModel_Carreau::get_dmu_dI1( const Tensor2_3D &grad_velo ) const
 
 double ViscosityModel_Carreau::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
 {
-  const SymmTensor2_3D D = gen_symm_part( grad_velo );    
+  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );    
   const double DII = D.MatContraction( D );
   const double pow_base = 1.0 + lambda * lambda * 2.0 * DII;
   const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * lambda 

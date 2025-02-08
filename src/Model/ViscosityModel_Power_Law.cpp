@@ -66,7 +66,7 @@ void ViscosityModel_Power_Law::write_hdf5( const char * const &fname ) const
 
 double ViscosityModel_Power_Law::get_mu( const Tensor2_3D &grad_velo ) const
 {
-  const SymmTensor2_3D D = gen_symm_part( grad_velo );
+  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );
   const double DII = D.MatContraction( D );
   return m_cons * std::pow( std::sqrt( 2.0 * DII ), n_pli - 1.0 ); 
 }
@@ -108,7 +108,7 @@ double ViscosityModel_Power_Law::get_dmu_dI1( const Tensor2_3D &grad_velo ) cons
 
 double ViscosityModel_Power_Law::get_dmu_dI2( const Tensor2_3D &grad_velo ) const
 {
-  const SymmTensor2_3D D = gen_symm_part( grad_velo );
+  const SymmTensor2_3D D = STen2::gen_symm_part( grad_velo );
   const double DII = D.MatContraction( D );
   const double dmu_dvelo = m_cons * ( n_pli - 1.0) * 
                            std::pow( std::sqrt( 2.0 * DII ), n_pli - 2.0 ) /
