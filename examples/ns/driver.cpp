@@ -34,9 +34,6 @@
 #include "GenBC_Inductance.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
-#include "ViscosityModel_Carreau.hpp"
-#include "ViscosityModel_Newtonian.hpp"
-#include "ViscosityModel_Power_Law.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
@@ -227,7 +224,7 @@ int main(int argc, char *argv[])
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
-    // cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
+    cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
@@ -368,32 +365,21 @@ int main(int argc, char *argv[])
 
   tm_galpha_ptr->print_info();
 
-  // ===== Generate a Carreau viscosity model =====
-  IViscosityModel * vismodel = nullptr;
-  const double mu_inf = 0.0345;
-  const double mu_0   = 0.56;
-  const double lambda = 3.313;
-  const double n_pli  = 0.3568; 
-  vismodel = new ViscosityModel_Carreau( mu_inf, mu_0, lambda, n_pli );
-
-  // ===== Generate a Newtonian viscosity model =====
-  // vismodel = new ViscosityModel_Newtonian( fluid_mu );
-
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
   if( locwbc->get_wall_model_type() == 0 )
   {
     locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-      vismodel, tm_galpha_ptr, elementv->get_nLocBas(),
+      tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
   }
   else if( locwbc->get_wall_model_type() == 1 )
   {
     locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-      vismodel, tm_galpha_ptr, elementv->get_nLocBas(),
+      tm_galpha_ptr, elementv->get_nLocBas(),
       quadv->get_num_quadPts(), elements->get_nLocBas(),
-      fluid_density, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
+      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
   }
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
@@ -609,7 +595,6 @@ int main(int argc, char *argv[])
   delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
   delete lsolver; delete nsolver; delete tsolver;
-  delete vismodel;
 
   PetscFinalize();
   return EXIT_SUCCESS;

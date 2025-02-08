@@ -16,11 +16,11 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
 {
   public:
     PLocAssem_VMS_NS_GenAlpha_WeakBC(
-        IViscosityModel * const &in_vismodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
         const int &in_snlocbas, const double &in_rho, 
-        const double &in_beta, const FEType &elemtype,
+        const double &in_vis_mu, const double &in_beta,
+        const FEType &elemtype,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0,
         const double &in_C_bI = 4.0 );
 

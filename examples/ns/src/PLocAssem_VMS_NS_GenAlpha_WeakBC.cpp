@@ -1,15 +1,15 @@
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 
 PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
-        IViscosityModel * const &in_vismodel,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
         const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas, const double &in_rho,
+        const int &in_snlocbas,
+        const double &in_rho, const double &in_vis_mu,
         const double &in_beta, const FEType &elemtype, 
         const double &in_ct, const double &in_ctauc,
         const double &in_C_bI )
-: PLocAssem_VMS_NS_GenAlpha(in_vismodel, tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
-  in_rho, in_beta, elemtype, in_ct, in_ctauc), C_bI(in_C_bI)
+: PLocAssem_VMS_NS_GenAlpha(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
+  in_rho, in_vis_mu, in_beta, elemtype, in_ct, in_ctauc), C_bI(in_C_bI)
 { }
 
 void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
@@ -28,8 +28,8 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
-  // SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
-  // SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
+  SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
+  SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
   SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
   SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
   SYS_T::commPrint("  Scaling factor for tau_C = %e \n", Ctauc);
@@ -105,11 +105,6 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    // Get the viscosity
-    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
-
-    const double vis_mu = vismodel->get_mu( grad_velo );
-    
     const Vector_3 u_vec (u, v, w);
     const double u_dot_n = u_vec.dot_product(n_out);
     const double inflow_factor = ( u_dot_n < 0.0 ? u_dot_n : 0.0 );
@@ -232,11 +227,6 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
       coor.y() += eleCtrlPts_y[ii] * R[ii];
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
-
-    // Get the viscosity
-    const Tensor2_3D grad_velo( u_x, u_y, u_z, v_x, v_y, v_z, w_x, w_y, w_z );
-
-    const double vis_mu = vismodel->get_mu( grad_velo );
 
     const Vector_3 u_vec (u, v, w);
     const double u_dot_n = u_vec.dot_product(n_out);
