@@ -56,7 +56,7 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const double &in_thred_time,
   std::vector<int> num_of_mode;
   std::vector<double> w, period;
 
-  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
+  if( bc_type.compare("Linear") == 0 || bc_type.compare("LINEAR") == 0 || bc_type.compare("linear") == 0 )
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);

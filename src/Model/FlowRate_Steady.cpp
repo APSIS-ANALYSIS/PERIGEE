@@ -31,7 +31,7 @@ FlowRate_Steady::FlowRate_Steady( const std::string &filename )
   std::vector<int> num_of_mode;
   std::vector<double> w, period;
 
-  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
+  if( bc_type.compare("Steady") == 0 || bc_type.compare("STEADY") == 0 || bc_type.compare("steady") == 0 )
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);

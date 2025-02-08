@@ -1,33 +1,8 @@
 #include "FlowRate_Cosine2Steady.hpp"
 
-FlowRate_Cosine2Steady::FlowRate_Cosine2Steady(
-    const int &input_num_nbc, const double &in_thred_time, 
-    const double &flrate, const double &in_TI_std_dev )
-: num_nbc(input_num_nbc), thred_time(in_thred_time), 
-  TI_std_dev( in_TI_std_dev )
-{
-  target_flow_rate.resize( num_nbc );
-  for(int ii=0; ii<num_nbc; ++ii) target_flow_rate[ii] = flrate;
-
-  // Calculate flow rate and record in txt file 
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    if( SYS_T::get_MPI_rank() == 0 )
-    {
-      std::ofstream ofile;
-      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for( double tt = 0; tt <= thred_time * 2.0; tt += 0.001 )
-        ofile<<tt<<'\t'<<get_flow_rate(nbc_id, tt)<<'\n';
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
-}
-
 FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time, 
-    const double &in_TI_std_dev, const std::string &filename )
-: thred_time( in_thred_time ), TI_std_dev( in_TI_std_dev )
+  const std::string &filename )
+: thred_time( in_thred_time )
 {
   SYS_T::commPrint("FlowRate_Cosine2Steady: data read from %s \n", filename.c_str() );
 
@@ -58,10 +33,20 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time,
   std::vector<int> num_of_mode;
   std::vector<double> w, period;
 
-  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
+  if( bc_type.compare("Cosine") == 0 || bc_type.compare("COSINE") == 0 || bc_type.compare("cosine") == 0 )
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
+
+    // default start value = 0
+    start_flow_rate.resize(num_nbc);
+    for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+      start_flow_rate[nbc_id] = 0.0;
+
+    // default TI_std_dev = 0
+    TI_std_dev.resize(num_nbc);
+    for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+      TI_std_dev[nbc_id] = 0.0;
   }
   else
     SYS_T::print_fatal("FlowRate_Cosine2Steady Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
@@ -83,6 +68,9 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time,
         sstrm >> num_of_mode[nbc_id];
         sstrm >> w[nbc_id];
         sstrm >> period[nbc_id];
+
+        sstrm >> start_flow_rate[nbc_id];
+        sstrm >> TI_std_dev[nbc_id];
 
         sstrm.clear();
         break;
@@ -166,7 +154,7 @@ double FlowRate_Cosine2Steady::get_flow_rate( const int &nbc_id,
   double out_rate = target_flow_rate[nbc_id];
 
   if( time < thred_time && time >= 0.0 ) 
-    out_rate = 0.5 * target_flow_rate[nbc_id] * (1 -  std::cos(MATH_T::PI * time / thred_time));
+    out_rate = start_flow_rate[nbc_id] + 0.5 * target_flow_rate[nbc_id] * (1 -  std::cos(MATH_T::PI * time / thred_time));
 
   return out_rate;
 }

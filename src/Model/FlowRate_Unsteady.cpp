@@ -27,7 +27,7 @@ FlowRate_Unsteady::FlowRate_Unsteady( const std::string &filename )
     }
   }
 
-  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
+  if( bc_type.compare("Unsteady") == 0 || bc_type.compare("UNSTEADY") == 0 || bc_type.compare("unsteady") == 0 )
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);

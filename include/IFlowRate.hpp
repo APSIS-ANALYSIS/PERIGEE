@@ -27,6 +27,8 @@ class IFlowRate
     // deviation
     virtual double get_flow_TI_std_dev( const int &nbc_id ) const { return 0.0; }
 
+    virtual double get_start_flow_rate( const int &nbc_id ) const { return 0.0; }
+
     virtual int get_num_nbc() const = 0;
 
     virtual void print_info() const = 0;
