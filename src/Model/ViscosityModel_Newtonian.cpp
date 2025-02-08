@@ -9,3 +9,5 @@ void ViscosityModel_Newtonian::print_info() const
   SYS_T::commPrint("\t  ViscosityModel_Newtonian:: \n");
   SYS_T::commPrint("\t  Viscosity mu = %e \n", mu);
 }
+
+// EOF
