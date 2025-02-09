@@ -15,6 +15,8 @@ class ALocal_WeakBC
   public:
     ALocal_WeakBC( const std::string &fileBaseName, const int &cpu_rank );
 
+    ALocal_WeakBC( const HDF5_Reader * const &h5r );
+
     virtual ~ALocal_WeakBC() = default;
 
     // Get the type of weak enforced Dirichlet BC

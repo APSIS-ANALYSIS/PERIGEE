@@ -17,6 +17,8 @@ class ALocal_InflowBC
   public:
     ALocal_InflowBC( const std::string &fileBaseName, const int &cpu_rank );
 
+    ALocal_InflowBC( const HDF5_Reader * const &h5r );
+
     virtual ~ALocal_InflowBC() = default;
 
     // ------------------------------------------------------------------------

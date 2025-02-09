@@ -1,17 +1,26 @@
 #include "PLocAssem_Elastodynamics_GenAlpha.hpp"
 
 PLocAssem_Elastodynamics_GenAlpha::PLocAssem_Elastodynamics_GenAlpha(
+    const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const double &in_rho, const double &in_module_E, const double &in_nu,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nlocbas, const int &in_snlocbas, 
     const int &in_num_ebc_fun )
-: rho( in_rho ), module_E( in_module_E ), nu( in_nu ),
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
+  elementv( ElementFactory::createVolElement(elemType, nqpv) ),
+  elements( ElementFactory::createSurElement(elemType, nqps) ),
+  quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
+  quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
+  rho( in_rho ), module_E( in_module_E ), nu( in_nu ),
   lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
   mu( 0.5 * in_module_E / (1.0 + in_nu) ),
-  alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-  gamma(tm_gAlpha->get_gamma()), num_ebc_fun( in_num_ebc_fun ),
-  nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-  vec_size( 3 * in_nlocbas ), sur_size( 3 * in_snlocbas )
+  alpha_f(tm_gAlpha->get_alpha_f()),
+  alpha_m(tm_gAlpha->get_alpha_m()),
+  gamma(tm_gAlpha->get_gamma()),
+  num_ebc_fun( in_num_ebc_fun ),
+  nLocBas( elementv->get_nLocBas() ),
+  snLocBas( elements->get_nLocBas() ),
+  vec_size( 3 * nLocBas ),
+  sur_size( 3 * snLocBas )
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -44,15 +53,7 @@ void PLocAssem_Elastodynamics_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional elastodynamics equation: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 10)
-    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
-  else if(nLocBas == 27)
-    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
+  elementv->print_info();
   SYS_T::commPrint("  Young's modulus: %e \n", module_E);
   SYS_T::commPrint("  Poisson's ratio: %e \n", nu);
   SYS_T::commPrint("  Spatial: finite element \n");
@@ -65,15 +66,11 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol_velo,
     const double * const &sol_disp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  const int nqp = quad -> get_num_quadPts();
-
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
   
   const double curr = time + alpha_f * dt;
 
@@ -83,7 +80,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
     double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
@@ -93,7 +90,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -120,7 +117,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
     
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -153,15 +150,11 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &dot_sol_velo,
     const double * const &sol_disp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  const int nqp = quad -> get_num_quadPts();
-  
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
   
   const double curr = time + alpha_f * dt;
 
@@ -173,7 +166,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
     double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
@@ -183,7 +176,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
     
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
     
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -210,7 +203,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
     
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
     
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -270,15 +263,11 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Tangent_Residual(
 
 void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
     const double * const &sol_disp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
-{
-  const int nqp = quad -> get_num_quadPts();
-  
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+    const double * const &eleCtrlPts_z )
+{ 
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = 0.0;
 
@@ -288,7 +277,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double ux_x = 0.0, ux_y = 0.0, ux_z = 0.0;
     double uy_x = 0.0, uy_y = 0.0, uy_z = 0.0;
@@ -296,7 +285,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -319,7 +308,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -358,26 +347,22 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Mass_Residual(
 void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_sur_Residual();
 
   const double curr = time + alpha_f * dt;
 
-  for(int qua=0; qua < face_nqp; ++qua)
+  for(int qua=0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -390,7 +375,7 @@ void PLocAssem_Elastodynamics_GenAlpha::Assem_Residual_EBC(
 
     const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
 
-    const double gwts = surface_area * quad -> get_qw( qua );
+    const double gwts = surface_area * quads -> get_qw( qua );
 
     for(int A=0; A<snLocBas; ++A)
     {

@@ -31,6 +31,8 @@ class APart_Node_FSI : public APart_Node
   public:
     APart_Node_FSI(const std::string &fileBaseName, const int &rank );
 
+    APart_Node_FSI(const HDF5_Reader * const &h5r);
+
     virtual ~APart_Node_FSI() = default;
 
     virtual void print_info() const;
