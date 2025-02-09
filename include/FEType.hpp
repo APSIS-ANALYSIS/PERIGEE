@@ -99,6 +99,20 @@ namespace FE_T
       default: return 0;
     }
   }
+  
+  // Convert FEType to its number of local basis functions on the element
+  // surfaces. This is only defined for volumetric elements.
+  inline int to_snLocBas(const FEType &type) 
+  {
+    switch (type) 
+    {
+      case FEType::Tet4: return 3;
+      case FEType::Tet10: return 6;
+      case FEType::Hex8: return 4;
+      case FEType::Hex27: return 9;
+      default: return 0;
+    }
+  }
 }
 
 #endif
