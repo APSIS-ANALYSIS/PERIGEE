@@ -97,7 +97,10 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp
+  ${perigee_source}/Model/GenBC_Tools.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
+  ${perigee_source}/Model/GenBC_Pressure.cpp
+  ${perigee_source}/Model/GenBC_Coronary.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
   ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
