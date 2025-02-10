@@ -10,8 +10,6 @@
 class ViscosityModel_Carreau final : public IViscosityModel
 {
   public:
-    ViscosityModel_Carreau() = delete;
-
     ViscosityModel_Carreau( const double &in_mu_inf, const double &in_mu_0,
         const double &in_lambda, const double &in_n_pli ) : mu_inf( in_mu_inf ),
     mu_0( in_mu_0 ), lambda( in_lambda ), n_pli( in_n_pli ) {};
@@ -60,6 +58,8 @@ class ViscosityModel_Carreau final : public IViscosityModel
     //          shear rate
     // ----------------------------------------------------------------------------
     const double mu_inf, mu_0, lambda, n_pli;
+    
+    ViscosityModel_Carreau() = delete;
 };
 
 #endif

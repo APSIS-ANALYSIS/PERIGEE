@@ -10,8 +10,6 @@
 class ViscosityModel_Newtonian final : public IViscosityModel
 {
   public:
-    ViscosityModel_Newtonian() = delete;
-
     ViscosityModel_Newtonian( const double &in_mu ) : mu(in_mu) {};
 
     ~ViscosityModel_Newtonian() override = default;
@@ -52,6 +50,8 @@ class ViscosityModel_Newtonian final : public IViscosityModel
     // mu : viscosity
     // ------------------------------------------------------------------------
     const double mu;
+    
+    ViscosityModel_Newtonian() = delete;
 };
 
 #endif
