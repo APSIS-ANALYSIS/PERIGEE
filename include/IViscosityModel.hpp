@@ -22,9 +22,8 @@ class IViscosityModel
 
     virtual std::string get_model_name() const
     {
-      const std::string output = "unknown";
-      SYS_T::commPrint("Warning: IViscosityModel::get_model_name() is not implemented. \n");
-      return output;
+      SYS_T::commPrint("Warning: IViscosityModel::get_model_name() is not implemented.\n");
+      return "unknown";
     }
 
     virtual double get_mu( const SymmTensor2_3D &strain_rate ) const = 0;
