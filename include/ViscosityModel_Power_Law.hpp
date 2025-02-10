@@ -12,7 +12,7 @@ class ViscosityModel_Power_Law : public IViscosityModel
   public:
     ViscosityModel_Power_Law() = delete;
     
-    ViscosityModel_Power_Law( const double &in_m_cons, const double &in_n_pli );
+    ViscosityModel_Power_Law( const double &in_m_cons, const double &in_n_pli, const double & in_mu_max, const double & in_mu_min );
 
     virtual ~ViscosityModel_Power_Law() = default;
 
@@ -38,6 +38,12 @@ class ViscosityModel_Power_Law : public IViscosityModel
     // n_pli  : an index shows the dependency of viscosity on shear rate
     // ------------------------------------------------------------------------
     double m_cons, n_pli;
+
+    // ------------------------------------------------------------------------
+    // mu_max : maximum viscosity
+    // mu_min : minimum viscosity
+    // ------------------------------------------------------------------------
+    const double mu_max, mu_min;
 };
 
 #endif
