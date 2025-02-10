@@ -12,11 +12,15 @@ class ViscosityModel_Newtonian : public IViscosityModel
   public:
     ViscosityModel_Newtonian() = delete;
 
-    ViscosityModel_Newtonian( const double &in_mu );
+    ViscosityModel_Newtonian( const double &in_mu ) : mu(in_mu) {};
 
     virtual ~ViscosityModel_Newtonian() = default;
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("\t  ViscosityModel_Newtonian:: \n");
+      SYS_T::commPrint("\t  Viscosity mu = %e \n", mu);
+    }
 
     virtual std::string get_model_name() const
     {
@@ -44,11 +48,11 @@ class ViscosityModel_Newtonian : public IViscosityModel
       return 0.0;
     }
 
-    private:
+  private:
     // ------------------------------------------------------------------------
     // mu : viscosity
     // ------------------------------------------------------------------------
-    double mu;
+    const double mu;
 };
 
 #endif

@@ -4,10 +4,11 @@
 // IViscosityModel.hpp
 //
 // Interface for fluid viscosity model (including Newtonian and Non-Newtonian
-// fluid models)
+// fluid models).
+//
+// Authors: Xinhai Yue, Yujie Sun
+// Date: Feb. 10 2025
 // ============================================================================
-#include "HDF5_Writer.hpp"
-#include "HDF5_Reader.hpp"
 #include "SymmTensor2_3D.hpp"
 
 class IViscosityModel
