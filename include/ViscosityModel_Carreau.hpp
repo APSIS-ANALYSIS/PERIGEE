@@ -29,7 +29,7 @@ class ViscosityModel_Carreau final : public IViscosityModel
 
     double get_mu( const SymmTensor2_3D &strain_rate ) const override
     {
-      const double strain_rate_II = strain_rate.MatContraction( strain_rate );
+      const double strain_rate_II = strain_rate.MatContraction();
       const double pow_base = 1.0 + lambda * lambda * 2.0 * strain_rate_II;
       return mu_inf + ( mu_0 - mu_inf ) * std::pow( pow_base, (n_pli - 1.0) * 0.5 );
     }
@@ -39,7 +39,7 @@ class ViscosityModel_Carreau final : public IViscosityModel
 
     double get_dmu_dI2( const SymmTensor2_3D &strain_rate ) const override
     {
-      const double strain_rate_II = strain_rate.MatContraction( strain_rate );
+      const double strain_rate_II = strain_rate.MatContraction();
       const double pow_base = 1.0 + lambda * lambda * 2.0 * strain_rate_II;
       const double dmu_dvelo = ( mu_0 - mu_inf ) * ( n_pli - 1.0 ) * lambda * lambda
         * std::pow( pow_base, ( n_pli - 3.0 ) * 0.5 );
