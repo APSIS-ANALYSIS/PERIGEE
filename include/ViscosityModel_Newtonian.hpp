@@ -14,36 +14,35 @@ class ViscosityModel_Newtonian : public IViscosityModel
 
     ViscosityModel_Newtonian( const double &in_mu ) : mu(in_mu) {};
 
-    virtual ~ViscosityModel_Newtonian() = default;
+    ~ViscosityModel_Newtonian() override = default;
 
-    virtual void print_info() const
+    void print_info() const override
     {
       SYS_T::commPrint("\t  ViscosityModel_Newtonian:: \n");
       SYS_T::commPrint("\t  Viscosity mu = %e \n", mu);
     }
 
-    virtual std::string get_model_name() const
+    std::string get_model_name() const override
     {
-      const std::string mname = "Newtonian";
-      return mname;
+      return "Newtonian";
     }
 
-    virtual double get_mu( const SymmTensor2_3D &strain_rate ) const
+    double get_mu( const SymmTensor2_3D &strain_rate ) const override
     {
       return mu;
     }
 
-    virtual double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const
+    double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const override
     {
       return 0.0;
     }
 
-    virtual double get_dmu_dI2( const SymmTensor2_3D &strain_rate) const
+    double get_dmu_dI2( const SymmTensor2_3D &strain_rate) const override
     {
       return 0.0;
     }
 
-    virtual double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const
+    double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const override
     {
       return 0.0;
     }
