@@ -4,6 +4,10 @@
 // ViscosityModel_Carreau.hpp
 //
 // Interface for Carreau non-Newtonian model
+// Ref. Cho and Kensey, Bioheology, 28:241-262, 1991
+//
+// Auther: Xinhai Yue
+// Email: seavegetableyxh@outlook.com
 // ============================================================================
 #include "IViscosityModel.hpp"
 
