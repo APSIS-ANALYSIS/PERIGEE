@@ -7,8 +7,7 @@
 // Ref. Cho and Kensey, Bioheology, 28:241-262, 1991
 //
 // The method from https://www.simscale.com/docs/simulation-setup/materials/non
-// -newtonian-models/
-// is utilized to resolve the sigularity of this model.
+// -newtonian-models/ is utilized to resolve the sigularity of this model.
 //
 // Auther: Xinhai Yue
 // Email: seavegetableyxh@outlook.com
