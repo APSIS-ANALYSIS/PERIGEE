@@ -7,7 +7,7 @@
 // ============================================================================
 #include "IViscosityModel.hpp"
 
-class ViscosityModel_Newtonian : public IViscosityModel
+class ViscosityModel_Newtonian final : public IViscosityModel
 {
   public:
     ViscosityModel_Newtonian() = delete;

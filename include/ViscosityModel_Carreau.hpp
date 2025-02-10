@@ -7,7 +7,7 @@
 // ============================================================================
 #include "IViscosityModel.hpp"
 
-class ViscosityModel_Carreau : public IViscosityModel
+class ViscosityModel_Carreau final : public IViscosityModel
 {
   public:
     ViscosityModel_Carreau() = delete;
