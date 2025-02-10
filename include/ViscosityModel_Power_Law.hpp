@@ -37,7 +37,7 @@ class ViscosityModel_Power_Law final : public IViscosityModel
     double get_mu( const SymmTensor2_3D &strain_rate ) const override
     {
       const double strain_rate_II = strain_rate.MatContraction();
-      const double temp_mu = m_cons * std::pow( std::sqrt( 2.0 * strain_rate_II ), n_pli - 1.0 );
+      const double temp_mu = m_cons * std::pow( 2.0*strain_rate_II, (n_pli - 1.0)*0.5 );
 
       return (temp_mu <= mu_min) ? mu_min : (temp_mu > mu_max ? mu_max : temp_mu);
     }
@@ -52,9 +52,9 @@ class ViscosityModel_Power_Law final : public IViscosityModel
       const double strain_rate_II = strain_rate.MatContraction();
 
       const double dmu_dvelo = m_cons * ( n_pli - 1.0) *
-        std::pow( std::sqrt( 2.0 * strain_rate_II ), n_pli - 3.0 );
+        std::pow( 2.0*strain_rate_II, (n_pli - 3.0)*0.5 );
 
-      const double temp_mu = m_cons * std::pow( std::sqrt( 2.0 * strain_rate_II ), n_pli - 1.0 );
+      const double temp_mu = m_cons * std::pow( 2.0*strain_rate_II, (n_pli - 1.0)*0.5 );
 
       return (temp_mu <= mu_min || temp_mu > mu_max) ? 0.0 : dmu_dvelo;
     }
