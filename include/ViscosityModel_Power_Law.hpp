@@ -6,7 +6,8 @@
 // Interface for Power Law non-Newtonian model
 // Ref. Cho and Kensey, Bioheology, 28:241-262, 1991
 //
-// The method from https://www.simscale.com/docs/simulation-setup/materials/non-newtonian-models/
+// The method from https://www.simscale.com/docs/simulation-setup/materials/non
+// -newtonian-models/
 // is utilized to resolve the sigularity of this model.
 //
 // Auther: Xinhai Yue
