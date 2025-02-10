@@ -20,7 +20,7 @@ class FlowRate_Cosine2Steady : public IFlowRate
     // at the initial time (i.e. time = 0.0) by setting target_flow_rate to be
     // the sum of coef_a.
     // Same as FlowRate_Linear2Steady.
-    FlowRate_Cosine2Steady( const double &in_thred_time, const std::string &filename );
+    FlowRate_Cosine2Steady( const std::string &filename );
 
     virtual ~FlowRate_Cosine2Steady() = default;
 
@@ -39,8 +39,8 @@ class FlowRate_Cosine2Steady : public IFlowRate
 
   private:
     int num_nbc;
-    
-    const double thred_time;
+
+    std::vector<double> thred_time;
     
     std::vector<double> target_flow_rate;
 

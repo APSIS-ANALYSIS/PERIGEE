@@ -133,28 +133,6 @@ FlowRate_Steady::FlowRate_Steady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-FlowRate_Steady::FlowRate_Steady( const int &in_num_nbc, const double &in_flowrate ) 
-: num_nbc(in_num_nbc)
-{
-  flowrate.resize( num_nbc );
-
-  for(int ii=0; ii<num_nbc; ++ii) flowrate[ii] = in_flowrate;
-  
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    if( SYS_T::get_MPI_rank() == 0 )
-    {
-      std::ofstream ofile;
-      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      const double tt = 0.0;
-      ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
-}
-
 double FlowRate_Steady::get_flow_rate(const int &nbc_id , const double &time) const
 {
   return flowrate[nbc_id];

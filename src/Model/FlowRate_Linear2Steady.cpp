@@ -1,31 +1,6 @@
 #include "FlowRate_Linear2Steady.hpp"
 
-FlowRate_Linear2Steady::FlowRate_Linear2Steady(
-    const int &input_num_nbc,
-    const double &in_thred_time, const double &flrate )
-: thred_time(in_thred_time), num_nbc(input_num_nbc)
-{
-  target_flow_rate.resize( num_nbc );
-  for(int ii=0; ii<num_nbc; ++ii) target_flow_rate[ii] = flrate;
-
-  // Calculate flow rate and record in txt file 
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    if( SYS_T::get_MPI_rank() == 0 )
-    {
-      std::ofstream ofile;
-      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for( double tt = 0; tt <= thred_time * 2.0; tt += 0.001 )
-        ofile<<tt<<'\t'<<get_flow_rate(nbc_id, tt)<<'\n';
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
-}
-
-FlowRate_Linear2Steady::FlowRate_Linear2Steady( const double &in_thred_time, 
-    const std::string &filename ) : thred_time( in_thred_time )
+FlowRate_Linear2Steady::FlowRate_Linear2Steady( const std::string &filename )
 {
   SYS_T::commPrint("FlowRate_Linear2Steady: data read from %s \n", filename.c_str() );
 
@@ -56,6 +31,11 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const double &in_thred_time,
   std::vector<int> num_of_mode;
   std::vector<double> w, period;
 
+  thred_time.resize(num_nbc);
+
+  start_flow_rate.resize(num_nbc);
+  TI_std_dev.resize(num_nbc);
+
   if( bc_type.compare("Linear") == 0 || bc_type.compare("LINEAR") == 0 || bc_type.compare("linear") == 0 )
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
@@ -78,9 +58,29 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const double &in_thred_time,
 
         if( face_id != nbc_id ) SYS_T::print_fatal("FlowRate_Linear2Steady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
-        sstrm >> num_of_mode[nbc_id];
-        sstrm >> w[nbc_id];
-        sstrm >> period[nbc_id];
+        if(!(sstrm >> num_of_mode[nbc_id]))
+          SYS_T::commPrint("FlowRate_Linear2Steady Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
+        
+        if(!(sstrm >> w[nbc_id]))
+          SYS_T::commPrint("FlowRate_Linear2Steady Error: w of nbc %d is undefined!\n", nbc_id);
+        
+        if(!(sstrm >> period[nbc_id]))
+          SYS_T::commPrint("FlowRate_Linear2Steady Error: period of nbc %d is undefined!\n", nbc_id);
+
+        if(!(sstrm >> thred_time[nbc_id]))
+          SYS_T::commPrint("FlowRate_Linear2Steady Error: thred_time of nbc %d is undefined!\n", nbc_id);
+
+        if(!(sstrm >> start_flow_rate[nbc_id]))
+        {
+          start_flow_rate[nbc_id] = 0.0;
+          SYS_T::commPrint("FlowRate_Linear2Steady: default start_flow_rate of nbc %d is 0.0\n", nbc_id);
+        }
+
+        if(!(sstrm >> TI_std_dev[nbc_id]))
+        {
+          TI_std_dev[nbc_id] = 0.0;
+          SYS_T::commPrint("FlowRate_Linear2Steady: default TI_std_dev of nbc %d is 0.0\n", nbc_id);
+        }
 
         sstrm.clear();
         break;
@@ -149,7 +149,7 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const double &in_thred_time,
     {
       std::ofstream ofile;
       ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for( double tt = 0; tt <= thred_time * 2.0; tt += 0.001 )
+      for( double tt = 0; tt <= thred_time[nbc_id] * 2.0; tt += 0.001 )
         ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
       ofile.close();
     }
@@ -163,8 +163,8 @@ double FlowRate_Linear2Steady::get_flow_rate( const int &nbc_id,
 {
   double out_rate = target_flow_rate[nbc_id];
 
-  if( time < thred_time && time >= 0.0 ) 
-    out_rate = target_flow_rate[nbc_id] * time / thred_time;
+  if( time < thred_time[nbc_id] && time >= 0.0 ) 
+    out_rate = target_flow_rate[nbc_id] * time / thred_time[nbc_id];
 
   return out_rate;
 }
@@ -173,11 +173,13 @@ void FlowRate_Linear2Steady::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("     FlowRate_Linear2Steady:\n");
-  SYS_T::commPrint("     Time to reach steady state is %e \n", thred_time);
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
     SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
+    SYS_T::commPrint("     start flow rate =%e \n", start_flow_rate[nbc_id]);
+    SYS_T::commPrint("     time to reach steady state is %e \n", thred_time[nbc_id]);
     SYS_T::commPrint("     target flow rate =%e \n", target_flow_rate[nbc_id]);
+    SYS_T::commPrint("     turbulance intensity is %e \n", TI_std_dev[nbc_id]);
   }
   SYS_T::print_sep_line();
 }

@@ -1,8 +1,6 @@
 #include "FlowRate_Cosine2Steady.hpp"
 
-FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time, 
-  const std::string &filename )
-: thred_time( in_thred_time )
+FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
 {
   SYS_T::commPrint("FlowRate_Cosine2Steady: data read from %s \n", filename.c_str() );
 
@@ -37,16 +35,10 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time,
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
+    thred_time.resize(num_nbc);
 
-    // default start value = 0
     start_flow_rate.resize(num_nbc);
-    for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-      start_flow_rate[nbc_id] = 0.0;
-
-    // default TI_std_dev = 0
     TI_std_dev.resize(num_nbc);
-    for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-      TI_std_dev[nbc_id] = 0.0;
   }
   else
     SYS_T::print_fatal("FlowRate_Cosine2Steady Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
@@ -65,12 +57,29 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time,
 
         if( face_id != nbc_id ) SYS_T::print_fatal("FlowRate_Cosine2Steady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
-        sstrm >> num_of_mode[nbc_id];
-        sstrm >> w[nbc_id];
-        sstrm >> period[nbc_id];
+        if(!(sstrm >> num_of_mode[nbc_id]))
+          SYS_T::commPrint("FlowRate_Cosine2Steady Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
+        
+        if(!(sstrm >> w[nbc_id]))
+          SYS_T::commPrint("FlowRate_Cosine2Steady Error: w of nbc %d is undefined!\n", nbc_id);
+        
+        if(!(sstrm >> period[nbc_id]))
+          SYS_T::commPrint("FlowRate_Cosine2Steady Error: period of nbc %d is undefined!\n", nbc_id);
 
-        sstrm >> start_flow_rate[nbc_id];
-        sstrm >> TI_std_dev[nbc_id];
+        if(!(sstrm >> thred_time[nbc_id]))
+          SYS_T::commPrint("FlowRate_Cosine2Steady Error: thred_time of nbc %d is undefined!\n", nbc_id);
+
+        if(!(sstrm >> start_flow_rate[nbc_id]))
+        {
+          start_flow_rate[nbc_id] = 0.0;
+          SYS_T::commPrint("FlowRate_Cosine2Steady: default start_flow_rate of nbc %d is 0.0\n", nbc_id);
+        }
+
+        if(!(sstrm >> TI_std_dev[nbc_id]))
+        {
+          TI_std_dev[nbc_id] = 0.0;
+          SYS_T::commPrint("FlowRate_Cosine2Steady: default TI_std_dev of nbc %d is 0.0\n", nbc_id);
+        }
 
         sstrm.clear();
         break;
@@ -139,7 +148,7 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const double &in_thred_time,
     {
       std::ofstream ofile;
       ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for( double tt = 0; tt <= thred_time * 2.0; tt += 0.001 )
+      for( double tt = 0; tt <= thred_time[nbc_id] * 2.0; tt += 0.001 )
         ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
       ofile.close();
     }
@@ -153,8 +162,8 @@ double FlowRate_Cosine2Steady::get_flow_rate( const int &nbc_id,
 {
   double out_rate = target_flow_rate[nbc_id];
 
-  if( time < thred_time && time >= 0.0 ) 
-    out_rate = start_flow_rate[nbc_id] + 0.5 * target_flow_rate[nbc_id] * (1 -  std::cos(MATH_T::PI * time / thred_time));
+  if( time < thred_time[nbc_id] && time >= 0.0 ) 
+    out_rate = start_flow_rate[nbc_id] + 0.5 * target_flow_rate[nbc_id] * (1 -  std::cos(MATH_T::PI * time / thred_time[nbc_id]));
 
   return out_rate;
 }
@@ -163,11 +172,13 @@ void FlowRate_Cosine2Steady::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("     FlowRate_Cosine2Steady:\n");
-  SYS_T::commPrint("     Time to reach steady state is %e \n", thred_time);
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
     SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
+    SYS_T::commPrint("     start flow rate =%e \n", start_flow_rate[nbc_id]);
+    SYS_T::commPrint("     time to reach steady state is %e \n", thred_time[nbc_id]);
     SYS_T::commPrint("     target flow rate =%e \n", target_flow_rate[nbc_id]);
+    SYS_T::commPrint("     turbulance intensity is %e \n", TI_std_dev[nbc_id]);
   }
   SYS_T::print_sep_line();
 }

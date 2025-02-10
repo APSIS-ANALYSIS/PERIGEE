@@ -17,8 +17,6 @@ class FlowRate_Steady : public IFlowRate
   public:
     FlowRate_Steady( const std::string &filename );
 
-    FlowRate_Steady( const int &input_num_nbc, const double &in_flowrate );
-
     virtual ~FlowRate_Steady() = default;
 
     virtual double get_flow_rate(const int &nbc_id, const double &time) const;
