@@ -21,29 +21,19 @@ class ViscosityModel_Newtonian final : public IViscosityModel
     }
 
     std::string get_model_name() const override
-    {
-      return "Newtonian";
-    }
+    {return "Newtonian";}
 
     double get_mu( const SymmTensor2_3D &strain_rate ) const override
-    {
-      return mu;
-    }
+    {return mu;}
 
     double get_dmu_dI1( const SymmTensor2_3D &strain_rate ) const override
-    {
-      return 0.0;
-    }
+    {return 0.0;}
 
     double get_dmu_dI2( const SymmTensor2_3D &strain_rate) const override
-    {
-      return 0.0;
-    }
+    {return 0.0;}
 
     double get_dmu_dI3( const SymmTensor2_3D &strain_rate ) const override
-    {
-      return 0.0;
-    }
+    {return 0.0;}
 
   private:
     // ------------------------------------------------------------------------
