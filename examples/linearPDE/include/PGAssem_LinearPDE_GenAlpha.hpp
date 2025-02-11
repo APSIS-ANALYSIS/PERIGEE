@@ -18,7 +18,6 @@ class PGAssem_LinearPDE_GenAlpha : public IPGAssem
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<IPLocAssem> in_locassem,
-        const int &in_nlocbas,
         const int &in_nz_estimate = 60 );
 
     // Destructor

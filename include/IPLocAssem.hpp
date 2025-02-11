@@ -41,25 +41,20 @@ class IPLocAssem
     // ------------------------------------------------------------------------
     // Tangent and Residual of volumetric elements 
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     PetscScalar * Tangent;
     
     PetscScalar * Residual;
 
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     // Tangent and Residual of surface elements 
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     PetscScalar * sur_Tangent;
 
     PetscScalar * sur_Residual;
     
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     // Tangent and Residual of sliding-interface
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     PetscScalar * Tangent_ss;
     PetscScalar * Tangent_sr;
     PetscScalar * Tangent_rs;
@@ -68,56 +63,38 @@ class IPLocAssem
     PetscScalar * Residual_s;
     PetscScalar * Residual_r;
     
-    // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Get degree of freedom of this problem. In segregated algorithms
     //   this dof returns the fully coupled multiphysics problem's dof.
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     virtual int get_dof() const = 0;
 
-    // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Get degree of freedom of the matrix. In segregated algorithms, 
     //   this dof returns the actually implicit solver's dof per node.
     //   In fully coupled fashions, this defaults to the get_dof function.
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     virtual int get_dof_mat() const {return get_dof();}
 
-    // --------------------------------------------------------------
     // ------------------------------------------------------------------------
     // Return the number of local basis
     // ------------------------------------------------------------------------
-    // --------------------------------------------------------------
-    virtual int get_nLocBas() const
-    {
-      SYS_T::commPrint("Warning: IPLocAssem::get_nLocBas is not implemented. \n");
-      return -1;
-    }
+    virtual int get_nLocBas() const = 0;
 
-    virtual int get_snLocBas() const
-    {
-      SYS_T::commPrint("Warning: IPLocAssem::get_snLocBas is not implemented. \n");
-      return -1;
-    }
+    virtual int get_snLocBas() const = 0;
 
-    // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Get the number of ebc functions implemented inside this 
     //   local assembly routine
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     virtual int get_num_ebc_fun() const
     {SYS_T::commPrint("Warning: IPLocAssem::get_num_ebc_fun is not implemented. \n");
       return 0;}
 
-    // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Assign all values in Tangent matrix 0.0
     //   Call this function before assembly to zero everything in container
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     virtual void Zero_Tangent_Residual() = 0;
 
     virtual void Zero_sur_Tangent_Residual()
@@ -125,12 +102,10 @@ class IPLocAssem
       SYS_T::print_fatal("Error: Zero_sur_Tangent_Residual is not implemented.\n");
     }
 
-    // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Assign all values in Residual vector 0.0
     //   Call this function before assembly to zero everything in container
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     virtual void Zero_Residual() = 0;
 
     virtual void Zero_sur_Residual()
@@ -138,11 +113,9 @@ class IPLocAssem
       SYS_T::print_fatal("Error: Zero_sur_Residual is not implemented. \n");
     }
 
-    // -------------------------------------------------------------- 
     // ------------------------------------------------------------------------
     // ! Give nonzero pattern of the sparse matrix 
     // ------------------------------------------------------------------------
-    // -------------------------------------------------------------- 
     virtual void Assem_Estimate() = 0;
 
     // ------------------------------------------------------------------------

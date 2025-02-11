@@ -8,7 +8,6 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
     std::unique_ptr<IPLocAssem> in_locassem,
-    const int &in_nlocbas,
     const int &in_nz_estimate )
 : locien( std::move(in_locien) ),
   locelem( std::move(in_locelem) ),
@@ -18,8 +17,8 @@ PGAssem_LinearPDE_GenAlpha::PGAssem_LinearPDE_GenAlpha(
   ebc( std::move(in_ebc) ),
   locassem(std::move(in_locassem)),
   num_ebc( ebc->get_num_ebc() ),
-  nLocBas( in_nlocbas ),
-  snLocBas( num_ebc>0 ? ebc -> get_cell_nLocBas(0) : 0 ),
+  nLocBas( locassem->get_nLocBas() ),
+  snLocBas( locassem->get_snLocBas() ),
   dof_mat( locassem->get_dof_mat() ),
   nlgn( pnode->get_nlocghonode() )
 {
