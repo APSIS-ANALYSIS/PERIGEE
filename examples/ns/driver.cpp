@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
   auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
-  auto locinnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
+  auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
   auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
   auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
@@ -403,7 +403,7 @@ int main(int argc, char *argv[])
     //   quadv->get_num_quadPts(), elements->get_nLocBas(),
     //   fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
     
-    locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha>(
+    locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha_WeakBC>(
       ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
       fluid_density, fluid_mu, bs_beta, tm_galpha.get(), c_ct, c_tauc, C_bI );    
   }
@@ -500,8 +500,9 @@ int main(int argc, char *argv[])
   std::unique_ptr<IPGAssem> gloAssem =
     SYS_T::make_unique<PGAssem_NS_FEM>(
       std::move(locIEN), std::move(locElem), std::move(fNode),
-      std::move(pNode), std::move(locnbc), std::move(locebc),
-      std::move(gbc), std::move(locAssem_ptr), nz_estimate ); 
+      std::move(pNode), std::move(locnbc), std::move(locinfnbc), 
+      std::move(locebc), std::move(gbc), std::move(locwbc), 
+      std::move(locAssem_ptr), nz_estimate ); 
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   // gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
@@ -567,7 +568,7 @@ int main(int argc, char *argv[])
 
   auto nsolver = SYS_T::make_unique<PNonlinear_LinearPDE_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha),
+      std::move(tm_galpha), std::move(inflow_rate_ptr),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -594,14 +595,14 @@ int main(int argc, char *argv[])
     // const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
     //     sol, locAssem_ptr, elements, quads, locebc, ff );
 
-    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol.get(), std::move(locebc), ff );
+    const double dot_face_flrate = gloAssem_ptr -> Assem_outlet_flowrate(
+        dot_sol.get(), ff );
 
-    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol.get(), std::move(locebc), ff );
+    const double face_flrate = gloAssem_ptr -> Assem_outlet_flowrate(
+        sol.get(), ff );
 
-    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol.get(), std::move(locebc), loc
+    const double face_avepre = gloAssem_ptr -> Assem_outlet_ave_pressure(
+        sol.get(), ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
