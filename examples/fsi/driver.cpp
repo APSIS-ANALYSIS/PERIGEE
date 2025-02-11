@@ -17,9 +17,9 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Hex8.hpp"
-#include "CVFlowRate_Unsteady.hpp"
-#include "CVFlowRate_Linear2Steady.hpp"
-#include "CVFlowRate_Steady.hpp"
+#include "FlowRate_Unsteady.hpp"
+#include "FlowRate_Linear2Steady.hpp"
+#include "FlowRate_Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -346,21 +346,21 @@ int main(int argc, char *argv[])
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  ICVFlowRate * inflow_rate_ptr = nullptr;
+  IFlowRate * inflow_rate_ptr = nullptr;
 
   if( inflow_type == 0 )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
+    inflow_rate_ptr = new FlowRate_Unsteady( inflow_file );
   else if( inflow_type == 1 )
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
+    inflow_rate_ptr = new FlowRate_Linear2Steady( inflow_thd_time, inflow_file );
   else if( inflow_type == 2 )
-    inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
+    inflow_rate_ptr = new FlowRate_Steady( inflow_file );
   else
     SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
 
   inflow_rate_ptr->print_info();
 
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
-      "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
+      "Error: ALocal_InflowBC number of faces does not match with that in IFlowRate.\n");
 
   // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");

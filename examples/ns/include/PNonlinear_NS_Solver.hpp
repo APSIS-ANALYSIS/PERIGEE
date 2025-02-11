@@ -8,7 +8,7 @@
 // Author: Ju Liu
 // Date: Feb 11 2020
 // ==================================================================
-#include "ICVFlowRate.hpp"
+#include "IFlowRate.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "IPGAssem.hpp"
 #include "PLinear_Solver_PETSc.hpp"
@@ -46,7 +46,7 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
         const TimeMethod_GenAlpha * const &tmga_ptr,
-        const ICVFlowRate * const flr_ptr,
+        const IFlowRate * const flr_ptr,
         const ALocal_Elem * const &alelem_ptr,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &feanode_ptr,
@@ -83,7 +83,7 @@ class PNonlinear_NS_Solver
 
     void rescale_inflow_value( const double &stime,
         const ALocal_InflowBC * const &infbc,
-        const ICVFlowRate * const &flrate,
+        const IFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
 };
