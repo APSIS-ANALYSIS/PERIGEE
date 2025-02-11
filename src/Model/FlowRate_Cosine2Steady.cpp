@@ -163,7 +163,7 @@ double FlowRate_Cosine2Steady::get_flow_rate( const int &nbc_id,
   double out_rate = target_flow_rate[nbc_id];
 
   if( time < thred_time[nbc_id] && time >= 0.0 ) 
-    out_rate = start_flow_rate[nbc_id] + 0.5 * target_flow_rate[nbc_id] * (1 -  std::cos(MATH_T::PI * time / thred_time[nbc_id]));
+    out_rate = start_flow_rate[nbc_id] + 0.5 * (target_flow_rate[nbc_id] - start_flow_rate[nbc_id]) * (1 -  std::cos(MATH_T::PI * time / thred_time[nbc_id]));
 
   return out_rate;
 }

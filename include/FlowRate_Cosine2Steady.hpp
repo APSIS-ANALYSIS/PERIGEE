@@ -24,14 +24,16 @@ class FlowRate_Cosine2Steady : public IFlowRate
 
     virtual ~FlowRate_Cosine2Steady() = default;
 
-    // From time 0 to in_time, the flow rate equals
-    // 0.5 * flrate * (1 -  cos (PI * time / in_thred_time))
-    // From in_time to infty, flow_rate = flrate
+    // From time 0 to in_thred_time, the flow rate equals
+    // start_rate + 0.5 * (target_rate - start_rate) * (1 -  cos (PI * time / in_thred_time))
+    // From in_thred_time to infty, flow_rate = target_rate
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 
+    // Get the turbulance intensity
     virtual double get_flow_TI_std_dev( const int &nbc_id ) const { return TI_std_dev[nbc_id]; }
 
-    virtual double get_start_flow_rate( const int &nbc_id ) const { return start_flow_rate[nbc_id]; }
+    // Get the start rate if the users want to now it
+    virtual double get_flow_start_rate( const int &nbc_id ) const { return start_flow_rate[nbc_id]; }
 
     virtual int get_num_nbc() const { return num_nbc; }
 

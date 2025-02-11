@@ -164,7 +164,7 @@ double FlowRate_Linear2Steady::get_flow_rate( const int &nbc_id,
   double out_rate = target_flow_rate[nbc_id];
 
   if( time < thred_time[nbc_id] && time >= 0.0 ) 
-    out_rate = target_flow_rate[nbc_id] * time / thred_time[nbc_id];
+    out_rate = start_flow_rate[nbc_id] + (target_flow_rate[nbc_id] - start_flow_rate[nbc_id]) * time / thred_time[nbc_id];
 
   return out_rate;
 }

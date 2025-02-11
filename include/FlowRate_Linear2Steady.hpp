@@ -24,7 +24,16 @@ class FlowRate_Linear2Steady : public IFlowRate
 
     virtual ~FlowRate_Linear2Steady() = default;
 
+    // From time 0 to in_thred_time, the flow rate equals
+    // start_rate + (target_rate - start_rate) * time / in_thred_time
+    // From in_thred_time to infty, flow_rate = target_rate
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
+
+    // Get the turbulance intensity
+    virtual double get_flow_TI_std_dev( const int &nbc_id ) const { return TI_std_dev[nbc_id]; }
+
+    // Get the start rate if the users want to now it
+    virtual double get_flow_start_rate( const int &nbc_id ) const { return start_flow_rate[nbc_id]; }
 
     virtual int get_num_nbc() const { return num_nbc; }
 
