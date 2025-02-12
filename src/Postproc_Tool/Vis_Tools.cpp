@@ -452,4 +452,18 @@ void VIS_T::read_epart( const std::string &epart_file, const int &esize,
   SYS_T::print_fatal_if( int(elem_part.size()) != esize, "Error: the epart file's part length does not match given size. \n" );
 }
 
+std::vector<int> VIS_T::read_epart( const std::string &epart_file, 
+    const int &esize )
+{
+  std::string fname(epart_file);
+  fname.erase( fname.end()-3, fname.end() );
+  fname.append(".h5");
+  
+  const auto elem_part = HDF5_T::read_intVector( fname.c_str(), "/", "part" );
+
+  SYS_T::print_fatal_if( int(elem_part.size()) != esize, "Error: the epart file's part length does not match given size. \n" );
+
+  return elem_part;
+}
+
 // EOF
