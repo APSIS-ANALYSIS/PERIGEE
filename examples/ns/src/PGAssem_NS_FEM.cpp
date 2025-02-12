@@ -1,39 +1,71 @@
 #include "PGAssem_NS_FEM.hpp"
 
 PGAssem_NS_FEM::PGAssem_NS_FEM(
-    IPLocAssem * const &locassem_ptr,
-    FEAElement * const &elements,
-    const IQuadPts * const &quads,
-    const AGlobal_Mesh_Info * const &agmi_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &aien_ptr,
-    const APart_Node * const &pnode_ptr,
-    const ALocal_NBC * const &part_nbc,
-    const ALocal_EBC * const &part_ebc,
-    const IGenBC * const &gbc,
-    const int &in_nz_estimate )
-: nLocBas( agmi_ptr->get_nLocBas() ),
-  dof_sol( pnode_ptr->get_dof() ),
-  dof_mat( locassem_ptr->get_dof_mat() ),
-  num_ebc( part_ebc->get_num_ebc() ),
-  nlgn( pnode_ptr->get_nlocghonode() ),
-  snLocBas( 0 ) 
+    // IPLocAssem * const &locassem_ptr,
+    // FEAElement * const &elements,
+    // const IQuadPts * const &quads,
+    // const AGlobal_Mesh_Info * const &agmi_ptr,
+    // const ALocal_Elem * const &alelem_ptr,
+    // const ALocal_IEN * const &aien_ptr,
+    // const APart_Node * const &pnode_ptr,
+    // const ALocal_NBC * const &part_nbc,
+    // const ALocal_EBC * const &part_ebc,
+    // const IGenBC * const &gbc,
+    // const int &in_nz_estimate )
+// : nLocBas( agmi_ptr->get_nLocBas() ),
+//   dof_sol( pnode_ptr->get_dof() ),
+//   dof_mat( locassem_ptr->get_dof_mat() ),
+//   num_ebc( part_ebc->get_num_ebc() ),
+//   nlgn( pnode_ptr->get_nlocghonode() ),
+//   snLocBas( 0 ) 
+    std::unique_ptr<ALocal_IEN> in_locien,
+    std::unique_ptr<ALocal_Elem> in_locelem,
+    std::unique_ptr<FEANode> in_fnode,
+    std::unique_ptr<APart_Node> in_pnode,
+    std::unique_ptr<ALocal_NBC> in_nbc,
+    std::unique_ptr<ALocal_InflowBC> in_infnbc,
+    std::unique_ptr<ALocal_EBC> in_ebc,
+    std::unique_ptr<ALocal_EBC> in_gbc,
+    std::unique_ptr<ALocal_WeakBC> in_wbc,
+    std::unique_ptr<IPLocAssem> in_locassem,    
+    const int &in_nz_estimate=60 )
+: locien( std::move(in_locien) ),
+  locelem( std::move(in_locelem) ),
+  fnode( std::move(in_fnode) ),
+  pnode( std::move(in_pnode) ),
+  nbc( std::move(in_nbc) ),
+  in_infnbc( std::move(in_infnbc) ),
+  ebc( std::move(in_ebc) ),
+  gbc( std::move(in_gbc) ),
+  wbc( std::move(in_wbc) ),
+  locassem(std::move(in_locassem)),
+  nLocBas( locassem->get_nLocBas() ),
+  snLocBas( locassem->get_snLocBas() ),
+  dof_sol( pnode->get_dof() ),
+  dof_mat( locassem->get_dof_mat() ),
+  num_ebc( ebc->get_num_ebc() ),
+  nlgn( pnode->get_nlocghonode() )
 {
   // Make sure the data structure is compatible
-  SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
-      "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
+  // SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
 
-  SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
-      "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
+  // SYS_T::print_fatal_if(dof_mat != part_nbc->get_dof_LID(),
+  //     "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
+  //     "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
+  SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
+      "PGAssem_NS_FEM::dof_sol != locassem->get_dof(). \n");
+
+  SYS_T::print_fatal_if(dof_mat != nbc->get_dof_LID(),
+      "PGAssem_NS_FEM::dof_mat != nbc->get_dof_LID(). \n");
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
-  if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
+  // if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
   
-  for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
-    SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
-        "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
-  }
+  // for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
+  //   SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
+  //       "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
+  // }
 
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
 
@@ -52,8 +84,9 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+  // Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
+  //     elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+  Assem_nonzero_estimate();
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -72,28 +105,35 @@ PGAssem_NS_FEM::~PGAssem_NS_FEM()
   MatDestroy(&K);
 }
 
-void PGAssem_NS_FEM::EssBC_KG(
-    const ALocal_NBC * const &nbc_part, const int &field )
+// void PGAssem_NS_FEM::EssBC_KG(
+//     const ALocal_NBC * const &nbc_part, const int &field )
+void PGAssem_NS_FEM::EssBC_KG( const int &field )
 {
-  const int local_dir = nbc_part->get_Num_LD(field);
+  // const int local_dir = nbc_part->get_Num_LD(field);
+  const int local_dir = nbc->get_Num_LD(field);
 
   if(local_dir > 0)
   {
     for(int i=0; i<local_dir; ++i)
     {
-      const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
+      // const int row = nbc_part->get_LDN(field, i) * dof_mat + field;
+      const int row = nbc->get_LDN(field, i) * dof_mat + field;
+      
       VecSetValue(G, row, 0.0, INSERT_VALUES);
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   }
 
-  const int local_sla = nbc_part->get_Num_LPS(field);
+  // const int local_sla = nbc_part->get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(field);
   if(local_sla > 0)
   {
     for(int i=0; i<local_sla; ++i)
     {
-      const int row = nbc_part->get_LPSN(field, i) * dof_mat + field;
-      const int col = nbc_part->get_LPMN(field, i) * dof_mat + field;
+    //   const int row = nbc_part->get_LPSN(field, i) * dof_mat + field;
+    //   const int col = nbc_part->get_LPMN(field, i) * dof_mat + field;
+      const int row = nbc->get_LPSN(field, i) * dof_mat + field;
+      const int col = nbc->get_LPMN(field, i) * dof_mat + field;
       MatSetValue(K, row, col, 1.0, ADD_VALUES);
       MatSetValue(K, row, row, -1.0, ADD_VALUES);
       VecSetValue(G, row, 0.0, INSERT_VALUES);
@@ -101,45 +141,53 @@ void PGAssem_NS_FEM::EssBC_KG(
   }
 }
 
-void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part, 
-    const int &field )
+// void PGAssem_NS_FEM::EssBC_G( const ALocal_NBC * const &nbc_part, 
+//     const int &field )
+void PGAssem_NS_FEM::EssBC_G( const int &field )
 {
-  const int local_dir = nbc_part->get_Num_LD(field);
+  // const int local_dir = nbc_part->get_Num_LD(field);
+  const int local_dir = nbc->get_Num_LD(field);
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      // const int row = nbc_part->get_LDN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LDN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
 
-  const int local_sla = nbc_part->get_Num_LPS(field);
+  // const int local_sla = nbc_part->get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(field);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      // const int row = nbc_part->get_LPSN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LPSN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
 }
 
-void PGAssem_NS_FEM::Assem_nonzero_estimate(
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &node_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const IGenBC * const &gbc )
+// void PGAssem_NS_FEM::Assem_nonzero_estimate(
+//     const ALocal_Elem * const &alelem_ptr,
+//     IPLocAssem * const &lassem_ptr,
+//     FEAElement * const &elements,
+//     const IQuadPts * const &quad_s,
+//     const ALocal_IEN * const &lien_ptr,
+//     const APart_Node * const &node_ptr,
+//     const ALocal_NBC * const &nbc_part,
+//     const ALocal_EBC * const &ebc_part,
+//     const IGenBC * const &gbc )
+void PGAssem_NS_FEM::Assem_nonzero_estimate()
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  // const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
-  lassem_ptr->Assem_Estimate();
+  // lassem_ptr->Assem_Estimate();
+  locassem->Assem_Estimate();
 
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
@@ -150,11 +198,14 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
       const int loc_index  = lien_ptr->get_LIEN(e, i);
 
       for(int m=0; m<dof_mat; ++m)
-        row_index[dof_mat * i + m] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
+        // row_index[dof_mat * i + m] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
+        row_index[dof_mat * i + m] = dof_mat * nbc->get_LID( m, loc_index ) + m;
     }
     
+    // MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+    //     lassem_ptr->Tangent, ADD_VALUES);
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
+        locassem_ptr->Tangent, ADD_VALUES);
   }
 
   delete [] row_index; row_index = nullptr;
@@ -170,7 +221,8 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  // for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -178,22 +230,25 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   VecAssemblyEnd(G);
 }
 
+// void PGAssem_NS_FEM::Assem_mass_residual(
+//     const PDNSolution * const &sol_a,
+//     const ALocal_Elem * const &alelem_ptr,
+//     IPLocAssem * const &lassem_ptr,
+//     FEAElement * const &elementv,
+//     FEAElement * const &elements,
+//     FEAElement * const &elementvs,
+//     const IQuadPts * const &quad_v,
+//     const IQuadPts * const &quad_s,
+//     const ALocal_IEN * const &lien_ptr,
+//     const FEANode * const &fnode_ptr,
+//     const ALocal_NBC * const &nbc_part,
+//     const ALocal_EBC * const &ebc_part,
+//     const ALocal_WeakBC * const &wbc_part )
 void PGAssem_NS_FEM::Assem_mass_residual(
-    const PDNSolution * const &sol_a,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem * const &lassem_ptr,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    FEAElement * const &elementvs,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const ALocal_WeakBC * const &wbc_part )
+    const PDNSolution * const &sol_a)
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  // const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
   double * array_a = new double [nlgn * dof_sol];
@@ -208,23 +263,31 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
+    // lien_ptr->get_LIEN(ee, IEN_e);
+    locien->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
-    fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    // fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
+    fnode->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    lassem_ptr->Assem_Mass_Residual( local_a, elementv,
-        ectrl_x, ectrl_y, ectrl_z, quad_v );
+    // lassem_ptr->Assem_Mass_Residual( local_a, elementv,
+    //     ectrl_x, ectrl_y, ectrl_z, quad_v );
+    locassem->Assem_Mass_Residual( local_a, ectrl_x, 
+          ectrl_y, ectrl_z, quad_v );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
       for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+        // row_index[dof_mat*ii+mm] = dof_mat * nbc_part -> get_LID(mm, IEN_e[ii]) + mm;
+        row_index[dof_mat*ii+mm] = dof_mat * nbc -> get_LID(mm, IEN_e[ii]) + mm;
     }
     
+    // MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
+    //     lassem_ptr->Tangent, ADD_VALUES);
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
+        locassem->Tangent, ADD_VALUES);
 
-    VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    // VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+    VecSetValues(G, loc_dof, row_index, locassem->Residual, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -237,8 +300,9 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
-    lien_ptr, fnode_ptr, nbc_part, wbc_part);
+  // Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
+  //   lien_ptr, fnode_ptr, nbc_part, wbc_part);
+  Weak_EssBC_G(0, 0);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
