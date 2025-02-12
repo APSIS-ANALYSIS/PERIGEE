@@ -208,7 +208,6 @@ namespace VIS_T
       std::vector<int> &elem_part );
   
   std::vector<int> read_epart( const std::string &epart_file, const int &esize );
-
 }
 
 #endif

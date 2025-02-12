@@ -26,7 +26,7 @@ class VTK_Writer_FSI
         const int &in_nlocbas, 
         const std::string &epart_file );
 
-    ~VTK_Writer_FSI();
+    ~VTK_Writer_FSI() = default;
 
     // Write the fluid and solid domain together in a unified continuum body
     void writeOutput(
