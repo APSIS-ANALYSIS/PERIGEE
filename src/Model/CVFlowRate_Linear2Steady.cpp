@@ -108,7 +108,7 @@ CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady( const double &in_thred_time,
       }
     }
 
-    VEC_T::shrink2fit( coef_a[nbc_id] );
+    coef_a[nbc_id].shrink_to_fit();
     
     if( static_cast<int>(coef_a[nbc_id].size()) != num_of_mode[nbc_id]+1 )
       SYS_T::print_fatal("CVFlowRate_Linear2Steady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
@@ -127,7 +127,7 @@ CVFlowRate_Linear2Steady::CVFlowRate_Linear2Steady( const double &in_thred_time,
       }
     }
 
-    VEC_T::shrink2fit( coef_b[nbc_id] );
+    coef_b[nbc_id].shrink_to_fit();
 
     if( static_cast<int>(coef_b[nbc_id].size()) != num_of_mode[nbc_id]+1 )
       SYS_T::print_fatal("CVFlowRate_Linear2Steady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
