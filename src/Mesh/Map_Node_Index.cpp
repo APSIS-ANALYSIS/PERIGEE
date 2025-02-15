@@ -21,7 +21,7 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
       }
     }
   }
-  VEC_T::shrink2fit(old_2_new); VEC_T::shrink2fit(new_2_old);
+  old_2_new.shrink_to_fit(); new_2_old.shrink_to_fit();
   
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
