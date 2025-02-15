@@ -75,7 +75,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
     if(LID[ii] != -1) LID[ii] = mnindex->get_old2new(LID[ii]);
   }
 
-  VEC_T::shrink2fit( LID );
+  LID.shrink_to_fit();
 }
 
 void NBC_Partition::write_hdf5( const std::string &FileName, 
