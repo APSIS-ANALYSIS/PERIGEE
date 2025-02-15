@@ -115,7 +115,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       break;
   }
 
-  VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
+  qp.shrink_to_fit(); qw.shrink_to_fit();
 
   // Correct the formula by time c = 1.0 / 6.0, the volume of ref. tet.
   for(int ii=0; ii<num_pts; ++ii) qw[ii] /= 6.0;
