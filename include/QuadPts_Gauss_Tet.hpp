@@ -17,6 +17,7 @@
 //
 // Date Created: Jan. 18 2017
 // ==================================================================
+#include <vector>
 #include "IQuadPts.hpp"
 
 class QuadPts_Gauss_Tet final : public IQuadPts

@@ -24,6 +24,7 @@
 //
 // Date Created: Jan. 17 2017
 // ==================================================================
+#include <vector>
 #include "IQuadPts.hpp"
 
 class QuadPts_Gauss_Triangle final : public IQuadPts
