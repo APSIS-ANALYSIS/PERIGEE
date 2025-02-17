@@ -169,11 +169,11 @@ void FlowRate_Cosine2Steady::print_info() const
   SYS_T::commPrint("     FlowRate_Cosine2Steady:\n");
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
-    SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
-    SYS_T::commPrint("     start flow rate =%e \n", start_flow_rate[nbc_id]);
-    SYS_T::commPrint("     time to reach steady state is %e \n", thred_time[nbc_id]);
-    SYS_T::commPrint("     target flow rate =%e \n", target_flow_rate[nbc_id]);
-    SYS_T::commPrint("     turbulance intensity is %e \n", TI_std_dev[nbc_id]);
+    SYS_T::commPrint("  -- nbc_id = %d \n", nbc_id);
+    SYS_T::commPrint("     start flow rate : %e \n", start_flow_rate[nbc_id]);
+    SYS_T::commPrint("     time to reach steady state : %e \n", thred_time[nbc_id]);
+    SYS_T::commPrint("     target flow rate : %e \n", target_flow_rate[nbc_id]);
+    SYS_T::commPrint("     turbulance intensity : %e \n", TI_std_dev[nbc_id]);
   }
   SYS_T::print_sep_line();
 }

@@ -1,7 +1,7 @@
 #ifndef FLOWRATEFACTORY_HPP
 #define FLOWRATEFACTORY_HPP
 // ============================================================================
-// FlowrateFactory.hpp
+// FlowRateFactory.hpp
 //
 // This is the factory that construct a flowrate class based on the inflow file
 //
