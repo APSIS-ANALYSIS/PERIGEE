@@ -32,7 +32,6 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const std::string &filename )
   std::vector<double> w, period;
 
   thred_time.resize(num_nbc);
-
   start_flow_rate.resize(num_nbc);
   TI_std_dev.resize(num_nbc);
 
