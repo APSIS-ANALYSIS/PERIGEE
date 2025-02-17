@@ -17,6 +17,8 @@ class ALocal_RotatedBC
   public:
     ALocal_RotatedBC( const std::string &fileBaseName, const int &cpu_rank );
 
+    ALocal_RotatedBC( const HDF5_Reader * const &h5r );
+
     virtual ~ALocal_RotatedBC() = default;
 
     // ------------------------------------------------------------------------

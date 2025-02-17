@@ -32,9 +32,9 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "CVFlowRate_Unsteady.hpp"
-#include "CVFlowRate_Linear2Steady.hpp"
-#include "CVFlowRate_Cosine2Steady.hpp"
+#include "FlowRate_Unsteady.hpp"
+#include "FlowRate_Linear2Steady.hpp"
+#include "FlowRate_Cosine2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -319,14 +319,14 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  ICVFlowRate * inflow_rate_ptr = nullptr;
+  IFlowRate * inflow_rate_ptr = nullptr;
 
   // If inflow file exist, load it
   // otherwise, call the linear incremental flow rate to reach a steady flow
   // if( SYS_T::file_exist( inflow_file ) )
-  //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
+  //   inflow_rate_ptr = new FlowRate_Unsteady( inflow_file.c_str() );
   // else
-  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, inflow_file );
+  inflow_rate_ptr = new FlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, inflow_file );
 
   inflow_rate_ptr->print_info();
 

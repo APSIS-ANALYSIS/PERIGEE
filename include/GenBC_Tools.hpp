@@ -15,12 +15,12 @@ namespace GENBC_T
   // ----------------------------------------------------------------
   // ! get_genbc_file_type : read the genbc file and determine what
   //   type of gen bc the file specifies. It will return
-  //   0 for unknown type
-  //   1 for Resistance
-  //   2 for RCR
-  //   3 for Inductance
-  //   4 for Coronary (including RCR)
-  //   5 for Pressure in Fourier modes
+  //   0 : unknown type
+  //   1 : Resistance
+  //   2 : RCR
+  //   3 : Inductance
+  //   4 : Coronary (including RCR)
+  //   5 : Pressure in Fourier modes
   // ----------------------------------------------------------------
   int get_genbc_file_type( const std::string &lpn_filename );
 
