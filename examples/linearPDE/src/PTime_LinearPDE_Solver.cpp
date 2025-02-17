@@ -1,13 +1,13 @@
 #include "PTime_LinearPDE_Solver.hpp"
 
-PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( const std::string &input_name,
-        const int &input_record_freq, const int &input_renew_tang_freq,
-        const double &input_final_time )
+PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( 
+    std::unique_ptr<PNonlinear_LinearPDE_Solver> in_nsolver,
+    const std::string &input_name,
+    const int &input_record_freq, const int &input_renew_tang_freq,
+    const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
-{}
-
-PTime_LinearPDE_Solver::~PTime_LinearPDE_Solver()
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
+  nsolver(std::move(in_nsolver))
 {}
 
 void PTime_LinearPDE_Solver::print_info() const
@@ -50,38 +50,22 @@ std::string PTime_LinearPDE_Solver::Name_dot_Generator( const std::string &middl
 
 void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     const bool &restart_init_assembly_flag,
-    const PDNSolution * const &init_dot_sol,
-    const PDNSolution * const &init_sol,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const Matrix_PETSc * const &bc_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    IPLocAssem * const &lassem_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const
+    std::unique_ptr<PDNSolution> init_dot_sol,
+    std::unique_ptr<PDNSolution> init_sol,
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
-  PDNSolution * pre_sol = new PDNSolution(*init_sol);
-  PDNSolution * cur_sol = new PDNSolution(*init_sol);
-  PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+  auto pre_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto cur_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto pre_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+  auto cur_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
-    const std::string sol_name = Name_Generator("temp_", time_info->get_index());
+    const auto sol_name = Name_Generator("temp_", time_info->get_index());
     cur_sol->WriteBinary(sol_name.c_str());
 
-    const std::string sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
+    const auto sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name.c_str());
   }
 
@@ -109,12 +93,11 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_Transport( renew_flag,
+    nsolver->GenAlpha_Solve_Transport( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        pre_dot_sol, pre_sol, tmga_ptr,
-        alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part,
-        ebc_part, bc_mat, elementv, elements, quad_v, quad_s, lassem_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        pre_dot_sol.get(), pre_sol.get(),
+        cur_dot_sol.get(), cur_sol.get(), 
+        conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -126,10 +109,10 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
-      const std::string sol_name = Name_Generator("temp_", time_info->get_index() );
+      const auto sol_name = Name_Generator("temp_", time_info->get_index() );
       cur_sol->WriteBinary(sol_name.c_str());
 
-      const std::string sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
+      const auto sol_dot_name = Name_dot_Generator("temp_", time_info->get_index());
       cur_dot_sol->WriteBinary(sol_dot_name.c_str());
     }
 
@@ -137,53 +120,35 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Transport(
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
   } 
-
-  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
 }
 
 void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     const bool &restart_init_assembly_flag,
-    const PDNSolution * const &init_dot_disp,
-    const PDNSolution * const &init_dot_velo,
-    const PDNSolution * const &init_disp,
-    const PDNSolution * const &init_velo,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_EBC * const &ebc_part,
-    const Matrix_PETSc * const &bc_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    IPLocAssem * const &lassem_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_LinearPDE_Solver * const &nsolver_ptr ) const
+    std::unique_ptr<PDNSolution> init_dot_disp,
+    std::unique_ptr<PDNSolution> init_dot_velo,
+    std::unique_ptr<PDNSolution> init_disp,
+    std::unique_ptr<PDNSolution> init_velo,
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
-  PDNSolution * pre_disp = new PDNSolution( init_disp );
-  PDNSolution * cur_disp = new PDNSolution( init_disp );
-  PDNSolution * pre_velo = new PDNSolution( init_velo );
-  PDNSolution * cur_velo = new PDNSolution( init_velo );
-  PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * cur_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * cur_dot_velo = new PDNSolution( init_dot_velo );
+  auto pre_disp = SYS_T::make_unique<PDNSolution>( *init_disp );
+  auto cur_disp = SYS_T::make_unique<PDNSolution>( *init_disp );
+  auto pre_velo = SYS_T::make_unique<PDNSolution>( *init_velo );
+  auto cur_velo = SYS_T::make_unique<PDNSolution>( *init_velo );
+  auto pre_dot_disp = SYS_T::make_unique<PDNSolution>( *init_dot_disp );
+  auto cur_dot_disp = SYS_T::make_unique<PDNSolution>( *init_dot_disp );
+  auto pre_dot_velo = SYS_T::make_unique<PDNSolution>( *init_dot_velo );
+  auto cur_dot_velo = SYS_T::make_unique<PDNSolution>( *init_dot_velo );
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
-    std::string sol_name = Name_Generator("disp_", time_info->get_index());
+    auto sol_name = Name_Generator("disp_", time_info->get_index());
     cur_disp->WriteBinary(sol_name.c_str());
 
     sol_name = Name_Generator("velo_", time_info->get_index());
     cur_velo->WriteBinary(sol_name.c_str());
 
-    std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+    auto sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
     cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
     sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
@@ -215,13 +180,11 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_Elastodynamics( renew_flag,
+    nsolver->GenAlpha_Solve_Elastodynamics( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        pre_dot_disp, pre_dot_velo, pre_disp, pre_velo, tmga_ptr,
-        alelem_ptr, lien_ptr, anode_ptr, feanode_ptr, nbc_part,
-        ebc_part, bc_mat, elementv, elements, quad_v, quad_s, lassem_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_disp, cur_dot_velo,
-        cur_disp, cur_velo, conv_flag, nl_counter );
+        pre_dot_disp.get(), pre_dot_velo.get(), pre_disp.get(), pre_velo.get(),
+        cur_dot_disp.get(), cur_dot_velo.get(), cur_disp.get(), cur_velo.get(),
+        conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -233,13 +196,13 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     // Record solution if meets criteria
     if( time_info->get_index()%sol_record_freq == 0 )
     {
-      std::string sol_name = Name_Generator("disp_", time_info->get_index());
+      auto sol_name = Name_Generator("disp_", time_info->get_index());
       cur_disp->WriteBinary(sol_name.c_str());
 
       sol_name = Name_Generator("velo_", time_info->get_index());
       cur_velo->WriteBinary(sol_name.c_str());
 
-      std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+      auto sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
       cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
       sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
@@ -247,14 +210,11 @@ void PTime_LinearPDE_Solver::TM_GenAlpha_Elastodynamics(
     }
 
     // Prepare for next time step
-    pre_disp -> Copy( cur_disp );
-    pre_velo -> Copy( cur_velo );
-    pre_dot_disp -> Copy( cur_dot_disp );
-    pre_dot_velo -> Copy( cur_dot_velo );
-  } 
-
-  delete pre_disp; delete cur_disp; delete pre_dot_disp; delete cur_dot_disp;
-  delete pre_velo; delete cur_velo; delete pre_dot_velo; delete cur_dot_velo;
+    pre_disp -> Copy( cur_disp.get() );
+    pre_velo -> Copy( cur_velo.get() );
+    pre_dot_disp -> Copy( cur_dot_disp.get() );
+    pre_dot_velo -> Copy( cur_dot_velo.get() );
+  }
 }
 
 // EOF

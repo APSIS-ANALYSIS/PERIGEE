@@ -30,6 +30,15 @@ class AGlobal_Mesh_Info
       H5Fclose( file_id );
     }
 
+    AGlobal_Mesh_Info( const HDF5_Reader * const &h5r )
+    {
+      nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
+      nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
+      nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
+      probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
+      elemType = FE_T::to_FEType(h5r -> read_string("Global_Mesh_Info", "elemType"));
+    }
+
     ~AGlobal_Mesh_Info() = default;
 
     // --------------------------------------------------------------
