@@ -1,29 +1,39 @@
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 
+// PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
+//         const TimeMethod_GenAlpha * const &tm_gAlpha,
+//         const int &in_nlocbas, const int &in_nqp,
+//         const int &in_snlocbas,
+//         const double &in_rho, const double &in_vis_mu,
+//         const double &in_beta, const FEType &elemtype, 
+//         const double &in_ct, const double &in_ctauc,
+//         const double &in_C_bI )
+// : PLocAssem_VMS_NS_GenAlpha(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
+//   in_rho, in_vis_mu, in_beta, elemtype, in_ct, in_ctauc), C_bI(in_C_bI)
+// { }
 PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const FEType &elemtype, 
-        const double &in_ct, const double &in_ctauc,
-        const double &in_C_bI )
-: PLocAssem_VMS_NS_GenAlpha(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
-  in_rho, in_vis_mu, in_beta, elemtype, in_ct, in_ctauc), C_bI(in_C_bI)
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+        const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
+        const double &in_vis_mu, const double &in_beta,
+        const double &in_ct = 4.0, const double &in_ctauc = 1.0, 
+        const double &in_C_bI = 4.0 );
+: PLocAssem_VMS_NS_GenAlpha(in_type, in_nqp_v, in_nqp_s, tm_gAlpha, in_rho, in_vis_mu, 
+  in_beta, in_ct, in_ctauc), C_bI(in_C_bI)
 { }
 
 void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 10)
-    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
-  else if(nLocBas == 27)
-    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
+  // if(nLocBas == 4)
+  //   SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
+  // else if(nLocBas == 10)
+  //   SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
+  // else if(nLocBas == 8)
+  //   SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  // else if(nLocBas == 27)
+  //   SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
+  elementv->print_info();
   else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
@@ -43,18 +53,25 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
+// void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
+//     const double &time, const double &dt,
+//     const double * const &sol,
+//     FEAElement * const &elementvs,
+//     const double * const &eleCtrlPts_x,
+//     const double * const &eleCtrlPts_y,
+//     const double * const &eleCtrlPts_z,
+//     const IQuadPts * const &quads,
+//     const int &face_id)
 void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
     const double &time, const double &dt,
     const double * const &sol,
-    FEAElement * const &elementvs,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quads,
     const int &face_id)
 {
   // Build the basis function of volume element
-  elementvs->buildBasis( face_id, quads, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementvs->buildBasis( face_id, quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr {time + alpha_f * dt};
 
@@ -64,7 +81,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua {0}; qua < face_nqp; ++qua)
+  for(int qua {0}; qua < nqps; ++qua)
   {
     elementvs->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
@@ -165,17 +182,24 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
   } // qua-loop
 }
 
+// void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
+//     const double &time, const double &dt,
+//     const double * const &sol,
+//     FEAElement * const &elementvs,
+//     const double * const &eleCtrlPts_x,
+//     const double * const &eleCtrlPts_y,
+//     const double * const &eleCtrlPts_z,
+//     const IQuadPts * const &quads,
+//     const int &face_id)
 void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
     const double &time, const double &dt,
     const double * const &sol,
-    FEAElement * const &elementvs,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quads,
     const int &face_id)
 {
-  elementvs->buildBasis( face_id, quads, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementvs->buildBasis( face_id, quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr {time + alpha_f * dt};
 
@@ -187,7 +211,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua {0}; qua < face_nqp; ++qua)
+  for(int qua {0}; qua < nqps; ++qua)
   {
     elementvs->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 

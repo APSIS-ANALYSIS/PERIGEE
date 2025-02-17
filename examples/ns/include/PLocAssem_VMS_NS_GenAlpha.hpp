@@ -205,7 +205,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     
     const int nqpv, npqs;
 
-    const std::unique_ptr<FEAElement> elementv, elements;
+    const std::unique_ptr<FEAElement> elementv, elements, elementvs;
 
     const std::unique_ptr<IQuadPts> quadv, quads;
 

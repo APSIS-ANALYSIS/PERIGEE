@@ -25,7 +25,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_InflowBC> in_infnbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
-    std::unique_ptr<ALocal_EBC> in_gbc,
+    std::unique_ptr<IGenBC> in_gbc,
     std::unique_ptr<ALocal_WeakBC> in_wbc,
     std::unique_ptr<IPLocAssem> in_locassem,    
     const int &in_nz_estimate=60 )
@@ -62,10 +62,10 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   // the same. This is an assumption in this assembly routine.
   // if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
   
-  // for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
-  //   SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
-  //       "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
-  // }
+  for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
+    SYS_T::print_fatal_if(snLocBas != ebc->get_cell_nLocBas(ebc_id),
+        "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
+  }
 
   const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
 

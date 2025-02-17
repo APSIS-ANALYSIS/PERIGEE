@@ -15,6 +15,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 : elemType(in_type), nqpv(in_npq_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
+  elementvs( ElementFactory::createVolElement(elemType, nqps) ),
   quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
   quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
   rho0( in_rho ), vis_mu( in_vis_mu ),
