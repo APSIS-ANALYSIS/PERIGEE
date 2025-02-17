@@ -40,7 +40,6 @@ class PGAssem_NS_FEM : public IPGAssem
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode,
         std::unique_ptr<ALocal_NBC> in_nbc,
-        std::unique_ptr<ALocal_InflowBC> in_infnbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<IGenBC> in_gbc,
         std::unique_ptr<ALocal_WeakBC> in_wbc,
@@ -193,7 +192,6 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<const FEANode> fnode;
     const std::unique_ptr<const APart_Node> pnode;
     const std::unique_ptr<const ALocal_NBC> nbc;
-    const std::unique_ptr<const ALocal_InflowBC> in_infnbc;
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<const IGenBC> gbc;
