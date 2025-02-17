@@ -192,7 +192,6 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<const FEANode> fnode;
     const std::unique_ptr<const APart_Node> pnode;
     const std::unique_ptr<const ALocal_NBC> nbc;
-    const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<const IGenBC> gbc;
     const std::unique_ptr<const ALocal_WeakBC> wbc;

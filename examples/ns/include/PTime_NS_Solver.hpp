@@ -55,7 +55,9 @@ class PTime_NS_Solver
         // PNonlinear_NS_Solver * const &nsolver_ptr ) const;
         std::unique_ptr<PDNSolution> init_dot_sol,
         std::unique_ptr<PDNSolution> init_sol,
-        std::unique_ptr<PDNTimeStep> time_info ) const;
+        std::unique_ptr<PDNTimeStep> time_info,
+        std::unique_ptr<ALocal_InflowBC> in_infbc,
+        std::unique_ptr<ALocal_EBC> in_ebc, ) const;
 
   private:
     const double final_time;
@@ -64,6 +66,8 @@ class PTime_NS_Solver
     const std::string pb_name; // the problem base name for the solution
 
     const std::unique_ptr<PNonlinear_LinearPDE_Solver> nsolver;
+    const std::unique_ptr<const ALocal_InflowBC> infbc;
+    const std::unique_ptr<const ALocal_EBC> ebc;
 
     std::string Name_Generator( const int &counter ) const;
     
