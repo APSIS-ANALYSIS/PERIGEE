@@ -15,7 +15,11 @@ class PTime_NS_Solver
 {
   public:
     PTime_NS_Solver( 
-        std::unique_ptr<PNonlinear_LinearPDE_Solver> in_nsolver,
+        std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+        std::unique_ptr<IPGAssem> in_gassem,
+        std::unique_ptr<ALocal_InflowBC> in_infbc,
+        std::unique_ptr<ALocal_EBC> in_ebc,
+        std::unique_ptr<IGenBC> gbc,
         const std::string &input_name,      
         const int &input_record_freq, const int &input_renew_tang_freq, 
         const double &input_final_time );
@@ -55,9 +59,7 @@ class PTime_NS_Solver
         // PNonlinear_NS_Solver * const &nsolver_ptr ) const;
         std::unique_ptr<PDNSolution> init_dot_sol,
         std::unique_ptr<PDNSolution> init_sol,
-        std::unique_ptr<PDNTimeStep> time_info,
-        std::unique_ptr<ALocal_InflowBC> in_infbc,
-        std::unique_ptr<ALocal_EBC> in_ebc, ) const;
+        std::unique_ptr<PDNTimeStep> time_info ) const;
 
   private:
     const double final_time;
@@ -65,9 +67,11 @@ class PTime_NS_Solver
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
 
-    const std::unique_ptr<PNonlinear_LinearPDE_Solver> nsolver;
+    const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
+    const std::unique_ptr<IPGAssem> gassem;
     const std::unique_ptr<const ALocal_InflowBC> infbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
+    const std::unique_ptr<IGenBC> gbc;
 
     std::string Name_Generator( const int &counter ) const;
     

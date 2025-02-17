@@ -597,6 +597,15 @@ class IPGAssem
         const double &dt )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
+    virtual void Assem_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
     //                            for 3D problem WITHOUT pre-existing cached 
@@ -875,6 +884,15 @@ class IPGAssem
         const double &dt )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
     // --------------------------------------------------------------
     // Assembly boundary integrals
     // --------------------------------------------------------------
@@ -935,6 +953,22 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_inlet_flowrate(
+        const PDNSolution * const &vec,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_outlet_flowrate(
+        const PDNSolution * const &vec,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the
@@ -966,6 +1000,22 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_inlet_ave_pressure(
+        const PDNSolution * const &vec,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_outlet_ave_pressure(
+        const PDNSolution * const &vec,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
@@ -992,7 +1042,7 @@ class IPGAssem
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
     }
-
+  
     // Update wall prestress at all surface quadrature points
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &sol_wall_disp,

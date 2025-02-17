@@ -353,6 +353,21 @@ class IPLocAssem
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
 
+    virtual void Assem_Residual_BackFlowStab(
+        const double * const &sol,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Residual_BackFlowStab is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_BackFlowStab(
+        const double &dt,
+        const double * const &sol,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
+
     // ------------------------------------------------------------------------
     // Perform Elemental BC surface integration for elemental BC id ebc_id.
     // Based on ebc_id, the traction forcing function will be called accordingly
@@ -417,6 +432,13 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
+
+    virtual void Assem_Residual_EBC_Resistance(
+        const int &ebc_id, const double &val,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
     // ------------------------------------------------------------------------
@@ -497,6 +519,15 @@ class IPLocAssem
       return 0.0;
     }
 
+    virtual double get_flowrate( const double * const &sol,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {
+      SYS_T::commPrint("Warning: get_flowrate() is not implemented. \n");
+      return 0.0;
+    }
+
     // ------------------------------------------------------------------------
     // This is a function in local assembly that calculates the pressure
     // integrated over surface: int_{Gamma} p dA
@@ -508,6 +539,15 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad,
+        double &pres, double &area )
+    {
+      SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
+    }
+
+    virtual void get_pressure_area( const double * const &vec, 
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
         double &pres, double &area )
     {
       SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
@@ -562,6 +602,24 @@ class IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
+
+    virtual void Assem_Residual_Weak(
+        const double &time, const double &dt,
+        const double * const &sol,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &veleCtrlPts_z,
+        const int &face_id)
+    {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_Weak(
+        const double &time, const double &dt,
+        const double * const &sol,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak is not implemented.\n");}
 

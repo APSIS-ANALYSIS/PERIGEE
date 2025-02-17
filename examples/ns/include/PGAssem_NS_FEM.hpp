@@ -39,6 +39,7 @@ class PGAssem_NS_FEM : public IPGAssem
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode,
+        std::unique_ptr<ALocal_InflowBC> in_infbc,
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<IGenBC> in_gbc,
@@ -183,7 +184,7 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const int &nbc_id );
     virtual double Assem_inlet_ave_pressure(
         const PDNSolution * const &sol,
-        const int &infnbc_id )
+        const int &infnbc_id );
 
   private:
     // Private data
@@ -191,6 +192,7 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const FEANode> fnode;
     const std::unique_ptr<const APart_Node> pnode;
+    const std::unique_ptr<const ALocal_InflowBC> infbc;
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<const IGenBC> gbc;

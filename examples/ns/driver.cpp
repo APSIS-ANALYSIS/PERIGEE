@@ -78,6 +78,7 @@ int main(int argc, char *argv[])
 
   // generalized-alpha rho_inf
   double genA_rho_inf = 0.5;
+  bool is_backward_Euler = false;
 
   // part file location
   std::string part_file("part");
@@ -137,6 +138,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
+  SYS_T::GetOptionBool("-is_backward_Euler", is_backward_Euler);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
@@ -170,6 +172,10 @@ int main(int argc, char *argv[])
   // ===== Print Command Line Arguments =====
   SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
   SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  if( is_backward_Euler )
+    SYS_T::commPrint(   "-is_backward_Euler: true \n");
+  else
+    SYS_T::cmdPrint(    "-rho_inf:",         genA_rho_inf);
   // SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
   // SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);

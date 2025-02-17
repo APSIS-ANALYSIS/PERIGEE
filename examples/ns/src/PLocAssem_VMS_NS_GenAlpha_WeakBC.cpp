@@ -15,8 +15,8 @@ PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
         const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
         const double &in_vis_mu, const double &in_beta,
-        const double &in_ct = 4.0, const double &in_ctauc = 1.0, 
-        const double &in_C_bI = 4.0 );
+        const double &in_ct, const double &in_ctauc, 
+        const double &in_C_bI )
 : PLocAssem_VMS_NS_GenAlpha(in_type, in_nqp_v, in_nqp_s, tm_gAlpha, in_rho, in_vis_mu, 
   in_beta, in_ct, in_ctauc), C_bI(in_C_bI)
 { }
@@ -33,8 +33,8 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
   //   SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
   // else if(nLocBas == 27)
   //   SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
+  // else SYS_T::print_fatal("Error: unknown elem type.\n");
   elementv->print_info();
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
@@ -75,7 +75,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
 
   const double curr {time + alpha_f * dt};
 
-  const int face_nqp {quads -> get_num_quadPts()};
+  // const int face_nqp {quads -> get_num_quadPts()};
 
   Zero_Residual();
 
@@ -205,7 +205,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
 
   const double dd_dv {alpha_f * gamma * dt};
 
-  const int face_nqp {quads -> get_num_quadPts()};
+  // const int face_nqp {quads -> get_num_quadPts()};
 
   Zero_Tangent_Residual();
 

@@ -22,16 +22,18 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     std::unique_ptr<ALocal_Elem> in_locelem,
     std::unique_ptr<FEANode> in_fnode,
     std::unique_ptr<APart_Node> in_pnode,
+    std::unique_ptr<ALocal_InflowBC> in_infbc,
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
     std::unique_ptr<IGenBC> in_gbc,
     std::unique_ptr<ALocal_WeakBC> in_wbc,
     std::unique_ptr<IPLocAssem> in_locassem,    
-    const int &in_nz_estimate=60 )
+    const int &in_nz_estimate )
 : locien( std::move(in_locien) ),
   locelem( std::move(in_locelem) ),
   fnode( std::move(in_fnode) ),
   pnode( std::move(in_pnode) ),
+  infbc( std::move(in_infbc) ),
   nbc( std::move(in_nbc) ),
   ebc( std::move(in_ebc) ),
   gbc( std::move(in_gbc) ),
@@ -65,7 +67,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
         "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
   }
 
-  const int nlocrow = dof_mat * pnode_ptr->get_nlocalnode();
+  const int nlocrow = dof_mat * pnode->get_nlocalnode();
 
   // Allocate the sparse matrix K
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
@@ -193,7 +195,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate()
   {
     for(int i=0; i<nLocBas; ++i)
     {
-      const int loc_index  = lien_ptr->get_LIEN(e, i);
+      const int loc_index  = locien->get_LIEN(e, i);
 
       for(int m=0; m<dof_mat; ++m)
         // row_index[dof_mat * i + m] = dof_mat * nbc_part->get_LID( m, loc_index ) + m;
@@ -203,16 +205,16 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate()
     // MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
     //     lassem_ptr->Tangent, ADD_VALUES);
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        locassem_ptr->Tangent, ADD_VALUES);
+        locassem->Tangent, ADD_VALUES);
   }
 
   delete [] row_index; row_index = nullptr;
 
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
-  PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
+  PDNSolution * temp = new PDNSolution_NS( pnode.get(), 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, nbc_part, ebc_part, gbc );
+  NatBC_Resis_KG( 0.0, 0.1, temp, temp );
 
   delete temp;
 
@@ -269,8 +271,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
     // lassem_ptr->Assem_Mass_Residual( local_a, elementv,
     //     ectrl_x, ectrl_y, ectrl_z, quad_v );
-    locassem->Assem_Mass_Residual( local_a, ectrl_x, 
-          ectrl_y, ectrl_z, quad_v );
+    locassem->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -300,12 +301,12 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   // If wall_model_type = 0, it will do nothing.
   // Weak_EssBC_G(0, 0, sol_a, lassem_ptr, elementvs, quad_s,
   //   lien_ptr, fnode_ptr, nbc_part, wbc_part);
-  Weak_EssBC_G(0, 0);
+  Weak_EssBC_G(0, 0, sol_a);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( ii );
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -458,7 +459,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
     fnode->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
-    locassem>Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
+    locassem->Assem_Tangent_Residual(curr_time, dt, local_a, local_b,
         ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -484,14 +485,14 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_b, locassem );
+  BackFlow_KG( dt, sol_b );
 
   // Resistance type boundary condition
-  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, locassem );
+  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1 );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_KG( curr_time, dt, sol_b, locassem );
+  Weak_EssBC_KG( curr_time, dt, sol_b );
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -529,7 +530,7 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt )
       ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       locassem -> Assem_Residual_EBC( ebc_id, curr_time, dt,
-          sctrl_x, sctrl_y, sctrl_z, quad_s );
+          sctrl_x, sctrl_y, sctrl_z );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {

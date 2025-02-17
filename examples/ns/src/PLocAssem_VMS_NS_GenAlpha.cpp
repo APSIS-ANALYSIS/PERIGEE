@@ -11,8 +11,8 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
     const double &in_vis_mu, const double &in_beta,
-    const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
-: elemType(in_type), nqpv(in_npq_v), nqps(in_nqp_s),
+    const double &in_ct, const double &in_ctauc )
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
   elementvs( ElementFactory::createVolElement(elemType, nqps) ),
@@ -21,12 +21,12 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
-  CI( (elemtype == FEType::Tet4 || elemtype == FEType::Hex8) ? 36.0 : 60.0 ),
+  CI( (elemType == FEType::Tet4 || elemType == FEType::Hex8) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
-  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
-  coef( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
-  mm( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
+  vec_size( nLocBas * 4 ), sur_size ( snLocBas * 4 ),
+  coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
+  mm( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 // : rho0( in_rho ), vis_mu( in_vis_mu ),
 //   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
@@ -223,7 +223,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     }
 
     // Get the tau_m and tau_c
-    const auto dxi_dx = element->get_invJacobian(qua);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
 
     const std::array<double, 2> tau = get_tau( dt, dxi_dx, u, v, w );
     const double tau_m = tau[0];

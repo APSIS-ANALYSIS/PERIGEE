@@ -143,7 +143,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     virtual double get_flowrate( const double * const &sol,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z )
+        const double * const &eleCtrlPts_z );
 
     // virtual void get_pressure_area( const double * const &sol,
     //     FEAElement * const &element,
@@ -203,7 +203,7 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     // Private data
     const FEType elemType;
     
-    const int nqpv, npqs;
+    const int nqpv, nqps;
 
     const std::unique_ptr<FEAElement> elementv, elements, elementvs;
 

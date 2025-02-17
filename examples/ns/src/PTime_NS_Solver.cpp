@@ -3,8 +3,12 @@
 // PTime_NS_Solver::PTime_NS_Solver(
 //     const std::string &input_name, const int &input_record_freq,
 //     const int &input_renew_tang_freq, const double &input_final_time )
-PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( 
-    std::unique_ptr<PNonlinear_LinearPDE_Solver> in_nsolver,
+PTime_NS_Solver::PTime_NS_Solver( 
+    std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+    std::unique_ptr<IPGAssem> in_gassem,
+    std::unique_ptr<ALocal_InflowBC> in_infbc,
+    std::unique_ptr<ALocal_EBC> in_ebc,
+    std::unique_ptr<IGenBC> in_gbc,
     const std::string &input_name,
     const int &input_record_freq, const int &input_renew_tang_freq,
     const double &input_final_time )
@@ -12,7 +16,8 @@ PTime_LinearPDE_Solver::PTime_LinearPDE_Solver(
 //   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 // {}
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
-  nsolver(std::move(in_nsolver)), infbc(std::move(in_infbc)), ebc(std::move(in_ebc))
+  nsolver(std::move(in_nsolver)), gassem(std::move(in_gassem)),
+  infbc(std::move(in_infbc)), ebc(std::move(in_ebc)), gbc(std::move(in_gbc))
 {}
 
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
@@ -149,7 +154,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(),
-        sol_base.get(), pre_dot_sol.get(), pre_sol.get(), 
+        sol_base, pre_dot_sol.get(), pre_sol.get(), 
         cur_dot_sol.get(), cur_sol.get(), conv_flag, nl_counter );
 
     // Update the time step information
@@ -173,16 +178,16 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     for(int face=0; face<ebc -> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
-      const double dot_face_flrate = gassem_ptr -> Assem_outlet_flowrate( 
-          cur_dot_sol, face); 
+      const double dot_face_flrate = gassem -> Assem_outlet_flowrate( 
+          cur_dot_sol.get(), face); 
 
       // Calculate the 3D flow rate on the outlet
-      const double face_flrate = gassem_ptr -> Assem_outlet_flowrate( 
-          cur_sol, face); 
+      const double face_flrate = gassem -> Assem_outlet_flowrate( 
+          cur_sol.get(), face); 
 
       // Calculate the 3D averaged pressure on the outlet
-      const double face_avepre = gassem_ptr -> Assem_outlet_ave_pressure( 
-          cur_sol, face);
+      const double face_avepre = gassem -> Assem_outlet_ave_pressure( 
+          cur_sol.get(), face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -209,11 +214,11 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Calcualte the inlet data
     for(int face=0; face<infbc -> get_num_nbc(); ++face)
     {
-      const double inlet_face_flrate = gassem_ptr -> Assem_inlet_flowrate(
-          cur_sol, face ); 
+      const double inlet_face_flrate = gassem -> Assem_inlet_flowrate(
+          cur_sol.get(), face ); 
 
-      const double inlet_face_avepre = gassem_ptr -> Assem_inlet_flowrate(
-          cur_sol, face );
+      const double inlet_face_avepre = gassem -> Assem_inlet_flowrate(
+          cur_sol.get(), face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
@@ -230,7 +235,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     pre_dot_sol->Copy(*cur_dot_sol);
   }
 
-  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
+  // delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol;
 }
 
 // EOF
