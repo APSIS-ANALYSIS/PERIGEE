@@ -83,8 +83,7 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
 
     // Check the compatibility of period and w. If the difference
     // is larger than 0.01, print a warning message
-    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 )
-      SYS_T::commPrint( "\nFlowRate_Cosine2Steady WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*MATH_T::PI/period[nbc_id], w[nbc_id] );
+    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 ) SYS_T::commPrint( "\nFlowRate_Cosine2Steady WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*static_cast<double>(MATH_T::PI)/period[nbc_id], w[nbc_id] );
 
     coef_a[nbc_id].clear(); coef_b[nbc_id].clear(); 
 
