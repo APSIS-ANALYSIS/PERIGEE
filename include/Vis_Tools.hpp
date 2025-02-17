@@ -204,9 +204,6 @@ namespace VIS_T
   //                    the array with size esize, and deleting it after
   //                    usage.
   // --------------------------------------------------------------
-  void read_epart( const std::string &epart_file, const int &esize,
-      std::vector<int> &elem_part );
-  
   std::vector<int> read_epart( const std::string &epart_file, const int &esize );
 }
 
