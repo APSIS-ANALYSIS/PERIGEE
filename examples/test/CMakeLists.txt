@@ -103,8 +103,10 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Coronary.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
   ${perigee_source}/Model/GenBC_Inductance.cpp
-  ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
-  ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
+  ${perigee_source}/Model/FlowRate_Steady.cpp
+  ${perigee_source}/Model/FlowRate_Unsteady.cpp
+  ${perigee_source}/Model/FlowRate_Cosine2Steady.cpp
+  ${perigee_source}/Model/FlowRate_Linear2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
