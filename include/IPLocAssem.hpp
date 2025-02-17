@@ -589,7 +589,7 @@ class IPLocAssem
         FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &veleCtrlPts_z,
+        const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
@@ -610,7 +610,7 @@ class IPLocAssem
         const double * const &sol,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &veleCtrlPts_z,
+        const double * const &eleCtrlPts_z,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Residual_Weak is not implemented.\n");}
 
@@ -632,7 +632,7 @@ class IPLocAssem
         FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &veleCtrlPts_z,
+        const double * const &eleCtrlPts_z,
         const IQuadPts * const &quads,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Residual_Weak_Rotated is not implemented.\n");}
