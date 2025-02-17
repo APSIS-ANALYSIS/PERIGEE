@@ -1,10 +1,18 @@
 #include "PTime_NS_Solver.hpp"
 
-PTime_NS_Solver::PTime_NS_Solver(
-    const std::string &input_name, const int &input_record_freq,
-    const int &input_renew_tang_freq, const double &input_final_time )
+// PTime_NS_Solver::PTime_NS_Solver(
+//     const std::string &input_name, const int &input_record_freq,
+//     const int &input_renew_tang_freq, const double &input_final_time )
+PTime_LinearPDE_Solver::PTime_LinearPDE_Solver( 
+    std::unique_ptr<PNonlinear_LinearPDE_Solver> in_nsolver,
+    const std::string &input_name,
+    const int &input_record_freq, const int &input_renew_tang_freq,
+    const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
+//   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
+// {}
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
+  nsolver(std::move(in_nsolver))
 {}
 
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
@@ -60,35 +68,43 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
     PDNSolution * const &sol_base,
-    const PDNSolution * const &init_dot_sol,
-    const PDNSolution * const &init_sol,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const ICVFlowRate * const flr_ptr,
-    const APart_Node * const &pNode_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
-    const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_EBC * const &ebc_part,
-    IGenBC * const &gbc,
-    const ALocal_WeakBC * const &wbc_part,
-    const Matrix_PETSc * const &bc_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    FEAElement * const &elementvs,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    IPLocAssem * const &lassem_fluid_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr ) const
+    // const PDNSolution * const &init_dot_sol,
+    // const PDNSolution * const &init_sol,
+    // const TimeMethod_GenAlpha * const &tmga_ptr,
+    // PDNTimeStep * const &time_info,
+    // const ICVFlowRate * const flr_ptr,
+    // const APart_Node * const &pNode_ptr,
+    // const ALocal_Elem * const &alelem_ptr,
+    // const ALocal_IEN * const &lien_ptr,
+    // const FEANode * const &feanode_ptr,
+    // const ALocal_NBC * const &nbc_part,
+    // const ALocal_InflowBC * const &infnbc_part,
+    // const ALocal_EBC * const &ebc_part,
+    // IGenBC * const &gbc,
+    // const ALocal_WeakBC * const &wbc_part,
+    // const Matrix_PETSc * const &bc_mat,
+    // FEAElement * const &elementv,
+    // FEAElement * const &elements,
+    // FEAElement * const &elementvs,
+    // const IQuadPts * const &quad_v,
+    // const IQuadPts * const &quad_s,
+    // IPLocAssem * const &lassem_fluid_ptr,
+    // IPGAssem * const &gassem_ptr,
+    // PLinear_Solver_PETSc * const &lsolver_ptr,
+    // PNonlinear_NS_Solver * const &nsolver_ptr ) const
+    std::unique_ptr<PDNSolution> init_dot_sol,
+    std::unique_ptr<PDNSolution> init_sol,
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
-  PDNSolution * pre_sol = new PDNSolution(*init_sol);
-  PDNSolution * cur_sol = new PDNSolution(*init_sol);
-  PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+  // PDNSolution * pre_sol = new PDNSolution(*init_sol);
+  // PDNSolution * cur_sol = new PDNSolution(*init_sol);
+  // PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
+  // PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+  
+  auto pre_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto cur_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto pre_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+  auto cur_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -124,12 +140,17 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
+    // nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
+    //     time_info->get_time(), time_info->get_step(),
+    //     sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
+    //     alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
+    //     ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
+    //     gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+
+    nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(),
-        sol_base, pre_dot_sol, pre_sol, tmga_ptr, flr_ptr,
-        alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part,
-        ebc_part, gbc, wbc_part, bc_mat, elementv, elements, elementvs, quad_v, quad_s, lassem_fluid_ptr,
-        gassem_ptr, lsolver_ptr, cur_dot_sol, cur_sol, conv_flag, nl_counter );
+        sol_base.get(), pre_dot_sol.get(), pre_sol.get(), 
+        cur_dot_sol.get(), cur_sol.get(), conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
