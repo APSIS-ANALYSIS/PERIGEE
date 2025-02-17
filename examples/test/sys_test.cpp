@@ -4,14 +4,30 @@
 #include <random>
 #include <cmath>
 
-#include "GenBCFactory.hpp"
+#include "AGlobal_Mesh_Info.hpp"
+#include "Vis_Tools.hpp"
 
 int main()
 {
-  auto gbc = GenBCFactory::createGenBC("test.txt", 0.3, 0.14, 1, 200);
+  const std::string epart_file = "epart.h5";
+  const std::string part_file="postpart";
+  const int rank = 0;
+  auto GMIptr = new AGlobal_Mesh_Info(part_file,rank);
+  
+  const int nElem = GMIptr->get_nElem();
 
-  gbc -> print_info();
+  std::vector<int> epart_map_1;
+  VIS_T::read_epart( epart_file, nElem, epart_map_1 );
 
+  auto epart_map_2 = VIS_T::read_epart(epart_file, nElem);
+
+  VEC_T::print(epart_map_1);
+  VEC_T::print(epart_map_2);
+
+  if(VEC_T::is_equal(epart_map_1, epart_map_2, 0)) std::cout<<"good!\n";
+  else std::cout<<"bad\n";
+
+  delete GMIptr;
   return EXIT_SUCCESS;
 }
 

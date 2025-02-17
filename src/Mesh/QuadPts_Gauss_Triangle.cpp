@@ -293,8 +293,8 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       break;
   }
 
-  VEC_T::shrink2fit(qp);
-  VEC_T::shrink2fit(qw);
+  qp.shrink_to_fit();
+  qw.shrink_to_fit();
 
   // Correct the formula by scaling all weights by 0.5
   for(int ii=0; ii<num_pts; ++ii) qw[ii] *= 0.5;

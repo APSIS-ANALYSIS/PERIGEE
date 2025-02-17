@@ -63,9 +63,9 @@ ALocal_NBC::ALocal_NBC( const std::string &fileBaseName,
     LPM_offset.push_back( LPM_offset[ii-1] + Num_LPM[ii-1] );
   }
 
-  VEC_T::shrink2fit( LD_offset  );
-  VEC_T::shrink2fit( LPS_offset );
-  VEC_T::shrink2fit( LPM_offset );
+  LD_offset.shrink_to_fit();
+  LPS_offset.shrink_to_fit();
+  LPM_offset.shrink_to_fit();
 }
 
 ALocal_NBC::ALocal_NBC( const HDF5_Reader * const &h5r,

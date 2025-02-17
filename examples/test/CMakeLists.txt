@@ -144,7 +144,8 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 ADD_EXECUTABLE( sys_test sys_test.cpp )
 ADD_EXECUTABLE( mod_test matmodel_test.cpp )
 
-TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis )
+TARGET_LINK_LIBRARIES( sys_test perigee_preprocess perigee_analysis
+  perigee_postprocess )
 TARGET_LINK_LIBRARIES( mod_test perigee_preprocess perigee_analysis )
 
 if(OPENMP_CXX_FOUND)

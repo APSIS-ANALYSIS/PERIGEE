@@ -1,8 +1,5 @@
 #include "Interpolater.hpp"
 
-Interpolater::Interpolater( const int &in_nlocbas ) : nLocBas( in_nlocbas )
-{}
-
 void Interpolater::print_info() const
 {
   std::cout<<"Interpolater: \n";

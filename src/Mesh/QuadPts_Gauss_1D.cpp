@@ -151,8 +151,8 @@ QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min,
       compute_npts();
       break;
   }
-  VEC_T::shrink2fit(qp);
-  VEC_T::shrink2fit(qw);
+  qp.shrink_to_fit();
+  qw.shrink_to_fit();
 
   // Reverse the points and weights to make them in ascending order
   std::reverse(qp.begin(), qp.end());

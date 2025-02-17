@@ -7,7 +7,7 @@ VTK_Writer_Elastodynamics::VTK_Writer_Elastodynamics( const int &in_nelem,
   lambda( in_nu * in_module_E / ((1.0 + in_nu) * (1.0 - 2.0 * in_nu)) ),
   mu( 0.5 * in_module_E / (1.0 + in_nu) )
 {
-  VIS_T::read_epart( epart_file, nElem, epart_map );
+  epart_map = VIS_T::read_epart( epart_file, nElem );
 }
 
 void VTK_Writer_Elastodynamics::writeOutput(

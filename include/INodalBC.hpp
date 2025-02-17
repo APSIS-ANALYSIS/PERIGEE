@@ -12,7 +12,6 @@
 // Date: Aug 16 2015
 // ============================================================================
 #include "Sys_Tools.hpp"
-#include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
 #include "IIEN.hpp"
 
@@ -366,7 +365,7 @@ class INodalBC
     // ------------------------------------------------------------------------
     virtual void Create_ID( const unsigned int &num_node )
     {
-      ID.resize(num_node); VEC_T::shrink2fit(ID);
+      ID.resize(num_node); ID.shrink_to_fit();
 
       for(unsigned int ii = 0; ii<ID.size(); ++ii) ID[ii] = ii;
 

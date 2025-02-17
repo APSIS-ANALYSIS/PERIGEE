@@ -53,8 +53,8 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
     } // end jj-loop
   } // end ii-loop over dof
 
-  VEC_T::shrink2fit( LDN ); VEC_T::shrink2fit( LPSN ); VEC_T::shrink2fit( LPMN );
-  VEC_T::shrink2fit( LocalMaster ); VEC_T::shrink2fit( LocalMasterSlave );
+  LDN.shrink_to_fit(); LPSN.shrink_to_fit(); LPMN.shrink_to_fit();
+  LocalMaster.shrink_to_fit(); LocalMasterSlave.shrink_to_fit();
 
   const int totnode = part->get_nlocghonode();
 
@@ -75,7 +75,7 @@ NBC_Partition::NBC_Partition( const IPart * const &part,
     if(LID[ii] != -1) LID[ii] = mnindex->get_old2new(LID[ii]);
   }
 
-  VEC_T::shrink2fit( LID );
+  LID.shrink_to_fit();
 }
 
 void NBC_Partition::write_hdf5( const std::string &FileName, 
