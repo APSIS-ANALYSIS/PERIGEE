@@ -57,17 +57,13 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const std::string &filename )
 
         if( face_id != nbc_id ) SYS_T::print_fatal("FlowRate_Linear2Steady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
-        if(!(sstrm >> num_of_mode[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Linear2Steady Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> num_of_mode[nbc_id])) SYS_T::print_fatal("FlowRate_Linear2Steady Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
         
-        if(!(sstrm >> w[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Linear2Steady Error: w of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> w[nbc_id])) SYS_T::print_fatal("FlowRate_Linear2Steady Error: w of nbc %d is undefined!\n", nbc_id);
         
-        if(!(sstrm >> period[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Linear2Steady Error: period of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> period[nbc_id])) SYS_T::print_fatal("FlowRate_Linear2Steady Error: period of nbc %d is undefined!\n", nbc_id);
 
-        if(!(sstrm >> thred_time[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Linear2Steady Error: thred_time of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> thred_time[nbc_id])) SYS_T::print_fatal("FlowRate_Linear2Steady Error: thred_time of nbc %d is undefined!\n", nbc_id);
 
         if(!(sstrm >> start_flow_rate[nbc_id]))
         {

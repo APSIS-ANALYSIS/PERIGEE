@@ -36,7 +36,6 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
     thred_time.resize(num_nbc);
-
     start_flow_rate.resize(num_nbc);
     TI_std_dev.resize(num_nbc);
   }
@@ -57,17 +56,13 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
 
         if( face_id != nbc_id ) SYS_T::print_fatal("FlowRate_Cosine2Steady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
-        if(!(sstrm >> num_of_mode[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Cosine2Steady Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> num_of_mode[nbc_id])) SYS_T::print_fatal("FlowRate_Cosine2Steady Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
         
-        if(!(sstrm >> w[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Cosine2Steady Error: w of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> w[nbc_id])) SYS_T::print_fatal("FlowRate_Cosine2Steady Error: w of nbc %d is undefined!\n", nbc_id);
         
-        if(!(sstrm >> period[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Cosine2Steady Error: period of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> period[nbc_id])) SYS_T::print_fatal("FlowRate_Cosine2Steady Error: period of nbc %d is undefined!\n", nbc_id);
 
-        if(!(sstrm >> thred_time[nbc_id]))
-          SYS_T::print_fatal("FlowRate_Cosine2Steady Error: thred_time of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> thred_time[nbc_id])) SYS_T::print_fatal("FlowRate_Cosine2Steady Error: thred_time of nbc %d is undefined!\n", nbc_id);
 
         if(!(sstrm >> start_flow_rate[nbc_id]))
         {
