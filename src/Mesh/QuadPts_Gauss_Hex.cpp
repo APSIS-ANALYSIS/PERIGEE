@@ -27,7 +27,8 @@ QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts_x,
       }
     }
   }
-  VEC_T::shrink2fit(qp); VEC_T::shrink2fit(qw);
+  qp.shrink_to_fit();
+  qw.shrink_to_fit();
 }
 
 QuadPts_Gauss_Hex::QuadPts_Gauss_Hex( const int &in_num_pts_1d, 

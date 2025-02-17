@@ -9,7 +9,6 @@
 // Date Created: Oct. 30 2021
 // ============================================================================
 #include "IGenBC.hpp"
-#include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 
 class GenBC_Pressure : public IGenBC

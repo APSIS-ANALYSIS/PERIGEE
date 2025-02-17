@@ -440,16 +440,18 @@ void VIS_T::setQuadTetraelem( const int &ptid0, const int &ptid1,
   cell->Delete();
 }
 
-void VIS_T::read_epart( const std::string &epart_file, const int &esize,
-    std::vector<int> &elem_part )
+std::vector<int> VIS_T::read_epart( const std::string &epart_file, 
+    const int &esize )
 {
   std::string fname(epart_file);
   fname.erase( fname.end()-3, fname.end() );
   fname.append(".h5");
   
-  elem_part = HDF5_T::read_intVector( fname.c_str(), "/", "part" );
+  const auto elem_part = HDF5_T::read_intVector( fname.c_str(), "/", "part" );
 
   SYS_T::print_fatal_if( int(elem_part.size()) != esize, "Error: the epart file's part length does not match given size. \n" );
+
+  return elem_part;
 }
 
 // EOF

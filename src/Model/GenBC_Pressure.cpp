@@ -76,7 +76,7 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename, const double &i
       }
     }
 
-    VEC_T::shrink2fit( coef_a[ebc_id] );
+    coef_a[ebc_id].shrink_to_fit();
 
     if( static_cast<int>(coef_a[ebc_id].size()) != num_of_mode[ebc_id]+1 ) SYS_T::print_fatal( "GenBC_Pressure Error: ebc_id %d a-coefficients in %s incompatible with the given number of modes.\n", ebc_id, lpn_filename.c_str() );
 
@@ -94,7 +94,7 @@ GenBC_Pressure::GenBC_Pressure( const std::string &lpn_filename, const double &i
       }
     }
 
-    VEC_T::shrink2fit( coef_b[ebc_id] );
+    coef_b[ebc_id].shrink_to_fit();
 
     if( static_cast<int>(coef_b[ebc_id].size()) != num_of_mode[ebc_id]+1 ) SYS_T::print_fatal( "GenBC_Pressure Error: ebc_id %d b-coefficients in %s incompatible with the given number of modes.\n", ebc_id, lpn_filename.c_str() );
   }
