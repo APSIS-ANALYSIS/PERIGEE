@@ -9,6 +9,7 @@
 // Date: Aug. 27 2015
 // ============================================================================
 #include "IQuadPts.hpp"
+#include "Vec_Tools.hpp"
 
 class QuadPts_debug final : public IQuadPts
 {
