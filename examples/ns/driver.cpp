@@ -370,7 +370,8 @@ int main(int argc, char *argv[])
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
   auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
-  auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
+  // auto locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
+  std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
   auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
   auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
 

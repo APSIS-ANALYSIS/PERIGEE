@@ -23,6 +23,7 @@
 #include "ALocal_NBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "ALocal_EBC.hpp"
+#include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_Interface.hpp"
 #include "Sliding_Interface_Tools.hpp"
