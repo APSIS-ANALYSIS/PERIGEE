@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
-  int nqp_tet = 5, nqp_tri = 4;
+  int nqp_vol = 5, nqp_sur = 4;
 
   // Number of quadrature points for hexs and quadrangles
   // Suggested values: 2 / 2 for linear, 4 / 4 for quadratic
@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionInt("-nqp_tet", nqp_tet);
-  SYS_T::GetOptionInt("-nqp_tri", nqp_tri);
+  SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
+  SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
   // SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
   // SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
@@ -170,8 +170,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-C_bI", C_bI);
 
   // ===== Print Command Line Arguments =====
-  SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
-  SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
+  SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
+  SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
   if( is_backward_Euler )
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
@@ -287,17 +287,24 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  ICVFlowRate * inflow_rate_ptr = nullptr;
+  // ICVFlowRate * inflow_rate_ptr = nullptr;
 
   // If inflow file exist, load it
   // otherwise, call the linear incremental flow rate to reach a steady flow
   // if( SYS_T::file_exist( inflow_file ) )
   //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
   // else
-  inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
+  // inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
+  //     inflow_file );
+
+  // inflow_rate_ptr->print_info();
+
+  std::unique_ptr<ICVFlowRate> inflow_rate = nullptr;
+
+  inflow_rate = SYS_T::make_unique<CVFlowRate_Cosine2Steady>( inflow_thd_time, inflow_TI_perturbation, 
       inflow_file );
 
-  inflow_rate_ptr->print_info();
+  inflow_rate->print_info();
 
   // ===== Finite Element Container & Quadrature rules =====
   // SYS_T::commPrint("===> Setup element container. \n");
@@ -400,7 +407,7 @@ int main(int argc, char *argv[])
 
     locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha>(
       ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
-      fluid_density, fluid_mu, bs_beta, tm_galpha.get(), c_ct, c_tauc );    
+      tm_galpha.get(), fluid_density, fluid_mu, bs_beta, c_ct, c_tauc );    
   }
   else if( locwbc->get_wall_model_type() == 1 )
   {
@@ -411,7 +418,7 @@ int main(int argc, char *argv[])
     
     locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha_WeakBC>(
       ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
-      fluid_density, fluid_mu, bs_beta, tm_galpha.get(), c_ct, c_tauc, C_bI );    
+      tm_galpha.get(), fluid_density, fluid_mu, bs_beta, c_ct, c_tauc, C_bI );    
   }
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
@@ -423,7 +430,7 @@ int main(int argc, char *argv[])
   // PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
 
   std::unique_ptr<PDNSolution> base =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(); 1 );
+    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 );
 
   std::unique_ptr<PDNSolution> sol =
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
@@ -506,7 +513,7 @@ int main(int argc, char *argv[])
   std::unique_ptr<IPGAssem> gloAssem =
     SYS_T::make_unique<PGAssem_NS_FEM>(
       std::move(locIEN), std::move(locElem), std::move(fNode),
-      std::move(pNode), std::move(locnbc), std::move(locinfnbc), 
+      std::move(pNode), std::move(locinfnbc), std::move(locnbc), 
       std::move(locebc), std::move(gbc), std::move(locwbc), 
       std::move(locAssem_ptr), nz_estimate ); 
 
@@ -554,7 +561,7 @@ int main(int argc, char *argv[])
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
-    delete lsolver_acce;
+    // delete lsolver_acce;
     SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
@@ -572,9 +579,9 @@ int main(int argc, char *argv[])
   // PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
   //     nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
-  auto nsolver = SYS_T::make_unique<PNonlinear_LinearPDE_Solver>(
+  auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(inflow_rate_ptr),
+      std::move(tm_galpha), std::move(inflow_rate), std::move(locinfnbc),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -584,8 +591,9 @@ int main(int argc, char *argv[])
   //     sol_record_freq, ttan_renew_freq, final_time );
 
   auto tsolver = SYS_T::make_unique<PTime_NS_Solver>(
-      std::move(nsolver), sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time )
+      std::move(nsolver), std::move(gloAssem), 
+      std::move(locinfnbc), std::move(locebc), std::move(gbc),
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
 
@@ -601,13 +609,13 @@ int main(int argc, char *argv[])
     // const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
     //     sol, locAssem_ptr, elements, quads, locebc, ff );
 
-    const double dot_face_flrate = gloAssem_ptr -> Assem_outlet_flowrate(
+    const double dot_face_flrate = gloAssem -> Assem_outlet_flowrate(
         dot_sol.get(), ff );
 
-    const double face_flrate = gloAssem_ptr -> Assem_outlet_flowrate(
+    const double face_flrate = gloAssem -> Assem_outlet_flowrate(
         sol.get(), ff );
 
-    const double face_avepre = gloAssem_ptr -> Assem_outlet_ave_pressure(
+    const double face_avepre = gloAssem -> Assem_outlet_ave_pressure(
         sol.get(), ff );
 
     // set the gbc initial conditions using the 3D data
@@ -651,11 +659,11 @@ int main(int argc, char *argv[])
     // const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
     //     sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol.get(), std::move(locAssem_ptr), ff );
+    const double inlet_face_flrate = gloAssem -> Assem_inlet_flowrate(
+        sol.get(), ff );
 
-    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol.get(), std::move(locAssem_ptr), ff );
+    const double inlet_face_avepre = gloAssem -> Assem_inlet_ave_pressure(
+        sol.get(), ff );
 
     if( rank == 0 )
     {
@@ -690,15 +698,16 @@ int main(int argc, char *argv[])
       std::move(sol), std::move(timeinfo) );
 
   // ===== Print complete solver info =====
-  lsolver -> print_info();
+  // lsolver -> print_info();
+  tsolver -> print_lsolver_info();
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr;
-  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
-  delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
-  delete lsolver; delete nsolver; delete tsolver;
+  // delete fNode; delete locIEN; delete GMIptr;
+  // delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
+  // delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
+  // delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
+  // delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
+  // delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();
   return EXIT_SUCCESS;

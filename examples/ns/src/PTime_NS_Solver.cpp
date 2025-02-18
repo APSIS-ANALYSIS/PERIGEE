@@ -72,7 +72,8 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    PDNSolution * const &sol_base,
+    // PDNSolution * const &sol_base,
+    std::unique_ptr<PDNSolution> sol_base,
     // const PDNSolution * const &init_dot_sol,
     // const PDNSolution * const &init_sol,
     // const TimeMethod_GenAlpha * const &tmga_ptr,
@@ -154,7 +155,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(),
-        sol_base, pre_dot_sol.get(), pre_sol.get(), 
+        sol_base.get(), pre_dot_sol.get(), pre_sol.get(), 
         cur_dot_sol.get(), cur_sol.get(), conv_flag, nl_counter );
 
     // Update the time step information

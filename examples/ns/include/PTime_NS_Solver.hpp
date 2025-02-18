@@ -32,7 +32,8 @@ class PTime_NS_Solver
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-        PDNSolution * const &sol_base,
+        // PDNSolution * const &sol_base,
+        std::unique_ptr<PDNSolution> sol_base,
         // const PDNSolution * const &init_dot_sol,
         // const PDNSolution * const &init_sol,
         // const TimeMethod_GenAlpha * const &tmga_ptr,
