@@ -155,8 +155,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_EBC * const &ebc_part,
     //     const int &ebc_id );
-    virtual double Assem_outlet_flowrate(
+    virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
+        const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
     // virtual double Assem_surface_flowrate(
@@ -166,8 +167,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_InflowBC * const &infbc_part,
     //     const int &nbc_id );
-    virtual double Assem_inlet_flowrate(
+    virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
+        const ALocal_InflowBC * const &infbc_part,
         const int &infnbc_id );
 
     // virtual double Assem_surface_ave_pressure(
@@ -177,8 +179,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_EBC * const &ebc_part,
     //     const int &ebc_id );
-    virtual double Assem_outlet_ave_pressure(
+    virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
+        const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
     // virtual double Assem_surface_ave_pressure(
@@ -188,8 +191,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_InflowBC * const &infbc_part,
     //     const int &nbc_id );
-    virtual double Assem_inlet_ave_pressure(
+    virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
+        const ALocal_EBC * const &ebc_part,
         const int &infnbc_id );
 
   private:
@@ -224,7 +228,8 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_NBC * const &nbc_part,
     //     const ALocal_EBC * const &ebc_part );
-    void NatBC_G( const double &curr_time, const double &dt );
+    void NatBC_G( const double &curr_time, const double &dt,
+        const ALocal_EBC * const &ebc_part );
 
     // Backflow integral on outlet surfaces
     // void BackFlow_G( const PDNSolution * const &sol,

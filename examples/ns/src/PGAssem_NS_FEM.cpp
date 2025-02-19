@@ -22,7 +22,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     std::unique_ptr<ALocal_Elem> in_locelem,
     std::unique_ptr<FEANode> in_fnode,
     std::unique_ptr<APart_Node> in_pnode,
-    std::unique_ptr<ALocal_InflowBC> in_infbc,
+    // std::unique_ptr<ALocal_InflowBC> in_infbc,
     std::unique_ptr<ALocal_NBC> in_nbc,
     // std::unique_ptr<ALocal_EBC> in_ebc,
     // std::unique_ptr<IGenBC> in_gbc,
@@ -33,7 +33,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   locelem( std::move(in_locelem) ),
   fnode( std::move(in_fnode) ),
   pnode( std::move(in_pnode) ),
-  infbc( std::move(in_infbc) ),
+  // infbc( std::move(in_infbc) ),
   nbc( std::move(in_nbc) ),
   // ebc( std::move(in_ebc) ),
   // gbc( std::move(in_gbc) ),
@@ -518,7 +518,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 //     const IQuadPts * const &quad_s,
 //     const ALocal_NBC * const &nbc_part,
 //     const ALocal_EBC * const &ebc_part )
-void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt )
+void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt,
+    const ALocal_EBC * const &ebc_part )
 {
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
@@ -528,13 +529,13 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt )
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    const int num_sele = ebc -> get_num_local_cell(ebc_id);
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
 
-      ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       locassem -> Assem_Residual_EBC( ebc_id, curr_time, dt,
           sctrl_x, sctrl_y, sctrl_z );
@@ -676,8 +677,9 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 //     const IQuadPts * const &quad_s,
 //     const ALocal_EBC * const &ebc_part,
 //     const int &ebc_id )
-double PGAssem_NS_FEM::Assem_outlet_flowrate(
+double PGAssem_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
+    const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
   double * array = new double [nlgn * dof_sol];
@@ -689,17 +691,17 @@ double PGAssem_NS_FEM::Assem_outlet_flowrate(
 
   vec -> GetLocalArray( array );
 
-  const int num_sele = ebc -> get_num_local_cell(ebc_id);
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
   double esum = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
     // Obtain the LSIEN array
-    ebc -> get_SIEN( ebc_id, ee, LSIEN);
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN);
 
     // Obtain the control points coordinates
-    ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
@@ -728,8 +730,9 @@ double PGAssem_NS_FEM::Assem_outlet_flowrate(
 //     const IQuadPts * const &quad_s,
 //     const ALocal_InflowBC * const &infbc_part,
 //     const int &nbc_id )
-double PGAssem_NS_FEM::Assem_inlet_flowrate(
+double PGAssem_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
+    const ALocal_InflowBC * const &infbc_part,
     const int &infnbc_id )
 {
   double * array = new double [nlgn * dof_sol];
@@ -741,17 +744,17 @@ double PGAssem_NS_FEM::Assem_inlet_flowrate(
 
   vec -> GetLocalArray( array );
 
-  const int num_sele = infbc -> get_num_local_cell(infnbc_id);
+  const int num_sele = infbc_part -> get_num_local_cell(infnbc_id);
 
   double esum = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
     // Obtain the LSIEN array
-    infbc -> get_SIEN( infnbc_id, ee, LSIEN );
+    infbc_part -> get_SIEN( infnbc_id, ee, LSIEN );
 
     // Obtain the control points coordinates
-    infbc -> get_ctrlPts_xyz( infnbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    infbc_part -> get_ctrlPts_xyz( infnbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
@@ -780,8 +783,9 @@ double PGAssem_NS_FEM::Assem_inlet_flowrate(
 //     const IQuadPts * const &quad_s,
 //     const ALocal_EBC * const &ebc_part,
 //     const int &ebc_id )
-double PGAssem_NS_FEM::Assem_outlet_ave_pressure(
+double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
+    const ALocal_EBC * const &ebc_part,
     const int &ebc_id )
 {
   double * array = new double [nlgn * dof_sol];
@@ -793,17 +797,17 @@ double PGAssem_NS_FEM::Assem_outlet_ave_pressure(
 
   vec -> GetLocalArray( array );
 
-  const int num_sele = ebc -> get_num_local_cell(ebc_id);
+  const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
   double val_pres = 0.0, val_area = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
     // Obtain the LSIEN array
-    ebc -> get_SIEN( ebc_id, ee, LSIEN );
+    ebc_part -> get_SIEN( ebc_id, ee, LSIEN );
 
     // Obtain the control points coordinates
-    ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
@@ -840,8 +844,9 @@ double PGAssem_NS_FEM::Assem_outlet_ave_pressure(
 //     const IQuadPts * const &quad_s,
 //     const ALocal_InflowBC * const &infbc_part,
 //     const int &nbc_id )
-double PGAssem_NS_FEM::Assem_inlet_ave_pressure(
+double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
+    const ALocal_InflowBC * const &infbc_part,
     const int &infnbc_id )
 {
   double * array = new double [nlgn * dof_sol];
@@ -853,17 +858,17 @@ double PGAssem_NS_FEM::Assem_inlet_ave_pressure(
 
   vec -> GetLocalArray( array );
 
-  const int num_sele = infbc -> get_num_local_cell(infnbc_id);
+  const int num_sele = infbc_part -> get_num_local_cell(infnbc_id);
 
   double val_pres = 0.0, val_area = 0.0;
 
   for(int ee=0; ee<num_sele; ++ee)
   {
     // Obtain the LSIEN array
-    infbc -> get_SIEN( infnbc_id, ee, LSIEN );
+    infbc_part -> get_SIEN( infnbc_id, ee, LSIEN );
 
     // Obtain the control points coordinates
-    infbc -> get_ctrlPts_xyz( infnbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+    infbc_part -> get_ctrlPts_xyz( infnbc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
