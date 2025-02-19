@@ -19,7 +19,7 @@ class PNonlinear_NS_Solver
 {
   public:
     PNonlinear_NS_Solver( 
-        std::unique_ptr<IPGAssem> in_gassem,
+        // std::unique_ptr<IPGAssem> in_gassem,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
@@ -60,9 +60,6 @@ class PNonlinear_NS_Solver
         // const ALocal_IEN * const &lien_ptr,
         // const FEANode * const &feanode_ptr,
         // const ALocal_NBC * const &nbc_part,
-        const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
         // const ALocal_WeakBC * const &wbc_part,
         // const Matrix_PETSc * const &bc_mat,
         // FEAElement * const &elementv,
@@ -75,13 +72,17 @@ class PNonlinear_NS_Solver
         // PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
+        const ALocal_InflowBC * const &infnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        IPGAssem * const &gassem_ptr,
         bool &conv_flag, int &nl_counter ) const;
 
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
-    const std::unique_ptr<IPGAssem> gassem;
+    // const std::unique_ptr<IPGAssem> gassem;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;

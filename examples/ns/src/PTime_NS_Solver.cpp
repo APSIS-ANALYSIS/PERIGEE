@@ -5,18 +5,17 @@
 //     const int &input_renew_tang_freq, const double &input_final_time )
 PTime_NS_Solver::PTime_NS_Solver( 
     std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
-    std::unique_ptr<IPGAssem> in_gassem,
-    std::unique_ptr<ALocal_InflowBC> in_infbc,
-    std::unique_ptr<ALocal_EBC> in_ebc,
-    std::unique_ptr<IGenBC> in_gbc,
+    // std::unique_ptr<IPGAssem> in_gassem,
+    // std::unique_ptr<ALocal_InflowBC> in_infbc,
+    // std::unique_ptr<ALocal_EBC> in_ebc,
+    // std::unique_ptr<IGenBC> in_gbc,
     const std::string &input_name,
     const int &input_record_freq, const int &input_renew_tang_freq,
     const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
 //   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 // {}
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
-  nsolver(std::move(in_nsolver)), gassem(std::move(in_gassem)),
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), nsolver(std::move(in_nsolver)), 
   infbc(std::move(in_infbc)), ebc(std::move(in_ebc)), gbc(std::move(in_gbc))
 {}
 
@@ -84,9 +83,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // const ALocal_IEN * const &lien_ptr,
     // const FEANode * const &feanode_ptr,
     // const ALocal_NBC * const &nbc_part,
-    // const ALocal_InflowBC * const &infnbc_part,
-    // const ALocal_EBC * const &ebc_part,
-    // IGenBC * const &gbc,
+    const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_EBC * const &ebc_part,
+    IGenBC * const &gbc,
     // const ALocal_WeakBC * const &wbc_part,
     // const Matrix_PETSc * const &bc_mat,
     // FEAElement * const &elementv,
@@ -95,7 +94,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // const IQuadPts * const &quad_v,
     // const IQuadPts * const &quad_s,
     // IPLocAssem * const &lassem_fluid_ptr,
-    // IPGAssem * const &gassem_ptr,
+    IPGAssem * const &gassem_ptr,
     // PLinear_Solver_PETSc * const &lsolver_ptr,
     // PNonlinear_NS_Solver * const &nsolver_ptr ) const
     std::unique_ptr<PDNSolution> init_dot_sol,
@@ -156,7 +155,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(),
         sol_base.get(), pre_dot_sol.get(), pre_sol.get(), 
-        cur_dot_sol.get(), cur_sol.get(), conv_flag, nl_counter );
+        cur_dot_sol.get(), cur_sol.get(), infnbc_part, ebc_part, gbc,
+        gassem_ptr, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -176,19 +176,19 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
-    for(int face=0; face<ebc -> get_num_ebc(); ++face)
+    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
-      const double dot_face_flrate = gassem -> Assem_outlet_flowrate( 
-          cur_dot_sol.get(), face); 
+      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+          cur_dot_sol.get(), ebc_part, face); 
 
       // Calculate the 3D flow rate on the outlet
-      const double face_flrate = gassem -> Assem_outlet_flowrate( 
-          cur_sol.get(), face); 
+      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+          cur_sol.get(), ebc_part, face); 
 
       // Calculate the 3D averaged pressure on the outlet
-      const double face_avepre = gassem -> Assem_outlet_ave_pressure( 
-          cur_sol.get(), face);
+      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
+          cur_sol.get(), ebc_part, face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -205,7 +205,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( ebc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
@@ -213,18 +213,18 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
    
     // Calcualte the inlet data
-    for(int face=0; face<infbc -> get_num_nbc(); ++face)
+    for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
-      const double inlet_face_flrate = gassem -> Assem_inlet_flowrate(
-          cur_sol.get(), face ); 
+      const double inlet_face_flrate = gassem_ptr -> Assem_inlet_flowrate(
+          cur_sol.get(), infnbc_part, face ); 
 
-      const double inlet_face_avepre = gassem -> Assem_inlet_flowrate(
-          cur_sol.get(), face );
+      const double inlet_face_avepre = gassem_ptr -> Assem_inlet_flowrate(
+          cur_sol.get(), infnbc_part, face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( infbc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( infnbc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
         ofile.close();
       } 
