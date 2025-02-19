@@ -1055,7 +1055,7 @@ class IPGAssem
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
     }
-  
+
     // Update wall prestress at all surface quadrature points
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &sol_wall_disp,
