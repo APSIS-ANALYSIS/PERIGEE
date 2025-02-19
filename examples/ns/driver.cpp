@@ -264,11 +264,11 @@ int main(int argc, char *argv[])
   // // Local sub-domain's nodal bc
   // ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
 
-  // // Local sub-domain's inflow bc
-  // ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
+  // Local sub-domain's inflow bc
+  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
-  // // Local sub-domain's elemental bc
-  // ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+  // Local sub-domain's elemental bc
+  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
 
   // // Local sub_domain's weak bc
   // ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
@@ -369,9 +369,8 @@ int main(int argc, char *argv[])
   auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
-  auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
-  // auto locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
-  std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
+  // auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
+  // std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
   auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
   auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
 
@@ -431,7 +430,7 @@ int main(int argc, char *argv[])
   // PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
 
   std::unique_ptr<PDNSolution> base =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 );
+    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc, 1 );
 
   std::unique_ptr<PDNSolution> sol =
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
@@ -470,35 +469,35 @@ int main(int argc, char *argv[])
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== LPN models =====
-  // IGenBC * gbc = nullptr;
+  IGenBC * gbc = nullptr;
   
-  std::unique_ptr<IGenBC> gbc = nullptr; 
+  // std::unique_ptr<IGenBC> gbc = nullptr; 
   
-  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-      gbc = SYS_T::make_unique<GenBC_Resistance>( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2 )
-      gbc = SYS_T::make_unique<GenBC_RCR>( lpn_file, 1000, initial_step );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3 )
-      gbc = SYS_T::make_unique<GenBC_Inductance>( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4 )
-      gbc = SYS_T::make_unique<GenBC_Coronary>( lpn_file, 1000, initial_step, initial_index );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5 )
-      gbc = SYS_T::make_unique<GenBC_Pressure>( lpn_file, initial_time );
-  else
-      SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
-
   // if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-  //   gbc = new GenBC_Resistance( lpn_file );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
-  //   gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
-  //   gbc = new GenBC_Inductance( lpn_file );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
-  //   gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-  //   gbc = new GenBC_Pressure( lpn_file, initial_time );
+  //     gbc = SYS_T::make_unique<GenBC_Resistance>( lpn_file );
+  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2 )
+  //     gbc = SYS_T::make_unique<GenBC_RCR>( lpn_file, 1000, initial_step );
+  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3 )
+  //     gbc = SYS_T::make_unique<GenBC_Inductance>( lpn_file );
+  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4 )
+  //     gbc = SYS_T::make_unique<GenBC_Coronary>( lpn_file, 1000, initial_step, initial_index );
+  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5 )
+  //     gbc = SYS_T::make_unique<GenBC_Pressure>( lpn_file, initial_time );
   // else
-  //   SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+  //     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+
+  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
+    gbc = new GenBC_Resistance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
+    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
+    gbc = new GenBC_Inductance( lpn_file );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
+    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
+  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
+    gbc = new GenBC_Pressure( lpn_file, initial_time );
+  else
+    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
 
   gbc -> print_info();
 
@@ -511,24 +510,26 @@ int main(int argc, char *argv[])
   // IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
   //     GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
 
-  std::unique_ptr<IPGAssem> gloAssem =
-    SYS_T::make_unique<PGAssem_NS_FEM>(
+  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locebc, gbc, 
       std::move(locIEN), std::move(locElem), std::move(fNode),
-      std::move(pNode), std::move(locinfnbc), std::move(locnbc), 
-      std::move(locebc), std::move(gbc), std::move(locwbc), 
-      std::move(locAssem_ptr), nz_estimate ); 
+      std::move(pNode), std::move(locnbc), std::move(locwbc),
+      std::move(locAssem_ptr), nz_estimate );
+
+  // std::unique_ptr<IPGAssem> gloAssem =
+  //   SYS_T::make_unique<PGAssem_NS_FEM>(
+  //     std::move(locIEN), std::move(locElem), std::move(fNode),
+  //     std::move(pNode), std::move(locinfnbc), std::move(locnbc), 
+  //     std::move(locebc), std::move(gbc), std::move(locwbc), 
+  //     std::move(locAssem_ptr), nz_estimate ); 
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   // gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
   //     elements, quads, locIEN, pNode, locnbc, locebc, gbc );
-  gloAssem->Assem_nonzero_estimate( );
+  gloAssem_ptr->Assem_nonzero_estimate( locebc, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  // gloAssem_ptr->Fix_nonzero_err_str();
-  // gloAssem_ptr->Clear_KG();
-
-  gloAssem->Fix_nonzero_err_str();
-  gloAssem->Clear_KG();
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   if( is_restart == false )
@@ -552,11 +553,11 @@ int main(int argc, char *argv[])
     // gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
     //     elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
 
-    gloAssem->Assem_mass_residual( sol.get() );
+    gloAssem_ptr->Assem_mass_residual( sol.get() );
 
     // lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
-    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol.get() );
+    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol.get() );
 
     dot_sol -> ScaleValue(-1.0);
 
@@ -581,9 +582,9 @@ int main(int argc, char *argv[])
   //     nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>(
-      std::move(gloAssem), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(inflow_rate), std::move(locinfnbc),
-      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
+      std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
+      std::move(inflow_rate), nl_rtol, nl_atol, nl_dtol, 
+      nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
@@ -592,9 +593,8 @@ int main(int argc, char *argv[])
   //     sol_record_freq, ttan_renew_freq, final_time );
 
   auto tsolver = SYS_T::make_unique<PTime_NS_Solver>(
-      std::move(nsolver), std::move(gloAssem), 
-      std::move(locinfnbc), std::move(locebc), std::move(gbc),
-      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
+      std::move(nsolver), sol_bName, sol_record_freq, 
+      ttan_renew_freq, final_time );
 
   tsolver->print_info();
 
@@ -610,14 +610,14 @@ int main(int argc, char *argv[])
     // const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
     //     sol, locAssem_ptr, elements, quads, locebc, ff );
 
-    const double dot_face_flrate = gloAssem -> Assem_outlet_flowrate(
-        dot_sol.get(), ff );
+    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        dot_sol.get(), locebc, ff );
 
-    const double face_flrate = gloAssem -> Assem_outlet_flowrate(
-        sol.get(), ff );
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol.get(), locebc, ff );
 
-    const double face_avepre = gloAssem -> Assem_outlet_ave_pressure(
-        sol.get(), ff );
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol.get(), locebc, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -660,11 +660,11 @@ int main(int argc, char *argv[])
     // const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
     //     sol, locAssem_ptr, elements, quads, locinfnbc, ff );
 
-    const double inlet_face_flrate = gloAssem -> Assem_inlet_flowrate(
-        sol.get(), ff );
+    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
+        sol.get(), locinfnbc, ff );
 
-    const double inlet_face_avepre = gloAssem -> Assem_inlet_ave_pressure(
-        sol.get(), ff );
+    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
+        sol.get(), locinfnbc, ff );
 
     if( rank == 0 )
     {
@@ -696,7 +696,8 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart,
       std::move(base), std::move(dot_sol), 
-      std::move(sol), std::move(timeinfo) );
+      std::move(sol), std::move(timeinfo),
+      locinfnbc, locebc, gbc, gloAssem_ptr );
 
   // ===== Print complete solver info =====
   // lsolver -> print_info();
@@ -709,6 +710,8 @@ int main(int argc, char *argv[])
   // delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
   // delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
   // delete lsolver; delete nsolver; delete tsolver;
+
+  delete locinfnbc; delete locebc; delete gbc; delete gloAssem_ptr;
 
   PetscFinalize();
   return EXIT_SUCCESS;

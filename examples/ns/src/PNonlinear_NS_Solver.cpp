@@ -8,7 +8,7 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     // const APart_Node * const &anode_ptr,
     // const FEANode * const &feanode_ptr,
     std::unique_ptr<ICVFlowRate> in_flrate,
-    std::unique_ptr<ALocal_InflowBC> in_infbc,
+    // std::unique_ptr<ALocal_InflowBC> in_infbc,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 
@@ -21,7 +21,7 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
-  flrate(std::move(in_flrate)),
+  flrate(std::move(in_flrate))
   // infbc(std::move(in_infbc))
 {
   // Generate the incremental solution vector used for update 

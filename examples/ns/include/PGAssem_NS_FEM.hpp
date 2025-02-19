@@ -193,7 +193,7 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const int &nbc_id );
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part,
+        const ALocal_InflowBC * const &infbc_part,
         const int &infnbc_id );
 
   private:
@@ -238,7 +238,7 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_NBC * const &nbc_part,
     //     const ALocal_EBC * const &ebc_part );
-    void BackFlow_G( const PDNSolution * const &sol
+    void BackFlow_G( const PDNSolution * const &sol,
         const ALocal_EBC * const &ebc_part );
 
     // void BackFlow_KG( const double &dt,
@@ -279,7 +279,7 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IGenBC * const &gbc );
     void NatBC_Resis_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol
+        const PDNSolution * const &sol,
         const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 

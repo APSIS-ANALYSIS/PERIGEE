@@ -15,8 +15,7 @@ PTime_NS_Solver::PTime_NS_Solver(
 : final_time(input_final_time), sol_record_freq(input_record_freq),
 //   renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
 // {}
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), nsolver(std::move(in_nsolver)), 
-  infbc(std::move(in_infbc)), ebc(std::move(in_ebc)), gbc(std::move(in_gbc))
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), nsolver(std::move(in_nsolver))
 {}
 
 std::string PTime_NS_Solver::Name_Generator(const int &counter) const
@@ -83,9 +82,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // const ALocal_IEN * const &lien_ptr,
     // const FEANode * const &feanode_ptr,
     // const ALocal_NBC * const &nbc_part,
-    const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_EBC * const &ebc_part,
-    IGenBC * const &gbc,
     // const ALocal_WeakBC * const &wbc_part,
     // const Matrix_PETSc * const &bc_mat,
     // FEAElement * const &elementv,
@@ -94,12 +90,15 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // const IQuadPts * const &quad_v,
     // const IQuadPts * const &quad_s,
     // IPLocAssem * const &lassem_fluid_ptr,
-    IPGAssem * const &gassem_ptr,
     // PLinear_Solver_PETSc * const &lsolver_ptr,
     // PNonlinear_NS_Solver * const &nsolver_ptr ) const
     std::unique_ptr<PDNSolution> init_dot_sol,
     std::unique_ptr<PDNSolution> init_sol,
-    std::unique_ptr<PDNTimeStep> time_info ) const
+    std::unique_ptr<PDNTimeStep> time_info,
+    const ALocal_InflowBC * const &infnbc_part,
+    const ALocal_EBC * const &ebc_part,
+    IGenBC * const &gbc,
+    IPGAssem * const &gassem_ptr ) const
 {
   // PDNSolution * pre_sol = new PDNSolution(*init_sol);
   // PDNSolution * cur_sol = new PDNSolution(*init_sol);
@@ -215,10 +214,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Calcualte the inlet data
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
-      const double inlet_face_flrate = gassem_ptr -> Assem_inlet_flowrate(
+      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
           cur_sol.get(), infnbc_part, face ); 
 
-      const double inlet_face_avepre = gassem_ptr -> Assem_inlet_flowrate(
+      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_sol.get(), infnbc_part, face );
 
       if( SYS_T::get_MPI_rank() == 0 )

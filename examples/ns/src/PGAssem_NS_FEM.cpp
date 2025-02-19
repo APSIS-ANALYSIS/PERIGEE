@@ -43,7 +43,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   snLocBas( locassem->get_snLocBas() ),
   dof_sol( pnode->get_dof() ),
   dof_mat( locassem->get_dof_mat() ),
-  num_ebc( ebc->get_num_ebc() ),
+  num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode->get_nlocghonode() )
 {
   // Make sure the data structure is compatible
@@ -63,7 +63,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   // if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
-    SYS_T::print_fatal_if(snLocBas != ebc->get_cell_nLocBas(ebc_id),
+    SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
         "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
   }
 
@@ -925,10 +925,10 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
     // Calculate dot flow rate for face with ebc_id from solution vector dot_sol
-    const double dot_flrate = Assem_outlet_flowrate( dot_sol, ebc_id ); 
+    const double dot_flrate = Assem_surface_flowrate( dot_sol, ebc_part, ebc_id ); 
 
     // Calculate flow rate for face with ebc_id from solution vector sol
-    const double flrate = Assem_outlet_flowrate( sol, ebc_id );
+    const double flrate = Assem_surface_flowrate( sol, ebc_part, ebc_id );
 
     // Get the (pressure) value on the outlet surface for traction evaluation    
     const double P_n   = gbc -> get_P0( ebc_id );
@@ -1011,11 +1011,11 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
   {
     // Calculate dot flow rate for face with ebc_id and MPI_Allreduce them
     // Here, dot_sol is the solution at time step n+1 (not n+alpha_f!)
-    const double dot_flrate = Assem_outlet_flowrate( dot_sol, ebc_id ); 
+    const double dot_flrate = Assem_surface_flowrate( dot_sol, ebc_part, ebc_id ); 
 
     // Calculate flow rate for face with ebc_id and MPI_Allreduce them
     // Here, sol is the solution at time step n+1 (not n+alpha_f!)
-    const double flrate = Assem_outlet_flowrate( sol, ebc_id );
+    const double flrate = Assem_surface_flowrate( sol, ebc_part, ebc_id );
 
     // Get the (pressure) value on the outlet surface for traction evaluation    
     const double P_n   = gbc -> get_P0( ebc_id );
