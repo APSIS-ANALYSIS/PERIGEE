@@ -33,16 +33,16 @@ class PGAssem_NS_FEM : public IPGAssem
         // const ALocal_IEN * const &aien_ptr,
         // const APart_Node * const &pnode_ptr,
         // const ALocal_NBC * const &part_nbc,
-        // const ALocal_EBC * const &part_ebc,
-        // const IGenBC * const &gbc,
+        const ALocal_EBC * const &part_ebc,
+        const IGenBC * const &gbc,
         std::unique_ptr<ALocal_IEN> in_locien,
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode,
-        std::unique_ptr<ALocal_InflowBC> in_infbc,
+        // std::unique_ptr<ALocal_InflowBC> in_infbc,
         std::unique_ptr<ALocal_NBC> in_nbc,
-        std::unique_ptr<ALocal_EBC> in_ebc,
-        std::unique_ptr<IGenBC> in_gbc,
+        // std::unique_ptr<ALocal_EBC> in_ebc,
+        // std::unique_ptr<IGenBC> in_gbc,
         std::unique_ptr<ALocal_WeakBC> in_wbc,
         std::unique_ptr<IPLocAssem> in_locassem,    
         const int &in_nz_estimate=60 );
@@ -61,7 +61,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const ALocal_NBC * const &nbc_part,
     //     const ALocal_EBC * const &ebc_part,
     //     const IGenBC * const &gbc );
-    virtual void Assem_nonzero_estimate();
+    virtual void Assem_nonzero_estimate(
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     // Assem mass matrix and residual vector
     // virtual void Assem_mass_residual(
@@ -108,7 +110,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
-        const double &dt );
+        const double &dt,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
@@ -138,7 +142,9 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
-        const double &dt );
+        const double &dt,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
@@ -192,10 +198,10 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const FEANode> fnode;
     const std::unique_ptr<const APart_Node> pnode;
-    const std::unique_ptr<const ALocal_InflowBC> infbc;
+    // const std::unique_ptr<const ALocal_InflowBC> infbc;
     const std::unique_ptr<const ALocal_NBC> nbc;
-    const std::unique_ptr<const ALocal_EBC> ebc;
-    const std::unique_ptr<const IGenBC> gbc;
+    // const std::unique_ptr<const ALocal_EBC> ebc;
+    // const std::unique_ptr<const IGenBC> gbc;
     const std::unique_ptr<const ALocal_WeakBC> wbc;
     const std::unique_ptr<IPLocAssem> locassem;
 
@@ -227,7 +233,8 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IQuadPts * const &quad_s,
     //     const ALocal_NBC * const &nbc_part,
     //     const ALocal_EBC * const &ebc_part );
-    void BackFlow_G( const PDNSolution * const &sol );
+    void BackFlow_G( const PDNSolution * const &sol
+        const ALocal_EBC * const &ebc_part );
 
     // void BackFlow_KG( const double &dt,
     //     const PDNSolution * const &sol,
@@ -237,7 +244,8 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const ALocal_NBC * const &nbc_part,
     //     const ALocal_EBC * const &ebc_part );
     void BackFlow_KG( const double &dt,
-        const PDNSolution * const &sol );
+        const PDNSolution * const &sol,
+        const ALocal_EBC * const &ebc_part );
 
     // Resistance type boundary condition on outlet surfaces
     // void NatBC_Resis_G( const double &curr_time, const double &dt,
@@ -251,7 +259,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IGenBC * const &gbc );
     void NatBC_Resis_G( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol );
+        const PDNSolution * const &sol,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     // void NatBC_Resis_KG( const double &curr_time, const double &dt,
     //     const PDNSolution * const &dot_sol,
@@ -264,7 +274,9 @@ class PGAssem_NS_FEM : public IPGAssem
     //     const IGenBC * const &gbc );
     void NatBC_Resis_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol );
+        const PDNSolution * const &sol
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc );
 
     // Weak imposition of no-slip boundary condition on wall
     // void Weak_EssBC_KG( const double &curr_time, const double &dt,

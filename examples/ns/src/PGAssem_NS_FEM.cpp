@@ -9,8 +9,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     // const ALocal_IEN * const &aien_ptr,
     // const APart_Node * const &pnode_ptr,
     // const ALocal_NBC * const &part_nbc,
-    // const ALocal_EBC * const &part_ebc,
-    // const IGenBC * const &gbc,
+    const ALocal_EBC * const &part_ebc,
+    const IGenBC * const &gbc,
     // const int &in_nz_estimate )
 // : nLocBas( agmi_ptr->get_nLocBas() ),
 //   dof_sol( pnode_ptr->get_dof() ),
@@ -24,8 +24,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     std::unique_ptr<APart_Node> in_pnode,
     std::unique_ptr<ALocal_InflowBC> in_infbc,
     std::unique_ptr<ALocal_NBC> in_nbc,
-    std::unique_ptr<ALocal_EBC> in_ebc,
-    std::unique_ptr<IGenBC> in_gbc,
+    // std::unique_ptr<ALocal_EBC> in_ebc,
+    // std::unique_ptr<IGenBC> in_gbc,
     std::unique_ptr<ALocal_WeakBC> in_wbc,
     std::unique_ptr<IPLocAssem> in_locassem,    
     const int &in_nz_estimate )
@@ -35,8 +35,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   pnode( std::move(in_pnode) ),
   infbc( std::move(in_infbc) ),
   nbc( std::move(in_nbc) ),
-  ebc( std::move(in_ebc) ),
-  gbc( std::move(in_gbc) ),
+  // ebc( std::move(in_ebc) ),
+  // gbc( std::move(in_gbc) ),
   wbc( std::move(in_wbc) ),
   locassem(std::move(in_locassem)),
   nLocBas( locassem->get_nLocBas() ),
@@ -86,7 +86,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 
   // Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
   //     elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
-  Assem_nonzero_estimate();
+  // Assem_nonzero_estimate();
+  Assem_nonzero_estimate( part_ebc, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -180,7 +181,9 @@ void PGAssem_NS_FEM::EssBC_G( const int &field )
 //     const ALocal_NBC * const &nbc_part,
 //     const ALocal_EBC * const &ebc_part,
 //     const IGenBC * const &gbc )
-void PGAssem_NS_FEM::Assem_nonzero_estimate()
+void PGAssem_NS_FEM::Assem_nonzero_estimate(
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   // const int nElem = alelem_ptr->get_nlocalele();
   const int nElem = locelem->get_nlocalele();
@@ -214,7 +217,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate()
   PDNSolution * temp = new PDNSolution_NS( pnode.get(), 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp );
+  NatBC_Resis_KG( 0.0, 0.1, temp, temp, ebc_part, gbc );
 
   delete temp;
 
@@ -340,7 +343,9 @@ void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
-    const double &dt )
+    const double &dt,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -389,10 +394,10 @@ void PGAssem_NS_FEM::Assem_residual(
   delete [] row_index; row_index = nullptr;
   
   // Backflow stabilization residual contribution
-  BackFlow_G( sol_b );
+  BackFlow_G( sol_b, ebc_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1 );
+  NatBC_Resis_G( curr_time, dt, dot_sol_np1, sol_np1, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -433,7 +438,9 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const PDNSolution * const &dot_sol_np1,
     const PDNSolution * const &sol_np1,
     const double &curr_time,
-    const double &dt )
+    const double &dt,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -485,10 +492,10 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   delete [] row_index; row_index = nullptr;
 
   // Backflow stabilization residual & tangent contribution
-  BackFlow_KG( dt, sol_b );
+  BackFlow_KG( dt, sol_b, ebc_part );
 
   // Resistance type boundary condition
-  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1 );
+  NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, ebc_part, gbc );
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
@@ -556,7 +563,9 @@ void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt )
 //     const IQuadPts * const &quad_s,
 //     const ALocal_NBC * const &nbc_part,
 //     const ALocal_EBC * const &ebc_part )
-void PGAssem_NS_FEM::BackFlow_G( const PDNSolution * const &sol )
+void PGAssem_NS_FEM::BackFlow_G( 
+  const PDNSolution * const &sol,
+  const ALocal_EBC * const &ebc_part )
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -570,13 +579,13 @@ void PGAssem_NS_FEM::BackFlow_G( const PDNSolution * const &sol )
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    const int num_sele = ebc -> get_num_local_cell(ebc_id);
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
 
-      ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       GetLocal(array, LSIEN, snLocBas, local);
 
@@ -610,7 +619,8 @@ void PGAssem_NS_FEM::BackFlow_G( const PDNSolution * const &sol )
 //     const ALocal_NBC * const &nbc_part,
 //     const ALocal_EBC * const &ebc_part )
 void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
-    const PDNSolution * const &sol )
+    const PDNSolution * const &sol,
+    const ALocal_EBC * const &ebc_part )
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -624,13 +634,13 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 
   for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
   {
-    const int num_sele = ebc -> get_num_local_cell(ebc_id);
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
 
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
 
-      ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       GetLocal(array, LSIEN, snLocBas, local);
 
@@ -896,7 +906,9 @@ double PGAssem_NS_FEM::Assem_inlet_ave_pressure(
 void PGAssem_NS_FEM::NatBC_Resis_G(
     const double &curr_time, const double &dt,
     const PDNSolution * const &dot_sol,
-    const PDNSolution * const &sol )
+    const PDNSolution * const &sol,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   PetscScalar * Res = new PetscScalar [snLocBas * 3];
   PetscInt * srow_idx = new PetscInt [snLocBas * 3];
@@ -921,11 +933,11 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
     // lassem_ptr->get_model_para_1() gives alpha_f 
     const double val = P_n + locassem->get_model_para_1() * (P_np1 - P_n);
 
-    const int num_sele = ebc -> get_num_local_cell(ebc_id);
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc -> get_SIEN(ebc_id, ee, LSIEN);
-      ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       // Here, val is Pressure, and is used as the surface traction h = P I 
       // to calculate the boundary integral
@@ -967,7 +979,9 @@ void PGAssem_NS_FEM::NatBC_Resis_G(
 void PGAssem_NS_FEM::NatBC_Resis_KG(
     const double &curr_time, const double &dt,
     const PDNSolution * const &dot_sol,
-    const PDNSolution * const &sol )
+    const PDNSolution * const &sol,
+    const ALocal_EBC * const &ebc_part,
+    const IGenBC * const &gbc )
 {
   const double a_f = locassem -> get_model_para_1();
 
@@ -1015,14 +1029,14 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
     // coef a^t a enters as the consistent tangent for the resistance-type bc
     const double coef = a_f * n_val + dd_dv * m_val;
 
-    const int num_face_nodes = ebc -> get_num_face_nodes(ebc_id);
+    const int num_face_nodes = ebc_part -> get_num_face_nodes(ebc_id);
     if(num_face_nodes > 0)
     {
       Tan = new PetscScalar [snLocBas * 3 * num_face_nodes * 3];
       scol_idx = new PetscInt [num_face_nodes * 3];
-      out_n  = ebc -> get_outvec( ebc_id );
-      intNB  = ebc -> get_intNA( ebc_id );
-      map_Bj = ebc -> get_LID( ebc_id );
+      out_n  = ebc_part -> get_outvec( ebc_id );
+      intNB  = ebc_part -> get_intNA( ebc_id );
+      map_Bj = ebc_part -> get_LID( ebc_id );
     }
     else
     {
@@ -1030,11 +1044,11 @@ void PGAssem_NS_FEM::NatBC_Resis_KG(
       scol_idx = nullptr;
     }
 
-    const int num_sele = ebc -> get_num_local_cell(ebc_id);
+    const int num_sele = ebc_part -> get_num_local_cell(ebc_id);
     for(int ee=0; ee<num_sele; ++ee)
     {
-      ebc -> get_SIEN(ebc_id, ee, LSIEN);
-      ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+      ebc_part -> get_SIEN(ebc_id, ee, LSIEN);
+      ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       // For here, we scale the int_NA nx/y/z by factor 1
       locassem->Assem_Residual_EBC_Resistance(ebc_id, 1.0,

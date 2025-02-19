@@ -110,6 +110,11 @@ class IPGAssem
     virtual void Assem_nonzero_estimate()
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
+    virtual void Assem_nonzero_estimate(
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -140,7 +145,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
@@ -604,7 +608,9 @@ class IPGAssem
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
-        const double &dt )
+        const double &dt,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -891,7 +897,9 @@ class IPGAssem
         const PDNSolution * const &dot_sol_np1,
         const PDNSolution * const &sol_np1,
         const double &curr_time,
-        const double &dt )
+        const double &dt,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // --------------------------------------------------------------
