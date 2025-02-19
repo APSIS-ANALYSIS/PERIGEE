@@ -18,13 +18,6 @@
 class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 {
   public:
-    // PLocAssem_VMS_NS_GenAlpha(
-    //     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    //     const int &in_nlocbas, const int &in_nqp,
-    //     const int &in_snlocbas, const double &in_rho, 
-    //     const double &in_vis_mu, const double &in_beta,
-    //     const FEType &elemtype,
-    //     const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
     PLocAssem_VMS_NS_GenAlpha(
         const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
@@ -72,15 +65,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
       for(int ii=0; ii<vec_size*vec_size; ++ii) Tangent[ii] = 1.0;
     }
 
-    // virtual void Assem_Residual(
-    //     const double &time, const double &dt,
-    //     const double * const &dot_sol,
-    //     const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol,
@@ -89,15 +73,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual void Assem_Tangent_Residual(
-    //     const double &time, const double &dt,
-    //     const double * const &dot_sol,
-    //     const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol,
@@ -106,27 +81,12 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual void Assem_Mass_Residual(
-    //     const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Mass_Residual(
         const double * const &sol,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual void Assem_Residual_EBC(
-    //     const int &ebc_id,
-    //     const double &time, const double &dt,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
@@ -134,64 +94,29 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual double get_flowrate( const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual double get_flowrate( const double * const &sol,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual void get_pressure_area( const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad,
-    //     double &pres, double &area );
     virtual void get_pressure_area( const double * const &sol,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         double &pres, double &area );
 
-    // virtual void Assem_Residual_EBC_Resistance(
-    //     const int &ebc_id, const double &val,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Residual_EBC_Resistance(
         const int &ebc_id, const double &val,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual void Assem_Residual_BackFlowStab(
-    //     const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Residual_BackFlowStab(
         const double * const &sol,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    // virtual void Assem_Tangent_Residual_BackFlowStab(
-    //     const double &dt,
-    //     const double * const &sol,
-    //     FEAElement * const &element,
-    //     const double * const &eleCtrlPts_x,
-    //     const double * const &eleCtrlPts_y,
-    //     const double * const &eleCtrlPts_z,
-    //     const IQuadPts * const &quad );
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
         const double * const &sol,
@@ -214,8 +139,6 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     const double CI, CT; // Constants for stabilization parameters
     
     const double Ctauc; // Constant scaling factor for tau_C
-
-    // const int nqp; // number of quadrature points
     
     const int nLocBas, snLocBas, vec_size, sur_size;
 

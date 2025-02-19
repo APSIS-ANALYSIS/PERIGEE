@@ -1,12 +1,5 @@
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 
-// PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
-//         const TimeMethod_GenAlpha * const &tm_gAlpha,
-//         const int &in_nlocbas, const int &in_nqp,
-//         const int &in_snlocbas,
-//         const double &in_rho, const double &in_vis_mu,
-//         const double &in_beta, const FEType &elemtype, 
-//         const double &in_ct, const double &in_ctauc )
 PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
@@ -28,16 +21,6 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
   mm( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
-// : rho0( in_rho ), vis_mu( in_vis_mu ),
-//   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
-//   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
-//   CI( (elemtype == FEType::Tet4 || elemtype == FEType::Hex8) ? 36.0 : 60.0 ),
-//   CT( in_ct ), Ctauc( in_ctauc ),
-//   nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-//   vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ),
-//   coef( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
-//   mm( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
-//                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -64,15 +47,6 @@ void PLocAssem_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  // if(nLocBas == 4)
-  //   SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  // else if(nLocBas == 10)
-  //   SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
-  // else if(nLocBas == 8)
-  //   SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
-  // else if(nLocBas == 27)
-  //   SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
-  // else SYS_T::print_fatal("Error: unknown elem type.\n");
   elementv->print_info();
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
@@ -673,13 +647,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   // ----------------------------------------------------------------
 }
 
-// void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
-//     const double * const &sol,
-//     FEAElement * const &element,
-//     const double * const &eleCtrlPts_x,
-//     const double * const &eleCtrlPts_y,
-//     const double * const &eleCtrlPts_z,
-//     const IQuadPts * const &quad )
 void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
     const double * const &eleCtrlPts_x,
@@ -774,13 +741,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
-    // const int &ebc_id,
-    // const double &time, const double &dt,
-    // FEAElement * const &element,
-    // const double * const &eleCtrlPts_x,
-    // const double * const &eleCtrlPts_y,
-    // const double * const &eleCtrlPts_z,
-    // const IQuadPts * const &quad )
     const int &ebc_id,
     const double &time, const double &dt,
     const double * const &eleCtrlPts_x,
@@ -788,8 +748,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const double * const &eleCtrlPts_z )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  // const int face_nqp = quad -> get_num_quadPts();
 
   const double curr = time + alpha_f * dt;
 
@@ -823,13 +781,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
-    // const int &ebc_id,
-    // const double &val,
-    // FEAElement * const &element,
-    // const double * const &eleCtrlPts_x,
-    // const double * const &eleCtrlPts_y,
-    // const double * const &eleCtrlPts_z,
-    // const IQuadPts * const &quad )
     const int &ebc_id,
     const double &val,
     const double * const &eleCtrlPts_x,
@@ -837,8 +788,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const double * const &eleCtrlPts_z )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  // const int face_nqp = quad -> get_num_quadPts();
 
   double surface_area;
 
@@ -860,20 +809,12 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
-    // const double * const &sol,
-    // FEAElement * const &element,
-    // const double * const &eleCtrlPts_x,
-    // const double * const &eleCtrlPts_y,
-    // const double * const &eleCtrlPts_z,
-    // const IQuadPts * const &quad )
     const double * const &sol,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  // const int face_nqp = quad -> get_num_quadPts();
 
   Zero_sur_Residual();
 
@@ -908,13 +849,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
-    // const double &dt,
-    // const double * const &sol,
-    // FEAElement * const &element,
-    // const double * const &eleCtrlPts_x,
-    // const double * const &eleCtrlPts_y,
-    // const double * const &eleCtrlPts_z,
-    // const IQuadPts * const &quad )
     const double &dt,
     const double * const &sol,
     const double * const &eleCtrlPts_x,
@@ -922,8 +856,6 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double * const &eleCtrlPts_z )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  // const int face_nqp = quad -> get_num_quadPts();
 
   const double dd_dv = alpha_f * gamma * dt;
 
@@ -972,18 +904,11 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 }
 
 double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
-    // FEAElement * const &element,
-    // const double * const &eleCtrlPts_x,
-    // const double * const &eleCtrlPts_y,
-    // const double * const &eleCtrlPts_z,
-    // const IQuadPts * const &quad )
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  // const int face_nqp = quad -> get_num_quadPts();
 
   double flrate = 0.0;
 
@@ -1009,13 +934,6 @@ double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
 }
 
 void PLocAssem_VMS_NS_GenAlpha::get_pressure_area( 
-    // const double * const &sol,
-    // FEAElement * const &element,
-    // const double * const &eleCtrlPts_x,
-    // const double * const &eleCtrlPts_y,
-    // const double * const &eleCtrlPts_z,
-    // const IQuadPts * const &quad,
-    // double &pres, double &area )
     const double * const &sol,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
@@ -1023,9 +941,7 @@ void PLocAssem_VMS_NS_GenAlpha::get_pressure_area(
     double &pres, double &area )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  // const int face_nqp = quad -> get_num_quadPts();
-
+  
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
 

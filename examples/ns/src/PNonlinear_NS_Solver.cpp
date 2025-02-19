@@ -1,14 +1,10 @@
 #include "PNonlinear_NS_Solver.hpp"
 
 PNonlinear_NS_Solver::PNonlinear_NS_Solver(
-    // std::unique_ptr<IPGAssem> in_gassem,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
-    // const APart_Node * const &anode_ptr,
-    // const FEANode * const &feanode_ptr,
     std::unique_ptr<ICVFlowRate> in_flrate,
-    // std::unique_ptr<ALocal_InflowBC> in_infbc,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 
@@ -17,24 +13,11 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold),
-  // gassem(std::move(in_gassem)),
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
   flrate(std::move(in_flrate))
-  // infbc(std::move(in_infbc))
-{
-  // Generate the incremental solution vector used for update 
-  // the solution of the nonlinear algebraic system 
-  // dot_step = new PDNSolution_NS( anode_ptr, 0, false );
-}
-
-
-// PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
-// {
-//   // delete dot_step; dot_step = nullptr;
-// }
-
+{}
 
 void PNonlinear_NS_Solver::print_info() const
 {
@@ -57,22 +40,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
-    // const TimeMethod_GenAlpha * const &tmga_ptr,
-    // const ICVFlowRate * const flr_ptr,
-    // const ALocal_Elem * const &alelem_ptr,
-    // const ALocal_IEN * const &lien_ptr,
-    // const FEANode * const &feanode_ptr,
-    // const ALocal_NBC * const &nbc_part,
-    // const ALocal_WeakBC * const &wbc_part,
-    // const Matrix_PETSc * const &bc_mat,
-    // FEAElement * const &elementv,
-    // FEAElement * const &elements,
-    // FEAElement * const &elementvs,
-    // const IQuadPts * const &quad_v,
-    // const IQuadPts * const &quad_s,
-    // IPLocAssem * const &lassem_ptr,
-    // IPGAssem * const &gassem_ptr,
-    // PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     const ALocal_InflowBC * const &infnbc_part,
@@ -134,10 +101,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PetscLogEventBegin(mat_assem_0_event, 0,0,0,0);
 #endif
 
-    // gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
-    //     curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-    //     quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
-
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
         curr_time, dt, ebc_part, gbc );
 
@@ -158,10 +121,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #ifdef PETSC_USE_LOG
     PetscLogEventBegin(vec_assem_0_event, 0,0,0,0);
 #endif
-
-    // gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-    //     curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-    //     quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
         curr_time, dt, ebc_part, gbc );
@@ -209,10 +168,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
       PetscLogEventBegin(mat_assem_1_event, 0,0,0,0);
 #endif
 
-      // gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-      //     curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-      //     quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
-
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, ebc_part, gbc );
 
@@ -230,10 +185,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #ifdef PETSC_USE_LOG
       PetscLogEventBegin(vec_assem_1_event, 0,0,0,0);
 #endif
-
-      // gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-      //     curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs,
-      //     quad_v, quad_s, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part );
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
           curr_time, dt, ebc_part, gbc );
@@ -263,7 +214,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
-    // const ICVFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
 {

@@ -9,23 +9,7 @@
 // Date: Feb. 6 2020
 // ==================================================================
 #include "HDF5_Writer.hpp"
-// #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
-// #include "ALocal_EBC_outflow.hpp"
-// #include "ALocal_WeakBC.hpp"
-// #include "ALocal_InflowBC.hpp"
-// #include "QuadPts_Gauss_Triangle.hpp"
-// #include "QuadPts_Gauss_Quad.hpp"
-// #include "QuadPts_Gauss_Tet.hpp"
-// #include "QuadPts_Gauss_Hex.hpp"
-// #include "FEAElement_Tet4.hpp"
-// #include "FEAElement_Tet10.hpp"
-// #include "FEAElement_Hex8.hpp"
-// #include "FEAElement_Hex27.hpp"
-// #include "FEAElement_Triangle3_3D_der0.hpp"
-// #include "FEAElement_Triangle6_3D_der0.hpp"
-// #include "FEAElement_Quad4_3D_der0.hpp"
-// #include "FEAElement_Quad9_3D_der0.hpp"
 #include "CVFlowRate_Unsteady.hpp"
 #include "CVFlowRate_Linear2Steady.hpp"
 #include "CVFlowRate_Cosine2Steady.hpp"
@@ -46,11 +30,9 @@ int main(int argc, char *argv[])
 
   // Number of quadrature points for tets and triangles
   // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
-  int nqp_vol = 5, nqp_sur = 4;
-
   // Number of quadrature points for hexs and quadrangles
-  // Suggested values: 2 / 2 for linear, 4 / 4 for quadratic
-  // int nqp_vol_1D = 2, nqp_sur_1D = 2;
+  // Suggested values: 8 / 4 for linear, 64 / 16 for quadratic
+  int nqp_vol = 5, nqp_sur = 4;
 
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -133,8 +115,6 @@ int main(int argc, char *argv[])
 
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
-  // SYS_T::GetOptionInt("-nqp_vol_1d", nqp_vol_1D);
-  // SYS_T::GetOptionInt("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-bs_beta", bs_beta);
   SYS_T::GetOptionReal("-rho_inf", genA_rho_inf);
@@ -176,8 +156,6 @@ int main(int argc, char *argv[])
     SYS_T::commPrint(   "-is_backward_Euler: true \n");
   else
     SYS_T::cmdPrint(    "-rho_inf:",         genA_rho_inf);
-  // SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
-  // SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-rho_inf:", genA_rho_inf);
@@ -248,34 +226,12 @@ int main(int argc, char *argv[])
 
   MPI_Barrier(PETSC_COMM_WORLD);
 
-  // // ===== Data from Files =====
-  // // Control points' xyz coordinates
-  // FEANode * fNode = new FEANode(part_file, rank);
-
-  // // Local sub-domain's IEN array
-  // ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
-
-  // // Global mesh info
-  // AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
-
-  // // Local sub-domain's element indices
-  // ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
-
-  // // Local sub-domain's nodal bc
-  // ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
-
+  // ===== Data from Files =====
   // Local sub-domain's inflow bc
   ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
 
   // Local sub-domain's elemental bc
   ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
-
-  // // Local sub_domain's weak bc
-  // ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
-  // locwbc -> print_info();
-
-  // // Local sub-domain's nodal indices
-  // APart_Node * pNode = new APart_Node(part_file, rank);
 
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
@@ -287,18 +243,6 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  // ICVFlowRate * inflow_rate_ptr = nullptr;
-
-  // If inflow file exist, load it
-  // otherwise, call the linear incremental flow rate to reach a steady flow
-  // if( SYS_T::file_exist( inflow_file ) )
-  //   inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file.c_str() );
-  // else
-  // inflow_rate_ptr = new CVFlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, 
-  //     inflow_file );
-
-  // inflow_rate_ptr->print_info();
-
   std::unique_ptr<ICVFlowRate> inflow_rate = nullptr;
 
   inflow_rate = SYS_T::make_unique<CVFlowRate_Cosine2Steady>( inflow_thd_time, inflow_TI_perturbation, 
@@ -306,72 +250,22 @@ int main(int argc, char *argv[])
 
   inflow_rate->print_info();
 
-  // ===== Finite Element Container & Quadrature rules =====
-  // SYS_T::commPrint("===> Setup element container. \n");
-  // FEAElement * elementv = nullptr;
-  // FEAElement * elements = nullptr;
-  // FEAElement * elementvs = nullptr;
-
-  // SYS_T::commPrint("===> Build quadrature rules. \n");
-  // const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
-  // const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4 || GMIptr->get_elemType() == FEType::Tet10) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
-
-  // IQuadPts * quadv = nullptr;
-  // IQuadPts * quads = nullptr;
-
-  // if( GMIptr->get_elemType() == FEType::Tet4 )
-  // {
-  //   if( nqp_tet > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
-  //   if( nqp_tri > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
-
-  //   elementv = new FEAElement_Tet4( nqp_vol ); // elem type Tet4
-  //   elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
-  //   elementvs = new FEAElement_Tet4( nqp_sur );
-  //   quadv = new QuadPts_Gauss_Tet( nqp_vol );
-  //   quads = new QuadPts_Gauss_Triangle( nqp_sur );
-  // }
-  // else if( GMIptr->get_elemType() == FEType::Tet10 )
-  // {
-  //   SYS_T::print_fatal_if( nqp_tet < 29, "Error: not enough quadrature points for tets.\n" );
-  //   SYS_T::print_fatal_if( nqp_tri < 13, "Error: not enough quadrature points for triangles.\n" );
-
-  //   elementv = new FEAElement_Tet10( nqp_vol ); // elem type Tet10
-  //   elements = new FEAElement_Triangle6_3D_der0( nqp_sur );
-  //   elementvs = new FEAElement_Tet10( nqp_sur );
-  //   quadv = new QuadPts_Gauss_Tet( nqp_vol );
-  //   quads = new QuadPts_Gauss_Triangle( nqp_sur );
-  // }
-  // else if( GMIptr->get_elemType() == FEType::Hex8 )
-  // {
-  //   SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
-  //   SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
-
-  //   elementv = new FEAElement_Hex8( nqp_vol ); // elem type Hex8
-  //   elements = new FEAElement_Quad4_3D_der0( nqp_sur );
-  //   elementvs = new FEAElement_Hex8( nqp_sur );
-  //   quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
-  //   quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
-  // }
-  // else if( GMIptr->get_elemType() == FEType::Hex27 )
-  // {
-  //   SYS_T::print_fatal_if( nqp_vol_1D < 4, "Error: not enough quadrature points for hex.\n" );
-  //   SYS_T::print_fatal_if( nqp_sur_1D < 3, "Error: not enough quadrature points for quad.\n" );
-
-  //   elementv = new FEAElement_Hex27( nqp_vol ); // elem type Hex27
-  //   elements = new FEAElement_Quad9_3D_der0( nqp_sur );
-  //   elementvs = new FEAElement_Hex27( nqp_sur );
-  //   quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
-  //   quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
-  // }
-  // else SYS_T::print_fatal("Error: Element type not supported.\n");
-
+  // Control points' xyz coordinates
   auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
+
+  // Local sub-domain's IEN array
   auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
+  
+  // Local sub-domain's element indices
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
+
+  // Local sub-domain's nodal bc
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
-  // auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
-  // std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
+
+  // Local sub_domain's weak bc
   auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
+
+  // Local sub-domain's nodal indices
   auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
@@ -384,38 +278,23 @@ int main(int argc, char *argv[])
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  // TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
-  //     genA_rho_inf, false );
-
   auto tm_galpha = is_backward_Euler
     ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
     : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
-  // tm_galpha_ptr->print_info();
   tm_galpha->print_info();
 
   // ===== Local Assembly routine =====
-  // IPLocAssem * locAssem_ptr = nullptr;
   std::unique_ptr<IPLocAssem> locAssem_ptr = nullptr;
 
   if( locwbc->get_wall_model_type() == 0 )
   {
-    // locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-    //   tm_galpha_ptr, elementv->get_nLocBas(),
-    //   quadv->get_num_quadPts(), elements->get_nLocBas(),
-    //   fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc );
-
     locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha>(
       ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
       tm_galpha.get(), fluid_density, fluid_mu, bs_beta, c_ct, c_tauc );    
   }
   else if( locwbc->get_wall_model_type() == 1 )
   {
-    // locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-    //   tm_galpha_ptr, elementv->get_nLocBas(),
-    //   quadv->get_num_quadPts(), elements->get_nLocBas(),
-    //   fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), c_ct, c_tauc, C_bI );
-    
     locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha_WeakBC>(
       ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
       tm_galpha.get(), fluid_density, fluid_mu, bs_beta, c_ct, c_tauc, C_bI );    
@@ -423,12 +302,6 @@ int main(int argc, char *argv[])
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   // ===== Initial condition =====
-  // PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
-
-  // PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
-
-  // PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
-
   std::unique_ptr<PDNSolution> base =
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc, 1 );
 
@@ -471,21 +344,6 @@ int main(int argc, char *argv[])
   // ===== LPN models =====
   IGenBC * gbc = nullptr;
   
-  // std::unique_ptr<IGenBC> gbc = nullptr; 
-  
-  // if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-  //     gbc = SYS_T::make_unique<GenBC_Resistance>( lpn_file );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2 )
-  //     gbc = SYS_T::make_unique<GenBC_RCR>( lpn_file, 1000, initial_step );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3 )
-  //     gbc = SYS_T::make_unique<GenBC_Inductance>( lpn_file );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4 )
-  //     gbc = SYS_T::make_unique<GenBC_Coronary>( lpn_file, 1000, initial_step, initial_index );
-  // else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5 )
-  //     gbc = SYS_T::make_unique<GenBC_Pressure>( lpn_file, initial_time );
-  // else
-  //     SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
-
   if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
     gbc = new GenBC_Resistance( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
@@ -507,24 +365,12 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  // IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, quads,
-  //     GMIptr, locElem, locIEN, pNode, locnbc, locebc, gbc, nz_estimate );
-
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locebc, gbc, 
       std::move(locIEN), std::move(locElem), std::move(fNode),
       std::move(pNode), std::move(locnbc), std::move(locwbc),
       std::move(locAssem_ptr), nz_estimate );
 
-  // std::unique_ptr<IPGAssem> gloAssem =
-  //   SYS_T::make_unique<PGAssem_NS_FEM>(
-  //     std::move(locIEN), std::move(locElem), std::move(fNode),
-  //     std::move(pNode), std::move(locinfnbc), std::move(locnbc), 
-  //     std::move(locebc), std::move(gbc), std::move(locwbc), 
-  //     std::move(locAssem_ptr), nz_estimate ); 
-
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  // gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-  //     elements, quads, locIEN, pNode, locnbc, locebc, gbc );
   gloAssem_ptr->Assem_nonzero_estimate( locebc, gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
@@ -535,9 +381,6 @@ int main(int argc, char *argv[])
   if( is_restart == false )
   {
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    // PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
-    //     1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
-
     auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
         1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
@@ -550,12 +393,7 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    // gloAssem_ptr->Assem_mass_residual( sol, locElem, locAssem_ptr, elementv,
-    //     elements, elementvs, quadv, quads, locIEN, fNode, locnbc, locebc, locwbc );
-
     gloAssem_ptr->Assem_mass_residual( sol.get() );
-
-    // lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol.get() );
 
@@ -563,12 +401,11 @@ int main(int argc, char *argv[])
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
     lsolver_acce -> print_info();
-    // delete lsolver_acce;
+
     SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
   // ===== Linear solver context =====
-  // PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   PC upc; lsolver->GetPC(&upc);
@@ -578,9 +415,6 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  // PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
-  //     nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
-
   auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>(
       std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
       std::move(inflow_rate), nl_rtol, nl_atol, nl_dtol, 
@@ -589,9 +423,6 @@ int main(int argc, char *argv[])
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  // PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
-  //     sol_record_freq, ttan_renew_freq, final_time );
-
   auto tsolver = SYS_T::make_unique<PTime_NS_Solver>(
       std::move(nsolver), sol_bName, sol_record_freq, 
       ttan_renew_freq, final_time );
@@ -601,15 +432,6 @@ int main(int argc, char *argv[])
   // ===== Outlet data recording files =====
   for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
   {
-    // const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-    //     dot_sol, locAssem_ptr, elements, quads, locebc, ff );
-
-    // const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-    //     sol, locAssem_ptr, elements, quads, locebc, ff );
-
-    // const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-    //     sol, locAssem_ptr, elements, quads, locebc, ff );
-
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
         dot_sol.get(), locebc, ff );
 
@@ -654,12 +476,6 @@ int main(int argc, char *argv[])
   // ===== Inlet data recording files =====
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
-    // const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-    //     sol, locAssem_ptr, elements, quads, locinfnbc, ff );
-
-    // const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-    //     sol, locAssem_ptr, elements, quads, locinfnbc, ff );
-
     const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
         sol.get(), locinfnbc, ff );
 
@@ -688,29 +504,15 @@ int main(int argc, char *argv[])
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-
-  // tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol,
-  //     tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
-  //     locnbc, locinfnbc, locebc, gbc, locwbc, pmat, elementv, elements, elementvs, quadv, quads,
-  //     locAssem_ptr, gloAssem_ptr, lsolver, nsolver);
-
   tsolver->TM_NS_GenAlpha(is_restart,
       std::move(base), std::move(dot_sol), 
       std::move(sol), std::move(timeinfo),
       locinfnbc, locebc, gbc, gloAssem_ptr );
 
   // ===== Print complete solver info =====
-  // lsolver -> print_info();
   tsolver -> print_lsolver_info();
 
   // ===== Clean Memory =====
-  // delete fNode; delete locIEN; delete GMIptr;
-  // delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc;
-  // delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete elementvs;
-  // delete quads; delete quadv; delete inflow_rate_ptr; delete gbc; delete timeinfo;
-  // delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete gloAssem_ptr;
-  // delete lsolver; delete nsolver; delete tsolver;
-
   delete locinfnbc; delete locebc; delete gbc; delete gloAssem_ptr;
 
   PetscFinalize();
