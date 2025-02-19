@@ -26,7 +26,7 @@ class PNonlinear_NS_Solver
         // const APart_Node * const &anode_ptr,
         // const FEANode * const &feanode_ptr,
         std::unique_ptr<ICVFlowRate> in_flrate,
-        std::unique_ptr<ALocal_InflowBC> in_infbc,
+        // std::unique_ptr<ALocal_InflowBC> in_infbc,
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
@@ -60,9 +60,9 @@ class PNonlinear_NS_Solver
         // const ALocal_IEN * const &lien_ptr,
         // const FEANode * const &feanode_ptr,
         // const ALocal_NBC * const &nbc_part,
-        // const ALocal_InflowBC * const &infnbc_part,
-        // const ALocal_EBC * const &ebc_part,
-        // const IGenBC * const &gbc,
+        const ALocal_InflowBC * const &infnbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
         // const ALocal_WeakBC * const &wbc_part,
         // const Matrix_PETSc * const &bc_mat,
         // FEAElement * const &elementv,
@@ -86,7 +86,7 @@ class PNonlinear_NS_Solver
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<ICVFlowRate> flrate;
-    const std::unique_ptr<const ALocal_InflowBC> infbc;
+    // const std::unique_ptr<const ALocal_InflowBC> infbc;
     
     // vector container for the step update in the smaller matrix problem
     // PDNSolution * dot_step;
@@ -102,7 +102,7 @@ class PNonlinear_NS_Solver
     }
 
     void rescale_inflow_value( const double &stime,
-        // const ALocal_InflowBC * const &infbc,
+        const ALocal_InflowBC * const &infbc,
         // const ICVFlowRate * const &flrate,
         const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
