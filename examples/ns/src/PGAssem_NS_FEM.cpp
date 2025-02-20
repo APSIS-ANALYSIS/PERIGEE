@@ -551,8 +551,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
 
-    esum += locassem -> get_flowrate( local, sctrl_x,
-        sctrl_y, sctrl_z );
+    esum += locassem -> get_flowrate( local, sctrl_x, sctrl_y, sctrl_z );
   }
 
   delete [] array; array = nullptr;
@@ -597,8 +596,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
     // Obtain the solution vector in this element
     GetLocal(array, LSIEN, snLocBas, local);
 
-    esum += locassem -> get_flowrate( local, sctrl_x,
-        sctrl_y, sctrl_z );
+    esum += locassem -> get_flowrate( local, sctrl_x, sctrl_y, sctrl_z );
   }
 
   delete [] array; array = nullptr;
