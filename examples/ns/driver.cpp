@@ -270,10 +270,8 @@ int main(int argc, char *argv[])
   inflow_rate->print_info();
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  // Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
 
-  // pmat->gen_perm_bc(pNode, locnbc);
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
   // ===== Generalized-alpha =====
@@ -343,7 +341,7 @@ int main(int argc, char *argv[])
 
   // ===== LPN models =====
   std::unique_ptr<IGenBC> gbc = nullptr;
-  
+
   if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
     gbc = SYS_T::make_unique<GenBC_Resistance>( lpn_file );
   else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2 )
