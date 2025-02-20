@@ -227,6 +227,30 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Data from Files =====
+  // Control points' xyz coordinates
+  auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
+
+  // Local sub-domain's IEN array
+  auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
+  
+  // Local sub-domain's element indices
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
+
+  // Local sub-domain's nodal bc
+  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+
+  // Local sub-domain's inflow bc
+  auto locinfnbc = SYS_T::make_unique< ALocal_InflowBC>(part_file, rank);
+
+  // Local sub-domain's elemental bc
+  std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
+
+  // Local sub_domain's weak bc
+  auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
+
+  // Local sub-domain's nodal indices
+  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
+
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
 
   SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
@@ -243,30 +267,6 @@ int main(int argc, char *argv[])
       inflow_file );
 
   inflow_rate->print_info();
-
-  // Local sub-domain's inflow bc
-  auto locinfnbc = SYS_T::make_unique< ALocal_InflowBC>(part_file, rank);
-
-  // Local sub-domain's elemental bc
-  std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
-
-  // Control points' xyz coordinates
-  auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
-
-  // Local sub-domain's IEN array
-  auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
-  
-  // Local sub-domain's element indices
-  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
-
-  // Local sub-domain's nodal bc
-  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
-
-  // Local sub_domain's weak bc
-  auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
-
-  // Local sub-domain's nodal indices
-  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   // Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
