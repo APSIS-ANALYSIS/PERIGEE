@@ -210,6 +210,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
   else conv_flag = false;
+
+  delete dot_step;
 }
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
