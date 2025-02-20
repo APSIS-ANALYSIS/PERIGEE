@@ -33,7 +33,7 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const int &face_id);
-        
+
     virtual void Assem_Tangent_Residual_Weak(
         const double &time, const double &dt,
         const double * const &sol,
