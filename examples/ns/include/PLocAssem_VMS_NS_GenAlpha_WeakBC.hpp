@@ -45,6 +45,8 @@ class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
   private:
     const double C_bI;
 
+    const std::unique_ptr<FEAElement> elementvs;
+
     Vector_3 get_g_weak(const Vector_3 &pt, const double &tt)
     {
       return Vector_3( 0.0, 0.0, 0.0 );

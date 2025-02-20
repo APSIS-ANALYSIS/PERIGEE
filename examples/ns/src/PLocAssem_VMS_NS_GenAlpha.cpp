@@ -8,7 +8,6 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
 : elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
-  elementvs( ElementFactory::createVolElement(elemType, nqps) ),
   quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
   quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
   rho0( in_rho ), vis_mu( in_vis_mu ),
@@ -941,7 +940,7 @@ void PLocAssem_VMS_NS_GenAlpha::get_pressure_area(
     double &pres, double &area )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-  
+
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
 

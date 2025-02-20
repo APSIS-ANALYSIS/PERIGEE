@@ -7,7 +7,8 @@ PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
         const double &in_ct, const double &in_ctauc, 
         const double &in_C_bI )
 : PLocAssem_VMS_NS_GenAlpha(in_type, in_nqp_v, in_nqp_s, tm_gAlpha, in_rho, in_vis_mu, 
-  in_beta, in_ct, in_ctauc), C_bI(in_C_bI)
+  in_beta, in_ct, in_ctauc), C_bI(in_C_bI),
+  elementvs( ElementFactory::createVolElement(elemType, nqps) )
 {}
 
 void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
