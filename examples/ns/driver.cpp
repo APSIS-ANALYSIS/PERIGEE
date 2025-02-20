@@ -10,9 +10,9 @@
 // ==================================================================
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
-#include "CVFlowRate_Unsteady.hpp"
-#include "CVFlowRate_Linear2Steady.hpp"
-#include "CVFlowRate_Cosine2Steady.hpp"
+#include "FlowRate_Unsteady.hpp"
+#include "FlowRate_Linear2Steady.hpp"
+#include "FlowRate_Cosine2Steady.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -262,9 +262,9 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  std::unique_ptr<ICVFlowRate> inflow_rate = nullptr;
+  std::unique_ptr<IFlowRate> inflow_rate = nullptr;
 
-  inflow_rate = SYS_T::make_unique<CVFlowRate_Cosine2Steady>( inflow_thd_time, inflow_TI_perturbation, 
+  inflow_rate = SYS_T::make_unique<FlowRate_Cosine2Steady>( inflow_thd_time, inflow_TI_perturbation, 
       inflow_file );
 
   inflow_rate->print_info();

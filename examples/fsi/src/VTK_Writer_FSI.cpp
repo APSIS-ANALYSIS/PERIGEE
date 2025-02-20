@@ -4,13 +4,7 @@ VTK_Writer_FSI::VTK_Writer_FSI( const int &in_nelem,
     const int &in_nlocbas, const std::string &epart_file )
 : nLocBas(in_nlocbas), nElem(in_nelem)
 {
-  VIS_T::read_epart( epart_file, nElem, epart_map );
-}
-
-
-VTK_Writer_FSI::~VTK_Writer_FSI()
-{
-  VEC_T::clean(epart_map);
+  epart_map = VIS_T::read_epart( epart_file, nElem );
 }
 
 void VTK_Writer_FSI::interpolateJ( const int * const &ptid,

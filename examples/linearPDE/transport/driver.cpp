@@ -227,8 +227,7 @@ int main(int argc, char *argv[])
     = SYS_T::make_unique<PGAssem_LinearPDE_GenAlpha>( 
       std::move(locIEN), std::move(locElem), std::move(fNode),
       std::move(pNode), std::move(locnbc), std::move(locebc),
-      std::move(locAssem_ptr), 
-      ANL_T::get_nLocBas(part_file, rank), nz_estimate );  
+      std::move(locAssem_ptr), nz_estimate );  
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem->Assem_nonzero_estimate();
@@ -289,6 +288,8 @@ int main(int argc, char *argv[])
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
+
+  tsolver.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;

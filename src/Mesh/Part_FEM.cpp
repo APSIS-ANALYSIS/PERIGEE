@@ -44,9 +44,9 @@ Part_FEM::Part_FEM(
       ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
     }
 
-    VEC_T::shrink2fit(ctrlPts_x_loc);
-    VEC_T::shrink2fit(ctrlPts_y_loc);
-    VEC_T::shrink2fit(ctrlPts_z_loc);
+    ctrlPts_x_loc.shrink_to_fit();
+    ctrlPts_y_loc.shrink_to_fit();
+    ctrlPts_z_loc.shrink_to_fit();
 
     std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
   }
@@ -103,9 +103,9 @@ Part_FEM::Part_FEM(
       ctrlPts_z_loc[ii] = ctrlPts[3*aux_index + 2];
     }
 
-    VEC_T::shrink2fit(ctrlPts_x_loc);
-    VEC_T::shrink2fit(ctrlPts_y_loc);
-    VEC_T::shrink2fit(ctrlPts_z_loc);
+    ctrlPts_x_loc.shrink_to_fit();
+    ctrlPts_y_loc.shrink_to_fit();
+    ctrlPts_z_loc.shrink_to_fit();
 
     std::cout<<"-- proc "<<cpu_rank<<" Local control points generated. \n";
   }
@@ -214,7 +214,7 @@ void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
   {
     if( gpart->get_epart(e) == cpu_rank ) elem_loc.push_back(e);
   }
-  VEC_T::shrink2fit(elem_loc);
+  elem_loc.shrink_to_fit();
   nlocalele = VEC_T::get_size( elem_loc );
 
   for( int n=0; n<nFunc; ++n )
@@ -225,7 +225,7 @@ void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
       node_loc_original.push_back(n);
     }
   }
-  VEC_T::shrink2fit(node_loc); VEC_T::shrink2fit(node_loc_original);
+  node_loc.shrink_to_fit(); node_loc_original.shrink_to_fit();
   nlocalnode = VEC_T::get_size( node_loc );
 
   std::cout<<"-- proc "<<cpu_rank<<" -- elem_loc & node_loc arrays generated. \n";
@@ -260,7 +260,7 @@ void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
       node_ghost.push_back(node_tot[ii]);
   }
 
-  VEC_T::shrink2fit(node_ghost);
+  node_ghost.shrink_to_fit();
   nghostnode = VEC_T::get_size( node_ghost );
 
   nbadnode = 0;
@@ -298,7 +298,7 @@ void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
   for( int n=0; n<nghostnode; ++n )
     local_to_global.push_back( node_ghost[n] );
 
-  VEC_T::shrink2fit(local_to_global);
+  local_to_global.shrink_to_fit();
   nlocghonode = VEC_T::get_size( local_to_global );
 
   std::cout<<"-- proc "<<cpu_rank<<" local_to_global generated. \n";

@@ -27,6 +27,10 @@ class PLocAssem_Elastodynamics_GenAlpha : public IPLocAssem
 
     virtual int get_dof_mat() const {return 3;}
 
+    virtual int get_nLocBas() const {return nLocBas;}
+
+    virtual int get_snLocBas() const {return snLocBas;}
+
     virtual void Zero_Tangent_Residual()
     {
       for(int ii=0; ii<vec_size; ++ii) Residual[ii] = 0.0;

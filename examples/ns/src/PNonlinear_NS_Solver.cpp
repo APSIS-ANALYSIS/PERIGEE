@@ -4,7 +4,7 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
-    std::unique_ptr<ICVFlowRate> in_flrate,
+    std::unique_ptr<IFlowRate> in_flrate,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 

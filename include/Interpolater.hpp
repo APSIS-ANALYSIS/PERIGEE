@@ -25,7 +25,7 @@ class Interpolater
     // nLocBas : number of basis functions and
     // isDer   : the flag telling if the derivatives are needed
     // ------------------------------------------------------------------------
-    Interpolater( const int &in_nlocbas );
+    Interpolater( const int &in_nlocbas ) : nLocBas( in_nlocbas ) {};
     
     virtual ~Interpolater() = default;
     

@@ -81,7 +81,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const PDNSolution * const &init_pres,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
-    const ICVFlowRate * const flr_ptr,
+    const IFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_v,
     const ALocal_IEN * const &lien_p,

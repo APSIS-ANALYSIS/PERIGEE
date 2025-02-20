@@ -1,8 +1,8 @@
-#include "CVFlowRate_Unsteady.hpp"
+#include "FlowRate_Steady.hpp"
 
-CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
+FlowRate_Steady::FlowRate_Steady( const std::string &filename )
 {
-  SYS_T::commPrint("CVFlowRate_Unsteady: data read from %s \n", filename.c_str());
+  SYS_T::commPrint("FlowRate_Steady: data read from %s \n", filename.c_str() );
 
   SYS_T::file_check( filename );
   
@@ -27,13 +27,17 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
     }
   }
 
-  if( bc_type.compare("Inflow") == 0 || bc_type.compare("INFLOW") == 0 )
+  std::vector< std::vector<double> > coef_a, coef_b;
+  std::vector<int> num_of_mode;
+  std::vector<double> w, period;
+
+  if( bc_type.compare("Steady") == 0 || bc_type.compare("STEADY") == 0 || bc_type.compare("steady") == 0 )
   {
     coef_a.resize(num_nbc); coef_b.resize(num_nbc);
     num_of_mode.resize(num_nbc); w.resize(num_nbc); period.resize(num_nbc);
   }
   else
-    SYS_T::print_fatal("CVFlowRate_Unsteady Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
+    SYS_T::print_fatal("FlowRate_Steady Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
 
   // Read in num_of_mode, w, period, coef_a, and coef_b per nbc
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
@@ -47,7 +51,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
         int face_id;
         sstrm >> face_id;
 
-        if( face_id != nbc_id ) SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
+        if( face_id != nbc_id ) SYS_T::print_fatal("FlowRate_Steady Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
         sstrm >> num_of_mode[nbc_id];
         sstrm >> w[nbc_id];
@@ -60,8 +64,7 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
 
     // Check the compatibility of period and w. If the difference
     // is larger than 0.01, print a warning message
-    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 )
-      SYS_T::commPrint( "\nCVFlowRate_Unsteady WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*MATH_T::PI/period[nbc_id], w[nbc_id] );
+    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 ) SYS_T::commPrint( "\nFlowRate_Steady WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*static_cast<double>(MATH_T::PI)/period[nbc_id], w[nbc_id] );
 
     coef_a[nbc_id].clear(); coef_b[nbc_id].clear(); 
 
@@ -79,10 +82,10 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
       }
     }
 
-    VEC_T::shrink2fit( coef_a[nbc_id] );
+    coef_a[nbc_id].shrink_to_fit();
     
     if( static_cast<int>(coef_a[nbc_id].size()) != num_of_mode[nbc_id]+1 )
-      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
+      SYS_T::print_fatal("FlowRate_Steady Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
 
     while( std::getline(reader, sline) )
     {
@@ -98,14 +101,19 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
       }
     }
 
-    VEC_T::shrink2fit( coef_b[nbc_id] );
+    coef_b[nbc_id].shrink_to_fit();
 
     if( static_cast<int>(coef_b[nbc_id].size()) != num_of_mode[nbc_id]+1 )
-      SYS_T::print_fatal("CVFlowRate_Unsteady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
+      SYS_T::print_fatal("FlowRate_Steady Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
   }
 
   // Finish reading the file and close it
   reader.close();
+
+  // Define flow rate to be the smallest value in flow_waveform
+  flowrate.resize( num_nbc );
+
+  for(int ii=0; ii<num_nbc; ++ii) flowrate[ii] = VEC_T::sum( coef_a[ii] );
 
   // Calculate the flow rate and record them on disk as 
   // Inlet_XXX_flowrate.txt with sampling interval 0.001
@@ -115,8 +123,8 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
     {
       std::ofstream ofile;
       ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for(double tt = 0.0; tt <= period[nbc_id]; tt += 0.001 )
-        ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
+      const double tt = 0.0;
+      ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
       ofile.close();
     }
   }
@@ -124,36 +132,20 @@ CVFlowRate_Unsteady::CVFlowRate_Unsteady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double CVFlowRate_Unsteady::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Steady::get_flow_rate(const int &nbc_id , const double &time) const
 {
-  const int num_of_past_period = time / period[nbc_id];
-  const double local_time = time - num_of_past_period * period[nbc_id];
-
-  double sum = coef_a[nbc_id][0];
-  for( int ii = 1; ii <= num_of_mode[nbc_id]; ++ii )
-  {
-    sum += coef_a[nbc_id][ii] * cos( ii*w[nbc_id]*local_time ) +
-      coef_b[nbc_id][ii] * sin( ii*w[nbc_id]*local_time );
-  }
-
-  return sum;
+  return flowrate[nbc_id];
 }
 
-void CVFlowRate_Unsteady::print_info() const
+void FlowRate_Steady::print_info() const
 {
   SYS_T::print_sep_line();
-  SYS_T::commPrint("  CVFlowRate_Unsteady:\n");
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  SYS_T::commPrint("  FlowRate_Steady:\n");
+  for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
     SYS_T::commPrint("  -- nbc_id = %d", nbc_id);
-    SYS_T::commPrint("     w = %e, period =%e \n", w[nbc_id], period[nbc_id]);
-    SYS_T::commPrint("     a[0] + Sum{ a[i] cos(i x w x t) + b[i] sin(i x w x t) }, for i = 1,...,%d. \n", num_of_mode[nbc_id]);
-    for(int ii=0; ii<=num_of_mode[nbc_id]; ++ii)
-      SYS_T::commPrint("     i = %d, a = %e, b = %e \n", ii, coef_a[nbc_id][ii], coef_b[nbc_id][ii]);
+    SYS_T::commPrint("     flow rate =%e \n", flowrate[nbc_id]);
   }
-
   SYS_T::print_sep_line();
 }
 

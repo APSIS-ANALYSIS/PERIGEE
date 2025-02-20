@@ -28,8 +28,7 @@ void HDF5_Reader::read_intArray(const char * const &group_name,
   // setup the buffer
   hsize_t dSize = 1;
 
-  for(hid_t ii=0; ii<data_rank; ++ii)
-    dSize = dSize * data_dims[ii];
+  for(hid_t ii=0; ii<data_rank; ++ii) dSize *= data_dims[ii];
 
   // the data will pass out in a one-dimensional array
   data = new int [dSize];
@@ -73,8 +72,7 @@ void HDF5_Reader::read_doubleArray(const char * const &group_name,
 
   hsize_t dSize = 1;
 
-  for(hid_t ii=0; ii<data_rank; ++ii)
-    dSize = dSize * data_dims[ii];
+  for(hid_t ii=0; ii<data_rank; ++ii) dSize *= data_dims[ii];
 
   data = new double [dSize];
 
@@ -182,7 +180,7 @@ std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_na
   return out;
 }
 
-  std::array<double, 3> HDF5_Reader::read_Vector_3( const char * const &group_name,
+std::array<double, 3> HDF5_Reader::read_Vector_3( const char * const &group_name,
     const char * const &data_name ) const
 {
   hid_t drank;

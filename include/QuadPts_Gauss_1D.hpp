@@ -8,7 +8,6 @@
 // Date: Sept. 24th 2013
 // ============================================================================
 #include <limits>
-#include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 #include "IQuadPts.hpp"
 

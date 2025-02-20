@@ -79,16 +79,6 @@ namespace VEC_T
   }
   
   // --------------------------------------------------------------------------
-  // ! shrink2fit  
-  //   trim the capacity of vector.
-  //   Ref. Item 17 in "Effective STL" by Scott Meyers
-  // --------------------------------------------------------------------------
-  template<typename T> void shrink2fit( std::vector<T> &vec )
-  {
-    std::vector<T>(vec.begin(), vec.end()).swap(vec);
-  }
-
-  // --------------------------------------------------------------------------
   // ! fillArray
   //   fill the array data into a vector, with array length len
   // --------------------------------------------------------------------------
@@ -97,7 +87,7 @@ namespace VEC_T
     std::vector<T> vec(len);
     for(int ii=0; ii<len; ++ii) vec[ii] = input[ii];
     
-    shrink2fit(vec);
+    vec.shrink_to_fit();
     return vec;
   }
 

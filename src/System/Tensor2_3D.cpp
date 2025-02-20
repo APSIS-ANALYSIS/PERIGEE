@@ -277,6 +277,13 @@ double Tensor2_3D::MatContraction( const Tensor2_3D &in ) const
     + mat[8] * in(8);
 }
 
+double Tensor2_3D::MatContraction() const
+{
+  return mat[0] * mat[0] + mat[1] * mat[1] + mat[2] * mat[2] + mat[3] * mat[3]
+    + mat[4] * mat[4] + mat[5] * mat[5] + mat[6] * mat[6] + mat[7] * mat[7]
+    + mat[8] * mat[8];
+}
+
 double Tensor2_3D::MatTContraction( const Tensor2_3D &in ) const
 {
   return mat[0] * in(0) + mat[1] * in(3) + mat[2] * in(6) + mat[3] * in(1)

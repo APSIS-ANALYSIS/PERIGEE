@@ -25,6 +25,7 @@
 // Author: Ju Liu
 // ==================================================================
 #include "INodalBC.hpp"
+#include "Vec_Tools.hpp"
 #include "VTK_Tools.hpp"
 
 class NodalBC : public INodalBC

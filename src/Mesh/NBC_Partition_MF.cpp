@@ -58,12 +58,12 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     }
   } // end ii-loop over dof
   
-  VEC_T::shrink2fit( LDN_MF ); 
-  VEC_T::shrink2fit( LPSN_MF ); 
-  VEC_T::shrink2fit( LPMN_MF ); 
-  VEC_T::shrink2fit( LocalMaster_MF ); 
-  VEC_T::shrink2fit( LocalMasterSlave_MF ); 
-  VEC_T::shrink2fit( LID_MF );
+  LDN_MF.shrink_to_fit(); 
+  LPSN_MF.shrink_to_fit();
+  LPMN_MF.shrink_to_fit();
+  LocalMaster_MF.shrink_to_fit();
+  LocalMasterSlave_MF.shrink_to_fit();
+  LID_MF.shrink_to_fit();
 }
 
 NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
@@ -121,12 +121,12 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     }
   } // end ii-loop over dof
   
-  VEC_T::shrink2fit( LDN_MF ); 
-  VEC_T::shrink2fit( LPSN_MF ); 
-  VEC_T::shrink2fit( LPMN_MF ); 
-  VEC_T::shrink2fit( LocalMaster_MF ); 
-  VEC_T::shrink2fit( LocalMasterSlave_MF ); 
-  VEC_T::shrink2fit( LID_MF );
+  LDN_MF.shrink_to_fit(); 
+  LPSN_MF.shrink_to_fit(); 
+  LPMN_MF.shrink_to_fit();
+  LocalMaster_MF.shrink_to_fit();
+  LocalMasterSlave_MF.shrink_to_fit();
+  LID_MF.shrink_to_fit();
 }
 
 NBC_Partition_MF::~NBC_Partition_MF()

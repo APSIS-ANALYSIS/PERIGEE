@@ -207,6 +207,12 @@ class Tensor2_3D
     double MatContraction( const Tensor2_3D &source ) const;
 
     // ------------------------------------------------------------------------
+    // Contraction
+    // return source_ij source_ij
+    // ------------------------------------------------------------------------
+    double MatContraction() const;
+
+    // ------------------------------------------------------------------------
     // Contraction with the transpose of the input
     // return mat_ij source_ji
     // ------------------------------------------------------------------------
