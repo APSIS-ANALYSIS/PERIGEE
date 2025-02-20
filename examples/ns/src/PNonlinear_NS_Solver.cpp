@@ -133,7 +133,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
-  PDNSolution * dot_step = new PDNSolution( pre_sol );
+  auto dot_step = SYS_T::make_unique<PDNSolution>( pre_sol );
 
   // Now do consistent Newton-Raphson iteration
   do
@@ -143,21 +143,21 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
     
     // solve the equation K dot_step = G
-    lsolver->Solve( gassem_ptr->G, dot_step );
+    lsolver->Solve( gassem_ptr->G, dot_step.get() );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(lin_solve_event,0,0,0,0);
 #endif
 
-    bc_mat->MatMultSol( dot_step );
+    bc_mat->MatMultSol( dot_step.get() );
 
     nl_counter += 1;
 
-    dot_sol->PlusAX( dot_step, -1.0 );
-    sol->PlusAX( dot_step, (-1.0) * gamma * dt );
+    dot_sol->PlusAX( dot_step.get(), -1.0 );
+    sol->PlusAX( dot_step.get(), (-1.0) * gamma * dt );
 
-    dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
-    sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+    dot_sol_alpha.PlusAX( dot_step.get(), (-1.0) * alpha_m );
+    sol_alpha.PlusAX( dot_step.get(), (-1.0) * alpha_f * gamma * dt );
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
@@ -210,8 +210,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
   else conv_flag = false;
-
-  delete dot_step;
 }
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
