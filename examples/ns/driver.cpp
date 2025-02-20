@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
 
   // Local sub-domain's inflow bc
-  auto locinfnbc = SYS_T::make_unique< ALocal_InflowBC>(part_file, rank);
+  auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_file, rank);
 
   // Local sub-domain's elemental bc
   std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
