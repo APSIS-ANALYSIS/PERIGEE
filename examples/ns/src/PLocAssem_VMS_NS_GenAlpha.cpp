@@ -940,7 +940,7 @@ void PLocAssem_VMS_NS_GenAlpha::get_pressure_area(
     double &pres, double &area )
 {
   elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
+  
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
 
