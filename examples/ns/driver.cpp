@@ -247,6 +247,7 @@ int main(int argc, char *argv[])
 
   // Local sub_domain's weak bc
   auto locwbc = SYS_T::make_unique<ALocal_WeakBC>(part_file, rank);
+  locwbc -> print_info();
 
   // Local sub-domain's nodal indices
   auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
