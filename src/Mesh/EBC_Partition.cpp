@@ -4,17 +4,6 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc )
 : cpu_rank( part->get_cpu_rank() ), num_ebc( ebc->get_num_ebc() )
 {
-  // Clean up all the vectors
-  num_local_cell_node.clear();
-  num_local_cell.clear();
-  cell_nLocBas.clear();
-  local_cell_node_xyz.clear();
-  local_cell_ien.clear();
-  local_cell_node_vol_id.clear();
-  local_cell_node.clear();
-  local_cell_node_pos.clear();
-  local_cell_vol_id.clear();
-
   // resize the vectors with length equaling to the number of ebc's
   num_local_cell_node.resize( num_ebc );
   num_local_cell.resize( num_ebc );
@@ -27,8 +16,7 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
   local_cell_vol_id.resize( num_ebc );
 
   // fill the cell_nLocBas array
-  for(int ii=0; ii<num_ebc; ++ii) 
-    cell_nLocBas[ii] = ebc->get_cell_nLocBas(ii);
+  for(int ii=0; ii<num_ebc; ++ii) cell_nLocBas[ii] = ebc->get_cell_nLocBas(ii);
 
   // Loop over each element bc surface
   for(int ii=0; ii<num_ebc; ++ii)
@@ -37,8 +25,7 @@ EBC_Partition::EBC_Partition( const IPart * const &part,
     local_cell_node[ii].clear(); 
     
     // obtain the node belonging to this partition
-    std::vector<int> local_elem;
-    local_elem.clear();
+    std::vector<int> local_elem{};
 
     const int num_global_bccell = ebc->get_num_cell( ii );
 
@@ -114,7 +101,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
 
   hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( file_id );
 
   h5w -> write_intScalar( g_id, "num_ebc", num_ebc );
 
@@ -150,7 +137,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
     }
   }
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+  H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 void EBC_Partition::print_info() const
