@@ -11,9 +11,7 @@
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
-#include "GenBC_Resistance.hpp"
-#include "GenBC_RCR.hpp"
-#include "GenBC_Inductance.hpp"
+#include "GenBCFactory.hpp"
 #include "GenBC_Coronary.hpp"
 #include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
@@ -307,20 +305,8 @@ int main(int argc, char *argv[])
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== LPN models =====
-  std::unique_ptr<IGenBC> gbc = nullptr;
-
-  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-    gbc = SYS_T::make_unique<GenBC_Resistance>( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2 )
-    gbc = SYS_T::make_unique<GenBC_RCR>( lpn_file, 1000, initial_step );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3 )
-    gbc = SYS_T::make_unique<GenBC_Inductance>( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4 )
-    gbc = SYS_T::make_unique<GenBC_Coronary>( lpn_file, 1000, initial_step, initial_index );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5 )
-    gbc = SYS_T::make_unique<GenBC_Pressure>( lpn_file, initial_time );
-  else
-    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+  std::unique_ptr<IGenBC> gbc = GenBCFactory::createGenBC(
+      lpn_file, initial_time, initial_step, initial_index, 1000);
 
   gbc -> print_info();
 
