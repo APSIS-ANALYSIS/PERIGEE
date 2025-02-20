@@ -315,6 +315,8 @@ int main(int argc, char *argv[])
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
 
+  tsolver.reset();
+
   PetscFinalize();
   return EXIT_SUCCESS;
 }
