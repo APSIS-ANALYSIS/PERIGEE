@@ -10,9 +10,7 @@
 // ==================================================================
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
-#include "FlowRate_Unsteady.hpp"
-#include "FlowRate_Linear2Steady.hpp"
-#include "FlowRate_Cosine2Steady.hpp"
+#include "FlowRateFactory.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -45,12 +43,6 @@ int main(int argc, char *argv[])
 
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
-
-  double inflow_thd_time = 1.0; // prescribed time for inflow to reach steadness
-  double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
-
-  // Turbulence intensity for the purtabation at inlets, 3% ==> 0.03
-  double inflow_TI_perturbation = 0.0;
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
@@ -124,9 +116,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
   SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
-  SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
-  SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
-  SYS_T::GetOptionReal("-inflow_TI_perturbation", inflow_TI_perturbation);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-nl_rtol", nl_rtol);
@@ -163,18 +152,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
-
-  // if inflow file exists, print the file name
-  // otherwise, print the parameter for linear2steady inflow setting
-  if( SYS_T::file_exist( inflow_file ) )
-    SYS_T::cmdPrint("-inflow_file:", inflow_file);
-  else
-  {
-    SYS_T::cmdPrint("-inflow_thd_time:", inflow_thd_time);
-    SYS_T::cmdPrint("-inflow_tgt_rate:", inflow_tgt_rate);
-  }
-  SYS_T::cmdPrint("-inflow_TI_perturbation:", inflow_TI_perturbation);
-
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
@@ -212,15 +190,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
-
-    if( SYS_T::file_exist( inflow_file ) )
-      cmdh5w->write_string("inflow_file", inflow_file);
-    else
-    {
-      cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
-      cmdh5w->write_doubleScalar("inflow_tgt_rate", inflow_tgt_rate );
-    }
-    cmdh5w->write_doubleScalar("inflow_TI_perturbation", inflow_TI_perturbation);
+    cmdh5w->write_string("inflow_file", inflow_file);
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
@@ -262,10 +232,7 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  std::unique_ptr<IFlowRate> inflow_rate = nullptr;
-
-  inflow_rate = SYS_T::make_unique<FlowRate_Cosine2Steady>( inflow_thd_time, inflow_TI_perturbation, 
-      inflow_file );
+  std::unique_ptr<IFlowRate> inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
 
   inflow_rate->print_info();
 

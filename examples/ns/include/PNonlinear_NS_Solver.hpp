@@ -65,7 +65,7 @@ class PNonlinear_NS_Solver
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
-    const std::unique_ptr<ICVFlowRate> flrate;
+    const std::unique_ptr<IFlowRate> flrate;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
