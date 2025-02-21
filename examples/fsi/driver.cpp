@@ -17,9 +17,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Hex8.hpp"
-#include "FlowRate_Unsteady.hpp"
-#include "FlowRate_Linear2Steady.hpp"
-#include "FlowRate_Steady.hpp"
+#include "FlowRateFactory.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -63,14 +61,8 @@ int main(int argc, char *argv[])
   double mesh_E  = 1.0;
   double mesh_nu = 0.3;
 
-  // flag for determining inflow type: 
-  // 0 pulsatile flow; 1 linear-to-steady; 2 steady
-  int inflow_type = 0;
-
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
-
-  double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
@@ -160,9 +152,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-sl_nu",             solid_nu);
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
-  SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
   SYS_T::GetOptionString("-inflow_file",       inflow_file);
-  SYS_T::GetOptionReal(  "-inflow_thd_time",   inflow_thd_time);
   SYS_T::GetOptionString("-lpn_file",          lpn_file);
   SYS_T::GetOptionReal(  "-nl_rtol",           nl_rtol);
   SYS_T::GetOptionReal(  "-nl_atol",           nl_atol);
@@ -210,25 +200,7 @@ int main(int argc, char *argv[])
   else
     SYS_T::commPrint(     "-is_load_ps: false \n");
 
-  if( inflow_type == 0 )
-  {
-    SYS_T::commPrint(   "-inflow_type: 0 (pulsatile flow) \n");
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
-  }
-  else if( inflow_type == 1 )
-  {
-    SYS_T::commPrint(   "-inflow_type: 1 (linear-to-steady flow) \n");
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
-    SYS_T::cmdPrint(    "-inflow_thd_time:", inflow_thd_time);
-  }
-  else if( inflow_type == 2 )
-  {
-    SYS_T::commPrint(   "-inflow_type: 2 (steady flow) \n");
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
-  }
-  else
-    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
-
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
   SYS_T::cmdPrint("-nl_atol:", nl_atol);
@@ -276,11 +248,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar(     "nqp_sur_1d",      nqp_sur_1D);
     cmdh5w->write_intScalar(     "nqp_vol_1d",      nqp_vol_1D);
     cmdh5w->write_string(        "lpn_file",        lpn_file);
-    cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
     cmdh5w->write_string(        "sol_bName",       sol_bName);
-    if( inflow_type == 1 )
-      cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
 
     cmdh5w->write_string("date",              SYS_T::get_date() );
     cmdh5w->write_string("time",              SYS_T::get_time() );
@@ -346,20 +315,11 @@ int main(int argc, char *argv[])
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  IFlowRate * inflow_rate_ptr = nullptr;
+  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
 
-  if( inflow_type == 0 )
-    inflow_rate_ptr = new FlowRate_Unsteady( inflow_file );
-  else if( inflow_type == 1 )
-    inflow_rate_ptr = new FlowRate_Linear2Steady( inflow_thd_time, inflow_file );
-  else if( inflow_type == 2 )
-    inflow_rate_ptr = new FlowRate_Steady( inflow_file );
-  else
-    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
+  inflow_rate->print_info();
 
-  inflow_rate_ptr->print_info();
-
-  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
+  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate->get_num_nbc(),
       "Error: ALocal_InflowBC number of faces does not match with that in IFlowRate.\n");
 
   // ===== Finite Element Container & Quadrature rules =====
@@ -679,9 +639,9 @@ int main(int argc, char *argv[])
       // If this is NOT a restart run, generate a new file, otherwise append to
       // a existing file
       if( !is_restart )
-        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       // if this is NOT a restart run, record the initial values
       if( !is_restart )
@@ -710,9 +670,9 @@ int main(int argc, char *argv[])
     {
       std::ofstream ofile;
       if( !is_restart )
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       if( !is_restart )
       {
@@ -742,7 +702,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
+      tm_galpha_ptr, timeinfo, inflow_rate.get(), locElem, locIEN_v, locIEN_p, 
       pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
       locebc_v, locebc_p, mesh_locebc, 
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
@@ -766,7 +726,7 @@ int main(int argc, char *argv[])
   delete locAssem_mesh_ptr; delete locAssem_fluid_ptr;
   delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
+  delete elements; delete elementv; delete quadv; delete quads;
   delete GMIptr; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
   delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
   delete locebc_v; delete locebc_p; delete mesh_locebc; 

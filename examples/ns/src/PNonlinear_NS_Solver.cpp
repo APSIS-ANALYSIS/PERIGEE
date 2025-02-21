@@ -5,6 +5,7 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
     std::unique_ptr<IFlowRate> in_flrate,
+    std::unique_ptr<PDNSolution> in_sol_base,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 
@@ -16,7 +17,8 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
-  flrate(std::move(in_flrate))
+  flrate(std::move(in_flrate)),
+  sol_base(std::move(in_sol_base))
 {}
 
 void PNonlinear_NS_Solver::print_info() const
@@ -37,13 +39,11 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
-    const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     IPGAssem * const &gassem_ptr,
     bool &conv_flag, int &nl_counter ) const
@@ -87,8 +87,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, sol_base, sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, sol_base, &sol_alpha);
+  rescale_inflow_value(curr_time+dt, infnbc_part, sol_base.get(), sol);
+  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, sol_base.get(), &sol_alpha);
   // ------------------------------------------------- 
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
@@ -102,7 +102,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
-        curr_time, dt, ebc_part, gbc );
+        curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -123,7 +123,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-        curr_time, dt, ebc_part, gbc );
+        curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -169,7 +169,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-          curr_time, dt, ebc_part, gbc );
+          curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -187,7 +187,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-          curr_time, dt, ebc_part, gbc );
+          curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);

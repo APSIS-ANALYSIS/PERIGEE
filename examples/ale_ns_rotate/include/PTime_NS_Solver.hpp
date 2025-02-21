@@ -27,6 +27,21 @@ class PTime_NS_Solver
 
     void print_info() const;
 
+    // ------------------------------------------------------------------------
+    // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
+    // ------------------------------------------------------------------------
+    std::string gen_flowfile_name(const std::string &prefix, const int &id) const
+    {
+      std::ostringstream ss;
+      ss << prefix;
+
+      if(id < 10) ss << "00";
+      else if(id < 100) ss << "0";
+
+      ss << id << "_data.txt";
+      return ss.str();
+    }
+    
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
         PDNSolution * const &sol_base,
@@ -107,52 +122,6 @@ class PTime_NS_Solver
       // The vector from the projection point to the input point
       return Vector_3 (coor.x()- point_projected.x(), coor.y()- point_projected.y(), coor.z()- point_projected.z());
     } 
-
-    // Get the current point coordinates for the case of rotation around x/y/z-axis
-    Vector_3 get_currPts( const Vector_3 init_pt_xyz,
-        const double &tt,
-        const SI_rotation_info * const &rot_info,
-        const int &type) const
-    {       
-      Vector_3 curr_pt_xyz(0, 0, 0);
-
-      const Vector_3 radius_pt = get_radius(init_pt_xyz, rot_info);
-
-      const double rr = radius_pt.norm2();
-      
-      double angle = 0.0;
-
-      //rotation axis: case 0: x-axis, case 1: y-axis, case 2: z-axis
-      switch(type) 
-      {
-        case 0:
-          angle = MATH_T::get_angle_2d(init_pt_xyz.y(), init_pt_xyz.z());
-          angle += rot_info->get_rotated_theta(tt);
-          curr_pt_xyz.x() = init_pt_xyz.x();
-          curr_pt_xyz.y() = std::cos(angle) * rr;
-          curr_pt_xyz.z() = std::sin(angle) * rr;       
-          break;
-        case 1: 
-          angle = MATH_T::get_angle_2d(init_pt_xyz.z(), init_pt_xyz.x());        
-          angle += rot_info->get_rotated_theta(tt);
-          curr_pt_xyz.x() = std::sin(angle) * rr;
-          curr_pt_xyz.y() = init_pt_xyz.y();
-          curr_pt_xyz.z() = std::cos(angle) * rr;            
-          break;            
-        case 2: 
-          angle = MATH_T::get_angle_2d(init_pt_xyz.x(), init_pt_xyz.y());        
-          angle += rot_info->get_rotated_theta(tt);
-          curr_pt_xyz.x() = std::cos(angle) * rr;
-          curr_pt_xyz.y() = std::sin(angle) * rr;
-          curr_pt_xyz.z() = init_pt_xyz.z();            
-          break;            
-        default:
-          SYS_T::print_fatal("Error: PTime_NS_Solver::get_currPts: No such type of rotation axis. \n");
-          break;        
-      }
-
-      return curr_pt_xyz;
-    }
 
     // Get the current point coordinates for the case of rotation around any axis (i.e., unit rotation vector (a, b, c))
     // Rodrigues's Formula, theta is the rotation angle

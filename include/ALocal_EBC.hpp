@@ -141,21 +141,6 @@ class ALocal_EBC
     }
 
     // ------------------------------------------------------------------------
-    // Generate a file name for outlet face ii as Outlet_xx_flowrate.txt
-    // ------------------------------------------------------------------------
-    virtual std::string gen_flowfile_name(const int &ii) const
-    {
-      std::ostringstream ss;
-      ss<<"Outlet_";
-      if( ii/10 == 0 ) ss<<"00";
-      else if(ii/100 == 0) ss<<"0";
-
-      ss<<ii<<"_data.txt";
-      
-      return ss.str();
-    }
-
-    // ------------------------------------------------------------------------
     // The following functions are in the derived _outflow classes
     // for the Dirichlet-to-Neumann type outflow boundary conditions.
     // ------------------------------------------------------------------------

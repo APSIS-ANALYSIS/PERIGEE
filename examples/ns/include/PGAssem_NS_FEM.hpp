@@ -25,13 +25,13 @@ class PGAssem_NS_FEM : public IPGAssem
   public:
     // Constructor for NS equations
     PGAssem_NS_FEM( 
-        const ALocal_EBC * const &part_ebc,
         const IGenBC * const &gbc,
         std::unique_ptr<ALocal_IEN> in_locien,
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode,
         std::unique_ptr<ALocal_NBC> in_nbc,
+        std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<ALocal_WeakBC> in_wbc,
         std::unique_ptr<IPLocAssem> in_locassem,    
         const int &in_nz_estimate=60 );
@@ -41,7 +41,6 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
     // Assem mass matrix and residual vector
@@ -56,7 +55,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
     // Assembly the residual vector and tangent matrix 
@@ -68,14 +66,12 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
     virtual double Assem_surface_flowrate(
@@ -85,7 +81,6 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part,
         const int &ebc_id );
 
     virtual double Assem_surface_ave_pressure(
@@ -100,6 +95,7 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<const FEANode> fnode;
     const std::unique_ptr<const APart_Node> pnode;
     const std::unique_ptr<const ALocal_NBC> nbc;
+    const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<const ALocal_WeakBC> wbc;
     const std::unique_ptr<IPLocAssem> locassem;
 
@@ -112,28 +108,23 @@ class PGAssem_NS_FEM : public IPGAssem
     void EssBC_G( const int &field );
 
     // Natural boundary condition
-    void NatBC_G( const double &curr_time, const double &dt,
-        const ALocal_EBC * const &ebc_part );
+    void NatBC_G( const double &curr_time, const double &dt );
 
     // Backflow integral on outlet surfaces
-    void BackFlow_G( const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part );
+    void BackFlow_G( const PDNSolution * const &sol );
 
     void BackFlow_KG( const double &dt,
-        const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part );
+        const PDNSolution * const &sol );
 
     // Resistance type boundary condition on outlet surfaces
     void NatBC_Resis_G( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
     void NatBC_Resis_KG( const double &curr_time, const double &dt,
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc );
 
     // Weak imposition of no-slip boundary condition on wall

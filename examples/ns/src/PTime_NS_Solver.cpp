@@ -56,12 +56,10 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    std::unique_ptr<PDNSolution> sol_base,
     std::unique_ptr<PDNSolution> init_dot_sol,
     std::unique_ptr<PDNSolution> init_sol,
     std::unique_ptr<PDNTimeStep> time_info,
     const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     IPGAssem * const &gassem_ptr ) const
 {
@@ -105,10 +103,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
     // Call the nonlinear equation solver
     nsolver->GenAlpha_Solve_NS( renew_flag, 
-        time_info->get_time(), time_info->get_step(),
-        sol_base.get(), pre_dot_sol.get(), pre_sol.get(), 
-        cur_dot_sol.get(), cur_sol.get(), infnbc_part, ebc_part, gbc,
-        gassem_ptr, conv_flag, nl_counter );
+        time_info->get_time(), time_info->get_step(), pre_dot_sol.get(), 
+        pre_sol.get(), cur_dot_sol.get(), cur_sol.get(), infnbc_part, 
+        gbc, gassem_ptr, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -128,19 +125,19 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
-    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
+    for(int face=0; face<gbc-> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol.get(), ebc_part, face); 
+          cur_dot_sol.get(), face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol.get(), ebc_part, face); 
+          cur_sol.get(), face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol.get(), ebc_part, face);
+          cur_sol.get(), face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -157,7 +154,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( gen_flowfile_name("Outlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
@@ -176,7 +173,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( infnbc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
         ofile.close();
       } 

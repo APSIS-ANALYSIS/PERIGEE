@@ -238,7 +238,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( ebc_v->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( gen_flowfile_name("Outlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
@@ -262,7 +262,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( infnbc->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
         ofile.close();
       }

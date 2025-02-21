@@ -315,15 +315,13 @@ int main(int argc, char *argv[])
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   std::unique_ptr<IPGAssem> gloAssem =
-    SYS_T::make_unique<PGAssem_NS_FEM>( 
-      locebc.get(), gbc.get(), 
-      std::move(locIEN), std::move(locElem),
-      std::move(fNode), std::move(pNode), 
-      std::move(locnbc), std::move(locwbc),
-      std::move(locAssem_ptr), nz_estimate );
+    SYS_T::make_unique<PGAssem_NS_FEM>( gbc.get(), 
+      std::move(locIEN), std::move(locElem), std::move(fNode), 
+      std::move(pNode), std::move(locnbc), std::move(locebc), 
+      std::move(locwbc), std::move(locAssem_ptr), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem->Assem_nonzero_estimate( locebc.get(), gbc.get() );
+  gloAssem->Assem_nonzero_estimate( gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem->Fix_nonzero_err_str();
@@ -369,8 +367,8 @@ int main(int argc, char *argv[])
   // ===== Nonlinear solver context =====
   auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>(
       std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
-      std::move(inflow_rate), nl_rtol, nl_atol, nl_dtol, 
-      nl_maxits, nl_refreq, nl_threshold );
+      std::move(inflow_rate), std::move(base), nl_rtol, nl_atol, 
+      nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
@@ -382,16 +380,16 @@ int main(int argc, char *argv[])
   tsolver->print_info();
 
   // ===== Outlet data recording files =====
-  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem -> Assem_surface_flowrate(
-        dot_sol.get(), locebc.get(), ff );
+        dot_sol.get(), ff );
 
     const double face_flrate = gloAssem -> Assem_surface_flowrate(
-        sol.get(), locebc.get(), ff );
+        sol.get(), ff );
 
     const double face_avepre = gloAssem -> Assem_surface_ave_pressure(
-        sol.get(), locebc.get(), ff );
+        sol.get(), ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -408,9 +406,9 @@ int main(int argc, char *argv[])
       // If this is NOT a restart run, generate a new file, otherwise append to
       // existing file
       if( !is_restart )
-        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locebc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       // If this is NOT a restart, then record the initial values
       if( !is_restart )
@@ -438,9 +436,9 @@ int main(int argc, char *argv[])
     {
       std::ofstream ofile;
       if( !is_restart )
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       if( !is_restart )
       {
@@ -456,15 +454,13 @@ int main(int argc, char *argv[])
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  tsolver->TM_NS_GenAlpha(is_restart,
-      std::move(base), std::move(dot_sol), 
-      std::move(sol), std::move(timeinfo),
-      locinfnbc.get(), locebc.get(), gbc.get(), gloAssem.get() );
+  tsolver->TM_NS_GenAlpha(is_restart, std::move(dot_sol), std::move(sol), 
+      std::move(timeinfo), locinfnbc.get(), gbc.get(), gloAssem.get() );
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
 
-  tsolver.reset(); locinfnbc.reset(); locebc.reset(); gbc.reset(); gloAssem.reset();
+  tsolver.reset(); locinfnbc.reset(); gbc.reset(); gloAssem.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;
