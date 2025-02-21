@@ -123,8 +123,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     { 
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
-      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info, 0); //get_currPts() may be writtern into Sl_tools
-      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info, 0);
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info); //get_currPts() may be writtern into Sl_tools
+      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info);
 
       const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, rot_info); 
       const Vector_3 velo_mesh_alpha = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*rot_info->get_direction_rotated(), radius_alpha);
