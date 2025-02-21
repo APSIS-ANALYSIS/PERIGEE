@@ -290,13 +290,9 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  IFlowRate * inflow_rate_ptr = nullptr;
-
   auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
 
-  inflow_rate_ptr = inflow_rate.get();
-
-  inflow_rate_ptr->print_info();
+  inflow_rate->print_info();
 
   // ===== Finite Element Container & Quadrature rules =====
   SYS_T::commPrint("===> Setup element container. \n");
@@ -638,7 +634,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh, velo_mesh,
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, pNode, locElem, locIEN, fNode,
+      tm_galpha_ptr, timeinfo, inflow_rate.get(), pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
       pmat, elementv, elements, anchor_elementv, opposite_elementv,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
@@ -652,7 +648,7 @@ int main(int argc, char *argv[])
   delete fNode; delete locIEN; delete GMIptr; delete sir_info; delete locrotnbc;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
-  delete quads; delete quadv; delete free_quad; delete inflow_rate_ptr; delete gbc; delete timeinfo;
+  delete quads; delete quadv; delete free_quad; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
   delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
