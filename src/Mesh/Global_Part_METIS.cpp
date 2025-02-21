@@ -334,7 +334,7 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
     const idx_t * const &part_in,
     const int &part_size, const int &cpu_size ) const
 {
-  std::string fName( fileName ); fName.append(".h5");
+  const std::string fName = fileName + ".h5";
 
   // file creation
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
@@ -361,7 +361,7 @@ void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
     const int64_t * const &part_in,
     const int64_t &part_size, const int &cpu_size ) const
 {
-  std::string fName( fileName ); fName.append( ".h5" );
+  const std::string fName = fileName + ".h5";
 
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
   
