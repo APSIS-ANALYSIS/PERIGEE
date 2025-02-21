@@ -8,6 +8,8 @@
 // Date: Sept. 24th 2013
 // ============================================================================
 #include <limits>
+#include <iomanip>
+#include <algorithm>
 #include "Math_Tools.hpp"
 #include "IQuadPts.hpp"
 
