@@ -88,19 +88,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_InflowBC * const &infbc_part,
         const int &infnbc_id );
 
-    // ------------------------------------------------------------------------
-    // ! Get the number of different elemental surfaces, that may potentially
-    //   be associated with different material properties or boundary tractions.
-    // ------------------------------------------------------------------------
-    virtual int get_num_ebc() {return num_ebc;}
-
-//   protected:
-//     // ------------------------------------------------------------------------
-//     // ! Get the number of different elemental surfaces, that may potentially
-//     //   be associated with different material properties or boundary tractions.
-//     // ------------------------------------------------------------------------
-//     int get_num_ebc() const {return num_ebc;}
-
   private:
     // Private data
     const std::unique_ptr<const ALocal_IEN> locien;

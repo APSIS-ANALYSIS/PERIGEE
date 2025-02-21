@@ -1087,16 +1087,6 @@ class IPGAssem
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
-    // ------------------------------------------------------------------------
-    // ! Get the number of different elemental surfaces, that may potentially
-    //   be associated with different material properties or boundary tractions.
-    // ------------------------------------------------------------------------
-    virtual int get_num_ebc()
-    {
-      SYS_T::commPrint("Warning: get_num_ebc() is not implemented. \n"); 
-      return 0;
-    }
-
 };
 
 #endif

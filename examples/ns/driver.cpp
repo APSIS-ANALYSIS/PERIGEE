@@ -380,7 +380,7 @@ int main(int argc, char *argv[])
   tsolver->print_info();
 
   // ===== Outlet data recording files =====
-  for(int ff=0; ff<gloAssem->get_num_ebc(); ++ff)
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem -> Assem_surface_flowrate(
         dot_sol.get(), ff );

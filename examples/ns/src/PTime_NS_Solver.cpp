@@ -130,7 +130,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
-    for(int face=0; face<gassem_ptr -> get_num_ebc(); ++face)
+    for(int face=0; face<gbc-> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
