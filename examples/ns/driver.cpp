@@ -369,8 +369,8 @@ int main(int argc, char *argv[])
   // ===== Nonlinear solver context =====
   auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>(
       std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
-      std::move(inflow_rate), nl_rtol, nl_atol, nl_dtol, 
-      nl_maxits, nl_refreq, nl_threshold );
+      std::move(inflow_rate), std::move(base), nl_rtol, nl_atol, 
+      nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
@@ -457,8 +457,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver->TM_NS_GenAlpha(is_restart,
-      std::move(base), std::move(dot_sol), 
-      std::move(sol), std::move(timeinfo),
+      std::move(dot_sol), std::move(sol), std::move(timeinfo),
       locinfnbc.get(), locebc.get(), gbc.get(), gloAssem.get() );
 
   // ===== Print complete solver info =====

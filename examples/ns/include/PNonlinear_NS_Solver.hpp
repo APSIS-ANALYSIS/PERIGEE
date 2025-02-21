@@ -23,6 +23,7 @@ class PNonlinear_NS_Solver
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
         std::unique_ptr<IFlowRate> in_flrate,
+        std::unique_ptr<PDNSolution> in_sol_base,
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
@@ -47,7 +48,6 @@ class PNonlinear_NS_Solver
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
-        const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
         PDNSolution * const &dot_sol,
@@ -66,6 +66,7 @@ class PNonlinear_NS_Solver
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<IFlowRate> flrate;
+    const std::unique_ptr<PDNSolution> sol_base;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const

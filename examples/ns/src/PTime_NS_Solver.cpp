@@ -61,7 +61,6 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    std::unique_ptr<PDNSolution> sol_base,
     std::unique_ptr<PDNSolution> init_dot_sol,
     std::unique_ptr<PDNSolution> init_sol,
     std::unique_ptr<PDNTimeStep> time_info,
@@ -110,10 +109,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
     // Call the nonlinear equation solver
     nsolver->GenAlpha_Solve_NS( renew_flag, 
-        time_info->get_time(), time_info->get_step(),
-        sol_base.get(), pre_dot_sol.get(), pre_sol.get(), 
-        cur_dot_sol.get(), cur_sol.get(), infnbc_part, ebc_part, gbc,
-        gassem_ptr, conv_flag, nl_counter );
+        time_info->get_time(), time_info->get_step(), pre_dot_sol.get(), 
+        pre_sol.get(), cur_dot_sol.get(), cur_sol.get(), infnbc_part, 
+        ebc_part, gbc, gassem_ptr, conv_flag, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();

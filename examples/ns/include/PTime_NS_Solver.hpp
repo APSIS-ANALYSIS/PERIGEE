@@ -43,7 +43,6 @@ class PTime_NS_Solver
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-        std::unique_ptr<PDNSolution> sol_base,
         std::unique_ptr<PDNSolution> init_dot_sol,
         std::unique_ptr<PDNSolution> init_sol,
         std::unique_ptr<PDNTimeStep> time_info,
