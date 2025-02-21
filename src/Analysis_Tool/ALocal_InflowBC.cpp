@@ -31,7 +31,7 @@ ALocal_InflowBC::ALocal_InflowBC(
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    const std::string sub_gname = gname + "/nbcid_" std::to_string(nbc_id);
+    const std::string sub_gname = gname + "/nbcid_" + std::to_string(nbc_id);
 
     Num_LD[nbc_id] = h5r -> read_intScalar( sub_gname.c_str(), "Num_LD" );
 
@@ -113,7 +113,7 @@ ALocal_InflowBC::ALocal_InflowBC( const HDF5_Reader * const &h5r )
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
   {
-    const std::string sub_gname = gname + "/nbcid_" std::to_string(nbc_id);
+    const std::string sub_gname = gname + "/nbcid_" + std::to_string(nbc_id);
 
     Num_LD[nbc_id] = h5r -> read_intScalar( sub_gname.c_str(), "Num_LD" );
 
