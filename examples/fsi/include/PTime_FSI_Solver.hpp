@@ -21,6 +21,21 @@ class PTime_FSI_Solver
 
     void print_info() const;
 
+    // ------------------------------------------------------------------------
+    // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
+    // ------------------------------------------------------------------------
+    std::string gen_flowfile_name(const std::string &prefix, const int &id) const
+    {
+      std::ostringstream ss;
+      ss << prefix;
+
+      if(id < 10) ss << "00";
+      else if(id < 100) ss << "0";
+
+      ss << id << "_data.txt";
+      return ss.str();
+    }
+
     void TM_FSI_GenAlpha(
         const bool &restart_init_assembly_flag,
         const IS &is_v,

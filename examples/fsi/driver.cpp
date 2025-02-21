@@ -679,9 +679,9 @@ int main(int argc, char *argv[])
       // If this is NOT a restart run, generate a new file, otherwise append to
       // a existing file
       if( !is_restart )
-        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       // if this is NOT a restart run, record the initial values
       if( !is_restart )
@@ -710,9 +710,9 @@ int main(int argc, char *argv[])
     {
       std::ofstream ofile;
       if( !is_restart )
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       if( !is_restart )
       {
