@@ -33,9 +33,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const PDNSolution * const &init_sol,
     const PDNSolution * const &init_mdisp,
     const PDNSolution * const &init_mvelo,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
-    const IFlowRate * const flr_ptr,
     const APart_Node * const &pNode_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -50,7 +48,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const SI_rotation_info * const &rot_info,
     SI_T::SI_solution * const &SI_sol,
     SI_T::SI_quad_point * const &SI_qp,
-    const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
@@ -96,7 +93,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
-  const double alpha_f = tmga_ptr->get_alpha_f();
+  const double alpha_f = nsolver_ptr->get_alpha_f();
 
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -171,9 +168,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Call the nonlinear equation solver
     nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
-        pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh, tmga_ptr, flr_ptr,
+        pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part, rotnbc_part,
-        ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, bc_mat, elementv, elements, elementvs, elementvs_rotated,
+        ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 

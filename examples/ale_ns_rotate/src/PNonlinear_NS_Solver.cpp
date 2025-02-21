@@ -1,6 +1,9 @@
 #include "PNonlinear_NS_Solver.hpp"
 
 PNonlinear_NS_Solver::PNonlinear_NS_Solver(
+    std::unique_ptr<Matrix_PETSc> in_bc_mat,
+    std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+    std::unique_ptr<IFlowRate> in_flrate,
     std::unique_ptr<PDNSolution> in_sol_base,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
@@ -10,6 +13,9 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold),
+  bc_mat(std::move(in_bc_mat)),
+  tmga(std::move(in_tmga)),
+  flrate(std::move(in_flrate)),
   sol_base(std::move(in_sol_base))
 {}
 
@@ -34,8 +40,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &pre_sol,
     const PDNSolution * const &pre_velo_mesh,    
     const PDNSolution * const &pre_disp_mesh,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    const IFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
@@ -48,7 +52,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const ALocal_Interface * const &itf_part,
     SI_T::SI_solution * const &SI_sol,
     SI_T::SI_quad_point * const &SI_qp,
-    const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
@@ -86,9 +89,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
   // Gen-alpha parameters
-  const double gamma   = tmga_ptr->get_gamma();
-  const double alpha_m = tmga_ptr->get_alpha_m();
-  const double alpha_f = tmga_ptr->get_alpha_f();
+  const double gamma   = tmga->get_gamma();
+  const double alpha_m = tmga->get_alpha_m();
+  const double alpha_f = tmga->get_alpha_f();
 
   // Same-Y predictor
   sol->Copy(*pre_sol);
@@ -117,8 +120,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, &sol_alpha);
+  rescale_inflow_value(curr_time+dt, infnbc_part, sol);
+  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, &sol_alpha);
   // ------------------------------------------------- 
 
   // ------------------------------------------------- 
@@ -262,7 +265,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
-    const IFlowRate * const &flrate,
     PDNSolution * const &sol ) const
 {
   const int num_nbc = infbc -> get_num_nbc();

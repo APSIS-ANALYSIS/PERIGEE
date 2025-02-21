@@ -360,17 +360,17 @@ int main(int argc, char *argv[])
   SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf, nqp_sur);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc);
 
   pmat->gen_perm_bc(pNode, locnbc);
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
+  auto tm_galpha = SYS_T::make_unique<TimeMethod_GenAlpha>(
       genA_rho_inf, false );
 
-  tm_galpha_ptr->print_info();
+  tm_galpha->print_info();
 
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
   // else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_Interface(
-    tm_galpha_ptr, elementv->get_nLocBas(),
+    tm_galpha.get(), elementv->get_nLocBas(),
     quadv->get_num_quadPts(), elements->get_nLocBas(),
     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
 
@@ -546,7 +546,9 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( std::move(base), 
+  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( 
+      std::move(pmat), std::move(tm_galpha), std::move(inflow_rate),
+      std::move(base), 
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -634,9 +636,9 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
-      tm_galpha_ptr, timeinfo, inflow_rate.get(), pNode, locElem, locIEN, fNode,
+      timeinfo, pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
-      pmat, elementv, elements, anchor_elementv, opposite_elementv,
+      elementv, elements, anchor_elementv, opposite_elementv,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
 
   // ===== Print complete solver info =====
@@ -647,7 +649,7 @@ int main(int argc, char *argv[])
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete sir_info; delete locrotnbc;
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
+  delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
   delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
