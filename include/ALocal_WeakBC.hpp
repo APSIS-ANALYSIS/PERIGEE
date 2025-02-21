@@ -32,14 +32,20 @@ class ALocal_WeakBC
     // 0 <= ee < get_num_ele()
     virtual int get_ele_face_id( const int &ee ) const { return ele_face_id[ee]; }
 
-    virtual void print_info() const;
+    virtual void print_info() const
+    {
+      SYS_T::commPrint("Weakly enforced wall boundary condition:\n");
+      SYS_T::commPrint("-wall_model_type: %d\n", wall_model_type);
+    }
 
   protected:
+    // ------------------------------------------------------------------------
     // type = 0: the whole wall is set to be strongly no-slip BC
     // type = 1: all dof of wall nodes are set to be weakly essential BC;
     // type = 2: the normal direction of wall nodes (the rotated-x component)
     //           are set to be strongly no-slip, and the tanget direction 
     //           of wall nodes are set to be weakly essential BC.       
+    // ------------------------------------------------------------------------
     int wall_model_type;
 
     // stores the number of surface elements.
@@ -53,6 +59,7 @@ class ALocal_WeakBC
 
     // ------------------------------------------------------------------------
     // Disallow default constructor
+    // ------------------------------------------------------------------------
     ALocal_WeakBC() = delete;
 };
 

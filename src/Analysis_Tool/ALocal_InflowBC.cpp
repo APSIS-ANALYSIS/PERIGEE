@@ -66,7 +66,7 @@ ALocal_InflowBC::ALocal_InflowBC(
     // load its geometrical info 
     if(num_local_cell[nbc_id] > 0)
     {
-      const std::vector<double> temp_xyz = h5r->read_doubleVector( sub_gname.c_str(), "local_pt_xyz" );
+      const auto temp_xyz = h5r->read_doubleVector( sub_gname.c_str(), "local_pt_xyz" );
 
       ASSERT( VEC_T::get_size(temp_xyz) == num_local_node[nbc_id]*3, "Error: ALocal_InflowBC local_pt_xyz format is wrong.\n");
 
@@ -148,7 +148,7 @@ ALocal_InflowBC::ALocal_InflowBC( const HDF5_Reader * const &h5r )
     // load its geometrical info
     if(num_local_cell[nbc_id] > 0)
     {
-      const std::vector<double> temp_xyz = h5r->read_doubleVector( sub_gname.c_str(), "local_pt_xyz" );
+      const auto temp_xyz = h5r->read_doubleVector( sub_gname.c_str(), "local_pt_xyz" );
 
       ASSERT( VEC_T::get_size(temp_xyz) == num_local_node[nbc_id]*3, "Error: ALocal_InflowBC local_pt_xyz format is wrong.\n");
 

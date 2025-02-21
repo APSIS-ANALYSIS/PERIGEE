@@ -60,10 +60,4 @@ ALocal_WeakBC::ALocal_WeakBC( const HDF5_Reader * const &h5r )
   }
 }
 
-void ALocal_WeakBC::print_info() const
-{
-  SYS_T::commPrint("Weakly enforced wall boundary condition:\n");
-  SYS_T::commPrint("-wall_model_type: %d\n", wall_model_type);
-}
-
 // EOF

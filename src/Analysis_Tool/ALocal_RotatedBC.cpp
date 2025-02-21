@@ -11,8 +11,6 @@ ALocal_RotatedBC::ALocal_RotatedBC(
 
   const std::string gname("/rotated_nbc"); 
 
-  std::string groupbase(gname);
-
   Num_LD = h5r -> read_intScalar( gname.c_str(), "Num_LD" );
 
   // If this sub-domain of this CPU contains local moving bc points, load the LDN array.
@@ -20,7 +18,7 @@ ALocal_RotatedBC::ALocal_RotatedBC(
   {
     LDN = h5r -> read_intVector( gname.c_str(), "LDN" );
 
-    const std::vector<double> temp_ldn_xyz = h5r->read_doubleVector( gname.c_str(), "LDN_pt_xyz" );
+    const auto temp_ldn_xyz = h5r->read_doubleVector( gname.c_str(), "LDN_pt_xyz" );
 
     ASSERT( VEC_T::get_size(temp_ldn_xyz) == Num_LD*3, "Error: ALocal_RotatedBC LDN_pt_xyz format is wrong.\n");
 
@@ -55,7 +53,7 @@ ALocal_RotatedBC::ALocal_RotatedBC(
 
   if(num_local_node > 0)
   {  
-    const std::vector<double> temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
+    const auto temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
 
     ASSERT( VEC_T::get_size(temp_xyz) == num_local_node*3, "Error: ALocal_RotatedBC local_pt_xyz format is wrong.\n");
 
@@ -79,8 +77,6 @@ ALocal_RotatedBC::ALocal_RotatedBC( const HDF5_Reader * const &h5r )
 {
   const std::string gname("/rotated_nbc");
 
-  std::string groupbase(gname);
-
   Num_LD = h5r -> read_intScalar( gname.c_str(), "Num_LD" );
 
   // If this sub-domain of this CPU contains local moving bc points, load the LDN array.
@@ -88,7 +84,7 @@ ALocal_RotatedBC::ALocal_RotatedBC( const HDF5_Reader * const &h5r )
   {
     LDN = h5r -> read_intVector( gname.c_str(), "LDN" );
 
-    const std::vector<double> temp_ldn_xyz = h5r->read_doubleVector( gname.c_str(), "LDN_pt_xyz" );
+    const auto temp_ldn_xyz = h5r->read_doubleVector( gname.c_str(), "LDN_pt_xyz" );
 
     ASSERT( VEC_T::get_size(temp_ldn_xyz) == Num_LD*3, "Error: ALocal_RotatedBC LDN_pt_xyz format is wrong.\n");
 
@@ -123,7 +119,7 @@ ALocal_RotatedBC::ALocal_RotatedBC( const HDF5_Reader * const &h5r )
 
   if(num_local_node > 0)
   {
-    const std::vector<double> temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
+    const auto temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
 
     ASSERT( VEC_T::get_size(temp_xyz) == num_local_node*3, "Error: ALocal_RotatedBC local_pt_xyz format is wrong.\n");
 
