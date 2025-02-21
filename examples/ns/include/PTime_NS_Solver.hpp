@@ -26,6 +26,21 @@ class PTime_NS_Solver
 
     void print_lsolver_info() const {nsolver -> print_lsolver_info();}
 
+    // ------------------------------------------------------------------------
+    // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
+    // ------------------------------------------------------------------------
+    std::string gen_flowfile_name(const std::string &prefix, const int &id) const
+    {
+      std::ostringstream ss;
+      ss << prefix;
+
+      if(id < 10) ss << "00";
+      else if(id < 100) ss << "0";
+
+      ss << id << "_data.txt";
+      return ss.str();
+    }
+
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
         std::unique_ptr<PDNSolution> sol_base,
@@ -46,9 +61,9 @@ class PTime_NS_Solver
     const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
 
     std::string Name_Generator( const int &counter ) const;
-    
+
     std::string Name_dot_Generator( const int &counter ) const;
-    
+
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
 };
