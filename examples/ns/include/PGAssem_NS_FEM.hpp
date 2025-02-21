@@ -108,8 +108,7 @@ class PGAssem_NS_FEM : public IPGAssem
     void EssBC_G( const int &field );
 
     // Natural boundary condition
-    void NatBC_G( const double &curr_time, 
-        const double &dt );
+    void NatBC_G( const double &curr_time, const double &dt );
 
     // Backflow integral on outlet surfaces
     void BackFlow_G( const PDNSolution * const &sol );
