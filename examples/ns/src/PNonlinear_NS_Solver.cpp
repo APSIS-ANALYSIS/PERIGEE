@@ -44,7 +44,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     IPGAssem * const &gassem_ptr,
     bool &conv_flag, int &nl_counter ) const
@@ -103,7 +102,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol, 
-        curr_time, dt, ebc_part, gbc );
+        curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -124,7 +123,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-        curr_time, dt, ebc_part, gbc );
+        curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -170,7 +169,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-          curr_time, dt, ebc_part, gbc );
+          curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -188,7 +187,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, dot_sol, sol,
-          curr_time, dt, ebc_part, gbc );
+          curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);

@@ -53,7 +53,6 @@ class PNonlinear_NS_Solver
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
         const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
         IPGAssem * const &gassem_ptr,
         bool &conv_flag, int &nl_counter ) const;

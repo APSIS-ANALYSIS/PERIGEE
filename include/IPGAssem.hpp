@@ -111,7 +111,6 @@ class IPGAssem
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
     virtual void Assem_nonzero_estimate(
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
@@ -609,7 +608,6 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
@@ -898,7 +896,6 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
@@ -973,7 +970,6 @@ class IPGAssem
 
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &vec,
-        const ALocal_EBC * const &ebc_part,
         const int &ebc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
@@ -1022,7 +1018,6 @@ class IPGAssem
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &vec,
-        const ALocal_EBC * const &ebc_part,
         const int &ebc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
@@ -1091,6 +1086,17 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+
+    // ------------------------------------------------------------------------
+    // ! Get the number of different elemental surfaces, that may potentially
+    //   be associated with different material properties or boundary tractions.
+    // ------------------------------------------------------------------------
+    virtual int get_num_ebc()
+    {
+      SYS_T::commPrint("Warning: get_num_ebc() is not implemented. \n"); 
+      return 0;
+    }
+
 };
 
 #endif
