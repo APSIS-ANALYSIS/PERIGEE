@@ -70,12 +70,6 @@ int main(int argc, char *argv[])
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
 
-  double inflow_thd_time = 0.01; // prescribed time for inflow to reach steadness
-  double inflow_tgt_rate = 1.0; // prescribed flow rate at steady state
-
-  // Turbulence intensity for the purtabation at inlets, 3% ==> 0.03
-  double inflow_TI_perturbation = 0.0;
-
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
 
@@ -153,9 +147,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
   SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
-  SYS_T::GetOptionReal("-inflow_thd_time", inflow_thd_time);
-  SYS_T::GetOptionReal("-inflow_tgt_rate", inflow_tgt_rate);
-  SYS_T::GetOptionReal("-inflow_TI_perturbation", inflow_TI_perturbation);
   SYS_T::GetOptionReal("-angular_velo", angular_velo);
   SYS_T::GetOptionReal("-angular_thd_time", angular_thd_time);
   SYS_T::GetOptionString("-lpn_file", lpn_file);
@@ -193,18 +184,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
-
-  // if inflow file exists, print the file name
-  // otherwise, print the parameter for linear2steady inflow setting
-  if( SYS_T::file_exist( inflow_file ) )
-    SYS_T::cmdPrint("-inflow_file:", inflow_file);
-  else
-  {
-    SYS_T::cmdPrint("-inflow_thd_time:", inflow_thd_time);
-    SYS_T::cmdPrint("-inflow_tgt_rate:", inflow_tgt_rate);
-  }
-  SYS_T::cmdPrint("-inflow_TI_perturbation:", inflow_TI_perturbation);
-
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
@@ -243,15 +223,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_doubleScalar("angular_velo", angular_velo);
-
-    if( SYS_T::file_exist( inflow_file ) )
-      cmdh5w->write_string("inflow_file", inflow_file);
-    else
-    {
-      cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
-      cmdh5w->write_doubleScalar("inflow_tgt_rate", inflow_tgt_rate );
-    }
-    cmdh5w->write_doubleScalar("inflow_TI_perturbation", inflow_TI_perturbation);
+    cmdh5w->write_string("inflow_file", inflow_file);
+    
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
