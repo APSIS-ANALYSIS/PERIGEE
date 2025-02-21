@@ -15,9 +15,7 @@ std::string PTime_NS_Solver::Name_Generator(const int &counter) const
   temp.str("");
   temp<<900000000 + counter;
 
-  std::string out_name(pb_name);
-  out_name.append(temp.str());
-  return out_name;
+  return pb_name + temp.str();
 }
 
 std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
@@ -26,10 +24,7 @@ std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
   temp.str("");
   temp<<900000000 + counter;
 
-  std::string out_name("dot_");
-  out_name.append(pb_name);
-  out_name.append(temp.str());
-  return out_name;
+  return std::string("dot_") + pb_name + temp.str();
 }
 
 void PTime_NS_Solver::print_info() const
