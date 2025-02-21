@@ -17,13 +17,11 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(gname);
-      subgroup_name.append("/ebcid_");
-      subgroup_name.append( std::to_string(ii) );
+      const std::string sub_gname = gname + "/ebcid_" + std::to_string(ii);
 
-      intNA[ii]  = h5r -> read_doubleVector( subgroup_name.c_str(), "intNA" );
-      LID[ii]    = h5r -> read_intVector(    subgroup_name.c_str(), "LID_all_face_nodes" );
-      outvec[ii] = Vector_3( h5r -> read_Vector_3( subgroup_name.c_str(), "out_normal" ) );
+      intNA[ii]  = h5r -> read_doubleVector( sub_gname.c_str(), "intNA" );
+      LID[ii]    = h5r -> read_intVector(    sub_gname.c_str(), "LID_all_face_nodes" );
+      outvec[ii] = Vector_3( h5r -> read_Vector_3( sub_gname.c_str(), "out_normal" ) );
     
       num_face_nodes[ii] = static_cast<int>(intNA[ii].size());
     }
@@ -52,13 +50,11 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const HDF5_Reader * const &h5r,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(gname);
-      subgroup_name.append("/ebcid_");
-      subgroup_name.append( std::to_string(ii) );
+      const std::string sub_gname = gname + "/ebcid_" + std::to_string(ii);
 
-      intNA[ii]  = h5r -> read_doubleVector( subgroup_name.c_str(), "intNA" );
-      LID[ii]    = h5r -> read_intVector(    subgroup_name.c_str(), "LID_all_face_nodes" );
-      outvec[ii] = Vector_3( h5r -> read_Vector_3( subgroup_name.c_str(), "out_normal" ) );
+      intNA[ii]  = h5r -> read_doubleVector( sub_gname.c_str(), "intNA" );
+      LID[ii]    = h5r -> read_intVector(    sub_gname.c_str(), "LID_all_face_nodes" );
+      outvec[ii] = Vector_3( h5r -> read_Vector_3( sub_gname.c_str(), "out_normal" ) );
 
       num_face_nodes[ii] = static_cast<int>(intNA[ii].size());
     }

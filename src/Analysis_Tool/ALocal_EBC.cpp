@@ -20,9 +20,6 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     cell_nLocBas = h5r -> read_intVector(gname.c_str(), "cell_nLocBas" );
   }
 
-  std::string groupbase(gname);
-  groupbase.append("/ebcid_");
-
   local_cell_node_xyz.resize(num_ebc);
   local_cell_ien.resize(num_ebc);
   local_cell_node_vol_id.resize(num_ebc);
@@ -33,18 +30,17 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( std::to_string(ii) );
+      const std::string sub_gname = gname + "/ebcid_" + std::to_string(ii);
 
-      local_cell_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz" );
+      local_cell_node_xyz[ii] = h5r -> read_doubleVector( sub_gname.c_str(), "local_cell_node_xyz" );
 
-      local_cell_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_ien" );
+      local_cell_ien[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_ien" );
 
-      local_cell_node_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_vol_id" );
+      local_cell_node_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_vol_id" );
 
-      local_cell_node_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_pos" );
+      local_cell_node_pos[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_pos" );
 
-      local_cell_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_vol_id" );
+      local_cell_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_vol_id" );
     }
     else
     {
@@ -73,9 +69,6 @@ ALocal_EBC::ALocal_EBC( const HDF5_Reader * const &h5r,
     cell_nLocBas = h5r -> read_intVector(gname.c_str(), "cell_nLocBas" );
   }
 
-  std::string groupbase(gname);
-  groupbase.append("/ebcid_");
-
   local_cell_node_xyz.resize(num_ebc);
   local_cell_ien.resize(num_ebc);
   local_cell_node_vol_id.resize(num_ebc);
@@ -86,18 +79,17 @@ ALocal_EBC::ALocal_EBC( const HDF5_Reader * const &h5r,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( std::to_string(ii) );
+      const std::string sub_gname = gname + "/ebcid_" + std::to_string(ii);
 
-      local_cell_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz" );
+      local_cell_node_xyz[ii] = h5r -> read_doubleVector( sub_gname.c_str(), "local_cell_node_xyz" );
 
-      local_cell_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_ien" );
+      local_cell_ien[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_ien" );
 
-      local_cell_node_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_vol_id" );
+      local_cell_node_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_vol_id" );
 
-      local_cell_node_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_pos" );
+      local_cell_node_pos[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_pos" );
 
-      local_cell_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_vol_id" );
+      local_cell_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_vol_id" );
     }
     else
     {
