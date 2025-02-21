@@ -12,8 +12,6 @@
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
 #include "GenBCFactory.hpp"
-#include "GenBC_Coronary.hpp"
-#include "GenBC_Pressure.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
@@ -230,7 +228,7 @@ int main(int argc, char *argv[])
   // ===== Inflow flow rate =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  std::unique_ptr<IFlowRate> inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
+  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
 
   inflow_rate->print_info();
 
@@ -305,7 +303,7 @@ int main(int argc, char *argv[])
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== LPN models =====
-  std::unique_ptr<IGenBC> gbc = GenBCFactory::createGenBC(
+  auto gbc = GenBCFactory::createGenBC(
       lpn_file, initial_time, initial_step, initial_index, 1000);
 
   gbc -> print_info();
@@ -466,9 +464,7 @@ int main(int argc, char *argv[])
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
 
-  tsolver.reset(); locinfnbc.reset(); 
-  locebc.reset(); gbc.reset(); 
-  gloAssem.reset();
+  tsolver.reset(); locinfnbc.reset(); locebc.reset(); gbc.reset(); gloAssem.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;
