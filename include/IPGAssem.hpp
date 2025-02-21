@@ -1086,7 +1086,6 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
-
 };
 
 #endif
