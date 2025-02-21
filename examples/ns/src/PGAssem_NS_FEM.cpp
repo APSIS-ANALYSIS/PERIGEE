@@ -382,8 +382,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   VecAssemblyEnd(G);
 }
 
-void PGAssem_NS_FEM::NatBC_G( 
-  const double &curr_time, const double &dt )
+void PGAssem_NS_FEM::NatBC_G( const double &curr_time, const double &dt )
 {
   int * LSIEN = new int [snLocBas];
   double * sctrl_x = new double [snLocBas];
