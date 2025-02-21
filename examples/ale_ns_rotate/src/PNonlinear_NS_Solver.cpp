@@ -1,8 +1,7 @@
 #include "PNonlinear_NS_Solver.hpp"
 
 PNonlinear_NS_Solver::PNonlinear_NS_Solver(
-    const APart_Node * const &anode_ptr,
-    const FEANode * const &feanode_ptr,
+    std::unique_ptr<PDNSolution> in_sol_base,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 
@@ -10,19 +9,9 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     const int &input_renew_threshold )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
-  nrenew_threshold(input_renew_threshold)
-{
-  // Generate the incremental solution vector used for update 
-  // the solution of the nonlinear algebraic system 
-  dot_step = new PDNSolution_NS( anode_ptr, 0, false );
-}
-
-
-PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
-{
-  delete dot_step; dot_step = nullptr;
-}
-
+  nrenew_threshold(input_renew_threshold),
+  sol_base(std::move(in_sol_base))
+{}
 
 void PNonlinear_NS_Solver::print_info() const
 {
@@ -37,12 +26,10 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-
 void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
-    const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_sol,
     const PDNSolution * const &pre_sol,
     const PDNSolution * const &pre_velo_mesh,    
@@ -130,8 +117,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol_base, sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, sol_base, &sol_alpha);
+  rescale_inflow_value(curr_time+dt, infnbc_part, flr_ptr, sol);
+  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flr_ptr, &sol_alpha);
   // ------------------------------------------------- 
 
   // ------------------------------------------------- 
@@ -190,6 +177,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
+  auto dot_step = SYS_T::make_unique<PDNSolution>( pre_sol );
+
   // Now do consistent Newton-Raphson iteration
   do
   {
@@ -198,21 +187,21 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
     
     // solve the equation K dot_step = G
-    lsolver_ptr->Solve( gassem_ptr->G, dot_step );
+    lsolver_ptr->Solve( gassem_ptr->G, dot_step.get() );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(lin_solve_event,0,0,0,0);
 #endif
 
-    bc_mat->MatMultSol( dot_step );
+    bc_mat->MatMultSol( dot_step.get() );
 
     nl_counter += 1;
 
-    dot_sol->PlusAX( dot_step, -1.0 );
-    sol->PlusAX( dot_step, (-1.0) * gamma * dt );
+    dot_sol->PlusAX( dot_step.get(), -1.0 );
+    sol->PlusAX( dot_step.get(), (-1.0) * gamma * dt );
 
-    dot_sol_alpha.PlusAX( dot_step, (-1.0) * alpha_m );
-    sol_alpha.PlusAX( dot_step, (-1.0) * alpha_f * gamma * dt );
+    dot_sol_alpha.PlusAX( dot_step.get(), (-1.0) * alpha_m );
+    sol_alpha.PlusAX( dot_step.get(), (-1.0) * alpha_f * gamma * dt );
 
     SI_sol->update_node_sol(&sol_alpha);
 
@@ -271,11 +260,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   else conv_flag = false;
 }
 
-
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
     const IFlowRate * const &flrate,
-    const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
 {
   const int num_nbc = infbc -> get_num_nbc();

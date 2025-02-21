@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
+  std::unique_ptr<PDNSolution> base = SYS_T::make_unique<PDNSolution_NS>( pNode, fNode, locinfnbc, 1 );
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
@@ -546,7 +546,7 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
+  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( std::move(base), 
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -633,7 +633,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh, velo_mesh,
+  tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
       tm_galpha_ptr, timeinfo, inflow_rate.get(), pNode, locElem, locIEN, fNode,
       locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
       pmat, elementv, elements, anchor_elementv, opposite_elementv,
@@ -649,7 +649,7 @@ int main(int argc, char *argv[])
   delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
+  delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
   delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
 
   PetscFinalize();

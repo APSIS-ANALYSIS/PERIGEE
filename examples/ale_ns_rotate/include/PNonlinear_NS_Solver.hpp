@@ -20,14 +20,13 @@
 class PNonlinear_NS_Solver
 {
   public:
-    PNonlinear_NS_Solver( const APart_Node * const &anode_ptr,
-        const FEANode * const &feanode_ptr,
+    PNonlinear_NS_Solver( std::unique_ptr<PDNSolution> in_sol_base,
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
         const int &input_renew_threshold = 4 );
 
-    ~PNonlinear_NS_Solver();
+    ~PNonlinear_NS_Solver() = default;
 
     int get_non_max_its() const {return nmaxits;}
 
@@ -44,7 +43,6 @@ class PNonlinear_NS_Solver
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
-        const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_sol,
         const PDNSolution * const &pre_sol,
         const PDNSolution * const &pre_velo_mesh,    
@@ -87,8 +85,7 @@ class PNonlinear_NS_Solver
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
-    // vector container for the step update in the smaller matrix problem
-    PDNSolution * dot_step;
+    const std::unique_ptr<PDNSolution> sol_base;
 
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
@@ -99,14 +96,12 @@ class PNonlinear_NS_Solver
     void rescale_inflow_value( const double &stime,
         const ALocal_InflowBC * const &infbc,
         const IFlowRate * const &flrate,
-        const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
 
     void update_rotatedbc_value(
         const ALocal_RotatedBC * const &rotbc,
         const PDNSolution * const &velo_mesh,
         PDNSolution * const &sol ) const;
-
 };
 
 #endif
