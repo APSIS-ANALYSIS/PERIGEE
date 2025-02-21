@@ -32,9 +32,7 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
-#include "FlowRate_Unsteady.hpp"
-#include "FlowRate_Linear2Steady.hpp"
-#include "FlowRate_Cosine2Steady.hpp"
+#include "FlowRateFactory.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -321,12 +319,9 @@ int main(int argc, char *argv[])
 
   IFlowRate * inflow_rate_ptr = nullptr;
 
-  // If inflow file exist, load it
-  // otherwise, call the linear incremental flow rate to reach a steady flow
-  // if( SYS_T::file_exist( inflow_file ) )
-  //   inflow_rate_ptr = new FlowRate_Unsteady( inflow_file.c_str() );
-  // else
-  inflow_rate_ptr = new FlowRate_Cosine2Steady( inflow_thd_time, inflow_TI_perturbation, inflow_file );
+  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
+
+  inflow_rate_ptr = inflow_rate.get();
 
   inflow_rate_ptr->print_info();
 
@@ -650,9 +645,9 @@ int main(int argc, char *argv[])
     {
       std::ofstream ofile;
       if( !is_restart )
-        ofile.open( gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
       else
-        ofile.open( gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
 
       if( !is_restart )
       {
