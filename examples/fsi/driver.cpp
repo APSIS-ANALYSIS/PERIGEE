@@ -17,9 +17,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Tet4.hpp"
 #include "FEAElement_Hex8.hpp"
-#include "FlowRate_Unsteady.hpp"
-#include "FlowRate_Linear2Steady.hpp"
-#include "FlowRate_Steady.hpp"
+#include "FlowRateFactory.hpp"
 #include "GenBC_Resistance.hpp"
 #include "GenBC_RCR.hpp"
 #include "GenBC_Inductance.hpp"
@@ -348,14 +346,9 @@ int main(int argc, char *argv[])
 
   IFlowRate * inflow_rate_ptr = nullptr;
 
-  if( inflow_type == 0 )
-    inflow_rate_ptr = new FlowRate_Unsteady( inflow_file );
-  else if( inflow_type == 1 )
-    inflow_rate_ptr = new FlowRate_Linear2Steady( inflow_thd_time, inflow_file );
-  else if( inflow_type == 2 )
-    inflow_rate_ptr = new FlowRate_Steady( inflow_file );
-  else
-    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
+  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
+
+  inflow_rate_ptr = inflow_rate.get();
 
   inflow_rate_ptr->print_info();
 
