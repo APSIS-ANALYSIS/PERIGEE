@@ -300,11 +300,12 @@ int main(int argc, char *argv[])
   }
 
   // ===== Time step info =====
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
+      initial_step);
 
   // ===== LPN models =====
-  auto gbc = GenBCFactory::createGenBC(
-      lpn_file, initial_time, initial_step, initial_index, 1000);
+  auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
+      initial_index, 1000);
 
   gbc -> print_info();
 
@@ -314,11 +315,10 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  std::unique_ptr<IPGAssem> gloAssem =
-    SYS_T::make_unique<PGAssem_NS_FEM>( gbc.get(), 
-      std::move(locIEN), std::move(locElem), std::move(fNode), 
-      std::move(pNode), std::move(locnbc), std::move(locebc), 
-      std::move(locwbc), std::move(locAssem_ptr), nz_estimate );
+  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_NS_FEM>( gbc.get(), 
+        std::move(locIEN), std::move(locElem), std::move(fNode), 
+        std::move(pNode), std::move(locnbc), std::move(locebc), 
+        std::move(locwbc), std::move(locAssem_ptr), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem->Assem_nonzero_estimate( gbc.get() );
