@@ -57,8 +57,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr,
     Mat &shell ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
@@ -93,7 +91,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
-  const double alpha_f = nsolver_ptr->get_alpha_f();
+  const double alpha_f = nsolver->get_alpha_f();
 
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -166,12 +164,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
+    nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
         alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part, rotnbc_part,
         ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
+        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr,
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 
     // Update the time step information

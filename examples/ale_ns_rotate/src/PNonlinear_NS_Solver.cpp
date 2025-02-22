@@ -1,6 +1,7 @@
 #include "PNonlinear_NS_Solver.hpp"
 
 PNonlinear_NS_Solver::PNonlinear_NS_Solver(
+    std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
     std::unique_ptr<IFlowRate> in_flrate,
@@ -13,6 +14,7 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold),
+  lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
   flrate(std::move(in_flrate)),
@@ -61,7 +63,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
     const PDNSolution * const &velo_mesh,    
@@ -158,7 +159,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     
     // SetOperator will pass the tangent matrix to the linear solver and the
     // linear solver will generate the preconditioner based on the new matrix.
-    lsolver_ptr->SetOperator( shell, gassem_ptr->K );
+    lsolver->SetOperator( shell, gassem_ptr->K );
   }
   else
   {
@@ -190,7 +191,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
     
     // solve the equation K dot_step = G
-    lsolver_ptr->Solve( gassem_ptr->G, dot_step.get() );
+    lsolver->Solve( gassem_ptr->G, dot_step.get() );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(lin_solve_event,0,0,0,0);
@@ -226,7 +227,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       SYS_T::commPrint("  --- M updated");
-      lsolver_ptr->SetOperator(shell, gassem_ptr->K);
+      lsolver->SetOperator(shell, gassem_ptr->K);
     }
     else
     {

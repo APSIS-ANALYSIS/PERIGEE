@@ -21,6 +21,7 @@ class PNonlinear_NS_Solver
 {
   public:
     PNonlinear_NS_Solver( 
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
         std::unique_ptr<IFlowRate> in_flrate,
@@ -37,6 +38,8 @@ class PNonlinear_NS_Solver
     int get_alpha_f() const {return tmga->get_alpha_f();}
 
     void print_info() const;
+
+    void print_lsolver_info() const {lsolver->print_info();}
 
     // --------------------------------------------------------------
     // GenAlpha_Solve_NS:
@@ -74,7 +77,6 @@ class PNonlinear_NS_Solver
         IQuadPts * const &free_quad,
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_sol,
         PDNSolution * const &sol,
         const PDNSolution * const &velo_mesh,    
@@ -87,7 +89,8 @@ class PNonlinear_NS_Solver
   private:
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
-
+    
+    const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<IFlowRate> flrate;

@@ -537,7 +537,7 @@ int main(int argc, char *argv[])
   }
 
   // ===== Linear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   PC upc; lsolver->GetPC(&upc);
   const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
@@ -546,16 +546,16 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( 
-      std::move(pmat), std::move(tm_galpha), std::move(inflow_rate),
-      std::move(base), 
+  auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>( 
+      std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
+      std::move(inflow_rate), std::move(base), 
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
+  auto tsolver = SYS_T::make_unique<PTime_NS_Solver>( std::move(nsolver), 
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
 
@@ -637,12 +637,13 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
       timeinfo, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
+      locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, 
+      locitf, sir_info, SI_sol, SI_qp,
       elementv, elements, anchor_elementv, opposite_elementv,
-      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
+      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, shell_mat);
 
   // ===== Print complete solver info =====
-  lsolver -> print_info();
+  tsolver -> print_lsolver_info();
 
   MatDestroy(&shell_mat);
 
@@ -652,7 +653,9 @@ int main(int argc, char *argv[])
   delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete gbc; delete timeinfo;
   delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
-  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
+  delete gloAssem_ptr;
+
+  tsolver.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;

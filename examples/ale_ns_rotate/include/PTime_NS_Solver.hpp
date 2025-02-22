@@ -15,17 +15,20 @@
 class PTime_NS_Solver
 {
   public:
-    PTime_NS_Solver( const std::string &input_name, 
+    PTime_NS_Solver( std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+        const std::string &input_name, 
         const int &input_record_freq, 
         const int &input_renew_tang_freq, 
         const double &input_final_time ) : final_time(input_final_time), 
     sol_record_freq(input_record_freq), 
     renew_tang_freq(input_renew_tang_freq), 
-    pb_name(input_name) {}
+    pb_name(input_name), nsolver(std::move(in_nsolver)) {}
 
     ~PTime_NS_Solver() = default;
 
     void print_info() const;
+
+    void print_lsolver_info() const {nsolver -> print_lsolver_info();}
 
     // ------------------------------------------------------------------------
     // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
@@ -72,8 +75,6 @@ class PTime_NS_Solver
         IQuadPts * const &free_quad,
         IPLocAssem * const &lassem_ptr,
         IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_NS_Solver * const &nsolver_ptr,
         Mat &shell ) const;
 
   private:
@@ -81,6 +82,8 @@ class PTime_NS_Solver
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
+
+    const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
 
     std::string generateNumericSuffix(const int &counter) const 
     { return std::to_string(900000000 + counter); }
