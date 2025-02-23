@@ -45,10 +45,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_RotatedBC * const &rotnbc_part,
-    const ALocal_EBC * const &ebc_part,
     const IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
@@ -149,7 +147,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol, 
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
+        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, gbc, wbc_part, itf_part, SI_sol, SI_qp );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -171,7 +169,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
         curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
+        quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -220,7 +218,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
+          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -239,7 +237,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
           curr_time, dt, alelem_ptr, lassem_ptr, elementv, elements, elementvs, elementvs_rotated,
-          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, nbc_part, ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp );
+          quad_v, quad_s, free_quad, lien_ptr, feanode_ptr, gbc, wbc_part, itf_part, SI_sol, SI_qp );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);

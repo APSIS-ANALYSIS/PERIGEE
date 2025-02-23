@@ -38,10 +38,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_RotatedBC * const &rotnbc_part,
-    const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
@@ -167,8 +165,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
-        alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part, rotnbc_part,
-        ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
+        alelem_ptr, lien_ptr, feanode_ptr, infnbc_part, rotnbc_part,
+        gbc, wbc_part, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr,
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 
@@ -196,19 +194,19 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
-    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
+    for(int face=0; face<gbc -> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+          cur_sol, lassem_fluid_ptr, elements, quad_s, face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
+          cur_sol, lassem_fluid_ptr, elements, quad_s, face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;

@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   // Local sub-domain's nodal bc
-  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
+  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
 
   // Local sub-domain's inflow bc
   ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
   ALocal_RotatedBC * locrotnbc = new ALocal_RotatedBC(part_file, rank);
 
   // Local sub-domain's elemental bc
-  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+  auto locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
 
   // Local sub_domain's weak bc
   ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
@@ -356,9 +356,9 @@ int main(int argc, char *argv[])
   SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf, nqp_sur);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc.get());
 
-  pmat->gen_perm_bc(pNode, locnbc);
+  pmat->gen_perm_bc(pNode, locnbc.get());
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
@@ -468,11 +468,11 @@ int main(int argc, char *argv[])
   SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
 
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, anchor_elementv, opposite_elementv, quads, free_quad,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc.get(), nz_estimate );
+      GMIptr, locElem, locIEN, pNode, std::move(locnbc), std::move(locebc), locitf, SI_sol, SI_qp, gbc.get(), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, locnbc, locebc, gbc.get() );
+      elements, quads, locIEN, pNode, gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -508,7 +508,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
         elements, anchor_elementv, opposite_elementv, quadv, quads, free_quad, locIEN, fNode,
-        locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
+        locwbc, locitf, SI_sol, SI_qp );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -544,16 +544,16 @@ int main(int argc, char *argv[])
   tsolver->print_info();
 
   // ===== Outlet data recording files =====
-  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+        dot_sol, locAssem_ptr, elements, quads, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_ptr, elements, quads, locebc, ff );
+        sol, locAssem_ptr, elements, quads, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_ptr, elements, quads, locebc, ff );
+        sol, locAssem_ptr, elements, quads, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
       timeinfo, pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locrotnbc, locebc, gbc.get(), locwbc, 
+      locinfnbc, locrotnbc, gbc.get(), locwbc, 
       locitf, sir_info, SI_sol, SI_qp,
       elementv, elements, anchor_elementv, opposite_elementv,
       quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, shell_mat);
@@ -633,7 +633,7 @@ int main(int argc, char *argv[])
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete sir_info; delete locrotnbc;
-  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
+  delete locElem; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete timeinfo;
   delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
