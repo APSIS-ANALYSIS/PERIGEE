@@ -23,7 +23,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_ptr->get_dof_mat() ),
-  num_ebc( part_ebc->get_num_ebc() ),
+  num_ebc( ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() ),
   snLocBas( 0 ),
   anci( locassem_ptr, elementvs, elementvs_rotated, elements,
@@ -38,10 +38,10 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
 
   // Make sure that the surface element's number of local basis are 
   // the same. This is an assumption in this assembly routine.
-  if(num_ebc>0) snLocBas = part_ebc -> get_cell_nLocBas(0);
+  if(num_ebc>0) snLocBas = ebc -> get_cell_nLocBas(0);
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
-    SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
+    SYS_T::print_fatal_if(snLocBas != ebc->get_cell_nLocBas(ebc_id),
         "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
   }
 
@@ -63,7 +63,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   Release_nonzero_err_str();
 
   Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, part_nbc, part_ebc, gbc );
+      elements, quads, aien_ptr, pnode_ptr, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;

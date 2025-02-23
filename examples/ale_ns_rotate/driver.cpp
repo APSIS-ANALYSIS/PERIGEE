@@ -258,7 +258,7 @@ int main(int argc, char *argv[])
   ALocal_RotatedBC * locrotnbc = new ALocal_RotatedBC(part_file, rank);
 
   // Local sub-domain's elemental bc
-  auto locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
+  std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
 
   // Local sub_domain's weak bc
   ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
