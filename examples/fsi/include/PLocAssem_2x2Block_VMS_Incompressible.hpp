@@ -16,10 +16,10 @@
 class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
 {
   public:
-    PLocAssem_2x2Block_VMS_Incompressible( 
-        std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel,
+    PLocAssem_2x2Block_VMS_Incompressible(
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_snlocbas );
+        std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel );
 
     virtual ~PLocAssem_2x2Block_VMS_Incompressible();
 
@@ -54,12 +54,10 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const double * const &qua_prestress );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -69,41 +67,33 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const double * const &qua_prestress );
 
     virtual void Assem_Mass_Residual(
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad );
+        const double * const &qua_prestress );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_Interior_Wall_EBC(
         const double &time,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     // ------------------------------------------------------------------------
     // This function will calculate the Cauchy stress at every quadrature points
@@ -112,13 +102,19 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
     virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad ) const;
+        const double * const &eleCtrlPts_z ) const;
 
   private:
+    const FEType elemType;
+
+    const int nqpv, nqps;
+
+    const std::unique_ptr<FEAElement> elementv, elements;
+
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
     const double rho0, alpha_f, alpha_m, gamma;
 
     // memory layout

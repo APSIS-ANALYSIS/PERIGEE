@@ -257,7 +257,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
 
     const std::vector<double> local_p = GetLocal( array_p, LSIEN_p, snLocBas, 1 );
 
-    lassem_s_ptr -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+    lassem_s_ptr -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], sctrl_x, sctrl_y, sctrl_z );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -345,8 +345,8 @@ void PGAssem_Wall_Prestress::Assem_Residual(
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
       lassem_s_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], 
-          &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], elementv, 
-          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], 
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
@@ -439,8 +439,8 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
       lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
-          &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], elementv,
-          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0], quad_v );
+          &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0],
+          ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
 
@@ -504,7 +504,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
       const std::vector<SymmTensor2_3D> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
-          &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quadv );
+          &local_p[0], ectrl_x, ectrl_y, ectrl_z );
 
       for( int qua = 0; qua < nqp; ++qua )
       {
