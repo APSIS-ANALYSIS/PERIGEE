@@ -251,48 +251,46 @@ int main(int argc, char *argv[])
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
-  
+    
   // ===== Main Data Strucutre =====
   // Control points are only stored for the geometry-defining field, that is the velo/disp
   // field.
-  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_v_file, rank);
-
-  ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
   
-  ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
-  
-  ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
+  auto locIEN_v = SYS_T::make_unique<ALocal_IEN>(part_v_file, rank);
 
-  FEANode * fNode = new FEANode(part_v_file, rank);
+  auto locIEN_p = SYS_T::make_unique<ALocal_IEN>(part_p_file, rank);
 
-  APart_Node * pNode_v = new APart_Node_FSI(part_v_file, rank);
-  
-  APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
+  auto fNode = SYS_T::make_unique<FEANode>(part_v_file, rank);
 
-  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_v_file, rank);
+  auto pNode_v = SYS_T::make_unique<APart_Node>(part_v_file, rank);
 
-  ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
-  
-  ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
+  auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
 
-  ALocal_NBC * mesh_locnbc = new ALocal_NBC(part_v_file, rank, "/mesh_nbc/MF");
+  auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_v_file, rank);
 
-  ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
-  
-  ALocal_EBC * locebc_p = new ALocal_EBC( part_p_file, rank );
+  auto locnbc_v = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
 
-  ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
+  auto locnbc_p = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
+  auto mesh_locnbc = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/mesh_nbc/MF");
+
+  std::unique_ptr<ALocal_EBC> locebc_v = SYS_T::make_unique<ALocal_EBC_outflow>(part_v_file, rank);
+
+  std::unique_ptr<ALocal_EBC> locebc_p = SYS_T::make_unique<ALocal_EBC>(part_p_file, rank);
+
+  std::unique_ptr<ALocal_EBC> mesh_locebc = SYS_T::make_unique<ALocal_EBC>(part_v_file, rank, "/mesh_ebc");
+
+  auto ps_data = SYS_T::make_unique<Tissue_prestress>(locElem.get(), nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
-  std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
+  std::vector<std::unique_ptr<APart_Node>> pNode_list { std::move(pNode_v), std::move(pNode_p) };
 
-  std::vector<ALocal_NBC *> locnbc_list { locnbc_v, locnbc_p };
+  std::vector<std::unique_ptr<ALocal_NBC>> locnbc_list { std::move(locnbc_v), std::move(locnbc_p) };
 
-  std::vector<APart_Node *> pNode_m_list { pNode_v };
+  std::vector<std::unique_ptr<APart_Node>> pNode_m_list { std::move(pNode_v) };
 
-  std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc };
+  std::vector<std::unique_ptr<ALocal_NBC>> locnbc_m_list { std::move(mesh_locnbc) };
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_v_file, rank),
@@ -465,14 +463,14 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_FSI( locAssem_fluid_ptr,
-      locAssem_solid_ptr, elements, quads, locElem, locIEN_v, locIEN_p,
-      pNode_v, pNode_p, locnbc_v, locnbc_p, locebc_v, gbc, nz_estimate );
+  IPGAssem * gloAssem_ptr = new PGAssem_FSI( 
+      gbc.get(), std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), 
+      std::move(fNode), std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), 
+      std::move(locnbc_p), std::move(locebc_v), std::move(locebc_p), 
+      std::move(locAssem_fluid_ptr), std::move(locAssem_solid_ptr), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
-      locAssem_solid_ptr, elements, quads, locIEN_v, locIEN_p, pNode_v, 
-      locnbc_v, locnbc_p, locebc_v, gbc );
+  gloAssem_ptr->Assem_nonzero_estimate( gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -507,9 +505,7 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->Assem_mass_residual( disp, velo, pres, locElem, locAssem_fluid_ptr,
-        locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
-        fNode, locnbc_v, locnbc_p, locebc_v, ps_data );
+    gloAssem_ptr->Assem_mass_residual( disp, velo, pres,  ps_data );
 
     Vec proj_vp, proj_v, proj_p;
     VecDuplicate( gloAssem_ptr->G, &proj_vp );
@@ -573,14 +569,11 @@ int main(int argc, char *argv[])
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
   {
-    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, dot_velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
+    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate( disp, dot_velo, ff );
 
-    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
+    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate( disp, velo, ff );
 
-    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, locebc_p, ff );
+    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure( disp, pres, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -617,11 +610,9 @@ int main(int argc, char *argv[])
   // ===== Inlet data recording files =====
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
-    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, velo, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
+    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate( disp, velo, locinfnbc, ff );
 
-    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
+    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure( disp, pres, locinfnbc, ff );
 
     if( rank == 0 )
     {

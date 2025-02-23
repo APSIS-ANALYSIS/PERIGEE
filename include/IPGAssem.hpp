@@ -326,6 +326,13 @@ class IPGAssem
     virtual void Assem_mass_residual( const PDNSolution * const &sol )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
+    virtual void Assem_mass_residual(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const Tissue_prestress * const &ps_ptr )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
@@ -511,6 +518,21 @@ class IPGAssem
         const ALocal_NBC * const &nbc_v,
         const ALocal_NBC * const &nbc_p,
         const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc,
+        const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    virtual void Assem_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo_np1,
+        const PDNSolution * const &velo_np1,
+        const PDNSolution * const &disp_np1,
         const IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
@@ -803,6 +825,21 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    virtual void Assem_Tangent_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo_np1,
+        const PDNSolution * const &velo_np1,
+        const PDNSolution * const &disp_np1,
+        const IGenBC * const &gbc,
+        const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
     // Assembly in prestress generation
     virtual void Assem_Tangent_Residual(
         const double &curr_time,
@@ -949,9 +986,28 @@ class IPGAssem
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
@@ -1041,9 +1097,28 @@ class IPGAssem
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
         IPLocAssem_2x2Block * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
     {
