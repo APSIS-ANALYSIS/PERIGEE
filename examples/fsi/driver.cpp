@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
   }
 
   // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
+  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur );
   
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 

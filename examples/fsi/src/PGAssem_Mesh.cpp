@@ -119,7 +119,7 @@ void PGAssem_Mesh::Assem_mass_residual(
     
     fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
     
-    lassem_ptr -> Assem_Mass_Residual( &local[0], elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
+    lassem_ptr -> Assem_Mass_Residual( &local[0], ectrl_x, ectrl_y, ectrl_z );
     
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<dof; ++mm)
@@ -183,7 +183,7 @@ void PGAssem_Mesh::Assem_residual(
     fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
    
     lassem_ptr->Assem_Residual(curr_time, dt, &local_a[0], &local_b[0],
-		    elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+		    ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<dof; ++mm)
@@ -244,7 +244,7 @@ void PGAssem_Mesh::Assem_tangent_residual(
     fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
     lassem_ptr->Assem_Tangent_Residual(curr_time, dt, &local_a[0], &local_b[0],
-		    elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+		    ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<dof; ++mm)
@@ -356,7 +356,7 @@ void PGAssem_Mesh::NatBC_G( const double &curr_time, const double &dt,
       ebc_part -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
       lassem_ptr->Assem_Residual_EBC(ebc_id, curr_time, dt,
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+          sctrl_x, sctrl_y, sctrl_z);
 
       for(int ii=0; ii<snLocBas; ++ii)
         for(int mm=0; mm<dof; ++mm)
