@@ -12,15 +12,16 @@
 #include "IPLocAssem_2x2Block.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
 {
   public:
     PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const FEType &elemtype );
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+        const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
+        const double &in_vis_mu, const double &in_beta );
 
     virtual ~PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha();
 
@@ -84,11 +85,9 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -98,52 +97,42 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Mass_Residual(
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
         const double * const &disp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     // Calculate the flow rate Q := int_Omega^e v dot n dA
     virtual double get_flowrate( 
         const double * const &disp,
         const double * const &velo,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     // Calculate the pressure integrated over the element
     // as well as the area of the element.
     virtual void get_pressure_area( 
         const double * const &disp,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad,
         double &pressure, double &area );
 
     // Assembly the elemental boundary condition
@@ -152,22 +141,18 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     virtual void Assem_Residual_EBC_Resistance(
         const double &val,
         const double * const &disp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     // Assembly the residual due to the back flow stabilization
     virtual void Assem_Residual_BackFlowStab(
         const double * const &dot_disp,
         const double * const &disp,
         const double * const &velo,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     // Assembly the residual and tangent due to the back flow stabilization
     virtual void Assem_Tangent_Residual_BackFlowStab(
@@ -175,13 +160,20 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
         const double * const &dot_disp,
         const double * const &disp,
         const double * const &velo,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
   private:
+    // Private data
+    const FEType elemType;
+
+    const int nqpv, nqps;
+
+    const std::unique_ptr<FEAElement> elementv, elements;
+
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta, CI, CT;
 
     const int nLocBas, snLocBas;

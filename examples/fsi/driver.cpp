@@ -39,11 +39,9 @@
 
 int main(int argc, char *argv[])
 {
-  // Number of quadrature points for tet and triangle
-  int nqp_tet = 5, nqp_tri = 4;
-
-  // Number of quadrature points for hex and quadrangle
-  int nqp_vol_1D = 2, nqp_sur_1D = 2;
+  // Number of quadrature points 5/4 for tet and triangle
+  // Number of quadrature points 8/4  for hex and quadrangle
+  int nqp_vol = 5, nqp_sur = 4;
 
   // Estimate the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -136,10 +134,8 @@ int main(int argc, char *argv[])
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionInt(   "-nqp_tet",           nqp_tet);
-  SYS_T::GetOptionInt(   "-nqp_tri",           nqp_tri);
-  SYS_T::GetOptionInt(   "-nqp_vol_1d",        nqp_vol_1D);
-  SYS_T::GetOptionInt(   "-nqp_sur_1d",        nqp_sur_1D);
+  SYS_T::GetOptionInt(   "-nqp_vol",           nqp_vol);
+  SYS_T::GetOptionInt(   "-nqp_sur",           nqp_sur);;
   SYS_T::GetOptionInt(   "-nz_estimate",       nz_estimate);
   SYS_T::GetOptionReal(  "-bs_beta",           bs_beta);
   SYS_T::GetOptionReal(  "-rho_inf",           genA_rho_inf);
@@ -176,10 +172,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-restart_p_name",    restart_p_name);
 
   // ===== Print the command line argumetn on screen =====
-  SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
-  SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
-  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
-  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
+  SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
+  SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
@@ -243,10 +237,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
     cmdh5w->write_intScalar(     "sol_record_freq", sol_record_freq);
-    cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
-    cmdh5w->write_intScalar(     "nqp_tet",         nqp_tet);
-    cmdh5w->write_intScalar(     "nqp_sur_1d",      nqp_sur_1D);
-    cmdh5w->write_intScalar(     "nqp_vol_1d",      nqp_vol_1D);
+    cmdh5w->write_intScalar(     "nqp_vol",         nqp_vol);
+    cmdh5w->write_intScalar(     "nqp_sur",         nqp_sur);
     cmdh5w->write_string(        "lpn_file",        lpn_file);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
     cmdh5w->write_string(        "sol_bName",       sol_bName);
@@ -291,10 +283,6 @@ int main(int argc, char *argv[])
 
   ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
 
-  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
-
-  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
-
   Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
@@ -321,37 +309,6 @@ int main(int argc, char *argv[])
 
   SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate->get_num_nbc(),
       "Error: ALocal_InflowBC number of faces does not match with that in IFlowRate.\n");
-
-  // ===== Finite Element Container & Quadrature rules =====
-  SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = nullptr;
-  FEAElement * elements = nullptr;
-
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = nullptr;
-  IQuadPts * quads = nullptr;
-
-  if( GMIptr->get_elemType() == FEType::Tet4 )
-  {
-    if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
-    if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
-
-    elementv = new FEAElement_Tet4( nqp_vol ); // elem type Tet4
-    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
-    quadv = new QuadPts_Gauss_Tet( nqp_vol );
-    quads = new QuadPts_Gauss_Triangle( nqp_sur );
-  }
-  else if( GMIptr->get_elemType() == FEType::Hex8 )
-  {
-    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
-
-    elementv = new FEAElement_Hex8( nqp_vol ); // elem type Hex8
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
-    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
-    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
-  }
-  else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   // ===== Generate the IS for pres and velo =====
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
@@ -400,8 +357,8 @@ int main(int argc, char *argv[])
 
   // ===== Local assembly =====
   IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
-      tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
+      ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
+      tm_galpha.get(), fluid_density, fluid_mu, bs_beta );  
 
   IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
 

@@ -226,8 +226,8 @@ void PGAssem_FSI::Assem_mass_residual(
 
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
-      lassem_f_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], elementv, 
-          ectrl_x, ectrl_y, ectrl_z, quad_v);
+      lassem_f_ptr->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0],
+          ectrl_x, ectrl_y, ectrl_z);
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
 
@@ -338,7 +338,7 @@ void PGAssem_FSI::Assem_Residual(
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
       lassem_f_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
-          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
+          &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z );
 
       VecSetValues(G, 3*nLocBas, row_id_v, lassem_f_ptr->Residual0, ADD_VALUES);
       VecSetValues(G,   nLocBas, row_id_p, lassem_f_ptr->Residual1, ADD_VALUES);
@@ -448,7 +448,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     if( alelem_ptr->get_elem_tag(ee) == 0 )
     {
       lassem_f_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
-          &local_d[0], &local_v[0], &local_p[0], elementv, ectrl_x, ectrl_y, ectrl_z, quad_v );
+          &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z );
 
       MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f_ptr->Tangent00, ADD_VALUES);
 
@@ -825,8 +825,8 @@ void PGAssem_FSI::NatBC_G( const double &curr_time, const double &dt,
 
       const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 ); 
 
-      lassem_f_ptr -> Assem_Residual_EBC( ebc_id, curr_time, dt, &local_d[0], element_s,
-          sctrl_x, sctrl_y, sctrl_z, quad_s );
+      lassem_f_ptr -> Assem_Residual_EBC( ebc_id, curr_time, dt, &local_d[0],
+          sctrl_x, sctrl_y, sctrl_z );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -890,7 +890,7 @@ void PGAssem_FSI::NatBC_Resis_G( const double &curr_time, const double &dt,
       const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
 
       lassem_f_ptr->Assem_Residual_EBC_Resistance( val, &local_d[0],
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+          sctrl_x, sctrl_y, sctrl_z);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -993,7 +993,7 @@ void PGAssem_FSI::NatBC_Resis_KG( const double &curr_time, const double &dt,
       const std::vector<double> local_d = GetLocal( array_d, LSIEN, snLocBas, 3 );
 
       lassem_f_ptr->Assem_Residual_EBC_Resistance( 1.0, &local_d[0],
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s);
+          sctrl_x, sctrl_y, sctrl_z);
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -1078,7 +1078,7 @@ void PGAssem_FSI::BackFlow_G(
       const std::vector<double> local_v     = GetLocal( array_v,     LSIEN, snLocBas, 3 );  
 
       lassem_f_ptr->Assem_Residual_BackFlowStab( &local_dot_d[0], &local_d[0], &local_v[0],
-          element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+          sctrl_x, sctrl_y, sctrl_z );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
@@ -1131,7 +1131,7 @@ void PGAssem_FSI::BackFlow_KG( const double &dt,
       const std::vector<double> local_v     = GetLocal( array_v,     LSIEN, snLocBas, 3 );
 
       lassem_f_ptr->Assem_Tangent_Residual_BackFlowStab( dt, &local_dot_d[0], &local_d[0], 
-          &local_v[0], element_s, sctrl_x, sctrl_y, sctrl_z, quad_s );
+          &local_v[0], sctrl_x, sctrl_y, sctrl_z );
 
       for(int ii=0; ii<snLocBas; ++ii)
       {
