@@ -422,8 +422,8 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Inlet data recording files =====
-  tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), gloAssem.get(), 
-      is_restart);
+  tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), 
+      gloAssem.get(), is_restart);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");

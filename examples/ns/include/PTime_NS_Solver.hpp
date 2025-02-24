@@ -51,7 +51,7 @@ class PTime_NS_Solver
         const PDNTimeStep * const &time_info,
         const ALocal_InflowBC * const &infnbc_part,
         const IPGAssem * const &gassem_ptr,
-        bool is_restart ) const;
+        bool is_app ) const;
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
