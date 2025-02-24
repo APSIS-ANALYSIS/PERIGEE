@@ -160,7 +160,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
    
     // Calcualte the inlet data
-    record_inlet_data(cur_sol.get(), time_info.get(), infnbc_part, gassem_ptr, std::ofstream::app);
+    record_inlet_data(cur_sol.get(), time_info.get(), infnbc_part, gassem_ptr, false);
 
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
