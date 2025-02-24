@@ -1,7 +1,7 @@
-#ifndef CVFLOWRATE_STEADY_HPP
-#define CVFLOWRATE_STEADY_HPP
+#ifndef FLOWRATE_STEADY_HPP
+#define FLOWRATE_STEADY_HPP
 // ============================================================================
-// CVFlowRate_Steady.hpp
+// FlowRate_Steady.hpp
 //
 // Steady flow for inflow condition
 //
@@ -10,16 +10,14 @@
 // ============================================================================
 #include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
-#include "ICVFlowRate.hpp"
+#include "IFlowRate.hpp"
 
-class CVFlowRate_Steady : public ICVFlowRate
+class FlowRate_Steady : public IFlowRate
 {
   public:
-    CVFlowRate_Steady( const std::string &filename );
+    FlowRate_Steady( const std::string &filename );
 
-    CVFlowRate_Steady( const int &input_num_nbc, const double &in_flowrate );
-
-    virtual ~CVFlowRate_Steady() = default;
+    virtual ~FlowRate_Steady() = default;
 
     virtual double get_flow_rate(const int &nbc_id, const double &time) const;
 

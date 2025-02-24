@@ -27,6 +27,8 @@ class ALocal_Interface
   public:
     ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
 
+    ALocal_Interface( const HDF5_Reader * const &h5r );
+
     virtual ~ALocal_Interface() = default;
 
     virtual void print_info() const;

@@ -117,10 +117,9 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( std::to_string(ii) );
+      const std::string sub_gname = groupbase + std::to_string(ii);
 
-      hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), 
+      hid_t group_id = H5Gcreate(g_id, sub_gname.c_str(), 
           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
       h5w->write_doubleVector( group_id, "local_cell_node_xyz", local_cell_node_xyz[ii] );
