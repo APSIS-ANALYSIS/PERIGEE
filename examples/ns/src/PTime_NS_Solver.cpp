@@ -140,11 +140,11 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
           cur_sol.get(), face);
 
       // Calculate the 0D pressure from LPN model
-      const double lpn_pressure = gbc -> get_P( face, dot_face_flowrate, face_flowrate,
+      const double lpn_pressure = gbc -> get_P( face, dot_face_flrate, face_flrate,
          time_info -> get_time() );
 
       // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, face_flowrate, lpn_pressure, time_info->get_time(), false );
+      gbc -> reset_initial_sol( face, face_flrate, lpn_pressure, time_info->get_time(), false );
 
       // On the CPU 0, write the time, flow rate, averaged pressure, and 0D
       // calculated pressure into the txt file, which is first generated in the
@@ -181,6 +181,32 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
+  }
+}
+
+void PTime_NS_Solver::record_inlet_data( 
+    const PDNSolution * const &sol,
+    const PDNTimeStep * const &time_info,
+    const ALocal_InflowBC * const &infnbc_part,
+    const IPGAssem * const &gassem_ptr,
+    std::ios_base::openmode mode ) const
+{
+  for(int ff=0; ff<infnbc_part->get_num_nbc(); ++ff)
+  {
+    const double flrate = gassem_ptr->Assem_surface_flowrate(sol, infnbc_part, ff); 
+
+    const double avepre = gassem_ptr->Assem_surface_ave_pressure(sol, infnbc_part, ff);
+
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | mode );
+      ofile<<time_info->get_index()<<'\t'
+           <<time_info->get_time()<<'\t'
+           <<flrate<<'\t'<<avepre<<std::endl;
+      ofile.close();
+    } 
+    MPI_Barrier(PETSC_COMM_WORLD);
   }
 }
 

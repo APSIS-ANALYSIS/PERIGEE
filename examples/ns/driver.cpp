@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
 
-    const double lpn_pressure = gbc -> get_P( ff, dot_face_flowrate, face_flowrate, timeinfo->get_time() );
+    const double lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate, timeinfo->get_time() );
 
     // Create the txt files and write the initial flow rates
     if(rank == 0)

@@ -41,6 +41,18 @@ class PTime_NS_Solver
       return ss.str();
     }
 
+    // ------------------------------------------------------------------------
+    // Calculate the flow rate and averaged pressre on each inlet surface and
+    // record them into the Inlet_xxx_data.txt file
+    // User is responsible for choosing the correct openmode, including
+    // std::ofstream::app and std::ofstream::trunc
+    // ------------------------------------------------------------------------
+    void record_inlet_data( const PDNSolution * const &sol,
+        const PDNTimeStep * const &time_info,
+        const ALocal_InflowBC * const &infnbc_part,
+        const IPGAssem * const &gassem_ptr,
+        std::ios_base::openmode mode ) const;
+
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
         std::unique_ptr<PDNSolution> init_dot_sol,
