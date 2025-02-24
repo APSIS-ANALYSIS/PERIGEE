@@ -160,23 +160,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
    
     // Calcualte the inlet data
-    for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
-    {
-      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_sol.get(), infnbc_part, face ); 
-
-      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_sol.get(), infnbc_part, face );
-
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-        ofile.close();
-      } 
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
+    record_inlet_data(cur_sol.get(), time_info.get(), infnbc_part, gassem_ptr, std::ofstream::app);
 
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);

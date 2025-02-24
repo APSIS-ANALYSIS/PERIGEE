@@ -422,33 +422,8 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== Inlet data recording files =====
-  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  {
-    const double inlet_face_flrate = gloAssem -> Assem_surface_flowrate(
-        sol.get(), locinfnbc.get(), ff );
-
-    const double inlet_face_avepre = gloAssem -> Assem_surface_ave_pressure(
-        sol.get(), locinfnbc.get(), ff );
-
-    if( rank == 0 )
-    {
-      std::ofstream ofile;
-      if( !is_restart )
-        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      if( !is_restart )
-      {
-        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
+  tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), gloAssem.get(), 
+      is_restart ? std::ofstream::app : std::ofstream::trunc);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
