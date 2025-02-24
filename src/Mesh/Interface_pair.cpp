@@ -231,8 +231,8 @@ void Interface_pair::Initialize(const std::string &fixed_vtkfile,
   Check_interval(intervals_in);
 
   // Generate the interval tag
-  Tag(intervals_in, num_fixed_ele, fixed_sur_pt_xyz, fixed_sur_ien,
-    num_rotated_ele, rotated_sur_pt_xyz, rotated_sur_ien);
+  Tag(intervals_in, fixed_sur_pt_xyz, fixed_sur_ien,
+    rotated_sur_pt_xyz, rotated_sur_ien);
 }
 
 void Interface_pair::Check_interval(const std::vector<double> &intervals)
@@ -255,10 +255,9 @@ void Interface_pair::Check_interval(const std::vector<double> &intervals)
   }
 }
 
-void Interface_pair::Tag(const std::vector<double> &intervals, const int &num_fixed_ele,
+void Interface_pair::Tag(const std::vector<double> &intervals,
   const std::vector<double> &fixed_sur_pt_xyz, const std::vector<int> &fixed_sur_ien,
-  const int &num_rotated_ele, const std::vector<double> &rotated_sur_pt_xyz,
-  const std::vector<int> &rotated_sur_ien)
+  const std::vector<double> &rotated_sur_pt_xyz, const std::vector<int> &rotated_sur_ien)
 {
   fixed_interval_tag.resize(num_fixed_ele);
 

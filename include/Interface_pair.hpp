@@ -174,10 +174,8 @@ class Interface_pair
 
     // Attach the interval tags to all the elements
     virtual void Tag(const std::vector<double> &intervals,
-      const int &num_fixed_ele,
       const std::vector<double> &fixed_sur_pt_xyz,
       const std::vector<int> &fixed_sur_ien,
-      const int &num_rotated_ele,
       const std::vector<double> &rotated_sur_pt_xyz,
       const std::vector<int> &rotated_sur_ien);
 
