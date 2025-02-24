@@ -29,29 +29,23 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    PDNSolution * const &sol_base,
     const PDNSolution * const &init_dot_sol,
     const PDNSolution * const &init_sol,
     const PDNSolution * const &init_mdisp,
     const PDNSolution * const &init_mvelo,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
-    const IFlowRate * const flr_ptr,
     const APart_Node * const &pNode_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_part,
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_RotatedBC * const &rotnbc_part,
-    const ALocal_EBC * const &ebc_part,
     IGenBC * const &gbc,
     const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
     const SI_rotation_info * const &rot_info,
     SI_T::SI_solution * const &SI_sol,
     SI_T::SI_quad_point * const &SI_qp,
-    const Matrix_PETSc * const &bc_mat,
     FEAElement * const &elementv,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
@@ -61,8 +55,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PNonlinear_NS_Solver * const &nsolver_ptr,
     Mat &shell ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
@@ -97,7 +89,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   bool rest_flag = restart_init_assembly_flag;
 
-  const double alpha_f = tmga_ptr->get_alpha_f();
+  const double alpha_f = nsolver->get_alpha_f();
 
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -170,12 +162,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver_ptr->GenAlpha_Solve_NS( renew_flag, 
+    nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
-        sol_base, pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh, tmga_ptr, flr_ptr,
-        alelem_ptr, lien_ptr, feanode_ptr, nbc_part, infnbc_part, rotnbc_part,
-        ebc_part, gbc, wbc_part, itf_part, SI_sol, SI_qp, bc_mat, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr, lsolver_ptr,
+        pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
+        alelem_ptr, lien_ptr, feanode_ptr, infnbc_part, rotnbc_part,
+        gbc, wbc_part, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
+        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr,
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 
     // Update the time step information
@@ -202,19 +194,19 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     }
 
     // Calculate the flow rate & averaged pressure on all outlets
-    for(int face=0; face<ebc_part -> get_num_ebc(); ++face)
+    for(int face=0; face<gbc -> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face); 
+          cur_sol, lassem_fluid_ptr, elements, quad_s, face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, ebc_part, face);
+          cur_sol, lassem_fluid_ptr, elements, quad_s, face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;

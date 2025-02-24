@@ -58,7 +58,7 @@ class Interface_pair
                     const std::vector<double> &intervals_in,
                     const Vector_3 &centroid_in );
 
-    virtual ~Interface_pair(){};
+    virtual ~Interface_pair() = default;
 
     virtual int get_num_fixed_ele() const
     {return  num_fixed_ele;}

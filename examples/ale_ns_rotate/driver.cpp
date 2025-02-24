@@ -33,11 +33,7 @@
 #include "FEAElement_Quad4_3D_der0.hpp"
 #include "FEAElement_Quad9_3D_der0.hpp"
 #include "FlowRateFactory.hpp"
-#include "GenBC_Resistance.hpp"
-#include "GenBC_RCR.hpp"
-#include "GenBC_Inductance.hpp"
-#include "GenBC_Coronary.hpp"
-#include "GenBC_Pressure.hpp"
+#include "GenBCFactory.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_Interface.hpp"
@@ -253,7 +249,7 @@ int main(int argc, char *argv[])
   ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
 
   // Local sub-domain's nodal bc
-  ALocal_NBC * locnbc = new ALocal_NBC(part_file, rank);
+  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
 
   // Local sub-domain's inflow bc
   ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_file, rank);
@@ -262,7 +258,7 @@ int main(int argc, char *argv[])
   ALocal_RotatedBC * locrotnbc = new ALocal_RotatedBC(part_file, rank);
 
   // Local sub-domain's elemental bc
-  ALocal_EBC * locebc = new ALocal_EBC_outflow(part_file, rank);
+  std::unique_ptr<ALocal_EBC> locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
 
   // Local sub_domain's weak bc
   ALocal_WeakBC * locwbc = new ALocal_WeakBC(part_file, rank);
@@ -360,17 +356,17 @@ int main(int argc, char *argv[])
   SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf, nqp_sur);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  Matrix_PETSc * pmat = new Matrix_PETSc(pNode, locnbc);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc.get());
 
-  pmat->gen_perm_bc(pNode, locnbc);
+  pmat->gen_perm_bc(pNode, locnbc.get());
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = new TimeMethod_GenAlpha(
+  auto tm_galpha = SYS_T::make_unique<TimeMethod_GenAlpha>(
       genA_rho_inf, false );
 
-  tm_galpha_ptr->print_info();
+  tm_galpha->print_info();
 
   // ===== Local Assembly routine =====
   IPLocAssem * locAssem_ptr = nullptr;
@@ -391,12 +387,12 @@ int main(int argc, char *argv[])
   // else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_Interface(
-    tm_galpha_ptr, elementv->get_nLocBas(),
+    tm_galpha.get(), elementv->get_nLocBas(),
     quadv->get_num_quadPts(), elements->get_nLocBas(),
     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_NS( pNode, fNode, locinfnbc, 1 );
+  std::unique_ptr<PDNSolution> base = SYS_T::make_unique<PDNSolution_NS>( pNode, fNode, locinfnbc, 1 );
 
   PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
 
@@ -458,20 +454,8 @@ int main(int argc, char *argv[])
   PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
 
   // ===== LPN models =====
-  IGenBC * gbc = nullptr;
-
-  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-    gbc = new GenBC_Resistance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
-    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
-    gbc = new GenBC_Inductance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
-    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-    gbc = new GenBC_Pressure( lpn_file, initial_time );
-  else
-    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+  auto gbc = GenBCFactory::createGenBC(
+      lpn_file, initial_time, initial_step, initial_index, 1000);
 
   gbc -> print_info();
 
@@ -484,11 +468,11 @@ int main(int argc, char *argv[])
   SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
 
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, anchor_elementv, opposite_elementv, quads, free_quad,
-      GMIptr, locElem, locIEN, pNode, locnbc, locebc, locitf, SI_sol, SI_qp, gbc, nz_estimate );
+      GMIptr, locElem, locIEN, pNode, std::move(locnbc), std::move(locebc), locitf, SI_sol, SI_qp, gbc.get(), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, locnbc, locebc, gbc );
+      elements, quads, locIEN, pNode, gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -524,7 +508,7 @@ int main(int argc, char *argv[])
 
     gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
         elements, anchor_elementv, opposite_elementv, quadv, quads, free_quad, locIEN, fNode,
-        locnbc, locebc, locwbc, locitf, SI_sol, SI_qp );
+        locwbc, locitf, SI_sol, SI_qp );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -537,7 +521,7 @@ int main(int argc, char *argv[])
   }
 
   // ===== Linear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   PC upc; lsolver->GetPC(&upc);
   const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
@@ -546,28 +530,30 @@ int main(int argc, char *argv[])
   PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_NS_Solver * nsolver = new PNonlinear_NS_Solver( pNode, fNode,
+  auto nsolver = SYS_T::make_unique<PNonlinear_NS_Solver>( 
+      std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
+      std::move(inflow_rate), std::move(base), 
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_NS_Solver * tsolver = new PTime_NS_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
+  auto tsolver = SYS_T::make_unique<PTime_NS_Solver>( std::move(nsolver), 
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
 
   // ===== Outlet data recording files =====
-  for(int ff=0; ff<locebc->get_num_ebc(); ++ff)
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol, locAssem_ptr, elements, quads, locebc, ff );
+        dot_sol, locAssem_ptr, elements, quads, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_ptr, elements, quads, locebc, ff );
+        sol, locAssem_ptr, elements, quads, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_ptr, elements, quads, locebc, ff );
+        sol, locAssem_ptr, elements, quads, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -633,24 +619,27 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, base, dot_sol, sol, disp_mesh, velo_mesh,
-      tm_galpha_ptr, timeinfo, inflow_rate.get(), pNode, locElem, locIEN, fNode,
-      locnbc, locinfnbc, locrotnbc, locebc, gbc, locwbc, locitf, sir_info, SI_sol, SI_qp,
-      pmat, elementv, elements, anchor_elementv, opposite_elementv,
-      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, lsolver, nsolver, shell_mat);
+  tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
+      timeinfo, pNode, locElem, locIEN, fNode,
+      locinfnbc, locrotnbc, gbc.get(), locwbc, 
+      locitf, sir_info, SI_sol, SI_qp,
+      elementv, elements, anchor_elementv, opposite_elementv,
+      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, shell_mat);
 
   // ===== Print complete solver info =====
-  lsolver -> print_info();
+  tsolver -> print_lsolver_info();
 
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
   delete fNode; delete locIEN; delete GMIptr; delete sir_info; delete locrotnbc;
-  delete locElem; delete locnbc; delete locebc; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
-  delete tm_galpha_ptr; delete pmat; delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
-  delete quads; delete quadv; delete free_quad; delete gbc; delete timeinfo;
-  delete locAssem_ptr; delete base; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
-  delete gloAssem_ptr; delete lsolver; delete nsolver; delete tsolver;
+  delete locElem; delete locwbc; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
+  delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
+  delete quads; delete quadv; delete free_quad; delete timeinfo;
+  delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
+  delete gloAssem_ptr;
+
+  tsolver.reset(); gbc.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;
