@@ -173,8 +173,10 @@ void PTime_NS_Solver::record_inlet_data(
     const PDNTimeStep * const &time_info,
     const ALocal_InflowBC * const &infnbc_part,
     const IPGAssem * const &gassem_ptr,
-    std::ios_base::openmode mode ) const
+    bool is_restart ) const
 {
+  auto mode = is_restart ? std::ofstream::app : std::ofstream::trunc;
+
   for(int ff=0; ff<infnbc_part->get_num_nbc(); ++ff)
   {
     const double flrate = gassem_ptr->Assem_surface_flowrate(sol, infnbc_part, ff); 
@@ -185,6 +187,10 @@ void PTime_NS_Solver::record_inlet_data(
     {
       std::ofstream ofile;
       ofile.open( gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | mode );
+      
+      if( !is_restart )
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+      
       ofile<<time_info->get_index()<<'\t'
            <<time_info->get_time()<<'\t'
            <<flrate<<'\t'<<avepre<<std::endl;

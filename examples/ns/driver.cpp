@@ -423,7 +423,7 @@ int main(int argc, char *argv[])
 
   // ===== Inlet data recording files =====
   tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), gloAssem.get(), 
-      is_restart ? std::ofstream::app : std::ofstream::trunc);
+      is_restart);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
