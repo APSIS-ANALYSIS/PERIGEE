@@ -24,7 +24,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   num_ebc( part_ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() ),
   snLocBas( 0 ),
-  anci( locassem_ptr, elementvs, elementvs_rotated, elements,
+  anci( locassem_ptr, elementvs, elementvs_rotated,
     quads, free_quad, part_itf, SI_sol, SI_qp )
 {
   // Make sure the data structure is compatible
@@ -175,7 +175,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 
   delete temp;
 
-  Interface_KG(0.1, lassem_ptr, anci.A_anchor_elementv, anci.A_opposite_elementv, anci.A_elements,
+  Interface_KG(0.1, lassem_ptr, anci.A_anchor_elementv, anci.A_opposite_elementv,
     anci.A_quad_s, anci.A_free_quad, anci.A_itf_part, anci.A_SI_sol, anci.A_SI_qp);
 
   VecAssemblyBegin(G);
@@ -259,7 +259,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     lien_ptr, fnode_ptr, nbc_part, wbc_part);
 
   // Surface integral from Nitsche method
-  Interface_G(0, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_G(0, lassem_ptr, elementvs, elementvs_rotated, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -374,7 +374,7 @@ void PGAssem_NS_FEM::Assem_residual(
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method
-  Interface_G(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_G(dt, lassem_ptr, elementvs, elementvs_rotated, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -490,7 +490,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
 
   // Surface integral from Nitsche method (Only assemble G at present)
-  Interface_KG(dt, lassem_ptr, elementvs, elementvs_rotated, elements, quad_s, free_quad, itf_part, SI_sol, SI_qp);
+  Interface_KG(dt, lassem_ptr, elementvs, elementvs_rotated, quad_s, free_quad, itf_part, SI_sol, SI_qp);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1224,7 +1224,6 @@ void PGAssem_NS_FEM::Interface_KG(
   IPLocAssem * const &lassem_ptr,
   FEAElement * const &anchor_elementv,
   FEAElement * const &opposite_elementv,
-  FEAElement * const &elements,
   const IQuadPts * const &quad_s,
   IQuadPts * const &free_quad,
   const ALocal_Interface * const &itf_part,
@@ -1405,7 +1404,6 @@ void PGAssem_NS_FEM::Interface_G(
   IPLocAssem * const &lassem_ptr,
   FEAElement * const &anchor_elementv,
   FEAElement * const &opposite_elementv,
-  FEAElement * const &elements,
   const IQuadPts * const &quad_s,
   IQuadPts * const &free_quad,
   const ALocal_Interface * const &itf_part,
