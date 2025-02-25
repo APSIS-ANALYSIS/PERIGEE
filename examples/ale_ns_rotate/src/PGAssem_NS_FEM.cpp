@@ -13,6 +13,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     const APart_Node * const &pnode_ptr,
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
+    std::unique_ptr<ALocal_WeakBC> in_wbc,
     const ALocal_Interface * const &part_itf,
     SI_T::SI_solution * const &SI_sol,
     SI_T::SI_quad_point * const &SI_qp,
@@ -20,6 +21,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     const int &in_nz_estimate )
 : nbc( std::move(in_nbc) ),
   ebc( std::move(in_ebc) ),
+  wbc( std::move(in_wbc) ),
   nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
   dof_mat( locassem_ptr->get_dof_mat() ),
@@ -201,7 +203,6 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     IQuadPts * const &free_quad,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
-    const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
     const SI_T::SI_solution * const &SI_sol,
     const SI_T::SI_quad_point * const &SI_qp )
@@ -252,7 +253,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   // If wall_model_type = 0, it will do nothing.
   // Default mdisp = mvelo = zeros at t = 0.
   Weak_EssBC_G(0, 0, sol_a, mdisp, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
-    lien_ptr, fnode_ptr, wbc_part);
+    lien_ptr, fnode_ptr);
 
   // Surface integral from Nitsche method
   Interface_G(0, lassem_ptr, elementvs, elementvs_rotated, quad_s, free_quad, itf_part, SI_sol, SI_qp);
@@ -289,7 +290,6 @@ void PGAssem_NS_FEM::Assem_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const IGenBC * const &gbc,
-    const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
     const SI_T::SI_solution * const &SI_sol,
     const SI_T::SI_quad_point * const &SI_qp )
@@ -362,7 +362,7 @@ void PGAssem_NS_FEM::Assem_residual(
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
   Weak_EssBC_G(curr_time, dt, sol_b, mvelo, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
-      lien_ptr, fnode_ptr, wbc_part);
+      lien_ptr, fnode_ptr);
 
   // // For Poiseuille flow
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s );
@@ -400,7 +400,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const IGenBC * const &gbc,
-    const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
     const SI_T::SI_solution * const &SI_sol,
     const SI_T::SI_quad_point * const &SI_qp )
@@ -476,7 +475,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
   Weak_EssBC_KG(curr_time, dt, sol_b, mvelo, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
-    lien_ptr, fnode_ptr, wbc_part);
+    lien_ptr, fnode_ptr);
 
   // // For Poiseuille flow
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s );
@@ -1063,8 +1062,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
     FEAElement * const &element_vs,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_WeakBC * const &wbc_part)
+    const FEANode * const &fnode_ptr)
 {
   const int loc_dof {dof_mat * nLocBas};
   double * array_b = new double [nlgn * dof_sol];
@@ -1083,12 +1081,12 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
   mvelo->GetLocalArray( array_mvelo );
   mdisp->GetLocalArray( array_mdisp );
 
-  const int num_wele {wbc_part->get_num_ele()};
+  const int num_wele {wbc->get_num_ele()};
 
   // If wall_model_type = 0, num_wele will be 0 and this loop will be skipped.
   for(int ee{0}; ee < num_wele; ++ee)
   {
-    const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
+    const int local_ee_index {wbc->get_part_vol_ele_id(ee)};
 
     lien_ptr->get_LIEN(local_ee_index, IEN_v);
     GetLocal(array_b, IEN_v, local_b);
@@ -1097,7 +1095,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
 
-    const int face_id {wbc_part->get_ele_face_id(ee)};
+    const int face_id {wbc->get_ele_face_id(ee)};
 
     lassem_ptr->Assem_Tangent_Residual_Weak(curr_time, dt, local_b, local_mvelo, local_mdisp,
       element_vs, ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);
@@ -1136,8 +1134,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
     FEAElement * const &element_vs,
     const IQuadPts * const &quad_s,
     const ALocal_IEN * const &lien_ptr,
-    const FEANode * const &fnode_ptr,
-    const ALocal_WeakBC * const &wbc_part)
+    const FEANode * const &fnode_ptr)
 {
   const int loc_dof {dof_mat * nLocBas};
   double * array_b = new double [nlgn * dof_sol];
@@ -1156,12 +1153,12 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   mvelo->GetLocalArray( array_mvelo );
   mdisp->GetLocalArray( array_mdisp );
 
-  const int num_wele {wbc_part->get_num_ele()};
+  const int num_wele {wbc->get_num_ele()};
 
   // If wall_model_type = 0, num_wele will be 0 and this loop will be skipped.
   for(int ee{0}; ee < num_wele; ++ee)
   {
-    const int local_ee_index {wbc_part->get_part_vol_ele_id(ee)};
+    const int local_ee_index {wbc->get_part_vol_ele_id(ee)};
 
     lien_ptr->get_LIEN(local_ee_index, IEN_v);
     GetLocal(array_b, IEN_v, local_b);
@@ -1170,7 +1167,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_v, ctrl_x, ctrl_y, ctrl_z);
 
-    const int face_id {wbc_part->get_ele_face_id(ee)};
+    const int face_id {wbc->get_ele_face_id(ee)};
     
     lassem_ptr->Assem_Residual_Weak(curr_time, dt, local_b, local_mvelo, local_mdisp,
       element_vs, ctrl_x, ctrl_y, ctrl_z, quad_s, face_id);

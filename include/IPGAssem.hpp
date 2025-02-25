@@ -313,7 +313,6 @@ class IPGAssem
         IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
@@ -582,7 +581,6 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
@@ -868,7 +866,6 @@ class IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )

@@ -39,6 +39,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const APart_Node * const &pnode_ptr,
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
+        std::unique_ptr<ALocal_WeakBC> in_wbc,
         const ALocal_Interface * const &part_itf,
         SI_T::SI_solution * const &SI_sol,
         SI_T::SI_quad_point * const &SI_qp,
@@ -73,7 +74,6 @@ class PGAssem_NS_FEM : public IPGAssem
         IQuadPts * const &free_quad,
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp );
@@ -100,7 +100,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp );
@@ -128,7 +127,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp );
@@ -171,6 +169,7 @@ class PGAssem_NS_FEM : public IPGAssem
     // Private data
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
+    const std::unique_ptr<const ALocal_WeakBC> wbc;
     
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
     
@@ -229,8 +228,7 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &element_vs,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_WeakBC * const &wbc_part);
+        const FEANode * const &fnode_ptr);
 
     void Weak_EssBC_G( const double &curr_time, const double &dt,
         const PDNSolution * const &sol,
@@ -241,8 +239,7 @@ class PGAssem_NS_FEM : public IPGAssem
         FEAElement * const &element_vs,
         const IQuadPts * const &quad_s,
         const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_WeakBC * const &wbc_part);
+        const FEANode * const &fnode_ptr);
 
     virtual void Interface_KG(
         const double &dt,

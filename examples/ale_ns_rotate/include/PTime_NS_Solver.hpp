@@ -59,7 +59,6 @@ class PTime_NS_Solver
         const ALocal_InflowBC * const &infnbc_part,
         const ALocal_RotatedBC * const &rotnbc_part,
         IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_rotation_info * const &rot_info,
         SI_T::SI_solution * const &SI_sol,

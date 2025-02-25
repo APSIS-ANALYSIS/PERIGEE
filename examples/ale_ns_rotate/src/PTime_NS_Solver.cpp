@@ -41,7 +41,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_RotatedBC * const &rotnbc_part,
     IGenBC * const &gbc,
-    const ALocal_WeakBC * const &wbc_part,
     const ALocal_Interface * const &itf_part,
     const SI_rotation_info * const &rot_info,
     SI_T::SI_solution * const &SI_sol,
@@ -166,7 +165,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), 
         pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
         alelem_ptr, lien_ptr, feanode_ptr, infnbc_part, rotnbc_part,
-        gbc, wbc_part, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
+        gbc, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
         quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr,
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 

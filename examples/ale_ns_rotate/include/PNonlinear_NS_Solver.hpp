@@ -62,7 +62,6 @@ class PNonlinear_NS_Solver
         const ALocal_InflowBC * const &infnbc_part,
         const ALocal_RotatedBC * const &rotnbc_part,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         SI_T::SI_solution * const &SI_sol,
         SI_T::SI_quad_point * const &SI_qp,
