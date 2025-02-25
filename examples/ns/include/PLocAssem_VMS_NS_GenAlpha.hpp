@@ -12,16 +12,16 @@
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
 #include "SymmTensor2_3D.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 {
   public:
     PLocAssem_VMS_NS_GenAlpha(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas, const double &in_rho, 
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+        const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
         const double &in_vis_mu, const double &in_beta,
-        const FEType &elemtype,
         const double &in_ct = 4.0, const double &in_ctauc = 1.0 );
 
     virtual ~PLocAssem_VMS_NS_GenAlpha();
@@ -29,6 +29,10 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
     virtual int get_dof() const {return 4;}
 
     virtual int get_dof_mat() const {return 4;}
+
+    virtual int get_nLocBas() const {return nLocBas;}
+
+    virtual int get_snLocBas() const {return snLocBas;}
 
     virtual double get_model_para_1() const {return alpha_f;}
 
@@ -65,88 +69,76 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Mass_Residual(
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual double get_flowrate( const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void get_pressure_area( const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad,
         double &pres, double &area );
 
     virtual void Assem_Residual_EBC_Resistance(
         const int &ebc_id, const double &val,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_BackFlowStab(
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Tangent_Residual_BackFlowStab(
         const double &dt,
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
   protected:
     // Private data
+    const FEType elemType;
+    
+    const int nqpv, nqps;
+
+    const std::unique_ptr<FEAElement> elementv, elements;
+
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
     const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
     const double CI, CT; // Constants for stabilization parameters
     
     const double Ctauc; // Constant scaling factor for tau_C
-
-    const int nqp; // number of quadrature points
     
     const int nLocBas, snLocBas, vec_size, sur_size;
 

@@ -23,6 +23,7 @@
 #include "ALocal_NBC.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "ALocal_EBC.hpp"
+#include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
 #include "ALocal_Interface.hpp"
 #include "Sliding_Interface_Tools.hpp"
@@ -106,6 +107,13 @@ class IPGAssem
     // ! Assem_nonzero_estimate : Assembly nonzero estimate matrix for K.
     //                            Insert 1.0 to every possible nonzero locations.
     // ------------------------------------------------------------------------
+    virtual void Assem_nonzero_estimate()
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
+    virtual void Assem_nonzero_estimate(
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -136,7 +144,6 @@ class IPGAssem
         const ALocal_NBC * const &nbc_part,
         const ALocal_EBC * const &ebc_part )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
@@ -314,6 +321,9 @@ class IPGAssem
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+
+    virtual void Assem_mass_residual( const PDNSolution * const &sol )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -583,6 +593,23 @@ class IPGAssem
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    virtual void Assem_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const double &curr_time,
+        const double &dt )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
+    virtual void Assem_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_tangent_residual : assembly tangent matrix and residual vector 
@@ -855,6 +882,23 @@ class IPGAssem
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &dot_sol,
+        const PDNSolution * const &sol,
+        const double &curr_time,
+        const double &dt )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
+    virtual void Assem_tangent_residual(
+        const PDNSolution * const &sol_a,
+        const PDNSolution * const &sol_b,
+        const PDNSolution * const &dot_sol_np1,
+        const PDNSolution * const &sol_np1,
+        const double &curr_time,
+        const double &dt,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
     // --------------------------------------------------------------
     // Assembly boundary integrals
     // --------------------------------------------------------------
@@ -915,6 +959,23 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &vec,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &vec,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
     // Assem_surface_ave_pressure
     // Performs surface integral to calculated the pressure integrated
     // over the surface as well as the surface area. Return the
@@ -941,6 +1002,23 @@ class IPGAssem
         const IQuadPts * const &quad_s,
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &vec,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &vec,
+        const int &ebc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;

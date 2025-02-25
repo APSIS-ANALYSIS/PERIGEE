@@ -32,6 +32,10 @@ class PLocAssem_VMS_NS_GenAlpha : public IPLocAssem
 
     virtual int get_dof_mat() const {return 4;}
 
+    virtual int get_nLocBas() const {return nLocBas;}
+
+    virtual int get_snLocBas() const {return snLocBas;}
+
     virtual double get_model_para_1() const {return alpha_f;}
 
     virtual double get_model_para_2() const {return gamma;}

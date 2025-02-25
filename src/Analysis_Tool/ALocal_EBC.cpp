@@ -7,7 +7,7 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
   num_ebc = h5r -> read_intScalar(gname.c_str(), "num_ebc");
 
@@ -20,9 +20,6 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     cell_nLocBas = h5r -> read_intVector(gname.c_str(), "cell_nLocBas" );
   }
 
-  std::string groupbase(gname);
-  groupbase.append("/ebcid_");
-
   local_cell_node_xyz.resize(num_ebc);
   local_cell_ien.resize(num_ebc);
   local_cell_node_vol_id.resize(num_ebc);
@@ -33,18 +30,17 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( std::to_string(ii) );
+      const std::string sub_gname = gname + "/ebcid_" + std::to_string(ii);
 
-      local_cell_node_xyz[ii] = h5r -> read_doubleVector( subgroup_name.c_str(), "local_cell_node_xyz" );
+      local_cell_node_xyz[ii] = h5r -> read_doubleVector( sub_gname.c_str(), "local_cell_node_xyz" );
 
-      local_cell_ien[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_ien" );
+      local_cell_ien[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_ien" );
 
-      local_cell_node_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_vol_id" );
+      local_cell_node_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_vol_id" );
 
-      local_cell_node_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_node_pos" );
+      local_cell_node_pos[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_pos" );
 
-      local_cell_vol_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "local_cell_vol_id" );
+      local_cell_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_vol_id" );
     }
     else
     {
@@ -56,7 +52,54 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     }
   }
 
-  delete h5r; H5Fclose( file_id );
+  H5Fclose( file_id );
+}
+
+ALocal_EBC::ALocal_EBC( const HDF5_Reader * const &h5r,
+    const std::string &gname )
+{
+  num_ebc = h5r -> read_intScalar(gname.c_str(), "num_ebc");
+
+  if( num_ebc > 0)
+  {
+    num_local_cell_node = h5r -> read_intVector(gname.c_str(), "num_local_cell_node" );
+
+    num_local_cell = h5r -> read_intVector(gname.c_str(), "num_local_cell" );
+
+    cell_nLocBas = h5r -> read_intVector(gname.c_str(), "cell_nLocBas" );
+  }
+
+  local_cell_node_xyz.resize(num_ebc);
+  local_cell_ien.resize(num_ebc);
+  local_cell_node_vol_id.resize(num_ebc);
+  local_cell_node_pos.resize(num_ebc);
+  local_cell_vol_id.resize(num_ebc);
+
+  for(int ii=0; ii<num_ebc; ++ii)
+  {
+    if( num_local_cell[ii] > 0 )
+    {
+      const std::string sub_gname = gname + "/ebcid_" + std::to_string(ii);
+
+      local_cell_node_xyz[ii] = h5r -> read_doubleVector( sub_gname.c_str(), "local_cell_node_xyz" );
+
+      local_cell_ien[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_ien" );
+
+      local_cell_node_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_vol_id" );
+
+      local_cell_node_pos[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_node_pos" );
+
+      local_cell_vol_id[ii] = h5r -> read_intVector( sub_gname.c_str(), "local_cell_vol_id" );
+    }
+    else
+    {
+      local_cell_node_xyz[ii].clear();
+      local_cell_ien[ii].clear();
+      local_cell_node_vol_id[ii].clear();
+      local_cell_node_pos[ii].clear();
+      local_cell_vol_id[ii].clear();
+    }
+  }
 }
 
 void ALocal_EBC::get_ctrlPts_xyz(const int &ii,

@@ -17,6 +17,8 @@ class ALocal_InflowBC
   public:
     ALocal_InflowBC( const std::string &fileBaseName, const int &cpu_rank );
 
+    ALocal_InflowBC( const HDF5_Reader * const &h5r );
+
     virtual ~ALocal_InflowBC() = default;
 
     // ------------------------------------------------------------------------
@@ -144,21 +146,6 @@ class ALocal_InflowBC
         int * const &sien ) const;
 
     virtual std::vector<int> get_SIEN( const int &nbc_id, const int &eindex ) const;
-
-    // ------------------------------------------------------------------------
-    // Generate filename Inlet_data.txt for inlet data
-    // ------------------------------------------------------------------------
-    virtual std::string gen_flowfile_name( const int &nbc_id ) const
-    {
-      std::ostringstream ss;
-      ss << "Inlet_";
-
-      if( nbc_id/10 == 0 ) ss << "00";
-      else if( nbc_id/100 == 0 ) ss << "0";
-
-      ss << nbc_id << "_data.txt";
-      return ss.str();
-    }
 
   private:
     int num_nbc;
