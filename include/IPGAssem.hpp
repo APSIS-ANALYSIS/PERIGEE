@@ -147,14 +147,10 @@ class IPGAssem
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
@@ -304,7 +300,6 @@ class IPGAssem
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &mdisp,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -313,11 +308,7 @@ class IPGAssem
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
@@ -574,7 +565,6 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -583,12 +573,8 @@ class IPGAssem
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
@@ -862,7 +848,6 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -871,12 +856,8 @@ class IPGAssem
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
         const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
@@ -914,7 +895,6 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
         const int &ebc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
@@ -988,7 +968,6 @@ class IPGAssem
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_s,
         const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
         const int &ebc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
