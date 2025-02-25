@@ -1,26 +1,39 @@
 #include "PGAssem_Wall_Prestress.hpp"
 
 PGAssem_Wall_Prestress::PGAssem_Wall_Prestress( 
-    IPLocAssem_2x2Block * const &locassem_s_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &aien_v,
-    const ALocal_IEN * const &aien_p,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
-    const ALocal_NBC * const &part_nbc_v,
-    const ALocal_NBC * const &part_nbc_p,
-    const ALocal_EBC * const &part_ebc,
+    std::unique_ptr<ALocal_IEN> in_locien_v,
+    std::unique_ptr<ALocal_IEN> in_locien_p,
+    std::unique_ptr<ALocal_Elem> in_locelem,
+    std::unique_ptr<FEANode> in_fnode,
+    std::unique_ptr<APart_Node> in_pnode_v,
+    std::unique_ptr<APart_Node> in_pnode_p,
+    std::unique_ptr<ALocal_NBC> in_nbc_v
+    std::unique_ptr<ALocal_NBC> in_nbc_p,
+    std::unique_ptr<ALocal_EBC> in_ebc_v,
+    std::unique_ptr<ALocal_EBC> in_ebc_p,
+    std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,
     const int &in_nz_estimate )
-: nLocBas( locassem_s_ptr->get_nLocBas_0() ), 
-  snLocBas( locassem_s_ptr->get_snLocBas_0() ),
-  num_ebc( part_ebc->get_num_ebc() ),
+: locien_v( std::move(in_locien_v) ),
+  locien_p( std::move(in_locien_p) ),
+  locelem( std::move(in_locelem) ),
+  fnode( std::move(in_fnode) ),
+  pnode_v( std::move(in_pnode_v) ),
+  pnode_p( std::move(in_pnode_p) ),
+  nbc_v( std::move(in_nbc_v) ),
+  nbc_p( std::move(in_nbc_p) ),
+  ebc_v( std::move(in_ebc_v) ),
+  ebc_p( std::move(in_ebc_p) ),
+  locassem_s(std::move(in_locassem_s)),
+  nLocBas( locassem_s->get_nLocBas_0() ),
+  snLocBas( locassem_s->get_snLocBas_0() ),
+  num_ebc( ebc_v->get_num_ebc() ),
   nlgn_v( pnode_v -> get_nlocghonode() ),
   nlgn_p( pnode_p -> get_nlocghonode() )
 {
   // Make sure the data structure is compatible
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
   {
-    SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
+    SYS_T::print_fatal_if(snLocBas != ebc_v->get_cell_nLocBas(ebc_id),
         "Error: in PGAssem_FSI, snLocBas has to be uniform.\n");
   }
 
@@ -52,7 +65,7 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  Assem_nonzero_estimate( alelem_ptr, locassem_s_ptr, aien_v, aien_p, part_nbc_v, part_nbc_p );
+  Assem_nonzero_estimate();
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -71,17 +84,11 @@ PGAssem_Wall_Prestress::~PGAssem_Wall_Prestress()
   MatDestroy(&K);
 }
 
-void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem_2x2Block * const &lassem_s_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p )
+void PGAssem_Wall_Prestress::Assem_nonzero_estimate()
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
 
-  lassem_s_ptr->Assem_Estimate();
+  locassem_s->Assem_Estimate();
 
   PetscInt * row_id_v = new PetscInt [3*nLocBas];
   PetscInt * row_id_p = new PetscInt [nLocBas];
@@ -98,15 +105,15 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( lien_p -> get_LIEN(ee,ii) );
 
-    if( alelem_ptr->get_elem_tag(ee) == 1 )
+    if( locelem->get_elem_tag(ee) == 1 )
     {
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_s->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr->Tangent01, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, locassem_s->Tangent01, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, locassem_s->Tangent10, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_s->Tangent11, ADD_VALUES);
     }
   }
 
@@ -114,14 +121,13 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate(
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
-  EssBC_KG( nbc_v, nbc_p );
+  EssBC_KG();
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
-void PGAssem_Wall_Prestress::EssBC_KG( const ALocal_NBC * const &nbc_v, 
-    const ALocal_NBC * const &nbc_p )
+void PGAssem_Wall_Prestress::EssBC_KG()
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -177,8 +183,7 @@ void PGAssem_Wall_Prestress::EssBC_KG( const ALocal_NBC * const &nbc_v,
   }
 }
 
-void PGAssem_Wall_Prestress::EssBC_G( const ALocal_NBC * const &nbc_v, 
-    const ALocal_NBC * const &nbc_p )
+void PGAssem_Wall_Prestress::EssBC_G()
 {
   // For three velocity fields
   for(int field=0; field<3; ++field)
@@ -227,13 +232,7 @@ void PGAssem_Wall_Prestress::EssBC_G( const ALocal_NBC * const &nbc_v,
 }
 
 void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
-    const PDNSolution * const &pres,
-    IPLocAssem_2x2Block * const &lassem_s_ptr,
-    FEAElement * const &element_s,
-    const IQuadPts * const &quad_s,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p ) 
+    const PDNSolution * const &pres ) 
 {
   SYS_T::print_fatal_if( num_ebc != 1, "Error: PGAssem_Wall_Prestress, there are more than 1 ebc surfaces.\n");
   
@@ -257,7 +256,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
 
     const std::vector<double> local_p = GetLocal( array_p, LSIEN_p, snLocBas, 1 );
 
-    lassem_s_ptr -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], sctrl_x, sctrl_y, sctrl_z );
+    locassem_s -> Assem_Residual_Interior_Wall_EBC( curr_time, &local_p[0], sctrl_x, sctrl_y, sctrl_z );
 
     for(int ii=0; ii<snLocBas; ++ii)
     {
@@ -266,7 +265,7 @@ void PGAssem_Wall_Prestress::NatBC_G( const double &curr_time,
       srow_index[3*ii+2] = nbc_v -> get_LID(2, LSIEN_v[ii]);
     }
 
-    VecSetValues(G, 3*snLocBas, srow_index, lassem_s_ptr->sur_Residual0, ADD_VALUES);
+    VecSetValues(G, 3*snLocBas, srow_index, locassem_s->sur_Residual0, ADD_VALUES);
   }
 
   delete [] srow_index; srow_index = nullptr;
@@ -283,22 +282,9 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
     const PDNSolution * const &pres,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem_2x2Block * const &lassem_s_ptr,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
     const Tissue_prestress * const &ps_ptr )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
 
   const std::vector<double> array_dot_d = dot_disp -> GetLocalArray();
   const std::vector<double> array_dot_v = dot_velo -> GetLocalArray();
@@ -320,7 +306,7 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
     const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
 
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+    fnode -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
     const std::vector<double> local_dot_d = GetLocal( array_dot_d, IEN_v, nLocBas, 3 );
     const std::vector<double> local_dot_v = GetLocal( array_dot_v, IEN_v, nLocBas, 3 );
@@ -340,16 +326,16 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     for(int ii=0; ii<nLocBas; ++ii)
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
 
-    if( alelem_ptr->get_elem_tag(ee) == 1 )
+    if( locelem->get_elem_tag(ee) == 1 )
     {
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
-      lassem_s_ptr -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], 
+      locassem_s -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], 
           &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], 
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_s->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, locassem_s->Residual1, ADD_VALUES);
     }
   }
 
@@ -358,11 +344,11 @@ void PGAssem_Wall_Prestress::Assem_Residual(
   delete [] row_id_v; delete [] row_id_p;
   row_id_v = nullptr; row_id_p = nullptr;
 
-  NatBC_G( curr_time, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_v, ebc_p );
+  NatBC_G( curr_time, pres );
   
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
-  EssBC_G( nbc_v, nbc_p );
+  EssBC_G();
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
@@ -376,22 +362,9 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
     const PDNSolution * const &pres,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem_2x2Block * const &lassem_s_ptr,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const FEANode * const &fnode_ptr,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
     const Tissue_prestress * const &ps_ptr )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
 
   const std::vector<double> array_dot_d = dot_disp -> GetLocalArray();
   const std::vector<double> array_dot_v = dot_velo -> GetLocalArray();
@@ -413,7 +386,7 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
     const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
 
-    fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+    fnode -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
     const std::vector<double> local_dot_d = GetLocal( array_dot_d, IEN_v, nLocBas, 3 );
     const std::vector<double> local_dot_v = GetLocal( array_dot_v, IEN_v, nLocBas, 3 );
@@ -434,24 +407,24 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
       row_id_p[ii] = nbc_p -> get_LID( IEN_p[ii] );
 
 
-    if( alelem_ptr->get_elem_tag(ee) == 1 )
+    if( locelem->get_elem_tag(ee) == 1 )
     {
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
-      lassem_s_ptr -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
+      locassem_s -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
           &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0],
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
 
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_s->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s_ptr->Tangent01, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, locassem_s->Tangent01, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s_ptr->Tangent10, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, locassem_s->Tangent10, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s_ptr->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_s->Tangent11, ADD_VALUES);
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s_ptr->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_s_ptr->Residual1, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_s->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, locassem_s->Residual1, ADD_VALUES);
     }
   }
 
@@ -460,11 +433,11 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
   delete [] row_id_v; delete [] row_id_p;
   row_id_v = nullptr; row_id_p = nullptr;
 
-  NatBC_G( curr_time, pres, lassem_s_ptr, elements, quad_s, nbc_v, ebc_v, ebc_p );
+  NatBC_G( curr_time, pres );
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
-  EssBC_KG( nbc_v, nbc_p );
+  EssBC_KG();
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
@@ -474,16 +447,9 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const PDNSolution * const &disp,
     const PDNSolution * const &pres,
-    const ALocal_Elem * const &alelem_ptr,
-    IPLocAssem_2x2Block * const &lassem_s_ptr,
-    FEAElement * const &elementv,
-    const IQuadPts * const &quadv,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const FEANode * const &fnode_ptr,
     Tissue_prestress * const &ps_ptr ) const
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int nqp   = quadv -> get_num_quadPts();
 
   const std::vector<double> array_d = disp -> GetLocalArray();
@@ -495,15 +461,15 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
 
   for( int ee =0; ee < nElem; ++ee )
   {
-    if( alelem_ptr->get_elem_tag(ee) == 1 )
+    if( locelem->get_elem_tag(ee) == 1 )
     {
       const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
       const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
-      fnode_ptr -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
+      fnode -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );
 
-      const std::vector<SymmTensor2_3D> sigma = lassem_s_ptr -> get_Wall_CauchyStress( &local_d[0], 
+      const std::vector<SymmTensor2_3D> sigma = locassem_s -> get_Wall_CauchyStress( &local_d[0], 
           &local_p[0], ectrl_x, ectrl_y, ectrl_z );
 
       for( int qua = 0; qua < nqp; ++qua )

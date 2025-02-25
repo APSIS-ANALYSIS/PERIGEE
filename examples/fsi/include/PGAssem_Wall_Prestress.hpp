@@ -13,27 +13,23 @@
 class PGAssem_Wall_Prestress : public IPGAssem
 {
   public:
-    PGAssem_Wall_Prestress( 
-        IPLocAssem_2x2Block * const &locassem_s_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &aien_v,
-        const ALocal_IEN * const &aien_p,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
-        const ALocal_NBC * const &part_nbc_v,
-        const ALocal_NBC * const &part_nbc_p,
-        const ALocal_EBC * const &part_ebc,
-        const int &in_nz_estimate = 60 );
+    PGAssem_Wall_Prestress(
+        std::unique_ptr<ALocal_IEN> in_locien_v,
+        std::unique_ptr<ALocal_IEN> in_locien_p,
+        std::unique_ptr<ALocal_Elem> in_locelem,
+        std::unique_ptr<FEANode> in_fnode,
+        std::unique_ptr<APart_Node> in_pnode_v,
+        std::unique_ptr<APart_Node> in_pnode_p,
+        std::unique_ptr<ALocal_NBC> in_nbc_v
+        std::unique_ptr<ALocal_NBC> in_nbc_p,
+        std::unique_ptr<ALocal_EBC> in_ebc_v,
+        std::unique_ptr<ALocal_EBC> in_ebc_p,
+        std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,
+        const int &in_nz_estimate=60 );
 
     virtual ~PGAssem_Wall_Prestress();
 
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p );
+    virtual void Assem_nonzero_estimate();
 
     virtual void Assem_Residual(
         const double &curr_time,
@@ -44,19 +40,6 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
         const Tissue_prestress * const &ps_ptr );
 
     virtual void Assem_Tangent_Residual(
@@ -68,48 +51,34 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
         const Tissue_prestress * const &ps_ptr );
 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        const IQuadPts * const &quadv,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const;
 
   private:
+    const std::unique_ptr<const ALocal_IEN> locien_v;
+    const std::unique_ptr<const ALocal_IEN> locien_p;
+    const std::unique_ptr<const ALocal_Elem> locelem;
+    const std::unique_ptr<const FEANode> fnode;
+    const std::unique_ptr<const APart_Node> pnode_v;
+    const std::unique_ptr<const APart_Node> pnode_p;
+    const std::unique_ptr<const ALocal_NBC> nbc_v;
+    const std::unique_ptr<const ALocal_NBC> nbc_p;
+    const std::unique_ptr<const ALocal_EBC> ebc_v;
+    const std::unique_ptr<const ALocal_EBC> ebc_p;
+    const std::unique_ptr<IPLocAssem_2x2Block> locassem_s;
+
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
-    void EssBC_KG( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
+    void EssBC_KG();
 
-    void EssBC_G( const ALocal_NBC * const &nbc_v, const ALocal_NBC * const &nbc_p );
+    void EssBC_G();
 
     void NatBC_G( const double &curr_time,
-        const PDNSolution * const &pres,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p );
+        const PDNSolution * const &pres );
 
     std::vector<double> GetLocal( const std::vector<double> &array,
         const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
