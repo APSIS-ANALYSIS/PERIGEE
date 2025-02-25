@@ -19,9 +19,18 @@
 class PNonlinear_FSI_Solver
 {
   public:
-    PNonlinear_FSI_Solver( const double &input_nrtol, const double &input_natol,
-        const double &input_ndtol, const int &input_max_iteration,
-        const int &input_renew_freq, const int &input_renew_thred );
+    PNonlinear_FSI_Solver( 
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver_mesh,
+        std::unique_ptr<Matrix_PETSc> in_bc_mat,
+        std::unique_ptr<Matrix_PETSc> in_bc_mesh_mat,        
+        std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+        std::unique_ptr<IFlowRate> in_flrate,
+        std::unique_ptr<PDNSolution> in_sol_base,
+        const double &input_nrtol, const double &input_natol, 
+        const double &input_ndtol, const int &input_max_iteration, 
+        const int &input_renew_freq, 
+        const int &input_renew_threshold );
 
     ~PNonlinear_FSI_Solver();
 
@@ -35,42 +44,19 @@ class PNonlinear_FSI_Solver
         const double &dt,
         const IS &is_v,
         const IS &is_p,
-        const PDNSolution * const &sol_base,
         const PDNSolution * const &pre_dot_disp,
         const PDNSolution * const &pre_dot_velo,
         const PDNSolution * const &pre_dot_pres,
         const PDNSolution * const &pre_disp,
         const PDNSolution * const &pre_velo,
         const PDNSolution * const &pre_pres,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        const IFlowRate * const flr_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &feanode_ptr,
         const APart_Node * const &pnode_v,
         const APart_Node * const &pnode_p,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
         const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_NBC * const &nbc_mesh,
-        const ALocal_EBC * const &ebc_part,
-        const ALocal_EBC * const &ebc_mesh_part,
         const IGenBC * const &gbc,
-        const Matrix_PETSc * const &bc_mat,
-        const Matrix_PETSc * const &bc_mesh_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
         const Tissue_prestress * const &ps_ptr,
-        IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-        IPLocAssem_2x2Block * const &lassem_solid_ptr,
-        IPLocAssem * const &lassem_mesh_ptr,
         IPGAssem * const &gassem_ptr,
         IPGAssem * const &gassem_mesh_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
         PDNSolution * const &dot_disp,
         PDNSolution * const &dot_velo,
         PDNSolution * const &dot_pres,
@@ -92,26 +78,10 @@ class PNonlinear_FSI_Solver
         const PDNSolution * const &pre_disp,
         const PDNSolution * const &pre_velo,
         const PDNSolution * const &pre_pres,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &feanode_ptr,
         const APart_Node * const &pnode_v,
         const APart_Node * const &pnode_p,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
-        const Matrix_PETSc * const &bc_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
         Tissue_prestress * const &ps_ptr,
-        IPLocAssem_2x2Block * const &lassem_solid_ptr,
         IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
         PDNSolution * const &dot_disp,
         PDNSolution * const &dot_velo,
         PDNSolution * const &dot_pres,
@@ -122,7 +92,15 @@ class PNonlinear_FSI_Solver
   
   private:
     const double nr_tol, na_tol, nd_tol;
-    const int nmaxits, nrenew_freq, nrenew_thred;
+    const int nmaxits, nrenew_freq, nrenew_threshold;
+
+    const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
+    const std::unique_ptr<PLinear_Solver_PETSc> lsolver_mesh;
+    const std::unique_ptr<Matrix_PETSc> bc_mat;
+    const std::unique_ptr<Matrix_PETSc> bc_mesh_mat;
+    const std::unique_ptr<TimeMethod_GenAlpha> tmga;
+    const std::unique_ptr<IFlowRate> flrate;
+    const std::unique_ptr<PDNSolution> sol_base;
 
     void Print_convergence_info( const int &count, const double &rel_err,
         const double &abs_err ) const
@@ -141,8 +119,6 @@ class PNonlinear_FSI_Solver
 
     void rescale_inflow_value( const double &stime,
         const ALocal_InflowBC * const &infbc,
-        const IFlowRate * const &flrate,
-        const PDNSolution * const &sol_base,
         PDNSolution * const &sol ) const;
 };
 

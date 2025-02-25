@@ -1,12 +1,28 @@
 #include "PNonlinear_FSI_Solver.hpp"
 
 PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
+    std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
+    std::unique_ptr<PLinear_Solver_PETSc> in_lsolver_mesh,
+    std::unique_ptr<Matrix_PETSc> in_bc_mat,
+    std::unique_ptr<Matrix_PETSc> in_bc_mesh_mat,
+    std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+    std::unique_ptr<IFlowRate> in_flrate,
+    std::unique_ptr<PDNSolution> in_sol_base,
     const double &input_nrtol, const double &input_natol,
-    const double &input_ndtol, const int &input_max_iteration,
-    const int &input_renew_freq, const int &input_renew_thred )
+    const double &input_ndtol,
+    const int &input_max_iteration, 
+    const int &input_renew_freq,
+    const int &input_renew_threshold )
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
-  nrenew_thred(input_renew_thred)
+  nrenew_threshold(input_renew_threshold),
+  lsolver(std::move(in_lsolver)),
+  lsolver_mesh(std::move(in_lsolver_mesh)),
+  bc_mat(std::move(in_bc_mat)),
+  bc_mesh_mat(std::move(in_bc_mesh_mat)),
+  tmga(std::move(in_tmga)),
+  flrate(std::move(in_flrate)),
+  sol_base(std::move(in_sol_base))
 {}
 
 PNonlinear_FSI_Solver::~PNonlinear_FSI_Solver()
@@ -57,8 +73,6 @@ void PNonlinear_FSI_Solver::update_solid_kinematics(
 
 void PNonlinear_FSI_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
-    const IFlowRate * const &flrate,
-    const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
 {
   const int num_nbc = infbc -> get_num_nbc();
@@ -94,42 +108,19 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const double &dt,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &sol_base,
     const PDNSolution * const &pre_dot_disp,
     const PDNSolution * const &pre_dot_velo,
     const PDNSolution * const &pre_dot_pres,
     const PDNSolution * const &pre_disp,
     const PDNSolution * const &pre_velo,
     const PDNSolution * const &pre_pres,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    const IFlowRate * const flr_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const FEANode * const &feanode_ptr,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
     const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_NBC * const &nbc_mesh,
-    const ALocal_EBC * const &ebc_part,
-    const ALocal_EBC * const &ebc_mesh,
     const IGenBC * const &gbc,
-    const Matrix_PETSc * const &bc_mat,
-    const Matrix_PETSc * const &bc_mesh_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
     const Tissue_prestress * const &ps_ptr,
-    IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
-    IPLocAssem * const &lassem_mesh_ptr,
     IPGAssem * const &gassem_ptr,
     IPGAssem * const &gassem_mesh_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
     PDNSolution * const &dot_pres,
@@ -154,9 +145,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
-  const double gamma   = tmga_ptr->get_gamma();
-  const double alpha_m = tmga_ptr->get_alpha_m();
-  const double alpha_f = tmga_ptr->get_alpha_f();
+  const double gamma   = tmga->get_gamma();
+  const double alpha_m = tmga->get_alpha_m();
+  const double alpha_f = tmga->get_alpha_f();
 
   const double val_1 = alpha_f * gamma * dt / alpha_m;
 
@@ -207,8 +198,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
   
   // Update inflow boundary values
-  rescale_inflow_value( curr_time + dt,           infnbc_part, flr_ptr, sol_base, velo );
-  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, flr_ptr, sol_base, velo_alpha );
+  rescale_inflow_value( curr_time + dt,           infnbc_part, velo );
+  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, velo_alpha );
 
 #ifdef PETSC_USE_LOG
   PetscLogEventBegin(assem_event_0, 0,0,0,0);
@@ -226,7 +217,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
         gbc, ps_ptr );
 
     SYS_T::commPrint("  --- M updated");
-    lsolver_ptr->SetOperator(gassem_ptr->K);
+    lsolver->SetOperator(gassem_ptr->K);
   }
   else
   {
@@ -265,7 +256,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     PetscLogEventBegin(solve_mech_event, 0,0,0,0);
 #endif
 
-    lsolver_ptr->Solve( gassem_ptr->G, sol_vp );
+    lsolver->Solve( gassem_ptr->G, sol_vp );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(solve_mech_event, 0,0,0,0);
@@ -303,9 +294,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   PetscLogEventBegin(assem_event_2, 0,0,0,0);
 #endif
 
-    gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt, 
-        alelem_ptr, lassem_mesh_ptr, elementv, elements,
-        quad_v, quad_s, lien_v, feanode_ptr, nbc_mesh, ebc_mesh );
+    gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(assem_event_2, 0,0,0,0);
@@ -315,7 +304,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
 #endif
     
-    lsolver_mesh_ptr -> Solve( gassem_mesh_ptr -> G, sol_mesh );
+    lsolver_mesh -> Solve( gassem_mesh_ptr -> G, sol_mesh );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(solve_mesh_event,0,0,0,0);
@@ -352,7 +341,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
           gbc, ps_ptr );
 
       SYS_T::commPrint("  --- M updated");
-      lsolver_ptr->SetOperator(gassem_ptr->K);
+      lsolver->SetOperator(gassem_ptr->K);
     }
     else
     {
@@ -408,26 +397,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     const PDNSolution * const &pre_disp,
     const PDNSolution * const &pre_velo,
     const PDNSolution * const &pre_pres,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const FEANode * const &feanode_ptr,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
-    const Matrix_PETSc * const &bc_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
     Tissue_prestress * const &ps_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
     IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
     PDNSolution * const &dot_pres,
@@ -440,9 +413,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
-  const double gamma   = tmga_ptr->get_gamma();
-  const double alpha_m = tmga_ptr->get_alpha_m();
-  const double alpha_f = tmga_ptr->get_alpha_f();
+  const double gamma   = tmga->get_gamma();
+  const double alpha_m = tmga->get_alpha_m();
+  const double alpha_f = tmga->get_alpha_f();
 
   const double val_1 = alpha_f * gamma * dt / alpha_m;
 
@@ -500,12 +473,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
         dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha,
-        alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s, 
-        lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+        disp_alpha, velo_alpha, pres_alpha, ps_ptr );
 
     SYS_T::commPrint("  --- M updated");
-    lsolver_ptr->SetOperator(gassem_ptr->K);
+    lsolver->SetOperator(gassem_ptr->K);
   }
   else
   {
@@ -513,9 +484,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
     gassem_ptr->Assem_Residual( curr_time, dt,
         dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha,
-        alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s, 
-        lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+        disp_alpha, velo_alpha, pres_alpha, ps_ptr );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -527,7 +496,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   // Now we do consistent Newton-Raphson iteration
   do
   {
-    lsolver_ptr->Solve( gassem_ptr->G, sol_vp );
+    lsolver->Solve( gassem_ptr->G, sol_vp );
 
     bc_mat -> MatMultSol( sol_vp );
 
@@ -561,12 +530,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
       gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
           dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-          disp_alpha, velo_alpha, pres_alpha,
-          alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s,
-          lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+          disp_alpha, velo_alpha, pres_alpha, ps_ptr );
 
       SYS_T::commPrint("  --- M updated");
-      lsolver_ptr->SetOperator(gassem_ptr->K);
+      lsolver->SetOperator(gassem_ptr->K);
     }
     else
     {
@@ -574,9 +541,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
       gassem_ptr->Assem_Residual( curr_time, dt,
           dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-          disp_alpha, velo_alpha, pres_alpha,
-          alelem_ptr, lassem_solid_ptr, elementv, elements, quad_v, quad_s,
-          lien_v, lien_p, feanode_ptr, nbc_v, nbc_p, ebc_v, ebc_p, ps_ptr );
+          disp_alpha, velo_alpha, pres_alpha, ps_ptr );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
@@ -594,8 +559,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
   // --------------------------------------------------------------------------
   // Calculate teh Cauchy stress in solid element and update the prestress
-  gassem_ptr -> Update_Wall_Prestress( disp, pres, alelem_ptr, lassem_solid_ptr, elementv,
-      quad_v, lien_v, lien_p, feanode_ptr, ps_ptr );
+  gassem_ptr -> Update_Wall_Prestress( disp, pres, ps_ptr );
 
   const double solid_disp_norm = disp -> Norm_inf();
 

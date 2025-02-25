@@ -1,16 +1,16 @@
 #include "PTime_FSI_Solver.hpp"
 
-PTime_FSI_Solver::PTime_FSI_Solver( const std::string &input_name, 
+PTime_FSI_Solver::PTime_FSI_Solver(
+    std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+    const std::string &input_name,      
     const int &input_record_freq, const int &input_renew_tang_freq, 
     const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), nsolver(std::move(in_nsolver))
 {}
-
 
 PTime_FSI_Solver::~PTime_FSI_Solver()
 {}
-
 
 void PTime_FSI_Solver::print_info() const
 {
@@ -21,7 +21,6 @@ void PTime_FSI_Solver::print_info() const
   SYS_T::commPrint( "solution base name: %s \n", pb_name.c_str());
   SYS_T::print_sep_line();
 }
-
 
 std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
     const int &counter ) const
@@ -36,7 +35,6 @@ std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
   return out_name;
 }
 
-
 std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name,
     const int &counter ) const
 {
@@ -50,7 +48,6 @@ std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name
   out_name.append(temp.str());
   return out_name;
 }
-
 
 void PTime_FSI_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     const std::string &solname ) const
@@ -72,61 +69,35 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const bool &restart_init_assembly_flag,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &sol_base,
-    const PDNSolution * const &init_dot_disp,
-    const PDNSolution * const &init_dot_velo,
-    const PDNSolution * const &init_dot_pres,
-    const PDNSolution * const &init_disp,
-    const PDNSolution * const &init_velo,
-    const PDNSolution * const &init_pres,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const IFlowRate * const flr_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
+    std::unique_ptr<PDNSolution> init_dot_disp,
+    std::unique_ptr<PDNSolution> init_dot_velo,
+    std::unique_ptr<PDNSolution> init_dot_pres,
+    std::unique_ptr<PDNSolution> init_disp,
+    std::unique_ptr<PDNSolution> init_velo,
+    std::unique_ptr<PDNSolution> init_pres,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
     const ALocal_InflowBC * const &infnbc,
-    const ALocal_NBC * const &nbc_mesh,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
-    const ALocal_EBC * const &ebc_mesh,
     IGenBC * const &gbc,
-    const Matrix_PETSc * const &bc_mat,
-    const Matrix_PETSc * const &bc_mesh_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
     const Tissue_prestress * const &ps_ptr,
-    IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
-    IPLocAssem * const &lassem_mesh_ptr,
     IPGAssem * const &gassem_ptr,
-    IPGAssem * const &gassem_mesh_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
-    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    IPGAssem * const &gassem_mesh_ptr ) const
 {
-  PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * pre_dot_pres = new PDNSolution( init_dot_pres );
+  auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
 
-  PDNSolution * pre_disp = new PDNSolution( init_disp );
-  PDNSolution * pre_velo = new PDNSolution( init_velo );
-  PDNSolution * pre_pres = new PDNSolution( init_pres );
+  auto pre_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto pre_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto pre_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
-  PDNSolution * cur_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * cur_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * cur_dot_pres = new PDNSolution( init_dot_pres );
+  auto cur_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto cur_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto cur_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
-  PDNSolution * cur_disp = new PDNSolution( init_disp );
-  PDNSolution * cur_velo = new PDNSolution( init_velo );
-  PDNSolution * cur_pres = new PDNSolution( init_pres );
+  auto cur_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto cur_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto cur_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
   // Do NOT overwrite solution if this is a restart
   if( restart_init_assembly_flag == false )
@@ -174,16 +145,10 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
 
     bool conv_flag;
     nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
-        time_info->get_step(), is_v, is_p, sol_base, 
-        pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres, 
-        tmga_ptr, flr_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p, 
-        nbc_v, nbc_p, infnbc,
-        nbc_mesh, ebc_v, ebc_mesh, gbc, bc_mat, bc_mesh_mat,
-        elementv, elements, quad_v, quad_s, ps_ptr, 
-        lassem_fluid_ptr, lassem_solid_ptr, lassem_mesh_ptr,
-        gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
-        cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres, 
-        conv_flag, nl_counter );
+        time_info->get_step(), is_v, is_p,pre_dot_disp, pre_dot_velo, pre_dot_pres, 
+        pre_disp, pre_velo, pre_pres, pnode_v, pnode_p, infnbc, gbc, ps_ptr, 
+        gassem_ptr, gassem_mesh_ptr, cur_dot_disp, cur_dot_velo, cur_dot_pres, 
+        cur_disp, cur_velo, cur_pres, conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 
@@ -217,15 +182,15 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     {
       // Calculate 3D dot flow rate on the outlets
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_dot_velo, lassem_fluid_ptr, elements, quad_s, ebc_v, face );
+          cur_dot_velo, face );
 
       // Calculate 3D flow rate on the outlets
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_velo, lassem_fluid_ptr, elements, quad_s, ebc_v, face);
+          cur_velo, face);
 
       // Calculate 3D averaged pressure on outlets
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, ebc_v, ebc_p, face);
+          cur_disp, cur_pres, face);
 
       // Calculate 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -254,10 +219,10 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     for(int face=0; face<infnbc -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_disp, cur_velo, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+          cur_disp, cur_velo, infnbc, face );
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+          cur_disp, cur_pres, infnbc, face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
@@ -277,12 +242,6 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     pre_velo -> Copy( cur_velo );
     pre_pres -> Copy( cur_pres );
   }
-
-  delete pre_dot_disp; delete pre_dot_velo; delete pre_dot_pres;
-  delete pre_disp; delete pre_velo; delete pre_pres;
-
-  delete cur_dot_disp; delete cur_dot_velo; delete cur_dot_pres;
-  delete cur_disp; delete cur_velo; delete cur_pres;
 }
 
 void PTime_FSI_Solver::TM_FSI_Prestress(
@@ -290,50 +249,32 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     const double &prestress_tol,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &init_dot_disp,
-    const PDNSolution * const &init_dot_velo,
-    const PDNSolution * const &init_dot_pres,
-    const PDNSolution * const &init_disp,
-    const PDNSolution * const &init_velo,
-    const PDNSolution * const &init_pres,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
+    std::unique_ptr<PDNSolution> init_dot_disp,
+    std::unique_ptr<PDNSolution> init_dot_velo,
+    std::unique_ptr<PDNSolution> init_dot_pres,
+    std::unique_ptr<PDNSolution> init_disp,
+    std::unique_ptr<PDNSolution> init_velo,
+    std::unique_ptr<PDNSolution> init_pres,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
-    const Matrix_PETSc * const &bc_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
     Tissue_prestress * const &ps_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    IPGAssem * const &gassem_ptr ) const
 {
-  PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * pre_dot_pres = new PDNSolution( init_dot_pres );
+  auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
 
-  PDNSolution * pre_disp = new PDNSolution( init_disp );
-  PDNSolution * pre_velo = new PDNSolution( init_velo );
-  PDNSolution * pre_pres = new PDNSolution( init_pres );
+  auto pre_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto pre_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto pre_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
-  PDNSolution * cur_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * cur_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * cur_dot_pres = new PDNSolution( init_dot_pres );
+  auto cur_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto cur_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto cur_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
-  PDNSolution * cur_disp = new PDNSolution( init_disp );
-  PDNSolution * cur_velo = new PDNSolution( init_velo );
-  PDNSolution * cur_pres = new PDNSolution( init_pres );
+  auto cur_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto cur_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto cur_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
   bool prestress_conv_flag = false, renew_flag;
   int nl_counter = nsolver_ptr -> get_non_max_its();
@@ -352,30 +293,27 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Nullify the solid solutions
-    Nullify_solid_dof( pnode_v, 3, pre_dot_disp );
-    Nullify_solid_dof( pnode_v, 3, pre_dot_velo );
-    Nullify_solid_dof( pnode_p, 1, pre_dot_pres );
+    Nullify_solid_dof( pnode_v, 3, pre_dot_disp.get() );
+    Nullify_solid_dof( pnode_v, 3, pre_dot_velo.get() );
+    Nullify_solid_dof( pnode_p, 1, pre_dot_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, pre_disp );
-    Nullify_solid_dof( pnode_v, 3, pre_velo );
-    Nullify_solid_dof( pnode_p, 1, pre_pres );
+    Nullify_solid_dof( pnode_v, 3, pre_disp.get() );
+    Nullify_solid_dof( pnode_v, 3, pre_velo.get() );
+    Nullify_solid_dof( pnode_p, 1, pre_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, cur_dot_disp );
-    Nullify_solid_dof( pnode_v, 3, cur_dot_velo );
-    Nullify_solid_dof( pnode_p, 1, cur_dot_pres );
+    Nullify_solid_dof( pnode_v, 3, cur_dot_disp.get() );
+    Nullify_solid_dof( pnode_v, 3, cur_dot_velo.get() );
+    Nullify_solid_dof( pnode_p, 1, cur_dot_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, cur_disp );
-    Nullify_solid_dof( pnode_v, 3, cur_velo );
-    Nullify_solid_dof( pnode_p, 1, cur_pres );
+    Nullify_solid_dof( pnode_v, 3, cur_disp.get() );
+    Nullify_solid_dof( pnode_v, 3, cur_velo.get() );
+    Nullify_solid_dof( pnode_p, 1, cur_pres.get() );
 
     nsolver_ptr -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
         time_info->get_time(), time_info->get_step(), is_v, is_p,
         pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres,
-        tmga_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p,
-        nbc_v, nbc_p, ebc_v, ebc_p, bc_mat, elementv, elements, quad_v, quad_s,
-        ps_ptr, lassem_solid_ptr, gassem_ptr, lsolver_ptr,
-        cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres,
-        prestress_conv_flag, nl_counter );
+        pnode_v, pnode_p, ps_ptr, gassem_ptr, cur_dot_disp, cur_dot_velo, 
+        cur_dot_pres, cur_disp, cur_velo, cur_pres, prestress_conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 
@@ -413,12 +351,6 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     pre_velo -> Copy( cur_velo );
     pre_pres -> Copy( cur_pres );
   }
-
-  delete pre_dot_disp; delete pre_dot_velo; delete pre_dot_pres;
-  delete pre_disp; delete pre_velo; delete pre_pres;
-
-  delete cur_dot_disp; delete cur_dot_velo; delete cur_dot_pres;
-  delete cur_disp; delete cur_velo; delete cur_pres;
 }
 
 void PTime_FSI_Solver::Nullify_solid_dof( const APart_Node * const &pnode,
