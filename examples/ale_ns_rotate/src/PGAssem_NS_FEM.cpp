@@ -8,8 +8,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     const IQuadPts * const &quads,
     IQuadPts * const &free_quad,
     const AGlobal_Mesh_Info * const &agmi_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &aien_ptr,
+    std::unique_ptr<ALocal_IEN> in_locien,
+    std::unique_ptr<ALocal_Elem> in_locelem,
     const APart_Node * const &pnode_ptr,
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
@@ -19,7 +19,9 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     SI_T::SI_quad_point * const &SI_qp,
     const IGenBC * const &gbc,
     const int &in_nz_estimate )
-: nbc( std::move(in_nbc) ),
+: locien( std::move(in_locien) ),
+  locelem( std::move(in_locelem) ),
+  nbc( std::move(in_nbc) ),
   ebc( std::move(in_ebc) ),
   wbc( std::move(in_wbc) ),
   nLocBas( agmi_ptr->get_nLocBas() ),
@@ -64,8 +66,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  Assem_nonzero_estimate( alelem_ptr, locassem_ptr, 
-      elements, quads, aien_ptr, pnode_ptr, gbc );
+  Assem_nonzero_estimate( locassem_ptr, elements, quads, pnode_ptr, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -136,15 +137,13 @@ void PGAssem_NS_FEM::EssBC_G( const int &field )
 }
 
 void PGAssem_NS_FEM::Assem_nonzero_estimate(
-    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
     const APart_Node * const &node_ptr,
     const IGenBC * const &gbc )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
   lassem_ptr->Assem_Estimate();
@@ -155,7 +154,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   {
     for(int i=0; i<nLocBas; ++i)
     {
-      const int loc_index  = lien_ptr->get_LIEN(e, i);
+      const int loc_index  = locien->get_LIEN(e, i);
 
       for(int m=0; m<dof_mat; ++m)
         row_index[dof_mat * i + m] = dof_mat * nbc->get_LID( m, loc_index ) + m;
@@ -192,7 +191,6 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 void PGAssem_NS_FEM::Assem_mass_residual(
     const PDNSolution * const &sol_a,
     const PDNSolution * const &mdisp,
-    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -201,13 +199,12 @@ void PGAssem_NS_FEM::Assem_mass_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     IQuadPts * const &free_quad,
-    const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const ALocal_Interface * const &itf_part,
     const SI_T::SI_solution * const &SI_sol,
     const SI_T::SI_quad_point * const &SI_qp )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
   double * array_a = new double [nlgn * dof_sol];
@@ -222,7 +219,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
+    locien->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     fnode_ptr->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
 
@@ -252,8 +249,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
   // Default mdisp = mvelo = zeros at t = 0.
-  Weak_EssBC_G(0, 0, sol_a, mdisp, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
-    lien_ptr, fnode_ptr);
+  Weak_EssBC_G(0, 0, sol_a, mdisp, mdisp, lassem_ptr, elementvs, quad_s, fnode_ptr);
 
   // Surface integral from Nitsche method
   Interface_G(0, lassem_ptr, elementvs, elementvs_rotated, quad_s, free_quad, itf_part, SI_sol, SI_qp);
@@ -278,7 +274,6 @@ void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
-    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -287,14 +282,13 @@ void PGAssem_NS_FEM::Assem_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     IQuadPts * const &free_quad,
-    const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const IGenBC * const &gbc,
     const ALocal_Interface * const &itf_part,
     const SI_T::SI_solution * const &SI_sol,
     const SI_T::SI_quad_point * const &SI_qp )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
   
   double * array_a = new double [nlgn * dof_sol];
@@ -318,7 +312,7 @@ void PGAssem_NS_FEM::Assem_residual(
 
   for( int ee=0; ee<nElem; ++ee )
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
+    locien->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
     GetLocal(array_mvelo, 3, IEN_e, local_mvelo);  // 3 is the DOFs of mvelo/mdisp
@@ -361,8 +355,8 @@ void PGAssem_NS_FEM::Assem_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(curr_time, dt, sol_b, mvelo, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
-      lien_ptr, fnode_ptr);
+  Weak_EssBC_G(curr_time, dt, sol_b, mvelo, mdisp, lassem_ptr, elementvs, quad_s,
+      fnode_ptr);
 
   // // For Poiseuille flow
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s );
@@ -388,7 +382,6 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
-    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &elementv,
     FEAElement * const &elements,
@@ -397,14 +390,13 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const IQuadPts * const &quad_v,
     const IQuadPts * const &quad_s,
     IQuadPts * const &free_quad,
-    const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr,
     const IGenBC * const &gbc,
     const ALocal_Interface * const &itf_part,
     const SI_T::SI_solution * const &SI_sol,
     const SI_T::SI_quad_point * const &SI_qp )
 {
-  const int nElem = alelem_ptr->get_nlocalele();
+  const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
   
   double * array_a = new double [nlgn * dof_sol];
@@ -428,7 +420,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    lien_ptr->get_LIEN(ee, IEN_e);
+    locien->get_LIEN(ee, IEN_e);
     GetLocal(array_a, IEN_e, local_a);
     GetLocal(array_b, IEN_e, local_b);
     GetLocal(array_mvelo, 3, IEN_e, local_mvelo);  // 3 is the DOFs of mvelo/mdisp
@@ -474,8 +466,8 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
 
   // Weakly enforced no-slip boundary condition
   // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_KG(curr_time, dt, sol_b, mvelo, mdisp, alelem_ptr, lassem_ptr, elementvs, quad_s,
-    lien_ptr, fnode_ptr);
+  Weak_EssBC_KG(curr_time, dt, sol_b, mvelo, mdisp, lassem_ptr, elementvs, quad_s,
+    fnode_ptr);
 
   // // For Poiseuille flow
   // NatBC_G( curr_time, dt, lassem_ptr, elements, quad_s );
@@ -1057,11 +1049,9 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
     const PDNSolution * const &sol,
     const PDNSolution * const &mvelo,
     const PDNSolution * const &mdisp,
-    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_vs,
     const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr)
 {
   const int loc_dof {dof_mat * nLocBas};
@@ -1088,7 +1078,7 @@ void PGAssem_NS_FEM::Weak_EssBC_KG(
   {
     const int local_ee_index {wbc->get_part_vol_ele_id(ee)};
 
-    lien_ptr->get_LIEN(local_ee_index, IEN_v);
+    locien->get_LIEN(local_ee_index, IEN_v);
     GetLocal(array_b, IEN_v, local_b);
     GetLocal(array_mvelo, 3, IEN_v, local_mvelo);
     GetLocal(array_mdisp, 3, IEN_v, local_mdisp);
@@ -1129,11 +1119,9 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
     const PDNSolution * const &sol,
     const PDNSolution * const &mvelo,
     const PDNSolution * const &mdisp,
-    const ALocal_Elem * const &alelem_ptr,
     IPLocAssem * const &lassem_ptr,
     FEAElement * const &element_vs,
     const IQuadPts * const &quad_s,
-    const ALocal_IEN * const &lien_ptr,
     const FEANode * const &fnode_ptr)
 {
   const int loc_dof {dof_mat * nLocBas};
@@ -1160,7 +1148,7 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
   {
     const int local_ee_index {wbc->get_part_vol_ele_id(ee)};
 
-    lien_ptr->get_LIEN(local_ee_index, IEN_v);
+    locien->get_LIEN(local_ee_index, IEN_v);
     GetLocal(array_b, IEN_v, local_b);
     GetLocal(array_mvelo, 3, IEN_v, local_mvelo);
     GetLocal(array_mdisp, 3, IEN_v, local_mdisp);

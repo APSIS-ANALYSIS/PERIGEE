@@ -34,8 +34,8 @@ class PGAssem_NS_FEM : public IPGAssem
         const IQuadPts * const &quads,
         IQuadPts * const &free_quad,
         const AGlobal_Mesh_Info * const &agmi_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &aien_ptr,
+        std::unique_ptr<ALocal_IEN> in_locien,
+        std::unique_ptr<ALocal_Elem> in_locelem,
         const APart_Node * const &pnode_ptr,
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
@@ -51,11 +51,9 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
         const APart_Node * const &node_ptr,
         const IGenBC * const &gbc );
 
@@ -63,7 +61,6 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &mdisp,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -72,7 +69,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
@@ -88,7 +84,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -97,7 +92,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
         const ALocal_Interface * const &itf_part,
@@ -115,7 +109,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &elementv,
         FEAElement * const &elements,
@@ -124,7 +117,6 @@ class PGAssem_NS_FEM : public IPGAssem
         const IQuadPts * const &quad_v,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
         const ALocal_Interface * const &itf_part,
@@ -167,6 +159,8 @@ class PGAssem_NS_FEM : public IPGAssem
 
   private:
     // Private data
+    const std::unique_ptr<const ALocal_IEN> locien;
+    const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<const ALocal_WeakBC> wbc;
@@ -223,22 +217,18 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol,
         const PDNSolution * const &mvelo,
         const PDNSolution * const &mdisp,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_vs,
         const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr);
 
     void Weak_EssBC_G( const double &curr_time, const double &dt,
         const PDNSolution * const &sol,
         const PDNSolution * const &mvelo,
         const PDNSolution * const &mdisp,
-        const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &element_vs,
         const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &fnode_ptr);
 
     virtual void Interface_KG(
