@@ -1,9 +1,9 @@
 // ==================================================================
-// ns_tet_driver.cpp
+// ns code driver.cpp
 //
-// Tetrahedral element based finite element code for 3D Navier-Stokes
-// equations using Variational Multiscale Formulation and Generalized
-// alpha time stepping.
+// Finite element code for 3D Navier-Stokes equations using the 
+// Variational Multiscale Formulation and Generalized-alpha time 
+// stepping.
 //
 // Author: Ju Liu, liujuy@gmail.com
 // Date: Feb. 6 2020
@@ -12,7 +12,6 @@
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
 #include "GenBCFactory.hpp"
-#include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
