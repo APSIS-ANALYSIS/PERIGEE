@@ -257,15 +257,23 @@ int main(int argc, char *argv[])
   // field.
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
   
+  auto locElem_mesh = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
+
   auto locIEN_v = SYS_T::make_unique<ALocal_IEN>(part_v_file, rank);
 
   auto locIEN_p = SYS_T::make_unique<ALocal_IEN>(part_p_file, rank);
 
+  auto locIEN_mesh = SYS_T::make_unique<ALocal_IEN>(part_v_file, rank);
+
   auto fNode = SYS_T::make_unique<FEANode>(part_v_file, rank);
+
+  auto fNode_mesh = SYS_T::make_unique<FEANode>(part_v_file, rank);
 
   auto pNode_v = SYS_T::make_unique<APart_Node>(part_v_file, rank);
 
   auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
+
+  auto pNode_mesh = SYS_T::make_unique<APart_Node>(part_v_file, rank);
 
   auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_v_file, rank);
 
@@ -354,11 +362,11 @@ int main(int argc, char *argv[])
   tm_galpha_ptr->print_info();
 
   // ===== Local assembly =====
-  IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
+  std::unique_ptr<IPLocAssem_2x2Block> locAssem_fluid = SYS_T::make_unique<PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha>(
       ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur,
-      tm_galpha.get(), fluid_density, fluid_mu, bs_beta );  
+      tm_galpha.get(), fluid_density, fluid_mu, bs_beta ); 
 
-  IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
+  std::unique_ptr<IPLocAssem_2x2Block> locAssem_solid = nullptr;
 
   const double solid_mu = solid_E/(2.0+2.0*solid_nu);
   std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
@@ -367,7 +375,7 @@ int main(int argc, char *argv[])
   {
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
-    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
+    locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
   }
   else
@@ -376,12 +384,12 @@ int main(int argc, char *argv[])
     const double solid_kappa  = solid_lambda + 2.0 * solid_mu / 3.0;
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
-    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
+    locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
   }
 
-  // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur );
+  // The harmonic extension algorithm & Pseudo elastic mesh motion
+  std::unique_ptr<IPLocAssem> locAssem_mesh = SYS_T::make_unique<PLocAssem_FSI_Mesh_Laplacian>( ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur );
   
   // ===== Initial condition =====
   PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
@@ -463,30 +471,32 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_FSI( 
+  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_FSI>(
       gbc.get(), std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), 
       std::move(fNode), std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), 
       std::move(locnbc_p), std::move(locebc_v), std::move(locebc_p), 
-      std::move(locAssem_fluid_ptr), std::move(locAssem_solid_ptr), nz_estimate );
+      std::move(locAssem_fluid), std::move(locAssem_solid), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( gbc );
+  gloAssem->Assem_nonzero_estimate( gbc );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  gloAssem_ptr->Fix_nonzero_err_str();
-  gloAssem_ptr->Clear_KG();
+  gloAssem->Fix_nonzero_err_str();
+  gloAssem->Clear_KG();
 
   // ===== Global assembly for mesh motion =====
   SYS_T::commPrint("===> Initializing Mat K_mesh and Vec G_mesh ... \n");
-  IPGAssem * gloAssem_mesh_ptr = new PGAssem_Mesh( locAssem_mesh_ptr,
-      locElem, locIEN_v, pNode_v, mesh_locnbc, mesh_locebc, nz_estimate );
+  std::unique_ptr<IPGAssem> gloAssem_mesh = SYS_T::make_unique<PGAssem_Mesh>(
+      std::move(locIEN_mesh), std::move(locElem_mesh), std::move(fNode_mesh), 
+      std::move(pNode_mesh), std::move(mesh_locnbc), std::move(mesh_locebc), 
+      std::move(locAssem_mesh), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate for K_mesh ... \n");
-  gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN_v, mesh_locnbc );
+  gloAssem_mesh->Assem_nonzero_estimate();
 
   SYS_T::commPrint("===> Matrix K_mesh nonzero structure fixed. \n");
-  gloAssem_mesh_ptr->Fix_nonzero_err_str();
-  gloAssem_mesh_ptr->Clear_KG();
+  gloAssem_mesh->Fix_nonzero_err_str();
+  gloAssem_mesh->Clear_KG();
 
   // ===== Initialize dot sol =====
   if( is_restart == false )
@@ -505,11 +515,11 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->Assem_mass_residual( disp, velo, pres,  ps_data );
+    gloAssem->Assem_mass_residual( disp, velo, pres,  ps_data );
 
     Vec proj_vp, proj_v, proj_p;
-    VecDuplicate( gloAssem_ptr->G, &proj_vp );
-    lsolver_acce -> Solve( gloAssem_ptr->K, gloAssem_ptr->G, proj_vp );
+    VecDuplicate( gloAssem->G, &proj_vp );
+    lsolver_acce -> Solve( gloAssem->K, gloAssem->G, proj_vp );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.\n");
     lsolver_acce -> print_info();
@@ -541,12 +551,10 @@ int main(int argc, char *argv[])
   PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
       1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
 
-  gloAssem_mesh_ptr->Assem_tangent_residual( disp, disp, 0.0,
-      timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
-      elements, quadv, quads, locIEN_v, fNode, mesh_locnbc,
-      mesh_locebc );
+  gloAssem_mesh->Assem_tangent_residual( disp, disp, 0.0,
+      timeinfo->get_step() );
 
-  mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
+  mesh_lsolver -> SetOperator( gloAssem_mesh->K );
   PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
   PCFieldSplitSetBlockSize( mesh_pc, 3 );
 
@@ -569,11 +577,11 @@ int main(int argc, char *argv[])
   // ===== Outlet flowrate recording files =====
   for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
   {
-    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate( disp, dot_velo, ff );
+    const double dot_face_flrate = gloAssem -> Assem_surface_flowrate( disp, dot_velo, ff );
 
-    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate( disp, velo, ff );
+    const double face_flrate = gloAssem -> Assem_surface_flowrate( disp, velo, ff );
 
-    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure( disp, pres, ff );
+    const double face_avepre = gloAssem -> Assem_surface_ave_pressure( disp, pres, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -610,9 +618,9 @@ int main(int argc, char *argv[])
   // ===== Inlet data recording files =====
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
-    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate( disp, velo, locinfnbc, ff );
+    const double inlet_face_flrate = gloAssem -> Assem_surface_flowrate( disp, velo, locinfnbc, ff );
 
-    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure( disp, pres, locinfnbc, ff );
+    const double inlet_face_avepre = gloAssem -> Assem_surface_ave_pressure( disp, pres, locinfnbc, ff );
 
     if( rank == 0 )
     {
@@ -654,8 +662,8 @@ int main(int argc, char *argv[])
       pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
       locebc_v, locebc_p, mesh_locebc, 
       gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
-      locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
-      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+      locAssem_fluid, locAssem_solid, locAssem_mesh,
+      gloAssem, gloAssem_mesh, lsolver, mesh_lsolver, nsolver);
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);
@@ -667,18 +675,13 @@ int main(int argc, char *argv[])
 
   // ===== PETSc Finalize =====
   delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
-  delete gloAssem_ptr; delete gloAssem_mesh_ptr;
   delete timeinfo; delete gbc;
   delete pres; delete dot_pres;
   delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
-  delete locAssem_mesh_ptr; delete locAssem_fluid_ptr;
-  delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
+  delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   delete elements; delete elementv; delete quadv; delete quads;
-  delete GMIptr; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
-  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
-  delete locebc_v; delete locebc_p; delete mesh_locebc; 
-  delete locIEN_v; delete locIEN_p; delete ps_data;
+  delete ps_data;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

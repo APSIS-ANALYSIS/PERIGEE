@@ -106,8 +106,8 @@ class PGAssem_FSI : public IPGAssem
     const std::unique_ptr<const ALocal_NBC> nbc_p;
     const std::unique_ptr<const ALocal_EBC> ebc_v;
     const std::unique_ptr<const ALocal_EBC> ebc_p;
-    const std::unique_ptr<IPLocAssem> locassem_f;
-    const std::unique_ptr<IPLocAssem> locassem_s;
+    const std::unique_ptr<IPLocAssem_2x2Block> locassem_f;
+    const std::unique_ptr<IPLocAssem_2x2Block> locassem_s;
 
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
