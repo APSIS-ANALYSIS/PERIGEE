@@ -240,13 +240,13 @@ int main(int argc, char *argv[])
   FEANode * fNode = new FEANode(part_file, rank);
 
   // Local sub-domain's IEN array
-  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
+  auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
 
   // Global mesh info
   AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
 
   // Local sub-domain's element indices
-  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
 
   // Local sub-domain's nodal bc
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
@@ -469,13 +469,13 @@ int main(int argc, char *argv[])
 
   IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, 
       anchor_elementv, opposite_elementv, quads, free_quad,
-      GMIptr, locElem, locIEN, pNode, 
+      GMIptr, std::move(locIEN), std::move(locElem), pNode, 
       std::move(locnbc), std::move(locebc), std::move(locwbc),
       locitf, SI_sol, SI_qp, gbc.get(), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_ptr,
-      elements, quads, locIEN, pNode, gbc.get() );
+  gloAssem_ptr->Assem_nonzero_estimate( locAssem_ptr,
+      elements, quads, pNode, gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -509,8 +509,8 @@ int main(int argc, char *argv[])
 
     SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
 
-    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locElem, locAssem_ptr, elementv,
-        elements, anchor_elementv, opposite_elementv, quadv, quads, free_quad, locIEN, fNode,
+    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locAssem_ptr, elementv,
+        elements, anchor_elementv, opposite_elementv, quadv, quads, free_quad, fNode,
         locitf, SI_sol, SI_qp );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
@@ -623,7 +623,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
-      timeinfo, pNode, locElem, locIEN, fNode,
+      timeinfo, pNode, fNode,
       locinfnbc, locrotnbc, gbc.get(), 
       locitf, sir_info, SI_sol, SI_qp,
       elementv, elements, anchor_elementv, opposite_elementv,
@@ -635,8 +635,8 @@ int main(int argc, char *argv[])
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
-  delete fNode; delete locIEN; delete GMIptr; delete sir_info; delete locrotnbc;
-  delete locElem; delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
+  delete fNode; delete GMIptr; delete sir_info; delete locrotnbc;
+  delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
   delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete timeinfo;
   delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;

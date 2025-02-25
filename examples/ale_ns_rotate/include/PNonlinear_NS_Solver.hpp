@@ -56,8 +56,6 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &pre_sol,
         const PDNSolution * const &pre_velo_mesh,    
         const PDNSolution * const &pre_disp_mesh,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_InflowBC * const &infnbc_part,
         const ALocal_RotatedBC * const &rotnbc_part,

@@ -53,8 +53,6 @@ class PTime_NS_Solver
         const PDNSolution * const &init_mvelo,
         PDNTimeStep * const &time_info,
         const APart_Node * const &pNode_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
         const FEANode * const &feanode_ptr,
         const ALocal_InflowBC * const &infnbc_part,
         const ALocal_RotatedBC * const &rotnbc_part,
