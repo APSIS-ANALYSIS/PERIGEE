@@ -92,10 +92,14 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/APart_Node_FSI.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
+  ${perigee_source}/Element/FEAElement_Hex27.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp  
   ${perigee_source}/Model/Tissue_prestress.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
@@ -120,7 +124,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Mesh.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_FSI.cpp
-  ${perigee_SOURCE_DIR}/src/PGAssem_Wall_Prestress.cpp
+  # ${perigee_SOURCE_DIR}/src/PGAssem_Wall_Prestress.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_FSI_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_FSI_Solver.cpp
   )
@@ -168,7 +172,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( preprocess_fsi preprocess.cpp)
-ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
+# ADD_EXECUTABLE( wall_ps3d wall_ps_driver.cpp)
 ADD_EXECUTABLE( fsi3d driver.cpp)
 ADD_EXECUTABLE( prepostproc prepost.cpp)
 ADD_EXECUTABLE( vis_fsi vis.cpp )
@@ -180,7 +184,7 @@ ADD_EXECUTABLE( vis_fsi_wss_hex8 vis_fsi_wss_hex8.cpp )
 
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi ${EXTRA_LINK_LIBS} perigee_preprocess )
-TARGET_LINK_LIBRARIES( wall_ps3d ${EXTRA_LINK_LIBS} perigee_analysis )
+# TARGET_LINK_LIBRARIES( wall_ps3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( fsi3d ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_LINK_LIBRARIES( prepostproc ${EXTRA_LINK_LIBS} perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_fsi ${EXTRA_LINK_LIBS} perigee_postprocess )

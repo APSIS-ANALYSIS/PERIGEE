@@ -20,7 +20,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode_v,
         std::unique_ptr<APart_Node> in_pnode_p,
-        std::unique_ptr<ALocal_NBC> in_nbc_v
+        std::unique_ptr<ALocal_NBC> in_nbc_v,
         std::unique_ptr<ALocal_NBC> in_nbc_p,
         std::unique_ptr<ALocal_EBC> in_ebc_v,
         std::unique_ptr<ALocal_EBC> in_ebc_p,

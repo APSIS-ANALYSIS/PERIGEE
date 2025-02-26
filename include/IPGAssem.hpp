@@ -114,6 +114,11 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
+    virtual void Assem_nonzero_estimate(
+        const APart_Node * const &pnode_ptr,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,
@@ -563,6 +568,17 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr) 
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
+
     // Assembly with weak BC
     virtual void Assem_residual(
         const PDNSolution * const &dot_sol,
@@ -866,6 +882,17 @@ class IPGAssem
         const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
+    virtual void Assem_Tangent_Residual(
+        const double &curr_time, const double &dt,
+        const PDNSolution * const &dot_disp,
+        const PDNSolution * const &dot_velo,
+        const PDNSolution * const &dot_pres,
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const Tissue_prestress * const &ps_ptr )
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+
     // Assembly with weak BC
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
@@ -1161,6 +1188,12 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+
+    virtual void Update_Wall_Prestress(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &pres,
+        Tissue_prestress * const &ps_ptr ) const
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}    
 };
 
 #endif

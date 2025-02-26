@@ -22,6 +22,8 @@
 // Author: Ju Liu
 // ==================================================================
 #include "IPLocAssem.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
 {

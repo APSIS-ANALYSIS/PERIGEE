@@ -36,7 +36,7 @@ void PNonlinear_FSI_Solver::print_info() const
   SYS_T::commPrint("divergence tolerance: %e \n", nd_tol);
   SYS_T::commPrint("maximum iteration: %d \n", nmaxits);
   SYS_T::commPrint("tangent matrix renew frequency: %d \n", nrenew_freq);
-  SYS_T::commPrint("tangent matrix renew threshold: %d \n", nrenew_thred);
+  SYS_T::commPrint("tangent matrix renew threshold: %d \n", nrenew_threshold);
   SYS_T::print_sep_line();
 }
 
@@ -161,32 +161,32 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   pres -> Copy( pre_pres );
 
   // Define intermediate solutions
-  auto dot_disp_alpha = std::make_unique<PDNSolution>(pre_dot_disp);
+  auto dot_disp_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_disp);
   dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
 
-  auto dot_velo_alpha = std::make_unique<PDNSolution>(pre_dot_velo);
+  auto dot_velo_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_velo);
   dot_velo_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_velo_alpha -> PlusAX( dot_velo, alpha_m );
 
-  auto dot_pres_alpha = std::make_unique<PDNSolution>(pre_dot_pres);
+  auto dot_pres_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_pres);
   dot_pres_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_pres_alpha -> PlusAX( dot_pres, alpha_m );
 
-  auto disp_alpha = std::make_unique<PDNSolution>(pre_disp);
+  auto disp_alpha = SYS_T::make_unique<PDNSolution>(pre_disp);
   disp_alpha -> ScaleValue( 1.0 - alpha_f );
   disp_alpha -> PlusAX( disp, alpha_f );
 
-  auto velo_alpha = std::make_unique<PDNSolution>(pre_velo);
+  auto velo_alpha = SYS_T::make_unique<PDNSolution>(pre_velo);
   velo_alpha -> ScaleValue( 1.0 - alpha_f );
   velo_alpha -> PlusAX( velo, alpha_f );
 
-  auto pres_alpha = std::make_unique<PDNSolution>(pre_pres);
+  auto pres_alpha = SYS_T::make_unique<PDNSolution>(pre_pres);
   pres_alpha -> ScaleValue( 1.0 - alpha_f );
   pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
-  std::unique_ptr<PDNSolution> Delta_dot_disp = std::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
+  std::unique_ptr<PDNSolution> Delta_dot_disp = SYS_T::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
 
   update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
   update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
@@ -331,7 +331,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 #endif
 
     // Assemble residual & tangent
-    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_thred )
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
       gassem_ptr -> Clear_KG();
 
@@ -426,32 +426,32 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   pres -> Copy( pre_pres );
 
   // Define intermediate solutions
-  auto dot_disp_alpha = std::make_unique<PDNSolution>(pre_dot_disp);
+  auto dot_disp_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_disp);
   dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
 
-  auto dot_velo_alpha = std::make_unique<PDNSolution>(pre_dot_velo);
+  auto dot_velo_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_velo);
   dot_velo_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_velo_alpha -> PlusAX( dot_velo, alpha_m );
 
-  auto dot_pres_alpha = std::make_unique<PDNSolution>(pre_dot_pres);
+  auto dot_pres_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_pres);
   dot_pres_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_pres_alpha -> PlusAX( dot_pres, alpha_m );
 
-  auto disp_alpha = std::make_unique<PDNSolution>(pre_disp);
+  auto disp_alpha = SYS_T::make_unique<PDNSolution>(pre_disp);
   disp_alpha -> ScaleValue( 1.0 - alpha_f );
   disp_alpha -> PlusAX( disp, alpha_f );
 
-  auto velo_alpha = std::make_unique<PDNSolution>(pre_velo);
+  auto velo_alpha = SYS_T::make_unique<PDNSolution>(pre_velo);
   velo_alpha -> ScaleValue( 1.0 - alpha_f );
   velo_alpha -> PlusAX( velo, alpha_f );
 
-  auto pres_alpha = std::make_unique<PDNSolution>(pre_pres);
+  auto pres_alpha = SYS_T::make_unique<PDNSolution>(pre_pres);
   pres_alpha -> ScaleValue( 1.0 - alpha_f );
   pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
-  std::unique_ptr<PDNSolution> Delta_dot_disp = std::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
+  std::unique_ptr<PDNSolution> Delta_dot_disp = SYS_T::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
 
   update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
   update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
@@ -521,7 +521,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
     // Assemble residual & tangent
-    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_thred )
+    if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
       gassem_ptr -> Clear_KG();
 

@@ -7,7 +7,7 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
     std::unique_ptr<FEANode> in_fnode,
     std::unique_ptr<APart_Node> in_pnode_v,
     std::unique_ptr<APart_Node> in_pnode_p,
-    std::unique_ptr<ALocal_NBC> in_nbc_v
+    std::unique_ptr<ALocal_NBC> in_nbc_v,
     std::unique_ptr<ALocal_NBC> in_nbc_p,
     std::unique_ptr<ALocal_EBC> in_ebc_v,
     std::unique_ptr<ALocal_EBC> in_ebc_p,
@@ -97,13 +97,13 @@ void PGAssem_Wall_Prestress::Assem_nonzero_estimate()
   {
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      row_id_v[3*ii  ] = nbc_v -> get_LID( 0, lien_v -> get_LIEN(ee, ii) );
-      row_id_v[3*ii+1] = nbc_v -> get_LID( 1, lien_v -> get_LIEN(ee, ii) );
-      row_id_v[3*ii+2] = nbc_v -> get_LID( 2, lien_v -> get_LIEN(ee, ii) );
+      row_id_v[3*ii  ] = nbc_v -> get_LID( 0, locien_v -> get_LIEN(ee, ii) );
+      row_id_v[3*ii+1] = nbc_v -> get_LID( 1, locien_v -> get_LIEN(ee, ii) );
+      row_id_v[3*ii+2] = nbc_v -> get_LID( 2, locien_v -> get_LIEN(ee, ii) );
     }
 
     for(int ii=0; ii<nLocBas; ++ii)
-      row_id_p[ii] = nbc_p -> get_LID( lien_p -> get_LIEN(ee,ii) );
+      row_id_p[ii] = nbc_p -> get_LID( locien_p -> get_LIEN(ee,ii) );
 
     if( locelem->get_elem_tag(ee) == 1 )
     {
@@ -303,8 +303,8 @@ void PGAssem_Wall_Prestress::Assem_Residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
-    const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
+    const std::vector<int> IEN_v = locien_v -> get_LIEN( ee );
+    const std::vector<int> IEN_p = locien_p -> get_LIEN( ee );
 
     fnode -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
@@ -383,8 +383,8 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 
   for(int ee=0; ee<nElem; ++ee)
   {
-    const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
-    const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
+    const std::vector<int> IEN_v = locien_v -> get_LIEN( ee );
+    const std::vector<int> IEN_p = locien_p -> get_LIEN( ee );
 
     fnode -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
 
@@ -463,8 +463,8 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
   {
     if( locelem->get_elem_tag(ee) == 1 )
     {
-      const std::vector<int> IEN_v = lien_v -> get_LIEN( ee );
-      const std::vector<int> IEN_p = lien_p -> get_LIEN( ee );
+      const std::vector<int> IEN_v = locien_v -> get_LIEN( ee );
+      const std::vector<int> IEN_p = locien_p -> get_LIEN( ee );
       fnode -> get_ctrlPts_xyz(nLocBas, &IEN_v[0], ectrl_x, ectrl_y, ectrl_z);
       const std::vector<double> local_d = GetLocal( array_d, IEN_v, nLocBas, 3 );
       const std::vector<double> local_p = GetLocal( array_p, IEN_p, nLocBas, 1 );

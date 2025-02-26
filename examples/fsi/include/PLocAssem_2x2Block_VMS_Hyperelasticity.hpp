@@ -12,6 +12,8 @@
 #include "IPLocAssem_2x2Block.hpp"
 #include "MaterialModel_Mixed_Elasticity.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
 {

@@ -276,7 +276,7 @@ int main( int argc, char *argv[] )
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
     locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
-        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
+        ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
   }
   else
   {
@@ -285,7 +285,7 @@ int main( int argc, char *argv[] )
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
     locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
-        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
+        ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
   }
 
   // ===== Initial conditions =====

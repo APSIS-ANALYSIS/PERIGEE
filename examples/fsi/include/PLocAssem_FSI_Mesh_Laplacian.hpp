@@ -10,6 +10,8 @@
 // Author: Ju Liu
 // ==================================================================
 #include "IPLocAssem.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_FSI_Mesh_Laplacian : public IPLocAssem
 {
@@ -76,7 +78,7 @@ class PLocAssem_FSI_Mesh_Laplacian : public IPLocAssem
 
     const std::unique_ptr<IQuadPts> quadv, quads;
 
-    const int num_ebc_fun, vec_size;
+    const int nLocBas, snLocBas, num_ebc_fun, vec_size;
 
     void print_info() const;
 

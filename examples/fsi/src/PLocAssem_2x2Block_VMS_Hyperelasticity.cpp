@@ -12,7 +12,7 @@ PLocAssem_2x2Block_VMS_Hyperelasticity::PLocAssem_2x2Block_VMS_Hyperelasticity(
   rho0( in_matmodel->get_rho_0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
-  nLocBas( elementv->get_nLocBas() ), snLocBas( elments->get_nLocBas() ), 
+  nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ), 
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
   sur_size_0( snLocBas * 3 ),
   matmodel( std::move(in_matmodel) )
@@ -758,7 +758,7 @@ std::vector<SymmTensor2_3D> PLocAssem_2x2Block_VMS_Hyperelasticity::get_Wall_Cau
 {
   elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  std::vector<SymmTensor2_3D> stress( nqp );
+  std::vector<SymmTensor2_3D> stress( nqpv );
 
   for( int qua = 0; qua < nqpv; ++qua )
   {

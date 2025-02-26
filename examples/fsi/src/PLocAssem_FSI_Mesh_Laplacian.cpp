@@ -7,8 +7,8 @@ PLocAssem_FSI_Mesh_Laplacian::PLocAssem_FSI_Mesh_Laplacian(
   elements( ElementFactory::createSurElement(elemType, nqps) ),
   quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
   quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
-  num_ebc_fun(0), nLocBas( elementv->get_nLocBas() ), 
-  snLocBas( elements->get_nLocBas() ), vec_size(nLocBas*3)
+  nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ), 
+  num_ebc_fun(0), vec_size(nLocBas*3)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];

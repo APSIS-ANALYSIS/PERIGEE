@@ -69,6 +69,29 @@ class Part_FEM : public IPart
 
     virtual void print_part_loadbalance_edgecut() const;
 
+    virtual int get_elem_loc(const int &pos) const {return elem_loc[pos];}
+    virtual int get_nlocalele() const {return nlocalele;}
+    virtual int get_node_loc(const int &pos) const {return node_loc[pos];}
+    virtual int get_node_loc_original(const int &pos) const {return node_loc_original[pos];}
+    virtual int get_node_ghost(const int &pos) const {return node_ghost[pos];}
+    virtual int get_local_to_global(const int &pos) const {return local_to_global[pos];}
+    virtual int get_nlocalnode() const {return nlocalnode;}
+    virtual int get_nghostnode() const {return nghostnode;}
+    virtual int get_ntotalnode() const {return ntotalnode;}
+    virtual int get_nbadnode() const {return nbadnode;}
+    virtual int get_nlocghonode() const {return nlocghonode;}
+    virtual int get_cpu_rank() const {return cpu_rank;}
+    virtual int get_cpu_size() const {return cpu_size;}
+
+    virtual int get_nElem() const {return nElem;}
+    virtual int get_nFunc() const {return nFunc;}
+    virtual int get_nLocBas() const {return nLocBas;}
+    virtual int get_LIEN(const int &ee, const int &ii) const {return LIEN[ee][ii];}
+
+    virtual double get_ctrlPts_x_loc(const int &pos) const {return ctrlPts_x_loc[pos];}
+    virtual double get_ctrlPts_y_loc(const int &pos) const {return ctrlPts_y_loc[pos];}
+    virtual double get_ctrlPts_z_loc(const int &pos) const {return ctrlPts_z_loc[pos];}
+
   protected:
     // ------------------------------------------------------------------------
     // Data

@@ -118,7 +118,7 @@ void PGAssem_Mesh::Assem_mass_residual(
     
     for(int ii=0; ii<nLocBas; ++ii)
       for(int mm=0; mm<dof; ++mm)
-        row_index[dof*ii+mm] = nbc_part -> get_LID(mm, IEN_e[ii]);
+        row_index[dof*ii+mm] = mesh_nbc -> get_LID(mm, IEN_e[ii]);
 
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index, locassem->Tangent, ADD_VALUES);
 

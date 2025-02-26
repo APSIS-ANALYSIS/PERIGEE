@@ -2,25 +2,27 @@
 
 PGAssem_FSI::PGAssem_FSI( 
     const IGenBC * const &gbc,
+    const APart_Node * const &pnode_v,
+    const APart_Node * const &pnode_p,    
     std::unique_ptr<ALocal_IEN> in_locien_v,
     std::unique_ptr<ALocal_IEN> in_locien_p,
     std::unique_ptr<ALocal_Elem> in_locelem,
     std::unique_ptr<FEANode> in_fnode,
-    std::unique_ptr<APart_Node> in_pnode_v,
-    std::unique_ptr<APart_Node> in_pnode_p,
-    std::unique_ptr<ALocal_NBC> in_nbc_v
+    // std::unique_ptr<APart_Node> in_pnode_v,
+    // std::unique_ptr<APart_Node> in_pnode_p,
+    std::unique_ptr<ALocal_NBC> in_nbc_v,
     std::unique_ptr<ALocal_NBC> in_nbc_p,
     std::unique_ptr<ALocal_EBC> in_ebc_v,
     std::unique_ptr<ALocal_EBC> in_ebc_p,
     std::unique_ptr<IPLocAssem_2x2Block> in_locassem_f,
     std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,  
-    const int &in_nz_estimate=60 )
+    const int &in_nz_estimate )
 : locien_v( std::move(in_locien_v) ),
   locien_p( std::move(in_locien_p) ),
   locelem( std::move(in_locelem) ),
   fnode( std::move(in_fnode) ),
-  pnode_v( std::move(in_pnode_v) ),
-  pnode_p( std::move(in_pnode_p) ),
+  // pnode_v( std::move(in_pnode_v) ),
+  // pnode_p( std::move(in_pnode_p) ),
   nbc_v( std::move(in_nbc_v) ),
   nbc_p( std::move(in_nbc_p) ),
   ebc_v( std::move(in_ebc_v) ),
@@ -42,7 +44,7 @@ PGAssem_FSI::PGAssem_FSI(
   // Make sure the data structure is compatible
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
   {
-    SYS_T::print_fatal_if(snLocBas != part_ebc->get_cell_nLocBas(ebc_id),
+    SYS_T::print_fatal_if(snLocBas != ebc_v->get_cell_nLocBas(ebc_id),
         "Error: in PGAssem_FSI, snLocBas has to be uniform.\n");
   }
 
@@ -74,7 +76,8 @@ PGAssem_FSI::PGAssem_FSI(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
   
-  Assem_nonzero_estimate(  gbc );
+  // Assem_nonzero_estimate( gbc );
+  Assem_nonzero_estimate( pnode_v, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -110,12 +113,13 @@ PGAssem_FSI::~PGAssem_FSI()
 }
 
 void PGAssem_FSI::Assem_nonzero_estimate(
+    const APart_Node * const &pnode_v,
     const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
 
-  lassem_f->Assem_Estimate();
-  lassem_s->Assem_Estimate();
+  locassem_f->Assem_Estimate();
+  locassem_s->Assem_Estimate();
 
   PetscInt * row_id_v = new PetscInt [3*nLocBas];
   PetscInt * row_id_p = new PetscInt [nLocBas];
@@ -134,29 +138,30 @@ void PGAssem_FSI::Assem_nonzero_estimate(
 
     if( locelem->get_elem_tag(ee) == 0 )
     {
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_f->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_f->Tangent01, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, locassem_f->Tangent01, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f->Tangent10, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, locassem_f->Tangent10, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_f->Tangent11, ADD_VALUES);
     }
     else
     {
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_s->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s->Tangent01, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, locassem_s->Tangent01, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s->Tangent10, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, locassem_s->Tangent10, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_s->Tangent11, ADD_VALUES);
     }
   }
 
   delete [] row_id_v; row_id_v = nullptr; delete [] row_id_p; row_id_p = nullptr;
 
   // Resis BC for K and G
+  // PDNSolution * temp = new PDNSolution_V( pnode_v.get(), 0, false, "aux" );
   PDNSolution * temp = new PDNSolution_V( pnode_v, 0, false, "aux" );
 
   NatBC_Resis_KG( 0.1, 0.1, temp, temp, temp, gbc );
@@ -213,14 +218,14 @@ void PGAssem_FSI::Assem_mass_residual(
 
     if( locelem->get_elem_tag(ee) == 0 )
     {
-      lassem_f->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0],
+      locassem_f->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0],
           ectrl_x, ectrl_y, ectrl_z);
 
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_f->Tangent00, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_f->Tangent11, ADD_VALUES);
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_f->Residual0, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_f->Residual0, ADD_VALUES);
     }
     else
     {
@@ -228,14 +233,14 @@ void PGAssem_FSI::Assem_mass_residual(
       // for the prestress values at the quadrature points
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
-      lassem_s->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], 
+      locassem_s->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], 
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0]);
 
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_s->Tangent00, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_s->Tangent11, ADD_VALUES);
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s->Residual0, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_s->Residual0, ADD_VALUES);
     } 
 
   }
@@ -247,7 +252,7 @@ void PGAssem_FSI::Assem_mass_residual(
 
   VecAssemblyBegin(G); VecAssemblyEnd(G);
 
-  EssBC_KG( nbc_v, nbc_p );
+  EssBC_KG();
 
   MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY); MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(G); VecAssemblyEnd(G);
@@ -311,11 +316,11 @@ void PGAssem_FSI::Assem_Residual(
 
     if( locelem->get_elem_tag(ee) == 0 )
     {
-      lassem_f -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+      locassem_f -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z );
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_f->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_f->Residual1, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_f->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, locassem_f->Residual1, ADD_VALUES);
     }
     else
     {
@@ -323,11 +328,11 @@ void PGAssem_FSI::Assem_Residual(
       // for the prestress values at the quadrature points
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
-      lassem_s -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+      locassem_s -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_s->Residual1, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_s->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, locassem_s->Residual1, ADD_VALUES);
     }
   }
 
@@ -407,19 +412,19 @@ void PGAssem_FSI::Assem_Tangent_Residual(
 
     if( locelem->get_elem_tag(ee) == 0 )
     {
-      lassem_f -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+      locassem_f -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z );
 
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_f->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_f->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_f->Tangent01, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, locassem_f->Tangent01, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_f->Tangent10, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, locassem_f->Tangent10, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_f->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_f->Tangent11, ADD_VALUES);
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_f->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_f->Residual1, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_f->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, locassem_f->Residual1, ADD_VALUES);
     }
     else
     {
@@ -427,19 +432,19 @@ void PGAssem_FSI::Assem_Tangent_Residual(
       // for the prestress values at the quadrature points
       const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
 
-      lassem_s -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
+      locassem_s -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
 
-      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, lassem_s->Tangent00, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v, 3*nLocBas, row_id_v, locassem_s->Tangent00, ADD_VALUES);
 
-      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, lassem_s->Tangent01, ADD_VALUES);
+      MatSetValues(K, 3*nLocBas, row_id_v,   nLocBas, row_id_p, locassem_s->Tangent01, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, lassem_s->Tangent10, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p, 3*nLocBas, row_id_v, locassem_s->Tangent10, ADD_VALUES);
 
-      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, lassem_s->Tangent11, ADD_VALUES);
+      MatSetValues(K,   nLocBas, row_id_p,   nLocBas, row_id_p, locassem_s->Tangent11, ADD_VALUES);
 
-      VecSetValues(G, 3*nLocBas, row_id_v, lassem_s->Residual0, ADD_VALUES);
-      VecSetValues(G,   nLocBas, row_id_p, lassem_s->Residual1, ADD_VALUES);
+      VecSetValues(G, 3*nLocBas, row_id_v, locassem_s->Residual0, ADD_VALUES);
+      VecSetValues(G,   nLocBas, row_id_p, locassem_s->Residual1, ADD_VALUES);
     }
   }
 

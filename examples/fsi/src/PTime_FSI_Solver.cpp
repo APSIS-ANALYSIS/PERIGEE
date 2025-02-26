@@ -1,7 +1,7 @@
 #include "PTime_FSI_Solver.hpp"
 
 PTime_FSI_Solver::PTime_FSI_Solver(
-    std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+    std::unique_ptr<PNonlinear_FSI_Solver> in_nsolver,
     const std::string &input_name,      
     const int &input_record_freq, const int &input_renew_tang_freq, 
     const double &input_final_time )
@@ -75,6 +75,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     std::unique_ptr<PDNSolution> init_disp,
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_pres,
+    std::unique_ptr<PDNTimeStep> time_info,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
     const ALocal_InflowBC * const &infnbc,
@@ -85,7 +86,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
 {
   auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
   auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
-  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
   auto pre_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
   auto pre_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
@@ -144,11 +145,11 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     bool conv_flag;
-    nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
-        time_info->get_step(), is_v, is_p,pre_dot_disp, pre_dot_velo, pre_dot_pres, 
-        pre_disp, pre_velo, pre_pres, pnode_v, pnode_p, infnbc, gbc, ps_ptr, 
-        gassem_ptr, gassem_mesh_ptr, cur_dot_disp, cur_dot_velo, cur_dot_pres, 
-        cur_disp, cur_velo, cur_pres, conv_flag, nl_counter );
+    nsolver -> GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
+        time_info->get_step(), is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(), 
+        pre_disp.get(), pre_velo.get(), pre_pres.get(), pnode_v, pnode_p, infnbc, gbc, ps_ptr, 
+        gassem_ptr, gassem_mesh_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), 
+        cur_disp.get(), cur_velo.get(), cur_pres.get(), conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 
@@ -178,19 +179,19 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     }
 
     // Calculate the flow rate on all outlets
-    for(int face=0; face<ebc_v -> get_num_ebc(); ++face)
+    for(int face=0; face<gbc -> get_num_ebc(); ++face)
     {
       // Calculate 3D dot flow rate on the outlets
-      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_dot_velo, face );
+      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp.get(),
+          cur_dot_velo.get(), face );
 
       // Calculate 3D flow rate on the outlets
-      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_velo, face);
+      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp.get(),
+          cur_velo.get(), face);
 
       // Calculate 3D averaged pressure on outlets
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, face);
+          cur_disp.get(), cur_pres.get(), face);
 
       // Calculate 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -219,10 +220,10 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     for(int face=0; face<infnbc -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_disp, cur_velo, infnbc, face );
+          cur_disp.get(), cur_velo.get(), infnbc, face );
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, infnbc, face );
+          cur_disp.get(), cur_pres.get(), infnbc, face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
@@ -234,13 +235,13 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
       MPI_Barrier(PETSC_COMM_WORLD);
     }
 
-    pre_dot_disp -> Copy( cur_dot_disp );
-    pre_dot_velo -> Copy( cur_dot_velo );
-    pre_dot_pres -> Copy( cur_dot_pres );
+    pre_dot_disp -> Copy( cur_dot_disp.get() );
+    pre_dot_velo -> Copy( cur_dot_velo.get() );
+    pre_dot_pres -> Copy( cur_dot_pres.get() );
 
-    pre_disp -> Copy( cur_disp );
-    pre_velo -> Copy( cur_velo );
-    pre_pres -> Copy( cur_pres );
+    pre_disp -> Copy( cur_disp.get() );
+    pre_velo -> Copy( cur_velo.get() );
+    pre_pres -> Copy( cur_pres.get() );
   }
 }
 
@@ -255,6 +256,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     std::unique_ptr<PDNSolution> init_disp,
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_pres,
+    std::unique_ptr<PDNTimeStep> time_info,
     const APart_Node * const &pnode_v,
     const APart_Node * const &pnode_p,
     Tissue_prestress * const &ps_ptr,
@@ -262,7 +264,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
 {
   auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
   auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
-  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
   auto pre_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
   auto pre_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
@@ -277,7 +279,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
   auto cur_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
   bool prestress_conv_flag = false, renew_flag;
-  int nl_counter = nsolver_ptr -> get_non_max_its();
+  int nl_counter = nsolver -> get_non_max_its();
 
   SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -309,7 +311,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     Nullify_solid_dof( pnode_v, 3, cur_velo.get() );
     Nullify_solid_dof( pnode_p, 1, cur_pres.get() );
 
-    nsolver_ptr -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
+    nsolver -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
         time_info->get_time(), time_info->get_step(), is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), 
         pre_dot_pres.get(), pre_disp.get(), pre_velo.get(), pre_pres.get(), pnode_v, pnode_p, ps_ptr, 
         gassem_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), cur_disp.get(), 
@@ -343,13 +345,13 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
       cur_dot_pres->WriteBinary(sol_dot_name);
     }
 
-    pre_dot_disp -> Copy( cur_dot_disp );
-    pre_dot_velo -> Copy( cur_dot_velo );
-    pre_dot_pres -> Copy( cur_dot_pres );
+    pre_dot_disp -> Copy( cur_dot_disp.get() );
+    pre_dot_velo -> Copy( cur_dot_velo.get() );
+    pre_dot_pres -> Copy( cur_dot_pres.get() );
 
-    pre_disp -> Copy( cur_disp );
-    pre_velo -> Copy( cur_velo );
-    pre_pres -> Copy( cur_pres );
+    pre_disp -> Copy( cur_disp.get() );
+    pre_velo -> Copy( cur_velo.get() );
+    pre_pres -> Copy( cur_pres.get() );
   }
 }
 
