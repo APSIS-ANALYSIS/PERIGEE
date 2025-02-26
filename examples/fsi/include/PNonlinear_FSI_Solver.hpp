@@ -38,6 +38,10 @@ class PNonlinear_FSI_Solver
 
     void print_info() const;
 
+    void print_lsolver_info() const {lsolver->print_info();}
+
+    void print_lsolver_mesh_info() const {lsolver_mesh->print_info();}
+
     void GenAlpha_Seg_solve_FSI(
         const bool &new_tangent_flag,
         const double &curr_time,

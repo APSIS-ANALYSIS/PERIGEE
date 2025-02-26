@@ -24,6 +24,10 @@ class PTime_FSI_Solver
 
     void print_info() const;
 
+    void print_lsolver_info() const {nsolver -> print_lsolver_info();}
+
+    void print_lsolver_mesh_info() const {nsolver -> print_lsolver_mesh_info();}
+
     // ------------------------------------------------------------------------
     // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
     // ------------------------------------------------------------------------

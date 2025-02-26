@@ -7,27 +7,8 @@
 #include "HDF5_Tools.hpp"
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
-#include "APart_Node_FSI.hpp"
-#include "ALocal_EBC_outflow.hpp"
-#include "QuadPts_Gauss_Triangle.hpp"
-#include "QuadPts_Gauss_Quad.hpp"
-#include "QuadPts_Gauss_Tet.hpp"
-#include "QuadPts_Gauss_Hex.hpp"
-#include "FEAElement_Triangle3_3D_der0.hpp"
-#include "FEAElement_Quad4_3D_der0.hpp"
-#include "FEAElement_Tet4.hpp"
-#include "FEAElement_Hex8.hpp"
 #include "FlowRateFactory.hpp"
-#include "GenBC_Resistance.hpp"
-#include "GenBC_RCR.hpp"
-#include "GenBC_Inductance.hpp"
-#include "GenBC_Coronary.hpp"
-#include "GenBC_Pressure.hpp"
-#include "MaterialModel_vol_Incompressible.hpp"
-#include "MaterialModel_vol_ST91.hpp"
-#include "MaterialModel_vol_M94.hpp"
-#include "MaterialModel_ich_NeoHookean.hpp"
-#include "MaterialModel_ich_GOH14.hpp"
+#include "GenBCFactory.hpp"
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
@@ -323,41 +304,44 @@ int main(int argc, char *argv[])
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
-  PetscInt * is_array_velo = new PetscInt[ idx_v_len ];
-  for(int ii=0; ii<idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
+  // PetscInt * is_array_velo = new PetscInt[ idx_v_len ];
+  // for(int ii=0; ii<idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
 
-  PetscInt * is_array_pres = new PetscInt[ idx_p_len ];
-  for(int ii=0; ii<idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
+  // PetscInt * is_array_pres = new PetscInt[ idx_p_len ];
+  // for(int ii=0; ii<idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
   
-  IS is_velo, is_pres;
-  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo, PETSC_COPY_VALUES, &is_velo);
-  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres, PETSC_COPY_VALUES, &is_pres);
+  auto is_array_velo = std::make_unique<PetscInt[]>(idx_v_len);
+  for (int ii = 0; ii < idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
 
-  delete [] is_array_velo; is_array_velo = nullptr;
-  delete [] is_array_pres; is_array_pres = nullptr;
+  auto is_array_pres = std::make_unique<PetscInt[]>(idx_p_len);
+  for (int ii = 0; ii < idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
+
+  IS is_velo, is_pres;
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo.get(), PETSC_COPY_VALUES, &is_velo);
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres.get(), PETSC_COPY_VALUES, &is_pres);
+
+  // delete [] is_array_velo; is_array_velo = nullptr;
+  // delete [] is_array_pres; is_array_pres = nullptr;
   // ================================================================
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   std::vector<int> start_idx{ idx_v_start, idx_p_start };
-
-  Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
-  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
+  
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>( idx_v_len + idx_p_len );
+  pmat->gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   const int idx_m_start = pNode_v->get_node_loc(0) * locnbc_v->get_dof_LID();
   std::vector<int> start_m_idx{ idx_m_start };
   
-  Matrix_PETSc * mmat = new Matrix_PETSc( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
+  auto mmat = SYS_T::make_unique<Matrix_PETSc>( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
   mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list, start_m_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
-
-  if( is_backward_Euler )
-    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
-  else
-    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
+  auto tm_galpha = is_backward_Euler
+    ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
+    : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
   tm_galpha_ptr->print_info();
 
@@ -392,16 +376,27 @@ int main(int argc, char *argv[])
   std::unique_ptr<IPLocAssem> locAssem_mesh = SYS_T::make_unique<PLocAssem_FSI_Mesh_Laplacian>( ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur );
   
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
-  
-  PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
-  PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
-  PDNSolution * pres = new PDNSolution_P(pNode_p, 0, true, "pres");
+  std::unique_ptr<PDNSolution> base =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), fNode.get(), locinfnbc.get(), 1, true, "base" );
 
-  PDNSolution * dot_velo = new PDNSolution_V(pNode_v, 0, true, "dot_velo");
-  PDNSolution * dot_disp = new PDNSolution_V(pNode_v, 0, true, "dot_disp");
-  PDNSolution * dot_pres = new PDNSolution_P(pNode_p, 0, true, "dot_pres");
-  
+  std::unique_ptr<PDNSolution> velo =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "velo" );
+
+  std::unique_ptr<PDNSolution> disp =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "disp" );
+
+  std::unique_ptr<PDNSolution> pres =
+    SYS_T::make_unique<PDNSolution_P>( pNode_p.get(), 0, true, "pres" );  
+
+  std::unique_ptr<PDNSolution> dot_velo =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "dot_velo" );
+
+  std::unique_ptr<PDNSolution> dot_disp =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "dot_disp" );
+
+  std::unique_ptr<PDNSolution> dot_pres =
+    SYS_T::make_unique<PDNSolution_P>( pNode_p.get(), 0, true, "dot_pres" );  
+
   if( is_restart )
   {
     initial_index = restart_index;
@@ -446,23 +441,14 @@ int main(int argc, char *argv[])
   }
 
   // ===== Time step info =====
-  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
+      initial_step);
 
   // ===== GenBC =====
   IGenBC * gbc = nullptr;
 
-  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-    gbc = new GenBC_Resistance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
-    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
-    gbc = new GenBC_Inductance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
-    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-    gbc = new GenBC_Pressure( lpn_file, initial_time );
-  else
-    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+  auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
+      initial_index, 1000);
 
   gbc -> print_info();
 
@@ -502,7 +488,7 @@ int main(int argc, char *argv[])
   if( is_restart == false )
   {
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
         1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
     KSPSetType(lsolver_acce->ksp, KSPGMRES);
@@ -542,13 +528,13 @@ int main(int argc, char *argv[])
   }
 
   // ===== Linear and nonlinear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   PC upc; lsolver->GetPC(&upc);
   PCFieldSplitSetIS(upc, "u", is_velo);
   PCFieldSplitSetIS(upc, "p", is_pres);
 
-  PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
+  auto mesh_lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>(
       1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
 
   gloAssem_mesh->Assem_tangent_residual( disp, disp, 0.0,
@@ -565,17 +551,24 @@ int main(int argc, char *argv[])
   // ===== Nonlinear solver context =====
   PNonlinear_FSI_Solver * nsolver = new PNonlinear_FSI_Solver(
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_rethred);
+
+  auto nsolver = SYS_T::make_unique<PNonlinear_FSI_Solver>(
+      std::move(lsolver), td::move(mesh_lsolver), std::move(pmat), 
+      std::move(mmat), std::move(tm_galpha), std::move(inflow_rate), 
+      std::move(base), nl_rtol, nl_atol, nl_dtol, nl_maxits, 
+      nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_FSI_Solver * tsolver = new PTime_FSI_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
+  auto tsolver = SYS_T::make_unique<PTime_FSI_Solver>(
+      std::move(nsolver), sol_bName, sol_record_freq, 
+      ttan_renew_freq, final_time );
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
-  for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem -> Assem_surface_flowrate( disp, dot_velo, ff );
 
@@ -656,32 +649,24 @@ int main(int argc, char *argv[])
   PetscLogEventBegin(tsolver_event, 0,0,0,0);
 #endif
 
-  tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
+  tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
-      tm_galpha_ptr, timeinfo, inflow_rate.get(), locElem, locIEN_v, locIEN_p, 
-      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
-      locebc_v, locebc_p, mesh_locebc, 
-      gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
-      locAssem_fluid, locAssem_solid, locAssem_mesh,
-      gloAssem, gloAssem_mesh, lsolver, mesh_lsolver, nsolver);
+      pNode_v, pNode_p, locinfnbc, gbc, ps_data, 
+      gloAssem, gloAssem_mesh);
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);
 #endif
 
   // Print complete solver info
-  lsolver -> print_info();
-  mesh_lsolver -> print_info();
+  tsolver -> print_lsolver_info();
+  tsolver -> print_lsolver_mesh_info();
 
   // ===== PETSc Finalize =====
-  delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
-  delete timeinfo; delete gbc;
-  delete pres; delete dot_pres;
-  delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
-  delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  delete elements; delete elementv; delete quadv; delete quads;
-  delete ps_data;
+  tsolver.reset(); locinfnbc.reset(); gbc.reset(); gloAssem.reset(); gloAssem_mesh.reset();
+  ps_data.reset();
+
   PetscFinalize();
   return EXIT_SUCCESS;
 }
