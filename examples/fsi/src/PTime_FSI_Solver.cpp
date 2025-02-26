@@ -310,10 +310,10 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     Nullify_solid_dof( pnode_p, 1, cur_pres.get() );
 
     nsolver_ptr -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
-        time_info->get_time(), time_info->get_step(), is_v, is_p,
-        pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres,
-        pnode_v, pnode_p, ps_ptr, gassem_ptr, cur_dot_disp, cur_dot_velo, 
-        cur_dot_pres, cur_disp, cur_velo, cur_pres, prestress_conv_flag, nl_counter );
+        time_info->get_time(), time_info->get_step(), is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), 
+        pre_dot_pres.get(), pre_disp.get(), pre_velo.get(), pre_pres.get(), pnode_v, pnode_p, ps_ptr, 
+        gassem_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), cur_disp.get(), 
+        cur_velo.get(), cur_pres.get(), prestress_conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 

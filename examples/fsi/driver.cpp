@@ -651,8 +651,8 @@ int main(int argc, char *argv[])
 
   tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, 
       dot_disp, dot_velo, dot_pres, disp, velo, pres, 
-      pNode_v, pNode_p, locinfnbc, gbc, ps_data, 
-      gloAssem, gloAssem_mesh);
+      pNode_v.get(), pNode_p.get(), locinfnb.get(), gbc.get(), 
+      ps_data.get(), gloAssem.get(), gloAssem_mesh.get());
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);

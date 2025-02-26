@@ -161,45 +161,45 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   pres -> Copy( pre_pres );
 
   // Define intermediate solutions
-  PDNSolution * dot_disp_alpha = new PDNSolution( pre_dot_disp ); 
+  auto dot_disp_alpha = std::make_unique<PDNSolution>(pre_dot_disp);
   dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
 
-  PDNSolution * dot_velo_alpha = new PDNSolution( pre_dot_velo );
+  auto dot_velo_alpha = std::make_unique<PDNSolution>(pre_dot_velo);
   dot_velo_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_velo_alpha -> PlusAX( dot_velo, alpha_m );
 
-  PDNSolution * dot_pres_alpha = new PDNSolution( pre_dot_pres );
+  auto dot_pres_alpha = std::make_unique<PDNSolution>(pre_dot_pres);
   dot_pres_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_pres_alpha -> PlusAX( dot_pres, alpha_m );
 
-  PDNSolution * disp_alpha = new PDNSolution( pre_disp );
+  auto disp_alpha = std::make_unique<PDNSolution>(pre_disp);
   disp_alpha -> ScaleValue( 1.0 - alpha_f );
   disp_alpha -> PlusAX( disp, alpha_f );
 
-  PDNSolution * velo_alpha = new PDNSolution( pre_velo );
+  auto velo_alpha = std::make_unique<PDNSolution>(pre_velo);
   velo_alpha -> ScaleValue( 1.0 - alpha_f );
   velo_alpha -> PlusAX( velo, alpha_f );
 
-  PDNSolution * pres_alpha = new PDNSolution( pre_pres );
+  auto pres_alpha = std::make_unique<PDNSolution>(pre_pres);
   pres_alpha -> ScaleValue( 1.0 - alpha_f );
   pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
-  PDNSolution * Delta_dot_disp = new PDNSolution_V( pnode_v, 0, false, "delta_dot_disp" );
+  std::unique_ptr<PDNSolution> Delta_dot_disp = std::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
 
-  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
-  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp );
+  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
+  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
 
   // Now update displacement solutions for solid sub-domain
-  dot_disp       -> PlusAX( Delta_dot_disp, 1.0 );
-  disp           -> PlusAX( Delta_dot_disp, gamma * dt );
-  dot_disp_alpha -> PlusAX( Delta_dot_disp, alpha_m );
-  disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
+  dot_disp       -> PlusAX( Delta_dot_disp.get(), 1.0 );
+  disp           -> PlusAX( Delta_dot_disp.get(), gamma * dt );
+  dot_disp_alpha -> PlusAX( Delta_dot_disp.get(), alpha_m );
+  disp_alpha     -> PlusAX( Delta_dot_disp.get(), alpha_f * gamma * dt );
   
   // Update inflow boundary values
   rescale_inflow_value( curr_time + dt,           infnbc_part, velo );
-  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, velo_alpha );
+  rescale_inflow_value( curr_time + alpha_f * dt, infnbc_part, velo_alpha.get() );
 
 #ifdef PETSC_USE_LOG
   PetscLogEventBegin(assem_event_0, 0,0,0,0);
@@ -212,9 +212,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr -> Clear_KG();
 
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt, 
-        dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
-        gbc, ps_ptr );
+        dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+        disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), 
+        dot_velo, velo, disp, gbc, ps_ptr );
 
     SYS_T::commPrint("  --- M updated");
     lsolver->SetOperator(gassem_ptr->K);
@@ -224,9 +224,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr -> Clear_G();
     
     gassem_ptr->Assem_Residual( curr_time, dt, 
-        dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
-        gbc, ps_ptr );
+        dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+        disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), 
+        dot_velo, velo, disp, gbc, ps_ptr );
   }
 
 #ifdef PETSC_USE_LOG
@@ -247,8 +247,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   {
     // Check the residual dot_u_alpha - v_alpha
     Delta_dot_disp -> ScaleValue( 0.0 );
-    update_solid_kinematics(  1.0, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
-    update_solid_kinematics( -1.0, pnode_v,     velo_alpha->solution, Delta_dot_disp );
+    update_solid_kinematics(  1.0, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
+    update_solid_kinematics( -1.0, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
     const double solid_kinematics_residual = Delta_dot_disp -> Norm_2();
     // Finish calculating dot_u_alpha - v_alpha
 
@@ -281,8 +281,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
     update_solid_kinematics( -1.0 * val_1, pnode_v, sol_v, dot_disp );
     update_solid_kinematics( -1.0 * val_1 * gamma * dt, pnode_v, sol_v, disp );
-    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha );
-    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha );
+    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha.get() );
+    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha.get());
 
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
@@ -336,9 +336,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
       gassem_ptr -> Clear_KG();
 
       gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
-          dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-          disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
-          gbc, ps_ptr );
+          dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+          disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), 
+          dot_velo, velo, disp, gbc, ps_ptr );
 
       SYS_T::commPrint("  --- M updated");
       lsolver->SetOperator(gassem_ptr->K);
@@ -348,9 +348,9 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
       gassem_ptr -> Clear_G();
 
       gassem_ptr->Assem_Residual( curr_time, dt,
-          dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-          disp_alpha, velo_alpha, pres_alpha, dot_velo, velo, disp,
-          gbc, ps_ptr );
+          dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+          disp_alpha.get(), velo_alpha.get(), pres_alpha.get(),
+          dot_velo, velo, disp, gbc, ps_ptr );
     }
 
 #ifdef PETSC_USE_LOG
@@ -379,9 +379,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
 
   VecDestroy(&sol_vp);
   VecDestroy(&sol_mesh);
-  delete Delta_dot_disp; 
-  delete dot_disp_alpha; delete dot_velo_alpha; delete dot_pres_alpha;
-  delete disp_alpha; delete velo_alpha; delete pres_alpha;
 }
 
 void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
@@ -429,41 +426,41 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   pres -> Copy( pre_pres );
 
   // Define intermediate solutions
-  PDNSolution * dot_disp_alpha = new PDNSolution( pre_dot_disp );
+  auto dot_disp_alpha = std::make_unique<PDNSolution>(pre_dot_disp);
   dot_disp_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_disp_alpha -> PlusAX( dot_disp, alpha_m );
 
-  PDNSolution * dot_velo_alpha = new PDNSolution( pre_dot_velo );
+  auto dot_velo_alpha = std::make_unique<PDNSolution>(pre_dot_velo);
   dot_velo_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_velo_alpha -> PlusAX( dot_velo, alpha_m );
 
-  PDNSolution * dot_pres_alpha = new PDNSolution( pre_dot_pres );
+  auto dot_pres_alpha = std::make_unique<PDNSolution>(pre_dot_pres);
   dot_pres_alpha -> ScaleValue( 1.0 - alpha_m );
   dot_pres_alpha -> PlusAX( dot_pres, alpha_m );
 
-  PDNSolution * disp_alpha = new PDNSolution( pre_disp );
+  auto disp_alpha = std::make_unique<PDNSolution>(pre_disp);
   disp_alpha -> ScaleValue( 1.0 - alpha_f );
   disp_alpha -> PlusAX( disp, alpha_f );
 
-  PDNSolution * velo_alpha = new PDNSolution( pre_velo );
+  auto velo_alpha = std::make_unique<PDNSolution>(pre_velo);
   velo_alpha -> ScaleValue( 1.0 - alpha_f );
   velo_alpha -> PlusAX( velo, alpha_f );
 
-  PDNSolution * pres_alpha = new PDNSolution( pre_pres );
+  auto pres_alpha = std::make_unique<PDNSolution>(pre_pres);
   pres_alpha -> ScaleValue( 1.0 - alpha_f );
   pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
-  PDNSolution * Delta_dot_disp = new PDNSolution_V( pnode_v, 0, false, "delta_dot_disp" );
+  std::unique_ptr<PDNSolution> Delta_dot_disp = std::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
 
-  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp );
-  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp );
+  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
+  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
 
   // Now update displacement solutions for solid sub-domain
-  dot_disp       -> PlusAX( Delta_dot_disp, 1.0 );
-  disp           -> PlusAX( Delta_dot_disp, gamma * dt );
-  dot_disp_alpha -> PlusAX( Delta_dot_disp, alpha_m );
-  disp_alpha     -> PlusAX( Delta_dot_disp, alpha_f * gamma * dt );
+  dot_disp       -> PlusAX( Delta_dot_disp.get(), 1.0 );
+  disp           -> PlusAX( Delta_dot_disp.get(), gamma * dt );
+  dot_disp_alpha -> PlusAX( Delta_dot_disp.get(), alpha_m );
+  disp_alpha     -> PlusAX( Delta_dot_disp.get(), alpha_f * gamma * dt );
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -472,8 +469,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     gassem_ptr -> Clear_KG();
 
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
-        dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha, ps_ptr );
+        dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+        disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
 
     SYS_T::commPrint("  --- M updated");
     lsolver->SetOperator(gassem_ptr->K);
@@ -483,8 +480,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     gassem_ptr -> Clear_G();
 
     gassem_ptr->Assem_Residual( curr_time, dt,
-        dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-        disp_alpha, velo_alpha, pres_alpha, ps_ptr );
+        dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+        disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -517,8 +514,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
     update_solid_kinematics( -1.0 * val_1, pnode_v, sol_v, dot_disp );
     update_solid_kinematics( -1.0 * val_1 * gamma * dt, pnode_v, sol_v, disp );
-    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha );
-    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha );
+    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha.get() );
+    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha.get() );
 
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
@@ -529,8 +526,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
       gassem_ptr -> Clear_KG();
 
       gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
-          dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-          disp_alpha, velo_alpha, pres_alpha, ps_ptr );
+          dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+          disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
 
       SYS_T::commPrint("  --- M updated");
       lsolver->SetOperator(gassem_ptr->K);
@@ -540,8 +537,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
       gassem_ptr -> Clear_G();
 
       gassem_ptr->Assem_Residual( curr_time, dt,
-          dot_disp_alpha, dot_velo_alpha, dot_pres_alpha,
-          disp_alpha, velo_alpha, pres_alpha, ps_ptr );
+          dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
+          disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
@@ -570,9 +567,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
   VecDestroy(&sol_vp);
-  delete Delta_dot_disp;
-  delete dot_disp_alpha; delete dot_velo_alpha; delete dot_pres_alpha;
-  delete disp_alpha; delete velo_alpha; delete pres_alpha;
 }
 
 // EOF
