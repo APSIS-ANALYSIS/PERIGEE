@@ -199,7 +199,7 @@ int main( int argc, char *argv[] )
 
   auto locnbc_v = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
 
-  auto locnbc_p = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
+  auto locnbc_p = SYS_T::make_unique<ALocal_NBC>(part_p_file, rank, "/nbc/MF");
 
   auto ps_data = SYS_T::make_unique<Tissue_prestress>(locElem.get(), nqp_vol, rank, is_load_ps, ps_file_name);
  
