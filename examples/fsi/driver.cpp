@@ -254,7 +254,7 @@ int main(int argc, char *argv[])
 
   auto fNode_mesh = SYS_T::make_unique<FEANode>(part_v_file, rank);
 
-  auto pNode_v = SYS_T::make_unique<APart_Node>(part_v_file, rank);
+  std::unique_ptr<APart_Node> pNode_v = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
 
   auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
 
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 
   auto locnbc_v = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
 
-  auto locnbc_p = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
+  auto locnbc_p = SYS_T::make_unique<ALocal_NBC>(part_p_file, rank, "/nbc/MF");
 
   auto mesh_locnbc = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/mesh_nbc/MF");
 
@@ -511,12 +511,9 @@ int main(int argc, char *argv[])
 
     gloAssem->Assem_mass_residual( disp.get(), velo.get(), pres.get(), ps_data.get() );
 
-    std::cout<<"xxxxxxxxxxxxxx"<<std::endl;
-
     Vec proj_vp, proj_v, proj_p;
     VecDuplicate( gloAssem->G, &proj_vp );
-
-      std::cout<<"yyyyyyyyyyyyyy"<<std::endl;
+    
     lsolver_acce -> Solve( gloAssem->K, gloAssem->G, proj_vp );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.\n");

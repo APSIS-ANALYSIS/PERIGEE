@@ -14,6 +14,7 @@
 // Date: July 31 2015 
 // ============================================================================
 #include "APart_Node.hpp"
+#include "APart_Node_FSI.hpp"
 #include "ALocal_Elem.hpp"
 #include "AGlobal_Mesh_Info.hpp"
 #include "IPLocAssem.hpp"
