@@ -27,7 +27,6 @@ class PGAssem_NS_FEM : public IPGAssem
   public:
     // Constructor for NS equations
     PGAssem_NS_FEM( 
-        IPLocAssem * const &locassem_ptr,
         FEAElement * const &elements,
         FEAElement * const &elementvs,
         FEAElement * const &elementvs_rotated,
@@ -40,6 +39,7 @@ class PGAssem_NS_FEM : public IPGAssem
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<ALocal_WeakBC> in_wbc,
+        std::unique_ptr<IPLocAssem> in_locassem,
         const ALocal_Interface * const &part_itf,
         SI_T::SI_solution * const &SI_sol,
         SI_T::SI_quad_point * const &SI_qp,
@@ -51,7 +51,6 @@ class PGAssem_NS_FEM : public IPGAssem
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
-        IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         const APart_Node * const &node_ptr,
@@ -164,7 +163,8 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<const ALocal_WeakBC> wbc;
-    
+    const std::unique_ptr<IPLocAssem> locassem;
+
     const int nLocBas, dof_sol, dof_mat, num_ebc, nlgn;
     
     int snLocBas;

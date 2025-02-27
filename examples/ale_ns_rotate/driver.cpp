@@ -104,7 +104,8 @@ int main(int argc, char *argv[])
 
   // Angular velocity
   double angular_velo = 250 * MATH_T::PI; //(rad/s)
-  double angular_thd_time = 1.5; // prescribed time for rotating part to reach angular velocity // 1.5 1.0
+  // prescribed time for rotating part to reach angular velocity // 1.5 1.0
+  double angular_thd_time = 1.5;
 
   // Yaml options
   bool is_loadYaml = true;
@@ -389,7 +390,8 @@ int main(int argc, char *argv[])
   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_Interface(
     tm_galpha.get(), elementv->get_nLocBas(),
     quadv->get_num_quadPts(), elements->get_nLocBas(),
-    fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
+    fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), 
+    angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====
   std::unique_ptr<PDNSolution> base = SYS_T::make_unique<PDNSolution_NS>( pNode, fNode, locinfnbc, 1 );

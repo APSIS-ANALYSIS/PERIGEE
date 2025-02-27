@@ -1,7 +1,6 @@
 #include "PGAssem_NS_FEM.hpp"
 
 PGAssem_NS_FEM::PGAssem_NS_FEM(
-    IPLocAssem * const &locassem_ptr,
     FEAElement * const &elements,
     FEAElement * const &elementvs,
     FEAElement * const &elementvs_rotated,
@@ -14,6 +13,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
     std::unique_ptr<ALocal_WeakBC> in_wbc,
+    std::unique_ptr<IPLocAssem> in_locassem,
     const ALocal_Interface * const &part_itf,
     SI_T::SI_solution * const &SI_sol,
     SI_T::SI_quad_point * const &SI_qp,
@@ -24,18 +24,19 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   nbc( std::move(in_nbc) ),
   ebc( std::move(in_ebc) ),
   wbc( std::move(in_wbc) ),
+  locassem(std::move(in_locassem)),
   nLocBas( agmi_ptr->get_nLocBas() ),
   dof_sol( pnode_ptr->get_dof() ),
-  dof_mat( locassem_ptr->get_dof_mat() ),
+  dof_mat( locassem->get_dof_mat() ),
   num_ebc( ebc->get_num_ebc() ),
   nlgn( pnode_ptr->get_nlocghonode() ),
   snLocBas( 0 ),
-  anci( locassem_ptr, elementvs, elementvs_rotated,
+  anci( locassem, elementvs, elementvs_rotated,
     quads, free_quad, part_itf, SI_sol, SI_qp )
 {
   // Make sure the data structure is compatible
-  SYS_T::print_fatal_if(dof_sol != locassem_ptr->get_dof(),
-      "PGAssem_NS_FEM::dof_sol != locassem_ptr->get_dof(). \n");
+  SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
+      "PGAssem_NS_FEM::dof_sol != locassem->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat != nbc->get_dof_LID(),
       "PGAssem_NS_FEM::dof_mat != part_nbc->get_dof_LID(). \n");
@@ -66,7 +67,7 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
-  Assem_nonzero_estimate( locassem_ptr, elements, quads, pnode_ptr, gbc );
+  Assem_nonzero_estimate( elements, quads, pnode_ptr, gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -137,7 +138,6 @@ void PGAssem_NS_FEM::EssBC_G( const int &field )
 }
 
 void PGAssem_NS_FEM::Assem_nonzero_estimate(
-    IPLocAssem * const &lassem_ptr,
     FEAElement * const &elements,
     const IQuadPts * const &quad_s,
     const APart_Node * const &node_ptr,
@@ -146,7 +146,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
 
-  lassem_ptr->Assem_Estimate();
+  locassem->Assem_Estimate();
 
   PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
 
@@ -161,7 +161,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
     }
     
     MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        lassem_ptr->Tangent, ADD_VALUES);
+        locassem->Tangent, ADD_VALUES);
   }
 
   delete [] row_index; row_index = nullptr;
@@ -170,11 +170,11 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
   PDNSolution * temp = new PDNSolution_NS( node_ptr, 0, false );
 
   // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  // NatBC_Resis_KG( 0.0, 0.1, temp, temp, lassem_ptr, elements, quad_s, gbc );
+  // NatBC_Resis_KG( 0.0, 0.1, temp, temp, elements, quad_s, gbc );
 
   delete temp;
 
-  Interface_KG(0.1, lassem_ptr, anci.A_anchor_elementv, anci.A_opposite_elementv,
+  Interface_KG(0.1, anci.A_anchor_elementv, anci.A_opposite_elementv,
     anci.A_quad_s, anci.A_free_quad, anci.A_itf_part, anci.A_SI_sol, anci.A_SI_qp);
 
   VecAssemblyBegin(G);

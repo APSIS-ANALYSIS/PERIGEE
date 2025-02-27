@@ -147,7 +147,6 @@ class IPGAssem
 
     // Nonzero pattern estimate for the NS equations
     virtual void Assem_nonzero_estimate(
-        IPLocAssem * const &lassem_ptr,
         FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         const APart_Node * const &node_ptr,
