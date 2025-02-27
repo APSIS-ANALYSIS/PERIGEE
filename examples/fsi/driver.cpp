@@ -328,7 +328,7 @@ int main(int argc, char *argv[])
   std::vector<int> start_idx{ idx_v_start, idx_p_start };
 
   auto pmat = SYS_T::make_unique<Matrix_PETSc>( idx_v_len + idx_p_len );
-  pmat->gen_perm_bc( pNode_list, locnbc_list, start_idx );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   const int idx_m_start = pNode_v->get_node_loc(0) * locnbc_v->get_dof_LID();
   std::vector<int> start_m_idx{ idx_m_start };
