@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
-
+  
   // ===== Main Data Strucutre =====
   // Control points are only stored for the geometry-defining field, that is the velo/disp
   // field.
