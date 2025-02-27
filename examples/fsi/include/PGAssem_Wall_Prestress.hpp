@@ -68,7 +68,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
     const std::unique_ptr<const ALocal_EBC> ebc_v;
     const std::unique_ptr<const ALocal_EBC> ebc_p;
     const std::unique_ptr<IPLocAssem_2x2Block> locassem_s;
-    const std::unique_ptr<const Tissue_prestress> ps;
+    const std::unique_ptr<Tissue_prestress> ps;
 
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 

@@ -276,9 +276,9 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<ALocal_EBC> locebc_v = SYS_T::make_unique<ALocal_EBC_outflow>(part_v_file, rank);
 
-  std::unique_ptr<ALocal_EBC> locebc_p = SYS_T::make_unique<ALocal_EBC>(part_p_file, rank);
+  auto locebc_p = SYS_T::make_unique<ALocal_EBC>(part_p_file, rank);
 
-  std::unique_ptr<ALocal_EBC> mesh_locebc = SYS_T::make_unique<ALocal_EBC>(part_v_file, rank, "/mesh_ebc");
+  auto mesh_locebc = SYS_T::make_unique<ALocal_EBC>(part_v_file, rank, "/mesh_ebc");
 
   auto ps_data = SYS_T::make_unique<Tissue_prestress>(locElem.get(), nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
@@ -313,12 +313,6 @@ int main(int argc, char *argv[])
 
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
-
-  // PetscInt * is_array_velo = new PetscInt[ idx_v_len ];
-  // for(int ii=0; ii<idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
-
-  // PetscInt * is_array_pres = new PetscInt[ idx_p_len ];
-  // for(int ii=0; ii<idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
   
   auto is_array_velo = SYS_T::make_unique<PetscInt>(static_cast<size_t>(idx_v_len));
   for (int ii = 0; ii < idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
@@ -329,10 +323,6 @@ int main(int argc, char *argv[])
   IS is_velo, is_pres;
   ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo.get(), PETSC_COPY_VALUES, &is_velo);
   ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres.get(), PETSC_COPY_VALUES, &is_pres);
-
-  // delete [] is_array_velo; is_array_velo = nullptr;
-  // delete [] is_array_pres; is_array_pres = nullptr;
-  // ================================================================
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   std::vector<int> start_idx{ idx_v_start, idx_p_start };

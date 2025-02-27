@@ -29,6 +29,30 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
   pnode_v(std::move(in_pnode_v))
 {}
 
+PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
+    std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
+    std::unique_ptr<Matrix_PETSc> in_bc_mat,
+    std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+    std::unique_ptr<APart_Node> in_pnode_v,
+    const double &input_nrtol, const double &input_natol,
+    const double &input_ndtol,
+    const int &input_max_iteration, 
+    const int &input_renew_freq,
+    const int &input_renew_threshold )
+: nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
+  nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
+  nrenew_threshold(input_renew_threshold),
+  gassem_mesh(nullptr),
+  lsolver(std::move(in_lsolver)),
+  lsolver_mesh(nullptr),
+  bc_mat(std::move(in_bc_mat)),
+  bc_mesh_mat(nullptr),
+  tmga(std::move(in_tmga)),
+  flrate(nullptr),
+  sol_base(nullptr),
+  pnode_v(std::move(in_pnode_v))
+{}
+
 PNonlinear_FSI_Solver::~PNonlinear_FSI_Solver()
 {}
 

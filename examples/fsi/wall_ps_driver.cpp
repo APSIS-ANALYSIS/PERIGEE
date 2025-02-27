@@ -7,8 +7,6 @@
 // ============================================================================
 #include "HDF5_Tools.hpp"
 #include "ANL_Tools.hpp"
-#include "FlowRateFactory.hpp"
-#include "GenBCFactory.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_vol_M94.hpp"
@@ -42,7 +40,7 @@ int main( int argc, char *argv[] )
   double nl_dtol    = 1.0e3;         // divergence criterion
   int    nl_maxits  = 20;            // maximum number if nonlinear iterations
   int    nl_refreq  = 4;             // frequency of tangent matrix renewal
-  int    nl_rethred = 4;             // threshold of tangent matrix renewal
+  int    nl_threshold = 4;             // threshold of tangent matrix renewal
 
   // Time stepping parameters
   double initial_time = 0.0;         // time of initial condition
@@ -122,7 +120,7 @@ int main( int argc, char *argv[] )
   SYS_T::GetOptionReal(  "-nl_dtol",             nl_dtol);
   SYS_T::GetOptionInt(   "-nl_maxits",           nl_maxits);
   SYS_T::GetOptionInt(   "-nl_refreq",           nl_refreq);
-  SYS_T::GetOptionInt(   "-nl_rethred",          nl_rethred);
+  SYS_T::GetOptionInt(   "-nl_rethred",          nl_threshold);
   SYS_T::GetOptionBool(  "-is_backward_Euler",   is_backward_Euler);
   SYS_T::GetOptionReal(  "-init_time",           initial_time);
   SYS_T::GetOptionReal(  "-fina_time",           final_time);
@@ -144,7 +142,7 @@ int main( int argc, char *argv[] )
   SYS_T::cmdPrint(       "-nl_dtol:",            nl_dtol);
   SYS_T::cmdPrint(       "-nl_maxits:",          nl_maxits);
   SYS_T::cmdPrint(       "-nl_refreq:",          nl_refreq);
-  SYS_T::cmdPrint(       "-nl_rethred",          nl_rethred);
+  SYS_T::cmdPrint(       "-nl_rethred",          nl_threshold);
 
   if( is_backward_Euler )
     SYS_T::commPrint(    "-is_backward_Euler: true \n");
@@ -193,6 +191,12 @@ int main( int argc, char *argv[] )
 
   std::unique_ptr<APart_Node> pNode_p = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
 
+  std::unique_ptr<APart_Node> pNode_v_time = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
+
+  std::unique_ptr<APart_Node> pNode_p_time = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
+
+  std::unique_ptr<APart_Node> pNode_v_nlinear = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
+
   auto locebc_v = SYS_T::make_unique<ALocal_EBC>(part_v_file, rank);
 
   auto locebc_p = SYS_T::make_unique<ALocal_EBC>(part_p_file, rank);
@@ -225,37 +229,30 @@ int main( int argc, char *argv[] )
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
 
-  PetscInt * is_array_velo = new PetscInt[ idx_v_len ];
-  for(int ii=0; ii<idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
+  auto is_array_velo = SYS_T::make_unique<PetscInt>( static_cast<size_t>(idx_v_len) );
+  for (int ii = 0; ii < idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
 
-  PetscInt * is_array_pres = new PetscInt[ idx_p_len ];
-  for(int ii=0; ii<idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
+  auto is_array_pres = SYS_T::make_unique<PetscInt>( static_cast<size_t>(idx_p_len) );
+  for (int ii = 0; ii < idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
 
   IS is_velo, is_pres;
-  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo, PETSC_COPY_VALUES, &is_velo);
-  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres, PETSC_COPY_VALUES, &is_pres);
-
-  delete [] is_array_velo; is_array_velo = nullptr;
-  delete [] is_array_pres; is_array_pres = nullptr;
-  // ================================================================
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo.get(), PETSC_COPY_VALUES, &is_velo);
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres.get(), PETSC_COPY_VALUES, &is_pres);
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   std::vector<int> start_idx{ idx_v_start, idx_p_start };
 
-  Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
-  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>( idx_v_len + idx_p_len );
+  pmat->gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+  auto tm_galpha = is_backward_Euler
+    ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
+    : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
-  if( is_backward_Euler )
-    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
-  else
-    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
-
-  tm_galpha_ptr->print_info();
+  tm_galpha->print_info();
 
   // ===== Local assembly =====
   std::unique_ptr<IPLocAssem_2x2Block> locAssem_solid = nullptr;
@@ -268,7 +265,7 @@ int main( int argc, char *argv[] )
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
     locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
-        ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
+        elemType, nqp_vol, nqp_sur, tm_galpha.get(), std::move(matmodel) );
   }
   else
   {
@@ -277,17 +274,27 @@ int main( int argc, char *argv[] )
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
     locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
-        ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur, tm_galpha_ptr, std::move(matmodel) );
+        elemType, nqp_vol, nqp_sur, tm_galpha.get(), std::move(matmodel) );
   }
 
   // ===== Initial conditions =====
-  PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
-  PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
-  PDNSolution * pres = new PDNSolution_P(pNode_p, 0, true, "pres");
+  std::unique_ptr<PDNSolution> velo =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "velo" );
 
-  PDNSolution * dot_velo = new PDNSolution_V(pNode_v, 0, true, "dot_velo");
-  PDNSolution * dot_disp = new PDNSolution_V(pNode_v, 0, true, "dot_disp");
-  PDNSolution * dot_pres = new PDNSolution_P(pNode_p, 0, true, "dot_pres");
+  std::unique_ptr<PDNSolution> disp =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "disp" );
+
+  std::unique_ptr<PDNSolution> pres =
+    SYS_T::make_unique<PDNSolution_P>( pNode_p.get(), 0, true, "pres" );  
+
+  std::unique_ptr<PDNSolution> dot_velo =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "dot_velo" );
+
+  std::unique_ptr<PDNSolution> dot_disp =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "dot_disp" );
+
+  std::unique_ptr<PDNSolution> dot_pres =
+    SYS_T::make_unique<PDNSolution_P>( pNode_p.get(), 0, true, "dot_pres" ); 
 
   // Read sol file
   SYS_T::file_check(restart_velo_name);
@@ -314,14 +321,16 @@ int main( int argc, char *argv[] )
   SYS_T::commPrint("     restart_dot_pres_name: %s \n", restart_dot_pres_name.c_str());
 
   // ===== Time step info =====
-  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
+      initial_step);
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_Wall_Prestress>(
       std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), std::move(fNode), 
-      std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v),  std::move(locnbc_p), 
-      std::move(locebc_v), std::move(locebc_p), std::move(locAssem_solid), nz_estimate );
+      std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), std::move(locnbc_p), 
+      std::move(locebc_v), std::move(locebc_p), std::move(locAssem_solid), 
+      std::move(ps_data), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem->Assem_nonzero_estimate();
@@ -331,45 +340,43 @@ int main( int argc, char *argv[] )
   gloAssem->Clear_KG();
 
   // ===== Linear and nonlinear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   PC upc; lsolver->GetPC(&upc);
   PCFieldSplitSetIS(upc, "u", is_velo);
   PCFieldSplitSetIS(upc, "p", is_pres);
 
   // ===== Nonlinear solver context =====
-  PNonlinear_FSI_Solver * nsolver = new PNonlinear_FSI_Solver(
-      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_rethred);
+  auto nsolver = SYS_T::make_unique<PNonlinear_FSI_Solver>(
+      std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
+      std::move(pNode_v_nlinear), nl_rtol, nl_atol, nl_dtol, 
+      nl_maxits, nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_FSI_Solver * tsolver = new PTime_FSI_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
+  auto tsolver = SYS_T::make_unique<PTime_FSI_Solver>(
+      std::move(nsolver), std::move(pNode_v_time), std::move(pNode_p_time), 
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver -> TM_FSI_Prestress( is_record_sol, prestress_disp_tol, is_velo, is_pres,
-      dot_disp, dot_velo, dot_pres, disp, velo, pres, tm_galpha_ptr,
-      timeinfo, locElem, locIEN_v, locIEN_p, pNode_v, pNode_p, fNode,
-      locnbc_v, locnbc_p, locebc_v, locebc_p, pmat, elementv, elements,
-      quadv, quads, ps_data, locAssem_solid, gloAssem, lsolver, nsolver );
+      std::move(dot_disp), std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), std::move(pres),
+      std::move(timeinfo), gloAssem.get() );
 
   // ===== Record the wall prestress to h5 file =====
   ps_data -> write_prestress_hdf5();
 
+  // Print complete solver info
+  tsolver -> print_lsolver_info();
+
   // ==========================================================================
   // Clean the memory
-  delete fNode; delete locIEN_v; delete locIEN_p; delete locElem;
-  delete pNode_v; delete pNode_p; delete locebc_v; delete locebc_p; 
-  delete locnbc_v; delete locnbc_p;
-  delete ps_data; delete quadv; delete quads; delete elementv; delete elements;
-  delete pmat; delete tm_galpha_ptr;
-  delete velo; delete disp; delete pres; delete dot_velo; delete dot_disp; delete dot_pres;
-  delete timeinfo; delete lsolver; delete nsolver; delete tsolver;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
+  tsolver.reset(); gloAssem.reset();
   PetscFinalize();
   return EXIT_SUCCESS;
 }

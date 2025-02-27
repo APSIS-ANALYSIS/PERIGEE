@@ -34,6 +34,17 @@ class PNonlinear_FSI_Solver
         const int &input_renew_freq, 
         const int &input_renew_threshold );
 
+    PNonlinear_FSI_Solver(
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
+        std::unique_ptr<Matrix_PETSc> in_bc_mat,
+        std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+        std::unique_ptr<APart_Node> in_pnode_v,
+        const double &input_nrtol, const double &input_natol,
+        const double &input_ndtol,
+        const int &input_max_iteration, 
+        const int &input_renew_freq,
+        const int &input_renew_threshold );
+
     ~PNonlinear_FSI_Solver();
 
     int get_non_max_its() const {return nmaxits;}
