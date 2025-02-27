@@ -100,18 +100,11 @@ class IPLocAssem_2x2Block
     virtual int get_snLocBas_1() const = 0;
 
     // --------------------------------------------------------------
-    // Return the number of quadrature points with field 0
+    // Return the number of quadrature points with physical field
     // --------------------------------------------------------------
-    virtual int get_nqpv_0() const = 0; 
+    virtual int get_nqpv() const = 0; 
 
-    virtual int get_nqps_0() const = 0;
-
-    // --------------------------------------------------------------
-    // Return the number of quadrature points with field 1
-    // --------------------------------------------------------------
-    virtual int get_nqpv_1() const = 0; 
-
-    virtual int get_nqps_1() const = 0;
+    virtual int get_nqps() const = 0;
 
     // -------------------------------------------------------------- 
     // Return the number of ebc functions implemented inside this local

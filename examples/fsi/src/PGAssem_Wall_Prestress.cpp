@@ -449,7 +449,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const PDNSolution * const &pres ) const
 {
   const int nElem = locelem->get_nlocalele();
-  const int nqp   = locassem_s -> get_nqpv_0();
+  const int nqp   = locassem_s -> get_nqpv();
 
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
