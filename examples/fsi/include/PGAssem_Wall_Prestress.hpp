@@ -56,6 +56,8 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &pres ) const;
 
+    virtual void write_prestress_hdf5() const {ps->write_prestress_hdf5();}
+
   private:
     const std::unique_ptr<const ALocal_IEN> locien_v;
     const std::unique_ptr<const ALocal_IEN> locien_p;

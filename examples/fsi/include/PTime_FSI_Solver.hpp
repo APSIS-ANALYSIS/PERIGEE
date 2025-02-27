@@ -30,6 +30,8 @@ class PTime_FSI_Solver
 
     void print_lsolver_mesh_info() const {nsolver -> print_lsolver_mesh_info();}
 
+    void write_prestress_hdf5() const {nsolver->write_prestress_hdf5();}
+
     // ------------------------------------------------------------------------
     // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
     // ------------------------------------------------------------------------

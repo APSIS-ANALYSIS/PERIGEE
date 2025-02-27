@@ -1183,7 +1183,10 @@ class IPGAssem
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres ) const
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}    
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+
+    virtual void write_prestress_hdf5() const
+    {SYS_T::commPrint("Warning: write_prestress_hdf5() is not implemented. \n");}
 };
 
 #endif

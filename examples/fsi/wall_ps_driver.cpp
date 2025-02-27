@@ -368,7 +368,7 @@ int main( int argc, char *argv[] )
       std::move(velo), std::move(pres), std::move(timeinfo) );
 
   // ===== Record the wall prestress to h5 file =====
-  ps_data -> write_prestress_hdf5();
+  tsolver -> write_prestress_hdf5();
 
   // Print complete solver info
   tsolver -> print_lsolver_info();
