@@ -83,8 +83,7 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const ALocal_InflowBC * const &infnbc,
     IGenBC * const &gbc,
     const Tissue_prestress * const &ps_ptr,
-    IPGAssem * const &gassem_ptr,
-    IPGAssem * const &gassem_mesh_ptr ) const
+    IPGAssem * const &gassem_ptr ) const
 {
   auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
   auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
@@ -147,11 +146,11 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     bool conv_flag;
-    nsolver -> GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
-        time_info->get_step(), is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(), 
-        pre_disp.get(), pre_velo.get(), pre_pres.get(), infnbc, gbc, ps_ptr, gassem_ptr, 
-        gassem_mesh_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), 
-        cur_disp.get(), cur_velo.get(), cur_pres.get(), conv_flag, nl_counter );
+    nsolver -> GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),time_info->get_step(), 
+        is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(), pre_disp.get(), 
+        pre_velo.get(), pre_pres.get(), infnbc, gbc, ps_ptr, gassem_ptr, cur_dot_disp.get(), 
+        cur_dot_velo.get(), cur_dot_pres.get(), cur_disp.get(), cur_velo.get(), cur_pres.get(), 
+        conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 

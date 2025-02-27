@@ -59,8 +59,7 @@ class PTime_FSI_Solver
         const ALocal_InflowBC * const &infnbc,
         IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr,
-        IPGAssem * const &gassem_ptr,
-        IPGAssem * const &gassem_mesh_ptr ) const;
+        IPGAssem * const &gassem_ptr ) const;
 
     void TM_FSI_Prestress(
         const bool &is_record_sol_flag,

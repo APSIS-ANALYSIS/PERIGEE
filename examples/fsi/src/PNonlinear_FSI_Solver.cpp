@@ -1,6 +1,7 @@
 #include "PNonlinear_FSI_Solver.hpp"
 
 PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
+    std::unique_ptr<IPGAssem> in_gassem_mesh,  
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver_mesh,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
@@ -17,6 +18,7 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
 : nr_tol(input_nrtol), na_tol(input_natol), nd_tol(input_ndtol),
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold),
+  gassem_mesh(std::move(in_gassem_mesh)),
   lsolver(std::move(in_lsolver)),
   lsolver_mesh(std::move(in_lsolver_mesh)),
   bc_mat(std::move(in_bc_mat)),
@@ -120,7 +122,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const IGenBC * const &gbc,
     const Tissue_prestress * const &ps_ptr,
     IPGAssem * const &gassem_ptr,
-    IPGAssem * const &gassem_mesh_ptr,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
     PDNSolution * const &dot_pres,
@@ -240,7 +241,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   VecDuplicate( gassem_ptr->G, &sol_vp );
 
   Vec sol_mesh;
-  VecDuplicate( gassem_mesh_ptr->G, &sol_mesh );
+  VecDuplicate( gassem_mesh->G, &sol_mesh );
 
   // Now we do consistent Newton-Raphson iteration
   do
@@ -288,13 +289,13 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
 
     // Solve for mesh motion
-    gassem_mesh_ptr -> Clear_G();
+    gassem_mesh -> Clear_G();
 
 #ifdef PETSC_USE_LOG
   PetscLogEventBegin(assem_event_2, 0,0,0,0);
 #endif
 
-    gassem_mesh_ptr -> Assem_residual( pre_disp, disp, curr_time, dt );
+    gassem_mesh -> Assem_residual( pre_disp, disp, curr_time, dt );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(assem_event_2, 0,0,0,0);
@@ -304,7 +305,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     PetscLogEventBegin(solve_mesh_event, 0,0,0,0);
 #endif
     
-    lsolver_mesh -> Solve( gassem_mesh_ptr -> G, sol_mesh );
+    lsolver_mesh -> Solve( gassem_mesh -> G, sol_mesh );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(solve_mesh_event,0,0,0,0);

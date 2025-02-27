@@ -19,7 +19,8 @@
 class PNonlinear_FSI_Solver
 {
   public:
-    PNonlinear_FSI_Solver( 
+    PNonlinear_FSI_Solver(
+        std::unique_ptr<IPGAssem> in_gassem_mesh,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver_mesh,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
@@ -59,7 +60,6 @@ class PNonlinear_FSI_Solver
         const IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr,
         IPGAssem * const &gassem_ptr,
-        IPGAssem * const &gassem_mesh_ptr,
         PDNSolution * const &dot_disp,
         PDNSolution * const &dot_velo,
         PDNSolution * const &dot_pres,
@@ -95,6 +95,7 @@ class PNonlinear_FSI_Solver
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
+    const std::unique_ptr<IPGAssem> gassem_mesh;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver_mesh;
     const std::unique_ptr<Matrix_PETSc> bc_mat;

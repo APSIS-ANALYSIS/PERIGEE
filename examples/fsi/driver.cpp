@@ -558,10 +558,10 @@ int main(int argc, char *argv[])
 
   // ===== Nonlinear solver context =====
   auto nsolver = SYS_T::make_unique<PNonlinear_FSI_Solver>(
-      std::move(lsolver), std::move(mesh_lsolver), std::move(pmat), 
-      std::move(mmat), std::move(tm_galpha), std::move(inflow_rate), 
-      std::move(base), std::move(pNode_v_nlinear), nl_rtol, nl_atol,
-      nl_dtol, nl_maxits, nl_refreq, nl_threshold );
+      std::move(gloAssem_mesh), std::move(lsolver), std::move(mesh_lsolver), 
+      std::move(pmat), std::move(mmat), std::move(tm_galpha), std::move(inflow_rate), 
+      std::move(base), std::move(pNode_v_nlinear), nl_rtol, nl_atol, nl_dtol, 
+      nl_maxits, nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
@@ -657,7 +657,7 @@ int main(int argc, char *argv[])
   tsolver->TM_FSI_GenAlpha( is_restart, is_velo, is_pres, std::move(dot_disp), 
       std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), 
       std::move(pres), std::move(timeinfo), locinfnbc.get(), gbc.get(), ps_data.get(), 
-      gloAssem.get(), gloAssem_mesh.get() );
+      gloAssem.get() );
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);
@@ -669,8 +669,8 @@ int main(int argc, char *argv[])
 
   // ===== PETSc Finalize =====
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  tsolver.reset(); locinfnbc.reset(); gbc.reset(); gloAssem.reset(); 
-  gloAssem_mesh.reset(); ps_data.reset();
+  tsolver.reset(); locinfnbc.reset(); gbc.reset(); 
+  gloAssem.reset(); ps_data.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;
