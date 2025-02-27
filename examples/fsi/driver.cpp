@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
-  
+
   // ===== Main Data Strucutre =====
   // Control points are only stored for the geometry-defining field, that is the velo/disp
   // field.
@@ -326,7 +326,7 @@ int main(int argc, char *argv[])
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   std::vector<int> start_idx{ idx_v_start, idx_p_start };
-  
+
   auto pmat = SYS_T::make_unique<Matrix_PETSc>( idx_v_len + idx_p_len );
   pmat->gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
