@@ -56,7 +56,11 @@ class PNonlinear_FSI_Solver
 
     void print_lsolver_mesh_info() const {lsolver_mesh->print_info();}
 
-    void write_prestress_hdf5() const {gassem_prestress->write_prestress_hdf5();}
+    void write_prestress_hdf5() const
+    {
+      SYS_T::print_fatal_if( gassem_prestress == nullptr, "Error: gassem_prestress is nullptr!\n" );
+      gassem_prestress->write_prestress_hdf5();
+    }
 
     void GenAlpha_Seg_solve_FSI(
         const bool &new_tangent_flag,
