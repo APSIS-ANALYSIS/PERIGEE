@@ -109,6 +109,7 @@ int main( int argc, char * argv[] )
   auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
 
   // Allocate the quadrature rule and element container
+  // We assume that the same element type is used for pressure and velocity
   const auto elemType = GMIptr_v->get_elemType();
   std::unique_ptr<IQuadPts> quad = QuadPtsFactory::createVisQuadrature(elemType);
   std::unique_ptr<FEAElement> element = ElementFactory::createVolElement(elemType,
