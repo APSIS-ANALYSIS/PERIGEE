@@ -71,8 +71,7 @@ class PTime_FSI_Solver
         std::unique_ptr<PDNSolution> init_disp,
         std::unique_ptr<PDNSolution> init_velo,
         std::unique_ptr<PDNSolution> init_pres,
-        std::unique_ptr<PDNTimeStep> time_info,
-        IPGAssem * const &gassem_ptr ) const;
+        std::unique_ptr<PDNTimeStep> time_info ) const;
 
   private:
     const double final_time;

@@ -255,8 +255,7 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     std::unique_ptr<PDNSolution> init_disp,
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_pres,
-    std::unique_ptr<PDNTimeStep> time_info,
-    IPGAssem * const &gassem_ptr ) const
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
   auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
   auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
@@ -310,9 +309,8 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     nsolver -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
         time_info->get_time(), time_info->get_step(), is_v, is_p, pre_dot_disp.get(), 
         pre_dot_velo.get(), pre_dot_pres.get(), pre_disp.get(), pre_velo.get(), 
-        pre_pres.get(), gassem_ptr, cur_dot_disp.get(), cur_dot_velo.get(), 
-        cur_dot_pres.get(), cur_disp.get(), cur_velo.get(), cur_pres.get(), 
-        prestress_conv_flag, nl_counter );
+        pre_pres.get(), cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), 
+        cur_disp.get(), cur_velo.get(), cur_pres.get(), prestress_conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 

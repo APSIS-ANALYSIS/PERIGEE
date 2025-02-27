@@ -348,9 +348,9 @@ int main( int argc, char *argv[] )
 
   // ===== Nonlinear solver context =====
   auto nsolver = SYS_T::make_unique<PNonlinear_FSI_Solver>(
-      std::move(lsolver), std::move(pmat), std::move(tm_galpha), 
-      std::move(pNode_v_nlinear), nl_rtol, nl_atol, nl_dtol, 
-      nl_maxits, nl_refreq, nl_threshold );
+      std::move(gloAssem), std::move(lsolver), std::move(pmat), 
+      std::move(tm_galpha), std::move(pNode_v_nlinear), nl_rtol, 
+      nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
@@ -364,8 +364,8 @@ int main( int argc, char *argv[] )
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver -> TM_FSI_Prestress( is_record_sol, prestress_disp_tol, is_velo, is_pres,
-      std::move(dot_disp), std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), std::move(pres),
-      std::move(timeinfo), gloAssem.get() );
+      std::move(dot_disp), std::move(dot_velo), std::move(dot_pres), std::move(disp), 
+      std::move(velo), std::move(pres), std::move(timeinfo) );
 
   // ===== Record the wall prestress to h5 file =====
   ps_data -> write_prestress_hdf5();
@@ -376,7 +376,7 @@ int main( int argc, char *argv[] )
   // ==========================================================================
   // Clean the memory
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  tsolver.reset(); gloAssem.reset();
+  tsolver.reset();
   PetscFinalize();
   return EXIT_SUCCESS;
 }

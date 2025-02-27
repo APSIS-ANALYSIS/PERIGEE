@@ -35,6 +35,7 @@ class PNonlinear_FSI_Solver
         const int &input_renew_threshold );
 
     PNonlinear_FSI_Solver(
+        std::unique_ptr<IPGAssem> in_gassem_prestress,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
@@ -91,7 +92,6 @@ class PNonlinear_FSI_Solver
         const PDNSolution * const &pre_disp,
         const PDNSolution * const &pre_velo,
         const PDNSolution * const &pre_pres,
-        IPGAssem * const &gassem_ptr,
         PDNSolution * const &dot_disp,
         PDNSolution * const &dot_velo,
         PDNSolution * const &dot_pres,
@@ -105,6 +105,7 @@ class PNonlinear_FSI_Solver
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
     const std::unique_ptr<IPGAssem> gassem_mesh;
+    const std::unique_ptr<IPGAssem> gassem_prestress;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver_mesh;
     const std::unique_ptr<Matrix_PETSc> bc_mat;

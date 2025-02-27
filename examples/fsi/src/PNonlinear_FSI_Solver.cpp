@@ -19,6 +19,7 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold),
   gassem_mesh(std::move(in_gassem_mesh)),
+  gassem_prestress(nullptr),
   lsolver(std::move(in_lsolver)),
   lsolver_mesh(std::move(in_lsolver_mesh)),
   bc_mat(std::move(in_bc_mat)),
@@ -30,6 +31,7 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
 {}
 
 PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
+    std::unique_ptr<IPGAssem> in_gassem_prestress,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
@@ -43,6 +45,7 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
   nmaxits(input_max_iteration), nrenew_freq(input_renew_freq),
   nrenew_threshold(input_renew_threshold),
   gassem_mesh(nullptr),
+  gassem_prestress(std::move(in_gassem_prestress)),
   lsolver(std::move(in_lsolver)),
   lsolver_mesh(nullptr),
   bc_mat(std::move(in_bc_mat)),
@@ -418,7 +421,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     const PDNSolution * const &pre_disp,
     const PDNSolution * const &pre_velo,
     const PDNSolution * const &pre_pres,
-    IPGAssem * const &gassem_ptr,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
     PDNSolution * const &dot_pres,
@@ -487,34 +489,34 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
   {
-    gassem_ptr -> Clear_KG();
+    gassem_prestress -> Clear_KG();
 
-    gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
+    gassem_prestress->Assem_Tangent_Residual( curr_time, dt,
         dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
         disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
 
     SYS_T::commPrint("  --- M updated");
-    lsolver->SetOperator(gassem_ptr->K);
+    lsolver->SetOperator(gassem_prestress->K);
   }
   else
   {
-    gassem_ptr -> Clear_G();
+    gassem_prestress -> Clear_G();
 
-    gassem_ptr->Assem_Residual( curr_time, dt,
+    gassem_prestress->Assem_Residual( curr_time, dt,
         dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
         disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
   }
 
-  VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
+  VecNorm(gassem_prestress->G, NORM_2, &initial_norm);
   SYS_T::commPrint("  Init res 2-norm: %e \n", initial_norm);
 
   Vec sol_vp, sol_v, sol_p;
-  VecDuplicate( gassem_ptr->G, &sol_vp );
+  VecDuplicate( gassem_prestress->G, &sol_vp );
 
   // Now we do consistent Newton-Raphson iteration
   do
   {
-    lsolver->Solve( gassem_ptr->G, sol_vp );
+    lsolver->Solve( gassem_prestress->G, sol_vp );
 
     bc_mat -> MatMultSol( sol_vp );
 
@@ -544,25 +546,25 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     // Assemble residual & tangent
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )
     {
-      gassem_ptr -> Clear_KG();
+      gassem_prestress -> Clear_KG();
 
-      gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
+      gassem_prestress->Assem_Tangent_Residual( curr_time, dt,
           dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
           disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
 
       SYS_T::commPrint("  --- M updated");
-      lsolver->SetOperator(gassem_ptr->K);
+      lsolver->SetOperator(gassem_prestress->K);
     }
     else
     {
-      gassem_ptr -> Clear_G();
+      gassem_prestress -> Clear_G();
 
-      gassem_ptr->Assem_Residual( curr_time, dt,
+      gassem_prestress->Assem_Residual( curr_time, dt,
           dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
           disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
     }
 
-    VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
+    VecNorm(gassem_prestress->G, NORM_2, &residual_norm);
     SYS_T::commPrint("  --- nl_res: %e \n", residual_norm);
 
     relative_error = residual_norm / initial_norm;
@@ -577,7 +579,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
   // --------------------------------------------------------------------------
   // Calculate teh Cauchy stress in solid element and update the prestress
-  gassem_ptr -> Update_Wall_Prestress( disp, pres );
+  gassem_prestress -> Update_Wall_Prestress( disp, pres );
 
   const double solid_disp_norm = disp -> Norm_inf();
 
