@@ -343,7 +343,7 @@ int main(int argc, char *argv[])
     ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
     : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
-  tm_galpha->print_info();
+  tm_galpha -> print_info();
 
   // ===== Local assembly =====
   std::unique_ptr<IPLocAssem_2x2Block> locAssem_fluid = SYS_T::make_unique<PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha>(
