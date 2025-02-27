@@ -58,7 +58,6 @@ class PTime_FSI_Solver
         std::unique_ptr<PDNTimeStep> time_info,
         const ALocal_InflowBC * const &infnbc,
         IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr,
         IPGAssem * const &gassem_ptr ) const;
 
     void TM_FSI_Prestress(
@@ -73,7 +72,6 @@ class PTime_FSI_Solver
         std::unique_ptr<PDNSolution> init_velo,
         std::unique_ptr<PDNSolution> init_pres,
         std::unique_ptr<PDNTimeStep> time_info,
-        Tissue_prestress * const &ps_ptr,
         IPGAssem * const &gassem_ptr ) const;
 
   private:

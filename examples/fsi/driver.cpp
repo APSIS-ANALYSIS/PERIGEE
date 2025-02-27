@@ -465,11 +465,11 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_FSI>(
-      gbc.get(), std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), 
-      std::move(fNode), std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), 
-      std::move(locnbc_p), std::move(locebc_v), std::move(locebc_p), 
-      std::move(locAssem_fluid), std::move(locAssem_solid), nz_estimate );
+  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_FSI>( gbc.get(), 
+      std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), std::move(fNode), 
+      std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), std::move(locnbc_p), 
+      std::move(locebc_v), std::move(locebc_p), std::move(locAssem_fluid), 
+      std::move(locAssem_solid), std::move(ps_data), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem->Assem_nonzero_estimate( gbc.get() );
@@ -509,7 +509,7 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem->Assem_mass_residual( disp.get(), velo.get(), pres.get(), ps_data.get() );
+    gloAssem->Assem_mass_residual( disp.get(), velo.get(), pres.get() );
 
     Vec proj_vp, proj_v, proj_p;
     VecDuplicate( gloAssem->G, &proj_vp );
@@ -656,7 +656,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_FSI_GenAlpha( is_restart, is_velo, is_pres, std::move(dot_disp), 
       std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), 
-      std::move(pres), std::move(timeinfo), locinfnbc.get(), gbc.get(), ps_data.get(), 
+      std::move(pres), std::move(timeinfo), locinfnbc.get(), gbc.get(), 
       gloAssem.get() );
 
 #ifdef PETSC_USE_LOG
@@ -669,8 +669,7 @@ int main(int argc, char *argv[])
 
   // ===== PETSc Finalize =====
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  tsolver.reset(); locinfnbc.reset(); gbc.reset(); 
-  gloAssem.reset(); ps_data.reset();
+  tsolver.reset(); locinfnbc.reset(); gbc.reset(); gloAssem.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;

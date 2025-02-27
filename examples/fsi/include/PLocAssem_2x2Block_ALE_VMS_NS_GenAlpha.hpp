@@ -37,6 +37,14 @@ class PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
     
     virtual int get_snLocBas_1() const {return snLocBas;}
 
+    virtual int get_nqpv_0() const {return nqpv;}  
+
+    virtual int get_nqps_0() const {return nqps;}
+
+    virtual int get_nqpv_1() const {return nqpv;}  
+
+    virtual int get_nqps_1() const {return nqps;}
+
     virtual double get_model_para_1() const {return alpha_f;}
 
     virtual double get_model_para_2() const {return gamma;}

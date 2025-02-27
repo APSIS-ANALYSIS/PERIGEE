@@ -13,7 +13,8 @@ PGAssem_FSI::PGAssem_FSI(
     std::unique_ptr<ALocal_EBC> in_ebc_v,
     std::unique_ptr<ALocal_EBC> in_ebc_p,
     std::unique_ptr<IPLocAssem_2x2Block> in_locassem_f,
-    std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,  
+    std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,
+    std::unique_ptr<Tissue_prestress> in_ps, 
     const int &in_nz_estimate )
 : locien_v( std::move(in_locien_v) ),
   locien_p( std::move(in_locien_p) ),
@@ -25,8 +26,9 @@ PGAssem_FSI::PGAssem_FSI(
   nbc_p( std::move(in_nbc_p) ),
   ebc_v( std::move(in_ebc_v) ),
   ebc_p( std::move(in_ebc_p) ),
-  locassem_f(std::move(in_locassem_f)),
-  locassem_s(std::move(in_locassem_s)),
+  locassem_f( std::move(in_locassem_f) ),
+  locassem_s( std::move(in_locassem_s) ),
+  ps( std::move(in_ps) ),
   nLocBas( locassem_f->get_nLocBas_0() ),
   snLocBas( locassem_f->get_snLocBas_0() ),
   num_ebc( ebc_v->get_num_ebc() ),
@@ -174,8 +176,7 @@ void PGAssem_FSI::Assem_nonzero_estimate(
 void PGAssem_FSI::Assem_mass_residual(
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
-    const PDNSolution * const &pres,
-    const Tissue_prestress * const &ps_ptr )
+    const PDNSolution * const &pres )
 {
   const int nElem = locelem->get_nlocalele();
 
@@ -226,7 +227,7 @@ void PGAssem_FSI::Assem_mass_residual(
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
-      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      const std::vector<double> quaprestress = ps->get_prestress( ee );
 
       locassem_s->Assem_Mass_Residual(&local_d[0], &local_v[0], &local_p[0], 
           ectrl_x, ectrl_y, ectrl_z, &quaprestress[0]);
@@ -264,8 +265,7 @@ void PGAssem_FSI::Assem_Residual(
     const PDNSolution * const &dot_velo_np1,
     const PDNSolution * const &velo_np1,
     const PDNSolution * const &disp_np1,
-    const IGenBC * const &gbc,
-    const Tissue_prestress * const &ps_ptr )
+    const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
 
@@ -321,7 +321,7 @@ void PGAssem_FSI::Assem_Residual(
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
-      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      const std::vector<double> quaprestress = ps->get_prestress( ee );
 
       locassem_s -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );
@@ -360,8 +360,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     const PDNSolution * const &dot_velo_np1,
     const PDNSolution * const &velo_np1,
     const PDNSolution * const &disp_np1,
-    const IGenBC * const &gbc,
-    const Tissue_prestress * const &ps_ptr )
+    const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
 
@@ -425,7 +424,7 @@ void PGAssem_FSI::Assem_Tangent_Residual(
     {
       // For solid element, quaprestress will return a vector of length nqp x 6
       // for the prestress values at the quadrature points
-      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      const std::vector<double> quaprestress = ps->get_prestress( ee );
 
       locassem_s -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], &local_dot_p[0],
           &local_d[0], &local_v[0], &local_p[0], ectrl_x, ectrl_y, ectrl_z, &quaprestress[0] );

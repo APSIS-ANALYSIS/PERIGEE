@@ -12,6 +12,7 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
     std::unique_ptr<ALocal_EBC> in_ebc_v,
     std::unique_ptr<ALocal_EBC> in_ebc_p,
     std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,
+    std::unique_ptr<Tissue_prestress> in_ps,
     const int &in_nz_estimate )
 : locien_v( std::move(in_locien_v) ),
   locien_p( std::move(in_locien_p) ),
@@ -23,7 +24,8 @@ PGAssem_Wall_Prestress::PGAssem_Wall_Prestress(
   nbc_p( std::move(in_nbc_p) ),
   ebc_v( std::move(in_ebc_v) ),
   ebc_p( std::move(in_ebc_p) ),
-  locassem_s(std::move(in_locassem_s)),
+  locassem_s( std::move(in_locassem_s) ),
+  ps( std::move(in_ps) ),
   nLocBas( locassem_s->get_nLocBas_0() ),
   snLocBas( locassem_s->get_snLocBas_0() ),
   num_ebc( ebc_v->get_num_ebc() ),
@@ -281,8 +283,7 @@ void PGAssem_Wall_Prestress::Assem_Residual(
     const PDNSolution * const &dot_pres,
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
-    const PDNSolution * const &pres,
-    const Tissue_prestress * const &ps_ptr )
+    const PDNSolution * const &pres )
 {
   const int nElem = locelem->get_nlocalele();
 
@@ -328,7 +329,7 @@ void PGAssem_Wall_Prestress::Assem_Residual(
 
     if( locelem->get_elem_tag(ee) == 1 )
     {
-      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      const std::vector<double> quaprestress = ps->get_prestress( ee );
 
       locassem_s -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0], 
           &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0], 
@@ -361,8 +362,7 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
     const PDNSolution * const &dot_pres,
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
-    const PDNSolution * const &pres,
-    const Tissue_prestress * const &ps_ptr )
+    const PDNSolution * const &pres )
 {
   const int nElem = locelem->get_nlocalele();
 
@@ -409,7 +409,7 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 
     if( locelem->get_elem_tag(ee) == 1 )
     {
-      const std::vector<double> quaprestress = ps_ptr->get_prestress( ee );
+      const std::vector<double> quaprestress = ps->get_prestress( ee );
 
       locassem_s -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
           &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0],
@@ -446,11 +446,10 @@ void PGAssem_Wall_Prestress::Assem_Tangent_Residual(
 
 void PGAssem_Wall_Prestress::Update_Wall_Prestress(
     const PDNSolution * const &disp,
-    const PDNSolution * const &pres,
-    Tissue_prestress * const &ps_ptr ) const
+    const PDNSolution * const &pres ) const
 {
   const int nElem = locelem->get_nlocalele();
-  const int nqp   = quadv -> get_num_quadPts();
+  const int nqp   = locassem_s -> get_nqpv_0();
 
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
@@ -475,7 +474,7 @@ void PGAssem_Wall_Prestress::Update_Wall_Prestress(
       for( int qua = 0; qua < nqp; ++qua )
       {
         const double sigma_at_qua[6] { sigma[qua].xx(), sigma[qua].yy(), sigma[qua].zz(), sigma[qua].yz(), sigma[qua].xz(), sigma[qua].xy() };
-        ps_ptr -> add_prestress( ee, qua, sigma_at_qua );
+        ps -> add_prestress( ee, qua, sigma_at_qua );
       }
     }
   }

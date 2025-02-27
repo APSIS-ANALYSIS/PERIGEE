@@ -29,7 +29,8 @@ class PGAssem_FSI : public IPGAssem
         std::unique_ptr<ALocal_EBC> in_ebc_v,
         std::unique_ptr<ALocal_EBC> in_ebc_p,
         std::unique_ptr<IPLocAssem_2x2Block> in_locassem_f,
-        std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,  
+        std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,
+        std::unique_ptr<Tissue_prestress> in_ps,  
         const int &in_nz_estimate=60 );
 
     virtual ~PGAssem_FSI();
@@ -40,8 +41,7 @@ class PGAssem_FSI : public IPGAssem
     virtual void Assem_mass_residual(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const Tissue_prestress * const &ps_ptr );
+        const PDNSolution * const &pres );
 
     virtual void Assem_Residual(
         const double &curr_time, const double &dt,
@@ -54,8 +54,7 @@ class PGAssem_FSI : public IPGAssem
         const PDNSolution * const &dot_velo_np1,
         const PDNSolution * const &velo_np1,
         const PDNSolution * const &disp_np1,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr );
+        const IGenBC * const &gbc );
 
     virtual void Assem_Tangent_Residual(
         const double &curr_time, const double &dt,
@@ -68,8 +67,7 @@ class PGAssem_FSI : public IPGAssem
         const PDNSolution * const &dot_velo_np1,
         const PDNSolution * const &velo_np1,
         const PDNSolution * const &disp_np1,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr );
+        const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals for flow rates
     // and averaged pressure
@@ -108,6 +106,7 @@ class PGAssem_FSI : public IPGAssem
     const std::unique_ptr<const ALocal_EBC> ebc_p;
     const std::unique_ptr<IPLocAssem_2x2Block> locassem_f;
     const std::unique_ptr<IPLocAssem_2x2Block> locassem_s;
+    const std::unique_ptr<const Tissue_prestress> ps;
 
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 

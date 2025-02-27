@@ -330,8 +330,7 @@ class IPGAssem
     virtual void Assem_mass_residual(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const Tissue_prestress * const &ps_ptr )
+        const PDNSolution * const &pres )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -534,8 +533,7 @@ class IPGAssem
         const PDNSolution * const &dot_velo_np1,
         const PDNSolution * const &velo_np1,
         const PDNSolution * const &disp_np1,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr )
+        const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // Assembly in the prestress generation
@@ -571,8 +569,7 @@ class IPGAssem
         const PDNSolution * const &dot_pres,
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const Tissue_prestress * const &ps_ptr )
+        const PDNSolution * const &pres )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // Assembly with weak BC
@@ -848,8 +845,7 @@ class IPGAssem
         const PDNSolution * const &dot_velo_np1,
         const PDNSolution * const &velo_np1,
         const PDNSolution * const &disp_np1,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr )
+        const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // Assembly in prestress generation
@@ -885,8 +881,7 @@ class IPGAssem
         const PDNSolution * const &dot_pres,
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const Tissue_prestress * const &ps_ptr )
+        const PDNSolution * const &pres )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // Assembly with weak BC
@@ -1187,8 +1182,7 @@ class IPGAssem
 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
-        const PDNSolution * const &pres,
-        Tissue_prestress * const &ps_ptr ) const
+        const PDNSolution * const &pres ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}    
 };
 

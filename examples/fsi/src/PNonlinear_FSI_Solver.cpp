@@ -120,7 +120,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const PDNSolution * const &pre_pres,
     const ALocal_InflowBC * const &infnbc_part,
     const IGenBC * const &gbc,
-    const Tissue_prestress * const &ps_ptr,
     IPGAssem * const &gassem_ptr,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
@@ -215,7 +214,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt, 
         dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
         disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), 
-        dot_velo, velo, disp, gbc, ps_ptr );
+        dot_velo, velo, disp, gbc );
 
     SYS_T::commPrint("  --- M updated");
     lsolver->SetOperator(gassem_ptr->K);
@@ -227,7 +226,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     gassem_ptr->Assem_Residual( curr_time, dt, 
         dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
         disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), 
-        dot_velo, velo, disp, gbc, ps_ptr );
+        dot_velo, velo, disp, gbc );
   }
 
 #ifdef PETSC_USE_LOG
@@ -339,7 +338,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
       gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
           dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
           disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), 
-          dot_velo, velo, disp, gbc, ps_ptr );
+          dot_velo, velo, disp, gbc );
 
       SYS_T::commPrint("  --- M updated");
       lsolver->SetOperator(gassem_ptr->K);
@@ -351,7 +350,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
       gassem_ptr->Assem_Residual( curr_time, dt,
           dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
           disp_alpha.get(), velo_alpha.get(), pres_alpha.get(),
-          dot_velo, velo, disp, gbc, ps_ptr );
+          dot_velo, velo, disp, gbc );
     }
 
 #ifdef PETSC_USE_LOG
@@ -395,7 +394,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     const PDNSolution * const &pre_disp,
     const PDNSolution * const &pre_velo,
     const PDNSolution * const &pre_pres,
-    Tissue_prestress * const &ps_ptr,
     IPGAssem * const &gassem_ptr,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
@@ -469,7 +467,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
     gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
         dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
-        disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
+        disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
 
     SYS_T::commPrint("  --- M updated");
     lsolver->SetOperator(gassem_ptr->K);
@@ -480,7 +478,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
     gassem_ptr->Assem_Residual( curr_time, dt,
         dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
-        disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
+        disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
   }
 
   VecNorm(gassem_ptr->G, NORM_2, &initial_norm);
@@ -526,7 +524,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
       gassem_ptr->Assem_Tangent_Residual( curr_time, dt,
           dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
-          disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
+          disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
 
       SYS_T::commPrint("  --- M updated");
       lsolver->SetOperator(gassem_ptr->K);
@@ -537,7 +535,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
       gassem_ptr->Assem_Residual( curr_time, dt,
           dot_disp_alpha.get(), dot_velo_alpha.get(), dot_pres_alpha.get(),
-          disp_alpha.get(), velo_alpha.get(), pres_alpha.get(), ps_ptr );
+          disp_alpha.get(), velo_alpha.get(), pres_alpha.get() );
     }
 
     VecNorm(gassem_ptr->G, NORM_2, &residual_norm);
@@ -555,7 +553,7 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
 
   // --------------------------------------------------------------------------
   // Calculate teh Cauchy stress in solid element and update the prestress
-  gassem_ptr -> Update_Wall_Prestress( disp, pres, ps_ptr );
+  gassem_ptr -> Update_Wall_Prestress( disp, pres );
 
   const double solid_disp_norm = disp -> Norm_inf();
 

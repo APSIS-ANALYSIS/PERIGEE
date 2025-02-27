@@ -25,6 +25,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         std::unique_ptr<ALocal_EBC> in_ebc_v,
         std::unique_ptr<ALocal_EBC> in_ebc_p,
         std::unique_ptr<IPLocAssem_2x2Block> in_locassem_s,
+        std::unique_ptr<Tissue_prestress> in_ps,
         const int &in_nz_estimate=60 );
 
     virtual ~PGAssem_Wall_Prestress();
@@ -39,8 +40,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &dot_pres,
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const Tissue_prestress * const &ps_ptr );
+        const PDNSolution * const &pres );
 
     virtual void Assem_Tangent_Residual(
         const double &curr_time,
@@ -50,13 +50,11 @@ class PGAssem_Wall_Prestress : public IPGAssem
         const PDNSolution * const &dot_pres,
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const Tissue_prestress * const &ps_ptr );
+        const PDNSolution * const &pres );
 
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
-        const PDNSolution * const &pres,
-        Tissue_prestress * const &ps_ptr ) const;
+        const PDNSolution * const &pres ) const;
 
   private:
     const std::unique_ptr<const ALocal_IEN> locien_v;
@@ -70,6 +68,7 @@ class PGAssem_Wall_Prestress : public IPGAssem
     const std::unique_ptr<const ALocal_EBC> ebc_v;
     const std::unique_ptr<const ALocal_EBC> ebc_p;
     const std::unique_ptr<IPLocAssem_2x2Block> locassem_s;
+    const std::unique_ptr<const Tissue_prestress> ps;
 
     const int nLocBas, snLocBas, num_ebc, nlgn_v, nlgn_p;
 
