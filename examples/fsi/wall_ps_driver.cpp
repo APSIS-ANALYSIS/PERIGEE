@@ -189,9 +189,9 @@ int main( int argc, char *argv[] )
 
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
 
-  auto pNode_v = SYS_T::make_unique<APart_Node>(part_v_file, rank);
+  std::unique_ptr<APart_Node> pNode_v = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
 
-  auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
+  std::unique_ptr<APart_Node> pNode_p = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
 
   auto locebc_v = SYS_T::make_unique<ALocal_EBC>(part_v_file, rank);
 
