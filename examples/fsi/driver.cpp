@@ -256,9 +256,15 @@ int main(int argc, char *argv[])
 
   std::unique_ptr<APart_Node> pNode_v = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
 
-  auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
+  std::unique_ptr<APart_Node> pNode_p = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
 
-  auto pNode_mesh = SYS_T::make_unique<APart_Node>(part_v_file, rank);
+  std::unique_ptr<APart_Node> pNode_v_time = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
+
+  std::unique_ptr<APart_Node> pNode_p_time = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
+
+  std::unique_ptr<APart_Node> pNode_v_nlinear = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
+
+  std::unique_ptr<APart_Node> pNode_mesh = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
 
   auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_v_file, rank);
 
@@ -460,19 +466,13 @@ int main(int argc, char *argv[])
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_FSI>(
-      gbc.get(), pNode_v.get(), pNode_p.get(), std::move(locIEN_v), std::move(locIEN_p), 
-      std::move(locElem),  std::move(fNode), std::move(locnbc_v), std::move(locnbc_p), 
-      std::move(locebc_v), std::move(locebc_p), std::move(locAssem_fluid),
-      std::move(locAssem_solid), nz_estimate );
-  // std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_FSI>(
-  //     gbc.get(), std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), 
-  //     std::move(fNode), std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), 
-  //     std::move(locnbc_p), std::move(locebc_v), std::move(locebc_p), 
-  //     std::move(locAssem_fluid), std::move(locAssem_solid), nz_estimate );
+      gbc.get(), std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), 
+      std::move(fNode), std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), 
+      std::move(locnbc_p), std::move(locebc_v), std::move(locebc_p), 
+      std::move(locAssem_fluid), std::move(locAssem_solid), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  // gloAssem->Assem_nonzero_estimate( gbc.get() );
-  gloAssem->Assem_nonzero_estimate( pNode_v.get(), gbc.get() );
+  gloAssem->Assem_nonzero_estimate( gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem->Fix_nonzero_err_str();
@@ -560,15 +560,15 @@ int main(int argc, char *argv[])
   auto nsolver = SYS_T::make_unique<PNonlinear_FSI_Solver>(
       std::move(lsolver), std::move(mesh_lsolver), std::move(pmat), 
       std::move(mmat), std::move(tm_galpha), std::move(inflow_rate), 
-      std::move(base), nl_rtol, nl_atol, nl_dtol, nl_maxits, 
-      nl_refreq, nl_threshold );
+      std::move(base), std::move(pNode_v_nlinear), nl_rtol, nl_atol,
+      nl_dtol, nl_maxits, nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_FSI_Solver>(
-      std::move(nsolver), sol_bName, sol_record_freq, 
-      ttan_renew_freq, final_time );
+      std::move(nsolver), std::move(pNode_v_time), std::move(pNode_p_time), 
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
 
@@ -654,10 +654,10 @@ int main(int argc, char *argv[])
   PetscLogEventBegin(tsolver_event, 0,0,0,0);
 #endif
 
-  tsolver->TM_FSI_GenAlpha( is_restart, is_velo, is_pres, 
-      std::move(dot_disp), std::move(dot_velo), std::move(dot_pres), std::move(disp), 
-      std::move(velo), std::move(pres), std::move(timeinfo), pNode_v.get(), pNode_p.get(), 
-      locinfnbc.get(), gbc.get(), ps_data.get(), gloAssem.get(), gloAssem_mesh.get() );
+  tsolver->TM_FSI_GenAlpha( is_restart, is_velo, is_pres, std::move(dot_disp), 
+      std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), 
+      std::move(pres), std::move(timeinfo), locinfnbc.get(), gbc.get(), ps_data.get(), 
+      gloAssem.get(), gloAssem_mesh.get() );
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);
@@ -670,7 +670,7 @@ int main(int argc, char *argv[])
   // ===== PETSc Finalize =====
   ISDestroy(&is_velo); ISDestroy(&is_pres);
   tsolver.reset(); locinfnbc.reset(); gbc.reset(); gloAssem.reset(); 
-  gloAssem_mesh.reset(); pNode_v.reset(); pNode_p.reset(); ps_data.reset();
+  gloAssem_mesh.reset(); ps_data.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;

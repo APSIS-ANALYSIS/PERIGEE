@@ -2,11 +2,15 @@
 
 PTime_FSI_Solver::PTime_FSI_Solver(
     std::unique_ptr<PNonlinear_FSI_Solver> in_nsolver,
+    std::unique_ptr<APart_Node> in_pnode_v,
+    std::unique_ptr<APart_Node> in_pnode_p,
     const std::string &input_name,      
     const int &input_record_freq, const int &input_renew_tang_freq, 
     const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), nsolver(std::move(in_nsolver))
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), 
+  nsolver(std::move(in_nsolver)), pnode_v(std::move(in_pnode_v)),
+  pnode_p(std::move(in_pnode_p))
 {}
 
 PTime_FSI_Solver::~PTime_FSI_Solver()
@@ -76,8 +80,6 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_pres,
     std::unique_ptr<PDNTimeStep> time_info,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
     const ALocal_InflowBC * const &infnbc,
     IGenBC * const &gbc,
     const Tissue_prestress * const &ps_ptr,
@@ -147,8 +149,8 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     bool conv_flag;
     nsolver -> GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
         time_info->get_step(), is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(), 
-        pre_disp.get(), pre_velo.get(), pre_pres.get(), pnode_v, pnode_p, infnbc, gbc, ps_ptr, 
-        gassem_ptr, gassem_mesh_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), 
+        pre_disp.get(), pre_velo.get(), pre_pres.get(), infnbc, gbc, ps_ptr, gassem_ptr, 
+        gassem_mesh_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), 
         cur_disp.get(), cur_velo.get(), cur_pres.get(), conv_flag, nl_counter );
 
     time_info->TimeIncrement();
@@ -257,8 +259,6 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_pres,
     std::unique_ptr<PDNTimeStep> time_info,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
     Tissue_prestress * const &ps_ptr,
     IPGAssem * const &gassem_ptr ) const
 {
@@ -295,26 +295,26 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Nullify the solid solutions
-    Nullify_solid_dof( pnode_v, 3, pre_dot_disp.get() );
-    Nullify_solid_dof( pnode_v, 3, pre_dot_velo.get() );
-    Nullify_solid_dof( pnode_p, 1, pre_dot_pres.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_dot_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_dot_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, pre_dot_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, pre_disp.get() );
-    Nullify_solid_dof( pnode_v, 3, pre_velo.get() );
-    Nullify_solid_dof( pnode_p, 1, pre_pres.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, pre_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, cur_dot_disp.get() );
-    Nullify_solid_dof( pnode_v, 3, cur_dot_velo.get() );
-    Nullify_solid_dof( pnode_p, 1, cur_dot_pres.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_dot_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_dot_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, cur_dot_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, cur_disp.get() );
-    Nullify_solid_dof( pnode_v, 3, cur_velo.get() );
-    Nullify_solid_dof( pnode_p, 1, cur_pres.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, cur_pres.get() );
 
     nsolver -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
         time_info->get_time(), time_info->get_step(), is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), 
-        pre_dot_pres.get(), pre_disp.get(), pre_velo.get(), pre_pres.get(), pnode_v, pnode_p, ps_ptr, 
-        gassem_ptr, cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), cur_disp.get(), 
+        pre_dot_pres.get(), pre_disp.get(), pre_velo.get(), pre_pres.get(), ps_ptr, gassem_ptr, 
+        cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), cur_disp.get(), 
         cur_velo.get(), cur_pres.get(), prestress_conv_flag, nl_counter );
 
     time_info->TimeIncrement();

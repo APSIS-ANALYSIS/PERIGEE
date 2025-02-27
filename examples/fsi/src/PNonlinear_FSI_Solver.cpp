@@ -8,6 +8,7 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
     std::unique_ptr<IFlowRate> in_flrate,
     std::unique_ptr<PDNSolution> in_sol_base,
+    std::unique_ptr<APart_Node> in_pnode_v,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol,
     const int &input_max_iteration, 
@@ -22,7 +23,8 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
   bc_mesh_mat(std::move(in_bc_mesh_mat)),
   tmga(std::move(in_tmga)),
   flrate(std::move(in_flrate)),
-  sol_base(std::move(in_sol_base))
+  sol_base(std::move(in_sol_base)),
+  pnode_v(std::move(in_pnode_v))
 {}
 
 PNonlinear_FSI_Solver::~PNonlinear_FSI_Solver()
@@ -41,10 +43,10 @@ void PNonlinear_FSI_Solver::print_info() const
 }
 
 void PNonlinear_FSI_Solver::update_solid_kinematics( 
-    const double &val, const APart_Node * const &pnode,
-    const Vec &input, PDNSolution * const &output ) const
+    const double &val, const Vec &input, 
+    PDNSolution * const &output ) const
 {
-  const int nlocal = pnode -> get_nlocalnode_solid();
+  const int nlocal = pnode_v -> get_nlocalnode_solid();
   
   Vec local_output;
 
@@ -57,7 +59,7 @@ void PNonlinear_FSI_Solver::update_solid_kinematics(
 
   for(int ii=0; ii<nlocal; ++ii)
   {
-    const int ii3 = pnode->get_node_loc_solid(ii) * 3;
+    const int ii3 = pnode_v->get_node_loc_solid(ii) * 3;
 
     array_output[ii3  ] += val * array_input[ii3  ];
     array_output[ii3+1] += val * array_input[ii3+1];
@@ -114,8 +116,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     const PDNSolution * const &pre_disp,
     const PDNSolution * const &pre_velo,
     const PDNSolution * const &pre_pres,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
     const ALocal_InflowBC * const &infnbc_part,
     const IGenBC * const &gbc,
     const Tissue_prestress * const &ps_ptr,
@@ -186,10 +186,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
-  std::unique_ptr<PDNSolution> Delta_dot_disp = SYS_T::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
+  std::unique_ptr<PDNSolution> Delta_dot_disp = SYS_T::make_unique<PDNSolution_V>(pnode_v.get(), 0, false, "delta_dot_disp");
 
-  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
-  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
+  update_solid_kinematics( -1.0 / alpha_m, dot_disp_alpha->solution, Delta_dot_disp.get() );
+  update_solid_kinematics(  1.0 / alpha_m, velo_alpha->solution, Delta_dot_disp.get() );
 
   // Now update displacement solutions for solid sub-domain
   dot_disp       -> PlusAX( Delta_dot_disp.get(), 1.0 );
@@ -247,8 +247,8 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
   {
     // Check the residual dot_u_alpha - v_alpha
     Delta_dot_disp -> ScaleValue( 0.0 );
-    update_solid_kinematics(  1.0, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
-    update_solid_kinematics( -1.0, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
+    update_solid_kinematics(  1.0, dot_disp_alpha->solution, Delta_dot_disp.get() );
+    update_solid_kinematics( -1.0,     velo_alpha->solution, Delta_dot_disp.get() );
     const double solid_kinematics_residual = Delta_dot_disp -> Norm_2();
     // Finish calculating dot_u_alpha - v_alpha
 
@@ -279,10 +279,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     pres           -> PlusAX( sol_p, -1.0 * gamma * dt );
     pres_alpha     -> PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
 
-    update_solid_kinematics( -1.0 * val_1, pnode_v, sol_v, dot_disp );
-    update_solid_kinematics( -1.0 * val_1 * gamma * dt, pnode_v, sol_v, disp );
-    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha.get() );
-    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha.get());
+    update_solid_kinematics( -1.0 * val_1, sol_v, dot_disp );
+    update_solid_kinematics( -1.0 * val_1 * gamma * dt, sol_v, disp );
+    update_solid_kinematics( -1.0 * val_1 * alpha_m, sol_v, dot_disp_alpha.get() );
+    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, sol_v, disp_alpha.get());
 
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);
@@ -394,8 +394,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     const PDNSolution * const &pre_disp,
     const PDNSolution * const &pre_velo,
     const PDNSolution * const &pre_pres,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
     Tissue_prestress * const &ps_ptr,
     IPGAssem * const &gassem_ptr,
     PDNSolution * const &dot_disp,
@@ -451,10 +449,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
   pres_alpha -> PlusAX( pres, alpha_f );
 
   // Get Delta_dot_disp by assuming Delta_v is zero
-  std::unique_ptr<PDNSolution> Delta_dot_disp = SYS_T::make_unique<PDNSolution_V>(pnode_v, 0, false, "delta_dot_disp");
+  std::unique_ptr<PDNSolution> Delta_dot_disp = SYS_T::make_unique<PDNSolution_V>(pnode_v.get(), 0, false, "delta_dot_disp");
 
-  update_solid_kinematics( -1.0 / alpha_m, pnode_v, dot_disp_alpha->solution, Delta_dot_disp.get() );
-  update_solid_kinematics(  1.0 / alpha_m, pnode_v,     velo_alpha->solution, Delta_dot_disp.get() );
+  update_solid_kinematics( -1.0 / alpha_m, dot_disp_alpha->solution, Delta_dot_disp.get() );
+  update_solid_kinematics(  1.0 / alpha_m,     velo_alpha->solution, Delta_dot_disp.get() );
 
   // Now update displacement solutions for solid sub-domain
   dot_disp       -> PlusAX( Delta_dot_disp.get(), 1.0 );
@@ -512,10 +510,10 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_Prestress(
     pres           -> PlusAX( sol_p, -1.0 * gamma * dt );
     pres_alpha     -> PlusAX( sol_p, -1.0 * gamma * alpha_f * dt );
 
-    update_solid_kinematics( -1.0 * val_1, pnode_v, sol_v, dot_disp );
-    update_solid_kinematics( -1.0 * val_1 * gamma * dt, pnode_v, sol_v, disp );
-    update_solid_kinematics( -1.0 * val_1 * alpha_m, pnode_v, sol_v, dot_disp_alpha.get() );
-    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, pnode_v, sol_v, disp_alpha.get() );
+    update_solid_kinematics( -1.0 * val_1, sol_v, dot_disp );
+    update_solid_kinematics( -1.0 * val_1 * gamma * dt, sol_v, disp );
+    update_solid_kinematics( -1.0 * val_1 * alpha_m, sol_v, dot_disp_alpha.get() );
+    update_solid_kinematics( -1.0 * val_1 * alpha_f * gamma * dt, sol_v, disp_alpha.get() );
 
     VecRestoreSubVector(sol_vp, is_v, &sol_v);
     VecRestoreSubVector(sol_vp, is_p, &sol_p);

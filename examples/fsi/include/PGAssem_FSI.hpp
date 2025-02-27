@@ -18,14 +18,12 @@ class PGAssem_FSI : public IPGAssem
   public:
     PGAssem_FSI( 
         const IGenBC * const &gbc,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
         std::unique_ptr<ALocal_IEN> in_locien_v,
         std::unique_ptr<ALocal_IEN> in_locien_p,
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
-        // std::unique_ptr<APart_Node> in_pnode_v,
-        // std::unique_ptr<APart_Node> in_pnode_p,
+        std::unique_ptr<APart_Node> in_pnode_v,
+        std::unique_ptr<APart_Node> in_pnode_p,
         std::unique_ptr<ALocal_NBC> in_nbc_v,
         std::unique_ptr<ALocal_NBC> in_nbc_p,
         std::unique_ptr<ALocal_EBC> in_ebc_v,
@@ -37,7 +35,6 @@ class PGAssem_FSI : public IPGAssem
     virtual ~PGAssem_FSI();
 
     virtual void Assem_nonzero_estimate(
-        const APart_Node * const &pnode_v,
         const IGenBC * const &gbc );
 
     virtual void Assem_mass_residual(
@@ -103,8 +100,8 @@ class PGAssem_FSI : public IPGAssem
     const std::unique_ptr<const ALocal_IEN> locien_p;
     const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const FEANode> fnode;
-    // const std::unique_ptr<const APart_Node> pnode_v;
-    // const std::unique_ptr<const APart_Node> pnode_p;
+    const std::unique_ptr<const APart_Node> pnode_v;
+    const std::unique_ptr<const APart_Node> pnode_p;
     const std::unique_ptr<const ALocal_NBC> nbc_v;
     const std::unique_ptr<const ALocal_NBC> nbc_p;
     const std::unique_ptr<const ALocal_EBC> ebc_v;

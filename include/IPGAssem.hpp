@@ -115,11 +115,6 @@ class IPGAssem
         const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
-    virtual void Assem_nonzero_estimate(
-        const APart_Node * const &pnode_ptr,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
     virtual void Assem_nonzero_estimate( 
         const ALocal_Elem * const &alelem_ptr,
         IPLocAssem * const &lassem_ptr,

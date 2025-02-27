@@ -16,6 +16,8 @@ class PTime_FSI_Solver
   public:
     PTime_FSI_Solver(
         std::unique_ptr<PNonlinear_FSI_Solver> in_nsolver,
+        std::unique_ptr<APart_Node> in_pnode_v,
+        std::unique_ptr<APart_Node> in_pnode_p,
         const std::string &input_name,      
         const int &input_record_freq, const int &input_renew_tang_freq, 
         const double &input_final_time );        
@@ -54,8 +56,6 @@ class PTime_FSI_Solver
         std::unique_ptr<PDNSolution> init_velo,
         std::unique_ptr<PDNSolution> init_pres,
         std::unique_ptr<PDNTimeStep> time_info,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
         const ALocal_InflowBC * const &infnbc,
         IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr,
@@ -74,8 +74,6 @@ class PTime_FSI_Solver
         std::unique_ptr<PDNSolution> init_velo,
         std::unique_ptr<PDNSolution> init_pres,
         std::unique_ptr<PDNTimeStep> time_info,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
         Tissue_prestress * const &ps_ptr,
         IPGAssem * const &gassem_ptr ) const;
 
@@ -86,6 +84,8 @@ class PTime_FSI_Solver
     const std::string pb_name; // the problem base name for the solution
 
     const std::unique_ptr<PNonlinear_FSI_Solver> nsolver;
+    const std::unique_ptr<const APart_Node> pnode_v;
+    const std::unique_ptr<const APart_Node> pnode_p;
 
     std::string Name_Generator( const std::string &middle_name, 
         const int &counter ) const;

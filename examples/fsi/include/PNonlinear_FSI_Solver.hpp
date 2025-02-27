@@ -27,6 +27,7 @@ class PNonlinear_FSI_Solver
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
         std::unique_ptr<IFlowRate> in_flrate,
         std::unique_ptr<PDNSolution> in_sol_base,
+        std::unique_ptr<APart_Node> in_pnode_v,
         const double &input_nrtol, const double &input_natol, 
         const double &input_ndtol, const int &input_max_iteration, 
         const int &input_renew_freq, 
@@ -54,8 +55,6 @@ class PNonlinear_FSI_Solver
         const PDNSolution * const &pre_disp,
         const PDNSolution * const &pre_velo,
         const PDNSolution * const &pre_pres,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
         const ALocal_InflowBC * const &infnbc_part,
         const IGenBC * const &gbc,
         const Tissue_prestress * const &ps_ptr,
@@ -82,8 +81,6 @@ class PNonlinear_FSI_Solver
         const PDNSolution * const &pre_disp,
         const PDNSolution * const &pre_velo,
         const PDNSolution * const &pre_pres,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
         Tissue_prestress * const &ps_ptr,
         IPGAssem * const &gassem_ptr,
         PDNSolution * const &dot_disp,
@@ -105,6 +102,7 @@ class PNonlinear_FSI_Solver
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<IFlowRate> flrate;
     const std::unique_ptr<PDNSolution> sol_base;
+    const std::unique_ptr<const APart_Node> pnode_v;
 
     void Print_convergence_info( const int &count, const double &rel_err,
         const double &abs_err ) const
@@ -117,9 +115,7 @@ class PNonlinear_FSI_Solver
     // User is responsible for making sure that the layouts of input and
     // output->solution are identical.
     void update_solid_kinematics( const double &val,
-        const APart_Node * const &pnode,
-        const Vec &input, 
-        PDNSolution * const &output ) const;
+        const Vec &input, PDNSolution * const &output ) const;
 
     void rescale_inflow_value( const double &stime,
         const ALocal_InflowBC * const &infbc,

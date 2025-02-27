@@ -1,15 +1,13 @@
 #include "PGAssem_FSI.hpp"
 
 PGAssem_FSI::PGAssem_FSI( 
-    const IGenBC * const &gbc,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,    
+    const IGenBC * const &gbc, 
     std::unique_ptr<ALocal_IEN> in_locien_v,
     std::unique_ptr<ALocal_IEN> in_locien_p,
     std::unique_ptr<ALocal_Elem> in_locelem,
     std::unique_ptr<FEANode> in_fnode,
-    // std::unique_ptr<APart_Node> in_pnode_v,
-    // std::unique_ptr<APart_Node> in_pnode_p,
+    std::unique_ptr<APart_Node> in_pnode_v,
+    std::unique_ptr<APart_Node> in_pnode_p,
     std::unique_ptr<ALocal_NBC> in_nbc_v,
     std::unique_ptr<ALocal_NBC> in_nbc_p,
     std::unique_ptr<ALocal_EBC> in_ebc_v,
@@ -21,8 +19,8 @@ PGAssem_FSI::PGAssem_FSI(
   locien_p( std::move(in_locien_p) ),
   locelem( std::move(in_locelem) ),
   fnode( std::move(in_fnode) ),
-  // pnode_v( std::move(in_pnode_v) ),
-  // pnode_p( std::move(in_pnode_p) ),
+  pnode_v( std::move(in_pnode_v) ),
+  pnode_p( std::move(in_pnode_p) ),
   nbc_v( std::move(in_nbc_v) ),
   nbc_p( std::move(in_nbc_p) ),
   ebc_v( std::move(in_ebc_v) ),
@@ -76,8 +74,7 @@ PGAssem_FSI::PGAssem_FSI(
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
   
-  // Assem_nonzero_estimate( gbc );
-  Assem_nonzero_estimate( pnode_v, gbc );
+  Assem_nonzero_estimate( gbc );
 
   // Obtain the precise dnz and onz count
   std::vector<int> Kdnz, Konz;
@@ -113,7 +110,6 @@ PGAssem_FSI::~PGAssem_FSI()
 }
 
 void PGAssem_FSI::Assem_nonzero_estimate(
-    const APart_Node * const &pnode_v,
     const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
@@ -161,8 +157,7 @@ void PGAssem_FSI::Assem_nonzero_estimate(
   delete [] row_id_v; row_id_v = nullptr; delete [] row_id_p; row_id_p = nullptr;
 
   // Resis BC for K and G
-  // PDNSolution * temp = new PDNSolution_V( pnode_v.get(), 0, false, "aux" );
-  PDNSolution * temp = new PDNSolution_V( pnode_v, 0, false, "aux" );
+  PDNSolution * temp = new PDNSolution_V( pnode_v.get(), 0, false, "aux" );
 
   NatBC_Resis_KG( 0.1, 0.1, temp, temp, temp, gbc );
 
