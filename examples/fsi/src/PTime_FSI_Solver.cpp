@@ -13,9 +13,6 @@ PTime_FSI_Solver::PTime_FSI_Solver(
   pnode_p(std::move(in_pnode_p))
 {}
 
-PTime_FSI_Solver::~PTime_FSI_Solver()
-{}
-
 void PTime_FSI_Solver::print_info() const
 {
   SYS_T::print_sep_line();

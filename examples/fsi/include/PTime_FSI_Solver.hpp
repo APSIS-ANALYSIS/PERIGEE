@@ -22,7 +22,7 @@ class PTime_FSI_Solver
         const int &input_record_freq, const int &input_renew_tang_freq, 
         const double &input_final_time );        
 
-    ~PTime_FSI_Solver();
+    ~PTime_FSI_Solver() = default;
 
     void print_info() const;
 

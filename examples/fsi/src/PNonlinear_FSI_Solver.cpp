@@ -56,9 +56,6 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
   pnode_v(std::move(in_pnode_v))
 {}
 
-PNonlinear_FSI_Solver::~PNonlinear_FSI_Solver()
-{}
-
 void PNonlinear_FSI_Solver::print_info() const
 {
   SYS_T::print_sep_line();

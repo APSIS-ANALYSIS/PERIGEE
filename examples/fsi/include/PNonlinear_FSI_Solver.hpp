@@ -46,7 +46,7 @@ class PNonlinear_FSI_Solver
         const int &input_renew_freq,
         const int &input_renew_threshold );
 
-    ~PNonlinear_FSI_Solver();
+    ~PNonlinear_FSI_Solver() = default;
 
     int get_non_max_its() const {return nmaxits;}
 
