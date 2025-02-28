@@ -1,12 +1,12 @@
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 
 PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
-        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
-        const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
-        const double &in_vis_mu, const double &in_beta,
-        const double &angular, const Vector_3 &point_xyz, 
-        const Vector_3 &angular_direc,
-        const double &in_ct, const double &in_ctauc )
+  const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+  const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
+  const double &in_vis_mu, const double &in_beta,
+  const double &angular, const Vector_3 &point_xyz, 
+  const Vector_3 &angular_direc,
+  const double &in_ct, const double &in_ctauc )
 : elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
