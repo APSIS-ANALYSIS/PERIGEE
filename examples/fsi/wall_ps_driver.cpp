@@ -243,7 +243,7 @@ int main( int argc, char *argv[] )
   std::vector<int> start_idx{ idx_v_start, idx_p_start };
 
   auto pmat = SYS_T::make_unique<Matrix_PETSc>( idx_v_len + idx_p_len );
-  pmat->gen_perm_bc( pNode_list, locnbc_list, start_idx );
+  pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
