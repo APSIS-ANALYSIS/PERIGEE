@@ -11,8 +11,6 @@
 // ==================================================================
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "Math_Tools.hpp"
-#include "FEAElementFactory.hpp"
-#include "QuadPtsFactory.hpp"
 
 class PLocAssem_VMS_NS_GenAlpha_WeakBC : public PLocAssem_VMS_NS_GenAlpha
 {
