@@ -379,51 +379,15 @@ int main(int argc, char *argv[])
 
   tsolver->print_info();
 
-  // ===== Outlet data recording files =====
-  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
-  {
-    const double dot_face_flrate = gloAssem -> Assem_surface_flowrate(
-        dot_sol.get(), ff );
-
-    const double face_flrate = gloAssem -> Assem_surface_flowrate(
-        sol.get(), ff );
-
-    const double face_avepre = gloAssem -> Assem_surface_ave_pressure(
-        sol.get(), ff );
-
-    // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
-
-    const double lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate, timeinfo->get_time() );
-
-    // Create the txt files and write the initial flow rates
-    if(rank == 0)
-    {
-      std::ofstream ofile;
-
-      // If this is NOT a restart run, generate a new file, otherwise append to
-      // existing file
-      if( !is_restart )
-        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      // If this is NOT a restart, then record the initial values
-      if( !is_restart )
-      {
-        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
-
   MPI_Barrier(PETSC_COMM_WORLD);
+
+  // ===== Outlet data recording files =====
+  tsolver->record_outlet_data(sol.get(), dot_sol.get(), timeinfo.get(), gbc.get(),
+      gloAssem.get(), true, is_restart);
 
   // ===== Inlet data recording files =====
   tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), 
-      gloAssem.get(), is_restart);
+      gloAssem.get(), true, is_restart);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");

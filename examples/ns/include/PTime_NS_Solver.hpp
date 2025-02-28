@@ -51,7 +51,17 @@ class PTime_NS_Solver
         const PDNTimeStep * const &time_info,
         const ALocal_InflowBC * const &infnbc_part,
         const IPGAssem * const &gassem_ptr,
-        bool is_app ) const;
+        bool is_driver,
+        bool is_restart ) const;
+    
+    void record_outlet_data(
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol,
+        const PDNTimeStep * const &time_info,
+        IGenBC * const &gbc,
+        const IPGAssem * const &gassem_ptr,
+        bool is_driver,
+        bool is_restart) const;
 
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
