@@ -58,7 +58,7 @@ class Interface_pair
                     const std::vector<double> &intervals_in,
                     const Vector_3 &centroid_in );
 
-    virtual ~Interface_pair(){};
+    virtual ~Interface_pair() = default;
 
     virtual int get_num_fixed_ele() const
     {return  num_fixed_ele;}
@@ -174,10 +174,8 @@ class Interface_pair
 
     // Attach the interval tags to all the elements
     virtual void Tag(const std::vector<double> &intervals,
-      const int &num_fixed_ele,
       const std::vector<double> &fixed_sur_pt_xyz,
       const std::vector<int> &fixed_sur_ien,
-      const int &num_rotated_ele,
       const std::vector<double> &rotated_sur_pt_xyz,
       const std::vector<int> &rotated_sur_ien);
 

@@ -17,6 +17,7 @@
 #include "QuadPts_vis_tet10.hpp"
 #include "QuadPts_vis_hex8.hpp"
 #include "QuadPts_vis_hex27.hpp"
+#include "QuadPts_UserDefined_Triangle.hpp"
 
 class QuadPtsFactory
 {
@@ -98,6 +99,22 @@ class QuadPtsFactory
         default:
           SYS_T::print_fatal("Error: FEType not supported.\n");
           return nullptr;
+      }
+    }
+
+    static std::unique_ptr<IQuadPts> createFreeSurQuadrature(const FEType &elemType)
+    {
+      if (elemType == FEType::Tet4 || elemType == FEType::Tet10)
+        return SYS_T::make_unique<QuadPts_UserDefined_Triangle>();
+      else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
+      {
+        SYS_T::print_fatal("Error: QuadPts_UserDefined_Quad is unavailable now.\n");
+        return nullptr;
+      }
+      else
+      {
+        SYS_T::print_fatal("Error: FEType not supported.\n");
+        return nullptr;
       }
     }
 
