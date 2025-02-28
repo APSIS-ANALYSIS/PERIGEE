@@ -15,10 +15,10 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
-  CI( (elemtype == FEType::Tet4 || elemtype == FEType::Hex8) ? 36.0 : 60.0 ),
+  CI( (elemType == FEType::Tet4 || elemType == FEType::Hex8) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
-  vec_size( nLocBas * 4 ), sur_size ( snLocbas * 4 ), angular_velo(angular),
+  vec_size( nLocBas * 4 ), sur_size ( snLocBas * 4 ), angular_velo(angular),
   point_rotated(point_xyz), direction_rotated(angular_direc),
   coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
   mm( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :

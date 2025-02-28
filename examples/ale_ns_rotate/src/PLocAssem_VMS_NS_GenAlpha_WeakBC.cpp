@@ -9,8 +9,8 @@ PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
   const double &in_ct, const double &in_ctauc,
   const double &in_C_bI )
 : PLocAssem_VMS_NS_GenAlpha(in_type, in_nqp_v, in_nqp_s, tm_gAlpha, in_rho, in_vis_mu, 
-  in_beta, in_ct, in_ctauc), C_bI(in_C_bI),
-  elementvs( ElementFactory::createVolElement(elemType, nqps))
+  in_beta, angular, point_xyz, angular_direc, in_ct, in_ctauc), C_bI(in_C_bI),
+  elementvs( ElementFactory::createVolElement(elemType, nqps) )
 { }
 
 PLocAssem_VMS_NS_GenAlpha_WeakBC::~PLocAssem_VMS_NS_GenAlpha_WeakBC()

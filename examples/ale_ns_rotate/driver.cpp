@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
   delete h5r; H5Fclose( file_id );
 
   // Control points' xyz coordinates
-  FEANode * fNode = new FEANode(part_file, rank);
+  auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
 
   // Local sub-domain's IEN array
   auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
@@ -266,14 +266,14 @@ int main(int argc, char *argv[])
   locwbc -> print_info();
 
   // Interfaces info
-  ALocal_Interface * locitf = new ALocal_Interface(part_file, rank);
+  auto locitf = SYS_T::make_unique<ALocal_Interface>(part_file, rank);
   SYS_T::commPrint("Interfaces: %d\n", locitf->get_num_itf());
   locitf -> print_info();
 
   SI_T::SI_solution * SI_sol = new SI_T::SI_solution(part_file, rank);
 
   // Local sub-domain's nodal indices
-  APart_Node * pNode = new APart_Node_Rotated(part_file, rank);
+  std::unique_ptr<APart_Node> pNode = SYS_T::make_unique<APart_Node_Rotated>(part_file, rank);
 
   SI_rotation_info * sir_info = new SI_rotation_info(angular_velo, angular_thd_time, point_rotated, angular_direction);
 
@@ -354,12 +354,12 @@ int main(int argc, char *argv[])
   }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
-  SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf, nqp_sur);
+  SI_T::SI_quad_point * SI_qp = new SI_T::SI_quad_point(locitf.get(), nqp_sur);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode, locnbc.get());
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
 
-  pmat->gen_perm_bc(pNode, locnbc.get());
+  pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
@@ -370,39 +370,22 @@ int main(int argc, char *argv[])
   tm_galpha->print_info();
 
   // ===== Local Assembly routine =====
-  IPLocAssem * locAssem_ptr = nullptr;
-  // if( locwbc->get_wall_model_type() == 0 )
-  // {
-  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha(
-  //     tm_galpha_ptr, elementv->get_nLocBas(),
-  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
-  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc );
-  // }
-  // else if( locwbc->get_wall_model_type() == 1 )
-  // {
-  //   locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_WeakBC(
-  //     tm_galpha_ptr, elementv->get_nLocBas(),
-  //     quadv->get_num_quadPts(), elements->get_nLocBas(),
-  //     fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), point_rotated, angular_velo, c_ct, c_tauc, C_bI );
-  // }
-  // else SYS_T::print_fatal("Error: Unknown wall model type.\n");
-
-  locAssem_ptr = new PLocAssem_VMS_NS_GenAlpha_Interface(
-    tm_galpha.get(), elementv->get_nLocBas(),
-    quadv->get_num_quadPts(), elements->get_nLocBas(),
-    fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType(), 
-    angular_velo, point_rotated, angular_direction, c_ct, c_tauc, C_bI );
+  std::unique_ptr<IPLocAssem> locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha_Interface>(
+    GMIptr->get_elemType(), nqp_vol, nqp_sur,
+    tm_galpha.get(), fluid_density, fluid_mu, bs_beta,
+    angular_velo, point_rotated, angular_direction,
+    c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====
-  std::unique_ptr<PDNSolution> base = SYS_T::make_unique<PDNSolution_NS>( pNode, fNode, locinfnbc, 1 );
+  std::unique_ptr<PDNSolution> base = SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc, 1 );
 
-  PDNSolution * sol = new PDNSolution_NS( pNode, 0 );
+  PDNSolution * sol = new PDNSolution_NS( pNode.get(), 0 );
 
-  PDNSolution * dot_sol = new PDNSolution_NS( pNode, 0 );
+  PDNSolution * dot_sol = new PDNSolution_NS( pNode.get(), 0 );
 
-  PDNSolution * disp_mesh = new PDNSolution_V( pNode );
+  PDNSolution * disp_mesh = new PDNSolution_V( pNode.get() );
 
-  PDNSolution * velo_mesh = new PDNSolution_V( pNode );
+  PDNSolution * velo_mesh = new PDNSolution_V( pNode.get() );
 
   if( is_restart )
   {
@@ -467,17 +450,17 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
+  SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf.get(), SI_sol);
 
-  IPGAssem * gloAssem_ptr = new PGAssem_NS_FEM( locAssem_ptr, elements, 
-      anchor_elementv, opposite_elementv, quads, free_quad,
-      GMIptr, std::move(locIEN), std::move(locElem), pNode, 
-      std::move(locnbc), std::move(locebc), std::move(locwbc),
-      locitf, SI_sol, SI_qp, gbc.get(), nz_estimate );
+  std::unique_ptr<IPGAssem> gloAssem_ptr = SYS_T::make_unique<PGAssem_NS_FEM>
+    ( GMIptr->get_elemType(), nqp_vol, nqp_sur,
+    std::move(locIEN), std::move(locElem),
+    std::move(fNode), std::move(pNode), 
+    std::move(locnbc), std::move(locebc), std::move(locwbc), std::move(locitf),
+    std::move(locAssem_ptr), SI_sol, SI_qp, gbc.get(), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locAssem_ptr,
-      elements, quads, pNode, gbc.get() );
+  gloAssem_ptr->Assem_nonzero_estimate( gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
@@ -489,7 +472,7 @@ int main(int argc, char *argv[])
   MatGetLocalSize( gloAssem_ptr->K, &local_row_size, &local_col_size );
   
   MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
-    PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem_ptr, &shell_mat);
+    PETSC_DETERMINE, PETSC_DETERMINE, (void *)(gloAssem_ptr.get()), &shell_mat);
 
   MatShellSetOperation(shell_mat, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
 
@@ -509,11 +492,9 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf, SI_sol);
+    SI_qp->search_all_opposite_point(anchor_elementv, opposite_elementv, elements, quads, free_quad, locitf.get(), SI_sol);
 
-    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, locAssem_ptr, elementv,
-        elements, anchor_elementv, opposite_elementv, quadv, quads, free_quad, fNode,
-        locitf, SI_sol, SI_qp );
+    gloAssem_ptr->Assem_mass_residual( sol, disp_mesh, SI_sol, SI_qp );
 
     lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_sol );
 
@@ -552,13 +533,13 @@ int main(int argc, char *argv[])
   for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
   {
     const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        dot_sol, locAssem_ptr, elements, quads, ff );
+        dot_sol, ff );
 
     const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_ptr, elements, quads, ff );
+        sol, ff );
 
     const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_ptr, elements, quads, ff );
+        sol, ff );
 
     // set the gbc initial conditions using the 3D data
     gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
@@ -596,10 +577,10 @@ int main(int argc, char *argv[])
   for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
   {
     const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+        sol, locinfnbc, ff );
 
     const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        sol, locAssem_ptr, elements, quads, locinfnbc, ff );
+        sol, locinfnbc, ff );
 
     if( rank == 0 )
     {
@@ -624,12 +605,12 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
-      timeinfo, pNode, fNode,
-      locinfnbc, locrotnbc, gbc.get(), 
-      locitf, sir_info, SI_sol, SI_qp,
-      elementv, elements, anchor_elementv, opposite_elementv,
-      quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, shell_mat);
+  // tsolver->TM_NS_GenAlpha(is_restart, dot_sol, sol, disp_mesh, velo_mesh,
+  //     timeinfo, pNode, fNode,
+  //     locinfnbc, locrotnbc, gbc.get(), 
+  //     locitf, sir_info, SI_sol, SI_qp,
+  //     elementv, elements, anchor_elementv, opposite_elementv,
+  //     quadv, quads, free_quad, locAssem_ptr, gloAssem_ptr, shell_mat);
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
@@ -637,12 +618,11 @@ int main(int argc, char *argv[])
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
-  delete fNode; delete GMIptr; delete sir_info; delete locrotnbc;
-  delete pNode; delete locinfnbc; delete locitf; delete SI_sol; delete SI_qp;
+  delete GMIptr; delete sir_info; delete locrotnbc;
+  delete locinfnbc; delete SI_sol; delete SI_qp;
   delete elementv; delete elements; delete anchor_elementv; delete opposite_elementv;
   delete quads; delete quadv; delete free_quad; delete timeinfo;
-  delete locAssem_ptr; delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
-  delete gloAssem_ptr;
+  delete sol; delete dot_sol; delete disp_mesh; delete velo_mesh;
 
   tsolver.reset(); gbc.reset();
 

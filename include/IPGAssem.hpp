@@ -299,16 +299,6 @@ class IPGAssem
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &mdisp,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        FEAElement * const &elementvs_rotated,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        const FEANode * const &fnode_ptr,
-        const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
@@ -564,17 +554,7 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        FEAElement * const &elementvs_rotated,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
-        const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
@@ -847,17 +827,7 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        FEAElement * const &elementvs_rotated,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        const FEANode * const &fnode_ptr,
         const IGenBC * const &gbc,
-        const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
