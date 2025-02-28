@@ -283,13 +283,13 @@ int main(int argc, char *argv[])
   auto ps_data = SYS_T::make_unique<Tissue_prestress>(locElem.get(), nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
-  std::vector<APart_Node*> pNode_list { pNode_v.get(), pNode_p.get() };
+  std::vector<APart_Node *> pNode_list { pNode_v.get(), pNode_p.get() };
 
-  std::vector<ALocal_NBC*> locnbc_list { locnbc_v.get(), locnbc_p.get() };
+  std::vector<ALocal_NBC *> locnbc_list { locnbc_v.get(), locnbc_p.get() };
 
-  std::vector<APart_Node*> pNode_m_list { pNode_v.get() };
+  std::vector<APart_Node *> pNode_m_list { pNode_v.get() };
 
-  std::vector<ALocal_NBC*> locnbc_m_list { mesh_locnbc.get() };
+  std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc.get() };
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_v_file, rank),
