@@ -1,24 +1,27 @@
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
 
 PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const FEType &elemtype,
-        const double &angular,
-        const Vector_3 &point_xyz, const Vector_3 &angular_direc,
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+        const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
+        const double &in_vis_mu, const double &in_beta,
+        const double &angular, const Vector_3 &point_xyz, 
+        const Vector_3 &angular_direc,
         const double &in_ct, const double &in_ctauc )
-: rho0( in_rho ), vis_mu( in_vis_mu ),
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
+  elementv( ElementFactory::createVolElement(elemType, nqpv) ),
+  elements( ElementFactory::createSurElement(elemType, nqps) ),
+  quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
+  quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
+  rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta),
   CI( (elemtype == FEType::Tet4 || elemtype == FEType::Hex8) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
-  nqp(in_nqp), nLocBas( in_nlocbas ), snLocBas( in_snlocbas ),
-  vec_size( in_nlocbas * 4 ), sur_size ( in_snlocbas * 4 ), angular_velo(angular),
+  nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
+  vec_size( nLocBas * 4 ), sur_size ( snLocbas * 4 ), angular_velo(angular),
   point_rotated(point_xyz), direction_rotated(angular_direc),
-  coef( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
-  mm( (elemtype == FEType::Tet4 || elemtype == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
+  coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
+  mm( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
   Tangent = new PetscScalar[vec_size * vec_size];
@@ -53,15 +56,7 @@ void PLocAssem_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 10)
-    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
-  else if(nLocBas == 27)
-    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
+  elementv->print_info();
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
@@ -137,17 +132,15 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double * const &sol,
     const double * const &mvelo,
     const double * const &mdisp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementv->buildBasis( quadv.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -158,7 +151,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
@@ -171,7 +164,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+    elementv->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -230,7 +223,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double cw = w - mw;
 
     // Get the tau_m and tau_c
-    const auto dxi_dx = element->get_invJacobian(qua);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
 
     const std::array<double, 2> tau = get_tau( dt, dxi_dx, cu, cv, cw );
     const double tau_m = tau[0];
@@ -238,7 +231,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
 
     const double tau_m_2 = tau_m * tau_m;
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     // Get the body force
     const Vector_3 f_body = get_f( coor, curr );
@@ -324,17 +317,15 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double * const &sol,
     const double * const &mvelo,
     const double * const &mdisp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementv->buildBasis( quadv.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -349,7 +340,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
@@ -362,7 +353,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
+    elementv->get_3D_R_gradR_LaplacianR( qua, &R[0], &dR_dx[0], 
         &dR_dy[0], &dR_dz[0], &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
@@ -420,7 +411,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double cv = v - mv;
     const double cw = w - mw;
 
-    const auto dxi_dx = element->get_invJacobian(qua);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
 
     const std::array<double, 2> tau = get_tau( dt, dxi_dx, cu, cv, cw );
     const double tau_m = tau[0];
@@ -428,7 +419,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const double tau_m_2 = tau_m * tau_m;
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
     const Vector_3 f_body = get_f( coor, curr );
 
@@ -701,13 +692,11 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -717,7 +706,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
@@ -726,7 +715,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -754,7 +743,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const Vector_3 f_body = get_f( coor, curr );
 
@@ -797,27 +786,23 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = time + alpha_f * dt;
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
@@ -831,9 +816,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
-      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
-      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
+      sur_Residual[4*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * traction.x();
+      sur_Residual[4*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * traction.y();
+      sur_Residual[4*A+3] -= surface_area * quads -> get_qw(qua) * R[A] * traction.z();
     }
   }
 }
@@ -841,56 +826,48 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const int &ebc_id,
     const double &val,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   double surface_area;
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
-      sur_Residual[4*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
-      sur_Residual[4*A+3] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
+      sur_Residual[4*A+1] += surface_area * quads -> get_qw(qua) * R[A] * n_out.x() * val;
+      sur_Residual[4*A+2] += surface_area * quads -> get_qw(qua) * R[A] * n_out.y() * val;
+      sur_Residual[4*A+3] += surface_area * quads -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }
 
 void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
@@ -907,9 +884,9 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual[4*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.x();
-      sur_Residual[4*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.y();
-      sur_Residual[4*A+3] -= surface_area * quad -> get_qw(qua) * R[A] * factor * velo.z();
+      sur_Residual[4*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * factor * velo.x();
+      sur_Residual[4*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * factor * velo.y();
+      sur_Residual[4*A+3] -= surface_area * quads -> get_qw(qua) * R[A] * factor * velo.z();
     }
   }
 }
@@ -917,27 +894,23 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
     const double &dt,
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double dd_dv = alpha_f * gamma * dt;
 
   Zero_sur_Tangent_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
@@ -951,7 +924,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 
     const double factor = temp < 0.0 ? temp * rho0 * beta : 0.0;
 
-    const double gwts = surface_area * quad -> get_qw(qua);
+    const double gwts = surface_area * quads -> get_qw(qua);
 
     // snLocBas = 3 for linear tri element
     //            6 for quadratic tri element
@@ -974,24 +947,20 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab(
 }
 
 double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   double flrate = 0.0;
 
-  for(int qua =0; qua< face_nqp; ++qua)
+  for(int qua =0; qua< nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 velo(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
@@ -1001,7 +970,7 @@ double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
       velo.z() += sol[ii*4+3] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
+    flrate += surface_area * quads->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
   }
 
   return flrate;
@@ -1009,29 +978,25 @@ double PLocAssem_VMS_NS_GenAlpha::get_flowrate( const double * const &sol,
 
 void PLocAssem_VMS_NS_GenAlpha::get_pressure_area( 
     const double * const &sol,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad,
     double &pres, double &area )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   // Initialize the two variables to be passed out
   pres = 0.0; area = 0.0;
 
-  for(int qua =0; qua < face_nqp; ++qua)
+  for(int qua =0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += sol[4*ii+0] * R[ii];
 
-    pres += element->get_detJac(qua) * quad->get_qw(qua) * pp;
-    area += element->get_detJac(qua) * quad->get_qw(qua);
+    pres += elements->get_detJac(qua) * quads->get_qw(qua) * pp;
+    area += elements->get_detJac(qua) * quads->get_qw(qua);
   }
 }
 

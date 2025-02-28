@@ -1,17 +1,16 @@
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 
 PLocAssem_VMS_NS_GenAlpha_WeakBC::PLocAssem_VMS_NS_GenAlpha_WeakBC(
-        const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_nqp,
-        const int &in_snlocbas,
-        const double &in_rho, const double &in_vis_mu,
-        const double &in_beta, const FEType &elemtype,
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+        const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
+        const double &in_vis_mu, const double &in_beta,
         const double &angular,
         const Vector_3 &point_xyz, const Vector_3 &angular_direc,
         const double &in_ct, const double &in_ctauc,
         const double &in_C_bI )
-: PLocAssem_VMS_NS_GenAlpha(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
-  in_rho, in_vis_mu, in_beta, elemtype, angular, point_xyz, angular_direc, in_ct, in_ctauc), C_bI(in_C_bI)
+: PLocAssem_VMS_NS_GenAlpha(in_type, in_nqp_v, in_nqp_s, tm_gAlpha, in_rho, in_vis_mu, 
+  in_beta, in_ct, in_ctauc), C_bI(in_C_bI),
+  elementvs( ElementFactory::createVolElement(elemType, nqps))
 { }
 
 PLocAssem_VMS_NS_GenAlpha_WeakBC::~PLocAssem_VMS_NS_GenAlpha_WeakBC()
@@ -21,15 +20,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 10)
-    SYS_T::commPrint("  FEM: 10-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
-  else if(nLocBas == 27)
-    SYS_T::commPrint("  FEM: 27-node Hexahedral element \n");
-  else SYS_T::print_fatal("Error: unknown elem type.\n");
+  elementv->print_info();
   SYS_T::commPrint("  Spatial: Residual-based VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
@@ -53,11 +44,9 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
     const double * const &sol,
     const double * const &local_mvelo,
     const double * const &local_mdisp,
-    FEAElement * const &elementvs,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quads,
     const int &face_id)
 {
   const double curr {time + alpha_f * dt};
@@ -68,15 +57,13 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Residual_Weak(
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, local_mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
   // Build the basis function of volume element
-  elementvs->buildBasis( face_id, quads, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp {quads -> get_num_quadPts()};
+  elementvs->buildBasis( face_id, quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   Zero_Residual();
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for(int qua {0}; qua < face_nqp; ++qua)
+  for(int qua {0}; qua < nqps; ++qua)
   {
     elementvs->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
@@ -196,11 +183,9 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
     const double * const &sol,
     const double * const &local_mvelo,
     const double * const &local_mdisp,
-    FEAElement * const &elementvs,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quads,
     const int &face_id)
 {
   const double curr {time + alpha_f * dt};
@@ -211,7 +196,7 @@ void PLocAssem_VMS_NS_GenAlpha_WeakBC::Assem_Tangent_Residual_Weak(
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, local_mdisp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
   // Build the basis function of volume element
-  elementvs->buildBasis( face_id, quads, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementvs->buildBasis( face_id, quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double dd_dv {alpha_f * gamma * dt};
 
