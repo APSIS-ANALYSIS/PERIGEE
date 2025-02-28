@@ -99,6 +99,13 @@ class IPLocAssem_2x2Block
 
     virtual int get_snLocBas_1() const = 0;
 
+    // --------------------------------------------------------------
+    // Return the number of quadrature points with physical field
+    // --------------------------------------------------------------
+    virtual int get_nqpv() const = 0; 
+
+    virtual int get_nqps() const = 0;
+
     // -------------------------------------------------------------- 
     // Return the number of ebc functions implemented inside this local
     // assembly routine.
@@ -171,6 +178,33 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual is not implemented. \n");}
 
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual is not implemented. \n");}
+
+    virtual void Assem_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual is not implemented. \n");}
+
     // Assembly the two Residuals and the four matrice blocks.
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -214,6 +248,33 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
 
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
+
+    virtual void Assem_Tangent_Residual(
+        const double &time, const double &dt,
+        const double * const &dot_disp,
+        const double * const &dot_velo,
+        const double * const &dot_pres,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Tangent_Residual is not implemented. \n");}
+
     // Assembly the two Residuals and the four matrice blocks for mass matrices.
     virtual void Assem_Mass_Residual(
         const double * const &vec,
@@ -247,6 +308,25 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
 
+    virtual void Assem_Mass_Residual(
+        const double * const &vec_0,
+        const double * const &vec_1,
+        const double * const &vec_2,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
+
+    virtual void Assem_Mass_Residual(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        const double * const &qua_prestress )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Mass_Residual is not implemented. \n");}
+
     // Perform surface integration for elemental BC id ebc_id.
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
@@ -269,6 +349,15 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
+        virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &disp,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
+
     virtual void Assem_Residual_Interior_Wall_EBC(
         const double &time,
         const double * const &pres,
@@ -279,6 +368,14 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_Interior_Wall_EBC is not implemented.\n");}
 
+    virtual void Assem_Residual_Interior_Wall_EBC(
+        const double &time,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_Interior_Wall_EBC is not implemented.\n");}
+
     virtual double get_flowrate(
         const double * const &disp,
         const double * const &velo,
@@ -287,6 +384,17 @@ class IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
+    {
+      SYS_T::commPrint("Warning: get_flowrate() is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double get_flowrate(
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
     {
       SYS_T::commPrint("Warning: get_flowrate() is not implemented. \n");
       return 0.0;
@@ -305,6 +413,17 @@ class IPLocAssem_2x2Block
       SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
     }
 
+    virtual void get_pressure_area( 
+        const double * const &disp,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z,
+        double &pressure, double &area )
+    {
+      SYS_T::commPrint("Warning: get_pressure_area() is not implemented. \n");
+    }
+
     virtual void Assem_Residual_EBC_Resistance(
         const double &val,
         const double * const &disp,
@@ -313,6 +432,14 @@ class IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad )
+    {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
+
+    virtual void Assem_Residual_EBC_Resistance(
+        const double &val,
+        const double * const &disp,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
     {SYS_T::commPrint("Warning: this Assem_Residual_EBC_Resistance is not implemented.\n");}
 
     virtual void Assem_Residual_BackFlowStab(
@@ -338,6 +465,25 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
 
+    virtual void Assem_Residual_BackFlowStab(
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Residual_BackFlowStab is not implemented.\n");}
+
+    virtual void Assem_Tangent_Residual_BackFlowStab(
+        const double &dt,
+        const double * const &dot_disp,
+        const double * const &disp,
+        const double * const &velo,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: this Assem_Tangent_Residual_BackFlowStab is not implemented.\n");}
+
     virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
         const double * const &disp,
         const double * const &pres,
@@ -346,6 +492,18 @@ class IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
         const IQuadPts * const &quad ) const
+    {
+      SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
+      std::vector<SymmTensor2_3D> output; output.clear();
+      return output;
+    }
+
+    virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
+        const double * const &disp,
+        const double * const &pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z ) const
     {
       SYS_T::commPrint("Warning: get_CauchyStress() is not implemented. \n");
       std::vector<SymmTensor2_3D> output; output.clear();
