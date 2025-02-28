@@ -136,7 +136,7 @@ int main( int argc, char * argv[] )
       fIEN[ee*nlocbas+ii] = VEC_T::get_pos( subdomain_nodes, locIEN_v->get_LIEN(ee, ii) );
 
   // Visualization prepration
-  std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_ALE_NS>(); 
+  std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_ALE_NS>();
   visprep->print_info();
 
   double ** pointArrays = new double * [3];
