@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   double fluid_density = 1.065;
   double fluid_mu = 3.5e-2;
   double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
-  double c_ct = 4.0; // C_T parameter for defining tau_M
+  double c_ct = 4.0;   // C_T parameter for defining tau_M
 
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
 
   // Restart options
   bool is_restart = false;
-  int restart_index = 0;     // restart solution time index
-  double restart_time = 0.0; // restart time
-  double restart_step = 1.0e-3; // restart simulation time step size
+  int restart_index = 0;             // restart solution time index
+  double restart_time = 0.0;         // restart time
+  double restart_step = 1.0e-3;      // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Yaml options
