@@ -363,7 +363,7 @@ void PTime_FSI_Solver::record_inlet_data(
       {
         if( !is_restart )
         {
-          ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+          ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
       
           ofile<<time_info->get_index()<<'\t'
              <<time_info->get_time()<<'\t'
@@ -422,8 +422,8 @@ void PTime_FSI_Solver::record_outlet_data(
       {
         if( !is_restart )
         {
-          ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'
-               <<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
+          ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"dot-Flow-rate"<<'\t'<<"Flow-rate"<<'\t'
+               <<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\n';
           
           ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
                <<dot_face_flrate<<'\t'<<face_flrate<<'\t'
