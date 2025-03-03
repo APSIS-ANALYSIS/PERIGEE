@@ -200,13 +200,22 @@ void PTime_NS_Solver::record_outlet_data(
     const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
         sol, ff);
 
+    double lpn_pressure;
+
     if ( is_driver )
+    {
       gbc -> reset_initial_sol( ff, face_flrate, face_avepre, time_info->get_time(), is_restart );
-    else
-      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, time_info->get_time(), false );
     
-    const double lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate,
+      lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate,
         time_info -> get_time() );
+    }
+    else
+    {
+      lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate,
+        time_info -> get_time() );
+      
+      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, time_info->get_time(), false );
+    }
     
     if( SYS_T::get_MPI_rank() == 0 )
     {
