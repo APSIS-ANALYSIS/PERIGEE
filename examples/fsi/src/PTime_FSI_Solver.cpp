@@ -175,61 +175,14 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     }
 
     // Calculate the flow rate on all outlets
-    for(int face=0; face<gbc -> get_num_ebc(); ++face)
-    {
-      // Calculate 3D dot flow rate on the outlets
-      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp.get(),
-          cur_dot_velo.get(), face );
-
-      // Calculate 3D flow rate on the outlets
-      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp.get(),
-          cur_velo.get(), face);
-
-      // Calculate 3D averaged pressure on outlets
-      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp.get(), cur_pres.get(), face);
-
-      // Calculate 0D pressure from LPN model
-      const double dot_lpn_flowrate = dot_face_flrate;
-      const double lpn_flowrate = face_flrate;
-      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate, time_info->get_time() );
-
-      // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
-
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( gen_flowfile_name("Outlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-        ofile.close();
-      }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
+    record_outlet_data( cur_disp.get(), cur_velo.get(), cur_pres.get(), cur_dot_velo.get(), time_info.get(), gbc, gassem_ptr, false, true );
 
     // Write all 0D solutions into a file
     if( SYS_T::get_MPI_rank() == 0 )
       gbc -> write_0D_sol ( time_info->get_index(), time_info->get_time() );
 
     // Calculate the flow rate and averaged pressure on all inlets
-    for(int face=0; face<infnbc -> get_num_nbc(); ++face)
-    {
-      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_disp.get(), cur_velo.get(), infnbc, face );
-
-      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp.get(), cur_pres.get(), infnbc, face );
-
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-        ofile.close();
-      }
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
+    record_inlet_data( cur_disp.get(), cur_velo.get(), cur_pres.get(), time_info.get(), infnbc, gassem_ptr, false, true );
 
     pre_dot_disp -> Copy( cur_dot_disp.get() );
     pre_dot_velo -> Copy( cur_dot_velo.get() );
@@ -378,6 +331,110 @@ void PTime_FSI_Solver::Nullify_solid_dof( const APart_Node * const &pnode,
   VecGhostRestoreLocalForm(sol->solution, &lsol);
 
   sol->GhostUpdate(); // update the ghost slots
+}
+
+void PTime_FSI_Solver::record_inlet_data( 
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    const PDNSolution * const &pres,
+    const PDNTimeStep * const &time_info,
+    const ALocal_InflowBC * const &infnbc_part,
+    const IPGAssem * const &gassem_ptr,
+    bool is_driver,
+    bool is_restart ) const
+{
+  auto mode = is_restart ? std::ofstream::app : std::ofstream::trunc;
+
+  for(int ff=0; ff<infnbc_part->get_num_nbc(); ++ff)
+  {
+    const double flrate = gassem_ptr->Assem_surface_flowrate(disp, velo, infnbc_part, ff); 
+
+    const double avepre = gassem_ptr->Assem_surface_ave_pressure(disp, pres, infnbc_part, ff);
+
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | mode );
+      
+      if( !is_driver )
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+           <<flrate<<'\t'<<avepre<<std::endl;
+      else
+      {
+        if( !is_restart )
+        {
+          ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
+      
+          ofile<<time_info->get_index()<<'\t'
+             <<time_info->get_time()<<'\t'
+             <<flrate<<'\t'<<avepre<<std::endl;
+        }
+      }
+
+      ofile.close();
+    } 
+    MPI_Barrier(PETSC_COMM_WORLD);
+  }
+}
+
+void PTime_FSI_Solver::record_outlet_data(
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    const PDNSolution * const &pres,
+    const PDNSolution * const &dot_velo,
+    const PDNTimeStep * const &time_info,
+    IGenBC * const &gbc,
+    const IPGAssem * const &gassem_ptr,
+    bool is_driver,
+    bool is_restart) const
+{
+  auto mode = is_restart ? std::ofstream::app : std::ofstream::trunc;
+
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
+  {
+    const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+        disp, dot_velo, ff); 
+
+    const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+        disp, velo, ff); 
+
+    const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
+        disp, pres, ff);
+
+    const double lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate,
+        time_info -> get_time() );
+    
+    if ( is_driver )
+      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, time_info->get_time(), is_restart );
+    else
+      gbc -> reset_initial_sol( ff, face_flrate, lpn_pressure, time_info->get_time(), false );
+    
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | mode );
+
+      if( !is_driver )
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+             <<dot_face_flrate<<'\t'<<face_flrate<<'\t'
+             <<face_avepre<<'\t'<<lpn_pressure<<std::endl;
+      else
+      {
+        if( !is_restart )
+        {
+          ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'
+               <<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
+          
+          ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+               <<dot_face_flrate<<'\t'<<face_flrate<<'\t'
+               <<face_avepre<<'\t'<<lpn_pressure<<std::endl;
+        }
+      }
+
+      ofile.close();
+    }
+    MPI_Barrier(PETSC_COMM_WORLD);
+  }
 }
 
 // EOF
