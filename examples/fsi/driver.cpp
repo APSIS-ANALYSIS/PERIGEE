@@ -563,72 +563,15 @@ int main(int argc, char *argv[])
   tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
-  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
-  {
-    const double dot_face_flrate = gloAssem -> Assem_surface_flowrate( disp.get(), dot_velo.get(), ff );
-
-    const double face_flrate = gloAssem -> Assem_surface_flowrate( disp.get(), velo.get(), ff );
-
-    const double face_avepre = gloAssem -> Assem_surface_ave_pressure( disp.get(), pres.get(), ff );
-
-    // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
-
-    const double dot_lpn_flowrate = dot_face_flrate;
-    const double lpn_flowrate = face_flrate;
-    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
-
-    if(rank == 0)
-    {
-      std::ofstream ofile;
-
-      // If this is NOT a restart run, generate a new file, otherwise append to
-      // a existing file
-      if( !is_restart )
-        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      // if this is NOT a restart run, record the initial values
-      if( !is_restart )
-      {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
+  tsolver->record_outlet_data( disp.get(), velo.get(), pres.get(), dot_velo.get(), timeinfo.get(), gbc.get(),
+      gloAssem.get(), true, is_restart );
 
   // Write all 0D solutions into a file
   if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
-  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  {
-    const double inlet_face_flrate = gloAssem -> Assem_surface_flowrate( disp.get(), velo.get(), locinfnbc.get(), ff );
-
-    const double inlet_face_avepre = gloAssem -> Assem_surface_ave_pressure( disp.get(), pres.get(), locinfnbc.get(), ff );
-
-    if( rank == 0 )
-    {
-      std::ofstream ofile;
-      if( !is_restart )
-        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      if( !is_restart )
-      {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
+  tsolver->record_inlet_data( disp.get(), velo.get(), pres.get(), timeinfo.get(), locinfnbc.get(), 
+      gloAssem.get(), true, is_restart );
 
   // ===== FEM analysis =====
 #ifdef PETSC_USE_LOG

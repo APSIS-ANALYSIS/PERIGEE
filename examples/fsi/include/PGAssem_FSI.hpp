@@ -74,24 +74,24 @@ class PGAssem_FSI : public IPGAssem
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const int &ebc_id );
+        const int &ebc_id ) const;
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
-        const int &ebc_id );
+        const int &ebc_id ) const;
 
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id );
+        const int &nbc_id ) const;
 
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
         const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id );
+        const int &nbc_id ) const;
 
   private:
     const std::unique_ptr<const ALocal_IEN> locien_v;

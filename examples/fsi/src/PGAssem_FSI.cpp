@@ -570,7 +570,7 @@ void PGAssem_FSI::EssBC_G()
 double PGAssem_FSI::Assem_surface_flowrate(
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
-    const int &ebc_id )
+    const int &ebc_id ) const
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
@@ -610,7 +610,7 @@ double PGAssem_FSI::Assem_surface_flowrate(
     const PDNSolution * const &disp,
     const PDNSolution * const &velo,
     const ALocal_InflowBC * const &infbc_part,
-    const int &nbc_id )
+    const int &nbc_id ) const
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_v = velo -> GetLocalArray();
@@ -649,7 +649,7 @@ double PGAssem_FSI::Assem_surface_flowrate(
 double PGAssem_FSI::Assem_surface_ave_pressure(
     const PDNSolution * const &disp,
     const PDNSolution * const &pres,
-    const int &ebc_id )
+    const int &ebc_id ) const
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();
@@ -697,7 +697,7 @@ double PGAssem_FSI::Assem_surface_ave_pressure(
     const PDNSolution * const &disp,
     const PDNSolution * const &pres,
     const ALocal_InflowBC * const &infbc_part,
-    const int &nbc_id )
+    const int &nbc_id ) const
 {
   const std::vector<double> array_d = disp -> GetLocalArray();
   const std::vector<double> array_p = pres -> GetLocalArray();

@@ -1004,7 +1004,7 @@ class IPGAssem
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
-        const int &ebc_id )
+        const int &ebc_id ) const
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
       return 0.0;
@@ -1027,7 +1027,7 @@ class IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
+        const int &nbc_id ) const
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
       return 0.0;
@@ -1115,7 +1115,7 @@ class IPGAssem
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
-        const int &ebc_id )
+        const int &ebc_id ) const
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
@@ -1138,7 +1138,7 @@ class IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
         const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
+        const int &nbc_id ) const
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
