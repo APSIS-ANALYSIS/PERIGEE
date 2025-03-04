@@ -223,7 +223,6 @@ namespace SI_T
         IPLocAssem * const &lassem_ptr,
         FEAElement * const &anchor_elementv,
         FEAElement * const &opposite_elementv,
-        FEAElement * const &elements,
         const IQuadPts * const &quad_s,
         IQuadPts * const &free_quad,
         const ALocal_Interface * const &itf_part,
@@ -235,7 +234,6 @@ namespace SI_T
         A_lassemptr = lassem_ptr;
         A_anchor_elementv = anchor_elementv;
         A_opposite_elementv = opposite_elementv;
-        A_elements = elements;
         A_quad_s = quad_s;
         A_free_quad = free_quad;
         A_itf_part = itf_part;
@@ -249,7 +247,6 @@ namespace SI_T
         A_lassemptr = nullptr;
         A_anchor_elementv = nullptr;
         A_opposite_elementv = nullptr;
-        A_elements = nullptr;
         A_free_quad = nullptr;
         A_SI_sol = nullptr;
         A_SI_qp = nullptr;
@@ -262,8 +259,6 @@ namespace SI_T
       FEAElement * A_anchor_elementv;
 
       FEAElement * A_opposite_elementv;
-
-      FEAElement * A_elements;
 
       const IQuadPts * A_quad_s;
 
