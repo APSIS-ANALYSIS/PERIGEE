@@ -41,15 +41,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     IGenBC * const &gbc,
     const ALocal_Interface * const &itf_part,
     const SI_rotation_info * const &rot_info,
-    SI_T::SI_solution * const &SI_sol,
-    SI_T::SI_quad_point * const &SI_qp,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    FEAElement * const &elementvs,
-    FEAElement * const &elementvs_rotated,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     Mat &shell ) const
@@ -163,8 +154,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         time_info->get_time(), time_info->get_step(), 
         pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
         feanode_ptr, infnbc_part, rotnbc_part,
-        gbc, itf_part, SI_sol, SI_qp, elementv, elements, elementvs, elementvs_rotated,
-        quad_v, quad_s, free_quad, lassem_fluid_ptr, gassem_ptr,
+        gbc, itf_part, lassem_fluid_ptr, gassem_ptr,
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
 
     // Update the time step information
@@ -195,15 +185,15 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol, lassem_fluid_ptr, elements, quad_s, face); 
+          cur_dot_sol, face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, face); 
+          cur_sol, face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol, lassem_fluid_ptr, elements, quad_s, face);
+          cur_sol, face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -231,10 +221,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face ); 
+          cur_sol, infnbc_part, face ); 
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_sol, lassem_fluid_ptr, elements, quad_s, infnbc_part, face );
+          cur_sol, infnbc_part, face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {

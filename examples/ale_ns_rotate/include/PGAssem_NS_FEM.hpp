@@ -30,7 +30,6 @@ class PGAssem_NS_FEM : public IPGAssem
     // Constructor for NS equations
     PGAssem_NS_FEM(
         const FEType &in_type,
-        const double &in_nqpv,
         const double &in_nqps,
         std::unique_ptr<ALocal_IEN> in_locien,
         std::unique_ptr<ALocal_Elem> in_locelem,
@@ -41,8 +40,8 @@ class PGAssem_NS_FEM : public IPGAssem
         std::unique_ptr<ALocal_WeakBC> in_wbc,
         std::unique_ptr<ALocal_Interface> in_itf,
         std::unique_ptr<IPLocAssem> in_locassem,
-        SI_T::SI_solution * const &SI_sol,
-        SI_T::SI_quad_point * const &SI_qp,
+        std::unique_ptr<SI_T::SI_solution> in_SI_sol,
+        std::unique_ptr<SI_T::SI_quad_point> in_SI_qp,
         const IGenBC * const &gbc,
         const int &in_nz_estimate=60 );
 
@@ -56,9 +55,7 @@ class PGAssem_NS_FEM : public IPGAssem
     // Assem mass matrix and residual vector
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
-        const PDNSolution * const &mdisp,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
+        const PDNSolution * const &mdisp);
 
     // Assembly the residual vector for the NS equations
     virtual void Assem_residual(
@@ -70,9 +67,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const IGenBC * const &gbc,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
+        const IGenBC * const &gbc );
 
     // Assembly the residual vector and tangent matrix 
     // for the NS equations
@@ -85,9 +80,7 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const IGenBC * const &gbc,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
+        const IGenBC * const &gbc );
 
     // Assembly routine for the surface integrals of flow rate and
     // pressure
@@ -111,8 +104,17 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
+    virtual SI_T::SI_solution * Get_SI_sol()
+    { return SI_sol.get(); }
+
+    virtual SI_T::SI_quad_point * Get_SI_qp()
+    { return SI_qp.get(); }
+
   private:
     // Private data
+    const std::unique_ptr<SI_T::SI_solution> SI_sol;
+    const std::unique_ptr<SI_T::SI_quad_point> SI_qp;
+
     const std::unique_ptr<const ALocal_IEN> locien;
     const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const FEANode> fnode;
@@ -133,12 +135,12 @@ class PGAssem_NS_FEM : public IPGAssem
     const std::unique_ptr<FEAElement> opposite_elementv;
 
     // For the interface integral
-    const std::unique_ptr<IQuadPts> quad_s;
+    const std::unique_ptr<const IQuadPts> quad_s;
 
     // Free parametric surface quadrature point
-    std::unique_ptr<IQuadPts> free_quad;
+    const std::unique_ptr<IQuadPts> free_quad;
 
-    SI_T::SI_ancillary anci;
+    double time_step;
 
     // Private function
     // Essential boundary condition
@@ -177,14 +179,10 @@ class PGAssem_NS_FEM : public IPGAssem
         const PDNSolution * const &mdisp);
 
     virtual void Interface_KG(
-        const double &dt,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
+        const double &dt );
 
     virtual void Interface_G(
-        const double &dt,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp );
+        const double &dt );
 
     virtual void local_MatMult_MF(
         const int &dof,

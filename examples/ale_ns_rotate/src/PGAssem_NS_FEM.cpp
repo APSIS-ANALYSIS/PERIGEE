@@ -2,7 +2,6 @@
 
 PGAssem_NS_FEM::PGAssem_NS_FEM(
   const FEType &in_type,
-  const double &in_nqpv,
   const double &in_nqps,
   std::unique_ptr<ALocal_IEN> in_locien,
   std::unique_ptr<ALocal_Elem> in_locelem,
@@ -13,11 +12,13 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   std::unique_ptr<ALocal_WeakBC> in_wbc,
   std::unique_ptr<ALocal_Interface> in_itf,
   std::unique_ptr<IPLocAssem> in_locassem,
-  SI_T::SI_solution * const &SI_sol,
-  SI_T::SI_quad_point * const &SI_qp,
+  std::unique_ptr<SI_T::SI_solution> in_SI_sol,
+  std::unique_ptr<SI_T::SI_quad_point> in_SI_qp,
   const IGenBC * const &gbc,
   const int &in_nz_estimate )
-: locien( std::move(in_locien) ),
+: SI_sol( std::move(in_SI_sol) ),
+  SI_qp( std::move(in_SI_qp) ),
+  locien( std::move(in_locien) ),
   locelem( std::move(in_locelem) ),
   fnode( std::move(in_fnode) ),
   pnode( std::move(in_pnode) ),
@@ -32,11 +33,11 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   dof_mat( locassem->get_dof_mat() ),
   num_ebc( ebc->get_num_ebc() ),
   nlgn( pnode->get_nlocghonode() ),
-  anchor_elementv( ElementFactory::createVolElement(in_type, in_nqpv) ),
+  anchor_elementv( ElementFactory::createVolElement(in_type, in_nqps) ),
   opposite_elementv( ElementFactory::createVolElement(in_type, 1) ),
   quad_s( QuadPtsFactory::createSurQuadrature(in_type, in_nqps) ),
   free_quad( QuadPtsFactory::createFreeSurQuadrature(in_type) ),
-  anci( SI_sol, SI_qp )
+  time_step( 0.0 )
 {
   // Make sure the data structure is compatible
   SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
@@ -63,6 +64,8 @@ PGAssem_NS_FEM::PGAssem_NS_FEM(
   VecSetFromOptions(G);
   VecSet(G, 0.0);
   VecSetOption(G, VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
+
+  SI_qp->search_all_opposite_point(itf.get(), SI_sol.get());
 
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
@@ -171,7 +174,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 
   delete temp;
 
-  Interface_KG(0.1, anci.A_SI_sol, anci.A_SI_qp);
+  Interface_KG(0.1);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -186,9 +189,7 @@ void PGAssem_NS_FEM::Assem_nonzero_estimate(
 
 void PGAssem_NS_FEM::Assem_mass_residual(
     const PDNSolution * const &sol_a,
-    const PDNSolution * const &mdisp,
-    const SI_T::SI_solution * const &SI_sol,
-    const SI_T::SI_quad_point * const &SI_qp )
+    const PDNSolution * const &mdisp )
 {
   const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -237,7 +238,7 @@ void PGAssem_NS_FEM::Assem_mass_residual(
   Weak_EssBC_G(0, 0, sol_a, mdisp, mdisp);
 
   // Surface integral from Nitsche method
-  Interface_G(0, SI_sol, SI_qp);
+  Interface_G(0);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -259,9 +260,7 @@ void PGAssem_NS_FEM::Assem_residual(
     const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
-    const IGenBC * const &gbc,
-    const SI_T::SI_solution * const &SI_sol,
-    const SI_T::SI_quad_point * const &SI_qp )
+    const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -335,7 +334,7 @@ void PGAssem_NS_FEM::Assem_residual(
   // NatBC_G( curr_time, dt );
 
   // Surface integral from Nitsche method
-  Interface_G(dt, SI_sol, SI_qp);
+  Interface_G(dt);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -355,9 +354,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
     const PDNSolution * const &sol_np1,
     const double &curr_time,
     const double &dt,
-    const IGenBC * const &gbc,
-    const SI_T::SI_solution * const &SI_sol,
-    const SI_T::SI_quad_point * const &SI_qp )
+    const IGenBC * const &gbc )
 {
   const int nElem = locelem->get_nlocalele();
   const int loc_dof = dof_mat * nLocBas;
@@ -434,7 +431,7 @@ void PGAssem_NS_FEM::Assem_tangent_residual(
   // NatBC_G( curr_time, dt );
 
   // Surface integral from Nitsche method (Only assemble G at present)
-  Interface_KG(dt, SI_sol, SI_qp);
+  Interface_KG(dt);
 
   VecAssemblyBegin(G);
   VecAssemblyEnd(G);
@@ -1105,11 +1102,9 @@ void PGAssem_NS_FEM::Weak_EssBC_G(
 }
 
 void PGAssem_NS_FEM::Interface_KG(
-  const double &dt,
-  const SI_T::SI_solution * const &SI_sol,
-  const SI_T::SI_quad_point * const &SI_qp )
+  const double &dt )
 {
-  anci.A_dt = dt;
+  time_step = dt;
   const int loc_dof {dof_mat * nLocBas};
   double * ctrl_x = new double [nLocBas];
   double * ctrl_y = new double [nLocBas];
@@ -1280,11 +1275,9 @@ void PGAssem_NS_FEM::Interface_KG(
 }
 
 void PGAssem_NS_FEM::Interface_G(
-  const double &dt,
-  const SI_T::SI_solution * const &SI_sol,
-  const SI_T::SI_quad_point * const &SI_qp )
+  const double &dt )
 {
-  anci.A_dt = dt;
+  time_step = dt;
   const int loc_dof {dof_mat * nLocBas};
   double * ctrl_x = new double [nLocBas];
   double * ctrl_y = new double [nLocBas];
@@ -1499,12 +1492,12 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
       anchor_elementv->buildBasis(fixed_face_id, quad_s.get(), ctrl_x, ctrl_y, ctrl_z);
 
       // Get the local ien and local sol of this fixed element
-      anci.A_SI_sol->get_fixed_local(itf.get(), itf_id, ee, anchor_local_ien, anchor_local_sol);
+      SI_sol->get_fixed_local(itf.get(), itf_id, ee, anchor_local_ien, anchor_local_sol);
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
         // Get the quadrature point info
-        anci.A_SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
+        SI_qp->get_curr_rotated(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int rotated_face_id {itf->get_rotated_face_id(itf_id, opposite_ee)};
 
@@ -1515,15 +1508,15 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
         const double qw = quad_s->get_qw(qua);
 
         // Get the local ien , displacement, solution and mesh velocity of the rotated element
-        anci.A_SI_sol->get_rotated_mdisp(itf.get(), itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
+        SI_sol->get_rotated_mdisp(itf.get(), itf_id, opposite_ee, opposite_local_ien, rotated_local_disp);
         get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
-        anci.A_SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
+        SI_sol->get_rotated_local(itf_id, opposite_local_ien, opposite_local_sol, rotated_local_mvelo);
 
         opposite_elementv->buildBasis(rotated_face_id, free_quad.get(), curPt_x, curPt_y, curPt_z);
 
         // Assembly
-        locassem->Assem_Tangent_itf_MF_fixed(qua, qw, anci.A_dt, anchor_elementv.get(), opposite_elementv.get(),
+        locassem->Assem_Tangent_itf_MF_fixed(qua, qw, time_step, anchor_elementv.get(), opposite_elementv.get(),
           anchor_local_sol, opposite_local_sol);
 
         for(int ii{0}; ii < nLocBas; ++ii)
@@ -1572,17 +1565,17 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
       const int rotated_face_id {itf->get_rotated_face_id(itf_id, ee)};
 
       // Get the local ien , displacement, solution and mesh velocity of the rotated element
-      anci.A_SI_sol->get_rotated_mdisp(itf.get(), itf_id, ee, anchor_local_ien, rotated_local_disp);
+      SI_sol->get_rotated_mdisp(itf.get(), itf_id, ee, anchor_local_ien, rotated_local_disp);
       get_currPts(ctrl_x, ctrl_y, ctrl_z, rotated_local_disp, nLocBas, curPt_x, curPt_y, curPt_z);
 
-      anci.A_SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
+      SI_sol->get_rotated_local(itf_id, anchor_local_ien, anchor_local_sol, rotated_local_mvelo);
 
       anchor_elementv->buildBasis(rotated_face_id, quad_s.get(), curPt_x, curPt_y, curPt_z);
 
       for(int qua{0}; qua<face_nqp; ++qua)
       {
         // Get the quadrature point info
-        anci.A_SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
+        SI_qp->get_curr_fixed(itf_id, ee_index, qua, opposite_ee, opposite_xi, opposite_eta);
 
         const int fixed_face_id {itf->get_fixed_face_id(itf_id, opposite_ee)};
 
@@ -1595,10 +1588,10 @@ void PGAssem_NS_FEM::Interface_K_MF(Vec &X, Vec &Y)
         opposite_elementv->buildBasis(fixed_face_id, free_quad.get(), ctrl_x, ctrl_y, ctrl_z);
 
         // Get the local ien and local sol of this fixed element
-        anci.A_SI_sol->get_fixed_local(itf.get(), itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
+        SI_sol->get_fixed_local(itf.get(), itf_id, opposite_ee, opposite_local_ien, opposite_local_sol);
 
         // Assembly
-        locassem->Assem_Tangent_itf_MF_rotated(qua, qw, anci.A_dt, anchor_elementv.get(), opposite_elementv.get(),
+        locassem->Assem_Tangent_itf_MF_rotated(qua, qw, time_step, anchor_elementv.get(), opposite_elementv.get(),
           anchor_local_sol, opposite_local_sol, rotated_local_mvelo);
 
         for(int ii{0}; ii < nLocBas; ++ii)

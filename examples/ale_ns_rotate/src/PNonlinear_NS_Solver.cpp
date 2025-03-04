@@ -47,15 +47,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const ALocal_RotatedBC * const &rotnbc_part,
     const IGenBC * const &gbc,
     const ALocal_Interface * const &itf_part,
-    SI_T::SI_solution * const &SI_sol,
-    SI_T::SI_quad_point * const &SI_qp,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    FEAElement * const &elementvs,
-    FEAElement * const &elementvs_rotated,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    IQuadPts * const &free_quad,
     IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
     PDNSolution * const &dot_sol,
@@ -126,11 +117,12 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   update_rotatedbc_value(rotnbc_part, mvelo_alpha, &sol_alpha);
   // ------------------------------------------------- 
 
+  SI_T::SI_solution * SI_sol = gassem_ptr->Get_SI_sol();
+  SI_T::SI_quad_point * SI_qp = gassem_ptr->Get_SI_qp();
   SI_sol->update_node_mvelo(mvelo_alpha);
   SI_sol->update_node_mdisp(mdisp_alpha);
   SI_sol->update_node_sol(&sol_alpha);
-  SI_qp->search_all_opposite_point(elementvs, elementvs_rotated, elements,
-    quad_s, free_quad, itf_part, SI_sol);
+  SI_qp->search_all_opposite_point(itf_part, SI_sol);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -143,7 +135,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
     gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol, 
-        curr_time, dt, gbc, SI_sol, SI_qp );
+        curr_time, dt, gbc );
    
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(mat_assem_0_event,0,0,0,0);
@@ -164,7 +156,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
     gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
-        curr_time, dt, gbc, SI_sol, SI_qp );
+        curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
     PetscLogEventEnd(vec_assem_0_event,0,0,0,0);
@@ -212,7 +204,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       gassem_ptr->Assem_tangent_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
-          curr_time, dt, gbc, SI_sol, SI_qp );
+          curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(mat_assem_1_event,0,0,0,0);
@@ -230,7 +222,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 #endif
 
       gassem_ptr->Assem_residual( &dot_sol_alpha, &sol_alpha, mvelo_alpha, mdisp_alpha, dot_sol, sol,
-          curr_time, dt, gbc, SI_sol, SI_qp );
+          curr_time, dt, gbc );
 
 #ifdef PETSC_USE_LOG
       PetscLogEventEnd(vec_assem_1_event,0,0,0,0);

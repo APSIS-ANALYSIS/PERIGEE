@@ -298,9 +298,7 @@ class IPGAssem
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
-        const PDNSolution * const &mdisp,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp )
+        const PDNSolution * const &mdisp )
     {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
 
     virtual void Assem_mass_residual( const PDNSolution * const &sol )
@@ -554,9 +552,7 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const IGenBC * const &gbc,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp )
+        const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     virtual void Assem_residual(
@@ -827,9 +823,7 @@ class IPGAssem
         const PDNSolution * const &sol_np1,
         const double &curr_time,
         const double &dt,
-        const IGenBC * const &gbc,
-        const SI_T::SI_solution * const &SI_sol,
-        const SI_T::SI_quad_point * const &SI_qp )
+        const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     virtual void Assem_tangent_residual(
@@ -1034,6 +1028,18 @@ class IPGAssem
         const FEANode * const &fnode_ptr,
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+
+    virtual SI_T::SI_solution * Get_SI_sol()
+    {
+      SYS_T::print_fatal("Warning: Get_SI_sol() is not implemented. \n");
+      return {};
+    }
+
+    virtual SI_T::SI_quad_point * Get_SI_qp()
+    {
+      SYS_T::print_fatal("Warning: Get_SI_qp() is not implemented. \n");
+      return {};
+    }
 };
 
 #endif
