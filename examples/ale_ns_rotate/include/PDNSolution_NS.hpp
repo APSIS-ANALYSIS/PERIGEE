@@ -27,6 +27,9 @@ class PDNSolution_NS : public PDNSolution
 
     virtual ~PDNSolution_NS() = default;
 
+  private:
+    const bool is_print;
+
     // case 0 : generate full zero solution
     void Init_zero( const APart_Node * const &pNode_ptr );
 
@@ -40,9 +43,6 @@ class PDNSolution_NS : public PDNSolution
     //         with the unit flow rate.
     void Init_pipe_parabolic( const APart_Node * const &pNode_ptr,
         const FEANode * const &fNode_ptr );
-
-  private:
-    const bool is_print;
 };
 
 #endif
