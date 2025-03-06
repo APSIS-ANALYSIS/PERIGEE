@@ -116,28 +116,39 @@ class PGAssem_HERK_Block_NS_FEM
 
     // Assembly the residual vector and tangent matrix for the sub-step of HERK
     void Assem_tangent_residual_substep(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
+        const int &substep_index,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 
     // Assembly the residual vector and tangent matrix for the final step of HERK
     void Assem_tangent_residual_finalstep(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 
     // Assembly the residual vector and tangent matrix for the pres stage of HERK 
     void Assem_tangent_residual_presstage(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
+        PDNSolution * const &cur_dot_velo,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution * const &cur_pres,    
+        const Runge_Kutta_Butcher * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 
