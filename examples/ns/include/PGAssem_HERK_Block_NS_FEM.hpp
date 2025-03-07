@@ -174,7 +174,7 @@ class PGAssem_HERK_Block_NS_FEM
         const Runge_Kutta_Butcher * const &tm_RK_ptr );
 
     // Natural boundary condition for finalstep of the HERK
-    void NatBC_G_HERK_Pres( const double &curr_time, const double &dt );
+    void NatBC_G_HERK_Pressure( const double &curr_time, const double &dt );
 
     void GetLocal(const double * const &array, const int * const &IEN,
         double * const &local_array) const

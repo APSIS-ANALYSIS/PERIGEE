@@ -27,14 +27,14 @@ PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
   nlgn( pnode->get_nlocghonode() )
 {
   SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
-      "PGAssem_NS_FEM::dof_sol != locassem->get_dof(). \n");
+      "PGAssem_HERK_Block_NS_FEM::dof_sol != locassem->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat_v + dof_mat_p != nbc->get_dof_LID(),
-      "PGAssem_NS_FEM::dof_mat != nbc->get_dof_LID(). \n");
+      "PGAssem_HERK_Block_NS_FEM::dof_mat != nbc->get_dof_LID(). \n");
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
     SYS_T::print_fatal_if(snLocBas != ebc->get_cell_nLocBas(ebc_id),
-        "Error: in PGAssem_NS_FEM, snLocBas has to be uniform. \n");
+        "Error: in PGAssem_HERK_Block_NS_FEM, snLocBas has to be uniform. \n");
   }
 
   const int nlocrow_v  = dof_mat_v * pnode->get_nlocalnode(); 
@@ -125,54 +125,113 @@ PGAssem_HERK_Block_NS_FEM::~PGAssem_HERK_Block_NS_FEM()
   MatDestroy(&subK[4]);
 }
 
-void PGAssem_HERK_Block_NS_FEM::EssBC_KG( const int &field )
+void PGAssem_HERK_Block_NS_FEM::EssBC_KG()
 {
-  const int local_dir = nbc->get_Num_LD(field);
+  // pressure dof comes from field 0, to be inserted in subK[0] and subG[0]
+  const int local_dir = nbc->get_Num_LD(0);
 
   if(local_dir > 0)
   {
     for(int i=0; i<local_dir; ++i)
     {
-      const int row = nbc->get_LDN(field, i) * dof_mat + field;
+      const int row = nbc->get_LDN(0, i) * dof_mat_p;
       
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
-      MatSetValue(K, row, row, 1.0, ADD_VALUES);
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+      MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
     }
   }
 
-  const int local_sla = nbc->get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(0);
   if(local_sla > 0)
   {
     for(int i=0; i<local_sla; ++i)
     {
-      const int row = nbc->get_LPSN(field, i) * dof_mat + field;
-      const int col = nbc->get_LPMN(field, i) * dof_mat + field;
-      MatSetValue(K, row, col, 1.0, ADD_VALUES);
-      MatSetValue(K, row, row, -1.0, ADD_VALUES);
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      const int row = nbc->get_LPSN(0, i) * dof_mat_p;
+      const int col = nbc->get_LPMN(0, i) * dof_mat_p;
+      MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
+      MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+    }
+  }
+
+  // velocity dofs
+  for(int field=1; field<=3; ++field)
+  {
+    const int local_dir = nbc_part->get_Num_LD(field);
+
+    if{local_dir > 0}
+    {
+      for(int i=0; i<local_dir; ++i)
+      {
+        const int row = nbc_part->get_LDN(field, i) * dof_mat_v + field - 1;
+        MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
+        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);        
+      }
+    }
+
+    const int local_sla = nbc_part->get_Num_LPS(field);
+
+    if{local_sla > 0}
+    {
+      for(int i=0; i<local_sla; ++i)
+      {
+        const int row = nbc_part->get_LPSN(field, i) * dof_mat_v + field - 1;
+        const int col = nbc_part->get_LPMN(field, i) * dof_mat_v + field - 1;
+        MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
+        MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
+        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
+        MatSetValue(subK[4], row, col, 0.0, ADD_VALUES);
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);        
+      }
     }
   }
 }
 
-void PGAssem_NS_FEM::EssBC_G( const int &field )
+void PGAssem_NS_FEM::EssBC_G()
 {
-  const int local_dir = nbc->get_Num_LD(field);
+  // pres field is 0, to be inserted to subG[0]
+  const int local_dir = nbc_part->get_Num_LD(0);
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc->get_LDN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      const int row = nbc_part->get_LDN(0, ii) * dof_mat_p;
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
 
-  const int local_sla = nbc->get_Num_LPS(field);
+  const int local_sla = nbc_part->get_Num_LPS(0);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc->get_LPSN(field, ii) * dof_mat + field;
-      VecSetValue(G, row, 0.0, INSERT_VALUES);
+      const int row = nbc_part->get_LPSN(0, ii) * dof_mat_p;
+      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+    }
+  }
+
+  // velo fields from 1 to 3
+  for(int field=1; field<=3; ++field)
+  {
+    const int local_dir = nbc_part->get_Num_LD(field);
+    if( local_dir > 0 )
+    {
+      for(int ii=0; ii<local_dir; ++ii)
+      {
+        const int row = nbc_part->get_LDN(field, ii) * dof_mat_v + field - 1;
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+      }
+    }
+
+    const int local_sla = nbc_part->get_Num_LPS(field);
+    if( local_sla > 0 )
+    {
+      for(int ii=0; ii<local_sla; ++ii)
+      {
+        const int row = nbc_part->get_LPSN(field, ii) * dof_mat_v + field - 1;
+        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+      }
     }
   }
 }
@@ -180,52 +239,65 @@ void PGAssem_NS_FEM::EssBC_G( const int &field )
 void PGAssem_HERK_Block_NS_FEM::Assem_nonzero_estimate()
 {
   const int nElem = locelem->get_nlocalele();
-  const int loc_dof = dof_mat * nLocBas;
-
+  const int loc_dof_v = dof_mat_v * nLocBas;
+  const int loc_dof_p = dof_mat_p * nLocBas;
+  
   locassem->Assem_Estimate();
 
-  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+  PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
 
-  for(int e=0; e<nElem; ++e)
+  for(int ee=0; ee<nElem; ++ee)
   {
-    for(int i=0; i<nLocBas; ++i)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      const int loc_index  = locien->get_LIEN(e, i);
+      const int loc_index  = locien->get_LIEN(ee, ii);
 
-      for(int m=0; m<dof_mat; ++m)
-        row_index[dof_mat * i + m] = dof_mat * nbc->get_LID( m, loc_index ) + m;
+      row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+      row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+      row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+      
+      row_idx_p[ii] = nbc->get_LID( 0, loc_index );
     }
-    
-    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        locassem->Tangent, ADD_VALUES);
+
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
+    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
+    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);    
+    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES); 
   }
 
-  delete [] row_index; row_index = nullptr;
+  delete [] row_idx_v; row_idx_v = nullptr;
+  delete [] row_idx_p; row_idx_p = nullptr;
 
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
   PDNSolution * temp = new PDNSolution_NS( pnode.get(), 0, false );
 
   // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp, gbc );
+  NatBC_Resis_KG( 0.0, 0.1, temp, temp );
 
   delete temp;
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
-  for(int ii=0; ii<dof_mat; ++ii) EssBC_KG( ii );
+  EssBC_KG( nbc );
 
-  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
     const PDNSolution * const &sol_a)
 {
-  const int nElem = locelem->get_nlocalele();
-  const int loc_dof = dof_mat * nLocBas;
+  const int nElem = alelem_ptr->get_nlocalele();
+  const int loc_dof_v = dof_mat_v * nLocBas;
+  const int loc_dof_p = dof_mat_p * nLocBas;
 
   double * array_a = new double [nlgn * dof_sol];
   double * local_a = new double [nLocBas * dof_sol];
@@ -233,7 +305,8 @@ void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
   double * ectrl_x = new double [nLocBas];
   double * ectrl_y = new double [nLocBas];
   double * ectrl_z = new double [nLocBas];
-  PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+  PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+  PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
 
   sol_a->GetLocalArray( array_a );
 
@@ -247,14 +320,23 @@ void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      for(int mm=0; mm<dof_mat; ++mm)
-        row_index[dof_mat*ii+mm] = dof_mat * nbc -> get_LID(mm, IEN_e[ii]) + mm;
+      const int loc_index  = locien>get_LIEN(ee, ii);
+
+      row_idx_v[3*ii]   = 3 * nbc_part->get_LID( 1, loc_index );
+      row_idx_v[3*ii+1] = 3 * nbc_part->get_LID( 2, loc_index ) + 1;
+      row_idx_v[3*ii+2] = 3 * nbc_part->get_LID( 3, loc_index ) + 2;
+
+      row_idx_p[ii] = nbc_part->get_LID( 0, loc_index );
     }
     
-    MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-        locassem->Tangent, ADD_VALUES);
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
+    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
+    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
+    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
 
-    VecSetValues(G, loc_dof, row_index, locassem->Residual, ADD_VALUES);
+    VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem_ptr->Residual0, ADD_VALUES);
+    VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem_ptr->Residual1, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -265,19 +347,20 @@ void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
   delete [] ectrl_z; ectrl_z = nullptr;
   delete [] row_index; row_index = nullptr;
 
-  // Weakly enforced no-slip boundary condition
-  // If wall_model_type = 0, it will do nothing.
-  Weak_EssBC_G(0, 0, sol_a);
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  EssBC_KG();
 
   for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( ii );
 
-  MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-  MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(G);
-  VecAssemblyEnd(G);
+  MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+  MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 
@@ -293,8 +376,9 @@ void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_substep(
   const double &curr_time,
   const double &dt )
 {
-const int nElem = alelem_ptr->get_nlocalele();
-const int loc_dof = dof_mat * nLocBas;
+const int nElem = locelem->get_nlocalele();
+const int loc_dof_v = dof_mat_v * nLocBas;
+const int loc_dof_p = dof_mat_p * nLocBas;
 
 std::vector<std::vector<double>> array_cur_velo_sols(substep_index+1);
 std::vector<std::vector<double>> array_cur_pres_sols(substep_index+1);
@@ -319,11 +403,12 @@ const std::vector<double> array_pre_velo_before = pre_velo_before -> GetLocalArr
 double * ectrl_x = new double [nLocBas];
 double * ectrl_y = new double [nLocBas];
 double * ectrl_z = new double [nLocBas];
-PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
 
 for(int ee=0; ee<nElem; ++ee)
 {
-  const std::vector<int> IEN_e = lien_ptr->get_LIEN(ee);
+  const std::vector<int> IEN_e = locien->get_LIEN(ee);
 
   std::vector<std::vector<double>> local_cur_velo_sols(substep_index+1);    
   std::vector<std::vector<double>> local_cur_pres_sols(substep_index+1); 
@@ -345,53 +430,53 @@ for(int ee=0; ee<nElem; ++ee)
   const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
   const std::vector<double> local_pre_velo_before = GetLocal( array_pre_velo_before, IEN_e, nLocBas, 3 );
 
-  fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+  fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  lassem_ptr->Assem_Tangent_Residual_Substep(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
-      local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before,
-      elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+  lassem->Assem_Tangent_Residual_Substep(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
+      local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before, ectrl_x, ectrl_y, ectrl_z);
 
   for(int ii=0; ii<nLocBas; ++ii)
   {
-    for(int mm=0; mm<dof_mat; ++mm)
-      row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+    const int loc_index  = locien->get_LIEN(ee, ii);
+
+    row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+    row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+    row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+
+    row_idx_p[ii] = nbc->get_LID( 0, loc_index );
   }
 
-  MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-      lassem_ptr->Tangent, ADD_VALUES);
+  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
+  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
+  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
+  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
+  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
 
-  VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
 delete [] ectrl_y; ectrl_y = nullptr;
 delete [] ectrl_z; ectrl_z = nullptr;
-delete [] row_index; row_index = nullptr;
+delete [] row_idx_v; row_idx_v = nullptr;
+delete [] row_idx_p; row_idx_p = nullptr;
 
-// Backflow stabilization residual & tangent contribution
-// BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr );
 
-// Resistance type boundary condition
-// NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-//    nbc_part, ebc_part, gbc );
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
-NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr, lassem_ptr, elements, quad_s, 
-   nbc_part, ebc_part );
+EssBC_KG();
 
-// Weakly enforced no-slip boundary condition
-// If wall_model_type = 0, it will do nothing.
-// Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
-//   lien_ptr, fnode_ptr, nbc_part, wbc_part);
+MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
 
-VecAssemblyBegin(G);
-VecAssemblyEnd(G);
-
-for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-
-MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-VecAssemblyBegin(G);
-VecAssemblyEnd(G);
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_finalstep(
@@ -406,8 +491,9 @@ void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_finalstep(
   const double &curr_time,
   const double &dt )
 {
-const int nElem = alelem_ptr->get_nlocalele();
-const int loc_dof = dof_mat * nLocBas;
+const int nElem = locelem->get_nlocalele();
+const int loc_dof_v = dof_mat_v * nLocBas;
+const int loc_dof_p = dof_mat_p * nLocBas;
 
 std::vector<std::vector<double>> array_cur_velo_sols(tm_RK_ptr->get_RK_step());
 std::vector<std::vector<double>> array_cur_pres_sols(tm_RK_ptr->get_RK_step());
@@ -429,11 +515,12 @@ const std::vector<double> array_pre_velo_before = pre_velo_before -> GetLocalArr
 double * ectrl_x = new double [nLocBas];
 double * ectrl_y = new double [nLocBas];
 double * ectrl_z = new double [nLocBas];
-PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
 
 for(int ee=0; ee<nElem; ++ee)
 {
-  const std::vector<int> IEN_e = lien_ptr->get_LIEN(ee);
+  const std::vector<int> IEN_e = locien->get_LIEN(ee);
 
   std::vector<std::vector<double>> local_cur_velo_sols(tm_RK_ptr->get_RK_step());    
   std::vector<std::vector<double>> local_cur_pres_sols(tm_RK_ptr->get_RK_step()); 
@@ -452,53 +539,53 @@ for(int ee=0; ee<nElem; ++ee)
   const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
   const std::vector<double> local_pre_velo_before = GetLocal( array_pre_velo_before, IEN_e, nLocBas, 3 );
 
-  fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+  fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  lassem_ptr->Assem_Tangent_Residual_Laststep(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
-      local_cur_pres_sols, local_pre_velo_sols, local_pre_velo, local_pre_pres_sols, local_pre_velo_before,
-      elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+  lassem->Assem_Tangent_Residual_Laststep(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
+      local_cur_pres_sols, local_pre_velo_sols, local_pre_velo, local_pre_pres_sols, local_pre_velo_before, 
+      ectrl_x, ectrl_y, ectrl_z);
 
   for(int ii=0; ii<nLocBas; ++ii)
   {
-    for(int mm=0; mm<dof_mat; ++mm)
-      row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
+    const int loc_index  = locien->get_LIEN(ee, ii);
+
+    row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+    row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+    row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+
+    row_idx_p[ii] = nbc->get_LID( 0, loc_index );
   }
+  
+  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
+  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
+  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
+  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
+  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
 
-  MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-      lassem_ptr->Tangent, ADD_VALUES);
-
-  VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem_ptr->Residual0, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem_ptr->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
 delete [] ectrl_y; ectrl_y = nullptr;
 delete [] ectrl_z; ectrl_z = nullptr;
-delete [] row_index; row_index = nullptr;
+delete [] row_idx_v; row_idx_v = nullptr;
+delete [] row_idx_p; row_idx_p = nullptr;
 
-// Backflow stabilization residual & tangent contribution
-// BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+NatBC_G_HERK_Final( curr_time, dt, tm_RK_ptr );
 
-// Resistance type boundary condition
-// NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-//    nbc_part, ebc_part, gbc );
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
-NatBC_G_HERK_Last( curr_time, dt, tm_RK_ptr, lassem_ptr, elements, quad_s, 
-   nbc_part, ebc_part );
+EssBC_KG();
 
-// Weakly enforced no-slip boundary condition
-// If wall_model_type = 0, it will do nothing.
-// Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
-//   lien_ptr, fnode_ptr, nbc_part, wbc_part);
-
-VecAssemblyBegin(G);
-VecAssemblyEnd(G);
-
-for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
-
-MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-VecAssemblyBegin(G);
-VecAssemblyEnd(G);
+MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_presstage(
@@ -512,8 +599,9 @@ void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_presstage(
   const double &curr_time,
   const double &dt )
 {
-const int nElem = alelem_ptr->get_nlocalele();
-const int loc_dof = dof_mat * nLocBas;
+const int nElem = locelem->get_nlocalele();
+const int loc_dof_v = dof_mat_v * nLocBas;
+const int loc_dof_p = dof_mat_p * nLocBas;
 
 std::vector<std::vector<double>> array_cur_velo_sols(tm_RK_ptr->get_RK_step());
 std::vector<std::vector<double>> array_cur_pres_sols(tm_RK_ptr->get_RK_step());
@@ -532,7 +620,8 @@ const std::vector<double> array_cur_pres = cur_pres -> GetLocalArray();
 double * ectrl_x = new double [nLocBas];
 double * ectrl_y = new double [nLocBas];
 double * ectrl_z = new double [nLocBas];
-PetscInt * row_index = new PetscInt [nLocBas * dof_mat];
+PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
 
 for(int ee=0; ee<nElem; ++ee)
 {
@@ -552,52 +641,170 @@ for(int ee=0; ee<nElem; ++ee)
   const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
   const std::vector<double> local_cur_pres = GetLocal( array_cur_pres, IEN_e, nLocBas, 1 );
 
-  fnode_ptr->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+  fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  lassem_ptr->Assem_Tangent_Residual_Finalstep(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
+  lassem->Assem_Tangent_Residual_Finalstep(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
       local_cur_velo_sols, local_cur_velo, local_cur_pres_sols, local_pre_velo, 
-      local_cur_pres, elementv, ectrl_x, ectrl_y, ectrl_z, quad_v);
+      local_cur_pres, ectrl_x, ectrl_y, ectrl_z);
 
-  for(int ii=0; ii<nLocBas; ++ii)
-  {
-    for(int mm=0; mm<dof_mat; ++mm)
-      row_index[dof_mat*ii + mm] = dof_mat*nbc_part->get_LID(mm, IEN_e[ii])+mm;
-  }
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const int loc_index  = locien->get_LIEN(ee, ii);
+  
+        row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+        row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+        row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+  
+        row_idx_p[ii] = nbc->get_LID( 0, loc_index );
+      }
 
-  MatSetValues(K, loc_dof, row_index, loc_dof, row_index,
-      lassem_ptr->Tangent, ADD_VALUES);
-
-  VecSetValues(G, loc_dof, row_index, lassem_ptr->Residual, ADD_VALUES);
+      MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
+      MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
+      MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
+      MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
+      MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
+      
+      VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem->Residual0, ADD_VALUES);
+      VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
 delete [] ectrl_y; ectrl_y = nullptr;
 delete [] ectrl_z; ectrl_z = nullptr;
-delete [] row_index; row_index = nullptr;
+delete [] row_idx_v; row_idx_v = nullptr;
+delete [] row_idx_p; row_idx_p = nullptr;
 
-// Backflow stabilization residual & tangent contribution
-// BackFlow_KG( dt, sol_b, lassem_ptr, elements, quad_s, nbc_part, ebc_part );
+NatBC_G_HERK_Pressure( curr_time, dt );
 
-// Resistance type boundary condition
-// NatBC_Resis_KG( curr_time, dt, dot_sol_np1, sol_np1, lassem_ptr, elements, quad_s, 
-//    nbc_part, ebc_part, gbc );
-NatBC_G_HERK_Final( curr_time, dt, lassem_ptr, elements, quad_s, 
-   nbc_part, ebc_part );
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
-// Weakly enforced no-slip boundary condition
-// If wall_model_type = 0, it will do nothing.
-// Weak_EssBC_KG(curr_time, dt, sol_b, lassem_ptr, elementvs, quad_s,
-//   lien_ptr, fnode_ptr, nbc_part, wbc_part);
+EssBC_KG();
 
-VecAssemblyBegin(G);
-VecAssemblyEnd(G);
+MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+}
 
-for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( nbc_part, ii );
+void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
+  const int &substep_index,
+  const Runge_Kutta_Butcher * const &tm_RK_ptr )
+{
+int * LSIEN = new int [snLocBas];
+double * sctrl_x = new double [snLocBas];
+double * sctrl_y = new double [snLocBas];
+double * sctrl_z = new double [snLocBas];
+PetscInt * srow_index_v = new PetscInt [snLocBas * dof_mat_v];
 
-MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
-MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
-VecAssemblyBegin(G);
-VecAssemblyEnd(G);
+for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+{
+  const int num_sele = ebc -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc -> get_SIEN(ebc_id, ee, LSIEN);
+
+    ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    lassem->Assem_Residual_EBC_HERK_Sub(ebc_id, curr_time, dt, substep_index, tm_RK_ptr,
+        sctrl_x, sctrl_y, sctrl_z);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat_v; ++mm)
+        srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
+    }
+
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem->Residual1, ADD_VALUES);
+  }
+}
+
+delete [] LSIEN; LSIEN = nullptr;
+delete [] sctrl_x; sctrl_x = nullptr;
+delete [] sctrl_y; sctrl_y = nullptr;
+delete [] sctrl_z; sctrl_z = nullptr;
+delete [] srow_index_v; srow_index_v = nullptr;
+}
+
+void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Final( const double &curr_time, const double &dt,
+  const Runge_Kutta_Butcher * const &tm_RK_ptr )
+{
+int * LSIEN = new int [snLocBas];
+double * sctrl_x = new double [snLocBas];
+double * sctrl_y = new double [snLocBas];
+double * sctrl_z = new double [snLocBas];
+PetscInt * srow_index_v = new PetscInt [snLocBas * dof_mat_v];
+
+for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+{
+  const int num_sele = ebc -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc -> get_SIEN(ebc_id, ee, LSIEN);
+
+    ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    lassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt, tm_RK_ptr,
+        sctrl_x, sctrl_y, sctrl_z);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat_v; ++mm)
+        srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
+    }
+
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem->sur_Residual1, ADD_VALUES);
+  }
+}
+
+delete [] LSIEN; LSIEN = nullptr;
+delete [] sctrl_x; sctrl_x = nullptr;
+delete [] sctrl_y; sctrl_y = nullptr;
+delete [] sctrl_z; sctrl_z = nullptr;
+delete [] srow_index_v; srow_index_v = nullptr;
+}
+
+void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Pressure( const double &curr_time, const double &dt )
+{
+int * LSIEN = new int [snLocBas];
+double * sctrl_x = new double [snLocBas];
+double * sctrl_y = new double [snLocBas];
+double * sctrl_z = new double [snLocBas];
+PetscInt * srow_index_v = new PetscInt [snLocBas * dof_mat_v];
+
+for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
+{
+  const int num_sele = ebc -> get_num_local_cell(ebc_id);
+
+  for(int ee=0; ee<num_sele; ++ee)
+  {
+    ebc -> get_SIEN(ebc_id, ee, LSIEN);
+
+    ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
+
+    lassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt,
+        sctrl_x, sctrl_y, sctrl_z);
+
+    for(int ii=0; ii<snLocBas; ++ii)
+    {
+      for(int mm=0; mm<dof_mat_v; ++mm)
+        srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
+    }
+
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->Residual1, ADD_VALUES);
+  }
+}
+
+delete [] LSIEN; LSIEN = nullptr;
+delete [] sctrl_x; sctrl_x = nullptr;
+delete [] sctrl_y; sctrl_y = nullptr;
+delete [] sctrl_z; sctrl_z = nullptr;
+delete [] srow_index_v; srow_index_v = nullptr;
 }
 
 // EOF
