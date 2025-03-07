@@ -142,11 +142,9 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Sub(
     const double &time, const double &dt,
     const int &subindex,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -192,15 +190,13 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Sub(
   }
 }
 
-void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Last(
+void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Final(
     const int &ebc_id,
     const double &time, const double &dt,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -246,14 +242,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Last(
   }
 }
 
-void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Final(
+void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Pressure(
     const int &ebc_id,
     const double &time, const double &dt,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -289,8 +283,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Final(
   }
 }
 
-void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
-    const double &time, const double &dt, 
+void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
+    const double &time, const double &dt,
     const int &subindex,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
     const std::vector<std::vector<double>>& cur_velo_sols,
@@ -299,11 +293,9 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
     const std::vector<std::vector<double>>& pre_pres_sols,
     const std::vector<double>& pre_velo,
     const std::vector<double>& pre_velo_before,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -786,7 +778,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Substep(
   }
 }
 
-void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
+void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
     const double &time, const double &dt,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
     const std::vector<std::vector<double>>& cur_velo_sols,
@@ -796,11 +788,9 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
     const std::vector<double>& pre_velo,
     const std::vector<std::vector<double>>& pre_pres_sols,
     const std::vector<double>& pre_velo_before,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -1263,7 +1253,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Laststep(
   }
 }
 
-void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
+void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
     const double &time, const double &dt,
     const Runge_Kutta_Butcher * const &tm_RK_ptr,
     const std::vector<double>& cur_dot_velo,
@@ -1272,11 +1262,9 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
     const std::vector<std::vector<double>>& cur_pres_sols,
     const std::vector<double>& pre_velo,
     const std::vector<double>& cur_pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -1628,40 +1616,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Finalstep(
       }
     }
   }
-}
-
-double PLocAssem_VMS_NS_HERK::get_flowrate( const double * const &cur_sol,
-    FEAElement * const &element,
-    const double * const &eleCtrlPts_x,
-    const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
-{
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
-
-  double flrate = 0.0;
-
-  for(int qua =0; qua< face_nqp; ++qua)
-  {
-    const std::vector<double> R = element->get_R(qua);
-
-    double surface_area;
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
-
-    Vector_3 velo(0.0, 0.0, 0.0);
-    for(int ii=0; ii<snLocBas; ++ii)
-    {
-      velo.x() += cur_sol[ii*4+1] * R[ii];        
-      velo.y() += cur_sol[ii*4+2] * R[ii];
-      velo.z() += cur_sol[ii*4+3] * R[ii];
-    }
-
-    flrate += surface_area * quad->get_qw(qua) * Vec3::dot_product( velo, n_out ); 
-  }
-
-  return flrate;
 }
 
 // EOF
