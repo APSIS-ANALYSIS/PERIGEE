@@ -691,29 +691,47 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         // Momentum-x with respect to p, u, v, w
         Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x);
         
-        Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0 /dt + NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
+        Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0 /dt);
         
-        Tangent3[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
+        Tangent3[3*nLocBas*3*A+3*B+1    ] += 0.0;
       
-        Tangent3[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z);
+        Tangent3[3*nLocBas*3*A+3*B+2    ] += 0.0;
+
+        Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
+        
+        Tangent4[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
+      
+        Tangent4[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z);
 
         // Momentum-y with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_y);
         
-        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt + NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt);
 
-        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z );
+        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z );
 
         // Momentum-z with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_z);
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt + NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z);        
+        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt);        
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z);        
       }
     }
   }
@@ -1162,29 +1180,47 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         // Momentum-x with respect to p, u, v, w
         Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_x);
         
-        Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0 /dt + NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x );
+        Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0 /dt);
         
-        Tangent3[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
+        Tangent3[3*nLocBas*3*A+3*B+1    ] += 0.0;
       
-        Tangent3[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z);
+        Tangent3[3*nLocBas*3*A+3*B+2    ] += 0.0;
+
+        Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
+        
+        Tangent4[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
+      
+        Tangent4[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z);
 
         // Momentum-y with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_y);
         
-        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt + NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt);
 
-        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z );
+        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z );
 
         // Momentum-z with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_z);
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt + NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z);   
+        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt);   
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z);   
       }    
     }
   }
@@ -1527,29 +1563,47 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
         // Momentum-x with respect to p, u, v, w
         Tangent2[  nLocBas*3*A+B       ] += gwts * (-NA_x * NB - NA * rho0 * tau_m * NB_x);
         
-        Tangent3[3*nLocBas*3*A+3*B+0   ] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0 + NA_x * tau_c * NB_x);
+        Tangent3[3*nLocBas*3*A+3*B+0   ] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0);
         
-        Tangent3[3*nLocBas*3*A+3*B+1   ]  += gwts * (NA_x * tau_c * NB_y);
+        Tangent3[3*nLocBas*3*A+3*B+1   ] += 0.0;
       
-        Tangent3[3*nLocBas*3*A+3*B+2   ] += gwts * (NA_x * tau_c * NB_z);
+        Tangent3[3*nLocBas*3*A+3*B+2   ] += 0.0;
+
+        Tangent4[3*nLocBas*3*A+3*B+0   ] += gwts * (NA_x * tau_c * NB_x);
+        
+        Tangent4[3*nLocBas*3*A+3*B+1   ] += gwts * (NA_x * tau_c * NB_y);
+      
+        Tangent4[3*nLocBas*3*A+3*B+2   ] += gwts * (NA_x * tau_c * NB_z);
 
         // Momentum-y with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y *  NB - NA * rho0 * tau_m * NB_y);
         
-        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tau_c * NB_x);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0 + NA_y * tau_c * NB_y);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0);
 
-        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tau_c * NB_z);
+        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tau_c * NB_x);
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA_y * tau_c * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tau_c * NB_z);
 
         // Momentum-z with repspect to p, u, v, w
-        Tangent2[  nLocBas*(3*A+2)+B    ]  += gwts * (-NA_z * NB - NA * rho0 * tau_m * NB_z);
+        Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * NB - NA * rho0 * tau_m * NB_z);
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * tau_c * NB_x);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * tau_c * NB_y);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
-        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0 + NA_z * tau_c * NB_z);   
+        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0);   
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * tau_c * NB_x);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * tau_c * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA_z * tau_c * NB_z); 
       }
     }
   }
