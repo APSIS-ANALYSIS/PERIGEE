@@ -260,11 +260,11 @@ void PGAssem_HERK_Block_NS_FEM::Assem_nonzero_estimate()
       row_idx_p[ii] = nbc->get_LID( 0, loc_index );
     }
 
-    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
-    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
-    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
-    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);    
-    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES); 
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);    
+    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES); 
   }
 
   delete [] row_idx_v; row_idx_v = nullptr;
@@ -329,14 +329,14 @@ void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
       row_idx_p[ii] = nbc_part->get_LID( 0, loc_index );
     }
     
-    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
-    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
-    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
-    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
-    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
 
-    VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem_ptr->Residual0, ADD_VALUES);
-    VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem_ptr->Residual1, ADD_VALUES);
+    VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem_ptr->Residual0, ADD_VALUES);
+    VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem_ptr->Residual1, ADD_VALUES);
   }
 
   delete [] array_a; array_a = nullptr;
@@ -432,7 +432,7 @@ for(int ee=0; ee<nElem; ++ee)
 
   fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  lassem->Assem_Tangent_Residual_Substep(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
+  locassem->Assem_Tangent_Residual_Substep(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
       local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before, ectrl_x, ectrl_y, ectrl_z);
 
   for(int ii=0; ii<nLocBas; ++ii)
@@ -446,14 +446,14 @@ for(int ee=0; ee<nElem; ++ee)
     row_idx_p[ii] = nbc->get_LID( 0, loc_index );
   }
 
-  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
-  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
-  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
-  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
-  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
+  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
 
-  VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem->Residual0, ADD_VALUES);
-  VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem->Residual1, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -541,7 +541,7 @@ for(int ee=0; ee<nElem; ++ee)
 
   fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  lassem->Assem_Tangent_Residual_Laststep(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
+  locassem->Assem_Tangent_Residual_Laststep(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
       local_cur_pres_sols, local_pre_velo_sols, local_pre_velo, local_pre_pres_sols, local_pre_velo_before, 
       ectrl_x, ectrl_y, ectrl_z);
 
@@ -556,14 +556,14 @@ for(int ee=0; ee<nElem; ++ee)
     row_idx_p[ii] = nbc->get_LID( 0, loc_index );
   }
   
-  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
-  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
-  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
-  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
-  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
+  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
 
-  VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem_ptr->Residual0, ADD_VALUES);
-  VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem_ptr->Residual1, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem_ptr->Residual0, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem_ptr->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -643,7 +643,7 @@ for(int ee=0; ee<nElem; ++ee)
 
   fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  lassem->Assem_Tangent_Residual_Finalstep(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
+  locassem->Assem_Tangent_Residual_Finalstep(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
       local_cur_velo_sols, local_cur_velo, local_cur_pres_sols, local_pre_velo, 
       local_cur_pres, ectrl_x, ectrl_y, ectrl_z);
 
@@ -658,14 +658,14 @@ for(int ee=0; ee<nElem; ++ee)
         row_idx_p[ii] = nbc->get_LID( 0, loc_index );
       }
 
-      MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, lassem->Tangent0, ADD_VALUES);
-      MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, lassem->Tangent1, ADD_VALUES);
-      MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, lassem->Tangent2, ADD_VALUES);
-      MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent3, ADD_VALUES);
-      MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, lassem->Tangent4, ADD_VALUES);
+      MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+      MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+      MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+      MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+      MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
       
-      VecSetValues(subG[0], loc_dof_p, row_idx_p, lassem->Residual0, ADD_VALUES);
-      VecSetValues(subG[1], loc_dof_v, row_idx_v, lassem->Residual1, ADD_VALUES);
+      VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+      VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -710,7 +710,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
 
     ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-    lassem->Assem_Residual_EBC_HERK_Sub(ebc_id, curr_time, dt, substep_index, tm_RK_ptr,
+    locassem->Assem_Residual_EBC_HERK_Sub(ebc_id, curr_time, dt, substep_index, tm_RK_ptr,
         sctrl_x, sctrl_y, sctrl_z);
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -719,7 +719,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem->Residual1, ADD_VALUES);
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
   }
 }
 
@@ -749,7 +749,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
 
     ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-    lassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt, tm_RK_ptr,
+    locassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt, tm_RK_ptr,
         sctrl_x, sctrl_y, sctrl_z);
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -758,7 +758,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem->sur_Residual1, ADD_VALUES);
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem->sur_Residual1, ADD_VALUES);
   }
 }
 
@@ -787,7 +787,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
 
     ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-    lassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt,
+    locassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt,
         sctrl_x, sctrl_y, sctrl_z);
 
     for(int ii=0; ii<snLocBas; ++ii)
@@ -796,7 +796,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, lassem_ptr->Residual1, ADD_VALUES);
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem_ptr->Residual1, ADD_VALUES);
   }
 }
 
