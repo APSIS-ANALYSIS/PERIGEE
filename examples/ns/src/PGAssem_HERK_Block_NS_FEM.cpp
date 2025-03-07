@@ -796,7 +796,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem_ptr->Residual1, ADD_VALUES);
+    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
   }
 }
 
