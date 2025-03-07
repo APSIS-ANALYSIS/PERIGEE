@@ -57,7 +57,6 @@ class IPGAssem
     void Fix_nonzero_str()
     {MatSetOption(K, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);}
 
-
     // ------------------------------------------------------------------------
     // ! Flag : New allocation error
     //          Add or insert in new locations will generate an error message.
@@ -66,7 +65,6 @@ class IPGAssem
     void Fix_nonzero_err_str()
     {MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);}
 
-
     // ------------------------------------------------------------------------
     // ! Flag : Ignore new allocation
     //          Add or insert in a new allocation will NOT generate error.
@@ -74,13 +72,11 @@ class IPGAssem
     void Release_nonzero_err_str()
     {MatSetOption(K, MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);}
 
-
     // ------------------------------------------------------------------------
     // ! Flag : Keep nonzero pattern of the matrix K
     // ------------------------------------------------------------------------
     void Keep_nonzero_pattern()
     {MatSetOption(K, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);}
-
 
     // ------------------------------------------------------------------------
     // ! Clear K and G to be zero
@@ -90,7 +86,6 @@ class IPGAssem
       MatZeroEntries(K);
       VecSet(G, 0.0);
     }
-
 
     // ------------------------------------------------------------------------
     // ! Clear G to be zero
@@ -111,111 +106,7 @@ class IPGAssem
     virtual void Assem_nonzero_estimate()
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
-    virtual void Assem_nonzero_estimate(
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &pnode_ptr )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const ALocal_NBC * const &nbc_part )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const ALocal_NBC * const &nbc_part )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    // Nonzero pattern estimate for the NS equations
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate( 
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const APart_Node * const &pnode_v,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
-
-    // Nonzero pattern for FSI wall prestressing
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p )
+    virtual void Assem_nonzero_estimate( const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
 
     // ------------------------------------------------------------------------
@@ -223,85 +114,6 @@ class IPGAssem
     //                         vector for 3D problems WITHOUT pre-existing 
     //                         cached quadrature info.
     // ------------------------------------------------------------------------
-    // Assemble mass matrix and residual vector for NS equations
-     virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        const IQuadPts * const &quad_v,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const APart_Node * const &pnode_ptr )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
-    virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
-    virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const Tissue_prestress * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
-    virtual void Assem_mass_residual(
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_part,
-        const Tissue_prestress * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
-    virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const ALocal_WeakBC * const &wbc_part )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
-
     virtual void Assem_mass_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &mdisp,
@@ -337,191 +149,7 @@ class IPGAssem
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
     //                    pre-existing cached quadrature info.
     // ------------------------------------------------------------------------
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        const IQuadPts * const &quad_v,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const APart_Node * const &pnode_ptr )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr )
-        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-
-    virtual void Assem_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const Tissue_prestress * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-    virtual void Assem_Residual(
-        const double &curr_time, const double &dt,
-        const PDNSolution * const &dot_disp,
-        const PDNSolution * const &dot_velo,
-        const PDNSolution * const &dot_pres,
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const PDNSolution * const &dot_velo_np1,
-        const PDNSolution * const &velo_np1,
-        const PDNSolution * const &disp_np1,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr )
-        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
+    // PGAssem_FSI
     virtual void Assem_Residual(
         const double &curr_time, const double &dt,
         const PDNSolution * const &dot_disp,
@@ -536,32 +164,7 @@ class IPGAssem
         const IGenBC * const &gbc )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
-    // Assembly in the prestress generation
-    virtual void Assem_Residual(
-        const double &curr_time,
-        const double &dt,
-        const PDNSolution * const &dot_disp,
-        const PDNSolution * const &dot_velo,
-        const PDNSolution * const &dot_pres,
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
-        const Tissue_prestress * const &ps_ptr) 
-        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
+    // PGAssem_Wall_Prestress
     virtual void Assem_Residual(
         const double &curr_time, const double &dt,
         const PDNSolution * const &dot_disp,
@@ -570,29 +173,6 @@ class IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const PDNSolution * const &pres )
-        {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
-
-    // Assembly with weak BC
-    virtual void Assem_residual(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part )
         {SYS_T::commPrint("Warning: Assem_residual() is not implemented. \n");}
 
     // Assembly with interface integral
@@ -647,193 +227,7 @@ class IPGAssem
     //                            for 3D problem WITHOUT pre-existing cached 
     //                            quadrature info.
     // ------------------------------------------------------------------------
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_f_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &sol_a,
-        const PDNSolution * const &sol_b,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const APart_Node * const &node_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const Tissue_prestress * const &ps_ptr )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    virtual void Assem_Tangent_Residual(
-        const double &curr_time, const double &dt,
-        const PDNSolution * const &dot_disp,
-        const PDNSolution * const &dot_velo,
-        const PDNSolution * const &dot_pres,
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const PDNSolution * const &dot_velo_np1,
-        const PDNSolution * const &velo_np1,
-        const PDNSolution * const &disp_np1,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_f_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
-        const Tissue_prestress * const &ps_ptr )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
+    // PGAssem_FSI
     virtual void Assem_Tangent_Residual(
         const double &curr_time, const double &dt,
         const PDNSolution * const &dot_disp,
@@ -846,32 +240,6 @@ class IPGAssem
         const PDNSolution * const &velo_np1,
         const PDNSolution * const &disp_np1,
         const IGenBC * const &gbc )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    // Assembly in prestress generation
-    virtual void Assem_Tangent_Residual(
-        const double &curr_time,
-        const double &dt,
-        const PDNSolution * const &dot_disp,
-        const PDNSolution * const &dot_velo,
-        const PDNSolution * const &dot_pres,
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
-        const Tissue_prestress * const &ps_ptr )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     virtual void Assem_Tangent_Residual(
@@ -882,29 +250,6 @@ class IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const PDNSolution * const &pres )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
-
-    // Assembly with weak BC
-    virtual void Assem_tangent_residual(
-        const PDNSolution * const &dot_sol,
-        const PDNSolution * const &sol,
-        const PDNSolution * const &dot_sol_np1,
-        const PDNSolution * const &sol_np1,
-        const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part,
-        const IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part )
         {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
 
     // Assembly with interface integral
@@ -965,59 +310,9 @@ class IPGAssem
     // and then a MPI_Reduce is called to collect the value over multiple
     // CPUs    
     virtual double Assem_surface_flowrate(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        IPLocAssem_2x2Block * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_flowrate(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const int &ebc_id ) const
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &disp,
-        const PDNSolution * const &velo,
-        IPLocAssem_2x2Block * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
       return 0.0;
@@ -1059,30 +354,6 @@ class IPGAssem
     //  integration p dGamma / integration 1 dGamma
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
-    {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &vec,
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id ) const
     {
@@ -1101,34 +372,7 @@ class IPGAssem
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
-        IPLocAssem_2x2Block * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &disp,
-        const PDNSolution * const &pres,
         const int &ebc_id ) const
-    {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &disp,
-        const PDNSolution * const &pres,
-        IPLocAssem_2x2Block * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
     {
       SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
       return 0.0;
@@ -1145,41 +389,6 @@ class IPGAssem
     }
 
     // Update wall prestress at all surface quadrature points
-    virtual void Update_Wall_Prestress(
-        const PDNSolution * const &sol_wall_disp,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_w,
-        const IQuadPts * const &quad_s,
-        ALocal_EBC * const &ebc_wall_part )
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
-
-    // Update solid prestress at all volumetric quadrature points (in
-    // tet4_vascular) 
-    virtual void Update_Wall_Prestress(
-        const PDNSolution * const &sol,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element,
-        const IQuadPts * const &quad,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        Tissue_prestress * const &ps_ptr ) const
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
-
-    // Update solid prestress at all volumetric quadrature points (in tet4_fsi) 
-    virtual void Update_Wall_Prestress(
-        const PDNSolution * const &disp,
-        const PDNSolution * const &pres,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem_2x2Block * const &lassem_s_ptr,
-        FEAElement * const &elementv,
-        const IQuadPts * const &quadv,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const FEANode * const &fnode_ptr,
-        Tissue_prestress * const &ps_ptr ) const
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
-
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres ) const
