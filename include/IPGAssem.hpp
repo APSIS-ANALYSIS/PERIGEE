@@ -45,9 +45,9 @@ class IPGAssem
     // ------------------------------------------------------------------------
     Vec G;
 
-    IPGAssem(){};
+    IPGAssem() = default;
 
-    virtual ~IPGAssem(){};
+    virtual ~IPGAssem() = default;
 
     // ------------------------------------------------------------------------
     // ! Flag : Fix nonzero structure
@@ -90,24 +90,22 @@ class IPGAssem
     // ------------------------------------------------------------------------
     // ! Clear G to be zero
     // ------------------------------------------------------------------------
-    void Clear_G()
-    {VecSet(G, 0.0);}
+    void Clear_G() {VecSet(G, 0.0);}
 
     // ------------------------------------------------------------------------
     // ! Print the vector G on screen
     // ------------------------------------------------------------------------
-    void Print_G() const
-    {VecView(G, PETSC_VIEWER_STDOUT_WORLD);}
+    void Print_G() const {VecView(G, PETSC_VIEWER_STDOUT_WORLD);}
 
     // ------------------------------------------------------------------------
     // ! Assem_nonzero_estimate : Assembly nonzero estimate matrix for K.
     //                            Insert 1.0 to every possible nonzero locations.
     // ------------------------------------------------------------------------
     virtual void Assem_nonzero_estimate()
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented.\n");}
 
     virtual void Assem_nonzero_estimate( const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented.\n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_mass_residual : assembly mass matrix and corresponding residual 
@@ -134,16 +132,16 @@ class IPGAssem
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented.\n");}
 
     virtual void Assem_mass_residual( const PDNSolution * const &sol )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented.\n");}
 
     virtual void Assem_mass_residual(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const PDNSolution * const &pres )
-    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_mass_residual() is not implemented.\n");}
 
     // ------------------------------------------------------------------------
     // ! Assem_residual : assembly residual vector for 3D problem WITHOUT
@@ -240,7 +238,7 @@ class IPGAssem
         const PDNSolution * const &velo_np1,
         const PDNSolution * const &disp_np1,
         const IGenBC * const &gbc )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented.\n");}
 
     virtual void Assem_Tangent_Residual(
         const double &curr_time, const double &dt,
@@ -250,7 +248,7 @@ class IPGAssem
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
         const PDNSolution * const &pres )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented.\n");}
 
     // Assembly with interface integral
     virtual void Assem_tangent_residual(
@@ -280,14 +278,14 @@ class IPGAssem
         const ALocal_Interface * const &itf_part,
         const SI_T::SI_solution * const &SI_sol,
         const SI_T::SI_quad_point * const &SI_qp )
-        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+        {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented.\n");}
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &dot_sol,
         const PDNSolution * const &sol,
         const double &curr_time,
         const double &dt )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented.\n");}
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
@@ -297,7 +295,7 @@ class IPGAssem
         const double &curr_time,
         const double &dt,
         const IGenBC * const &gbc )
-    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Assem_tangent_residual() is not implemented.\n");}
 
     // --------------------------------------------------------------
     // Assembly boundary integrals
@@ -357,7 +355,7 @@ class IPGAssem
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id ) const
     {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented.\n");
       return 0.0;
     }
 
@@ -365,7 +363,7 @@ class IPGAssem
         const PDNSolution * const &vec,
         const int &ebc_id ) const
     {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented.\n");
       return 0.0;
     }
 
@@ -374,7 +372,7 @@ class IPGAssem
         const PDNSolution * const &pres,
         const int &ebc_id ) const
     {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented.\n");
       return 0.0;
     }
 
@@ -384,7 +382,7 @@ class IPGAssem
         const ALocal_InflowBC * const &infbc_part,
         const int &nbc_id ) const
     {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented.\n");
       return 0.0;
     }
 
@@ -392,10 +390,10 @@ class IPGAssem
     virtual void Update_Wall_Prestress(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres ) const
-    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented.\n");}
 
     virtual void write_prestress_hdf5() const
-    {SYS_T::commPrint("Warning: write_prestress_hdf5() is not implemented. \n");}
+    {SYS_T::commPrint("Warning: write_prestress_hdf5() is not implemented.\n");}
 };
 
 #endif
