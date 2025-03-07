@@ -411,7 +411,7 @@ void PTime_FSI_Solver::record_outlet_data(
     else
     {
       lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate, time_info -> get_time() );
-      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, time_info->get_time(), false );
+      gbc -> reset_initial_sol( ff, face_flrate, lpn_pressure, time_info->get_time(), false );
     }
     
     if( SYS_T::get_MPI_rank() == 0 )
