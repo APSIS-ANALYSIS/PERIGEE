@@ -93,20 +93,6 @@ class PGAssem_HERK_Block_NS_FEM
       MatSetOption(subK[4], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
     }
 
-    // ------------------------------------------------------------------------
-    // ! Clear K and G to be zero
-    // ------------------------------------------------------------------------
-    void Clear_KG()
-    {
-      MatZeroEntries(K);
-      VecSet(G, 0.0);
-    }
-
-    // ------------------------------------------------------------------------
-    // ! Clear G to be zero
-    // ------------------------------------------------------------------------
-    void Clear_G() {VecSet(G, 0.0);}
-
     // Nonzero pattern estimate for the NS equations
     void Assem_nonzero_estimate();
     
