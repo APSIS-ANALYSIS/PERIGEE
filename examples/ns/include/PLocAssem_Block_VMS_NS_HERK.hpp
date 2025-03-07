@@ -148,15 +148,21 @@ class PLocAssem_Block_VMS_NS_HERK
 
   protected:
     // Private data
-    const double rho0, vis_mu;
+    const FEType elemType;
+    
+    const int nqpv, nqps;
+
+    const std::unique_ptr<FEAElement> elementv, elements;
+
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
+    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
 
     const double CI, CT; // Constants for stabilization parameters
     
     const double Ctauc; // Constant scaling factor for tau_C
-
-    const int nqp; // number of quadrature points
     
-    const int nLocBas, snLocBas, vec_size, sur_size;
+    const int nLocBas, snLocBas, vec_size_v, vec_size_p, sur_size_v;
 
     // M matrix for tau_m
     //             mm[0], mm[1], mm[2]
