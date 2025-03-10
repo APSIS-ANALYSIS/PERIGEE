@@ -107,6 +107,18 @@ class IPGAssem
     virtual void Assem_nonzero_estimate( const IGenBC * const &gbc )
     {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented.\n");}
 
+    virtual void Assem_nonzero_estimate(
+        const ALocal_Elem * const &alelem_ptr,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &elements,
+        const IQuadPts * const &quad_s,
+        const ALocal_IEN * const &lien_ptr,
+        const APart_Node * const &node_ptr,
+        const ALocal_NBC * const &nbc_part,
+        const ALocal_EBC * const &ebc_part,
+        const IGenBC * const &gbc )
+    {SYS_T::commPrint("Warning: Assem_nonzero_estimate() is not implemented.\n");}
+
     // ------------------------------------------------------------------------
     // ! Assem_mass_residual : assembly mass matrix and corresponding residual 
     //                         vector for 3D problems WITHOUT pre-existing 
@@ -340,6 +352,54 @@ class IPGAssem
         const int &ebc_id ) const
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_EBC * const &ebc_part,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_flowrate(
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_EBC * const &ebc_part,
+        const int &ebc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
+      return 0.0;
+    }
+
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &sol,
+        IPLocAssem * const &lassem_ptr,
+        FEAElement * const &element_s,
+        const IQuadPts * const &quad_s,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id )
+    {
+      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
       return 0.0;
     }
 
