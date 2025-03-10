@@ -5,7 +5,6 @@ MESSAGE(STATUS "=================== System setup ==========================")
 MESSAGE(STATUS "THE SYSTEM is " ${CMAKE_SYSTEM_NAME})
 MESSAGE(STATUS "              " ${CMAKE_SYSTEM})
 
-
 # if you are building in-source, this is the same as CMAKE_SOURCE_DIR, otherwise 
 # this is the top level directory of your build tree 
 MESSAGE( STATUS "CMAKE_BINARY_DIR:         " ${CMAKE_BINARY_DIR} )
@@ -70,16 +69,6 @@ MESSAGE( STATUS "CMAKE_COMMAND: " ${CMAKE_COMMAND} )
 # command.
 #MESSAGE( STATUS "CMAKE_LIBRARY_PATH: " ${CMAKE_LIBRARY_PATH} )
 
-# the complete system name, e.g. "Linux-2.4.22", "FreeBSD-5.4-RELEASE" or
-# "Windows 5.1" 
-#MESSAGE( STATUS "CMAKE_SYSTEM: " ${CMAKE_SYSTEM} )
-
-# the short system name, e.g. "Linux", "FreeBSD" or "Windows"
-#MESSAGE( STATUS "CMAKE_SYSTEM_NAME: " ${CMAKE_SYSTEM_NAME} )
-
-# only the version part of CMAKE_SYSTEM 
-#MESSAGE( STATUS "CMAKE_SYSTEM_VERSION: " ${CMAKE_SYSTEM_VERSION} )
-
 # the processor name (e.g. "Intel(R) Pentium(R) M processor 2.00GHz") 
 MESSAGE( STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR} )
 
@@ -127,45 +116,11 @@ MESSAGE( STATUS "CMAKE_SYSTEM_PROCESSOR: " ${CMAKE_SYSTEM_PROCESSOR} )
 # set to OFF
 #MESSAGE( STATUS "CMAKE_SKIP_RPATH: " ${CMAKE_SKIP_RPATH} )
 
-# set this to true if you are using makefiles and want to see the full compile
-# and link 
-# commands instead of only the shortened ones 
-#MESSAGE( STATUS "CMAKE_VERBOSE_MAKEFILE: " ${CMAKE_VERBOSE_MAKEFILE} )
-
 # this will cause CMake to not put in the rules that re-run CMake. This might be
 # useful if 
 # you want to use the generated build files on another machine. 
 #MESSAGE( STATUS "CMAKE_SUPPRESS_REGENERATION: " ${CMAKE_SUPPRESS_REGENERATION} )
 
-
-# A simple way to get switches to the compiler is to use ADD_DEFINITIONS(). 
-# But there are also two variables exactly for this purpose: 
-
-# the compiler flags for compiling C sources 
-#MESSAGE( STATUS "CMAKE_C_FLAGS: " ${CMAKE_C_FLAGS} )
-
-# the compiler flags for compiling C++ sources 
-#MESSAGE( STATUS "CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS} )
-
-
-# Choose the type of build.  Example: SET(CMAKE_BUILD_TYPE Debug) 
-#MESSAGE( STATUS "CMAKE_BUILD_TYPE: " ${CMAKE_BUILD_TYPE} )
-
-# if this is set to ON, then all libraries are built as shared libraries by
-# default.
-#MESSAGE( STATUS "BUILD_SHARED_LIBS: " ${BUILD_SHARED_LIBS} )
-
-# the compiler used for C files 
-#MESSAGE( STATUS "CMAKE_C_COMPILER: " ${CMAKE_C_COMPILER} )
-
-# the compiler used for C++ files 
-#MESSAGE( STATUS "CMAKE_CXX_COMPILER: " ${CMAKE_CXX_COMPILER} )
-
-# if the compiler is a variant of gcc, this should be set to 1 
-#MESSAGE( STATUS "CMAKE_COMPILER_IS_GNUCC: " ${CMAKE_COMPILER_IS_GNUCC} )
-
-# if the compiler is a variant of g++, this should be set to 1 
-#MESSAGE( STATUS "CMAKE_COMPILER_IS_GNUCXX : " ${CMAKE_COMPILER_IS_GNUCXX} )
 
 # the tools for creating libraries 
 MESSAGE( STATUS "CMAKE_AR: " ${CMAKE_AR} )
