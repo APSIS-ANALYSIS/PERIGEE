@@ -5,26 +5,9 @@
 // Date: Dec. 26 2021
 // ============================================================================
 #include "HDF5_Tools.hpp"
-#include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
-#include "APart_Node_FSI.hpp"
-#include "ALocal_EBC_outflow.hpp"
-#include "QuadPts_Gauss_Triangle.hpp"
-#include "QuadPts_Gauss_Quad.hpp"
-#include "QuadPts_Gauss_Tet.hpp"
-#include "QuadPts_Gauss_Hex.hpp"
-#include "FEAElement_Triangle3_3D_der0.hpp"
-#include "FEAElement_Quad4_3D_der0.hpp"
-#include "FEAElement_Tet4.hpp"
-#include "FEAElement_Hex8.hpp"
-#include "CVFlowRate_Unsteady.hpp"
-#include "CVFlowRate_Linear2Steady.hpp"
-#include "CVFlowRate_Steady.hpp"
-#include "GenBC_Resistance.hpp"
-#include "GenBC_RCR.hpp"
-#include "GenBC_Inductance.hpp"
-#include "GenBC_Coronary.hpp"
-#include "GenBC_Pressure.hpp"
+#include "FlowRateFactory.hpp"
+#include "GenBCFactory.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_vol_M94.hpp"
@@ -41,11 +24,9 @@
 
 int main(int argc, char *argv[])
 {
-  // Number of quadrature points for tet and triangle
-  int nqp_tet = 5, nqp_tri = 4;
-
-  // Number of quadrature points for hex and quadrangle
-  int nqp_vol_1D = 2, nqp_sur_1D = 2;
+  // Number of quadrature points 5/4 for tet and triangle
+  // Number of quadrature points 8/4  for hex and quadrangle
+  int nqp_vol = 5, nqp_sur = 4;
 
   // Estimate the nonzero per row for the sparse matrix
   int nz_estimate = 300;
@@ -63,14 +44,8 @@ int main(int argc, char *argv[])
   double mesh_E  = 1.0;
   double mesh_nu = 0.3;
 
-  // flag for determining inflow type: 
-  // 0 pulsatile flow; 1 linear-to-steady; 2 steady
-  int inflow_type = 0;
-
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
-
-  double inflow_thd_time = 1.0;      // time for linearly increasing inflow to reach steady state
 
   // LPN file
   std::string lpn_file("lpn_rcr_input.txt");
@@ -90,12 +65,12 @@ int main(int argc, char *argv[])
   const std::string part_p_file("./apart/part_p");
 
   // Nonlinear solver parameters
-  double nl_rtol = 1.0e-3;
-  double nl_atol = 1.0e-6;
-  double nl_dtol = 10.0;
-  int nl_maxits  = 20;
-  int nl_refreq  = 4;
-  int nl_rethred = 4;
+  double nl_rtol   = 1.0e-3;
+  double nl_atol   = 1.0e-6;
+  double nl_dtol   = 10.0;
+  int nl_maxits    = 20;
+  int nl_refreq    = 4;
+  int nl_threshold = 4;
 
   // Time stepping parameters
   double initial_time = 0.0;
@@ -144,10 +119,8 @@ int main(int argc, char *argv[])
   // ===== Command Line Argument =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionInt(   "-nqp_tet",           nqp_tet);
-  SYS_T::GetOptionInt(   "-nqp_tri",           nqp_tri);
-  SYS_T::GetOptionInt(   "-nqp_vol_1d",        nqp_vol_1D);
-  SYS_T::GetOptionInt(   "-nqp_sur_1d",        nqp_sur_1D);
+  SYS_T::GetOptionInt(   "-nqp_vol",           nqp_vol);
+  SYS_T::GetOptionInt(   "-nqp_sur",           nqp_sur);;
   SYS_T::GetOptionInt(   "-nz_estimate",       nz_estimate);
   SYS_T::GetOptionReal(  "-bs_beta",           bs_beta);
   SYS_T::GetOptionReal(  "-rho_inf",           genA_rho_inf);
@@ -160,16 +133,14 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal(  "-sl_nu",             solid_nu);
   SYS_T::GetOptionReal(  "-mesh_E",            mesh_E);
   SYS_T::GetOptionReal(  "-mesh_nu",           mesh_nu);
-  SYS_T::GetOptionInt(   "-inflow_type",       inflow_type);
   SYS_T::GetOptionString("-inflow_file",       inflow_file);
-  SYS_T::GetOptionReal(  "-inflow_thd_time",   inflow_thd_time);
   SYS_T::GetOptionString("-lpn_file",          lpn_file);
   SYS_T::GetOptionReal(  "-nl_rtol",           nl_rtol);
   SYS_T::GetOptionReal(  "-nl_atol",           nl_atol);
   SYS_T::GetOptionReal(  "-nl_dtol",           nl_dtol);
   SYS_T::GetOptionInt(   "-nl_maxits",         nl_maxits);
   SYS_T::GetOptionInt(   "-nl_refreq",         nl_refreq);
-  SYS_T::GetOptionInt(   "-nl_rethred",        nl_rethred);
+  SYS_T::GetOptionInt(   "-nl_rethred",        nl_threshold);
   SYS_T::GetOptionReal(  "-init_time",         initial_time);
   SYS_T::GetOptionReal(  "-fina_time",         final_time);
   SYS_T::GetOptionReal(  "-init_step",         initial_step);
@@ -186,10 +157,8 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-restart_p_name",    restart_p_name);
 
   // ===== Print the command line argumetn on screen =====
-  SYS_T::cmdPrint("-nqp_tet:", nqp_tet);
-  SYS_T::cmdPrint("-nqp_tri:", nqp_tri);
-  SYS_T::cmdPrint("-nqp_vol_1d", nqp_vol_1D);
-  SYS_T::cmdPrint("-nqp_sur_1d", nqp_sur_1D);
+  SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
+  SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-bs_beta:", bs_beta);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
@@ -210,32 +179,14 @@ int main(int argc, char *argv[])
   else
     SYS_T::commPrint(     "-is_load_ps: false \n");
 
-  if( inflow_type == 0 )
-  {
-    SYS_T::commPrint(   "-inflow_type: 0 (pulsatile flow) \n");
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
-  }
-  else if( inflow_type == 1 )
-  {
-    SYS_T::commPrint(   "-inflow_type: 1 (linear-to-steady flow) \n");
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
-    SYS_T::cmdPrint(    "-inflow_thd_time:", inflow_thd_time);
-  }
-  else if( inflow_type == 2 )
-  {
-    SYS_T::commPrint(   "-inflow_type: 2 (steady flow) \n");
-    SYS_T::cmdPrint(    "-inflow_file:",     inflow_file);
-  }
-  else
-    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
-
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-nl_rtol:", nl_rtol);
   SYS_T::cmdPrint("-nl_atol:", nl_atol);
   SYS_T::cmdPrint("-nl_dtol:", nl_dtol);
   SYS_T::cmdPrint("-nl_maxits:", nl_maxits);
   SYS_T::cmdPrint("-nl_refreq:", nl_refreq);
-  SYS_T::cmdPrint("-nl_rethred", nl_rethred);
+  SYS_T::cmdPrint("-nl_rethred", nl_threshold);
   SYS_T::cmdPrint("-init_time:", initial_time);
   SYS_T::cmdPrint("-init_step:", initial_step);
   SYS_T::cmdPrint("-init_index:", initial_index);
@@ -271,16 +222,11 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar(  "mesh_nu",         mesh_nu);
     cmdh5w->write_doubleScalar(  "init_step",       initial_step);
     cmdh5w->write_intScalar(     "sol_record_freq", sol_record_freq);
-    cmdh5w->write_intScalar(     "nqp_tri",         nqp_tri);
-    cmdh5w->write_intScalar(     "nqp_tet",         nqp_tet);
-    cmdh5w->write_intScalar(     "nqp_sur_1d",      nqp_sur_1D);
-    cmdh5w->write_intScalar(     "nqp_vol_1d",      nqp_vol_1D);
+    cmdh5w->write_intScalar(     "nqp_vol",         nqp_vol);
+    cmdh5w->write_intScalar(     "nqp_sur",         nqp_sur);
     cmdh5w->write_string(        "lpn_file",        lpn_file);
-    cmdh5w->write_intScalar(     "inflow_type",     inflow_type);
     cmdh5w->write_string(        "inflow_file",     inflow_file);
     cmdh5w->write_string(        "sol_bName",       sol_bName);
-    if( inflow_type == 1 )
-      cmdh5w->write_doubleScalar("inflow_thd_time", inflow_thd_time );
 
     cmdh5w->write_string("date",              SYS_T::get_date() );
     cmdh5w->write_string("time",              SYS_T::get_time() );
@@ -290,52 +236,60 @@ int main(int argc, char *argv[])
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
-  
+
   // ===== Main Data Strucutre =====
   // Control points are only stored for the geometry-defining field, that is the velo/disp
   // field.
-  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_v_file, rank);
-
-  ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
   
-  ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
-  
-  ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
+  auto locElem_mesh = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
 
-  FEANode * fNode = new FEANode(part_v_file, rank);
+  auto locIEN_v = SYS_T::make_unique<ALocal_IEN>(part_v_file, rank);
 
-  APart_Node * pNode_v = new APart_Node_FSI(part_v_file, rank);
-  
-  APart_Node * pNode_p = new APart_Node_FSI(part_p_file, rank);
+  auto locIEN_p = SYS_T::make_unique<ALocal_IEN>(part_p_file, rank);
 
-  ALocal_InflowBC * locinfnbc = new ALocal_InflowBC(part_v_file, rank);
+  auto locIEN_mesh = SYS_T::make_unique<ALocal_IEN>(part_v_file, rank);
 
-  ALocal_NBC * locnbc_v = new ALocal_NBC(part_v_file, rank, "/nbc/MF");
-  
-  ALocal_NBC * locnbc_p = new ALocal_NBC(part_p_file, rank, "/nbc/MF");
+  auto fNode = SYS_T::make_unique<FEANode>(part_v_file, rank);
 
-  ALocal_NBC * mesh_locnbc = new ALocal_NBC(part_v_file, rank, "/mesh_nbc/MF");
+  auto fNode_mesh = SYS_T::make_unique<FEANode>(part_v_file, rank);
 
-  ALocal_EBC * locebc_v = new ALocal_EBC_outflow(part_v_file, rank);
-  
-  ALocal_EBC * locebc_p = new ALocal_EBC( part_p_file, rank );
+  std::unique_ptr<APart_Node> pNode_v = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
 
-  ALocal_EBC * mesh_locebc = new ALocal_EBC(part_v_file, rank, "/mesh_ebc");
+  std::unique_ptr<APart_Node> pNode_p = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
 
-  const int nqp_vol { (GMIptr->get_elemType() == FEType::Tet4) ? nqp_tet : (nqp_vol_1D * nqp_vol_1D * nqp_vol_1D) };
+  std::unique_ptr<APart_Node> pNode_v_time = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
 
-  const int nqp_sur { (GMIptr->get_elemType() == FEType::Tet4) ? nqp_tri : (nqp_sur_1D * nqp_sur_1D) };
+  std::unique_ptr<APart_Node> pNode_p_time = SYS_T::make_unique<APart_Node_FSI>(part_p_file, rank);
 
-  Tissue_prestress * ps_data = new Tissue_prestress(locElem, nqp_vol, rank, is_load_ps, "./ps_data/prestress");
+  std::unique_ptr<APart_Node> pNode_v_nlinear = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
+
+  std::unique_ptr<APart_Node> pNode_mesh = SYS_T::make_unique<APart_Node_FSI>(part_v_file, rank);
+
+  auto locinfnbc = SYS_T::make_unique<ALocal_InflowBC>(part_v_file, rank);
+
+  auto locnbc_v = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/nbc/MF");
+
+  auto locnbc_p = SYS_T::make_unique<ALocal_NBC>(part_p_file, rank, "/nbc/MF");
+
+  auto mesh_locnbc = SYS_T::make_unique<ALocal_NBC>(part_v_file, rank, "/mesh_nbc/MF");
+
+  std::unique_ptr<ALocal_EBC> locebc_v = SYS_T::make_unique<ALocal_EBC_outflow>(part_v_file, rank);
+
+  auto locebc_p = SYS_T::make_unique<ALocal_EBC>(part_p_file, rank);
+
+  auto mesh_locebc = SYS_T::make_unique<ALocal_EBC>(part_v_file, rank, "/mesh_ebc");
+
+  auto ps_data = SYS_T::make_unique<Tissue_prestress>(locElem.get(), nqp_vol, rank, is_load_ps, "./ps_data/prestress");
 
   // Group APart_Node and ALocal_NBC into a vector
-  std::vector<APart_Node *> pNode_list { pNode_v, pNode_p };
+  std::vector<APart_Node *> pNode_list { pNode_v.get(), pNode_p.get() };
 
-  std::vector<ALocal_NBC *> locnbc_list { locnbc_v, locnbc_p };
+  std::vector<ALocal_NBC *> locnbc_list { locnbc_v.get(), locnbc_p.get() };
 
-  std::vector<APart_Node *> pNode_m_list { pNode_v };
+  std::vector<APart_Node *> pNode_m_list { pNode_v.get() };
 
-  std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc };
+  std::vector<ALocal_NBC *> locnbc_m_list { mesh_locnbc.get() };
 
   // ===== Basic Checking =====
   SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_v_file, rank),
@@ -346,52 +300,12 @@ int main(int argc, char *argv[])
   // ===== Inflow rate function =====
   SYS_T::commPrint("===> Setup inflow flow rate. \n");
 
-  ICVFlowRate * inflow_rate_ptr = nullptr;
+  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
 
-  if( inflow_type == 0 )
-    inflow_rate_ptr = new CVFlowRate_Unsteady( inflow_file );
-  else if( inflow_type == 1 )
-    inflow_rate_ptr = new CVFlowRate_Linear2Steady( inflow_thd_time, inflow_file );
-  else if( inflow_type == 2 )
-    inflow_rate_ptr = new CVFlowRate_Steady( inflow_file );
-  else
-    SYS_T::print_fatal("Error: unrecognized inflow_type = %d. \n", inflow_type);
+  inflow_rate->print_info();
 
-  inflow_rate_ptr->print_info();
-
-  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate_ptr->get_num_nbc(),
-      "Error: ALocal_InflowBC number of faces does not match with that in ICVFlowRate.\n");
-
-  // ===== Finite Element Container & Quadrature rules =====
-  SYS_T::commPrint("===> Setup element container. \n");
-  FEAElement * elementv = nullptr;
-  FEAElement * elements = nullptr;
-
-  SYS_T::commPrint("===> Build quadrature rules. \n");
-  IQuadPts * quadv = nullptr;
-  IQuadPts * quads = nullptr;
-
-  if( GMIptr->get_elemType() == FEType::Tet4 )
-  {
-    if( nqp_vol > 5 ) SYS_T::commPrint("Warning: the tet element is linear and you are using more than 5 quadrature points.\n");
-    if( nqp_sur > 4 ) SYS_T::commPrint("Warning: the tri element is linear and you are using more than 4 quadrature points.\n");
-
-    elementv = new FEAElement_Tet4( nqp_vol ); // elem type Tet4
-    elements = new FEAElement_Triangle3_3D_der0( nqp_sur );
-    quadv = new QuadPts_Gauss_Tet( nqp_vol );
-    quads = new QuadPts_Gauss_Triangle( nqp_sur );
-  }
-  else if( GMIptr->get_elemType() == FEType::Hex8 )
-  {
-    SYS_T::print_fatal_if( nqp_vol_1D < 2, "Error: not enough quadrature points for hex.\n" );
-    SYS_T::print_fatal_if( nqp_sur_1D < 1, "Error: not enough quadrature points for quad.\n" );
-
-    elementv = new FEAElement_Hex8( nqp_vol ); // elem type Hex8
-    elements = new FEAElement_Quad4_3D_der0( nqp_sur );
-    quadv = new QuadPts_Gauss_Hex( nqp_vol_1D );
-    quads = new QuadPts_Gauss_Quad( nqp_sur_1D );
-  }
-  else SYS_T::print_fatal("Error: Element type not supported.\n");
+  SYS_T::print_fatal_if(locinfnbc->get_num_nbc() != inflow_rate->get_num_nbc(),
+      "Error: ALocal_InflowBC number of faces does not match with that in IFlowRate.\n");
 
   // ===== Generate the IS for pres and velo =====
   const int idx_v_start = HDF5_T::read_intScalar( SYS_T::gen_partfile_name(part_v_file, rank).c_str(), "/DOF_mapper", "start_idx" );
@@ -399,51 +313,44 @@ int main(int argc, char *argv[])
 
   const int idx_v_len = pNode_v->get_dof() * pNode_v -> get_nlocalnode();
   const int idx_p_len = pNode_p->get_dof() * pNode_p -> get_nlocalnode();
-
-  PetscInt * is_array_velo = new PetscInt[ idx_v_len ];
-  for(int ii=0; ii<idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
-
-  PetscInt * is_array_pres = new PetscInt[ idx_p_len ];
-  for(int ii=0; ii<idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
   
-  IS is_velo, is_pres;
-  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo, PETSC_COPY_VALUES, &is_velo);
-  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres, PETSC_COPY_VALUES, &is_pres);
+  auto is_array_velo = SYS_T::make_unique<PetscInt>(static_cast<size_t>(idx_v_len));
+  for (int ii = 0; ii < idx_v_len; ++ii) is_array_velo[ii] = idx_v_start + ii;
 
-  delete [] is_array_velo; is_array_velo = nullptr;
-  delete [] is_array_pres; is_array_pres = nullptr;
-  // ================================================================
+  auto is_array_pres = SYS_T::make_unique<PetscInt>(static_cast<size_t>(idx_p_len));
+  for (int ii = 0; ii < idx_p_len; ++ii) is_array_pres[ii] = idx_p_start + ii;
+
+  IS is_velo, is_pres;
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_v_len, is_array_velo.get(), PETSC_COPY_VALUES, &is_velo);
+  ISCreateGeneral(PETSC_COMM_WORLD, idx_p_len, is_array_pres.get(), PETSC_COPY_VALUES, &is_pres);
 
   // ===== Generate a sparse matrix for strong enforcement of essential BC
   std::vector<int> start_idx{ idx_v_start, idx_p_start };
 
-  Matrix_PETSc * pmat = new Matrix_PETSc( idx_v_len + idx_p_len );
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>( idx_v_len + idx_p_len );
   pmat -> gen_perm_bc( pNode_list, locnbc_list, start_idx );
 
   const int idx_m_start = pNode_v->get_node_loc(0) * locnbc_v->get_dof_LID();
   std::vector<int> start_m_idx{ idx_m_start };
   
-  Matrix_PETSc * mmat = new Matrix_PETSc( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
+  auto mmat = SYS_T::make_unique<Matrix_PETSc>( pNode_v -> get_nlocalnode() * pNode_v -> get_dof() );
   mmat -> gen_perm_bc( pNode_m_list, locnbc_m_list, start_m_idx );
 
   // ===== Generate the generalized-alpha method
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
-  TimeMethod_GenAlpha * tm_galpha_ptr = nullptr;
+  auto tm_galpha = is_backward_Euler
+    ? SYS_T::make_unique<TimeMethod_GenAlpha>(1.0, 1.0, 1.0)
+    : SYS_T::make_unique<TimeMethod_GenAlpha>(genA_rho_inf, false);
 
-  if( is_backward_Euler )
-    tm_galpha_ptr = new TimeMethod_GenAlpha( 1.0, 1.0, 1.0 );
-  else
-    tm_galpha_ptr = new TimeMethod_GenAlpha( genA_rho_inf, false );
-
-  tm_galpha_ptr->print_info();
+  tm_galpha->print_info();
 
   // ===== Local assembly =====
-  IPLocAssem_2x2Block * locAssem_fluid_ptr = new PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
-      tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas(), 
-      fluid_density, fluid_mu, bs_beta, GMIptr->get_elemType() );
+  std::unique_ptr<IPLocAssem_2x2Block> locAssem_fluid = SYS_T::make_unique<PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha>(
+      ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur,
+      tm_galpha.get(), fluid_density, fluid_mu, bs_beta ); 
 
-  IPLocAssem_2x2Block * locAssem_solid_ptr = nullptr;
+  std::unique_ptr<IPLocAssem_2x2Block> locAssem_solid = nullptr;
 
   const double solid_mu = solid_E/(2.0+2.0*solid_nu);
   std::unique_ptr<IMaterialModel_ich> imodel = SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
@@ -452,8 +359,8 @@ int main(int argc, char *argv[])
   {
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
-    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Incompressible(
-        std::move(matmodel), tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
+        ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur, tm_galpha.get(), std::move(matmodel) );
   }
   else
   {
@@ -461,24 +368,35 @@ int main(int argc, char *argv[])
     const double solid_kappa  = solid_lambda + 2.0 * solid_mu / 3.0;
     std::unique_ptr<IMaterialModel_vol> vmodel = SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
-    locAssem_solid_ptr = new PLocAssem_2x2Block_VMS_Hyperelasticity(
-        std::move(matmodel), tm_galpha_ptr, elementv -> get_nLocBas(), elements->get_nLocBas() );
+    locAssem_solid = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
+        ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur, tm_galpha.get(), std::move(matmodel) );
   }
 
-  // Pseudo elastic mesh motion
-  IPLocAssem * locAssem_mesh_ptr = new PLocAssem_FSI_Mesh_Laplacian( elementv -> get_nLocBas() );
+  // The harmonic extension algorithm & Pseudo elastic mesh motion
+  std::unique_ptr<IPLocAssem> locAssem_mesh = SYS_T::make_unique<PLocAssem_FSI_Mesh_Laplacian>( ANL_T::get_elemType(part_v_file, rank), nqp_vol, nqp_sur );
   
   // ===== Initial condition =====
-  PDNSolution * base = new PDNSolution_V( pNode_v, fNode, locinfnbc, 1, true, "base" ); 
-  
-  PDNSolution * velo = new PDNSolution_V(pNode_v, 0, true, "velo");
-  PDNSolution * disp = new PDNSolution_V(pNode_v, 0, true, "disp");
-  PDNSolution * pres = new PDNSolution_P(pNode_p, 0, true, "pres");
+  std::unique_ptr<PDNSolution> base =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), fNode.get(), locinfnbc.get(), 1, true, "base" );
 
-  PDNSolution * dot_velo = new PDNSolution_V(pNode_v, 0, true, "dot_velo");
-  PDNSolution * dot_disp = new PDNSolution_V(pNode_v, 0, true, "dot_disp");
-  PDNSolution * dot_pres = new PDNSolution_P(pNode_p, 0, true, "dot_pres");
-  
+  std::unique_ptr<PDNSolution> velo =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "velo" );
+
+  std::unique_ptr<PDNSolution> disp =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "disp" );
+
+  std::unique_ptr<PDNSolution> pres =
+    SYS_T::make_unique<PDNSolution_P>( pNode_p.get(), 0, true, "pres" );  
+
+  std::unique_ptr<PDNSolution> dot_velo =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "dot_velo" );
+
+  std::unique_ptr<PDNSolution> dot_disp =
+    SYS_T::make_unique<PDNSolution_V>( pNode_v.get(), 0, true, "dot_disp" );
+
+  std::unique_ptr<PDNSolution> dot_pres =
+    SYS_T::make_unique<PDNSolution_P>( pNode_p.get(), 0, true, "dot_pres" );  
+
   if( is_restart )
   {
     initial_index = restart_index;
@@ -523,23 +441,12 @@ int main(int argc, char *argv[])
   }
 
   // ===== Time step info =====
-  PDNTimeStep * timeinfo = new PDNTimeStep(initial_index, initial_time, initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
+      initial_step);
 
   // ===== GenBC =====
-  IGenBC * gbc = nullptr;
-
-  if( GENBC_T::get_genbc_file_type( lpn_file ) == 1  )
-    gbc = new GenBC_Resistance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 2  )
-    gbc = new GenBC_RCR( lpn_file, 1000, initial_step );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 3  )
-    gbc = new GenBC_Inductance( lpn_file );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 4  )
-    gbc = new GenBC_Coronary( lpn_file, 1000, initial_step, initial_index );
-  else if( GENBC_T::get_genbc_file_type( lpn_file ) == 5  )
-    gbc = new GenBC_Pressure( lpn_file, initial_time );
-  else
-    SYS_T::print_fatal( "Error: GenBC input file %s format cannot be recongnized.\n", lpn_file.c_str() );
+  auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
+      initial_index, 1000);
 
   gbc -> print_info();
 
@@ -548,36 +455,38 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly routine =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  IPGAssem * gloAssem_ptr = new PGAssem_FSI( locAssem_fluid_ptr,
-      locAssem_solid_ptr, elements, quads, locElem, locIEN_v, locIEN_p,
-      pNode_v, pNode_p, locnbc_v, locnbc_p, locebc_v, gbc, nz_estimate );
+  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_FSI>( gbc.get(), 
+      std::move(locIEN_v), std::move(locIEN_p), std::move(locElem), std::move(fNode), 
+      std::move(pNode_v), std::move(pNode_p), std::move(locnbc_v), std::move(locnbc_p), 
+      std::move(locebc_v), std::move(locebc_p), std::move(locAssem_fluid), 
+      std::move(locAssem_solid), std::move(ps_data), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
-  gloAssem_ptr->Assem_nonzero_estimate( locElem, locAssem_fluid_ptr,
-      locAssem_solid_ptr, elements, quads, locIEN_v, locIEN_p, pNode_v, 
-      locnbc_v, locnbc_p, locebc_v, gbc );
+  gloAssem->Assem_nonzero_estimate( gbc.get() );
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  gloAssem_ptr->Fix_nonzero_err_str();
-  gloAssem_ptr->Clear_KG();
+  gloAssem->Fix_nonzero_err_str();
+  gloAssem->Clear_KG();
 
   // ===== Global assembly for mesh motion =====
   SYS_T::commPrint("===> Initializing Mat K_mesh and Vec G_mesh ... \n");
-  IPGAssem * gloAssem_mesh_ptr = new PGAssem_Mesh( locAssem_mesh_ptr,
-      locElem, locIEN_v, pNode_v, mesh_locnbc, mesh_locebc, nz_estimate );
+  std::unique_ptr<IPGAssem> gloAssem_mesh = SYS_T::make_unique<PGAssem_Mesh>(
+      std::move(locIEN_mesh), std::move(locElem_mesh), std::move(fNode_mesh), 
+      std::move(pNode_mesh), std::move(mesh_locnbc), std::move(mesh_locebc), 
+      std::move(locAssem_mesh), nz_estimate );
 
   SYS_T::commPrint("===> Assembly nonzero estimate for K_mesh ... \n");
-  gloAssem_mesh_ptr->Assem_nonzero_estimate( locElem, locAssem_mesh_ptr, locIEN_v, mesh_locnbc );
+  gloAssem_mesh->Assem_nonzero_estimate();
 
   SYS_T::commPrint("===> Matrix K_mesh nonzero structure fixed. \n");
-  gloAssem_mesh_ptr->Fix_nonzero_err_str();
-  gloAssem_mesh_ptr->Clear_KG();
+  gloAssem_mesh->Fix_nonzero_err_str();
+  gloAssem_mesh->Clear_KG();
 
   // ===== Initialize dot sol =====
   if( is_restart == false )
   {
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    PLinear_Solver_PETSc * lsolver_acce = new PLinear_Solver_PETSc(
+    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
         1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
 
     KSPSetType(lsolver_acce->ksp, KSPGMRES);
@@ -590,13 +499,12 @@ int main(int argc, char *argv[])
     PCSetType( preproc, PCHYPRE );
     PCHYPRESetType( preproc, "boomeramg" );
 
-    gloAssem_ptr->Assem_mass_residual( disp, velo, pres, locElem, locAssem_fluid_ptr,
-        locAssem_solid_ptr, elementv, elements, quadv, quads, locIEN_v, locIEN_p, 
-        fNode, locnbc_v, locnbc_p, locebc_v, ps_data );
+    gloAssem->Assem_mass_residual( disp.get(), velo.get(), pres.get() );
 
     Vec proj_vp, proj_v, proj_p;
-    VecDuplicate( gloAssem_ptr->G, &proj_vp );
-    lsolver_acce -> Solve( gloAssem_ptr->K, gloAssem_ptr->G, proj_vp );
+    VecDuplicate( gloAssem->G, &proj_vp );
+    
+    lsolver_acce -> Solve( gloAssem->K, gloAssem->G, proj_vp );
 
     SYS_T::commPrint("\n===> Consistent initial acceleration is obtained.\n");
     lsolver_acce -> print_info();
@@ -609,31 +517,28 @@ int main(int argc, char *argv[])
     dot_pres -> PlusAX(proj_p, -1.0);
 
     // dot_u = v
-    dot_disp -> Copy( velo ); 
+    dot_disp -> Copy( velo.get() ); 
 
     VecRestoreSubVector(proj_vp, is_velo, &proj_v);
     VecRestoreSubVector(proj_vp, is_pres, &proj_p);
     VecDestroy(&proj_vp);
-    delete lsolver_acce;
     SYS_T::commPrint("===> The mass matrix lsolver is destroyed.\n");
   }
 
   // ===== Linear and nonlinear solver context =====
-  PLinear_Solver_PETSc * lsolver = new PLinear_Solver_PETSc();
+  auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   PC upc; lsolver->GetPC(&upc);
   PCFieldSplitSetIS(upc, "u", is_velo);
   PCFieldSplitSetIS(upc, "p", is_pres);
 
-  PLinear_Solver_PETSc * mesh_lsolver = new PLinear_Solver_PETSc(
+  auto mesh_lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>(
       1.0e-12, 1.0e-55, 1.0e30, 500, "mesh_", "mesh_" );
 
-  gloAssem_mesh_ptr->Assem_tangent_residual( disp, disp, 0.0,
-      timeinfo->get_step(), locElem, locAssem_mesh_ptr, elementv,
-      elements, quadv, quads, locIEN_v, fNode, mesh_locnbc,
-      mesh_locebc );
+  gloAssem_mesh->Assem_tangent_residual( disp.get(), disp.get(), 0.0,
+      timeinfo->get_step() );
 
-  mesh_lsolver -> SetOperator( gloAssem_mesh_ptr->K );
+  mesh_lsolver -> SetOperator( gloAssem_mesh->K );
   PC mesh_pc; mesh_lsolver->GetPC(&mesh_pc);
   PCFieldSplitSetBlockSize( mesh_pc, 3 );
 
@@ -642,89 +547,31 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> mesh solver LHS setted up.\n");
 
   // ===== Nonlinear solver context =====
-  PNonlinear_FSI_Solver * nsolver = new PNonlinear_FSI_Solver(
-      nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_rethred);
+  auto nsolver = SYS_T::make_unique<PNonlinear_FSI_Solver>(
+      std::move(gloAssem_mesh), std::move(lsolver), std::move(mesh_lsolver), 
+      std::move(pmat), std::move(mmat), std::move(tm_galpha), std::move(inflow_rate), 
+      std::move(base), std::move(pNode_v_nlinear), nl_rtol, nl_atol, nl_dtol, 
+      nl_maxits, nl_refreq, nl_threshold );
   SYS_T::commPrint("===> Nonlinear solver setted up:\n");
   nsolver->print_info();
 
   // ===== Temporal solver context =====
-  PTime_FSI_Solver * tsolver = new PTime_FSI_Solver( sol_bName,
-      sol_record_freq, ttan_renew_freq, final_time );
+  auto tsolver = SYS_T::make_unique<PTime_FSI_Solver>(
+      std::move(nsolver), std::move(pNode_v_time), std::move(pNode_p_time), 
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
   SYS_T::commPrint("===> Time marching solver setted up:\n");
   tsolver->print_info();
 
   // ===== Outlet flowrate recording files =====
-  for(int ff=0; ff<locebc_v->get_num_ebc(); ++ff)
-  {
-    const double dot_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, dot_velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
-
-    const double face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, velo, locAssem_fluid_ptr, elements, quads, locebc_v, ff );
-
-    const double face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locebc_v, locebc_p, ff );
-
-    // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
-
-    const double dot_lpn_flowrate = dot_face_flrate;
-    const double lpn_flowrate = face_flrate;
-    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
-
-    if(rank == 0)
-    {
-      std::ofstream ofile;
-
-      // If this is NOT a restart run, generate a new file, otherwise append to
-      // a existing file
-      if( !is_restart )
-        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( locebc_v->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      // if this is NOT a restart run, record the initial values
-      if( !is_restart )
-      {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
+  tsolver->record_outlet_data( disp.get(), velo.get(), pres.get(), dot_velo.get(), timeinfo.get(), gbc.get(),
+      gloAssem.get(), true, is_restart );
 
   // Write all 0D solutions into a file
   if( rank == 0 ) gbc -> write_0D_sol ( initial_index, initial_time );
 
   // ===== Inlet data recording files =====
-  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  {
-    const double inlet_face_flrate = gloAssem_ptr -> Assem_surface_flowrate(
-        disp, velo, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
-
-    const double inlet_face_avepre = gloAssem_ptr -> Assem_surface_ave_pressure(
-        disp, pres, locAssem_fluid_ptr, elements, quads, locinfnbc, ff );
-
-    if( rank == 0 )
-    {
-      std::ofstream ofile;
-      if( !is_restart )
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( locinfnbc->gen_flowfile_name(ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      if( !is_restart )
-      {
-        ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
+  tsolver->record_inlet_data( disp.get(), velo.get(), pres.get(), timeinfo.get(), locinfnbc.get(), 
+      gloAssem.get(), true, is_restart );
 
   // ===== FEM analysis =====
 #ifdef PETSC_USE_LOG
@@ -740,37 +587,23 @@ int main(int argc, char *argv[])
   PetscLogEventBegin(tsolver_event, 0,0,0,0);
 #endif
 
-  tsolver->TM_FSI_GenAlpha(is_restart, is_velo, is_pres, base, 
-      dot_disp, dot_velo, dot_pres, disp, velo, pres, 
-      tm_galpha_ptr, timeinfo, inflow_rate_ptr, locElem, locIEN_v, locIEN_p, 
-      pNode_v, pNode_p, fNode, locnbc_v, locnbc_p, locinfnbc, mesh_locnbc, 
-      locebc_v, locebc_p, mesh_locebc, 
-      gbc, pmat, mmat, elementv, elements, quadv, quads, ps_data,
-      locAssem_fluid_ptr, locAssem_solid_ptr, locAssem_mesh_ptr,
-      gloAssem_ptr, gloAssem_mesh_ptr, lsolver, mesh_lsolver, nsolver);
+  tsolver->TM_FSI_GenAlpha( is_restart, is_velo, is_pres, std::move(dot_disp), 
+      std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), 
+      std::move(pres), std::move(timeinfo), locinfnbc.get(), gbc.get(), 
+      gloAssem.get() );
 
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(tsolver_event,0,0,0,0);
 #endif
 
   // Print complete solver info
-  lsolver -> print_info();
-  mesh_lsolver -> print_info();
+  tsolver -> print_lsolver_info();
+  tsolver -> print_lsolver_mesh_info();
 
   // ===== PETSc Finalize =====
-  delete tsolver; delete nsolver; delete lsolver; delete mesh_lsolver;
-  delete gloAssem_ptr; delete gloAssem_mesh_ptr;
-  delete timeinfo; delete gbc;
-  delete pres; delete dot_pres;
-  delete base; delete dot_velo; delete dot_disp; delete velo; delete disp;
-  delete locAssem_mesh_ptr; delete locAssem_fluid_ptr;
-  delete locAssem_solid_ptr; delete pmat; delete mmat; delete tm_galpha_ptr;
   ISDestroy(&is_velo); ISDestroy(&is_pres);
-  delete elements; delete elementv; delete quadv; delete quads; delete inflow_rate_ptr;
-  delete GMIptr; delete locElem; delete fNode; delete pNode_v; delete pNode_p;
-  delete locinfnbc; delete locnbc_v; delete locnbc_p; delete mesh_locnbc; 
-  delete locebc_v; delete locebc_p; delete mesh_locebc; 
-  delete locIEN_v; delete locIEN_p; delete ps_data;
+  tsolver.reset(); locinfnbc.reset(); gbc.reset(); gloAssem.reset();
+
   PetscFinalize();
   return EXIT_SUCCESS;
 }

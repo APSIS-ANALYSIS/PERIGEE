@@ -56,6 +56,12 @@ namespace SYS_T
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
   }
 
+  // Overload of make_unique for arrays with specified size for C++11
+  template <typename T> std::unique_ptr<T[]> make_unique(std::size_t size)
+  {
+    return std::unique_ptr<T[]>(new T[size]());  // Array of T with zero initialization
+  }
+
   // Return the OS environmental variable
   inline std::string get_Env_Var( const std::string &key )
   {

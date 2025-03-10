@@ -36,7 +36,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const PDNSolution * const &init_mvelo,
     const TimeMethod_GenAlpha * const &tmga_ptr,
     PDNTimeStep * const &time_info,
-    const ICVFlowRate * const flr_ptr,
+    const IFlowRate * const flr_ptr,
     const APart_Node * const &pNode_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -123,8 +123,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     { 
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
-      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info, 0); //get_currPts() may be writtern into Sl_tools
-      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info, 0);
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info); //get_currPts() may be writtern into Sl_tools
+      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info);
 
       const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, rot_info); 
       const Vector_3 velo_mesh_alpha = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*rot_info->get_direction_rotated(), radius_alpha);
@@ -231,7 +231,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( ebc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( gen_flowfile_name("Outlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
         ofile.close();
       }
@@ -250,7 +250,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       if( SYS_T::get_MPI_rank() == 0 )
       {
         std::ofstream ofile;
-        ofile.open( infnbc_part->gen_flowfile_name(face).c_str(), std::ofstream::out | std::ofstream::app );
+        ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
         ofile.close();
       } 

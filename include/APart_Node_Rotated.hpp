@@ -31,6 +31,8 @@ class APart_Node_Rotated : public APart_Node
   public:
     APart_Node_Rotated(const std::string &fileBaseName, const int &rank );
 
+    APart_Node_Rotated(const HDF5_Reader * const &h5r);
+
     virtual ~APart_Node_Rotated() = default;
 
     virtual void print_info() const;

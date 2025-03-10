@@ -9,14 +9,16 @@
 // ============================================================================
 #include "IPLocAssem.hpp"
 #include "TimeMethod_GenAlpha.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_Transport_GenAlpha : public IPLocAssem
 {
   public:
     PLocAssem_Transport_GenAlpha( 
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const double &in_rho, const double &in_cap, const double &in_kappa,
         const TimeMethod_GenAlpha * const &tm_gAlpha,
-        const int &in_nlocbas, const int &in_snlocbas,
         const int &in_num_ebc_fun );
 
     virtual ~PLocAssem_Transport_GenAlpha();
@@ -24,6 +26,10 @@ class PLocAssem_Transport_GenAlpha : public IPLocAssem
     virtual int get_dof() const {return 1;}
 
     virtual int get_dof_mat() const {return 1;}
+
+    virtual int get_nLocBas() const {return nLocBas;}
+
+    virtual int get_snLocBas() const {return snLocBas;}
 
     virtual void Zero_Tangent_Residual()
     {
@@ -55,44 +61,41 @@ class PLocAssem_Transport_GenAlpha : public IPLocAssem
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &dot_sol,
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Mass_Residual(
         const double * const &sol,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
   private:
     // Private data
+    const FEType elemType;
+    const int nqpv, nqps;
+    const std::unique_ptr<FEAElement> elementv, elements;
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
     const double rho, cap, kappa;
     const double alpha_f, alpha_m, gamma;
-    
+
     const int num_ebc_fun;
 
     const int nLocBas, snLocBas;
@@ -103,7 +106,7 @@ class PLocAssem_Transport_GenAlpha : public IPLocAssem
     double get_f( const Vector_3 &pt, const double &tt ) const
     {
       //const double pi = MATH_T::PI;
-    
+
       const double t3 = tt*tt*tt;
       const double t4 = t3 * tt;
       const double x = pt.x();

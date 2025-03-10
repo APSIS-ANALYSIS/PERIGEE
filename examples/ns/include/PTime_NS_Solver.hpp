@@ -14,7 +14,9 @@
 class PTime_NS_Solver
 {
   public:
-    PTime_NS_Solver( const std::string &input_name, 
+    PTime_NS_Solver( 
+        std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+        const std::string &input_name,      
         const int &input_record_freq, const int &input_renew_tang_freq, 
         const double &input_final_time );
 
@@ -22,33 +24,53 @@ class PTime_NS_Solver
 
     void print_info() const;
 
+    void print_lsolver_info() const {nsolver -> print_lsolver_info();}
+
+    // ------------------------------------------------------------------------
+    // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
+    // ------------------------------------------------------------------------
+    std::string gen_flowfile_name(const std::string &prefix, const int &id) const
+    {
+      std::ostringstream ss;
+      ss << prefix;
+
+      if(id < 10) ss << "00";
+      else if(id < 100) ss << "0";
+
+      ss << id << "_data.txt";
+      return ss.str();
+    }
+
+    // ------------------------------------------------------------------------
+    // Calculate the flow rate and averaged pressre on each inlet surface and
+    // record them into the Inlet_xxx_data.txt file
+    // User is responsible for choosing the correct openmode, including
+    // std::ofstream::app and std::ofstream::trunc
+    // ------------------------------------------------------------------------
+    void record_inlet_data( const PDNSolution * const &sol,
+        const PDNTimeStep * const &time_info,
+        const ALocal_InflowBC * const &infnbc_part,
+        const IPGAssem * const &gassem_ptr,
+        bool is_driver,
+        bool is_restart ) const;
+    
+    void record_outlet_data(
+        const PDNSolution * const &sol,
+        const PDNSolution * const &dot_sol,
+        const PDNTimeStep * const &time_info,
+        IGenBC * const &gbc,
+        const IPGAssem * const &gassem_ptr,
+        bool is_driver,
+        bool is_restart) const;
+
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-        PDNSolution * const &sol_base,
-        const PDNSolution * const &init_dot_sol,
-        const PDNSolution * const &init_sol,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        PDNTimeStep * const &time_info,
-        const ICVFlowRate * const flr_ptr,
-        const APart_Node * const &pNode_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &feanode_ptr,
-        const ALocal_NBC * const &nbc_part,
+        std::unique_ptr<PDNSolution> init_dot_sol,
+        std::unique_ptr<PDNSolution> init_sol,
+        std::unique_ptr<PDNTimeStep> time_info,
         const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_EBC * const &ebc_part,
-        IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
-        const Matrix_PETSc * const &bc_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        IPLocAssem * const &lassem_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_NS_Solver * const &nsolver_ptr ) const;
+        IGenBC * const &gbc, 
+        IPGAssem * const &gassem_ptr ) const;
 
   private:
     const double final_time;
@@ -56,10 +78,12 @@ class PTime_NS_Solver
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
 
+    const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
+
     std::string Name_Generator( const int &counter ) const;
-    
+
     std::string Name_dot_Generator( const int &counter ) const;
-    
+
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;
 };

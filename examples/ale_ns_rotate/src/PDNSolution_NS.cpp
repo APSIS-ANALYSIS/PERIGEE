@@ -97,7 +97,7 @@ void PDNSolution_NS::Init_flow_parabolic(
     // Maximum speed formula is 
     //             2.0 x flow rate (1.0) / surface area
     // Here I use the unit flow rate, and the actual flow rate is adjusted
-    // based on the CVFlowRate class.
+    // based on the FlowRate class.
     const double vmax = 2.0 / infbc->get_fularea(nbc_id);
     
     const double out_nx = infbc->get_outvec(nbc_id).x();
@@ -159,7 +159,7 @@ void PDNSolution_NS::Init_pipe_parabolic(
   // Maximum speed formula is 
   //             2.0 x flow rate (1.0) / surface area
   // Here I use the unit flow rate, and the actual flow rate is adjusted
-  // based on the CVFlowRate class.
+  // based on the FlowRate class.
   const double vmax = 2.0 * 100.0 / (3.14 * 4);
 
   const double out_nx = 0.0; 

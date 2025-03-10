@@ -48,7 +48,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &pre_velo_mesh,    
     const PDNSolution * const &pre_disp_mesh,
     const TimeMethod_GenAlpha * const &tmga_ptr,
-    const ICVFlowRate * const flr_ptr,
+    const IFlowRate * const flr_ptr,
     const ALocal_Elem * const &alelem_ptr,
     const ALocal_IEN * const &lien_ptr,
     const FEANode * const &feanode_ptr,
@@ -274,7 +274,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
-    const ICVFlowRate * const &flrate,
+    const IFlowRate * const &flrate,
     const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
 {

@@ -7,14 +7,8 @@
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
-#include "QuadPts_vis_tet4.hpp"
-#include "QuadPts_vis_tet10.hpp"
-#include "QuadPts_vis_hex8.hpp"
-#include "QuadPts_vis_hex27.hpp"
-#include "FEAElement_Tet4.hpp"
-#include "FEAElement_Tet10.hpp"
-#include "FEAElement_Hex8.hpp"
-#include "FEAElement_Hex27.hpp"
+#include "QuadPtsFactory.hpp"
+#include "FEAElementFactory.hpp"
 #include "VisDataPrep_Transport.hpp"
 #include "VTK_Writer_Transport.hpp"
 
@@ -81,51 +75,27 @@ int main( int argc, char * argv[] )
     SYS_T::execute("rm -rf *_.pvd");
   }
 
-  FEANode * fNode = new FEANode(part_file, rank);
-
-  ALocal_IEN * locIEN = new ALocal_IEN(part_file, rank);
-
-  AGlobal_Mesh_Info * GMIptr = new AGlobal_Mesh_Info(part_file,rank);
-
-  ALocal_Elem * locElem = new ALocal_Elem(part_file, rank);
-
-  APart_Node * pNode = new APart_Node(part_file, rank);
+  auto locIEN  = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
+  auto fNode   = SYS_T::make_unique<FEANode>(part_file, rank);
+  auto pNode   = SYS_T::make_unique<APart_Node>(part_file, rank);
+  auto GMIptr  = SYS_T::make_unique<AGlobal_Mesh_Info>(part_file,rank);
 
   SYS_T::print_fatal_if(size != ANL_T::get_cpu_size(part_file, rank), "Error: number of processors does not match with prepost! \n");
 
   SYS_T::commPrint("===> %d processor(s) are assigned for:", size);
 
   // Allocate the quadrature rule and element container
-  IQuadPts * quad = nullptr;
-  FEAElement * element = nullptr;
-
-  if( GMIptr->get_elemType() == FEType::Tet4 )
-  {
-    quad = new QuadPts_vis_tet4();
-    element = new FEAElement_Tet4( quad-> get_num_quadPts() );
-  }
-  else if( GMIptr->get_elemType() == FEType::Tet10 )
-  {
-    quad = new QuadPts_vis_tet10();
-    element = new FEAElement_Tet10( quad-> get_num_quadPts() );
-  }
-  else if( GMIptr->get_elemType() == FEType::Hex8 )
-  {
-    quad = new QuadPts_vis_hex8();
-    element = new FEAElement_Hex8( quad-> get_num_quadPts() );
-  }
-  else if( GMIptr->get_elemType() == FEType::Hex27 )
-  {
-    quad = new QuadPts_vis_hex27();
-    element = new FEAElement_Hex27( quad-> get_num_quadPts() );
-  }
-  else SYS_T::print_fatal( "Error: unsupported element type \n" );
+  const auto elemType = GMIptr->get_elemType();
+  std::unique_ptr<IQuadPts> quad = QuadPtsFactory::createVisQuadrature(elemType);
+  std::unique_ptr<FEAElement> element = ElementFactory::createVolElement(elemType,
+      quad->get_num_quadPts());
 
   // Print the sampling points on screen
   quad -> print_info();
 
   // Create the visualization data object
-  IVisDataPrep * visprep = new VisDataPrep_Transport();
+  std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_Transport>();
 
   visprep->print_info();
 
@@ -135,7 +105,7 @@ int main( int argc, char * argv[] )
     solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
   // VTK writer 
-  VTK_Writer_Transport * vtk_w = new VTK_Writer_Transport( GMIptr->get_nElem(), 
+  auto vtk_w = SYS_T::make_unique<VTK_Writer_Transport>( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
   
   std::ostringstream time_index;
@@ -153,10 +123,10 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
-        pNode, GMIptr->get_nFunc(), dof, solArrays);
+        pNode.get(), GMIptr->get_nFunc(), dof, solArrays);
 
-    vtk_w->writeOutput( fNode, locIEN, locElem,
-        visprep, element, quad, solArrays,
+    vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(),
+        visprep.get(), element.get(), quad.get(), solArrays,
         rank, size, time * dt, sol_bname, out_bname, name_to_write, isXML );
   }
 
@@ -167,9 +137,6 @@ int main( int argc, char * argv[] )
     delete [] solArrays[ii];
   delete [] solArrays;
   
-  delete fNode; delete locIEN; delete GMIptr; delete locElem;
-  delete pNode; delete quad; delete element; delete visprep; delete vtk_w;
-
   PetscFinalize();
   return EXIT_SUCCESS;
 }

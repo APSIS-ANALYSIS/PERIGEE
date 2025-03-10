@@ -6,7 +6,7 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
   nlocalele = h5r -> read_intScalar("Local_Elem", "nlocalele");
 
@@ -15,8 +15,22 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
   int num_row, num_col;
   LIEN = h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
   
-  delete h5r; H5Fclose( file_id );
+  H5Fclose( file_id );
 
+  SYS_T::print_fatal_if( num_row != nlocalele, "Error: ALocal_IEN::LIEN size does not match the number of element. \n");
+
+  SYS_T::print_fatal_if( num_col != nLocBas, "Error: ALocal_IEN::LIEN size does not match the value of nLocBas. \n");
+}
+
+ALocal_IEN::ALocal_IEN( const HDF5_Reader * const &h5r ) 
+{
+  nlocalele = h5r -> read_intScalar("Local_Elem", "nlocalele");
+
+  nLocBas = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
+
+  int num_row, num_col;
+  LIEN = h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
+  
   SYS_T::print_fatal_if( num_row != nlocalele, "Error: ALocal_IEN::LIEN size does not match the number of element. \n");
 
   SYS_T::print_fatal_if( num_col != nLocBas, "Error: ALocal_IEN::LIEN size does not match the value of nLocBas. \n");

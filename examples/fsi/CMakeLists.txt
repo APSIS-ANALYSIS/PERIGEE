@@ -92,10 +92,14 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Analysis_Tool/APart_Node_FSI.cpp
   ${perigee_source}/Analysis_Tool/FEANode.cpp
   ${perigee_source}/Element/FE_Tools.cpp
-  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
-  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
   ${perigee_source}/Element/FEAElement_Tet4.cpp
+  ${perigee_source}/Element/FEAElement_Tet10.cpp
   ${perigee_source}/Element/FEAElement_Hex8.cpp
+  ${perigee_source}/Element/FEAElement_Hex27.cpp
+  ${perigee_source}/Element/FEAElement_Triangle3_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Triangle6_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad4_3D_der0.cpp
+  ${perigee_source}/Element/FEAElement_Quad9_3D_der0.cpp  
   ${perigee_source}/Model/Tissue_prestress.cpp
   ${perigee_source}/Model/GenBC_RCR.cpp
   ${perigee_source}/Model/GenBC_Resistance.cpp
@@ -103,9 +107,10 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/GenBC_Coronary.cpp
   ${perigee_source}/Model/GenBC_Pressure.cpp
   ${perigee_source}/Model/GenBC_Tools.cpp
-  ${perigee_source}/Model/CVFlowRate_Steady.cpp
-  ${perigee_source}/Model/CVFlowRate_Unsteady.cpp
-  ${perigee_source}/Model/CVFlowRate_Linear2Steady.cpp
+  ${perigee_source}/Model/FlowRate_Steady.cpp
+  ${perigee_source}/Model/FlowRate_Unsteady.cpp
+  ${perigee_source}/Model/FlowRate_Linear2Steady.cpp
+  ${perigee_source}/Model/FlowRate_Cosine2Steady.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp

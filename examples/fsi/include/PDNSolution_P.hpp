@@ -19,7 +19,7 @@ class PDNSolution_P : public PDNSolution
         const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_pressure" );
 
-    virtual ~PDNSolution_P() {};
+    virtual ~PDNSolution_P() = default;
 
   private:
     const std::string sol_name;

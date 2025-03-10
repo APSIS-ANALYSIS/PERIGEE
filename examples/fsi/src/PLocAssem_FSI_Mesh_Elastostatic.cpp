@@ -1,10 +1,17 @@
 #include "PLocAssem_FSI_Mesh_Elastostatic.hpp"
 
 PLocAssem_FSI_Mesh_Elastostatic::PLocAssem_FSI_Mesh_Elastostatic(
-    const double &in_mat_E, const double &in_mat_nu, const int &in_nlocbas )
-: E(in_mat_E), nu(in_mat_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
+    const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+    const double &in_mat_E, const double &in_mat_nu )
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
+  elementv( ElementFactory::createVolElement(elemType, nqpv) ),
+  elements( ElementFactory::createSurElement(elemType, nqps) ),
+  quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
+  quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
+  E(in_mat_E), nu(in_mat_nu), lambda( nu * E / ((1+nu) * (1-2.0*nu)) ),
   mu( E/(2.0+2.0*nu) ), kappa( lambda + 2.0 * mu / 3.0 ),
-  nLocBas(in_nlocbas), vec_size(nLocBas*3)
+  nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ), 
+  vec_size(nLocBas*3)
 {
   Tangent = new PetscScalar[vec_size * vec_size];
   Residual = new PetscScalar[vec_size];
@@ -22,10 +29,7 @@ PLocAssem_FSI_Mesh_Elastostatic::~PLocAssem_FSI_Mesh_Elastostatic()
 void PLocAssem_FSI_Mesh_Elastostatic::print_info() const
 {
   SYS_T::commPrint("  Three-dimensional Elastostatic equation: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  elementv->print_info();
   SYS_T::commPrint("  Spatial: Galerkin Finite element \n");
   SYS_T::commPrint("  This solver is for mesh motion in the fluid sub-domain for FSI problems.\n");
   SYS_T::commPrint("  Young's Modulus E  = %e \n", E);
@@ -71,21 +75,17 @@ void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     const double &time, const double &dt,
     const double * const &vec_a,
     const double * const &vec_b,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   // vec_a passes the previous time step displacement.
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, vec_a, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  const int nqp = quad -> get_num_quadPts();
-
   // Because the call of get_currPts, this basis is at tilde(x)
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementv->buildBasis( quadv.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double l2mu = lambda + 2.0 * mu;
 
@@ -93,10 +93,10 @@ void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
 
   std::vector<double> dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-  for( int qua=0; qua<nqp; ++qua )
+  for( int qua=0; qua<nqpv; ++qua )
   {
-    element->get_gradR(qua, &dR_dx[0], &dR_dy[0], &dR_dz[0]);
-    const double detJac = element->get_detJac(qua);
+    elementv->get_gradR(qua, &dR_dx[0], &dR_dy[0], &dR_dz[0]);
+    const double detJac = elementv->get_detJac(qua);
 
     double ux = 0.0, uy = 0.0, uz = 0.0;
     double vx = 0.0, vy = 0.0, vz = 0.0;
@@ -122,7 +122,7 @@ void PLocAssem_FSI_Mesh_Elastostatic::Assem_Tangent_Residual(
     // by detJac to enhance the mesh moving algorithm's robustness, as the small
     // element will be stiffer and thus is resistant to mesh distortion.
     // Reference: T.E. Tezduyar and A.A. Johnson (1994) CMAME 119 (1994) 73–94
-    const double gwts = detJac * quad->get_qw(qua) / detJac;
+    const double gwts = detJac * quadv->get_qw(qua) / detJac;
 
     for(int A=0; A<nLocBas; ++A)
     {
