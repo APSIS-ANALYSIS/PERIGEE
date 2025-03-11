@@ -34,7 +34,7 @@ class PGAssem_HERK_Block_NS_FEM
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<ALocal_WeakBC> in_wbc,
-        std::unique_ptr<IPLocAssem_2x2Block> in_locassem,
+        std::unique_ptr<PLocAssem_Block_VMS_NS_HERK> in_locassem,
         const int &in_nz_estimate=60 );
 
     // Destructor
@@ -109,7 +109,7 @@ class PGAssem_HERK_Block_NS_FEM
         PDNSolution * const &pre_velo,
         PDNSolution ** const &pre_pres_sols,
         PDNSolution * const &pre_velo_before,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 
@@ -122,7 +122,7 @@ class PGAssem_HERK_Block_NS_FEM
         PDNSolution * const &pre_velo,
         PDNSolution ** const &pre_pres_sols,
         PDNSolution * const &pre_velo_before,    
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 
@@ -134,7 +134,7 @@ class PGAssem_HERK_Block_NS_FEM
         PDNSolution ** const &cur_pres_sols,
         PDNSolution * const &pre_velo,
         PDNSolution * const &cur_pres,    
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 

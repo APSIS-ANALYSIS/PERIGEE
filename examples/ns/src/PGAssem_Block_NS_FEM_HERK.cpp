@@ -1,4 +1,4 @@
-#include "PGAssem_HERK_Block_NS_FEM.hpp"
+#include "PGAssem_Block_NS_FEM_HERK.hpp"
 
 PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
     std::unique_ptr<ALocal_IEN> in_locien,
@@ -8,7 +8,7 @@ PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
     std::unique_ptr<ALocal_WeakBC> in_wbc,
-    std::unique_ptr<IPLocAssem_2x2Block> in_locassem,    
+    std::unique_ptr<PLocAssem_Block_VMS_NS_HERK> in_locassem,    
     const int &in_nz_estimate )
 : locien( std::move(in_locien) ),
   locelem( std::move(in_locelem) ),
@@ -371,8 +371,8 @@ void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_substep(
   PDNSolution ** const &pre_velo_sols,
   PDNSolution * const &pre_velo,
   PDNSolution ** const &pre_pres_sols,
-  PDNSolution * const &pre_velo_before,    
-  const Runge_Kutta_Butcher * const &tm_RK_ptr,
+  PDNSolution * const &pre_velo_before,   
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
   const double &curr_time,
   const double &dt )
 {
@@ -487,7 +487,7 @@ void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_finalstep(
   PDNSolution * const &pre_velo,
   PDNSolution ** const &pre_pres_sols,
   PDNSolution * const &pre_velo_before,    
-  const Runge_Kutta_Butcher * const &tm_RK_ptr,
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
   const double &curr_time,
   const double &dt )
 {
@@ -595,7 +595,7 @@ void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_presstage(
   PDNSolution ** const &cur_pres_sols,
   PDNSolution * const &pre_velo,
   PDNSolution * const &cur_pres,    
-  const Runge_Kutta_Butcher * const &tm_RK_ptr,
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
   const double &curr_time,
   const double &dt )
 {
@@ -692,7 +692,7 @@ VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
 void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
   const int &substep_index,
-  const Runge_Kutta_Butcher * const &tm_RK_ptr )
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr )
 {
 int * LSIEN = new int [snLocBas];
 double * sctrl_x = new double [snLocBas];
@@ -731,7 +731,7 @@ delete [] srow_index_v; srow_index_v = nullptr;
 }
 
 void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Final( const double &curr_time, const double &dt,
-  const Runge_Kutta_Butcher * const &tm_RK_ptr )
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr )
 {
 int * LSIEN = new int [snLocBas];
 double * sctrl_x = new double [snLocBas];
