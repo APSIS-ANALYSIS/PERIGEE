@@ -1,7 +1,7 @@
-#ifndef PGASSEM_HERK_BLOCK_NS_FEM_HPP
-#define PGASSEM_HERK_BLOCK_NS_FEM_HPP
+#ifndef PGASSEM_BLOCK_NS_FEM_HERK_HPP
+#define PGASSEM_BLOCK_NS_FEM_HERK_HPP
 // ==================================================================
-// PGAssem_HERK_Block_NS_FEM.hpp
+// PGAssem_Block_NS_FEM_HERK.hpp
 //
 // Parallel golbal assembly based on PETSc, using AIJ matrix format.
 // The assembly routine is designed for classical C0 FEM method, which
@@ -14,10 +14,21 @@
 // Author: Yujie Sun 
 // Date Created: Mar. 4 2025
 // ==================================================================
-#include "PETSC_Tools.hpp"
+#include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
+#include "PDNSolution_V.hpp"
+#include "PDNSolution_P.hpp"
+#include "PLocAssem_Block_VMS_NS_HERK.hpp"
+#include "APart_Node.hpp"
+#include "ALocal_Elem.hpp"
+#include "AGlobal_Mesh_Info.hpp"
+#include "FEANode.hpp"
+#include "PDNSolution.hpp"
+#include "ALocal_NBC.hpp"
+#include "ALocal_EBC.hpp"
+#include "ALocal_IEN.hpp"
 
-class PGAssem_HERK_Block_NS_FEM
+class PGAssem_Block_NS_FEM_HERK
 {
   public:
     Mat subK[5];
@@ -26,19 +37,18 @@ class PGAssem_HERK_Block_NS_FEM
     Vec subG[2];
 
     // Constructor
-    PGAssem_HERK_Block_NS_FEM(
+    PGAssem_Block_NS_FEM_HERK(
         std::unique_ptr<ALocal_IEN> in_locien,
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode,
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
-        std::unique_ptr<ALocal_WeakBC> in_wbc,
         std::unique_ptr<PLocAssem_Block_VMS_NS_HERK> in_locassem,
         const int &in_nz_estimate=60 );
 
     // Destructor
-    ~PGAssem_HERK_Block_NS_FEM();
+    ~PGAssem_Block_NS_FEM_HERK();
 
     // ------------------------------------------------------------------------
     // ! Flag : Fix nonzero structure
@@ -96,10 +106,6 @@ class PGAssem_HERK_Block_NS_FEM
     // Nonzero pattern estimate for the NS equations
     void Assem_nonzero_estimate();
     
-    // Assembly mass matrix and residual vector
-    void Assem_mass_residual(
-        const PDNSolution * const &sol_a );
-
     // Assembly the residual vector and tangent matrix for the sub-step of HERK
     void Assem_tangent_residual_substep(
         const int &substep_index,
@@ -146,18 +152,23 @@ class PGAssem_HERK_Block_NS_FEM
     const std::unique_ptr<const APart_Node> pnode;
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
-    const std::unique_ptr<IPLocAssem_2x2Block> locassem;
+    const std::unique_ptr<PLocAssem_Block_VMS_NS_HERK> locassem;
 
     const int nLocBas, snLocBas, dof_sol, dof_mat_v, dof_mat_p, num_ebc, nlgn;
+
+    // Essential boundary condition
+    void EssBC_KG();
+
+    void EssBC_G();
 
     // Natural boundary condition for substep of the HERK
     void NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
         const int &substep_index,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr );
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr );
 
     // Natural boundary condition for laststep of the HERK
     void NatBC_G_HERK_Final( const double &curr_time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr );
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr );
 
     // Natural boundary condition for finalstep of the HERK
     void NatBC_G_HERK_Pressure( const double &curr_time, const double &dt );
@@ -184,6 +195,17 @@ class PGAssem_HERK_Block_NS_FEM
         for(int jj=0; jj<dof_sol; ++jj)
           local_array[offset1 + jj] = array[offset2 + jj];
       }
+    }
+
+    std::vector<double> GetLocal( const std::vector<double> &array,
+      const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
+    {
+      std::vector<double> out( in_locbas * in_dof, 0.0 );
+      for(int ii=0; ii<in_locbas; ++ii)
+        for(int jj=0; jj<in_dof; ++jj)
+          out[ii * in_dof + jj] = array[IEN[ii] * in_dof + jj];
+  
+      return out;
     }
 };
 

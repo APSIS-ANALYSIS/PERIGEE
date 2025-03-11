@@ -1,13 +1,12 @@
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 
-PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
+PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
     std::unique_ptr<ALocal_IEN> in_locien,
     std::unique_ptr<ALocal_Elem> in_locelem,
     std::unique_ptr<FEANode> in_fnode,
     std::unique_ptr<APart_Node> in_pnode,
     std::unique_ptr<ALocal_NBC> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
-    std::unique_ptr<ALocal_WeakBC> in_wbc,
     std::unique_ptr<PLocAssem_Block_VMS_NS_HERK> in_locassem,    
     const int &in_nz_estimate )
 : locien( std::move(in_locien) ),
@@ -16,7 +15,6 @@ PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
   pnode( std::move(in_pnode) ),
   nbc( std::move(in_nbc) ),
   ebc( std::move(in_ebc) ),
-  wbc( std::move(in_wbc) ),
   locassem(std::move(in_locassem)),
   nLocBas( locassem->get_nLocBas() ),
   snLocBas( locassem->get_snLocBas() ),
@@ -27,18 +25,18 @@ PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
   nlgn( pnode->get_nlocghonode() )
 {
   SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
-      "PGAssem_HERK_Block_NS_FEM::dof_sol != locassem->get_dof(). \n");
+      "PGAssem_Block_NS_FEM_HERK::dof_sol != locassem->get_dof(). \n");
 
   SYS_T::print_fatal_if(dof_mat_v + dof_mat_p != nbc->get_dof_LID(),
-      "PGAssem_HERK_Block_NS_FEM::dof_mat != nbc->get_dof_LID(). \n");
+      "PGAssem_Block_NS_FEM_HERK::dof_mat != nbc->get_dof_LID(). \n");
   
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id){
     SYS_T::print_fatal_if(snLocBas != ebc->get_cell_nLocBas(ebc_id),
-        "Error: in PGAssem_HERK_Block_NS_FEM, snLocBas has to be uniform. \n");
+        "Error: in PGAssem_Block_NS_FEM_HERK, snLocBas has to be uniform. \n");
   }
 
   const int nlocrow_v  = dof_mat_v * pnode->get_nlocalnode(); 
-  const int nlocrow_p  = dof_mat_p * pnode->get_nlocalnode(););
+  const int nlocrow_p  = dof_mat_p * pnode->get_nlocalnode();
 
   // Allocate the block matrix K
   // D matrix
@@ -87,6 +85,9 @@ PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
 
   Assem_nonzero_estimate();
 
+  // Reallocate matrices with precise preallocation
+  std::vector<int> Kdnz, Konz;
+
   PETSc_T::Get_dnz_onz(subK[0], Kdnz, Konz);
   MatDestroy(&subK[0]);
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_p, PETSC_DETERMINE,
@@ -111,13 +112,9 @@ PGAssem_HERK_Block_NS_FEM::PGAssem_HERK_Block_NS_FEM(
   MatDestroy(&subK[4]);
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[4]);
-
-  // Create Mat with precise preallocation 
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow, nlocrow, PETSC_DETERMINE,
-      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
 }
 
-PGAssem_HERK_Block_NS_FEM::~PGAssem_HERK_Block_NS_FEM()
+PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
 {
   VecDestroy(&subG[0]); VecDestroy(&subG[1]); 
   MatDestroy(&subK[0]); MatDestroy(&subK[1]);
@@ -125,12 +122,12 @@ PGAssem_HERK_Block_NS_FEM::~PGAssem_HERK_Block_NS_FEM()
   MatDestroy(&subK[4]);
 }
 
-void PGAssem_HERK_Block_NS_FEM::EssBC_KG()
+void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 {
   // pressure dof comes from field 0, to be inserted in subK[0] and subG[0]
   const int local_dir = nbc->get_Num_LD(0);
 
-  if(local_dir > 0)
+  if( local_dir > 0 )
   {
     for(int i=0; i<local_dir; ++i)
     {
@@ -142,7 +139,7 @@ void PGAssem_HERK_Block_NS_FEM::EssBC_KG()
   }
 
   const int local_sla = nbc->get_Num_LPS(0);
-  if(local_sla > 0)
+  if( local_sla > 0 )
   {
     for(int i=0; i<local_sla; ++i)
     {
@@ -157,27 +154,27 @@ void PGAssem_HERK_Block_NS_FEM::EssBC_KG()
   // velocity dofs
   for(int field=1; field<=3; ++field)
   {
-    const int local_dir = nbc_part->get_Num_LD(field);
+    const int local_dir = nbc->get_Num_LD(field);
 
-    if{local_dir > 0}
+    if( local_dir > 0 )
     {
       for(int i=0; i<local_dir; ++i)
       {
-        const int row = nbc_part->get_LDN(field, i) * dof_mat_v + field - 1;
+        const int row = nbc->get_LDN(field, i) * dof_mat_v + field - 1;
         MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
         MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
         VecSetValue(subG[1], row, 0.0, INSERT_VALUES);        
       }
     }
 
-    const int local_sla = nbc_part->get_Num_LPS(field);
+    const int local_sla = nbc->get_Num_LPS(field);
 
-    if{local_sla > 0}
+    if( local_sla > 0 )
     {
       for(int i=0; i<local_sla; ++i)
       {
-        const int row = nbc_part->get_LPSN(field, i) * dof_mat_v + field - 1;
-        const int col = nbc_part->get_LPMN(field, i) * dof_mat_v + field - 1;
+        const int row = nbc->get_LPSN(field, i) * dof_mat_v + field - 1;
+        const int col = nbc->get_LPMN(field, i) * dof_mat_v + field - 1;
         MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
         MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
         MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
@@ -188,25 +185,25 @@ void PGAssem_HERK_Block_NS_FEM::EssBC_KG()
   }
 }
 
-void PGAssem_NS_FEM::EssBC_G()
+void PGAssem_Block_NS_FEM_HERK::EssBC_G()
 {
   // pres field is 0, to be inserted to subG[0]
-  const int local_dir = nbc_part->get_Num_LD(0);
+  const int local_dir = nbc->get_Num_LD(0);
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc_part->get_LDN(0, ii) * dof_mat_p;
+      const int row = nbc->get_LDN(0, ii) * dof_mat_p;
       VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
 
-  const int local_sla = nbc_part->get_Num_LPS(0);
+  const int local_sla = nbc->get_Num_LPS(0);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc_part->get_LPSN(0, ii) * dof_mat_p;
+      const int row = nbc->get_LPSN(0, ii) * dof_mat_p;
       VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
     }
   }
@@ -214,29 +211,29 @@ void PGAssem_NS_FEM::EssBC_G()
   // velo fields from 1 to 3
   for(int field=1; field<=3; ++field)
   {
-    const int local_dir = nbc_part->get_Num_LD(field);
+    const int local_dir = nbc->get_Num_LD(field);
     if( local_dir > 0 )
     {
       for(int ii=0; ii<local_dir; ++ii)
       {
-        const int row = nbc_part->get_LDN(field, ii) * dof_mat_v + field - 1;
+        const int row = nbc->get_LDN(field, ii) * dof_mat_v + field - 1;
         VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       }
     }
 
-    const int local_sla = nbc_part->get_Num_LPS(field);
+    const int local_sla = nbc->get_Num_LPS(field);
     if( local_sla > 0 )
     {
       for(int ii=0; ii<local_sla; ++ii)
       {
-        const int row = nbc_part->get_LPSN(field, ii) * dof_mat_v + field - 1;
+        const int row = nbc->get_LPSN(field, ii) * dof_mat_v + field - 1;
         VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       }
     }
   }
 }
 
-void PGAssem_HERK_Block_NS_FEM::Assem_nonzero_estimate()
+void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
 {
   const int nElem = locelem->get_nlocalele();
   const int loc_dof_v = dof_mat_v * nLocBas;
@@ -271,89 +268,18 @@ void PGAssem_HERK_Block_NS_FEM::Assem_nonzero_estimate()
   delete [] row_idx_p; row_idx_p = nullptr;
 
   // Create a temporary zero solution vector to feed Natbc_Resis_KG
-  PDNSolution * temp = new PDNSolution_NS( pnode.get(), 0, false );
+  // PDNSolution * temp = new PDNSolution_NS( pnode.get(), 0, false );
 
-  // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  NatBC_Resis_KG( 0.0, 0.1, temp, temp );
+  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
+  // NatBC_Resis_KG( 0.0, 0.1, temp, temp );
 
-  delete temp;
-
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
-
-  EssBC_KG( nbc );
-
-  MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
-}
-
-void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
-    const PDNSolution * const &sol_a)
-{
-  const int nElem = alelem_ptr->get_nlocalele();
-  const int loc_dof_v = dof_mat_v * nLocBas;
-  const int loc_dof_p = dof_mat_p * nLocBas;
-
-  double * array_a = new double [nlgn * dof_sol];
-  double * local_a = new double [nLocBas * dof_sol];
-  int * IEN_e = new int [nLocBas];
-  double * ectrl_x = new double [nLocBas];
-  double * ectrl_y = new double [nLocBas];
-  double * ectrl_z = new double [nLocBas];
-  PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
-  PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
-
-  sol_a->GetLocalArray( array_a );
-
-  for(int ee=0; ee<nElem; ++ee)
-  {
-    locien->get_LIEN(ee, IEN_e);
-    GetLocal(array_a, IEN_e, local_a);
-    fnode->get_ctrlPts_xyz(nLocBas, IEN_e, ectrl_x, ectrl_y, ectrl_z);
-
-    locassem->Assem_Mass_Residual( local_a, ectrl_x, ectrl_y, ectrl_z );
-
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      const int loc_index  = locien>get_LIEN(ee, ii);
-
-      row_idx_v[3*ii]   = 3 * nbc_part->get_LID( 1, loc_index );
-      row_idx_v[3*ii+1] = 3 * nbc_part->get_LID( 2, loc_index ) + 1;
-      row_idx_v[3*ii+2] = 3 * nbc_part->get_LID( 3, loc_index ) + 2;
-
-      row_idx_p[ii] = nbc_part->get_LID( 0, loc_index );
-    }
-    
-    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
-    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
-    MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
-    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
-    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
-
-    VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem_ptr->Residual0, ADD_VALUES);
-    VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem_ptr->Residual1, ADD_VALUES);
-  }
-
-  delete [] array_a; array_a = nullptr;
-  delete [] local_a; local_a = nullptr;
-  delete [] IEN_e; IEN_e = nullptr;
-  delete [] ectrl_x; ectrl_x = nullptr;
-  delete [] ectrl_y; ectrl_y = nullptr;
-  delete [] ectrl_z; ectrl_z = nullptr;
-  delete [] row_index; row_index = nullptr;
+  // delete temp;
 
   VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
   VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
   EssBC_KG();
 
-  for(int ii = 0; ii<dof_mat; ++ii) EssBC_KG( ii );
-
   MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
   MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
   MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
@@ -363,8 +289,7 @@ void PGAssem_HERK_Block_NS_FEM::Assem_mass_residual(
   VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
-
-void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_substep(
+void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_substep(
   const int &substep_index,
   PDNSolution ** const &cur_velo_sols,
   PDNSolution ** const &cur_pres_sols,
@@ -432,7 +357,7 @@ for(int ee=0; ee<nElem; ++ee)
 
   fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  locassem->Assem_Tangent_Residual_Substep(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
+  locassem->Assem_Tangent_Residual_Sub(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
       local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before, ectrl_x, ectrl_y, ectrl_z);
 
   for(int ii=0; ii<nLocBas; ++ii)
@@ -479,7 +404,7 @@ VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
 VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
-void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_finalstep(
+void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_finalstep(
   PDNSolution ** const &cur_velo_sols,
   PDNSolution * const &cur_velo,
   PDNSolution ** const &cur_pres_sols,
@@ -541,7 +466,7 @@ for(int ee=0; ee<nElem; ++ee)
 
   fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  locassem->Assem_Tangent_Residual_Laststep(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
+  locassem->Assem_Tangent_Residual_Final(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
       local_cur_pres_sols, local_pre_velo_sols, local_pre_velo, local_pre_pres_sols, local_pre_velo_before, 
       ectrl_x, ectrl_y, ectrl_z);
 
@@ -562,8 +487,8 @@ for(int ee=0; ee<nElem; ++ee)
   MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
   MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
 
-  VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem_ptr->Residual0, ADD_VALUES);
-  VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem_ptr->Residual1, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -588,7 +513,7 @@ VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
 VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
-void PGAssem_HERK_Block_NS_FEM::Assem_tangent_residual_presstage(
+void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_presstage(
   PDNSolution * const &cur_dot_velo,
   PDNSolution ** const &cur_velo_sols,
   PDNSolution * const &cur_velo,
@@ -625,7 +550,7 @@ PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
 
 for(int ee=0; ee<nElem; ++ee)
 {
-  const std::vector<int> IEN_e = lien_ptr->get_LIEN(ee);
+  const std::vector<int> IEN_e = locien->get_LIEN(ee);
 
   std::vector<std::vector<double>> local_cur_velo_sols(tm_RK_ptr->get_RK_step());    
   std::vector<std::vector<double>> local_cur_pres_sols(tm_RK_ptr->get_RK_step()); 
@@ -643,7 +568,7 @@ for(int ee=0; ee<nElem; ++ee)
 
   fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
 
-  locassem->Assem_Tangent_Residual_Finalstep(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
+  locassem->Assem_Tangent_Residual_Pressure(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
       local_cur_velo_sols, local_cur_velo, local_cur_pres_sols, local_pre_velo, 
       local_cur_pres, ectrl_x, ectrl_y, ectrl_z);
 
@@ -690,7 +615,7 @@ VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
 VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
-void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
+void PGAssem_Block_NS_FEM_HERK::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
   const int &substep_index,
   const ITimeMethod_RungeKutta * const &tm_RK_ptr )
 {
@@ -730,7 +655,7 @@ delete [] sctrl_z; sctrl_z = nullptr;
 delete [] srow_index_v; srow_index_v = nullptr;
 }
 
-void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Final( const double &curr_time, const double &dt,
+void PGAssem_Block_NS_FEM_HERK::NatBC_G_HERK_Final( const double &curr_time, const double &dt,
   const ITimeMethod_RungeKutta * const &tm_RK_ptr )
 {
 int * LSIEN = new int [snLocBas];
@@ -769,7 +694,7 @@ delete [] sctrl_z; sctrl_z = nullptr;
 delete [] srow_index_v; srow_index_v = nullptr;
 }
 
-void PGAssem_HERK_Block_NS_FEM::NatBC_G_HERK_Pressure( const double &curr_time, const double &dt )
+void PGAssem_Block_NS_FEM_HERK::NatBC_G_HERK_Pressure( const double &curr_time, const double &dt )
 {
 int * LSIEN = new int [snLocBas];
 double * sctrl_x = new double [snLocBas];
@@ -787,7 +712,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
 
     ebc -> get_ctrlPts_xyz(ebc_id, ee, sctrl_x, sctrl_y, sctrl_z);
 
-    locassem->Assem_Residual_EBC_HERK_Final(ebc_id, curr_time, dt,
+    locassem->Assem_Residual_EBC_HERK_Pressure(ebc_id, curr_time, dt,
         sctrl_x, sctrl_y, sctrl_z);
 
     for(int ii=0; ii<snLocBas; ++ii)

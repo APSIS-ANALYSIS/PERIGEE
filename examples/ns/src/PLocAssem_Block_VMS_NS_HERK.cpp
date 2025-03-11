@@ -2,9 +2,8 @@
 
 PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
-    const Runge_Kutta_Butcher * const &tm_RK, const double &in_rho, 
-    const double &in_vis_mu, const double &in_ct = 4.0, 
-    const double &in_ctauc = 1.0 )
+    const ITimeMethod_RungeKutta * const &tm_RK, const double &in_rho, 
+    const double &in_vis_mu, const double &in_ct, const double &in_ctauc )
 : elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
@@ -14,7 +13,7 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
   CI( (elemType == FEType::Tet4 || elemType == FEType::Hex8) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
-  vec_size_v( nlocbas * 3 ), vec_size_p( nlocbas ), sur_size_v ( snlocbas * 3 ),
+  vec_size_v( nLocBas * 3 ), vec_size_p( nLocBas ), sur_size_v ( snLocBas * 3 ),
   coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
   mm( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
@@ -28,12 +27,12 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
   Residual0 = new PetscScalar[vec_size_p];
   Residual1 = new PetscScalar[vec_size_v];
 
-  sur_Residual0 = new PetscScalar[sur_size_p];
+  // sur_Residual0 = new PetscScalar[sur_size_p];
   sur_Residual1 = new PetscScalar[sur_size_v];
 
   Zero_Tangent_Residual();
 
-  Zero_sur_Tangent_Residual();
+  Zero_sur_Residual();
 
   flist = nullptr;
   flist = new locassem_vms_ns_funs[1];
@@ -53,7 +52,7 @@ PLocAssem_Block_VMS_NS_HERK::~PLocAssem_Block_VMS_NS_HERK()
   delete [] Residual0; Residual0 = nullptr;
   delete [] Residual1; Residual1 = nullptr;
 
-  delete [] sur_Residual0; sur_Residual0 = nullptr;
+  // delete [] sur_Residual0; sur_Residual0 = nullptr;
   delete [] sur_Residual1; sur_Residual1 = nullptr;
 }
 
@@ -150,7 +149,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Sub(
     const int &ebc_id,
     const double &time, const double &dt,
     const int &subindex,
-    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const ITimeMethod_RungeKutta * const &tm_RK_ptr,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
@@ -197,7 +196,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Sub(
 void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Final(
     const int &ebc_id,
     const double &time, const double &dt,
-    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const ITimeMethod_RungeKutta * const &tm_RK_ptr,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z )
@@ -283,7 +282,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Pressure(
 void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
     const double &time, const double &dt,
     const int &subindex,
-    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const ITimeMethod_RungeKutta * const &tm_RK_ptr,
     const std::vector<std::vector<double>>& cur_velo_sols,
     const std::vector<std::vector<double>>& cur_pres_sols,
     const std::vector<std::vector<double>>& pre_velo_sols,
@@ -473,7 +472,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
       }
     }
 
-    const auto dxi_dx = element->get_invJacobian(qua);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
 
     // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );  // 这里应该用u[subindex], 但u[subindex]未知？
     // const double tau_m = tau_sub[0];
@@ -739,7 +738,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
 void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
     const double &time, const double &dt,
-    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const ITimeMethod_RungeKutta * const &tm_RK_ptr,
     const std::vector<std::vector<double>>& cur_velo_sols,
     const std::vector<double>& cur_velo,
     const std::vector<std::vector<double>>& cur_pres_sols,
@@ -1228,7 +1227,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
 
 void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
     const double &time, const double &dt,
-    const Runge_Kutta_Butcher * const &tm_RK_ptr,
+    const ITimeMethod_RungeKutta * const &tm_RK_ptr,
     const std::vector<double>& cur_dot_velo,
     const std::vector<std::vector<double>>& cur_velo_sols,
     const std::vector<double>& cur_velo,
@@ -1249,7 +1248,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
   std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
   std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
 
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u_n = 0.0, u_np1 = 0.0, u_np1_x = 0.0, u_np1_y = 0.0, u_np1_z = 0.0;
     double v_n = 0.0, v_np1 = 0.0, v_np1_x = 0.0, v_np1_y = 0.0, v_np1_z = 0.0;
@@ -1293,7 +1292,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
+    elementv->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
                               &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
                               &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
 

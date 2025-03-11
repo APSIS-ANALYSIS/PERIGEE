@@ -9,7 +9,7 @@
 // Author: Yujie Sun
 // Date: JMar. 5 2025
 // ==================================================================
-#include "Runge_Kutta_Butcher.hpp"
+#include "ITimeMethod_RungeKutta.hpp"
 #include "SymmTensor2_3D.hpp"
 #include "FEAElementFactory.hpp"
 #include "QuadPtsFactory.hpp"
@@ -26,12 +26,12 @@ class PLocAssem_Block_VMS_NS_HERK
     PetscScalar * Residual0; // R0
     PetscScalar * Residual1; // R1
 
-    PetscScalar * sur_Residual0; // sur_R0
+    // PetscScalar * sur_Residual0; // sur_R0
     PetscScalar * sur_Residual1; // sur_R1
 
     PLocAssem_Block_VMS_NS_HERK(
         const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
-        const Runge_Kutta_Butcher * const &tm_RK, const double &in_rho, 
+        const ITimeMethod_RungeKutta * const &tm_RK, const double &in_rho, 
         const double &in_vis_mu, const double &in_ct = 4.0, 
         const double &in_ctauc = 1.0 );
 
@@ -62,7 +62,7 @@ class PLocAssem_Block_VMS_NS_HERK
 
     void Zero_sur_Residual()
     {
-      for(int ii=0; ii<sur_size_v; ++ii) sur_Residual0[ii] = 0.0;
+      // for(int ii=0; ii<sur_size_v; ++ii) sur_Residual0[ii] = 0.0;
       for(int ii=0; ii<sur_size_v; ++ii) sur_Residual1[ii] = 0.0;
     }
 
@@ -85,7 +85,7 @@ class PLocAssem_Block_VMS_NS_HERK
         const int &ebc_id,
         const double &time, const double &dt,
         const int &subindex,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
@@ -93,7 +93,7 @@ class PLocAssem_Block_VMS_NS_HERK
     void Assem_Residual_EBC_HERK_Final(
         const int &ebc_id,
         const double &time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
@@ -108,7 +108,7 @@ class PLocAssem_Block_VMS_NS_HERK
     void Assem_Tangent_Residual_Sub(
         const double &time, const double &dt,
         const int &subindex,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<std::vector<double>>& cur_pres_sols,
         const std::vector<std::vector<double>>& pre_velo_sols,
@@ -121,7 +121,7 @@ class PLocAssem_Block_VMS_NS_HERK
 
     void Assem_Tangent_Residual_Final(
         const double &time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<double>& cur_velo,
         const std::vector<std::vector<double>>& cur_pres_sols,
@@ -133,9 +133,9 @@ class PLocAssem_Block_VMS_NS_HERK
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    void Assem_Tangent_Residual_Press(
+    void Assem_Tangent_Residual_Pressure(
         const double &time, const double &dt,
-        const Runge_Kutta_Butcher * const &tm_RK_ptr,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const std::vector<double>& cur_dot_velo,
         const std::vector<std::vector<double>>& cur_velo_sols,
         const std::vector<double>& cur_velo,
@@ -156,8 +156,8 @@ class PLocAssem_Block_VMS_NS_HERK
 
     const std::unique_ptr<IQuadPts> quadv, quads;
 
-    const double rho0, vis_mu, alpha_f, alpha_m, gamma, beta;
-
+    const double rho0, vis_mu;
+    
     const double CI, CT; // Constants for stabilization parameters
     
     const double Ctauc; // Constant scaling factor for tau_C
@@ -205,7 +205,7 @@ class PLocAssem_Block_VMS_NS_HERK
       return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
-    typedef Vector_3 ( PLocAssem_VMS_NS_HERK::*locassem_vms_ns_funs )( 
+    typedef Vector_3 ( PLocAssem_Block_VMS_NS_HERK::*locassem_vms_ns_funs )( 
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
 
     locassem_vms_ns_funs * flist;

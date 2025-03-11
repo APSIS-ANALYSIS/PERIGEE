@@ -109,8 +109,13 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Block_VMS_NS_HERK.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_Block_NS_FEM_HERK.cpp
+  ${perigee_SOURCE_DIR}/src/PTime_NS_HERK_Solver.cpp
   )
 
 SET( perigee_postprocess_lib_src
@@ -150,6 +155,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 ADD_EXECUTABLE( preprocess3d preprocess.cpp)
 ADD_EXECUTABLE( ns3d driver.cpp)
+ADD_EXECUTABLE( ns3dherk ns_herk_driver.cpp)
 ADD_EXECUTABLE( prepost3d prepost.cpp)
 ADD_EXECUTABLE( vis_ns vis.cpp)
 ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
@@ -159,6 +165,7 @@ ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
+TARGET_LINK_LIBRARIES( ns3dherk perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
