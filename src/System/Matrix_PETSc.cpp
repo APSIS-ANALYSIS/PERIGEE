@@ -171,6 +171,66 @@ void Matrix_PETSc::gen_perm_bc( const APart_Node * const &pnode_ptr,
   is_set = true;
 }
 
+void Matrix_PETSc::gen_perm_bc_block( const APart_Node * const &pnode_ptr,
+  const ALocal_NBC * const &bc_part )
+{
+ if(is_set) Clear();
+ 
+ SYS_T::print_fatal_if(gm != gn, "Error: This is not a square matrix. \n");
+ 
+ const int nnode = pnode_ptr->get_nlocalnode();
+ 
+ for(int ii=0; ii<nnode; ++ii)
+ {
+   // velo_dof
+   for(int jj=0; jj<3; ++jj)
+   {
+     const int row = pnode_ptr->get_node_loc(ii) * 3 + jj;
+     const int col = bc_part->get_LID(jj+1, ii) * 3 + jj;
+     MatSetValue(K, row, col, 1.0, INSERT_VALUES);
+   }
+
+   // pres_dof
+   const int row = 3 * nnode + pnode_ptr->get_node_loc(ii);
+   const int col = 3 * nnode + bc_part->get_LID(0, ii);
+   MatSetValue(K, row, col, 1.0, INSERT_VALUES);
+  }
+
+ MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+ MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+
+ // Obtain the precise dnz and onz count
+ std::vector<int> Kdnz, Konz;
+ PETSc_T::Get_dnz_onz(K, Kdnz, Konz);
+
+ MatDestroy(&K); // Destroy the K
+
+ // Create Mat with precise preallocation
+ MatCreateAIJ(PETSC_COMM_WORLD, lm, ln, PETSC_DETERMINE,
+     PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &K);
+
+ for(int ii=0; ii<nnode; ++ii)
+ {
+   // velo_dof
+   for(int jj=0; jj<3; ++jj)
+   {
+     const int row = pnode_ptr->get_node_loc(ii) * 3 + jj;
+     const int col = bc_part->get_LID(jj+1, ii) * 3 + jj;
+     MatSetValue(K, row, col, 1.0, INSERT_VALUES);
+   }
+
+   // pres_dof
+   const int row = 3 * nnode + pnode_ptr->get_node_loc(ii);
+   const int col = 3 * nnode + bc_part->get_LID(0, ii);
+   MatSetValue(K, row, col, 1.0, INSERT_VALUES);
+ }
+
+ MatAssemblyBegin(K, MAT_FINAL_ASSEMBLY);
+ MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
+
+ is_set = true;
+}
+
 void Matrix_PETSc::gen_perm_bc( const std::vector<APart_Node *> &pnode_list,
     const std::vector<ALocal_NBC *> &bc_part_list, 
     const std::vector<int> &start_idx )

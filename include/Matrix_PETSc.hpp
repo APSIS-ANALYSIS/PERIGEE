@@ -108,6 +108,13 @@ class Matrix_PETSc
         const ALocal_NBC * const &bc_part );
 
     // ------------------------------------------------------------------------
+    // gen_perm_bc : Generate a permutation matrix accounting for the essential
+    // boundary conditions, following the rule of arranging velocity first, then pressure.
+    // ------------------------------------------------------------------------
+    virtual void gen_perm_bc_block( const APart_Node * const &pnode_ptr,
+      const ALocal_NBC * const &bc_part );
+
+    // ------------------------------------------------------------------------
     // gen_perm_bc : Generate a permutation matrix for essential boundary
     // conditions for Multi-Field problems.
     // NOTE: LID from the ALocal_NBC here should give the matrix row/col id
