@@ -26,6 +26,11 @@ INCLUDE(../../conf/basic_variable_log.cmake)
 INCLUDE(../../conf/system_lib_loading.cmake)
 
 SET( perigee_source ${perigee_SOURCE_DIR}/../../src )
+
+SET( PERIGEE_INCLUDE_DIRS 
+  ${perigee_SOURCE_DIR}/include 
+  ${perigee_SOURCE_DIR}/../../include )
+
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
   ${perigee_source}/System/Vector_3.cpp
@@ -122,22 +127,24 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
   )
 
-INCLUDE_DIRECTORIES( ${perigee_SOURCE_DIR}/../../include )
-INCLUDE_DIRECTORIES( ${perigee_SOURCE_DIR}/include )
-
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
+TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PUBLIC
+  ${perigee_SOURCE_DIR}/../../include )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
+TARGET_INCLUDE_DIRECTORIES( perigee_analysis PUBLIC ${PERIGEE_INCLUDE_DIRS} ) 
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
+TARGET_INCLUDE_DIRECTORIES( perigee_postprocess PUBLIC ${PERIGEE_INCLUDE_DIRS} ) 
+
 # -------------------------------------------------------------------
 
 # Print compiler setup
@@ -155,14 +162,14 @@ ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
 
-TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
-TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_wss_hex8 perigee_postprocess )
-TARGET_LINK_LIBRARIES( vis_wss_hex27 perigee_postprocess )
+TARGET_LINK_LIBRARIES( preprocess3d PRIVATE perigee_preprocess )
+TARGET_LINK_LIBRARIES( ns3d PRIVATE perigee_analysis )
+TARGET_LINK_LIBRARIES( prepost3d PRIVATE perigee_preprocess )
+TARGET_LINK_LIBRARIES( vis_ns PRIVATE perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_tet4 PRIVATE perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_tet10 PRIVATE perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_hex8 PRIVATE perigee_postprocess )
+TARGET_LINK_LIBRARIES( vis_wss_hex27 PRIVATE perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
