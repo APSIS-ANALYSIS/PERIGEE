@@ -103,6 +103,8 @@ class PGAssem_Block_NS_FEM_HERK
       MatSetOption(subK[4], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
     }
 
+    void Clear_G() {VecSet(G, 0.0);}
+
     // Nonzero pattern estimate for the NS equations
     void Assem_nonzero_estimate();
     

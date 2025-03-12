@@ -80,6 +80,9 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   VecSetOption(subG[0], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
   VecSetOption(subG[1], VEC_IGNORE_NEGATIVE_INDICES, PETSC_TRUE);
 
+  // Setup nest vectors
+  VecCreateNest(PETSC_COMM_WORLD, 2, NULL, subG, &G);
+
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
 
@@ -119,7 +122,7 @@ PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
   VecDestroy(&subG[0]); VecDestroy(&subG[1]); 
   MatDestroy(&subK[0]); MatDestroy(&subK[1]);
   MatDestroy(&subK[2]); MatDestroy(&subK[3]);
-  MatDestroy(&subK[4]);
+  MatDestroy(&subK[4]); VecDestroy(&G);
 }
 
 void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
