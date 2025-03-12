@@ -142,7 +142,6 @@ TARGET_INCLUDE_DIRECTORIES( perigee_analysis PUBLIC ${PERIGEE_INCLUDE_DIRS} )
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_postprocess ${EXTRA_LINK_LIBS} perigee_analysis )
 TARGET_INCLUDE_DIRECTORIES( perigee_postprocess PUBLIC ${PERIGEE_INCLUDE_DIRS} ) 
-
 # -------------------------------------------------------------------
 
 # Print compiler setup
