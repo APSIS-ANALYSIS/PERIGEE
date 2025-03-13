@@ -131,12 +131,13 @@ SET( perigee_postprocess_lib_src
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PUBLIC
-  ${perigee_SOURCE_DIR}/../../include )
+  ${perigee_SOURCE_DIR}/../../include ${HDF5_INCLUDE_DIRS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_analysis ${EXTRA_LINK_LIBS} )
-TARGET_INCLUDE_DIRECTORIES( perigee_analysis PUBLIC ${PERIGEE_INCLUDE_DIRS} ) 
+TARGET_INCLUDE_DIRECTORIES( perigee_analysis PUBLIC 
+  ${PERIGEE_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS} ) 
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
@@ -158,6 +159,9 @@ ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
+
+TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${YAML_INCLUDE_DIRS} )
+TARGET_INCLUDE_DIRECTORIES( prepost3d PRIVATE ${YAML_INCLUDE_DIRS} )
 
 TARGET_LINK_LIBRARIES( preprocess3d PRIVATE perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d PRIVATE perigee_analysis )
