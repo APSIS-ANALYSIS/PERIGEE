@@ -68,7 +68,7 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
   PDNSolution** cur_velo_sols = new PDNSolution*[ss];
   for(int ii = 0; ii < ss; ++ii)
     cur_velo_sols[ii] = new PDNSolution(*init_velo);
-
+  
   // The velo solution in the final step at the (n+1)-th time step
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
 
@@ -152,8 +152,8 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
 
   for (int ii = 0; ii < ss; ++ii) 
   {
-      delete cur_velo_sols[ii]; delete pre_velo_sols[ii]; 
-      delete cur_pres_sols[ii]; delete pre_pres_sols[ii];
+    delete cur_velo_sols[ii]; delete pre_velo_sols[ii]; 
+    delete cur_pres_sols[ii]; delete pre_pres_sols[ii];
   }
   delete[] cur_velo_sols; delete[] pre_velo_sols; delete[] cur_pres_sols; delete[] pre_pres_sols;
   delete cur_velo; delete cur_dot_velo; delete cur_pres; delete cur_sol; 

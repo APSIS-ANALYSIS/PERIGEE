@@ -14,6 +14,7 @@
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver.hpp"
 #include "ExplicitRK_SSPRK33.hpp"
+#include "Matrix_Free_Tools.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -276,7 +277,7 @@ int main(int argc, char *argv[])
   Mat K_shell;
   
   MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
-    PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem, &K_shell);
+    PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem.get(), &K_shell);
 
   MatShellSetOperation(K_shell, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
 
