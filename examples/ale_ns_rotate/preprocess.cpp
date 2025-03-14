@@ -430,9 +430,6 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    // IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-    //     ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
-
     IPart * part = new Part_FEM_Rotated( nElem, nFunc, nLocBas, global_part, mnindex, IEN,
         ctrlPts, rotated_tag, node_f, node_r, proc_rank, cpu_size, elemType, 
         {0, dofNum, true, "ROTATED_NS"} );
@@ -440,7 +437,7 @@ int main( int argc, char * argv[] )
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
-    // write the part hdf5 file
+    // write the part h5 file
     part -> write( part_file );
 
     part -> print_part_loadbalance_edgecut();
