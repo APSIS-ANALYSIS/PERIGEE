@@ -235,7 +235,7 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
 
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
-  VEC_T::clean( vecIEN ); // clean the vector
+  VEC_T::clean( vecIEN );
   VEC_T::clean( rotated_vecIEN );
   VEC_T::clean( rotated_ctrlPts );
 
