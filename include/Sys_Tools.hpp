@@ -587,7 +587,7 @@ namespace SYS_T
     public:
       Timer() { startedAt = 0; stoppedAt = 0; }
 
-      ~Timer() {};
+      ~Timer() = default;
 
       void Reset() { startedAt = 0; stoppedAt = 0; }
 
