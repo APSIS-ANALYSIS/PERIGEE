@@ -24,6 +24,8 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   num_ebc( ebc->get_num_ebc() ),
   nlgn( pnode->get_nlocghonode() )
 {
+  double tangent_alpha_RK = 0.0;
+
   SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
       "PGAssem_Block_NS_FEM_HERK::dof_sol != locassem->get_dof(). \n");
 
@@ -405,6 +407,10 @@ MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL
 
 VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
 VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+//MatScale(subK[0], tm_RK_ptr->get_RK_a(subindex, subindex-1));
+//MatScale(subK[2], tm_RK_ptr->get_RK_a(subindex, subindex-1));
+//MatScale(subK[4], tm_RK_ptr->get_RK_a(subindex, subindex-1));
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_finalstep(

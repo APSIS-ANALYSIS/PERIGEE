@@ -29,11 +29,11 @@ class ITimeMethod_RungeKutta
       SYS_T::commPrint("a:\n");
       for (int ii = 0; ii < ss; ++ii) 
       {
-          for (const auto& aij : std::vector<double>(aa.begin() + ii * ss, aa.begin() + (ii + 1) * ss))
-          {
-              SYS_T::commPrint("%e ", aij);
-          }
-          SYS_T::commPrint("\n");
+        for (const auto& aij : std::vector<double>(aa.begin() + ii * ss, aa.begin() + (ii + 1) * ss))
+        {
+          SYS_T::commPrint("%e ", aij);
+        }
+        SYS_T::commPrint("\n");
       }
     }
 

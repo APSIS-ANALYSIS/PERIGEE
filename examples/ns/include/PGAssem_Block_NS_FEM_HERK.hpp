@@ -146,6 +146,12 @@ class PGAssem_Block_NS_FEM_HERK
         const double &curr_time,
         const double &dt );
 
+    void Set_tangent_alpha_RK( const double &aa )
+    {tangent_alpha_RK = aa;}
+
+    double Get_tangent_alpha_RK()
+    {return tangent_alpha_RK;}
+
   private:
     // Private data
     const std::unique_ptr<const ALocal_IEN> locien;
@@ -157,6 +163,9 @@ class PGAssem_Block_NS_FEM_HERK
     const std::unique_ptr<PLocAssem_Block_VMS_NS_HERK> locassem;
 
     const int nLocBas, snLocBas, dof_sol, dof_mat_v, dof_mat_p, num_ebc, nlgn;
+
+    // Runge Kuta butcher table coefficients
+    double tangent_alpha_RK;
 
     // Essential boundary condition
     void EssBC_KG();

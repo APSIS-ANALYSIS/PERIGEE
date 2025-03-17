@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
   std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_SSPRK33>();
 
   tm_RK->printCoefficients();
-
+ 
     // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_RK.get(),
@@ -307,7 +307,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
-      std::move(pres), std::move(timeinfo));
+      std::move(pres), std::move(timeinfo), K_shell);
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
