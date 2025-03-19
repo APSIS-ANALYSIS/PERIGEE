@@ -105,6 +105,54 @@ class PLocAssem_Block_VMS_NS_HERK
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
+    void Assem_Tangent_Matrix(
+      const double &time, const double &dt,
+      const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+      const double * const &eleCtrlPts_x,
+      const double * const &eleCtrlPts_y,
+      const double * const &eleCtrlPts_z );
+
+    void Assem_Residual_Sub(
+        const double &time, const double &dt,
+        const int &subindex,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<std::vector<double>>& pre_velo_sols,
+        const std::vector<std::vector<double>>& pre_pres_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<double>& pre_velo_before,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z );
+
+    void Assem_Residual_Final(
+        const double &time, const double &dt,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<double>& cur_velo,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<std::vector<double>>& pre_velo_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<std::vector<double>>& pre_pres_sols,
+        const std::vector<double>& pre_velo_before,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z );
+
+    void Assem_Residual_Pressure(
+        const double &time, const double &dt,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const std::vector<double>& cur_dot_velo,
+        const std::vector<std::vector<double>>& cur_velo_sols,
+        const std::vector<double>& cur_velo,
+        const std::vector<std::vector<double>>& cur_pres_sols,
+        const std::vector<double>& pre_velo,
+        const std::vector<double>& cur_pres,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z );
+
     void Assem_Tangent_Residual_Sub(
         const double &time, const double &dt,
         const int &subindex,
@@ -180,6 +228,9 @@ class PLocAssem_Block_VMS_NS_HERK
     std::array<double, 2> get_tau( const double &dt, 
         const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
+
+    std::array<double, 2> get_tau_Darcy( const double &dt, 
+        const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m_dot and tau_c_dot in RB-VMS
     std::array<double, 2> get_tau_dot( const double &dt, 

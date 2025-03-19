@@ -109,6 +109,47 @@ class PGAssem_Block_NS_FEM_HERK
     void Assem_nonzero_estimate();
     
     // Assembly the residual vector and tangent matrix for the sub-step of HERK
+    void Assem_tangent_matrix(
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt );
+
+    void Assem_residual_substep(
+        const int &substep_index,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt );
+
+    void Assem_residual_finalstep(
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution ** const &pre_velo_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution ** const &pre_pres_sols,
+        PDNSolution * const &pre_velo_before,    
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt );
+
+    void Assem_residual_presstage(
+        PDNSolution * const &cur_dot_velo,
+        PDNSolution ** const &cur_velo_sols,
+        PDNSolution * const &cur_velo,
+        PDNSolution ** const &cur_pres_sols,
+        PDNSolution * const &pre_velo,
+        PDNSolution * const &cur_pres,    
+        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        const double &curr_time,
+        const double &dt );
+
+    // Assembly the residual vector and tangent matrix for the sub-step of HERK
     void Assem_tangent_residual_substep(
         const int &substep_index,
         PDNSolution ** const &cur_velo_sols,
@@ -169,6 +210,8 @@ class PGAssem_Block_NS_FEM_HERK
 
     // Essential boundary condition
     void EssBC_KG();
+
+    void EssBC_K();
 
     void EssBC_G();
 

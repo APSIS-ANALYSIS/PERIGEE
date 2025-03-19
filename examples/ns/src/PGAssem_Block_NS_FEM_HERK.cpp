@@ -190,6 +190,65 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
   }
 }
 
+void PGAssem_Block_NS_FEM_HERK::EssBC_K()
+{
+  // pressure dof comes from field 0, to be inserted in subK[0] and subG[0]
+  const int local_dir = nbc->get_Num_LD(0);
+
+  if( local_dir > 0 )
+  {
+    for(int i=0; i<local_dir; ++i)
+    {
+      const int row = nbc->get_LDN(0, i) * dof_mat_p;
+      
+      MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
+    }
+  }
+
+  const int local_sla = nbc->get_Num_LPS(0);
+  if( local_sla > 0 )
+  {
+    for(int i=0; i<local_sla; ++i)
+    {
+      const int row = nbc->get_LPSN(0, i) * dof_mat_p;
+      const int col = nbc->get_LPMN(0, i) * dof_mat_p;
+      MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
+      MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
+    }
+  }
+
+  // velocity dofs
+  for(int field=1; field<=3; ++field)
+  {
+    const int local_dir = nbc->get_Num_LD(field);
+
+    if( local_dir > 0 )
+    {
+      for(int i=0; i<local_dir; ++i)
+      {
+        const int row = nbc->get_LDN(field, i) * dof_mat_v + field - 1;
+        MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
+        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);    
+      }
+    }
+
+    const int local_sla = nbc->get_Num_LPS(field);
+
+    if( local_sla > 0 )
+    {
+      for(int i=0; i<local_sla; ++i)
+      {
+        const int row = nbc->get_LPSN(field, i) * dof_mat_v + field - 1;
+        const int col = nbc->get_LPMN(field, i) * dof_mat_v + field - 1;
+        MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
+        MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
+        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
+        MatSetValue(subK[4], row, col, 0.0, ADD_VALUES);      
+      }
+    }
+  }
+}
+
 void PGAssem_Block_NS_FEM_HERK::EssBC_G()
 {
   // pres field is 0, to be inserted to subG[0]
@@ -292,6 +351,357 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
   MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
   VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
   VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+}
+
+void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+  const double &curr_time,
+  const double &dt )
+  {
+    const int nElem = locelem->get_nlocalele();
+    const int loc_dof_v = dof_mat_v * nLocBas;
+    const int loc_dof_p = dof_mat_p * nLocBas;
+
+    double * ectrl_x = new double [nLocBas];
+    double * ectrl_y = new double [nLocBas];
+    double * ectrl_z = new double [nLocBas];
+    PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+    PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+    
+    for(int ee=0; ee<nElem; ++ee)
+    {    
+      const std::vector<int> IEN_e = locien->get_LIEN(ee);
+
+      fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+    
+      locassem->Assem_Tangent_Matrix(curr_time, dt, tm_RK_ptr, ectrl_x, ectrl_y, ectrl_z);
+    
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const int loc_index  = locien->get_LIEN(ee, ii);
+    
+        row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+        row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+        row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+    
+        row_idx_p[ii] = nbc->get_LID( 0, loc_index );
+      }
+    
+      MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+      MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+      MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+      MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+      MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+    }
+    
+    delete [] ectrl_x; ectrl_x = nullptr;
+    delete [] ectrl_y; ectrl_y = nullptr;
+    delete [] ectrl_z; ectrl_z = nullptr;
+    delete [] row_idx_v; row_idx_v = nullptr;
+    delete [] row_idx_p; row_idx_p = nullptr;
+    
+    EssBC_K();
+    
+    MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+    MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+    MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+    MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+    MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+}
+
+void PGAssem_Block_NS_FEM_HERK::Assem_residual_substep(
+  const int &substep_index,
+  PDNSolution ** const &cur_velo_sols,
+  PDNSolution ** const &cur_pres_sols,
+  PDNSolution ** const &pre_velo_sols,
+  PDNSolution * const &pre_velo,
+  PDNSolution ** const &pre_pres_sols,
+  PDNSolution * const &pre_velo_before,   
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+  const double &curr_time,
+  const double &dt )
+{
+const int nElem = locelem->get_nlocalele();
+const int loc_dof_v = dof_mat_v * nLocBas;
+const int loc_dof_p = dof_mat_p * nLocBas;
+
+std::vector<std::vector<double>> array_cur_velo_sols(substep_index+1);
+std::vector<std::vector<double>> array_cur_pres_sols(substep_index+1);
+std::vector<std::vector<double>> array_pre_velo_sols(tm_RK_ptr->get_RK_step());
+std::vector<std::vector<double>> array_pre_pres_sols(tm_RK_ptr->get_RK_step());
+
+for(int ii = 0; ii < substep_index+1; ++ii)
+{
+  array_cur_velo_sols[ii] = cur_velo_sols[ii] -> GetLocalArray();
+  array_cur_pres_sols[ii] = cur_pres_sols[ii] -> GetLocalArray();
+}
+
+for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+{
+  array_pre_velo_sols[ii] = pre_velo_sols[ii] -> GetLocalArray();
+  array_pre_pres_sols[ii] = pre_pres_sols[ii] -> GetLocalArray();
+}
+
+const std::vector<double> array_pre_velo = pre_velo -> GetLocalArray();
+const std::vector<double> array_pre_velo_before = pre_velo_before -> GetLocalArray();
+
+double * ectrl_x = new double [nLocBas];
+double * ectrl_y = new double [nLocBas];
+double * ectrl_z = new double [nLocBas];
+PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+
+for(int ee=0; ee<nElem; ++ee)
+{
+  const std::vector<int> IEN_e = locien->get_LIEN(ee);
+
+  std::vector<std::vector<double>> local_cur_velo_sols(substep_index+1);    
+  std::vector<std::vector<double>> local_cur_pres_sols(substep_index+1); 
+  std::vector<std::vector<double>> local_pre_velo_sols(tm_RK_ptr->get_RK_step()); 
+  std::vector<std::vector<double>> local_pre_pres_sols(tm_RK_ptr->get_RK_step()); 
+
+  for(int ii = 0; ii < substep_index+1; ++ii)
+  {
+    local_cur_velo_sols[ii] = GetLocal( array_cur_velo_sols[ii], IEN_e, nLocBas, 3 );
+    local_cur_pres_sols[ii] = GetLocal( array_cur_pres_sols[ii], IEN_e, nLocBas, 1 );
+  }
+
+  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  {
+    local_pre_velo_sols[ii] = GetLocal( array_pre_velo_sols[ii], IEN_e, nLocBas, 3 );
+    local_pre_pres_sols[ii] = GetLocal( array_pre_pres_sols[ii], IEN_e, nLocBas, 1 );
+  }
+
+  const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
+  const std::vector<double> local_pre_velo_before = GetLocal( array_pre_velo_before, IEN_e, nLocBas, 3 );
+
+  fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+  locassem->Assem_Residual_Sub(curr_time, dt, substep_index, tm_RK_ptr, local_cur_velo_sols, local_cur_pres_sols,
+      local_pre_velo_sols, local_pre_pres_sols, local_pre_velo, local_pre_velo_before, ectrl_x, ectrl_y, ectrl_z);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    const int loc_index  = locien->get_LIEN(ee, ii);
+
+    row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+    row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+    row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+
+    row_idx_p[ii] = nbc->get_LID( 0, loc_index );
+  }
+
+  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+}
+
+delete [] ectrl_x; ectrl_x = nullptr;
+delete [] ectrl_y; ectrl_y = nullptr;
+delete [] ectrl_z; ectrl_z = nullptr;
+delete [] row_idx_v; row_idx_v = nullptr;
+delete [] row_idx_p; row_idx_p = nullptr;
+
+EssBC_K();
+
+MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+}
+
+void PGAssem_Block_NS_FEM_HERK::Assem_residual_finalstep(
+  PDNSolution ** const &cur_velo_sols,
+  PDNSolution * const &cur_velo,
+  PDNSolution ** const &cur_pres_sols,
+  PDNSolution ** const &pre_velo_sols,
+  PDNSolution * const &pre_velo,
+  PDNSolution ** const &pre_pres_sols,
+  PDNSolution * const &pre_velo_before,    
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+  const double &curr_time,
+  const double &dt )
+{
+const int nElem = locelem->get_nlocalele();
+const int loc_dof_v = dof_mat_v * nLocBas;
+const int loc_dof_p = dof_mat_p * nLocBas;
+
+std::vector<std::vector<double>> array_cur_velo_sols(tm_RK_ptr->get_RK_step());
+std::vector<std::vector<double>> array_cur_pres_sols(tm_RK_ptr->get_RK_step());
+std::vector<std::vector<double>> array_pre_velo_sols(tm_RK_ptr->get_RK_step());
+std::vector<std::vector<double>> array_pre_pres_sols(tm_RK_ptr->get_RK_step());
+
+for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+{
+  array_cur_velo_sols[ii] = cur_velo_sols[ii] -> GetLocalArray();
+  array_cur_pres_sols[ii] = cur_pres_sols[ii] -> GetLocalArray();
+  array_pre_velo_sols[ii] = pre_velo_sols[ii] -> GetLocalArray();
+  array_pre_pres_sols[ii] = pre_pres_sols[ii] -> GetLocalArray();
+}
+
+const std::vector<double> array_cur_velo = cur_velo -> GetLocalArray();
+const std::vector<double> array_pre_velo = pre_velo -> GetLocalArray();
+const std::vector<double> array_pre_velo_before = pre_velo_before -> GetLocalArray();
+
+double * ectrl_x = new double [nLocBas];
+double * ectrl_y = new double [nLocBas];
+double * ectrl_z = new double [nLocBas];
+PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+
+for(int ee=0; ee<nElem; ++ee)
+{
+  const std::vector<int> IEN_e = locien->get_LIEN(ee);
+
+  std::vector<std::vector<double>> local_cur_velo_sols(tm_RK_ptr->get_RK_step());    
+  std::vector<std::vector<double>> local_cur_pres_sols(tm_RK_ptr->get_RK_step()); 
+  std::vector<std::vector<double>> local_pre_velo_sols(tm_RK_ptr->get_RK_step()); 
+  std::vector<std::vector<double>> local_pre_pres_sols(tm_RK_ptr->get_RK_step()); 
+
+  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  {
+    local_cur_velo_sols[ii] = GetLocal( array_cur_velo_sols[ii], IEN_e, nLocBas, 3 );
+    local_cur_pres_sols[ii] = GetLocal( array_cur_pres_sols[ii], IEN_e, nLocBas, 1 );
+    local_pre_velo_sols[ii] = GetLocal( array_pre_velo_sols[ii], IEN_e, nLocBas, 3 );
+    local_pre_pres_sols[ii] = GetLocal( array_pre_pres_sols[ii], IEN_e, nLocBas, 1 );
+  }
+
+  const std::vector<double> local_cur_velo = GetLocal( array_cur_velo, IEN_e, nLocBas, 3 );
+  const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
+  const std::vector<double> local_pre_velo_before = GetLocal( array_pre_velo_before, IEN_e, nLocBas, 3 );
+
+  fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+  locassem->Assem_Residual_Final(curr_time, dt, tm_RK_ptr, local_cur_velo_sols, local_cur_velo,
+      local_cur_pres_sols, local_pre_velo_sols, local_pre_velo, local_pre_pres_sols, local_pre_velo_before, 
+      ectrl_x, ectrl_y, ectrl_z);
+
+  for(int ii=0; ii<nLocBas; ++ii)
+  {
+    const int loc_index  = locien->get_LIEN(ee, ii);
+
+    row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+    row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+    row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+
+    row_idx_p[ii] = nbc->get_LID( 0, loc_index );
+  }
+  
+  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+}
+
+delete [] ectrl_x; ectrl_x = nullptr;
+delete [] ectrl_y; ectrl_y = nullptr;
+delete [] ectrl_z; ectrl_z = nullptr;
+delete [] row_idx_v; row_idx_v = nullptr;
+delete [] row_idx_p; row_idx_p = nullptr;
+
+EssBC_K();
+
+MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+}
+
+void PGAssem_Block_NS_FEM_HERK::Assem_residual_presstage(
+  PDNSolution * const &cur_dot_velo,
+  PDNSolution ** const &cur_velo_sols,
+  PDNSolution * const &cur_velo,
+  PDNSolution ** const &cur_pres_sols,
+  PDNSolution * const &pre_velo,
+  PDNSolution * const &cur_pres,    
+  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+  const double &curr_time,
+  const double &dt )
+{
+const int nElem = locelem->get_nlocalele();
+const int loc_dof_v = dof_mat_v * nLocBas;
+const int loc_dof_p = dof_mat_p * nLocBas;
+
+std::vector<std::vector<double>> array_cur_velo_sols(tm_RK_ptr->get_RK_step());
+std::vector<std::vector<double>> array_cur_pres_sols(tm_RK_ptr->get_RK_step());
+
+for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+{
+  array_cur_velo_sols[ii] = cur_velo_sols[ii] -> GetLocalArray();
+  array_cur_pres_sols[ii] = cur_pres_sols[ii] -> GetLocalArray();
+}
+
+const std::vector<double> array_cur_dot_velo = cur_dot_velo -> GetLocalArray();
+const std::vector<double> array_cur_velo = cur_velo -> GetLocalArray();
+const std::vector<double> array_pre_velo = pre_velo -> GetLocalArray();
+const std::vector<double> array_cur_pres = cur_pres -> GetLocalArray();
+
+double * ectrl_x = new double [nLocBas];
+double * ectrl_y = new double [nLocBas];
+double * ectrl_z = new double [nLocBas];
+PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+
+for(int ee=0; ee<nElem; ++ee)
+{
+  const std::vector<int> IEN_e = locien->get_LIEN(ee);
+
+  std::vector<std::vector<double>> local_cur_velo_sols(tm_RK_ptr->get_RK_step());    
+  std::vector<std::vector<double>> local_cur_pres_sols(tm_RK_ptr->get_RK_step()); 
+
+  for(int ii = 0; ii < tm_RK_ptr->get_RK_step(); ++ii)
+  {
+    local_cur_velo_sols[ii] = GetLocal( array_cur_velo_sols[ii], IEN_e, nLocBas, 3 );
+    local_cur_pres_sols[ii] = GetLocal( array_cur_pres_sols[ii], IEN_e, nLocBas, 1 );
+  }
+
+  const std::vector<double> local_cur_dot_velo = GetLocal( array_cur_dot_velo, IEN_e, nLocBas, 3 );
+  const std::vector<double> local_cur_velo = GetLocal( array_cur_velo, IEN_e, nLocBas, 3 );
+  const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
+  const std::vector<double> local_cur_pres = GetLocal( array_cur_pres, IEN_e, nLocBas, 1 );
+
+  fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+  locassem->Assem_Residual_Pressure(curr_time, dt, tm_RK_ptr, local_cur_dot_velo, 
+      local_cur_velo_sols, local_cur_velo, local_cur_pres_sols, local_pre_velo, 
+      local_cur_pres, ectrl_x, ectrl_y, ectrl_z);
+
+      for(int ii=0; ii<nLocBas; ++ii)
+      {
+        const int loc_index  = locien->get_LIEN(ee, ii);
+  
+        row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+        row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+        row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+  
+        row_idx_p[ii] = nbc->get_LID( 0, loc_index );
+      }
+
+      MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+      MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
+      MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
+      MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
+      MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+}
+
+delete [] ectrl_x; ectrl_x = nullptr;
+delete [] ectrl_y; ectrl_y = nullptr;
+delete [] ectrl_z; ectrl_z = nullptr;
+delete [] row_idx_v; row_idx_v = nullptr;
+delete [] row_idx_p; row_idx_p = nullptr;
+
+EssBC_K();
+
+MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
+MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_substep(
@@ -407,10 +817,6 @@ MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL
 
 VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
 VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
-
-//MatScale(subK[0], tm_RK_ptr->get_RK_a(subindex, subindex-1));
-//MatScale(subK[2], tm_RK_ptr->get_RK_a(subindex, subindex-1));
-//MatScale(subK[4], tm_RK_ptr->get_RK_a(subindex, subindex-1));
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_finalstep(
