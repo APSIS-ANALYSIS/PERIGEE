@@ -26,8 +26,8 @@ INCLUDE(../../../conf/system_lib_loading.cmake)
 SET( perigee_source ${perigee_SOURCE_DIR}/../../../src )
 
 SET( PERIGEE_INCLUDE_DIRS
-  ${perigee_SOURCE_DIR}/include
-  ${perigee_SOURCE_DIR}/../../include )
+  ${perigee_SOURCE_DIR}/../include
+  ${perigee_SOURCE_DIR}/../../../include )
 
 # 1. Preprocessor source cpp
 SET( perigee_preprocess_lib_src 
@@ -97,16 +97,13 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/../src/VTK_Writer_Transport.cpp
   )
 
-INCLUDE_DIRECTORIES( ../../../include )
-INCLUDE_DIRECTORIES( ../include )
-
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_preprocess ${EXTRA_LINK_LIBS} )
 TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PUBLIC
-  ${perigee_SOURCE_DIR}/../../include ${HDF5_INCLUDE_DIRS} )
+  ${perigee_SOURCE_DIR}/../../../include ${HDF5_INCLUDE_DIRS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
