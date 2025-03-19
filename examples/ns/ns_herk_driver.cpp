@@ -273,7 +273,9 @@ int main(int argc, char *argv[])
   // gloAssem->Clear_KG();
   gloAssem->Clear_G();
 
-  // ===== Initialize the shell matrix =====
+  gloAssem->Assem_tangent_matrix(tm_RK.get(), 0.0, initial_step);
+
+  // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
   
   MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
@@ -283,12 +285,43 @@ int main(int argc, char *argv[])
 
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
+  
+  // ===== Linear solver context of Martrix A =====
+  auto lsolver_A = SYS_T::make_unique<PLinear_Solver_PETSc>(
+    1.0e-8, 1.0e-15, 1.0e30, 1000, "A_", "A_");
 
-  PC upc; lsolver->GetPC(&upc);
-  const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
-  PCFieldSplitSetBlockSize(upc,4);
-  PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
-  PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
+  lsolver_A->SetOperator(gloAssem->subK[3]); 
+
+  // ===== Linear solver context of Schur complement matrix =====
+  auto lsolver_S = SYS_T::make_unique<PLinear_Solver_PETSc>(
+    1.0e-8, 1.0e-15, 1.0e30, 1000, "S_", "S_");
+  
+  Mat S_approx;
+  
+  MF_T::SetupApproxSchur(gloAssem.get(), S_approx);
+
+  lsolver_S->SetOperator(S_approx);
+
+  MF_T::SolverContext solverCtx = {gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S)};
+
+  // ===== Initialize the shell preconditioner =====
+  PC pc_shell;
+  PCSetType( pc_shell, PCSHELL );
+
+  PCCreate(PETSC_COMM_WORLD, &pc_shell);
+  PCSetType(pc_shell, PCSHELL);
+  PCShellSetContext(pc_shell, &solverCtx);
+  PCShellSetApply(pc_shell, MF_T::MF_PCSchurApply);
+
+  KSPSetPC( lsolver->ksp, pc_shell ); 
+
+  // lsolver->SetPC(&pc_shell);
+
+  // PC upc; lsolver->GetPC(&upc);
+  // const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
+  // PCFieldSplitSetBlockSize(upc,4);
+  // PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
+  // PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Time step info =====
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
@@ -312,6 +345,9 @@ int main(int argc, char *argv[])
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
 
+  MatDestroy(&S_approx);
+  MatDestroy(&K_shell);
+  PCDestroy(&pc_shell);
   tsolver.reset();
 
   PetscFinalize();

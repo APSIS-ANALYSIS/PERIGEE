@@ -60,7 +60,8 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_dot_velo,
     std::unique_ptr<PDNSolution> init_pres,
-    std::unique_ptr<PDNTimeStep> time_info ) const
+    std::unique_ptr<PDNTimeStep> time_info,
+    Mat &shell ) const
 {
   const int ss = tmRK->get_RK_step();
 
@@ -68,10 +69,14 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
   PDNSolution** cur_velo_sols = new PDNSolution*[ss];
   for(int ii = 0; ii < ss; ++ii)
     cur_velo_sols[ii] = new PDNSolution(*init_velo);
-  
+
+  std::vector<std::unique_ptr<PDNSolution>> cur_velo_sols1(ss);    
+  for (int ii = 0; ii < ss; ++ii) 
+    cur_velo_sols1[ii] = SYS_T::make_unique<PDNSolution>(*init_velo);
+
   // The velo solution in the final step at the (n+1)-th time step
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
-
+  
   // The dot_velo solution in the final step at the (n+1)-th time step
   PDNSolution * cur_dot_velo = new PDNSolution(*init_dot_velo);
 
@@ -120,9 +125,9 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
   {   
     HERK_Solve_NS(
         time_info->get_time(), time_info->get_step(),
-        cur_velo_sols, cur_velo, cur_dot_velo, 
+        cur_velo_sols, cur_velo, cur_dot_velo,
         cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
-        pre_pres_sols, pre_pres, pre_velo_before, cur_sol );
+        pre_pres_sols, pre_pres, pre_velo_before, cur_sol, shell );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -172,7 +177,8 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     PDNSolution ** const &pre_pres_sols,
     PDNSolution * const &pre_pres,
     PDNSolution * const &pre_velo_before,
-    PDNSolution * const &cur_sol ) const
+    PDNSolution * const &cur_sol,
+    Mat &shell ) const
 { 
   auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
 
@@ -190,14 +196,20 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // Make the velo in each sub step meet the Dirchlet boundary
     rescale_inflow_velo(curr_time + tmRK->get_RK_c(ii) * dt, cur_velo_sols[ii]);
   
-    gassem->Clear_G();  // K use Matrix-free
+    gassem->Clear_G();  // K uses Matrix-free
       
-    gassem->Assem_tangent_residual_substep( ii, cur_velo_sols, cur_pres_sols,
+    gassem->Assem_residual_substep( ii, cur_velo_sols, cur_pres_sols,
       pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before, tmRK.get(), 
       curr_time, dt );     
     
+    gassem->Set_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );
+
     // lsolver->SetOperator(gassem->K);
-    lsolver->Solve(gassem->G, dot_step.get());
+    lsolver->SetOperator(shell);
+
+    // PCSetType( pc, PCSHELL );
+    // KSPSetPC( lsolver->ksp, pc );  
+    lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
@@ -205,44 +217,52 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   
     Update_pressure_velocity(cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step.get());
   }
-  // Final step
-  SYS_T::commPrint(" ==> Start solving the LastStep: \n");
+    // Final step
+    SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
   
-   // Make the velo in the last step meet the Dirchlet boundary
-   rescale_inflow_velo(curr_time + dt, cur_velo);
+    // Make the velo in the last step meet the Dirchlet boundary
+    rescale_inflow_velo(curr_time + dt, cur_velo);
   
-   gassem->Clear_G();
+    gassem->Clear_G();
   
-   gassem->Assem_tangent_residual_finalstep( cur_velo_sols, cur_velo, 
+    gassem->Assem_residual_finalstep( cur_velo_sols, cur_velo, 
       cur_pres_sols, pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before,
       tmRK.get(), curr_time, dt );
 
+    gassem->Set_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );
+
     // lsolver->SetOperator(gassem->K);
-    lsolver->Solve(gassem->G, dot_step.get());
+    lsolver->SetOperator(shell);
+
+    lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
-    SYS_T::commPrint(" --- laststep is solved. \n");
+    SYS_T::commPrint(" --- finalstep is solved. \n");
   
     Update_pressure_velocity(cur_velo, cur_pres_sols[ss-1], dot_step.get());
   
     // Pressure stage
-    SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
+    SYS_T::commPrint(" ==> Start solving the PressureStage: \n");
   
     //Make the dot_velo in the final step meet the Dirchlet boundary
     rescale_inflow_dot_velo(curr_time + dt, cur_dot_velo);
   
     gassem->Clear_G();
   
-    gassem->Assem_tangent_residual_presstage( cur_dot_velo, cur_velo_sols, 
+    gassem->Assem_residual_presstage( cur_dot_velo, cur_velo_sols, 
       cur_velo, cur_pres_sols, pre_velo, cur_pres, tmRK.get(), curr_time, dt );
   
+    gassem->Set_tangent_alpha_RK( 1.0 );
+
     // lsolver->SetOperator(gassem->K);
-    lsolver->Solve(gassem->G, dot_step.get());
+    lsolver->SetOperator(shell);
+    
+    lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
-    SYS_T::commPrint(" --- finalstep is solved. \n");
+    SYS_T::commPrint(" --- pressurestage is solved. \n");
   
     Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
   
