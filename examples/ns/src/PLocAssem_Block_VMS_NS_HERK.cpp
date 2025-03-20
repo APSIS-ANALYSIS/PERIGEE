@@ -3,7 +3,9 @@
 PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const ITimeMethod_RungeKutta * const &tm_RK, const double &in_rho, 
-    const double &in_vis_mu, const double &in_ct, const double &in_ctauc )
+    const double &in_vis_mu, const double &in_L0,
+    const double &in_ct, const double &in_ctauc, 
+    const double &in_cu, const double &in_cp )
 : elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
@@ -11,7 +13,7 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
   quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
   rho0( in_rho ), vis_mu( in_vis_mu ),
   CI( (elemType == FEType::Tet4 || elemType == FEType::Hex8) ? 36.0 : 60.0 ),
-  CT( in_ct ), Ctauc( in_ctauc ),
+  CT( in_ct ), Ctauc( in_ctauc ), L0( in_L0 ), cu( in_cu ), cp( in_cp ),
   nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
   vec_size_v( nLocBas * 3 ), vec_size_p( nLocBas ), sur_size_v ( snLocBas * 3 ),
   coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
@@ -69,6 +71,9 @@ void PLocAssem_Block_VMS_NS_HERK::print_info() const
   SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
   SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
   SYS_T::commPrint("  Scaling factor for tau_C = %e \n", Ctauc);
+  SYS_T::commPrint("  Characteristic length L0 = %e \n", L0);
+  SYS_T::commPrint("  Stabilization para cu for Darcy problem = %e \n", cu);
+  SYS_T::commPrint("  Stabilization para cp for Darcy problem = %e \n", cp);
   SYS_T::commPrint("  Note: \n");
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
@@ -97,15 +102,13 @@ SymmTensor2_3D PLocAssem_Block_VMS_NS_HERK::get_metric(
 std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
   const double &dt, const std::array<double, 9> &dxi_dx ) const
 {
-  const double c_u = 0.2, c_p = 2.0, L0 = 4.0;
-
   const SymmTensor2_3D G = get_metric( dxi_dx );
 
   const double dh = 1.0/std::sqrt( G.MatContraction( G ) );
 
-  const double tau_m = 1.0/(c_u * rho0/dt * L0) * dh;
+  const double tau_m = 1.0/(cu * rho0/dt * L0) * dh;
   
-  const double tau_c = c_p * rho0/dt * L0 * dh; 
+  const double tau_c = cp * rho0/dt * L0 * dh; 
 
   return {tau_m, tau_c};  
 }

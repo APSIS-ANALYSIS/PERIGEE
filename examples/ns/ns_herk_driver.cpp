@@ -32,6 +32,11 @@ int main(int argc, char *argv[])
   double fluid_mu = 3.5e-2;
   double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
   double c_ct = 4.0;   // C_T parameter for defining tau_M
+  
+  // Stabilization para for Darcy problem
+  double L0 = 1.0;
+  double cu = 2.0;
+  double cp = 2.0;
 
   // inflow file & dot_inflow_file
   std::string inflow_file("inflow_fourier_series.txt");
@@ -89,6 +94,9 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
   SYS_T::GetOptionReal("-c_tauc", c_tauc);
   SYS_T::GetOptionReal("-c_ct", c_ct);
+  SYS_T::GetOptionReal("-L0", L0);
+  SYS_T::GetOptionReal("-cu", cu);
+  SYS_T::GetOptionReal("-cp", cp);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
   SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
 //   SYS_T::GetOptionString("-lpn_file", lpn_file);
@@ -113,6 +121,9 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
   SYS_T::cmdPrint("-c_tauc:", c_tauc);
   SYS_T::cmdPrint("-c_ct:", c_ct);
+  SYS_T::cmdPrint("-L0", L0);
+  SYS_T::cmdPrint("-cu", cu);
+  SYS_T::cmdPrint("-cp", cp);
   SYS_T::cmdPrint("-inflow_file:", inflow_file);
   SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
@@ -223,7 +234,7 @@ int main(int argc, char *argv[])
     // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_RK.get(),
-        fluid_density, fluid_mu, c_ct, c_tauc );
+        fluid_density, fluid_mu, L0, c_ct, c_tauc, cu, cp );
 
   // ===== Initial condition =====
   std::unique_ptr<PDNSolution> base =

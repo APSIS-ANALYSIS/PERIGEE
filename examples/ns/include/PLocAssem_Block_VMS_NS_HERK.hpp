@@ -32,8 +32,9 @@ class PLocAssem_Block_VMS_NS_HERK
     PLocAssem_Block_VMS_NS_HERK(
         const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const ITimeMethod_RungeKutta * const &tm_RK, const double &in_rho, 
-        const double &in_vis_mu, const double &in_ct = 4.0, 
-        const double &in_ctauc = 1.0 );
+        const double &in_vis_mu, const double &in_L0,
+        const double &in_ct = 4.0, const double &in_ctauc = 1.0, 
+        const double &in_cu = 2.0, const double &in_cp = 2.0);
 
     ~PLocAssem_Block_VMS_NS_HERK();
 
@@ -210,6 +211,8 @@ class PLocAssem_Block_VMS_NS_HERK
     
     const double Ctauc; // Constant scaling factor for tau_C
     
+    const double L0, cu, cp; // Stabilization parameters for Darcy problem
+
     const int nLocBas, snLocBas, vec_size_v, vec_size_p, sur_size_v;
 
     // M matrix for tau_m
