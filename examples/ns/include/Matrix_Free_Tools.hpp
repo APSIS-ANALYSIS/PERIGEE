@@ -21,62 +21,75 @@ namespace MF_T
     MatShellGetContext(shell, &ptr);
     user = (PGAssem_Block_NS_FEM_HERK*) ptr;
 
-    Vec x1, x2, y1, y2;
-    PetscInt m1_local, m2_local;
+    Vec x1, x2, y1, y2, tmp1, tmp2;
+    // PetscInt m1_local, m2_local;
 
     const PetscScalar coef = user->Get_tangent_alpha_RK();
 
-    MatGetLocalSize(user->subK[3], &m1_local, NULL);
-    MatGetLocalSize(user->subK[0], &m2_local, NULL);
+    // MatGetLocalSize(user->subK[3], &m1_local, NULL);
+    // MatGetLocalSize(user->subK[0], &m2_local, NULL);
 
     // Create sub Vec
-    VecCreate(PETSC_COMM_WORLD, &x1);
-    VecSetSizes(x1, m1_local, PETSC_DECIDE);
-    VecCreate(PETSC_COMM_WORLD, &x2);
-    VecSetSizes(x2, m2_local, PETSC_DECIDE);
-    VecCreate(PETSC_COMM_WORLD, &y1);
-    VecSetSizes(y1, m1_local, PETSC_DECIDE);
-    VecCreate(PETSC_COMM_WORLD, &y2);
-    VecSetSizes(y2, m2_local, PETSC_DECIDE);
+    // VecCreate(PETSC_COMM_WORLD, &x1);
+    // VecSetSizes(x1, m1_local, PETSC_DECIDE);
+    // VecCreate(PETSC_COMM_WORLD, &x2);
+    // VecSetSizes(x2, m2_local, PETSC_DECIDE);
+    // VecCreate(PETSC_COMM_WORLD, &y1);
+    // VecSetSizes(y1, m1_local, PETSC_DECIDE);
+    // VecCreate(PETSC_COMM_WORLD, &y2);
+    // VecSetSizes(y2, m2_local, PETSC_DECIDE);
     
-    VecSetUp(x1);
-    VecSetUp(x2);
-    VecSetUp(y1);
-    VecSetUp(y2);
+    // VecSetUp(x1);
+    // VecSetUp(x2);
+    // VecSetUp(y1);
+    // VecSetUp(y2);
 
     // Split x into x1, x2  
-    PetscInt start1, start2;
-    IS is1, is2;
+    // PetscInt start1, start2;
+    // IS is1, is2;
 
-    VecGetOwnershipRange(x, &start1, NULL);
-    start2 = start1 + m1_local; 
+    // VecGetOwnershipRange(x, &start1, NULL);
+    // start2 = start1 + m1_local; 
 
-    ISCreateStride(PETSC_COMM_WORLD, m1_local, start1, 1, &is1);
-    ISCreateStride(PETSC_COMM_WORLD, m2_local, start2, 1, &is2);
+    // ISCreateStride(PETSC_COMM_WORLD, m1_local, start1, 1, &is1);
+    // ISCreateStride(PETSC_COMM_WORLD, m2_local, start2, 1, &is2);
 
-    VecGetSubVector(x, is1, &x1);
-    VecGetSubVector(x, is2, &x2);  
+    // VecGetSubVector(x, is1, &x1);
+    // VecGetSubVector(x, is2, &x2);
+    VecNestGetSubVec(x, 0, &x1);
+    VecNestGetSubVec(x, 1, &x2);
+
+    VecDuplicate(x1, &tmp1);
+    VecDuplicate(x2, &tmp2);
 
     MatMult(user->subK[3], x1, y1);      // y1 = A * x1
-    MatMult(user->subK[4], x1, x1);      // x1 = A_tilde * x1
-    VecAXPY(y1, coef, x1);               // y1 = A * x1 + coef * A_tilde * x1
-    MatMult(user->subK[2], x2, x1);      // x1 = B * x2
-    VecAXPY(y1, coef, x1);               // y1 = (A + coef * A_tilde) * x1 + coef * B * x2
+    MatMult(user->subK[4], x1, tmp1);    // tmp1 = A_tilde * x1
+    VecAXPY(y1, coef, tmp1);             // y1 = A * x1 + coef * A_tilde * x1
+    MatMult(user->subK[2], x2, tmp1);    // tmp1 = B * x2
+    VecAXPY(y1, coef, tmp1);             // y1 = (A + coef * A_tilde) * x1 + coef * B * x2
 
-    // Combine y1, y2 to y
-    VecGetSubVector(y, is1, &y1);
-    VecGetSubVector(y, is2, &y2);     
+    // Split y into y1, y2
+    // VecGetSubVector(y, is1, &y1);
+    // VecGetSubVector(y, is2, &y2);
+    VecNestGetSubVec(y, 0, &y1);
+    VecNestGetSubVec(y, 1, &y2);
     MatMult(user->subK[1], x1, y2);      // y2 = C * x1
-    MatMult(user->subK[0], x2, x2);      // x2 = D * x2
-    VecAXPY(y2, coef, x2);               // y2 = C * x1 + coef * D * x2
+    MatMult(user->subK[0], x2, tmp2);    // tmp2 = D * x2
+    VecAXPY(y2, coef, tmp2);             // y2 = C * x1 + coef * D * x2
     
+    // Restore
+    // VecRestoreSubVector(y, is1, &y1);
+    // VecRestoreSubVector(y, is2, &y2);
+
     // Destruction of sub vectors
-    VecDestroy(&x1);
-    VecDestroy(&x2);
-    VecDestroy(&y1);
-    VecDestroy(&y2);
-    ISDestroy(&is1);
-    ISDestroy(&is2);
+    // VecDestroy(&x1);
+    // VecDestroy(&x2);
+    // VecDestroy(&y1);
+    // VecDestroy(&y2);
+    VecDestroy(&tmp1);
+    VecDestroy(&tmp2);
+    // ISDestroy(&is1);
+    // ISDestroy(&is2);
 
     return 0;
   }
@@ -191,24 +204,27 @@ namespace MF_T
     PCShellGetContext(pc, &ptr);
     ctx = (SolverContext*) ptr;    
 
-    Mat A = ctx->gloAssem->subK[3], B = ctx->gloAssem->subK[2], C = ctx->gloAssem->subK[1], D = ctx->gloAssem->subK[0];
+    Mat B = ctx->gloAssem->subK[2], C = ctx->gloAssem->subK[1];
+    // Mat A = ctx->gloAssem->subK[3], B = ctx->gloAssem->subK[2], C = ctx->gloAssem->subK[1], D = ctx->gloAssem->subK[0];
 
     Vec x1, x2, y1, y2, z1, z2, w1, w2, temp;
-    IS is1, is2;
-    PetscInt m1_local, m2_local;
+    // IS is1, is2;
+    // PetscInt m1_local, m2_local;
 
-    MatGetLocalSize(A, &m1_local, NULL);
-    MatGetLocalSize(D, &m2_local, NULL);
+    // MatGetLocalSize(A, &m1_local, NULL);
+    // MatGetLocalSize(D, &m2_local, NULL);
 
-    PetscInt start1, start2;
-    VecGetOwnershipRange(x, &start1, NULL);
-    start2 = start1 + m1_local;
+    // PetscInt start1, start2;
+    // VecGetOwnershipRange(x, &start1, NULL);
+    // start2 = start1 + m1_local;
 
-    ISCreateStride(PETSC_COMM_WORLD, m1_local, start1, 1, &is1);
-    ISCreateStride(PETSC_COMM_WORLD, m2_local, start2, 1, &is2);
+    // ISCreateStride(PETSC_COMM_WORLD, m1_local, start1, 1, &is1);
+    // ISCreateStride(PETSC_COMM_WORLD, m2_local, start2, 1, &is2);
 
-    VecGetSubVector(x, is1, &x1);
-    VecGetSubVector(x, is2, &x2);
+    // VecGetSubVector(x, is1, &x1);
+    // VecGetSubVector(x, is2, &x2);
+    VecNestGetSubVec(x, 0, &x1);
+    VecNestGetSubVec(x, 1, &x2);
 
     VecDuplicate(x1, &z1);
     VecDuplicate(x2, &z2);
@@ -226,26 +242,29 @@ namespace MF_T
     // Step 3: Compute w2 = S^{-1} z2
     ctx->lsolver_S->Solve(z2, w2);
 
-    // Step 4: Compute w1 = A^{-1}(z1 - B w2)
+    // Step 4: Compute w1 = z1 - A^{-1} B w2 = A^{-1} x1 - A^{-1} B w2
     MatMult(B, w2, temp);
+    ctx->lsolver_A->Solve(temp, temp); 
     VecWAXPY(z1, -1.0, temp, z1);
-    ctx->lsolver_A->Solve(z1, w1); 
-  
+ 
     // Combine w1 and w2 into y
-    VecGetSubVector(y, is1, &y1);
-    VecGetSubVector(y, is2, &y2);
+    // VecGetSubVector(y, is1, &y1);
+    // VecGetSubVector(y, is2, &y2);
+    // Split y into y1, y2
+    VecNestGetSubVec(y, 0, &y1);
+    VecNestGetSubVec(y, 1, &y2);
 
     VecCopy(w1, y1);
     VecCopy(w2, y2);
 
     // Restore and clean up
-    VecRestoreSubVector(x, is1, &x1);
-    VecRestoreSubVector(x, is2, &x2);
-    VecRestoreSubVector(y, is1, &y1);
-    VecRestoreSubVector(y, is2, &y2);
+    // VecRestoreSubVector(x, is1, &x1);
+    // VecRestoreSubVector(x, is2, &x2);
+    // VecRestoreSubVector(y, is1, &y1);
+    // VecRestoreSubVector(y, is2, &y2);
 
-    ISDestroy(&is1);
-    ISDestroy(&is2);
+    // ISDestroy(&is1);
+    // ISDestroy(&is2);
     VecDestroy(&z1);
     VecDestroy(&z2);
     VecDestroy(&w1);
