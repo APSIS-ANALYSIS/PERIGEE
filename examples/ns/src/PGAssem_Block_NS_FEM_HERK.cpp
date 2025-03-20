@@ -19,8 +19,8 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   nLocBas( locassem->get_nLocBas() ),
   snLocBas( locassem->get_snLocBas() ),
   dof_sol( pnode->get_dof() ),
-  dof_mat_v( locassem->get_dof_mat_0() ),
-  dof_mat_p( locassem->get_dof_mat_1() ),
+  dof_mat_v( locassem->get_dof_mat_1() ),
+  dof_mat_p( locassem->get_dof_mat_0() ),
   num_ebc( ebc->get_num_ebc() ),
   nlgn( pnode->get_nlocghonode() )
 {
@@ -70,8 +70,8 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   VecCreate(PETSC_COMM_WORLD, &subG[0]);
   VecCreate(PETSC_COMM_WORLD, &subG[1]);
 
-  VecSetSizes(subG[0], nlocrow_p, PETSC_DECIDE);
-  VecSetSizes(subG[1], nlocrow_v, PETSC_DECIDE);
+  VecSetSizes(subG[0], nlocrow_v, PETSC_DECIDE); // Vec = [Vec_v, Vec_p];
+  VecSetSizes(subG[1], nlocrow_p, PETSC_DECIDE);
 
   VecSetFromOptions(subG[0]);
   VecSetFromOptions(subG[1]);
@@ -87,7 +87,7 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
 
   SYS_T::commPrint("===> MAT_NEW_NONZERO_ALLOCATION_ERR = FALSE.\n");
   Release_nonzero_err_str();
-
+ 
   Assem_nonzero_estimate();
 
   // Reallocate matrices with precise preallocation
@@ -129,7 +129,7 @@ PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
 
 void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 {
-  // pressure dof comes from field 0, to be inserted in subK[0] and subG[0]
+  // pressure dof comes from field 0, to be inserted in subK[0] and subG[1]
   const int local_dir = nbc->get_Num_LD(0);
 
   if( local_dir > 0 )
@@ -138,7 +138,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
     {
       const int row = nbc->get_LDN(0, i) * dof_mat_p;
       
-      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
       MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
     }
   }
@@ -152,7 +152,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
       const int col = nbc->get_LPMN(0, i) * dof_mat_p;
       MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
       MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
-      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
     }
   }
 
@@ -168,7 +168,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
         const int row = nbc->get_LDN(field, i) * dof_mat_v + field - 1;
         MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
         MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
-        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);        
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);        
       }
     }
 
@@ -184,7 +184,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
         MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
         MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
         MatSetValue(subK[4], row, col, 0.0, ADD_VALUES);
-        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);        
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);        
       }
     }
   }
@@ -192,7 +192,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 
 void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 {
-  // pressure dof comes from field 0, to be inserted in subK[0] and subG[0]
+  // pressure dof comes from field 0, to be inserted in subK[0]
   const int local_dir = nbc->get_Num_LD(0);
 
   if( local_dir > 0 )
@@ -251,14 +251,14 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 
 void PGAssem_Block_NS_FEM_HERK::EssBC_G()
 {
-  // pres field is 0, to be inserted to subG[0]
+  // pres field is 0, to be inserted to subG[1]
   const int local_dir = nbc->get_Num_LD(0);
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
       const int row = nbc->get_LDN(0, ii) * dof_mat_p;
-      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
     }
   }
 
@@ -268,7 +268,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_G()
     for(int ii=0; ii<local_sla; ++ii)
     {
       const int row = nbc->get_LPSN(0, ii) * dof_mat_p;
-      VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
+      VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
     }
   }
 
@@ -281,7 +281,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_G()
       for(int ii=0; ii<local_dir; ++ii)
       {
         const int row = nbc->get_LDN(field, ii) * dof_mat_v + field - 1;
-        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
       }
     }
 
@@ -291,7 +291,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_G()
       for(int ii=0; ii<local_sla; ++ii)
       {
         const int row = nbc->get_LPSN(field, ii) * dof_mat_v + field - 1;
-        VecSetValue(subG[1], row, 0.0, INSERT_VALUES);
+        VecSetValue(subG[0], row, 0.0, INSERT_VALUES);
       }
     }
   }
@@ -320,8 +320,7 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
       
       row_idx_p[ii] = nbc->get_LID( 0, loc_index );
     }
-
-    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
+    MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES); 
     MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
     MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
     MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);    
@@ -491,11 +490,8 @@ for(int ee=0; ee<nElem; ++ee)
     row_idx_p[ii] = nbc->get_LID( 0, loc_index );
   }
 
-  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
-  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
-  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
-  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
-  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -504,13 +500,15 @@ delete [] ectrl_z; ectrl_z = nullptr;
 delete [] row_idx_v; row_idx_v = nullptr;
 delete [] row_idx_p; row_idx_p = nullptr;
 
-EssBC_K();
+NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr );
 
-MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+EssBC_G();
+
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_residual_finalstep(
@@ -590,11 +588,8 @@ for(int ee=0; ee<nElem; ++ee)
     row_idx_p[ii] = nbc->get_LID( 0, loc_index );
   }
   
-  MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
-  MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
-  MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
-  MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
-  MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -603,13 +598,15 @@ delete [] ectrl_z; ectrl_z = nullptr;
 delete [] row_idx_v; row_idx_v = nullptr;
 delete [] row_idx_p; row_idx_p = nullptr;
 
-EssBC_K();
+NatBC_G_HERK_Final( curr_time, dt, tm_RK_ptr );
 
-MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+EssBC_G();
+
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_residual_presstage(
@@ -682,11 +679,8 @@ for(int ee=0; ee<nElem; ++ee)
         row_idx_p[ii] = nbc->get_LID( 0, loc_index );
       }
 
-      MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
-      MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
-      MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
-      MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
-      MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
+      VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+      VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -695,13 +689,15 @@ delete [] ectrl_z; ectrl_z = nullptr;
 delete [] row_idx_v; row_idx_v = nullptr;
 delete [] row_idx_p; row_idx_p = nullptr;
 
-EssBC_K();
+NatBC_G_HERK_Pressure( curr_time, dt );
 
-MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
-MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+EssBC_G();
+
+VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_tangent_residual_substep(
@@ -792,8 +788,8 @@ for(int ee=0; ee<nElem; ++ee)
   MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
   MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
 
-  VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
-  VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -902,8 +898,8 @@ for(int ee=0; ee<nElem; ++ee)
   MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
   MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
 
-  VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
-  VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
+  VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+  VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -1004,8 +1000,8 @@ for(int ee=0; ee<nElem; ++ee)
       MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
       MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
       
-      VecSetValues(subG[0], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
-      VecSetValues(subG[1], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
+      VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+      VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
 }
 
 delete [] ectrl_x; ectrl_x = nullptr;
@@ -1059,7 +1055,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
+    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
   }
 }
 
@@ -1098,7 +1094,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem->sur_Residual1, ADD_VALUES);
+    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->sur_Residual1, ADD_VALUES);
   }
 }
 
@@ -1136,7 +1132,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[1], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
+    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
   }
 }
 

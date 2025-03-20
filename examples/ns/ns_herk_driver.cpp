@@ -306,10 +306,9 @@ int main(int argc, char *argv[])
 
   // ===== Initialize the shell preconditioner =====
   PC pc_shell;
-  PCSetType( pc_shell, PCSHELL );
 
   PCCreate(PETSC_COMM_WORLD, &pc_shell);
-  PCSetType(pc_shell, PCSHELL);
+  PCSetType( pc_shell, PCSHELL );
   PCShellSetContext(pc_shell, &solverCtx);
   PCShellSetApply(pc_shell, MF_T::MF_PCSchurApply);
 
@@ -323,10 +322,10 @@ int main(int argc, char *argv[])
   // PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
   // PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
-  // ===== Time step info =====
+  // ===== Time step info ===== 
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
       initial_step);
-
+ 
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),

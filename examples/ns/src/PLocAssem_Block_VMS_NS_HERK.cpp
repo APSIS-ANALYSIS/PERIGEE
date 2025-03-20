@@ -347,8 +347,6 @@ for(int qua=0; qua<nqpv; ++qua)
   const double tau_c = tau_n[1];
 
   const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
-
-  int subindex = 1;
    
   for(int A=0; A<nLocBas; ++A)
   {

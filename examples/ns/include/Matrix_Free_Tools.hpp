@@ -57,18 +57,18 @@ namespace MF_T
     VecGetSubVector(x, is1, &x1);
     VecGetSubVector(x, is2, &x2);  
 
-    MatMult(user->subK[3], x1, y1);      // y1 = A3 * x1
-    MatMult(user->subK[4], x1, x1);      // x1 = A4 * x1
-    VecAXPY(y1, coef, x1);               // y1 = A3 * x1 + coef * A4 * x1
-    MatMult(user->subK[2], x2, x1);      // x1 = A2 * x2
-    VecAXPY(y1, coef, x1);               // y1 = (A3 + coef * A4) * x1 + coef * A2 * x2
+    MatMult(user->subK[3], x1, y1);      // y1 = A * x1
+    MatMult(user->subK[4], x1, x1);      // x1 = A_tilde * x1
+    VecAXPY(y1, coef, x1);               // y1 = A * x1 + coef * A_tilde * x1
+    MatMult(user->subK[2], x2, x1);      // x1 = B * x2
+    VecAXPY(y1, coef, x1);               // y1 = (A + coef * A_tilde) * x1 + coef * B * x2
 
     // Combine y1, y2 to y
     VecGetSubVector(y, is1, &y1);
     VecGetSubVector(y, is2, &y2);     
-    MatMult(user->subK[1], x1, y2);      // y2 = A1 * x1
-    MatMult(user->subK[0], x2, x2);      // x2 = A0 * x2
-    VecAXPY(y2, coef, x2);               // y2 = A1 * x1 + coef * A0 * x2
+    MatMult(user->subK[1], x1, y2);      // y2 = C * x1
+    MatMult(user->subK[0], x2, x2);      // x2 = D * x2
+    VecAXPY(y2, coef, x2);               // y2 = C * x1 + coef * D * x2
     
     // Destruction of sub vectors
     VecDestroy(&x1);
