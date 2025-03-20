@@ -197,7 +197,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     rescale_inflow_velo(curr_time + tmRK->get_RK_c(ii) * dt, cur_velo_sols[ii]);
   
     gassem->Clear_G();  // K uses Matrix-free
-      
+     
     gassem->Assem_residual_substep( ii, cur_velo_sols, cur_pres_sols,
       pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before, tmRK.get(), 
       curr_time, dt );     
@@ -207,15 +207,26 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // lsolver->SetOperator(gassem->K);
     lsolver->SetOperator(shell);
 
+    // SYS_T::commPrint(" ---xxxxxxxxxxxxxxxx. \n");  
+
     // PCSetType( pc, PCSHELL );
-    // KSPSetPC( lsolver->ksp, pc );  
-    lsolver->Solve( gassem->G, dot_step.get() );
-  
+    // KSPSetPC( lsolver->ksp, pc );
+   
+    Vec sol_vp;
+    VecDuplicate( gassem->G, &sol_vp );
+    lsolver->Solve( gassem->G, sol_vp ); 
+    Update_dot_step( sol_vp, dot_step.get() );
+    // lsolver->Solve( gassem->G, dot_step.get() );
+    
+    // SYS_T::commPrint(" ---xxxx. \n");  
+
     bc_mat->MatMultSol( dot_step.get() );
   
     SYS_T::commPrint(" --- substep = %d is solved. \n", ii+1);
   
     Update_pressure_velocity(cur_velo_sols[ii], cur_pres_sols[ii-1], dot_step.get());
+
+    VecDestroy( &sol_vp );
   }
     // Final step
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
@@ -234,7 +245,11 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // lsolver->SetOperator(gassem->K);
     lsolver->SetOperator(shell);
 
-    lsolver->Solve( gassem->G, dot_step.get() );
+    Vec sol_vp;
+    VecDuplicate( gassem->G, &sol_vp );
+    lsolver->Solve( gassem->G, sol_vp ); 
+    Update_dot_step( sol_vp, dot_step.get() );
+    // lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
@@ -257,8 +272,10 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
 
     // lsolver->SetOperator(gassem->K);
     lsolver->SetOperator(shell);
-    
-    lsolver->Solve( gassem->G, dot_step.get() );
+
+    lsolver->Solve( gassem->G, sol_vp ); 
+    Update_dot_step( sol_vp, dot_step.get() );    
+    // lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
@@ -268,6 +285,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   
     // Assemble velo and pres at the (n+1)-th time step into a solution vector
     Update_solutions(cur_velo, cur_pres, cur_sol);
+    VecDestroy( &sol_vp );
 }
 
 void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
@@ -348,6 +366,44 @@ void PTime_NS_HERK_Solver::rescale_inflow_dot_velo( const double &stime,
   dot_velo->Assembly_GhostUpdate();
 }
 
+// Please make sure the Vec vp is VecNest before using the function
+void PTime_NS_HERK_Solver::Update_dot_step(     
+  const Vec &vp, PDNSolution * const &step) const
+  {
+    Vec v, p;
+    VecNestGetSubVec(vp, 0, &v);
+    VecNestGetSubVec(vp, 1, &p);
+
+    Vec lstep, lv, lp;
+    double * array_step, * array_v, * array_p;
+
+    VecGhostGetLocalForm(step->solution, &lstep);
+    VecGhostGetLocalForm(v, &lv);
+    VecGhostGetLocalForm(p, &lp);
+
+    VecGetArray(lstep, &array_step);
+    VecGetArray(lv, &array_v); 
+    VecGetArray(lp, &array_p); 
+
+    for(int ii=0; ii<nlocalnode; ++ii)
+    {
+      array_step[ii*4 + 0] = array_p[ii];
+      array_step[ii*4 + 1] = array_v[ii*3 + 0];
+      array_step[ii*4 + 2] = array_v[ii*3 + 1];
+      array_step[ii*4 + 3] = array_v[ii*3 + 2];
+    }
+
+    VecRestoreArray(lv, &array_v);
+    VecRestoreArray(lp, &array_p);
+    VecRestoreArray(lstep, &array_step);
+  
+    VecGhostRestoreLocalForm(v, &lv);
+    VecGhostRestoreLocalForm(p, &lp);
+    VecGhostRestoreLocalForm(step->solution, &lstep);
+    
+    step->GhostUpdate();
+  }
+
 void PTime_NS_HERK_Solver::Update_pressure_velocity(     
     PDNSolution * const &velo,
     PDNSolution * const &pres,
@@ -364,28 +420,30 @@ void PTime_NS_HERK_Solver::Update_pressure_velocity(
     VecGetArray(lpres, &array_pres); 
     VecGetArray(lstep, &array_step);
 
-    // for(int ii=0; ii<nlocalnode; ++ii)
-    // {
-    //   array_pres[ii       ] -= array_step[ii*4 + 0];
-    //   array_velo[ii*3 + 0 ] -= array_step[ii*4 + 1];
-    //   array_velo[ii*3 + 1 ] -= array_step[ii*4 + 2];
-    //   array_velo[ii*3 + 2 ] -= array_step[ii*4 + 3];
-    // }
-
     for(int ii=0; ii<nlocalnode; ++ii)
     {
-      array_velo[ii*3 + 0 ] -= array_step[ii*3 + 0];
-      array_velo[ii*3 + 1 ] -= array_step[ii*3 + 1];
-      array_velo[ii*3 + 2 ] -= array_step[ii*3 + 2];
-      array_pres[ii       ] -= array_step[nlocalnode*3 + ii];
+      array_pres[ii       ] -= array_step[ii*4 + 0];
+      array_velo[ii*3 + 0 ] -= array_step[ii*4 + 1];
+      array_velo[ii*3 + 1 ] -= array_step[ii*4 + 2];
+      array_velo[ii*3 + 2 ] -= array_step[ii*4 + 3];
     }
+
+    // for(int ii=0; ii<nlocalnode; ++ii)
+    // {
+    //   array_velo[ii*3 + 0 ] -= array_step[ii*3 + 0];
+    //   array_velo[ii*3 + 1 ] -= array_step[ii*3 + 1];
+    //   array_velo[ii*3 + 2 ] -= array_step[ii*3 + 2];
+    //   array_pres[ii       ] -= array_step[nlocalnode*3 + ii];
+    // }
 
     VecRestoreArray(lvelo, &array_velo);    
     VecRestoreArray(lpres, &array_pres);
-
+    VecRestoreArray(lstep, &array_step);
+    
     VecGhostRestoreLocalForm(velo->solution, &lvelo);
     VecGhostRestoreLocalForm(pres->solution, &lpres);
-    
+    VecGhostRestoreLocalForm(step->solution, &lstep);
+
     velo->GhostUpdate();
     pres->GhostUpdate();  
   }
@@ -414,8 +472,12 @@ void PTime_NS_HERK_Solver::Update_solutions(
       array_sol[ii*4 + 3] = array_velo[ii*3 + 2 ];
     }
 
+    VecRestoreArray(lvelo, &array_velo);    
+    VecRestoreArray(lpres, &array_pres);
     VecRestoreArray(lsol, &array_sol);    
 
+    VecGhostRestoreLocalForm(velo->solution, &lvelo);
+    VecGhostRestoreLocalForm(pres->solution, &lpres);
     VecGhostRestoreLocalForm(sol->solution, &lsol);
     
     sol->GhostUpdate();
