@@ -273,18 +273,18 @@ namespace MF_T
     VecDuplicate(x2, &tmp2);
 
     // Step 1: Compute z1 = A^{-1} x1
-    ctx->lsolver_A->Solve(x1, z1);
+    ctx->lsolver_A->Solve(x1, z1, false);
 
     // Step 2: Compute z2 = x2 - C * z1
     MatMult(C, z1, tmp2);
     VecWAXPY(z2, -1.0, tmp2, x2);
 
     // Step 3: Compute w2 = S^{-1} z2
-    ctx->lsolver_S->Solve(z2, w2);
+    ctx->lsolver_S->Solve(z2, w2, false);
 
     // Step 4: Compute w1 = z1 - A^{-1} B w2 = A^{-1} x1 - A^{-1} B w2
     MatMult(B, w2, tmp1);
-    ctx->lsolver_A->Solve(tmp1, tmp1); 
+    ctx->lsolver_A->Solve(tmp1, tmp1, false); 
     VecWAXPY(w1, -1.0, tmp1, z1);
 
     // Combine w1 and w2 into y
