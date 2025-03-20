@@ -92,6 +92,12 @@ class FlowRateFactory
           || bc_type.compare("COSINE") == 0 )
       {
         filetype = 4;
+      }
+      else if( bc_type.compare("Sine") ==0
+          || bc_type.compare("sine") == 0
+          || bc_type.compare("SINE") == 0 )
+      {
+        filetype = 5;
       }       
       else
       {
