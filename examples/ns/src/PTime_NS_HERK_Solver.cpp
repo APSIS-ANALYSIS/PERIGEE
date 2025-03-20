@@ -269,7 +269,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // lsolver->SetOperator(gassem->K);
     lsolver->SetOperator(shell);
 
-    lsolver->Solve( gassem->G, sol_vp ); 
+    lsolver->Solve( gassem->G, sol_vp );
     Update_dot_step( sol_vp, dot_step.get() );    
     // lsolver->Solve( gassem->G, dot_step.get() );
   
@@ -366,21 +366,17 @@ void PTime_NS_HERK_Solver::rescale_inflow_dot_velo( const double &stime,
 void PTime_NS_HERK_Solver::Update_dot_step(     
   const Vec &vp, PDNSolution * const &step) const
   {
-    Vec v, p;
+    Vec lstep, v, p;
     VecNestGetSubVec(vp, 0, &v);
     VecNestGetSubVec(vp, 1, &p);
-
-    Vec lstep, lv, lp;
-    double * array_step, * array_v, * array_p;
-
     VecGhostGetLocalForm(step->solution, &lstep);
-    VecGhostGetLocalForm(v, &lv);
-    VecGhostGetLocalForm(p, &lp);
 
+    double * array_step, * array_v, * array_p;
     VecGetArray(lstep, &array_step);
-    VecGetArray(lv, &array_v); 
-    VecGetArray(lp, &array_p); 
 
+    VecGetArray(v, &array_v);
+    VecGetArray(p, &array_p);
+    
     for(int ii=0; ii<nlocalnode; ++ii)
     {
       array_step[ii*4 + 0] = array_p[ii];
@@ -389,12 +385,10 @@ void PTime_NS_HERK_Solver::Update_dot_step(
       array_step[ii*4 + 3] = array_v[ii*3 + 2];
     }
 
-    VecRestoreArray(lv, &array_v);
-    VecRestoreArray(lp, &array_p);
+    VecRestoreArray(v, &array_v);
+    VecRestoreArray(p, &array_p);
     VecRestoreArray(lstep, &array_step);
-  
-    VecGhostRestoreLocalForm(v, &lv);
-    VecGhostRestoreLocalForm(p, &lp);
+
     VecGhostRestoreLocalForm(step->solution, &lstep);
     
     step->GhostUpdate();
