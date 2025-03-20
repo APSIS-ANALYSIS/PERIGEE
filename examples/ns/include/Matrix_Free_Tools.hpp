@@ -56,11 +56,51 @@ namespace MF_T
 
     // VecGetSubVector(x, is1, &x1);
     // VecGetSubVector(x, is2, &x2);
+
+    // Split the VectNest into subVec
     VecNestGetSubVec(x, 0, &x1);
     VecNestGetSubVec(x, 1, &x2);
+    VecNestGetSubVec(y, 0, &y1);
+    VecNestGetSubVec(y, 1, &y2);
 
     VecDuplicate(x1, &tmp1);
     VecDuplicate(x2, &tmp2);
+
+// //////////////
+// PetscInt x1_size, x2_size, y1_size, y2_size;
+// PetscInt x1_local, x2_local, y1_local, y2_local;
+
+// VecGetSize(x1, &x1_size);
+// VecGetSize(x2, &x2_size);
+// VecGetSize(y1, &y1_size);
+// VecGetSize(y2, &y2_size);
+
+// VecGetLocalSize(x1, &x1_local);
+// VecGetLocalSize(x2, &x2_local);
+// VecGetLocalSize(y1, &y1_local);
+// VecGetLocalSize(y2, &y2_local);
+
+// PetscPrintf(PETSC_COMM_WORLD, 
+//     "x1: global = %d, local = %d\n"
+//     "x2: global = %d, local = %d\n"
+//     "y1: global = %d, local = %d\n"
+//     "y2: global = %d, local = %d\n",
+//     x1_size, x1_local, 
+//     x2_size, x2_local, 
+//     y1_size, y1_local, 
+//     y2_size, y2_local);
+
+// for (int i = 0; i < 5; i++) {
+//       PetscInt m, n, m_local, n_local;
+//       MatGetSize(user->subK[i], &m, &n);
+//       MatGetLocalSize(user->subK[i], &m_local, &n_local);
+  
+//       PetscPrintf(PETSC_COMM_WORLD, 
+//           "subK[%d]: global size = %d x %d, local size = %d x %d\n",
+//           i, m, n, m_local, n_local);
+//   }
+
+// //////////////
 
     MatMult(user->subK[3], x1, y1);      // y1 = A * x1
     MatMult(user->subK[4], x1, tmp1);    // tmp1 = A_tilde * x1
@@ -71,8 +111,7 @@ namespace MF_T
     // Split y into y1, y2
     // VecGetSubVector(y, is1, &y1);
     // VecGetSubVector(y, is2, &y2);
-    VecNestGetSubVec(y, 0, &y1);
-    VecNestGetSubVec(y, 1, &y2);
+
     MatMult(user->subK[1], x1, y2);      // y2 = C * x1
     MatMult(user->subK[0], x2, tmp2);    // tmp2 = D * x2
     VecAXPY(y2, coef, tmp2);             // y2 = C * x1 + coef * D * x2
@@ -207,7 +246,7 @@ namespace MF_T
     Mat B = ctx->gloAssem->subK[2], C = ctx->gloAssem->subK[1];
     // Mat A = ctx->gloAssem->subK[3], B = ctx->gloAssem->subK[2], C = ctx->gloAssem->subK[1], D = ctx->gloAssem->subK[0];
 
-    Vec x1, x2, y1, y2, z1, z2, w1, w2, temp;
+    Vec x1, x2, y1, y2, z1, z2, w1, w2, tmp1, tmp2;
     // IS is1, is2;
     // PetscInt m1_local, m2_local;
 
@@ -230,23 +269,24 @@ namespace MF_T
     VecDuplicate(x2, &z2);
     VecDuplicate(x1, &w1);
     VecDuplicate(x2, &w2);
-    VecDuplicate(x2, &temp);
+    VecDuplicate(x1, &tmp1);
+    VecDuplicate(x2, &tmp2);
 
     // Step 1: Compute z1 = A^{-1} x1
     ctx->lsolver_A->Solve(x1, z1);
 
     // Step 2: Compute z2 = x2 - C * z1
-    MatMult(C, z1, temp);
-    VecWAXPY(z2, -1.0, temp, x2);
+    MatMult(C, z1, tmp2);
+    VecWAXPY(z2, -1.0, tmp2, x2);
 
     // Step 3: Compute w2 = S^{-1} z2
     ctx->lsolver_S->Solve(z2, w2);
 
     // Step 4: Compute w1 = z1 - A^{-1} B w2 = A^{-1} x1 - A^{-1} B w2
-    MatMult(B, w2, temp);
-    ctx->lsolver_A->Solve(temp, temp); 
-    VecWAXPY(z1, -1.0, temp, z1);
- 
+    MatMult(B, w2, tmp1);
+    ctx->lsolver_A->Solve(tmp1, tmp1); 
+    VecWAXPY(w1, -1.0, tmp1, z1);
+
     // Combine w1 and w2 into y
     // VecGetSubVector(y, is1, &y1);
     // VecGetSubVector(y, is2, &y2);
@@ -269,7 +309,8 @@ namespace MF_T
     VecDestroy(&z2);
     VecDestroy(&w1);
     VecDestroy(&w2);
-    VecDestroy(&temp);
+    VecDestroy(&tmp1);
+    VecDestroy(&tmp2);
 
     return 0;
   }
