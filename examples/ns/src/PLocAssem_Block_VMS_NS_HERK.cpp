@@ -611,22 +611,27 @@ for(int qua=0; qua<nqpv; ++qua)
 
   const auto dxi_dx = elementv->get_invJacobian(qua);
 
-  // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );  // 这里应该用u[subindex], 但u[subindex]未知？
-  // const double tau_m = tau_sub[0];
-  // const double tau_c = tau_sub[1];
+  /////////////////////////////////////////////////////////////////////////////////////
+  // std::vector<double> tau_m(subindex+1, 0); std::vector<double> tau_c(subindex+1, 0);
 
-  std::vector<double> tau_m(subindex+1, 0); std::vector<double> tau_c(subindex+1, 0);
+  // for(int index=1; index<=subindex; ++index)
+  // {
+  //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
+  //   tau_m[index] = tau_sub[0];
+  //   tau_c[index] = tau_sub[1];
+  // }
 
-  for(int index=1; index<=subindex; ++index)
-  {
-    const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
-    tau_m[index] = tau_sub[0];
-    tau_c[index] = tau_sub[1];
-  }
+  // const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
+  // const double tau_m_n = tau_n[0];
+  // const double tau_c_n = tau_n[1];
 
-  const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
-  const double tau_m_n = tau_n[0];
-  const double tau_c_n = tau_n[1];
+  const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
+
+  std::vector<double> tau_m(subindex+1, tau_n[0]); std::vector<double> tau_c(subindex+1, tau_n[1]);
+
+  const double& tau_m_n = tau_n[0];
+  const double& tau_c_n = tau_n[1];
+  /////////////////////////////////////////////////////////////////////////////////////
 
   const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -1018,18 +1023,27 @@ for(int qua=0; qua<nqpv; ++qua)
 
   const auto dxi_dx = elementv->get_invJacobian(qua);
 
-  std::vector<double> tau_m(num_steps, 0); std::vector<double> tau_c(num_steps, 0);
+  /////////////////////////////////////////////////////////////////////////////////////
+  // std::vector<double> tau_m(num_steps, 0); std::vector<double> tau_c(num_steps, 0);
 
-  for(int index=1; index<num_steps; ++index)
-  {
-    const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] ); // Laststep中，每个子步粗尺度已知
-    tau_m[index] = tau_sub[0];
-    tau_c[index] = tau_sub[1];
-  }
+  // for(int index=1; index<num_steps; ++index)
+  // {
+  //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] ); // Laststep中，每个子步粗尺度已知
+  //   tau_m[index] = tau_sub[0];
+  //   tau_c[index] = tau_sub[1];
+  // }
 
-  const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
-  const double tau_m_n = tau_n[0];
-  const double tau_c_n = tau_n[1];
+  // const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
+  // const double tau_m_n = tau_n[0];
+  // const double tau_c_n = tau_n[1];
+
+  const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
+
+  std::vector<double> tau_m(num_steps, tau_n[0]); std::vector<double> tau_c(num_steps, tau_n[1]);
+
+  const double& tau_m_n = tau_n[0];
+  const double& tau_c_n = tau_n[1];
+  /////////////////////////////////////////////////////////////////////////////////////
 
   const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -1443,13 +1457,23 @@ for(int qua=0; qua<nqpv; ++qua)
 
   const auto dxi_dx = elementv->get_invJacobian(qua);
 
-  const std::array<double, 2> tau_np1_dot = get_tau_dot( dt, dxi_dx, u_np1, v_np1, w_np1 );
+  /////////////////////////////////////////////////////////////////////////////////////
+  // const std::array<double, 2> tau_np1_dot = get_tau_dot( dt, dxi_dx, u_np1, v_np1, w_np1 );
+  // const double tau_m = tau_np1_dot[0];
+  // const double tau_c = tau_np1_dot[1];
+
+  // const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
+  // const double tau_m_n = tau_n[0];
+  // const double tau_c_n = tau_n[1];
+
+  const std::array<double, 2> tau_np1_dot = get_tau_Darcy( dt, dxi_dx );
+
   const double tau_m = tau_np1_dot[0];
   const double tau_c = tau_np1_dot[1];
 
-  const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
-  const double tau_m_n = tau_n[0];
-  const double tau_c_n = tau_n[1];
+  const double& tau_m_n = tau_np1_dot[0];
+  const double& tau_c_n = tau_np1_dot[1];
+  /////////////////////////////////////////////////////////////////////////////////////
 
   const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
