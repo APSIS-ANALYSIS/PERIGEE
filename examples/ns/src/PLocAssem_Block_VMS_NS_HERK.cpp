@@ -97,15 +97,15 @@ SymmTensor2_3D PLocAssem_Block_VMS_NS_HERK::get_metric(
 std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
   const double &dt, const std::array<double, 9> &dxi_dx ) const
 {
-  const double c1_u = 0.0, c1_p = 0.0, L0 = 0.0;
+  const double c_u = 0.2, c_p = 2.0, L0 = 4.0;
 
   const SymmTensor2_3D G = get_metric( dxi_dx );
 
   const double dh = 1.0/std::sqrt( G.MatContraction( G ) );
 
-  const double tau_m = 1.0/(c1_u * rho0/dt * L0) * dh;
+  const double tau_m = 1.0/(c_u * rho0/dt * L0) * dh;
   
-  const double tau_c = c1_p * rho0/dt * L0 * dh; 
+  const double tau_c = c_p * rho0/dt * L0 * dh; 
 
   return {tau_m, tau_c};  
 }
@@ -690,17 +690,17 @@ for(int qua=0; qua<nqpv; ++qua)
     sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
   }
 
-  const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
-  const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
-  const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+  // const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
+  // const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
+  // const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
 
-  // const double u_n_prime = 0.0;
-  // const double v_n_prime = 0.0;
-  // const double w_n_prime = 0.0;
+  const double u_n_prime = 0.0;
+  const double v_n_prime = 0.0;
+  const double w_n_prime = 0.0;
 
-  u_prime[0] = u_n_prime;
-  v_prime[0] = v_n_prime;
-  w_prime[0] = w_n_prime;
+  // u_prime[0] = u_n_prime;
+  // v_prime[0] = v_n_prime;
+  // w_prime[0] = w_n_prime;
 
   const double div_vel= u_x[subindex] + v_y[subindex] + w_z[subindex];
 
@@ -1095,13 +1095,17 @@ for(int qua=0; qua<nqpv; ++qua)
     sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
   }
 
-  const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
-  const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
-  const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+  // const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
+  // const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
+  // const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
   
-  u_prime[0] = u_n_prime;
-  v_prime[0] = v_n_prime;
-  w_prime[0] = w_n_prime;
+  const double u_n_prime = 0.0;
+  const double v_n_prime = 0.0;
+  const double w_n_prime = 0.0;
+
+  // u_prime[0] = u_n_prime;
+  // v_prime[0] = v_n_prime;
+  // w_prime[0] = w_n_prime;
 
   double sum_u_cur_advec = 0.0, sum_u_cur_diffu = 0.0, sum_a_fx_cur = 0.0, sum_last_p_x = 0;
   double sum_v_cur_advec = 0.0, sum_v_cur_diffu = 0.0, sum_a_fy_cur = 0.0, sum_last_p_y = 0;

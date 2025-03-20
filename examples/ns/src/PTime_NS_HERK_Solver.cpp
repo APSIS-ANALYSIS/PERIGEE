@@ -207,8 +207,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // lsolver->SetOperator(gassem->K);
     lsolver->SetOperator(shell);
 
-    // SYS_T::commPrint(" ---xxxxxxxxxxxxxxxx. \n");  
-
     // PCSetType( pc, PCSHELL );
     // KSPSetPC( lsolver->ksp, pc );
    
@@ -217,8 +215,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     lsolver->Solve( gassem->G, sol_vp ); 
     Update_dot_step( sol_vp, dot_step.get() );
     // lsolver->Solve( gassem->G, dot_step.get() );
-    
-    // SYS_T::commPrint(" ---xxxx. \n");  
 
     bc_mat->MatMultSol( dot_step.get() );
   

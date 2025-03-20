@@ -338,8 +338,8 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
 
   // delete temp;
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  // VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  // VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 
   EssBC_KG();
 
@@ -1055,7 +1055,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
+    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->sur_Residual1, ADD_VALUES);
   }
 }
 
@@ -1132,7 +1132,7 @@ for(int ebc_id = 0; ebc_id < num_ebc; ++ebc_id)
         srow_index_v[dof_mat_v * ii + mm] = dof_mat_v * nbc -> get_LID(mm+1, LSIEN[ii]) + mm;
     }
 
-    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->Residual1, ADD_VALUES);
+    VecSetValues(subG[0], dof_mat_v*snLocBas, srow_index_v, locassem->sur_Residual1, ADD_VALUES);
   }
 }
 
