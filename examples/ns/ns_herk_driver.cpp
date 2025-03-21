@@ -222,9 +222,9 @@ int main(int argc, char *argv[])
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
 
-  pmat->gen_perm_bc_block(pNode.get(), locnbc.get());
+  pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
-  // ===== Half Explicit Runge Kutta =====
+  // ===== Half Explicit Runge Kutta scheme =====
   SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
 
   std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_SSPRK33>();
@@ -313,8 +313,8 @@ int main(int argc, char *argv[])
 
   lsolver_S->SetOperator(S_approx);
 
-  MF_T::SolverContext solverCtx = {gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S)};
-
+  MF_T::SolverContext solverCtx {gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S)};
+  
   // ===== Initialize the shell preconditioner =====
   PC pc_shell;
 
