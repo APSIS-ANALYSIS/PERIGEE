@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   double c_ct = 4.0;   // C_T parameter for defining tau_M
   
   // Stabilization para for Darcy problem
-  double L0 = 1.0;
+  double L0 = 0.1;
   double cu = 2.0;
   double cp = 2.0;
 
@@ -281,10 +281,25 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem->Fix_nonzero_err_str();
-  // gloAssem->Clear_KG();
-  gloAssem->Clear_G();
+  gloAssem->Clear_subKG();
 
   gloAssem->Assem_tangent_matrix(tm_RK.get(), 0.0, initial_step);
+
+  // PetscViewer viewer;
+
+  // for (int i = 0; i < 5; i++) 
+  // {
+  //   std::string filename = "mat_K_" + std::to_string(i) + ".m";
+  //   SYS_T::commPrint("mat_K_%d.m \n", i);
+
+  //   PetscViewerASCIIOpen(PETSC_COMM_WORLD, filename.c_str(), &viewer);
+  //   PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+
+  //   MatView(gloAssem->subK[i], viewer);
+
+  //   PetscViewerPopFormat(viewer);
+  //   PetscViewerDestroy(&viewer);
+  // }
 
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
@@ -310,6 +325,19 @@ int main(int argc, char *argv[])
   Mat S_approx;
   
   MF_T::SetupApproxSchur(gloAssem.get(), S_approx);
+
+//////////////////
+// std::string filename = "mat_Schur.m";
+// SYS_T::commPrint("mat_Schur.m \n");
+
+// PetscViewerASCIIOpen(PETSC_COMM_WORLD, filename.c_str(), &viewer);
+// PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
+
+// MatView(S_approx, viewer);
+
+// PetscViewerPopFormat(viewer);
+// PetscViewerDestroy(&viewer);
+//////////////////
 
   lsolver_S->SetOperator(S_approx);
 

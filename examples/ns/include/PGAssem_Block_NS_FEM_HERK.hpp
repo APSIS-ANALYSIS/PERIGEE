@@ -105,6 +105,16 @@ class PGAssem_Block_NS_FEM_HERK
 
     void Clear_G() {VecSet(G, 0.0);}
 
+    void Clear_subKG()
+    {
+      MatZeroEntries(subK[0]);
+      MatZeroEntries(subK[1]);
+      MatZeroEntries(subK[2]);
+      MatZeroEntries(subK[3]);
+      MatZeroEntries(subK[4]);
+      VecSet(G, 0.0);
+    }
+
     // Nonzero pattern estimate for the NS equations
     void Assem_nonzero_estimate();
     
