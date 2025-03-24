@@ -14,6 +14,7 @@
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver.hpp"
 #include "ExplicitRK_SSPRK33.hpp"
+#include "ExplicitRK_EMRK22.hpp"
 #include "Matrix_Free_Tools.hpp"
 
 int main(int argc, char *argv[])
@@ -227,7 +228,7 @@ int main(int argc, char *argv[])
   // ===== Half Explicit Runge Kutta scheme =====
   SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
 
-  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_SSPRK33>();
+  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_EMRK22>();
 
   tm_RK->printCoefficients();
  
