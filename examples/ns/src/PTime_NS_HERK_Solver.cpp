@@ -205,7 +205,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     gassem->Set_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );
 
     // lsolver->SetOperator(gassem->K);
-    lsolver->SetOperator(shell);
+    // lsolver->SetOperator(shell);
 
     // PCSetType( pc, PCSHELL );
     // KSPSetPC( lsolver->ksp, pc );
@@ -239,7 +239,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     gassem->Set_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );
 
     // lsolver->SetOperator(gassem->K);
-    lsolver->SetOperator(shell);
+    // lsolver->SetOperator(shell);
 
     Vec sol_vp;
     VecDuplicate( gassem->G, &sol_vp );
@@ -267,7 +267,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     gassem->Set_tangent_alpha_RK( 1.0 );
 
     // lsolver->SetOperator(gassem->K);
-    lsolver->SetOperator(shell);
+    // lsolver->SetOperator(shell);
 
     lsolver->Solve( gassem->G, sol_vp );
     Update_dot_step( sol_vp, dot_step.get() );    
@@ -376,7 +376,7 @@ void PTime_NS_HERK_Solver::Update_dot_step(
 
     VecGetArray(v, &array_v);
     VecGetArray(p, &array_p);
-    
+
     for(int ii=0; ii<nlocalnode; ++ii)
     {
       array_step[ii*4 + 0] = array_p[ii];

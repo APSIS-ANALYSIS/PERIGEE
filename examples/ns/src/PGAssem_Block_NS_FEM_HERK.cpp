@@ -163,11 +163,10 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 
     if( local_dir > 0 )
     {
-      for(int i=0; i<local_dir; ++i)
+      for(int ii=0; ii<local_dir; ++ii) 
       {
-        const int row = nbc->get_LDN(field, i) * dof_mat_v + field - 1;
+        const int row = nbc->get_LDN(field, ii) * dof_mat_v + field - 1;
         MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
-        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
         VecSetValue(subG[0], row, 0.0, INSERT_VALUES);        
       }
     }
@@ -176,14 +175,12 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 
     if( local_sla > 0 )
     {
-      for(int i=0; i<local_sla; ++i)
+      for(int ii=0; ii<local_sla; ++ii)
       {
-        const int row = nbc->get_LPSN(field, i) * dof_mat_v + field - 1;
-        const int col = nbc->get_LPMN(field, i) * dof_mat_v + field - 1;
+        const int row = nbc->get_LPSN(field, ii) * dof_mat_v + field - 1;
+        const int col = nbc->get_LPMN(field, ii) * dof_mat_v + field - 1;
         MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
         MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
-        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
-        MatSetValue(subK[4], row, col, 0.0, ADD_VALUES);
         VecSetValue(subG[0], row, 0.0, INSERT_VALUES);        
       }
     }
@@ -197,9 +194,9 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 
   if( local_dir > 0 )
   {
-    for(int i=0; i<local_dir; ++i)
+    for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc->get_LDN(0, i) * dof_mat_p;
+      const int row = nbc->get_LDN(0, ii) * dof_mat_p;
       
       MatSetValue(subK[0], row, row, 1.0, ADD_VALUES);
     }
@@ -208,10 +205,10 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
   const int local_sla = nbc->get_Num_LPS(0);
   if( local_sla > 0 )
   {
-    for(int i=0; i<local_sla; ++i)
+    for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc->get_LPSN(0, i) * dof_mat_p;
-      const int col = nbc->get_LPMN(0, i) * dof_mat_p;
+      const int row = nbc->get_LPSN(0, ii) * dof_mat_p;
+      const int col = nbc->get_LPMN(0, ii) * dof_mat_p;
       MatSetValue(subK[0], row, col, 1.0, ADD_VALUES);
       MatSetValue(subK[0], row, row, -1.0, ADD_VALUES);
     }
@@ -224,11 +221,10 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 
     if( local_dir > 0 )
     {
-      for(int i=0; i<local_dir; ++i)
+      for(int ii=0; ii<local_dir; ++ii)
       {
-        const int row = nbc->get_LDN(field, i) * dof_mat_v + field - 1;
-        MatSetValue(subK[3], row, row, 1.0, ADD_VALUES);
-        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);    
+        const int row = nbc->get_LDN(field, ii) * dof_mat_v + field - 1;
+        MatSetValue(subK[3], row, row, 1.0, ADD_VALUES); 
       }
     }
 
@@ -236,14 +232,12 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 
     if( local_sla > 0 )
     {
-      for(int i=0; i<local_sla; ++i)
+      for(int ii=0; ii<local_sla; ++ii)
       {
-        const int row = nbc->get_LPSN(field, i) * dof_mat_v + field - 1;
-        const int col = nbc->get_LPMN(field, i) * dof_mat_v + field - 1;
+        const int row = nbc->get_LPSN(field, ii) * dof_mat_v + field - 1;
+        const int col = nbc->get_LPMN(field, ii) * dof_mat_v + field - 1;
         MatSetValue(subK[3], row, col, 1.0, ADD_VALUES);
-        MatSetValue(subK[3], row, row, -1.0, ADD_VALUES);
-        MatSetValue(subK[4], row, row, 0.0, ADD_VALUES);
-        MatSetValue(subK[4], row, col, 0.0, ADD_VALUES);      
+        MatSetValue(subK[3], row, row, -1.0, ADD_VALUES); 
       }
     }
   }
@@ -392,7 +386,7 @@ void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
       MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
       MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
     }
-    
+
     delete [] ectrl_x; ectrl_x = nullptr;
     delete [] ectrl_y; ectrl_y = nullptr;
     delete [] ectrl_z; ectrl_z = nullptr;

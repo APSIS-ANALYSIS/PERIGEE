@@ -284,23 +284,7 @@ int main(int argc, char *argv[])
   gloAssem->Clear_subKG();
 
   gloAssem->Assem_tangent_matrix(tm_RK.get(), 0.0, initial_step);
-
-  // PetscViewer viewer;
-
-  // for (int i = 0; i < 5; i++) 
-  // {
-  //   std::string filename = "mat_K_" + std::to_string(i) + ".m";
-  //   SYS_T::commPrint("mat_K_%d.m \n", i);
-
-  //   PetscViewerASCIIOpen(PETSC_COMM_WORLD, filename.c_str(), &viewer);
-  //   PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
-
-  //   MatView(gloAssem->subK[i], viewer);
-
-  //   PetscViewerPopFormat(viewer);
-  //   PetscViewerDestroy(&viewer);
-  // }
-
+  
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
   
@@ -311,7 +295,9 @@ int main(int argc, char *argv[])
 
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
-  
+
+  // lsolver->SetOperator(K_shell);
+
   // ===== Linear solver context of Martrix A =====
   auto lsolver_A = SYS_T::make_unique<PLinear_Solver_PETSc>(
     1.0e-8, 1.0e-15, 1.0e30, 1000, "A_", "A_");
@@ -326,19 +312,6 @@ int main(int argc, char *argv[])
   
   MF_T::SetupApproxSchur(gloAssem.get(), S_approx);
 
-//////////////////
-// std::string filename = "mat_Schur.m";
-// SYS_T::commPrint("mat_Schur.m \n");
-
-// PetscViewerASCIIOpen(PETSC_COMM_WORLD, filename.c_str(), &viewer);
-// PetscViewerPushFormat(viewer, PETSC_VIEWER_ASCII_MATLAB);
-
-// MatView(S_approx, viewer);
-
-// PetscViewerPopFormat(viewer);
-// PetscViewerDestroy(&viewer);
-//////////////////
-
   lsolver_S->SetOperator(S_approx);
 
   MF_T::SolverContext solverCtx {gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S)};
@@ -352,14 +325,10 @@ int main(int argc, char *argv[])
   PCShellSetApply(pc_shell, MF_T::MF_PCSchurApply);
 
   KSPSetPC( lsolver->ksp, pc_shell ); 
+  
+  lsolver->SetOperator(K_shell); 
 
   // lsolver->SetPC(&pc_shell);
-
-  // PC upc; lsolver->GetPC(&upc);
-  // const PetscInt pfield[1] = {0}, vfields[] = {1,2,3};
-  // PCFieldSplitSetBlockSize(upc,4);
-  // PCFieldSplitSetFields(upc,"u",3,vfields,vfields);
-  // PCFieldSplitSetFields(upc,"p",1,pfield,pfield);
 
   // ===== Time step info ===== 
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 

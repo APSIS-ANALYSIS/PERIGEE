@@ -111,6 +111,15 @@ std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
   const double tau_c = cp * rho0/dt * L0 * dh; 
 
   return {tau_m, tau_c};  
+
+  // const SymmTensor2_3D G = get_metric( dxi_dx );
+
+  // const double temp_nu = vis_mu / rho0;
+
+  // const double denom_m = std::sqrt( CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
+
+  // return tau_m followed by tau_c
+  // return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
 
 std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau(
@@ -796,7 +805,7 @@ for(int qua=0; qua<nqpv; ++qua)
                                  - NA_x * grad_p - NA_x * grad_p_stab
                                  + NA * rho0 * u_stab1_1 + NA * rho0 * u_stab1_2 + NA * rho0 * u_stab1_3 
                                  - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
-    
+
     Residual1[3*A + 1] += gwts * ( NA * rho0/dt * v[subindex] - NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
                                  + NA * rho0/dt * v_prime[subindex] - NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
                                  - NA * rho0 * sum_a_fy[subindex] - NA * rho0/dt * v_n - NA * rho0/dt * v_n_prime
