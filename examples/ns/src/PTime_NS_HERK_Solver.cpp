@@ -254,30 +254,30 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     Update_pressure_velocity(cur_velo, cur_pres_sols[ss-1], dot_step.get());
   
     // Pressure stage
-    SYS_T::commPrint(" ==> Start solving the PressureStage: \n");
+    // SYS_T::commPrint(" ==> Start solving the PressureStage: \n");
   
-    //Make the dot_velo in the final step meet the Dirchlet boundary
-    rescale_inflow_dot_velo(curr_time + dt, cur_dot_velo);
+    // //Make the dot_velo in the final step meet the Dirchlet boundary
+    // rescale_inflow_dot_velo(curr_time + dt, cur_dot_velo);
   
-    gassem->Clear_G();
+    // gassem->Clear_G();
   
-    gassem->Assem_residual_presstage( cur_dot_velo, cur_velo_sols, 
-      cur_velo, cur_pres_sols, pre_velo, cur_pres, tmRK.get(), curr_time, dt );
+    // gassem->Assem_residual_presstage( cur_dot_velo, cur_velo_sols, 
+    //   cur_velo, cur_pres_sols, pre_velo, cur_pres, tmRK.get(), curr_time, dt );
   
-    gassem->Set_tangent_alpha_RK( 1.0 );
+    // gassem->Set_tangent_alpha_RK( 1.0 );
 
-    // lsolver->SetOperator(gassem->K);
-    // lsolver->SetOperator(shell);
+    // // lsolver->SetOperator(gassem->K);
+    // // lsolver->SetOperator(shell);
 
-    lsolver->Solve( gassem->G, sol_vp );
-    Update_dot_step( sol_vp, dot_step.get() );    
-    // lsolver->Solve( gassem->G, dot_step.get() );
+    // lsolver->Solve( gassem->G, sol_vp );
+    // Update_dot_step( sol_vp, dot_step.get() );    
+    // // lsolver->Solve( gassem->G, dot_step.get() );
   
-    bc_mat->MatMultSol( dot_step.get() );
+    // bc_mat->MatMultSol( dot_step.get() );
   
-    SYS_T::commPrint(" --- pressurestage is solved. \n");
+    // SYS_T::commPrint(" --- pressurestage is solved. \n");
   
-    Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
+    // Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
   
     // Assemble velo and pres at the (n+1)-th time step into a solution vector
     Update_solutions(cur_velo, cur_pres, cur_sol);
