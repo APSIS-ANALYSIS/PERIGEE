@@ -94,6 +94,14 @@ namespace MF_T
   
   PetscErrorCode MF_PCSchurApply(PC pc, Vec x, Vec y)
   {
+  #ifdef PETSC_USE_LOG
+    PetscLogEvent A_solve, S_solve;
+    PetscClassId classid_solve;
+    PetscClassIdRegister("PCsolve", &classid_solve);
+    PetscLogEventRegister("A_solve", classid_solve, &A_solve);
+    PetscLogEventRegister("S_solve", classid_solve, &S_solve);
+  #endif
+
     void *ptr;
     SolverContext *ctx;
     PCShellGetContext(pc, &ptr);
@@ -113,19 +121,37 @@ namespace MF_T
     VecDuplicate(x1, &tmp1);
     VecDuplicate(x2, &tmp2);
 
+  #ifdef PETSC_USE_LOG
+    PetscLogEventBegin(A_solve, 0,0,0,0);
+  #endif 
     // Step 1: Compute z1 = A^{-1} x1
     ctx->lsolver_A->Solve(x1, z1, false);
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(A_solve,0,0,0,0);
+  #endif
 
     // Step 2: Compute z2 = x2 - C * z1
     MatMult(C, z1, tmp2);
     VecWAXPY(z2, -1.0, tmp2, x2);
 
+  #ifdef PETSC_USE_LOG
+    PetscLogEventBegin(S_solve, 0,0,0,0);
+  #endif 
     // Step 3: Compute w2 = S^{-1} z2
     ctx->lsolver_S->Solve(z2, w2, false);
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(S_solve,0,0,0,0);
+  #endif
 
     // Step 4: Compute w1 = z1 - A^{-1} B w2 = A^{-1} x1 - A^{-1} B w2
     MatMult(B, w2, tmp1);
+  #ifdef PETSC_USE_LOG
+    PetscLogEventBegin(A_solve, 0,0,0,0);
+  #endif 
     ctx->lsolver_A->Solve(tmp1, tmp1, false); 
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(A_solve,0,0,0,0);
+  #endif
     VecWAXPY(w1, -1.0, tmp1, z1);
 
     // Split y into y1, y2

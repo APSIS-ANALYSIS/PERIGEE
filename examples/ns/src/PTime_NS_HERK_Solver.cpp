@@ -179,7 +179,15 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     PDNSolution * const &pre_velo_before,
     PDNSolution * const &cur_sol,
     Mat &shell ) const
-{ 
+{
+  #ifdef PETSC_USE_LOG
+    PetscLogEvent K_solve, update_dotstep;
+    PetscClassId classid_solve;
+    PetscClassIdRegister("matsolve", &classid_solve);
+    PetscLogEventRegister("K_solve", classid_solve, &K_solve);
+    PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
+  #endif
+
   auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
 
   // HERK's number of steps
@@ -212,8 +220,21 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
    
     Vec sol_vp;
     VecDuplicate( gassem->G, &sol_vp );
+  #ifdef PETSC_USE_LOG
+    PetscLogEventBegin(K_solve, 0,0,0,0);
+  #endif    
     lsolver->Solve( gassem->G, sol_vp ); 
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(K_solve,0,0,0,0);
+  #endif
+
+  #ifdef PETSC_USE_LOG
+  PetscLogEventBegin(update_dotstep, 0,0,0,0);
+  #endif 
     Update_dot_step( sol_vp, dot_step.get() );
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(update_dotstep, 0,0,0,0);
+  #endif
     // lsolver->Solve( gassem->G, dot_step.get() );
 
     bc_mat->MatMultSol( dot_step.get() );
@@ -243,8 +264,21 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
 
     Vec sol_vp;
     VecDuplicate( gassem->G, &sol_vp );
+  #ifdef PETSC_USE_LOG
+    PetscLogEventBegin(K_solve, 0,0,0,0);
+  #endif 
     lsolver->Solve( gassem->G, sol_vp ); 
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(K_solve,0,0,0,0);
+  #endif
+
+  #ifdef PETSC_USE_LOG
+  PetscLogEventBegin(update_dotstep, 0,0,0,0);
+  #endif 
     Update_dot_step( sol_vp, dot_step.get() );
+  #ifdef PETSC_USE_LOG
+    PetscLogEventEnd(update_dotstep, 0,0,0,0);
+  #endif
     // lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
