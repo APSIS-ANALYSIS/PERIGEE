@@ -41,7 +41,12 @@ class PTime_NS_HERK_Solver_AccurateA
 
     void print_info() const;
 
-    void print_lsolver_info() const {lsolver->print_info();}
+    void print_lsolver_info() const 
+    {
+      lsolver->print_info();
+      solver_ctx->lsolver_A->print_info();
+      solver_ctx->lsolver_S->print_info();
+    }
 
     void TM_NS_HERK(
         const bool &restart_init_assembly_flag,
