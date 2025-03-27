@@ -62,7 +62,7 @@ void PTime_NS_HERK_Solver_AccurateA::TM_NS_HERK(
     std::unique_ptr<PDNSolution> init_dot_velo,
     std::unique_ptr<PDNSolution> init_pres,
     std::unique_ptr<PDNTimeStep> time_info,
-    Mat &shell ) const
+    Mat &shell, PC &pc ) const
 {
   const int ss = tmRK->get_RK_step();
 
@@ -128,7 +128,7 @@ void PTime_NS_HERK_Solver_AccurateA::TM_NS_HERK(
         time_info->get_time(), time_info->get_step(),
         cur_velo_sols, cur_velo, cur_dot_velo,
         cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
-        pre_pres_sols, pre_pres, pre_velo_before, cur_sol, shell );
+        pre_pres_sols, pre_pres, pre_velo_before, cur_sol, shell, pc );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -179,7 +179,7 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     PDNSolution * const &pre_pres,
     PDNSolution * const &pre_velo_before,
     PDNSolution * const &cur_sol,
-    Mat &shell ) const
+    Mat &shell, PC &pc ) const
 {
   #ifdef PETSC_USE_LOG
     PetscLogEvent K_solve, update_dotstep;
@@ -211,19 +211,21 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
       pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before, tmRK.get(), 
       curr_time, dt );     
     
-      solver_ctx->gassem->Set_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );
-
+    solver_ctx->gassem->Update_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );  
+    solver_ctx->gassem->Update_tangent_submatrix5();     
     // lsolver->SetOperator(solver_ctx->gassem->K);
     // lsolver->SetOperator(shell);
 
     // PCSetType( pc, PCSHELL );
+    // KSPSetPC( lsolver->ksp, NULL );
     // KSPSetPC( lsolver->ksp, pc );
+    // lsolver->SetOperator(shell);
    
-    Vec sol_vp;
-    VecDuplicate( solver_ctx->gassem->G, &sol_vp );
+    Vec sol_vp;   
+    VecDuplicate( solver_ctx->gassem->G, &sol_vp );   
   #ifdef PETSC_USE_LOG
     PetscLogEventBegin(K_solve, 0,0,0,0);
-  #endif    
+  #endif
     lsolver->Solve( solver_ctx->gassem->G, sol_vp ); 
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(K_solve,0,0,0,0);
@@ -258,9 +260,14 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
       cur_pres_sols, pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before,
       tmRK.get(), curr_time, dt );
 
-      solver_ctx->gassem->Set_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );
+    solver_ctx->gassem->Update_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );  
+    solver_ctx->gassem->Update_tangent_submatrix5();  
 
     // lsolver->SetOperator(solver_ctx->gassem->K);
+    // lsolver->SetOperator(shell);
+
+    // PCSetType( pc, PCSHELL );
+    // KSPSetPC( lsolver->ksp, pc );
     // lsolver->SetOperator(shell);
 
     Vec sol_vp;
@@ -298,8 +305,9 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
   
     // solver_ctx->gassem->Assem_residual_presstage( cur_dot_velo, cur_velo_sols, 
     //   cur_velo, cur_pres_sols, pre_velo, cur_pres, tmRK.get(), curr_time, dt );
-  
-    // solver_ctx->gassem->Set_tangent_alpha_RK( 1.0 );
+
+    // solver_ctx->gassem->Update_tangent_alpha_RK( 1.0 );  
+    // solver_ctx->gassem->Update_tangent_submatrix5();  
 
     // // lsolver->SetOperator(solver_ctx->gassem->K);
     // // lsolver->SetOperator(shell);
@@ -315,7 +323,8 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     // Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
   
     // Assemble velo and pres at the (n+1)-th time step into a solution vector
-    Update_solutions(cur_velo, cur_pres, cur_sol);
+    // Update_solutions(cur_velo, cur_pres, cur_sol);
+    Update_solutions(cur_velo, cur_pres_sols[ss-1], cur_sol);
     VecDestroy( &sol_vp );
 }
 

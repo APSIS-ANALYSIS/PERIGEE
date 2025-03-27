@@ -23,6 +23,7 @@
 class PTime_NS_HERK_Solver_AccurateA
 {
   public:
+
     PTime_NS_HERK_Solver_AccurateA(
         // SolverContext in_solver_ctx,
         std::unique_ptr<MF_TA::SolverContext> in_solver_ctx,
@@ -49,7 +50,7 @@ class PTime_NS_HERK_Solver_AccurateA
         std::unique_ptr<PDNSolution> init_dot_velo,
         std::unique_ptr<PDNSolution> init_pres,
         std::unique_ptr<PDNTimeStep> time_info,
-        Mat &shell ) const;
+        Mat &shell, PC &pc ) const;
 
   private:
     const double final_time;
@@ -84,7 +85,7 @@ class PTime_NS_HERK_Solver_AccurateA
         PDNSolution * const &pre_pres,
         PDNSolution * const &pre_velo_before,
         PDNSolution * const &cur_sol,
-        Mat &shell ) const;
+        Mat &shell, PC &pc ) const;
 
       void rescale_inflow_velo( const double &stime,
           PDNSolution * const &velo ) const;

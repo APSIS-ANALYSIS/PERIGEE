@@ -31,7 +31,7 @@
 class PGAssem_Block_NS_FEM_HERK
 {
   public:
-    Mat subK[5];
+    Mat subK[6];
 
     Vec G;
     Vec subG[2];
@@ -115,6 +115,11 @@ class PGAssem_Block_NS_FEM_HERK
       VecSet(G, 0.0);
     }
 
+    void Clear_subK5()
+    {
+      MatZeroEntries(subK[5]);
+    }
+    
     // Nonzero pattern estimate for the NS equations
     void Assem_nonzero_estimate();
     
@@ -197,11 +202,24 @@ class PGAssem_Block_NS_FEM_HERK
         const double &curr_time,
         const double &dt );
 
-    void Set_tangent_alpha_RK( const double &aa )
+    void Update_tangent_alpha_RK( const double &aa )
     {tangent_alpha_RK = aa;}
 
     double Get_tangent_alpha_RK()
     {return tangent_alpha_RK;}
+
+    void Assem_tangent_submatrix5()
+    {
+      MatAssemblyBegin(subK[5], MAT_FINAL_ASSEMBLY);
+      MatAssemblyEnd(subK[5], MAT_FINAL_ASSEMBLY);      
+    }
+
+    void Update_tangent_submatrix5()
+    {
+      Clear_subK5();
+      MatAXPY(subK[5], 1.0, subK[3], DIFFERENT_NONZERO_PATTERN);
+      MatAXPY(subK[5], tangent_alpha_RK, subK[4], DIFFERENT_NONZERO_PATTERN);
+    }
 
   private:
     // Private data

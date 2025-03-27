@@ -288,14 +288,15 @@ int main(int argc, char *argv[])
   gloAssem->Clear_subKG();
 
   gloAssem->Assem_tangent_matrix(tm_RK.get(), 0.0, initial_step);
-  
+  gloAssem->Assem_tangent_submatrix5();
+
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
   
   MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
     PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem.get(), &K_shell);
 
-  MatShellSetOperation(K_shell, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
+  MatShellSetOperation(K_shell, MATOP_MULT, (void(*)(void))MF_TA::MF_MatMult);
 
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
@@ -310,51 +311,46 @@ int main(int argc, char *argv[])
   auto lsolver_S = SYS_T::make_unique<PLinear_Solver_PETSc>(
     1.0e-8, 1.0e-15, 1.0e30, 1000, "S_", "S_");
   
-  // MF_T::SolverContext solverCtx {std::move(gloAssem), std::move(lsolver_A), std::move(lsolver_S)};
-  
   auto solverCtx = SYS_T::make_unique<MF_TA::SolverContext>(std::move(gloAssem), std::move(lsolver_A), std::move(lsolver_S));
 
-  // // ===== Initialize the shell preconditioner =====
-  // PC pc_shell;
+  // ===== Initialize the shell preconditioner =====
+  PC pc_shell;
 
-  // PCCreate(PETSC_COMM_WORLD, &pc_shell);
-  // PCSetType( pc_shell, PCSHELL );
-  // PCShellSetContext(pc_shell, solverCtx.get());
-  // PCShellSetApply(pc_shell, MF_T::MF_PCSchurApply);
+  PCCreate(PETSC_COMM_WORLD, &pc_shell);
+  PCSetType( pc_shell, PCSHELL );
+  PCShellSetContext(pc_shell, solverCtx.get());
+  PCShellSetApply(pc_shell, MF_TA::MF_PCSchurApply);
 
-  // KSPSetPC( lsolver->ksp, pc_shell ); 
-  
-  // lsolver->SetOperator(K_shell); 
+  KSPSetPC( lsolver->ksp, pc_shell );   
+  lsolver->SetOperator(K_shell); 
 
-  // // lsolver->SetPC(&pc_shell);
-
-  // // ===== Time step info ===== 
-  // auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
-  //     initial_step);
+  // ===== Time step info ===== 
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
+      initial_step);
  
-  // // ===== Temporal solver context =====
-  // auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver_AccurateA>(
-  //     std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
-  //     std::move(inflow_rate), std::move(dot_inflow_rate), std::move(base),
-  //     std::move(locinfnbc), sol_bName, nlocalnode, sol_record_freq, final_time );
+  // ===== Temporal solver context =====
+  auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver_AccurateA>(
+      std::move(solverCtx), std::move(lsolver), std::move(pmat), std::move(tm_RK),
+      std::move(inflow_rate), std::move(dot_inflow_rate), std::move(base),
+      std::move(locinfnbc), sol_bName, nlocalnode, sol_record_freq, final_time );
 
-  // tsolver->print_info();
+  tsolver->print_info();
 
-  // MPI_Barrier(PETSC_COMM_WORLD);
+  MPI_Barrier(PETSC_COMM_WORLD);
 
-  // // ===== FEM analysis =====
-  // SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  // tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
-  //     std::move(pres), std::move(timeinfo), K_shell);
+  // ===== FEM analysis =====
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
+      std::move(pres), std::move(timeinfo), K_shell, pc_shell);
 
-  // // ===== Print complete solver info =====
-  // tsolver -> print_lsolver_info();
+  // ===== Print complete solver info =====
+  tsolver -> print_lsolver_info();
 
-  // MatDestroy(&K_shell);
-  // PCDestroy(&pc_shell);
-  // tsolver.reset();
+  MatDestroy(&K_shell);
+  PCDestroy(&pc_shell);
+  tsolver.reset();
 
-  // PetscFinalize();
+  PetscFinalize();
   return EXIT_SUCCESS;
 }
 

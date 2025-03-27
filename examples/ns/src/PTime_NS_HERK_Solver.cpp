@@ -210,7 +210,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
       pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before, tmRK.get(), 
       curr_time, dt );     
     
-    gassem->Set_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );
+    gassem->Update_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );
 
     // lsolver->SetOperator(gassem->K);
     // lsolver->SetOperator(shell);
@@ -257,7 +257,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
       cur_pres_sols, pre_velo_sols, pre_velo, pre_pres_sols, pre_velo_before,
       tmRK.get(), curr_time, dt );
 
-    gassem->Set_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );
+    gassem->Update_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );
 
     // lsolver->SetOperator(gassem->K);
     // lsolver->SetOperator(shell);
@@ -298,7 +298,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // gassem->Assem_residual_presstage( cur_dot_velo, cur_velo_sols, 
     //   cur_velo, cur_pres_sols, pre_velo, cur_pres, tmRK.get(), curr_time, dt );
   
-    // gassem->Set_tangent_alpha_RK( 1.0 );
+    // gassem->Update_tangent_alpha_RK( 1.0 );
 
     // // lsolver->SetOperator(gassem->K);
     // // lsolver->SetOperator(shell);
