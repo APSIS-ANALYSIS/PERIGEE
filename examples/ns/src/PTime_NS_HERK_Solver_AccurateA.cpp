@@ -61,8 +61,7 @@ void PTime_NS_HERK_Solver_AccurateA::TM_NS_HERK(
     std::unique_ptr<PDNSolution> init_velo,
     std::unique_ptr<PDNSolution> init_dot_velo,
     std::unique_ptr<PDNSolution> init_pres,
-    std::unique_ptr<PDNTimeStep> time_info,
-    Mat &shell, PC &pc ) const
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
   const int ss = tmRK->get_RK_step();
 
@@ -128,7 +127,7 @@ void PTime_NS_HERK_Solver_AccurateA::TM_NS_HERK(
         time_info->get_time(), time_info->get_step(),
         cur_velo_sols, cur_velo, cur_dot_velo,
         cur_pres_sols, cur_pres, pre_velo_sols, pre_velo,
-        pre_pres_sols, pre_pres, pre_velo_before, cur_sol, shell, pc );
+        pre_pres_sols, pre_pres, pre_velo_before, cur_sol );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -178,8 +177,7 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     PDNSolution ** const &pre_pres_sols,
     PDNSolution * const &pre_pres,
     PDNSolution * const &pre_velo_before,
-    PDNSolution * const &cur_sol,
-    Mat &shell, PC &pc ) const
+    PDNSolution * const &cur_sol ) const
 {
   #ifdef PETSC_USE_LOG
     PetscLogEvent K_solve, update_dotstep;
