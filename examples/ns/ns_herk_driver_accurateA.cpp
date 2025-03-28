@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
-      std::move(pres), std::move(timeinfo), K_shell, pc_shell);
+      std::move(pres), std::move(timeinfo));
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
