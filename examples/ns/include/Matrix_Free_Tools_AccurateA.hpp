@@ -106,21 +106,17 @@ namespace MF_TA
   //     MatGetRowSum(user->subK[5], diag); // Replace MatGetDiagonal() with MatGetRowSum()
   //     VecReciprocal(diag); // Take reciprocal
   
-  //     Mat B;
-  //     MatDuplicate(user->subK[2], MAT_COPY_VALUES, &B);
-
-  //     MatDiagonalScale(B, diag, NULL); // overwrites B = subK[2]) 
-  //     MatMatMult(user->subK[1], B, MAT_INITIAL_MATRIX, PETSC_DETERMINE, &S_approx);
+  //     MatDiagonalScale(user->subK[2], diag, NULL); // overwrites B = subK[2]) 
+  //     MatMatMult(user->subK[1], user->subK[2], MAT_INITIAL_MATRIX, PETSC_DETERMINE, &S_approx);
   
   //     MatScale(S_approx, -1.0);
   //     MatAXPY(S_approx, 1.0, user->subK[0], DIFFERENT_NONZERO_PATTERN);  // S_approx = D - S_approx
   
-  //     // // restore B = subK[2]
-  //     // MatGetRowSum(user->subK[5], diag); // Restore with row sums again
-  //     // MatDiagonalScale(user->subK[2], diag, NULL);
+  //     // restore B = subK[2]
+  //     MatGetRowSum(user->subK[5], diag); // Restore with row sums again
+  //     MatDiagonalScale(user->subK[2], diag, NULL);
   
   //     VecDestroy(&diag);
-  //     MatDestroy(&B);
   
   //     return 0;
   // }
