@@ -288,8 +288,7 @@ int main(int argc, char *argv[])
   gloAssem->Clear_subKG();
 
   gloAssem->Assem_tangent_matrix(tm_RK.get(), 0.0, initial_step);
-  gloAssem->Assem_tangent_submatrix5();
-
+  
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
   

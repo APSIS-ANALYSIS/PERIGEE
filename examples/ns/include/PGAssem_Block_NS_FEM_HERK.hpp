@@ -208,16 +208,9 @@ class PGAssem_Block_NS_FEM_HERK
     double Get_tangent_alpha_RK()
     {return tangent_alpha_RK;}
 
-    void Assem_tangent_submatrix5()
-    {
-      MatAssemblyBegin(subK[5], MAT_FINAL_ASSEMBLY);
-      MatAssemblyEnd(subK[5], MAT_FINAL_ASSEMBLY);      
-    }
-
     void Update_tangent_submatrix5()
     {
-      Clear_subK5();
-      MatAXPY(subK[5], 1.0, subK[3], DIFFERENT_NONZERO_PATTERN);
+      MatDuplicate(subK[3], MAT_COPY_VALUES, &subK[5]);
       MatAXPY(subK[5], tangent_alpha_RK, subK[4], DIFFERENT_NONZERO_PATTERN);
     }
 

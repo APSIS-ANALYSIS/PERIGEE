@@ -124,7 +124,8 @@ PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
   VecDestroy(&subG[0]); VecDestroy(&subG[1]); 
   MatDestroy(&subK[0]); MatDestroy(&subK[1]);
   MatDestroy(&subK[2]); MatDestroy(&subK[3]);
-  MatDestroy(&subK[4]); VecDestroy(&G);
+  MatDestroy(&subK[4]); MatDestroy(&subK[5]);
+  VecDestroy(&G);
 }
 
 void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
