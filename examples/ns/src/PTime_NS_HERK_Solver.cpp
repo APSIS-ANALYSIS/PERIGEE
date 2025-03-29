@@ -63,6 +63,9 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
     std::unique_ptr<PDNTimeStep> time_info,
     Mat &shell ) const
 {
+  // Make initial velo and pres compatible with initial sol
+  Update_init_pressure_velocity(init_velo.get(), init_pres.get(), init_sol.get());
+
   const int ss = tmRK->get_RK_step();
 
   // The velo solutions in each sub-step at the (n+1)-th time step
@@ -452,14 +455,6 @@ void PTime_NS_HERK_Solver::Update_pressure_velocity(
       array_velo[ii*3 + 2 ] -= array_step[ii*4 + 3];
     }
 
-    // for(int ii=0; ii<nlocalnode; ++ii)
-    // {
-    //   array_velo[ii*3 + 0 ] -= array_step[ii*3 + 0];
-    //   array_velo[ii*3 + 1 ] -= array_step[ii*3 + 1];
-    //   array_velo[ii*3 + 2 ] -= array_step[ii*3 + 2];
-    //   array_pres[ii       ] -= array_step[nlocalnode*3 + ii];
-    // }
-
     VecRestoreArray(lvelo, &array_velo);    
     VecRestoreArray(lpres, &array_pres);
     VecRestoreArray(lstep, &array_step);
@@ -467,6 +462,42 @@ void PTime_NS_HERK_Solver::Update_pressure_velocity(
     VecGhostRestoreLocalForm(velo->solution, &lvelo);
     VecGhostRestoreLocalForm(pres->solution, &lpres);
     VecGhostRestoreLocalForm(step->solution, &lstep);
+
+    velo->GhostUpdate();
+    pres->GhostUpdate();  
+  }
+
+void PTime_NS_HERK_Solver::Update_init_pressure_velocity(     
+    PDNSolution * const &velo,
+    PDNSolution * const &pres,
+    const PDNSolution * const &sol) const
+  {
+    Vec lvelo, lpres, lsol;
+    double * array_velo, * array_pres, * array_sol;
+
+    VecGhostGetLocalForm(velo->solution, &lvelo);    
+    VecGhostGetLocalForm(pres->solution, &lpres);    
+    VecGhostGetLocalForm(sol->solution, &lsol);
+
+    VecGetArray(lvelo, &array_velo);
+    VecGetArray(lpres, &array_pres); 
+    VecGetArray(lsol, &array_sol);
+
+    for(int ii=0; ii<nlocalnode; ++ii)
+    {
+      array_pres[ii       ] = array_sol[ii*4 + 0];
+      array_velo[ii*3 + 0 ] = array_sol[ii*4 + 1];
+      array_velo[ii*3 + 1 ] = array_sol[ii*4 + 2];
+      array_velo[ii*3 + 2 ] = array_sol[ii*4 + 3];
+    }
+
+    VecRestoreArray(lvelo, &array_velo);    
+    VecRestoreArray(lpres, &array_pres);
+    VecRestoreArray(lsol, &array_sol);
+    
+    VecGhostRestoreLocalForm(velo->solution, &lvelo);
+    VecGhostRestoreLocalForm(pres->solution, &lpres);
+    VecGhostRestoreLocalForm(sol->solution, &lsol);
 
     velo->GhostUpdate();
     pres->GhostUpdate();  

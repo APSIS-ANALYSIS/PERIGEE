@@ -103,7 +103,12 @@ class PTime_NS_HERK_Solver_AccurateA
           PDNSolution * const &velo,
           PDNSolution * const &pres,
           const PDNSolution * const &step) const;
-  
+
+      void Update_init_pressure_velocity(     
+          PDNSolution * const &velo,
+          PDNSolution * const &pres,
+          const PDNSolution * const &sol) const;
+    
       void Update_solutions(   
           const PDNSolution * const &velo,
           const PDNSolution * const &pres,
