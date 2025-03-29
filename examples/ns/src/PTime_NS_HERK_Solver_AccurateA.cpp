@@ -189,7 +189,7 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     PetscLogEventRegister("K_solve", classid_solve, &K_solve);
     PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
   #endif
-  
+
   auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
 
   // HERK's number of steps
