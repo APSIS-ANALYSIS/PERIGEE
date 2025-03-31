@@ -6,24 +6,21 @@
 
 namespace MF_T
 {
-  typedef struct 
+  struct SolverContext
   {
-    PGAssem_Block_NS_FEM_HERK *gloAssem;
-    std::unique_ptr<PLinear_Solver_PETSc> lsolver_A;
-    std::unique_ptr<PLinear_Solver_PETSc> lsolver_S;
-  } SolverContext;
+    PGAssem_Block_NS_FEM_HERK *const gloAssem;
+    const std::unique_ptr<PLinear_Solver_PETSc> lsolver_A;
+    const std::unique_ptr<PLinear_Solver_PETSc> lsolver_S;
 
-  // struct SolverContext 
-  // {
-  //   PGAssem_Block_NS_FEM_HERK *gloAssem;
-  //   std::unique_ptr<PLinear_Solver_PETSc> lsolver_A;
-  //   std::unique_ptr<PLinear_Solver_PETSc> lsolver_S;
-
-    // ~SolverContext() 
-    // {
-    //   delete gloAssem; gloAssem = nullptr;
-    // }
-  // };
+    // Constructor
+    SolverContext(PGAssem_Block_NS_FEM_HERK * in_gloAssem,
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver_A, 
+        std::unique_ptr<PLinear_Solver_PETSc> in_lsolver_S)
+    : gloAssem(in_gloAssem), 
+      lsolver_A(std::move(in_lsolver_A)), 
+      lsolver_S(std::move(in_lsolver_S))
+    {}
+  };
 
   PetscErrorCode MF_MatMult(Mat shell, Vec x, Vec y)
   {

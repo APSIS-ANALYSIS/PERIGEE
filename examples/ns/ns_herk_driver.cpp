@@ -287,7 +287,8 @@ int main(int argc, char *argv[])
   gloAssem->Clear_subKG();
 
   gloAssem->Assem_tangent_matrix(tm_RK.get(), 0.0, initial_step);
-
+  gloAssem->Update_tangent_submatrix5();  
+  
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
   
@@ -316,15 +317,15 @@ int main(int argc, char *argv[])
   MF_T::SetupApproxSchur(gloAssem.get(), S_approx);
 
   lsolver_S->SetOperator(S_approx);
-
-  MF_T::SolverContext solverCtx {gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S)};
   
+  auto solverCtx = SYS_T::make_unique<MF_T::SolverContext>(gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S));
+
   // ===== Initialize the shell preconditioner =====
   PC pc_shell;
 
   PCCreate(PETSC_COMM_WORLD, &pc_shell);
   PCSetType( pc_shell, PCSHELL );
-  PCShellSetContext(pc_shell, &solverCtx);
+  PCShellSetContext(pc_shell, solverCtx.get());
   PCShellSetApply(pc_shell, MF_T::MF_PCSchurApply);
 
   KSPSetPC( lsolver->ksp, pc_shell ); 
@@ -350,7 +351,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
-      std::move(pres), std::move(timeinfo), K_shell);
+      std::move(pres), std::move(timeinfo));
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
@@ -359,6 +360,7 @@ int main(int argc, char *argv[])
   MatDestroy(&K_shell);
   PCDestroy(&pc_shell);
   tsolver.reset();
+  solverCtx.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;
