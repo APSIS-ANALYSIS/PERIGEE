@@ -2,7 +2,7 @@
 // ns code driver.cpp
 //
 // Finite element code for 3D Navier-Stokes equations using the 
-// Variational Multiscale Formulation and Generalized-alpha time 
+// Variational Multiscale Formulation and Half-explicit RK time 
 // stepping.
 //
 // Author: Ju Liu, liujuy@gmail.com
