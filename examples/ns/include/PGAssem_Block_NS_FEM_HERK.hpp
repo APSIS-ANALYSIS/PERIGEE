@@ -9,7 +9,7 @@
 //
 // The assembly is for the NS equations written in VMS and HERK formualtion
 // of NS equations. The input solution vectors contains
-//  [ pressure; velocity/dot velocity ].
+//  [ velocity/dot velocity; pressure ].
 //
 // Author: Yujie Sun 
 // Date Created: Mar. 4 2025
