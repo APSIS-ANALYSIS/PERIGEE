@@ -73,9 +73,9 @@ void PTime_NS_HERK_Solver_AccurateA::TM_NS_HERK(
   for(int ii = 0; ii < ss; ++ii)
     cur_velo_sols[ii] = new PDNSolution(*init_velo);
 
-  std::vector<std::unique_ptr<PDNSolution>> cur_velo_sols1(ss);    
-  for (int ii = 0; ii < ss; ++ii) 
-    cur_velo_sols1[ii] = SYS_T::make_unique<PDNSolution>(*init_velo);
+  // std::vector<std::unique_ptr<PDNSolution>> cur_velo_sols1(ss);    
+  // for (int ii = 0; ii < ss; ++ii) 
+  //   cur_velo_sols1[ii] = SYS_T::make_unique<PDNSolution>(*init_velo);
 
   // The velo solution in the final step at the (n+1)-th time step
   PDNSolution * cur_velo = new PDNSolution(*init_velo);
