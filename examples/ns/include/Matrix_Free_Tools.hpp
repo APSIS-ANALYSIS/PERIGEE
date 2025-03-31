@@ -113,7 +113,6 @@ namespace MF_T
   //     MatScale(S_approx, -1.0);
   //     MatAXPY(S_approx, 1.0, user->subK[0], DIFFERENT_NONZERO_PATTERN);  // S_approx = D - S_approx
   
-  //     // restore B = subK[2]
   //     MatGetRowSum(user->subK[3], diag); // Restore with row sums again
   //     MatDiagonalScale(user->subK[2], diag, NULL);
   

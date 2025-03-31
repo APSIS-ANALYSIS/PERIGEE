@@ -77,12 +77,9 @@ namespace MF_TA
     MatDiagonalScale(user->subK[2], diag, NULL); // overwrites B = subK[2]) 
     MatMatMult(user->subK[1], user->subK[2], MAT_INITIAL_MATRIX, PETSC_DETERMINE, &S_approx);
 
-    // MatView(S_approx, PETSC_VIEWER_STDOUT_WORLD);
-
     MatScale(S_approx, -1.0);
     MatAXPY(S_approx, 1.0, user->subK[0], DIFFERENT_NONZERO_PATTERN);  // S_approx = D - S_approx
 
-    // restore B = subK[2]
     MatGetDiagonal(user->subK[5], diag);
     MatDiagonalScale(user->subK[2], diag, NULL);
 

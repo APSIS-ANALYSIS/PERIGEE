@@ -214,13 +214,6 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     
     solver_ctx->gassem->Update_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );  
     solver_ctx->gassem->Update_tangent_submatrix5();     
-    // lsolver->SetOperator(solver_ctx->gassem->K);
-    // lsolver->SetOperator(shell);
-
-    // PCSetType( pc, PCSHELL );
-    // KSPSetPC( lsolver->ksp, NULL );
-    // KSPSetPC( lsolver->ksp, pc );
-    // lsolver->SetOperator(shell);
    
     Vec sol_vp;   
     VecDuplicate( solver_ctx->gassem->G, &sol_vp );   
@@ -264,13 +257,6 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     solver_ctx->gassem->Update_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );  
     solver_ctx->gassem->Update_tangent_submatrix5();  
 
-    // lsolver->SetOperator(solver_ctx->gassem->K);
-    // lsolver->SetOperator(shell);
-
-    // PCSetType( pc, PCSHELL );
-    // KSPSetPC( lsolver->ksp, pc );
-    // lsolver->SetOperator(shell);
-
     Vec sol_vp;
     VecDuplicate( solver_ctx->gassem->G, &sol_vp );
   #ifdef PETSC_USE_LOG
@@ -288,7 +274,6 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(update_dotstep, 0,0,0,0);
   #endif
-    // lsolver->Solve( solver_ctx->gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
@@ -310,12 +295,8 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     // solver_ctx->gassem->Update_tangent_alpha_RK( 1.0 );  
     // solver_ctx->gassem->Update_tangent_submatrix5();  
 
-    // // lsolver->SetOperator(solver_ctx->gassem->K);
-    // // lsolver->SetOperator(shell);
-
     // lsolver->Solve( solver_ctx->gassem->G, sol_vp );
     // Update_dot_step( sol_vp, dot_step.get() );    
-    // // lsolver->Solve( solver_ctx->gassem->G, dot_step.get() );
   
     // bc_mat->MatMultSol( dot_step.get() );
   

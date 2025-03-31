@@ -340,7 +340,7 @@ for(int qua=0; qua<nqpv; ++qua)
 
   const auto dxi_dx = elementv->get_invJacobian(qua);
 
-  // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );  // 这里应该用u[subindex], 但u[subindex]未知？
+  // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );
   // const double tau_m = tau_sub[0];
   // const double tau_c = tau_sub[1];
 
@@ -1036,7 +1036,7 @@ for(int qua=0; qua<nqpv; ++qua)
 
   // for(int index=1; index<num_steps; ++index)
   // {
-  //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] ); // Laststep中，每个子步粗尺度已知
+  //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] );
   //   tau_m[index] = tau_sub[0];
   //   tau_c[index] = tau_sub[1];
   // }

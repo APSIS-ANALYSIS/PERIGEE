@@ -214,12 +214,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
       curr_time, dt );     
     
     gassem->Update_tangent_alpha_RK( tmRK->get_RK_a(ii, ii-1) );
-
-    // lsolver->SetOperator(gassem->K);
-    // lsolver->SetOperator(shell);
-
-    // PCSetType( pc, PCSHELL );
-    // KSPSetPC( lsolver->ksp, pc );
    
     Vec sol_vp;
     VecDuplicate( gassem->G, &sol_vp );
@@ -238,7 +232,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(update_dotstep, 0,0,0,0);
   #endif
-    // lsolver->Solve( gassem->G, dot_step.get() );
 
     bc_mat->MatMultSol( dot_step.get() );
   
@@ -262,9 +255,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
 
     gassem->Update_tangent_alpha_RK( tmRK->get_RK_b(ss-1) );
 
-    // lsolver->SetOperator(gassem->K);
-    // lsolver->SetOperator(shell);
-
     Vec sol_vp;
     VecDuplicate( gassem->G, &sol_vp );
   #ifdef PETSC_USE_LOG
@@ -282,7 +272,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(update_dotstep, 0,0,0,0);
   #endif
-    // lsolver->Solve( gassem->G, dot_step.get() );
   
     bc_mat->MatMultSol( dot_step.get() );
   
@@ -308,7 +297,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
 
     // lsolver->Solve( gassem->G, sol_vp );
     // Update_dot_step( sol_vp, dot_step.get() );    
-    // // lsolver->Solve( gassem->G, dot_step.get() );
   
     // bc_mat->MatMultSol( dot_step.get() );
   
