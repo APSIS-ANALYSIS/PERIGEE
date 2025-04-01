@@ -26,7 +26,6 @@ class PLocAssem_Block_VMS_NS_HERK
     PetscScalar * Residual0; // R0
     PetscScalar * Residual1; // R1
 
-    // PetscScalar * sur_Residual0; // sur_R0
     PetscScalar * sur_Residual1; // sur_R1
 
     PLocAssem_Block_VMS_NS_HERK(
@@ -61,9 +60,17 @@ class PLocAssem_Block_VMS_NS_HERK
       for(int ii=0; ii<vec_size_v*vec_size_v; ++ii) Tangent4[ii] = 0.0;
     }
 
+    void Zero_Tangent()
+    {
+      for(int ii=0; ii<vec_size_p*vec_size_p; ++ii) Tangent0[ii] = 0.0;
+      for(int ii=0; ii<vec_size_p*vec_size_v; ++ii) Tangent1[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v*vec_size_p; ++ii) Tangent2[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v*vec_size_v; ++ii) Tangent3[ii] = 0.0;
+      for(int ii=0; ii<vec_size_v*vec_size_v; ++ii) Tangent4[ii] = 0.0;
+    }
+
     void Zero_sur_Residual()
     {
-      // for(int ii=0; ii<sur_size_v; ++ii) sur_Residual0[ii] = 0.0;
       for(int ii=0; ii<sur_size_v; ++ii) sur_Residual1[ii] = 0.0;
     }
 

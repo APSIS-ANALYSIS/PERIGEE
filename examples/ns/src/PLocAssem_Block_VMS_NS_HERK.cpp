@@ -317,7 +317,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Matrix(
 {
 elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-Zero_Tangent_Residual();
+Zero_Tangent();
 
 std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
@@ -380,10 +380,6 @@ for(int qua=0; qua<nqpv; ++qua)
       
       Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0 /dt);
       
-      Tangent3[3*nLocBas*3*A+3*B+1    ] += 0.0;
-    
-      Tangent3[3*nLocBas*3*A+3*B+2    ] += 0.0;
-
       Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * 1.0 * tau_c * NB_x);
       
       Tangent4[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * 1.0 * tau_c * NB_y);
@@ -393,11 +389,7 @@ for(int qua=0; qua<nqpv; ++qua)
       // Momentum-y with repspect to p, u, v, w
       Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_y);
       
-      Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
-
       Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0/dt);
-
-      Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
 
       Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * 1.0 * tau_c * NB_x);
 
@@ -407,10 +399,6 @@ for(int qua=0; qua<nqpv; ++qua)
 
       // Momentum-z with repspect to p, u, v, w
       Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_z);
-
-      Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
-
-      Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
       Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0/dt);        
 
@@ -442,7 +430,7 @@ elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
 const int num_steps = tm_RK_ptr->get_RK_step();
 
-Zero_Tangent_Residual();
+Zero_Residual();
 
 std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
@@ -656,7 +644,7 @@ for(int qua=0; qua<nqpv; ++qua)
     {
       sum_u_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
       sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-      sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); // 这个time是不是n步的time？？？
+      sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
       sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
       sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
@@ -846,7 +834,7 @@ elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
 const int num_steps = tm_RK_ptr->get_RK_step();
 
-Zero_Tangent_Residual();
+Zero_Residual();
 
 std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
@@ -1068,7 +1056,7 @@ for(int qua=0; qua<nqpv; ++qua)
     {
       sum_u_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
       sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-      sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); // 这个time是不是n步的time？？？
+      sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
       sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
       sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
@@ -1289,7 +1277,7 @@ elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
 const int num_steps = tm_RK_ptr->get_RK_step();
 
-Zero_Tangent_Residual();
+Zero_Residual();
 
 std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
@@ -1835,7 +1823,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
       {
         sum_u_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
         sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); // 这个time是不是n步的time？？？
+        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
         sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
         sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
@@ -2296,7 +2284,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
       {
         sum_u_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
         sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); // 这个time是不是n步的time？？？
+        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
         sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
         sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
