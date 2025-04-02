@@ -71,4 +71,4 @@ class ITimeMethod_RungeKutta
     virtual void setCoefficients() = 0;
 };
 
-#endif // ITIMEMETHOD_RUNGEKUTTA_HPP
+#endif

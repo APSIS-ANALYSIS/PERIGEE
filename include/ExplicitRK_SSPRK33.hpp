@@ -31,4 +31,4 @@ class ExplicitRK_SSPRK33 : public ITimeMethod_RungeKutta
     }
 };
 
-#endif // EXPLICIT_RK_SSPRK33_HPP
+#endif

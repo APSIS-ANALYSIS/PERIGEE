@@ -28,4 +28,4 @@ class ExplicitRK_EMRK22 : public ITimeMethod_RungeKutta
     }
 };
 
-#endif // EXPLICIT_RK_EM_HPP
+#endif

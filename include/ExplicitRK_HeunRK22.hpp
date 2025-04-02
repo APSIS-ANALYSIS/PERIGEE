@@ -28,4 +28,4 @@ class ExplicitRK_HeunRK22 : public ITimeMethod_RungeKutta
     }
 };
 
-#endif // EXPLICIT_RK_HEUN_HPP
+#endif

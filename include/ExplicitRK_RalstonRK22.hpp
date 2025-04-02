@@ -28,4 +28,4 @@ class ExplicitRK_RalstonRK22 : public ITimeMethod_RungeKutta
     }
 };
 
-#endif // EXPLICIT_RK_RALSTON_HPP
+#endif
