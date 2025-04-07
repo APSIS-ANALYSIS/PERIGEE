@@ -56,6 +56,7 @@ PLocAssem_Block_VMS_NS_HERK::~PLocAssem_Block_VMS_NS_HERK()
 
   // delete [] sur_Residual0; sur_Residual0 = nullptr;
   delete [] sur_Residual1; sur_Residual1 = nullptr;
+  delete[] flist;  //
 }
 
 void PLocAssem_Block_VMS_NS_HERK::print_info() const
@@ -110,16 +111,22 @@ std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
   
   // const double tau_c = cp * rho0/dt * L0 * dh; 
 
-  // return {tau_m, tau_c};  
+  // return {tau_m, tau_c};
 
-  const SymmTensor2_3D G = get_metric( dxi_dx );
+  ////////////////////////////////////////////////
+  const double tau_m = 1.0/(cu * rho0/dt * L0);
 
-  const double temp_nu = vis_mu / rho0;
+  return {tau_m, 0.0};  
+  ////////////////////////////////////////////////
 
-  const double denom_m = std::sqrt( CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
+  // const SymmTensor2_3D G = get_metric( dxi_dx );
 
-  // return tau_m followed by tau_c
-  return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
+  // const double temp_nu = vis_mu / rho0;
+
+  // const double denom_m = std::sqrt( CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
+
+  // // return tau_m followed by tau_c
+  // return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
   // return {{1.0 / ( rho0 * denom_m ), 0.0 * rho0 * denom_m / G.tr()}};
 }
 

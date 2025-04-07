@@ -117,6 +117,8 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   MatDestroy(&subK[4]);
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[4]);
+
+  subK[5] = NULL;
 }
 
 PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
