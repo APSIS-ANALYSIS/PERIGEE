@@ -1,6 +1,9 @@
 #ifndef EXPLICITRK_PSEUDOSYMPLECTICRK3P5Q4S_HPP
 #define EXPLICITRK_PSEUDOSYMPLECTICRK3P5Q4S_HPP
-
+// ==================================================================
+// Ref: F. Capuano, G. Coppola, L. Rández, L. de Luca. Explicit Runge–Kutta schemes for 
+// incompressible flow with improved energy-conservation properties. JCP 2017
+// ==================================================================
 #include "ITimeMethod_RungeKutta.hpp"
 
 class ExplicitRK_PseudoSymplecticRK3p5q4s : public ITimeMethod_RungeKutta 
