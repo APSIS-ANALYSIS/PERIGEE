@@ -24,7 +24,7 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   num_ebc( ebc->get_num_ebc() ),
   nlgn( pnode->get_nlocghonode() )
 {
-  double tangent_alpha_RK = 0.0;
+  tangent_alpha_RK = 0.0;
 
   SYS_T::print_fatal_if(dof_sol != locassem->get_dof(),
       "PGAssem_Block_NS_FEM_HERK::dof_sol != locassem->get_dof(). \n");
@@ -133,7 +133,7 @@ PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
 void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 {
   // pressure dof comes from field 0, to be inserted in subK[0] and subG[1]
-  const int local_dir = nbc->get_Num_LD(0);
+  int local_dir = nbc->get_Num_LD(0);
 
   if( local_dir > 0 )
   {
@@ -146,7 +146,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
     }
   }
 
-  const int local_sla = nbc->get_Num_LPS(0);
+  int local_sla = nbc->get_Num_LPS(0);
   if( local_sla > 0 )
   {
     for(int i=0; i<local_sla; ++i)
@@ -162,7 +162,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
   // velocity dofs
   for(int field=1; field<=3; ++field)
   {
-    const int local_dir = nbc->get_Num_LD(field);
+    local_dir = nbc->get_Num_LD(field);
 
     if( local_dir > 0 )
     {
@@ -174,7 +174,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
       }
     }
 
-    const int local_sla = nbc->get_Num_LPS(field);
+    local_sla = nbc->get_Num_LPS(field);
 
     if( local_sla > 0 )
     {
@@ -193,7 +193,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_KG()
 void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 {
   // pressure dof comes from field 0, to be inserted in subK[0]
-  const int local_dir = nbc->get_Num_LD(0);
+  int local_dir = nbc->get_Num_LD(0);
 
   if( local_dir > 0 )
   {
@@ -205,7 +205,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
     }
   }
 
-  const int local_sla = nbc->get_Num_LPS(0);
+  int local_sla = nbc->get_Num_LPS(0);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
@@ -220,7 +220,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
   // velocity dofs
   for(int field=1; field<=3; ++field)
   {
-    const int local_dir = nbc->get_Num_LD(field);
+    local_dir = nbc->get_Num_LD(field);
 
     if( local_dir > 0 )
     {
@@ -231,7 +231,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
       }
     }
 
-    const int local_sla = nbc->get_Num_LPS(field);
+    local_sla = nbc->get_Num_LPS(field);
 
     if( local_sla > 0 )
     {
@@ -249,7 +249,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_K()
 void PGAssem_Block_NS_FEM_HERK::EssBC_G()
 {
   // pres field is 0, to be inserted to subG[1]
-  const int local_dir = nbc->get_Num_LD(0);
+  int local_dir = nbc->get_Num_LD(0);
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
@@ -259,7 +259,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_G()
     }
   }
 
-  const int local_sla = nbc->get_Num_LPS(0);
+  int local_sla = nbc->get_Num_LPS(0);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
@@ -272,7 +272,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_G()
   // velo fields from 1 to 3
   for(int field=1; field<=3; ++field)
   {
-    const int local_dir = nbc->get_Num_LD(field);
+    local_dir = nbc->get_Num_LD(field);
     if( local_dir > 0 )
     {
       for(int ii=0; ii<local_dir; ++ii)
@@ -282,7 +282,7 @@ void PGAssem_Block_NS_FEM_HERK::EssBC_G()
       }
     }
 
-    const int local_sla = nbc->get_Num_LPS(field);
+    local_sla = nbc->get_Num_LPS(field);
     if( local_sla > 0 )
     {
       for(int ii=0; ii<local_sla; ++ii)
