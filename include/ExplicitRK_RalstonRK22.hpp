@@ -1,5 +1,5 @@
-#ifndef EXPLICIT_RK_RALSTON_HPP
-#define EXPLICIT_RK_RALSTON_HPP
+#ifndef EXPLICITRK_RALSTON_HPP
+#define EXPLICITRK_RALSTON_HPP
 
 #include "ITimeMethod_RungeKutta.hpp"
 

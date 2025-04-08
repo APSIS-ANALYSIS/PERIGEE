@@ -1,5 +1,5 @@
-#ifndef EXPLICIT_RK_SSPRK33_HPP
-#define EXPLICIT_RK_SSPRK33_HPP
+#ifndef EXPLICITRK_SSPRK33_HPP
+#define EXPLICITRK_SSPRK33_HPP
 
 #include "ITimeMethod_RungeKutta.hpp"
 

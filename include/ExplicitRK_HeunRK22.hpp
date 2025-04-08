@@ -1,5 +1,5 @@
-#ifndef EXPLICIT_RK_HEUN_HPP
-#define EXPLICIT_RK_HEUN_HPP
+#ifndef EXPLICITRK_HEUN_HPP
+#define EXPLICITRK_HEUN_HPP
 
 #include "ITimeMethod_RungeKutta.hpp"
 
