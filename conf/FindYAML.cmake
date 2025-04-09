@@ -23,7 +23,7 @@ endif()
 ## Includes ##
 ##############
 if(EXISTS "${YAML_DIR}/include")
-  set(YAML_INCLUDE_DIRS "${YAML_DIR}/include")
+  set(YAML_INC "${YAML_DIR}/include")
 else()
   message(SEND_ERROR "YAML includes not found")
 endif()
@@ -45,6 +45,6 @@ endif()
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(YAML
   "YAML could not be found: be sure to set YAML_DIR in your environment variables"
-  YAML_LIB YAML_INCLUDE_DIRS YAML_DIR)
+  YAML_LIB YAML_INC YAML_DIR)
 
 # EOF
