@@ -118,7 +118,7 @@ TARGET_INCLUDE_DIRECTORIES( perigee_analysis PUBLIC
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_postprocess perigee_analysis )
+TARGET_LINK_LIBRARIES( perigee_postprocess PUBLIC perigee_analysis )
 TARGET_INCLUDE_DIRECTORIES( perigee_postprocess PUBLIC ${PERIGEE_INCLUDE_DIRS} )
 # -------------------------------------------------------------------
 
