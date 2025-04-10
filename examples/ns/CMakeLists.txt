@@ -8,9 +8,11 @@ cmake_policy(SET CMP0074 NEW)
 SET(perigee_VERSION_MAJOR 0)
 SET(perigee_VERSION_MINOR 0)
 
-IF(NOT CMAKE_BUILD_TYPE)
-  SET(CMAKE_BUILD_TYPE Debug CACHE STRING "Default to Debug if not set" FORCE)
-ENDIF()
+IF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+  SET(CMAKE_BUILD_TYPE Release CACHE STRING "set to release" FORCE)
+ELSE( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
+  SET(CMAKE_BUILD_TYPE Debug CACHE STRING "default to debug" FORCE)
+ENDIF( ${CMAKE_BUILD_TYPE} MATCHES "Release" )
 
 OPTION(BUILD_SHARED_LIBS "build shared libraries" OFF)
 
