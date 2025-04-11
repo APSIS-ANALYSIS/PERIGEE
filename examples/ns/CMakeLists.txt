@@ -125,29 +125,22 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
   )
 
+INCLUDE_DIRECTORIES( ../../include )
+INCLUDE_DIRECTORIES( ./include )
+
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
 # 1. Preprocess libs
 ADD_LIBRARY( perigee_preprocess ${perigee_preprocess_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_preprocess PUBLIC
-  ${YAML_LIB} ${PETSC_LIBRARIES} ${VTK_LIBRARIES}
-  ${HDF5_LIBRARIES} ${METIS_LIBRARIES} )
-TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PUBLIC
-  ${perigee_SOURCE_DIR}/../../include ${HDF5_INCLUDE_DIRS}
-  ${PETSC_INCLUDE_DIRS} ${METIS_INCLUDE_DIR} )
+TARGET_LINK_LIBRARIES( perigee_preprocess PUBLIC ${EXTRA_LINK_LIBS} )
 
 # 2. Analysis libs
 ADD_LIBRARY( perigee_analysis ${perigee_analysis_lib_src} )
-TARGET_LINK_LIBRARIES( perigee_analysis PUBLIC
-  ${PETSC_STATIC_LIBRARIES} ${VTK_LIBRARIES} ${HDF5_LIBRARIES} )
-TARGET_INCLUDE_DIRECTORIES( perigee_analysis PUBLIC 
-  ${PERIGEE_INCLUDE_DIRS} ${HDF5_INCLUDE_DIRS} 
-  ${PETSC_INCLUDE_DIRS} )
+TARGET_LINK_LIBRARIES( perigee_analysis PUBLIC ${EXTRA_LINK_LIBS} )
 
 # 3. Postprocess lib
 ADD_LIBRARY( perigee_postprocess ${perigee_postprocess_lib_src} )
 TARGET_LINK_LIBRARIES( perigee_postprocess PUBLIC perigee_analysis )
-TARGET_INCLUDE_DIRECTORIES( perigee_postprocess PUBLIC ${PERIGEE_INCLUDE_DIRS} ) 
 # -------------------------------------------------------------------
 
 # Print compiler setup
