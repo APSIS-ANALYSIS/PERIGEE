@@ -45,6 +45,11 @@ class NodalBC : public INodalBC
     NodalBC( const std::vector<std::string> &vtkfileList, const int &nFunc );
 
     // --------------------------------------------------------------
+    // The list of vtp files specifies the Dirichlet nodes and periodical type BC nodes.
+    // --------------------------------------------------------------
+    NodalBC( const std::vector<std::string> &vtkfileList, const std::vector<std::string> &slafileList, const int &nFunc );
+
+    // --------------------------------------------------------------
     // The list of vtp files specifies the rotated Dirichlet nodes. 
     // No periodical type BC nodes.
     // --------------------------------------------------------------
