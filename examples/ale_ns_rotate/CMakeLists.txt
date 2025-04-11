@@ -136,8 +136,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
   )
 
-INCLUDE_DIRECTORIES( ../../include )
-INCLUDE_DIRECTORIES( ./include )
+INCLUDE_DIRECTORIES( ${PERIGEE_INCLUDE_DIRS} )
 
 # -------------------------------------------------------------------
 # MAKE MY OWN LIBRARIES
@@ -168,9 +167,6 @@ ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
-
-TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${YAML_INC} )
-TARGET_INCLUDE_DIRECTORIES( prepost3d PRIVATE ${YAML_INC} )
 
 TARGET_LINK_LIBRARIES( preprocess3d PRIVATE perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d PRIVATE perigee_analysis )

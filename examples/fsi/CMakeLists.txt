@@ -182,9 +182,6 @@ ADD_EXECUTABLE( vis_fsi_wss vis_fsi_wss.cpp )
 ADD_EXECUTABLE( vis_fsi_wss_tet4 vis_fsi_wss_tet4.cpp )
 ADD_EXECUTABLE( vis_fsi_wss_hex8 vis_fsi_wss_hex8.cpp )
 
-TARGET_INCLUDE_DIRECTORIES( preprocess_fsi PRIVATE ${YAML_INC} )
-TARGET_INCLUDE_DIRECTORIES( prepostproc PRIVATE ${YAML_INC} )
-
 # Link libraries
 TARGET_LINK_LIBRARIES( preprocess_fsi PUBLIC perigee_preprocess )
 TARGET_LINK_LIBRARIES( wall_ps3d PUBLIC perigee_analysis )

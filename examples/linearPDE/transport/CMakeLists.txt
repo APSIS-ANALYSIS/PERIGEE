@@ -126,9 +126,6 @@ ADD_EXECUTABLE( prepost3d ../prepost.cpp)
 ADD_EXECUTABLE( post_error post_compare_manu.cpp )
 ADD_EXECUTABLE( vis_transport_3d vis.cpp )
 
-TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${YAML_INC} )
-TARGET_INCLUDE_DIRECTORIES( prepost3d PRIVATE ${YAML_INC} )
-
 TARGET_LINK_LIBRARIES( preprocess3d PRIVATE perigee_preprocess )
 TARGET_LINK_LIBRARIES( transport_3d PRIVATE perigee_analysis)
 TARGET_LINK_LIBRARIES( prepost3d PRIVATE perigee_preprocess )
