@@ -36,6 +36,7 @@ int main( int argc, char * argv[] )
   const std::vector<int> nbc_vol_id = config["nbc_vol_id"].as<std::vector<int>>();
   const std::vector<std::string> nbc_face_file_name = config["nbc_face_file_name"].as<std::vector<std::string>>();
   const std::vector<bool> nbc_isXML = config["nbc_isXML"].as<std::vector<bool>>();
+  const std::vector<bool> nbc_isslave = config["nbc_isslave"].as<std::vector<bool>>();
 
   const std::vector<int> ebc_face_id = config["ebc_face_id"].as<std::vector<int>>();
   const std::vector<std::string> ebc_face_name = config["ebc_face_name"].as<std::vector<std::string>>();
@@ -58,8 +59,7 @@ int main( int argc, char * argv[] )
       std::cout<<'\n'<<"=== nbc_face_name: "<<nbc_face_name[ii]<<'\t'; 
       std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(nbc_face_id[ii])<<" with ";
       std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
-       
-      GIO -> write_vtp( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+      GIO -> write_vtp( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii], nbc_isslave[ii] );
     }
 
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
@@ -81,7 +81,7 @@ int main( int argc, char * argv[] )
       std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(nbc_face_id[ii])<<" with ";
       std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
 
-      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii], nbc_isslave[ii] );
     }
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
     {
@@ -102,7 +102,7 @@ int main( int argc, char * argv[] )
       std::cout<<"phy_face_name: "<<GIO->get_phy_name_2d(nbc_face_id[ii])<<" with ";
       std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
 
-      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii] );
+      GIO -> write_quadratic_sur_vtu( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii], nbc_isslave[ii] );
     }
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
     {
