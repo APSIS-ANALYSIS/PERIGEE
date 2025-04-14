@@ -327,17 +327,6 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
   delete [] row_idx_v; row_idx_v = nullptr;
   delete [] row_idx_p; row_idx_p = nullptr;
 
-  // Create a temporary zero solution vector to feed Natbc_Resis_KG
-  // PDNSolution * temp = new PDNSolution_NS( pnode.get(), 0, false );
-
-  // // 0.1 is an (arbitrarily chosen) nonzero time step size feeding the NatBC_Resis_KG 
-  // NatBC_Resis_KG( 0.0, 0.1, temp, temp );
-
-  // delete temp;
-
-  // VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  // VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
-
   EssBC_KG();
 
   MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);

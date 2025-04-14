@@ -247,13 +247,13 @@ int main(int argc, char *argv[])
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
 
   std::unique_ptr<PDNSolution> velo =
-    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, 3, true, "velo" );
+    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "velo" );
 
   std::unique_ptr<PDNSolution> pres =
-    SYS_T::make_unique<PDNSolution_P>( pNode.get(), 0, 1, true, "pres" );
+    SYS_T::make_unique<PDNSolution_P>( pNode.get(), 0, true, "pres" );
 
   std::unique_ptr<PDNSolution> dot_velo =
-    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, 3, true, "dot_velo" );
+    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "dot_velo" );
 
   if( is_restart )
   {

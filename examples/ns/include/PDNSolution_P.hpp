@@ -16,8 +16,7 @@ class PDNSolution_P : public PDNSolution
 {
   public:
     PDNSolution_P( const APart_Node * const &pNode,
-        const int &type, const int &input_dof_num, 
-        const bool &isprint = false,
+        const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_pressure" );
 
     virtual ~PDNSolution_P() {};

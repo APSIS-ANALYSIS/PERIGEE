@@ -7,7 +7,7 @@
 // solver into 5 sub blocks.
 //
 // Author: Yujie Sun
-// Date: JMar. 5 2025
+// Date: Mar. 5 2025
 // ==================================================================
 #include "ITimeMethod_RungeKutta.hpp"
 #include "SymmTensor2_3D.hpp"
@@ -262,7 +262,7 @@ class PLocAssem_Block_VMS_NS_HERK
     Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
         const Vector_3 &n_out ) const
     {
-      const double p0 = 0.0;
+      const double p0 = 0.0;  
       return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 

@@ -1,10 +1,9 @@
 #include "PDNSolution_P.hpp"
 
 PDNSolution_P::PDNSolution_P( const APart_Node * const &pNode,
-    const int &type, const int &input_dof_num,
-    const bool &isprint,
+    const int &type, const bool &isprint,
     const std::string &in_name )
-: PDNSolution( pNode, input_dof_num ), sol_name( in_name ), is_print( isprint )
+: PDNSolution( pNode, 1 ), sol_name( in_name ), is_print( isprint )
 {
   switch(type)
   {

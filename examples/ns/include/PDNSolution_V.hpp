@@ -18,8 +18,7 @@ class PDNSolution_V : public PDNSolution
 {
   public:
     PDNSolution_V( const APart_Node * const &pNode,
-        const int &type, const int &input_dof_num,
-        const bool &isprint = false,
+        const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_velocity" );
 
     virtual ~PDNSolution_V() {};
