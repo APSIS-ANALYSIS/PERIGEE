@@ -21,11 +21,7 @@ PTime_NS_HERK_Solver::PTime_NS_HERK_Solver(
 
 std::string PTime_NS_HERK_Solver::Name_Generator(const int &counter) const
 {
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  return pb_name + temp.str();
+  return pb_name + std::to_string(900000000 + counter);
 }
 
 void PTime_NS_HERK_Solver::print_info() const
