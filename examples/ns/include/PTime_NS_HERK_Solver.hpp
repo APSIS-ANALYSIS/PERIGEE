@@ -83,10 +83,8 @@ class PTime_NS_HERK_Solver
         PDNSolution * const &cur_sol ) const;
 
       void rescale_inflow_velo( const double &stime,
+          const IFlowRate * const &flrate, 
           PDNSolution * const &velo ) const;
-        
-      void rescale_inflow_dot_velo( const double &stime,
-          PDNSolution * const &dot_velo ) const;
 
       void Update_dot_step(const Vec &vp, 
           PDNSolution * const &step) const;

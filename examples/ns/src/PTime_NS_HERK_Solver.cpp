@@ -195,7 +195,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   for(int ii = 1; ii < ss; ++ii)
   {
     // Make the velo in each sub step meet the Dirchlet boundary
-    rescale_inflow_velo(curr_time + tmRK->get_RK_c(ii) * dt, cur_velo_sols[ii]);
+    rescale_inflow_velo(curr_time + tmRK->get_RK_c(ii) * dt, flrate.get(), cur_velo_sols[ii]);
   
     gassem->Clear_G();  // K uses Matrix-free
      
@@ -235,7 +235,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
   
     // Make the velo in the last step meet the Dirchlet boundary
-    rescale_inflow_velo(curr_time + dt, cur_velo);
+    rescale_inflow_velo(curr_time + dt, flrate.get(), cur_velo);
   
     gassem->Clear_G();
   
@@ -275,7 +275,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
 }
 
 void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
-    PDNSolution * const &velo ) const
+    const IFlowRate * const &flrate, PDNSolution * const &velo ) const
 {
   const int num_nbc = infnbc -> get_num_nbc();
 
@@ -311,45 +311,6 @@ void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
   }
 
   velo->Assembly_GhostUpdate();
-}
-
-void PTime_NS_HERK_Solver::rescale_inflow_dot_velo( const double &stime,
-    PDNSolution * const &dot_velo ) const
-{
-  const int num_nbc = infnbc -> get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    const int numnode = infnbc -> get_Num_LD( nbc_id );
-
-    const double factor  = dot_flrate -> get_flow_rate( nbc_id, stime );
-    const double std_dev = dot_flrate -> get_flow_TI_std_dev( nbc_id );
-
-    for(int ii=0; ii<numnode; ++ii)
-    {
-      const int node_index = infnbc -> get_LDN( nbc_id, ii );
-      
-      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
-
-      double base_vals[3];
-
-      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
-
-      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
-
-      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
-        base_vals[1] * factor * (1.0 + perturb_y),
-        base_vals[2] * factor * (1.0 + perturb_z) };
-
-      const int dot_velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
-
-      VecSetValues(dot_velo->solution, 3, dot_velo_idx, vals, INSERT_VALUES);
-    }
-  }
-
-  dot_velo->Assembly_GhostUpdate();
 }
 
 // Please make sure the Vec vp is VecNest before using the function
