@@ -618,9 +618,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
 
     std::vector<double> tau_m(subindex+1, tau_n[0]); std::vector<double> tau_c(subindex+1, tau_n[1]);
 
-    const double& tau_m_n = tau_n[0];
-    const double& tau_c_n = tau_n[1];
-
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
     std::vector<double> sum_u_advec(subindex+1, 0); std::vector<double> sum_u_diffu(subindex+1, 0); std::vector<double> sum_a_fx(subindex+1, 0); std::vector<double> sum_p_x(subindex+1, 0);
@@ -1441,7 +1438,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
     const double tau_c = tau_np1_dot[1];
 
     const double& tau_m_n = tau_np1_dot[0];
-    const double& tau_c_n = tau_np1_dot[1];
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -1778,7 +1774,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
     const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
     const double tau_m_n = tau_n[0];
-    const double tau_c_n = tau_n[1];
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -2709,7 +2704,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
 
     const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
     const double tau_m_n = tau_n[0];
-    const double tau_c_n = tau_n[1];
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 

@@ -278,7 +278,7 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
 }
 
 void PTime_NS_HERK_Solver_AccurateA::rescale_inflow_velo( const double &stime,
-  const IFlowRate * const &flrate, PDNSolution * const &velo ) const
+  const IFlowRate * const &flowrate, PDNSolution * const &velo ) const
 {
   const int num_nbc = infnbc -> get_num_nbc();
 
@@ -286,8 +286,8 @@ void PTime_NS_HERK_Solver_AccurateA::rescale_inflow_velo( const double &stime,
   {
     const int numnode = infnbc -> get_Num_LD( nbc_id );
 
-    const double factor  = flrate -> get_flow_rate( nbc_id, stime );
-    const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
+    const double factor  = flowrate -> get_flow_rate( nbc_id, stime );
+    const double std_dev = flowrate -> get_flow_TI_std_dev( nbc_id );
 
     for(int ii=0; ii<numnode; ++ii)
     {

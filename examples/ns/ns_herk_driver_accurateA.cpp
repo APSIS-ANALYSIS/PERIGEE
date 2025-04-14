@@ -13,10 +13,11 @@
 #include "FlowRateFactory.hpp"
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver_AccurateA.hpp"
-#include "ExplicitRK_SSPRK33.hpp"
-#include "ExplicitRK_EMRK22.hpp"
-#include "ExplicitRK_HeunRK22.hpp"
-#include "ExplicitRK_RalstonRK22.hpp"
+#include "ExplicitRK_SSPRK3p3s.hpp"
+#include "ExplicitRK_EMRK2p2s.hpp"
+#include "ExplicitRK_HeunRK2p2s.hpp"
+#include "ExplicitRK_RalstonRK2p2s.hpp"
+#include "ExplicitRK_PseudoSymplecticRK3p5q4s.hpp"
 #include "Matrix_Free_Tools.hpp"
 #include "Matrix_Free_Tools_AccurateA.hpp"
 
@@ -231,9 +232,9 @@ int main(int argc, char *argv[])
   // ===== Half Explicit Runge Kutta scheme =====
   SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
 
-  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_RalstonRK22>();
+  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_RalstonRK2p2s>();
 
-  tm_RK->printCoefficients();
+  tm_RK->print_coefficients();
  
     // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
@@ -299,8 +300,6 @@ int main(int argc, char *argv[])
 
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
-
-  // lsolver->SetOperator(K_shell);
 
   // ===== Linear solver context of Martrix A =====
   auto lsolver_A = SYS_T::make_unique<PLinear_Solver_PETSc>(
