@@ -208,8 +208,9 @@ int main( int argc, char * argv[] )
 
   INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
-
-  InFBC -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  
+  // reset IEN for outward normal calculations
+  InFBC -> resetSurIEN_outwardnormal( IEN );
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
@@ -242,14 +243,16 @@ int main( int argc, char * argv[] )
 
   int sum_nghostnode = 0; // total number of ghost nodes
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer->Reset();
     mytimer->Start();
-    IPart * part = new Part_FEM( nElem, nFunc, nLocBas, global_part, mnindex, IEN,
-        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
+    auto part = SYS_T::make_unique<Part_FEM>( 
+        nElem, nFunc, nLocBas, global_part, mnindex, IEN,
+        ctrlPts, proc_rank, cpu_size, elemType, 
+        Field_Property(0, dofNum, true, "NS") );
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
@@ -259,22 +262,22 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
     
     // Partition Nodal BC and write to h5 file
-    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex, NBC_list);
+    auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex, NBC_list);
     
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
-    NBC_Partition_inflow * infpart = new NBC_Partition_inflow(part, mnindex, InFBC);
+    auto infpart = SYS_T::make_unique<NBC_Partition_inflow>(part.get(), mnindex, InFBC);
     
     infpart->write_hdf5( part_file );
     
     // Partition Elemental BC and write to h5 file
-    EBC_Partition * ebcpart = new EBC_Partition_outflow(part, mnindex, ebc, NBC_list);
+    auto ebcpart = SYS_T::make_unique<EBC_Partition_outflow>(part.get(), mnindex, ebc, NBC_list);
 
     ebcpart -> write_hdf5( part_file );
 
     // Partition Weak BC and write to h5 file
-    EBC_Partition * wbcpart = new EBC_Partition_WallModel(part, mnindex, wbc);
+    auto wbcpart = SYS_T::make_unique<EBC_Partition_WallModel>(part.get(), mnindex, wbc);
 
     wbcpart -> write_hdf5( part_file );
 
@@ -286,7 +289,6 @@ int main( int argc, char * argv[] )
     list_ratio_g2l.push_back((double)part->get_nghostnode()/(double) part->get_nlocalnode());
 
     sum_nghostnode += part->get_nghostnode();
-    delete part; delete nbcpart; delete infpart; delete ebcpart; delete wbcpart; 
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
@@ -306,7 +308,7 @@ int main( int argc, char * argv[] )
   // Finalize the code and exit
   for(auto &it_nbc : NBC_list) delete it_nbc;
 
-  delete InFBC; delete ebc; delete wbc; delete mytimer;
+  delete InFBC; delete ebc; delete wbc;
   delete mnindex; delete global_part; delete IEN;
 
   return EXIT_SUCCESS;
