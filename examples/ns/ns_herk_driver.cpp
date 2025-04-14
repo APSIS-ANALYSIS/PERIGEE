@@ -5,8 +5,8 @@
 // Variational Multiscale Formulation and Half-explicit RK time 
 // stepping.
 //
-// Author: Ju Liu, liujuy@gmail.com
-// Date: Feb. 6 2020
+// Author: Yujie Sun
+// Date: Apr. 4 2025
 // ==================================================================
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
