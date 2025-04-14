@@ -322,101 +322,101 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Matrix(
   const double * const &eleCtrlPts_y,
   const double * const &eleCtrlPts_z )
 {
-elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-Zero_Tangent();
+  Zero_Tangent();
 
-std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
-std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
-std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
+  std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
+  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
+  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
 
-for(int qua=0; qua<nqpv; ++qua)
-{
-  Vector_3 coor(0.0, 0.0, 0.0);
-
-  elementv->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
-                             &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
-                             &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
-
-  for(int ii=0; ii<nLocBas; ++ii)
+  for(int qua=0; qua<nqpv; ++qua)
   {
-    coor.x() += eleCtrlPts_x[ii] * R[ii];
-    coor.y() += eleCtrlPts_y[ii] * R[ii];
-    coor.z() += eleCtrlPts_z[ii] * R[ii];
-  }
+    Vector_3 coor(0.0, 0.0, 0.0);
 
-  const auto dxi_dx = elementv->get_invJacobian(qua);
+    elementv->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
+                              &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
+                              &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
 
-  // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );
-  // const double tau_m = tau_sub[0];
-  // const double tau_c = tau_sub[1];
-
-  // std::vector<double> tau_m(subindex+1, 0); std::vector<double> tau_c(subindex+1, 0);
-
-  // for(int index=1; index<=subindex; ++index)
-  // {
-  //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
-  //   tau_m[index] = tau_sub[0];
-  //   tau_c[index] = tau_sub[1];
-  // }
-
-  const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
-  const double tau_m = tau_n[0];
-  const double tau_c = tau_n[1];
-
-  const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
-   
-  for(int A=0; A<nLocBas; ++A)
-  {
-    const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-
-    for(int B=0; B<nLocBas; ++B)
+    for(int ii=0; ii<nLocBas; ++ii)
     {
-      const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
-      // Continuity equation with respect to p, u, v, w
-      Tangent0[  nLocBas*A+B          ] += gwts * (NA_x * tau_m * 1.0 * NB_x + NA_y * tau_m * 1.0 * NB_y + NA_z * tau_m * 1.0 * NB_z);
-      
-      Tangent1[3*nLocBas*A+3*B+0      ] += gwts * (NA * NB_x + NA_x * tau_m * NB * rho0/dt);
+      coor.x() += eleCtrlPts_x[ii] * R[ii];
+      coor.y() += eleCtrlPts_y[ii] * R[ii];
+      coor.z() += eleCtrlPts_z[ii] * R[ii];
+    }
 
-      Tangent1[3*nLocBas*A+3*B+1      ] += gwts * (NA * NB_y + NA_y * tau_m * NB * rho0/dt);
-      
-      Tangent1[3*nLocBas*A+3*B+2      ] += gwts * (NA * NB_z + NA_z * tau_m * NB * rho0/dt);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
 
-      // Momentum-x with respect to p, u, v, w
-      Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_x);
-      
-      Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0 /dt);
-      
-      Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * 1.0 * tau_c * NB_x);
-      
-      Tangent4[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * 1.0 * tau_c * NB_y);
+    // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );
+    // const double tau_m = tau_sub[0];
+    // const double tau_c = tau_sub[1];
+
+    // std::vector<double> tau_m(subindex+1, 0); std::vector<double> tau_c(subindex+1, 0);
+
+    // for(int index=1; index<=subindex; ++index)
+    // {
+    //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
+    //   tau_m[index] = tau_sub[0];
+    //   tau_c[index] = tau_sub[1];
+    // }
+
+    const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
+    const double tau_m = tau_n[0];
+    const double tau_c = tau_n[1];
+
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
     
-      Tangent4[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * 1.0 * tau_c * NB_z);
+    for(int A=0; A<nLocBas; ++A)
+    {
+      const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
 
-      // Momentum-y with repspect to p, u, v, w
-      Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_y);
+      for(int B=0; B<nLocBas; ++B)
+      {
+        const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
+        // Continuity equation with respect to p, u, v, w
+        Tangent0[  nLocBas*A+B          ] += gwts * (NA_x * tau_m * 1.0 * NB_x + NA_y * tau_m * 1.0 * NB_y + NA_z * tau_m * 1.0 * NB_z);
+        
+        Tangent1[3*nLocBas*A+3*B+0      ] += gwts * (NA * NB_x + NA_x * tau_m * NB * rho0/dt);
+
+        Tangent1[3*nLocBas*A+3*B+1      ] += gwts * (NA * NB_y + NA_y * tau_m * NB * rho0/dt);
+        
+        Tangent1[3*nLocBas*A+3*B+2      ] += gwts * (NA * NB_z + NA_z * tau_m * NB * rho0/dt);
+
+        // Momentum-x with respect to p, u, v, w
+        Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_x);
+        
+        Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0 /dt);
+        
+        Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * 1.0 * tau_c * NB_x);
+        
+        Tangent4[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * 1.0 * tau_c * NB_y);
       
-      Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0/dt);
+        Tangent4[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * 1.0 * tau_c * NB_z);
 
-      Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * 1.0 * tau_c * NB_x);
+        // Momentum-y with repspect to p, u, v, w
+        Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_y);
+        
+        Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0/dt);
 
-      Tangent4[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA_y * 1.0 * tau_c * NB_y);
+        Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * 1.0 * tau_c * NB_x);
 
-      Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * 1.0 * tau_c * NB_z );
+        Tangent4[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA_y * 1.0 * tau_c * NB_y);
 
-      // Momentum-z with repspect to p, u, v, w
-      Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_z);
+        Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * 1.0 * tau_c * NB_z );
 
-      Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0/dt);        
+        // Momentum-z with repspect to p, u, v, w
+        Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * 1.0 * NB - NA * rho0/dt * tau_m * 1.0 * NB_z);
 
-      Tangent4[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * 1.0 * tau_c * NB_x);
+        Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m * NB * rho0/dt);        
 
-      Tangent4[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * 1.0 * tau_c * NB_y);
+        Tangent4[3*nLocBas*(3*A+2)+3*B+0] += gwts * (NA_z * 1.0 * tau_c * NB_x);
 
-      Tangent4[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA_z * 1.0 * tau_c * NB_z);        
+        Tangent4[3*nLocBas*(3*A+2)+3*B+1] += gwts * (NA_z * 1.0 * tau_c * NB_y);
+
+        Tangent4[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA_z * 1.0 * tau_c * NB_z);        
+      }
     }
   }
-}
 }
 
 void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
