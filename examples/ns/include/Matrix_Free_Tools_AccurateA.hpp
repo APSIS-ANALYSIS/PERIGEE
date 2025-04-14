@@ -71,6 +71,7 @@ namespace MF_TA
     VecCreate(PETSC_COMM_WORLD, &diag);   
     VecSetSizes(diag, mA_local, PETSC_DETERMINE);
     VecSetType(diag, VECMPI);
+    // MatGetRowSum(user->subK[5], diag); // Replace MatGetDiagonal() with MatGetRowSum()
     MatGetDiagonal(user->subK[5], diag);
     VecReciprocal(diag);
 
@@ -80,6 +81,7 @@ namespace MF_TA
     MatScale(S_approx, -1.0);
     MatAXPY(S_approx, 1.0, user->subK[0], DIFFERENT_NONZERO_PATTERN);  // S_approx = D - S_approx
 
+    // MatGetRowSum(user->subK[5], diag); // Restore with row sums again
     MatGetDiagonal(user->subK[5], diag);
     MatDiagonalScale(user->subK[2], diag, NULL);
 
@@ -87,36 +89,6 @@ namespace MF_TA
 
     return 0;
   }
-  
-  // inline PetscErrorCode SetupApproxSchur(PGAssem_Block_NS_FEM_HERK *const user, Mat &S_approx)
-  // {
-  //     // Schur complement approximation: S = D - C inv(DIAGFORM(A)) B
-  //     Vec diag;
-  //     PetscInt mA_local;
-  
-  //     MatGetLocalSize(user->subK[5], &mA_local, NULL);
-  
-  //     // Compute row sums of A
-  //     VecCreate(PETSC_COMM_WORLD, &diag);
-  //     VecSetSizes(diag, mA_local, PETSC_DETERMINE);
-  //     VecSetType(diag, VECMPI);
-  //     MatGetRowSum(user->subK[5], diag); // Replace MatGetDiagonal() with MatGetRowSum()
-  //     VecReciprocal(diag); // Take reciprocal
-  
-  //     MatDiagonalScale(user->subK[2], diag, NULL); // overwrites B = subK[2]) 
-  //     MatMatMult(user->subK[1], user->subK[2], MAT_INITIAL_MATRIX, PETSC_DETERMINE, &S_approx);
-  
-  //     MatScale(S_approx, -1.0);
-  //     MatAXPY(S_approx, 1.0, user->subK[0], DIFFERENT_NONZERO_PATTERN);  // S_approx = D - S_approx
-  
-  //     // restore B = subK[2]
-  //     MatGetRowSum(user->subK[5], diag); // Restore with row sums again
-  //     MatDiagonalScale(user->subK[2], diag, NULL);
-  
-  //     VecDestroy(&diag);
-  
-  //     return 0;
-  // }
 
   inline PetscErrorCode MF_PCSchurApply(PC pc, Vec x, Vec y)
   {
