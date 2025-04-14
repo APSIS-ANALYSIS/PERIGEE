@@ -7,6 +7,9 @@
 //
 // Ref: F. Capuano et al. Explicit Runge-Kutta schemes for incompressible flow 
 //      with improved energy-conservation properties. Journal of Computational Physics, 2017
+//
+// Date: Apr. 14 2025
+// Author: Yujie Sun
 // ==================================================================
 #include "ITimeMethod_RungeKutta.hpp"
 

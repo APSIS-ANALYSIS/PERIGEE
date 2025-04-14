@@ -6,6 +6,9 @@
 //
 // Ref: S. Gottlieb et al. Strong stability-preserving high-order time 
 //      discretization methods. SIAM Review, 2001
+//
+// Date: Apr. 14 2025
+// Author: Yujie Sun
 // ==================================================================
 #include "ITimeMethod_RungeKutta.hpp"
 

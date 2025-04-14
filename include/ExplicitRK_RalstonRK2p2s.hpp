@@ -3,8 +3,11 @@
 // ==================================================================
 // Explicit Runge–Kutta method: Ralston’s method
 // Two-stage scheme with second-order accuracy on solution
-
-// J.C. Butcher. Numerical methods for ordinary differential equations, 2016
+//
+// Ref: J.C. Butcher. Numerical methods for ordinary differential equations, 2016
+//
+// Date: Apr. 14 2025
+// Author: Yujie Sun
 // ==================================================================
 #include "ITimeMethod_RungeKutta.hpp"
 
