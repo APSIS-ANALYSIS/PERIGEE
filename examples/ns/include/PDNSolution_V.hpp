@@ -11,8 +11,6 @@
 // Date: Dec. 29 2021 
 // ============================================================================
 #include "PDNSolution.hpp"
-#include "FEANode.hpp"
-#include "ALocal_InflowBC.hpp"
 
 class PDNSolution_V : public PDNSolution
 {
