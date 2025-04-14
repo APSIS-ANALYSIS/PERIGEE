@@ -12,14 +12,14 @@
 // ============================================================================
 #include "PDNSolution.hpp"
 
-class PDNSolution_V : public PDNSolution
+class PDNSolution_V final : public PDNSolution
 {
   public:
     PDNSolution_V( const APart_Node * const &pNode,
         const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_velocity" );
 
-    virtual ~PDNSolution_V() {};
+    virtual ~PDNSolution_V() = default;
 
   private:
     const std::string sol_name;

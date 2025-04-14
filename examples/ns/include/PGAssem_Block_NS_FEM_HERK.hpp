@@ -210,10 +210,6 @@ class PGAssem_Block_NS_FEM_HERK
 
     void Update_tangent_submatrix5()
     {
-      // if (subK[5] != NULL) MatDestroy(&subK[5]); // Prevent duplicate allocation leakage
-      // MatDuplicate(subK[3], MAT_COPY_VALUES, &subK[5]);
-      // MatAXPY(subK[5], tangent_alpha_RK, subK[4], DIFFERENT_NONZERO_PATTERN);
-
       if (subK[5] == NULL) // If subK [5] has not yet allocated memory, proceed with memory allocation
         MatDuplicate(subK[3], MAT_COPY_VALUES, &subK[5]);
       else // If subK [5] already has memory, update its contents directly

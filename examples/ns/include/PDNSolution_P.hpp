@@ -11,7 +11,7 @@
 // ============================================================================
 #include "PDNSolution.hpp"
 
-class PDNSolution_P : public PDNSolution
+class PDNSolution_P final : public PDNSolution
 {
   public:
     PDNSolution_P( const APart_Node * const &pNode,
