@@ -6,8 +6,8 @@
 // This is a solution class for the pressure field, which is attached to a
 // pressure-type mesh with 1 dof per grid point.
 //
-// Author: Ju Liu
-// Date: Dec. 29 2021
+// Author: Yujie Sun
+// Date: Apr. 14 2025 
 // ============================================================================
 #include "PDNSolution.hpp"
 

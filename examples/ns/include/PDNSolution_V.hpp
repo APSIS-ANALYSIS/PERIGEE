@@ -3,12 +3,11 @@
 // ============================================================================
 // PDNSolution_V.hpp
 //
-// This is a solution class for the kinematics field (displacement, velocity,
-// mesh displacement, mesh velocity, etc.), which is attached to a velocity-type
+// This is a solution class for the velocity field which is attached to a velocity-type
 // mesh with 3 dofs per grid point.
 //
-// Author: Ju Liu
-// Date: Dec. 29 2021 
+// Author: Yujie Sun
+// Date: Apr. 14 2025 
 // ============================================================================
 #include "PDNSolution.hpp"
 
