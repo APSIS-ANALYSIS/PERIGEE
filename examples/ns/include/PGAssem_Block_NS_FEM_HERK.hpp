@@ -126,7 +126,6 @@ class PGAssem_Block_NS_FEM_HERK
     // Assembly the tangent block matrix for the HERK
     void Assem_tangent_matrix(
         const ITimeMethod_RungeKutta * const &tm_RK_ptr,
-        const double &curr_time,
         const double &dt );
 
     // Assembly the residual vector for the sub-step of HERK        
@@ -255,7 +254,7 @@ class PGAssem_Block_NS_FEM_HERK
 
     // Natural boundary condition for pres stage of the HERK
     void NatBC_G_HERK_Pressure( const double &curr_time, const double &dt );
-    
+
     std::vector<double> GetLocal( const std::vector<double> &array,
       const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
     {

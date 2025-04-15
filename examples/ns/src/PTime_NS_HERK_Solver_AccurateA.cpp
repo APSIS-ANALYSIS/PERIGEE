@@ -1,7 +1,6 @@
 #include "PTime_NS_HERK_Solver_AccurateA.hpp"
 
 PTime_NS_HERK_Solver_AccurateA::PTime_NS_HERK_Solver_AccurateA(
-    // SolverContext in_solver_ctx,
     std::unique_ptr<MF_TA::SolverContext> in_solver_ctx,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,

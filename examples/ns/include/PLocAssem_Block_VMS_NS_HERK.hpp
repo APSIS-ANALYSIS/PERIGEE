@@ -114,7 +114,7 @@ class PLocAssem_Block_VMS_NS_HERK
         const double * const &eleCtrlPts_z );
 
     void Assem_Tangent_Matrix(
-      const double &time, const double &dt,
+      const double &dt,
       const ITimeMethod_RungeKutta * const &tm_RK_ptr,
       const double * const &eleCtrlPts_x,
       const double * const &eleCtrlPts_y,
