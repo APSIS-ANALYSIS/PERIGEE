@@ -57,13 +57,12 @@ class ExplicitRK_RalstonRK2p2s final : public ITimeMethod_RungeKutta
       SYS_T::commPrint("\nb: \n");
       for (const auto& bi : bb) SYS_T::commPrint("%e \n", bi);
 
-      SYS_T::commPrint("a:\n");
+      SYS_T::commPrint("\na:\n");
       for (int ii = 0; ii < ss; ++ii) 
       {
-        for (const auto& aij : std::vector<double>(aa.begin() + ii * ss, aa.begin() + (ii + 1) * ss))
-        {
-          SYS_T::commPrint("%e ", aij);
-        }
+        for (int jj = 0; jj < ss; ++jj)
+          SYS_T::commPrint("%e ", aa[ii * ss + jj]);
+      
         SYS_T::commPrint("\n");
       }
     }
