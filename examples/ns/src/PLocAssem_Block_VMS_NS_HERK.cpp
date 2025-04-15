@@ -29,7 +29,6 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
   Residual0 = new PetscScalar[vec_size_p];
   Residual1 = new PetscScalar[vec_size_v];
 
-  // sur_Residual0 = new PetscScalar[sur_size_p];
   sur_Residual1 = new PetscScalar[sur_size_v];
 
   Zero_Tangent_Residual();
@@ -54,9 +53,8 @@ PLocAssem_Block_VMS_NS_HERK::~PLocAssem_Block_VMS_NS_HERK()
   delete [] Residual0; Residual0 = nullptr;
   delete [] Residual1; Residual1 = nullptr;
 
-  // delete [] sur_Residual0; sur_Residual0 = nullptr;
   delete [] sur_Residual1; sur_Residual1 = nullptr;
-  delete[] flist;  //
+  delete [] flist;
 }
 
 void PLocAssem_Block_VMS_NS_HERK::print_info() const
