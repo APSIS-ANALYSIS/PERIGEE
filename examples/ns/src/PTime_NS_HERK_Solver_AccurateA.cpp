@@ -223,7 +223,6 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(update_dotstep, 0,0,0,0);
   #endif
-    // lsolver->Solve( solver_ctx->gassem->G, dot_step.get() );
 
     bc_mat->MatMultSol( dot_step.get() );
   
