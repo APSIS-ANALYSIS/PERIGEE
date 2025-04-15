@@ -112,44 +112,42 @@ namespace MF_TA
 
     Mat B = ctx->gassem->subK[2], C = ctx->gassem->subK[1];
 
-    Vec x1, x2, y1, y2, z1, z2, tmp1, tmp2;
+    Vec x1, x2, y1, y2, tmp1, tmp2;
 
     // Split x into x1, x2
     VecNestGetSubVec(x, 0, &x1);
     VecNestGetSubVec(x, 1, &x2);
-
+    
     // Split y into y1, y2
     VecNestGetSubVec(y, 0, &y1);
     VecNestGetSubVec(y, 1, &y2);
 
-    VecDuplicate(x1, &z1);
-    VecDuplicate(x2, &z2);
     VecDuplicate(x1, &tmp1);
     VecDuplicate(x2, &tmp2);
 
   #ifdef PETSC_USE_LOG
     PetscLogEventBegin(A_solve, 0,0,0,0);
   #endif 
-    // Step 1: Compute z1 = A^{-1} x1
-    ctx->lsolver_A->Solve(x1, z1, false);
+    // Step 1: Compute y1 = A^{-1} x1
+    ctx->lsolver_A->Solve(x1, y1, false);
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(A_solve,0,0,0,0);
   #endif
 
-    // Step 2: Compute z2 = x2 - C * z1
-    MatMult(C, z1, tmp2);
-    VecWAXPY(z2, -1.0, tmp2, x2);
+    // Step 2: Compute y2 = x2 - C * y1
+    MatMult(C, y1, tmp2);
+    VecWAXPY(y2, -1.0, tmp2, x2);
 
   #ifdef PETSC_USE_LOG
     PetscLogEventBegin(S_solve, 0,0,0,0);
   #endif 
-    // Step 3: Compute y2 = S^{-1} z2
-    ctx->lsolver_S->Solve(z2, y2, false);
+    // Step 3: Compute y2 = S^{-1} y2
+    ctx->lsolver_S->Solve(y2, y2, false);
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(S_solve,0,0,0,0);
   #endif
 
-    // Step 4: Compute y1 = z1 - A^{-1} B y2 = A^{-1} x1 - A^{-1} B y2
+    // Step 4: Compute y1 = y1 - A^{-1} B y2 = A^{-1} x1 - A^{-1} B y2
     MatMult(B, y2, tmp1);
   #ifdef PETSC_USE_LOG
     PetscLogEventBegin(A_solve, 0,0,0,0);
@@ -158,13 +156,10 @@ namespace MF_TA
   #ifdef PETSC_USE_LOG
     PetscLogEventEnd(A_solve,0,0,0,0);
   #endif
-    VecWAXPY(y1, -1.0, tmp1, z1);
+    VecAXPY(y1, -1.0, tmp1);
 
-    VecDestroy(&z1);
-    VecDestroy(&z2);
     VecDestroy(&tmp1);
     VecDestroy(&tmp2);
-    MatDestroy(&S_approx);
 
     return 0;
   }
