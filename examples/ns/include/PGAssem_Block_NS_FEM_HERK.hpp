@@ -123,12 +123,13 @@ class PGAssem_Block_NS_FEM_HERK
     // Nonzero pattern estimate for the NS equations
     void Assem_nonzero_estimate();
     
-    // Assembly the residual vector and tangent matrix for the sub-step of HERK
+    // Assembly the tangent block matrix for the HERK
     void Assem_tangent_matrix(
         const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double &curr_time,
         const double &dt );
 
+    // Assembly the residual vector for the sub-step of HERK        
     void Assem_residual_substep(
         const int &substep_index,
         PDNSolution ** const &cur_velo_sols,
@@ -141,6 +142,7 @@ class PGAssem_Block_NS_FEM_HERK
         const double &curr_time,
         const double &dt );
 
+    // Assembly the residual vector for the final step of HERK 
     void Assem_residual_finalstep(
         PDNSolution ** const &cur_velo_sols,
         PDNSolution * const &cur_velo,
@@ -153,6 +155,7 @@ class PGAssem_Block_NS_FEM_HERK
         const double &curr_time,
         const double &dt );
 
+    // Assembly the residual vector for the pres stage of HERK 
     void Assem_residual_presstage(
         PDNSolution * const &cur_dot_velo,
         PDNSolution ** const &cur_velo_sols,
@@ -208,6 +211,7 @@ class PGAssem_Block_NS_FEM_HERK
     double Get_tangent_alpha_RK()
     {return tangent_alpha_RK;}
 
+    // Assembly the tangent block matrix (A + coef * A_tilde)
     void Update_tangent_submatrix5()
     {
       if (subK[5] == NULL) // If subK [5] has not yet allocated memory, proceed with memory allocation
@@ -230,7 +234,7 @@ class PGAssem_Block_NS_FEM_HERK
 
     const int nLocBas, snLocBas, dof_sol, dof_mat_v, dof_mat_p, num_ebc, nlgn;
 
-    // Runge Kuta butcher table coefficients
+    // Runge-Kutta butcher table coefficients
     double tangent_alpha_RK;
 
     // Essential boundary condition
@@ -240,42 +244,18 @@ class PGAssem_Block_NS_FEM_HERK
 
     void EssBC_G();
 
-    // Natural boundary condition for substep of the HERK
+    // Natural boundary condition for sub-step of the HERK
     void NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
         const int &substep_index,
         const ITimeMethod_RungeKutta * const &tm_RK_ptr );
 
-    // Natural boundary condition for laststep of the HERK
+    // Natural boundary condition for final step of the HERK
     void NatBC_G_HERK_Final( const double &curr_time, const double &dt,
         const ITimeMethod_RungeKutta * const &tm_RK_ptr );
 
-    // Natural boundary condition for finalstep of the HERK
+    // Natural boundary condition for pres stage of the HERK
     void NatBC_G_HERK_Pressure( const double &curr_time, const double &dt );
-
-    void GetLocal(const double * const &array, const int * const &IEN,
-        double * const &local_array) const
-    {
-      for(int ii=0; ii<nLocBas; ++ii)
-      {
-        const int offset1 = ii * dof_sol;
-        const int offset2 = IEN[ii] * dof_sol;
-        for(int jj=0; jj<dof_sol; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
-    }
-
-    void GetLocal( const double * const &array, const int * const &IEN,
-        const int &in_locbas, double * const &local_array) const
-    {
-      for(int ii=0; ii<in_locbas; ++ii)
-      {
-        const int offset1 = ii * dof_sol;
-        const int offset2 = IEN[ii] * dof_sol;
-        for(int jj=0; jj<dof_sol; ++jj)
-          local_array[offset1 + jj] = array[offset2 + jj];
-      }
-    }
-
+    
     std::vector<double> GetLocal( const std::vector<double> &array,
       const std::vector<int> &IEN, const int &in_locbas, const int &in_dof ) const
     {
