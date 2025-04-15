@@ -351,6 +351,8 @@ int main(int argc, char *argv[])
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
+  solverCtx -> lsolver_A -> print_info();
+  solverCtx -> lsolver_S -> print_info();
 
   MatDestroy(&S_approx);
   MatDestroy(&K_shell);
