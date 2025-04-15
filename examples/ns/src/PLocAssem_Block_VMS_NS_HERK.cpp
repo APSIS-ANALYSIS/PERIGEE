@@ -113,11 +113,9 @@ std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
 
   // return {tau_m, tau_c};
 
-  ////////////////////////////////////////////////
   const double tau_m = 1.0/(cu * rho0/dt * L0);
 
   return {tau_m, 0.0};  
-  ////////////////////////////////////////////////
 
   // const SymmTensor2_3D G = get_metric( dxi_dx );
 
@@ -141,7 +139,6 @@ std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau(
   const double temp_nu = vis_mu / rho0;
 
   const double denom_m = std::sqrt( CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
-  // const double denom_m = std::sqrt( CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
 
   // return tau_m followed by tau_c
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
@@ -1424,14 +1421,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
 
     const auto dxi_dx = elementv->get_invJacobian(qua);
 
-    // const std::array<double, 2> tau_np1_dot = get_tau_dot( dt, dxi_dx, u_np1, v_np1, w_np1 );
-    // const double tau_m = tau_np1_dot[0];
-    // const double tau_c = tau_np1_dot[1];
-
-    // const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
-    // const double tau_m_n = tau_n[0];
-    // const double tau_c_n = tau_n[1];
-
     const std::array<double, 2> tau_np1_dot = get_tau_Darcy( dt, dxi_dx );
 
     const double tau_m = tau_np1_dot[0];
@@ -1759,10 +1748,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
     const auto dxi_dx = elementv->get_invJacobian(qua);
 
-    // const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[subindex-1], v[subindex-1], w[subindex-1] );  // 这里应该用u[subindex], 但u[subindex]未知？
-    // const double tau_m = tau_sub[0];
-    // const double tau_c = tau_sub[1];
-
     std::vector<double> tau_m(subindex+1, 0); std::vector<double> tau_c(subindex+1, 0);
 
     for(int index=1; index<=subindex; ++index)
@@ -1927,7 +1912,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
       Residual1[3*A + 0] += gwts * ( NA * rho0/dt * u[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
                                    + NA * rho0/dt * u_prime[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
-                                   - NA * rho0 * sum_a_fx[subindex] - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime // 缺一个自然边界条件 
+                                   - NA * rho0 * sum_a_fx[subindex] - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
                                    + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu * u_diffu1_3
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
@@ -1971,10 +1956,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x);
         
         Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0 /dt);
-        
-        Tangent3[3*nLocBas*3*A+3*B+1    ] += 0.0;
-      
-        Tangent3[3*nLocBas*3*A+3*B+2    ] += 0.0;
 
         Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
         
@@ -1984,12 +1965,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
         // Momentum-y with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_y);
-        
-        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
 
         Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt);
-
-        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
 
         Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_x);
 
@@ -1999,10 +1976,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
         // Momentum-z with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_z);
-
-        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
-
-        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
         Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt);        
 
@@ -2223,7 +2196,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
 
     for(int index=1; index<num_steps; ++index)
     {
-      const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] ); // Laststep中，每个子步粗尺度已知
+      const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] );
       tau_m[index] = tau_sub[0];
       tau_c[index] = tau_sub[1];
     }
@@ -2461,10 +2434,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         
         Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0 /dt);
         
-        Tangent3[3*nLocBas*3*A+3*B+1    ] += 0.0;
-      
-        Tangent3[3*nLocBas*3*A+3*B+2    ] += 0.0;
-
         Tangent4[3*nLocBas*3*A+3*B+0    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
         
         Tangent4[3*nLocBas*3*A+3*B+1    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_y);
@@ -2473,12 +2442,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
 
         // Momentum-y with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_y);
-        
-        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
 
         Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt);
-
-        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
 
         Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_x);
 
@@ -2488,10 +2453,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
 
         // Momentum-z with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_z);
-
-        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
-
-        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
         Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt);   
 
@@ -2843,10 +2804,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
         
         Tangent3[3*nLocBas*3*A+3*B+0   ] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0);
         
-        Tangent3[3*nLocBas*3*A+3*B+1   ] += 0.0;
-      
-        Tangent3[3*nLocBas*3*A+3*B+2   ] += 0.0;
-
         Tangent4[3*nLocBas*3*A+3*B+0   ] += gwts * (NA_x * tau_c * NB_x);
         
         Tangent4[3*nLocBas*3*A+3*B+1   ] += gwts * (NA_x * tau_c * NB_y);
@@ -2855,12 +2812,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
 
         // Momentum-y with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y *  NB - NA * rho0 * tau_m * NB_y);
-        
-        Tangent3[3*nLocBas*(3*A+1)+3*B+0] += 0.0;
 
         Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0);
-
-        Tangent3[3*nLocBas*(3*A+1)+3*B+2] += 0.0;
 
         Tangent4[3*nLocBas*(3*A+1)+3*B+0] += gwts * (NA_y * tau_c * NB_x);
 
@@ -2870,10 +2823,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
 
         // Momentum-z with repspect to p, u, v, w
         Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * NB - NA * rho0 * tau_m * NB_z);
-
-        Tangent3[3*nLocBas*(3*A+2)+3*B+0] += 0.0;
-
-        Tangent3[3*nLocBas*(3*A+2)+3*B+1] += 0.0;
 
         Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0 * NB - NA * rho0 * tau_m * NB * rho0);   
 
