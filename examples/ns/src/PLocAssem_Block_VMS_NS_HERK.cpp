@@ -154,8 +154,6 @@ std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_dot(
 
   const double denom_m = std::sqrt( CT + G.VecMatVec( velo_vec, velo_vec) * (dt*dt) + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
 
-  // const double denom_m = std::sqrt( CT + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
-
   // return tau_m followed by tau_c
   return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
