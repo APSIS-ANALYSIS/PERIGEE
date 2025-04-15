@@ -51,7 +51,7 @@ namespace MF_T
     MatMult(user->subK[1], x1, y2);      // y2 = C * x1
     MatMult(user->subK[0], x2, tmp2);    // tmp2 = D * x2
     VecAXPY(y2, coef, tmp2);             // y2 = C * x1 + coef * D * x2
-        
+ 
     // Destruction of sub vectors
     VecDestroy(&tmp1);
     VecDestroy(&tmp2);
