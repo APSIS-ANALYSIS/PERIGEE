@@ -19,14 +19,15 @@ class FlowRateDot_Sine2Zero : public IFlowRate
     // target flow rate are determined from the file and set to be the flow rate
     // at the initial time (i.e. time = 0.0) by setting target_flow_rate to be
     // the sum of coef_a.
-    // Same as FlowRate_Linear2Steady.
+    // Same as FlowRate_Cosine2Steady.
     FlowRateDot_Sine2Zero( const std::string &filename );
 
     virtual ~FlowRateDot_Sine2Zero() = default;
 
-    // From time 0 to in_thred_time, the flow rate equals
-    // start_rate + 0.5 * (target_rate - start_rate) * (1 -  cos (PI * time / in_thred_time))
-    // From in_thred_time to infty, flow_rate = target_rate
+    // From time 0 to in_thred_time,
+    // flow_rate =  start_rate + 0.5 * (target_rate - start_rate) * (1 -  cos (PI * time / in_thred_time)),
+    // dot_flow_rate = 0.5 * (target_rate - start_rate) * PI / in_thred_time * sin (PI * time / in_thred_time),
+    // From in_thred_time to infty, flow_rate = target_rate, dot_flow_rate = 0.0.
     virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
 
     // Get the turbulance intensity

@@ -27,10 +27,13 @@ class ITimeMethod_RungeKutta
 
     int get_RK_step() const { return ss; }
 
+    // Return the coefficients aij
     virtual double get_RK_a(const int &ii, const int &jj) const = 0;
 
+    // Return the coefficients bi
     virtual double get_RK_b(const int &ii) const = 0;
 
+    // Return the coefficients ci
     virtual double get_RK_c(const int &ii) const = 0;
 
   protected:

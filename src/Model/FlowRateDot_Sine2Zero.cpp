@@ -134,20 +134,6 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
 
   for(int ii=0; ii<num_nbc; ++ii) target_flow_rate[ii] = VEC_T::sum( coef_a[ii] );
 
-  // Calculate the flow rate and record them on disk as 
-  // Inlet_XXX_flowrate.txt with sampling interval 0.001
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    if( SYS_T::get_MPI_rank() == 0 )
-    {
-      std::ofstream ofile;
-      ofile.open( gen_flowfile_name(nbc_id).c_str(), std::ofstream::out | std::ofstream::trunc );
-      for( double tt = 0; tt <= thred_time[nbc_id] * 2.0; tt += 0.001 )
-        ofile << tt <<'\t'<<get_flow_rate(nbc_id, tt)<< '\n';
-      ofile.close();
-    }
-  }
-
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
