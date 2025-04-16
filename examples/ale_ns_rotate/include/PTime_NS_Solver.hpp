@@ -47,16 +47,16 @@ class PTime_NS_Solver
     
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-        const PDNSolution * const &init_dot_sol,
-        const PDNSolution * const &init_sol,
-        const PDNSolution * const &init_mdisp,
-        const PDNSolution * const &init_mvelo,
-        PDNTimeStep * const &time_info,
-        const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_RotatedBC * const &rotnbc_part,
-        IGenBC * const &gbc,
-        const SI_rotation_info * const &rot_info,
-        IPGAssem * const &gassem_ptr,
+        std::unique_ptr<PDNSolution> init_dot_sol,
+        std::unique_ptr<PDNSolution> init_sol,
+        std::unique_ptr<PDNSolution> init_mdisp,
+        std::unique_ptr<PDNSolution> init_mvelo,
+        std::unique_ptr<PDNTimeStep> time_info,
+        std::unique_ptr<ALocal_InflowBC> infnbc_part,
+        std::unique_ptr<ALocal_RotatedBC> rotnbc_part,
+        std::unique_ptr<IGenBC> gbc,
+        std::unique_ptr<SI_rotation_info> rot_info,
+        std::unique_ptr<IPGAssem> gassem_ptr,
         Mat &shell ) const;
 
   private:

@@ -29,16 +29,16 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
 
 void PTime_NS_Solver::TM_NS_GenAlpha( 
     const bool &restart_init_assembly_flag,
-    const PDNSolution * const &init_dot_sol,
-    const PDNSolution * const &init_sol,
-    const PDNSolution * const &init_mdisp,
-    const PDNSolution * const &init_mvelo,
-    PDNTimeStep * const &time_info,
-    const ALocal_InflowBC * const &infnbc_part,
-    const ALocal_RotatedBC * const &rotnbc_part,
-    IGenBC * const &gbc,
-    const SI_rotation_info * const &rot_info,
-    IPGAssem * const &gassem_ptr,
+    std::unique_ptr<PDNSolution> init_dot_sol,
+    std::unique_ptr<PDNSolution> init_sol,
+    std::unique_ptr<PDNSolution> init_mdisp,
+    std::unique_ptr<PDNSolution> init_mvelo,
+    std::unique_ptr<PDNTimeStep> time_info,
+    std::unique_ptr<ALocal_InflowBC> infnbc_part,
+    std::unique_ptr<ALocal_RotatedBC> rotnbc_part,
+    std::unique_ptr<IGenBC> gbc,
+    std::unique_ptr<SI_rotation_info> rot_info,
+    std::unique_ptr<IPGAssem> gassem_ptr,
     Mat &shell ) const
 {
   PDNSolution * pre_sol = new PDNSolution(*init_sol);
@@ -102,13 +102,13 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     { 
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
-      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info); //get_currPts() may be writtern into Sl_tools
-      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info);
+      const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info.get()); //get_currPts() may be writtern into Sl_tools
+      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info.get());
 
-      const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, rot_info); 
+      const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, rot_info.get()); 
       const Vector_3 velo_mesh_alpha = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*rot_info->get_direction_rotated(), radius_alpha);
 
-      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info); //get_radius() may be writtern into Sl_tools  
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info.get()); //get_radius() may be writtern into Sl_tools  
       const Vector_3 velo_mesh_curr = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + time_info->get_step())*rot_info->get_direction_rotated(), radius_curr);
 
       const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
@@ -152,7 +152,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
-        infnbc_part, rotnbc_part, gbc, gassem_ptr,
+        infnbc_part.get(), rotnbc_part.get(), gbc.get(), gassem_ptr.get(),
         cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh,
         alpha_velo_mesh, alpha_disp_mesh,
         conv_flag, nl_counter, shell );
@@ -221,10 +221,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_sol, infnbc_part, face ); 
+          cur_sol, infnbc_part.get(), face ); 
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_sol, infnbc_part, face );
+          cur_sol, infnbc_part.get(), face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {

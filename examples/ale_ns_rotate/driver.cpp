@@ -541,10 +541,10 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_NS_GenAlpha(is_restart, dot_sol.get(), sol.get(),
-      disp_mesh.get(), velo_mesh.get(), timeinfo.get(),
-      locinfnbc.get(), locrotnbc.get(), gbc.get(), 
-      sir_info.get(), gloAssem_ptr.get(), shell_mat);
+  tsolver->TM_NS_GenAlpha(is_restart, std::move(dot_sol), std::move(sol),
+      std::move(disp_mesh), std::move(velo_mesh), std::move(timeinfo),
+      std::move(locinfnbc), std::move(locrotnbc), std::move(gbc), 
+      std::move(sir_info), std::move(gloAssem_ptr), shell_mat);
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
@@ -552,7 +552,7 @@ int main(int argc, char *argv[])
   MatDestroy(&shell_mat);
 
   // ===== Clean Memory =====
-  tsolver.reset(); gbc.reset();
+  tsolver.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;
