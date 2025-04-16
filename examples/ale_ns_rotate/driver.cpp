@@ -265,7 +265,6 @@ int main(int argc, char *argv[])
 
   // Interfaces info
   auto locitf = SYS_T::make_unique<ALocal_Interface>(part_file, rank);
-  SYS_T::commPrint("Interfaces: %d\n", locitf->get_num_itf());
   locitf -> print_info();
 
   auto SI_sol = SYS_T::make_unique<SI_T::SI_solution>(part_file, rank);
@@ -544,10 +543,9 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_NS_GenAlpha(is_restart, dot_sol.get(), sol.get(),
-      disp_mesh.get(), velo_mesh.get(),
-      timeinfo.get(), pNode.get(), fNode.get(),
+      disp_mesh.get(), velo_mesh.get(), timeinfo.get(),
       locinfnbc.get(), locrotnbc.get(), gbc.get(), 
-      locitf.get(), sir_info.get(), locAssem_ptr.get(), gloAssem_ptr.get(), shell_mat);
+      sir_info.get(), gloAssem_ptr.get(), shell_mat);
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();

@@ -110,6 +110,15 @@ class PGAssem_NS_FEM : public IPGAssem
     virtual SI_T::SI_quad_point * Get_SI_qp()
     { return SI_qp.get(); }
 
+    virtual const ALocal_Interface * Get_itf()
+    { return itf.get(); }
+
+    virtual const FEANode * Get_fnode()
+    { return fnode.get(); }
+
+    virtual const APart_Node * Get_pnode()
+    { return pnode.get(); }
+
   private:
     // Private data
     const std::unique_ptr<SI_T::SI_solution> SI_sol;

@@ -42,12 +42,9 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &pre_sol,
     const PDNSolution * const &pre_velo_mesh,    
     const PDNSolution * const &pre_disp_mesh,
-    const FEANode * const &feanode_ptr,
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_RotatedBC * const &rotnbc_part,
     const IGenBC * const &gbc,
-    const ALocal_Interface * const &itf_part,
-    IPLocAssem * const &lassem_ptr,
     IPGAssem * const &gassem_ptr,
     PDNSolution * const &dot_sol,
     PDNSolution * const &sol,
@@ -119,10 +116,11 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   SI_T::SI_solution * SI_sol = gassem_ptr->Get_SI_sol();
   SI_T::SI_quad_point * SI_qp = gassem_ptr->Get_SI_qp();
+  const ALocal_Interface * itf = gassem_ptr->Get_itf();
   SI_sol->update_node_mvelo(mvelo_alpha);
   SI_sol->update_node_mdisp(mdisp_alpha);
   SI_sol->update_node_sol(&sol_alpha);
-  SI_qp->search_all_opposite_point(itf_part, SI_sol);
+  SI_qp->search_all_opposite_point(itf, SI_sol);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step

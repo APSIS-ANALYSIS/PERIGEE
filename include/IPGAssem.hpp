@@ -1040,6 +1040,24 @@ class IPGAssem
       SYS_T::print_fatal("Warning: Get_SI_qp() is not implemented. \n");
       return {};
     }
+
+    virtual const ALocal_Interface * Get_itf()
+    {
+      SYS_T::print_fatal("Warning: Get_itf() is not implemented. \n");
+      return {};
+    }
+
+    virtual const FEANode * Get_fnode()
+    {
+      SYS_T::print_fatal("Warning: Get_fnode() is not implemented. \n");
+      return {};
+    }
+
+    virtual const APart_Node * Get_pnode()
+    {
+      SYS_T::print_fatal("Warning: Get_pnode() is not implemented. \n");
+      return {};
+    }
 };
 
 #endif

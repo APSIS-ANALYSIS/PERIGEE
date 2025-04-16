@@ -34,14 +34,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     const PDNSolution * const &init_mdisp,
     const PDNSolution * const &init_mvelo,
     PDNTimeStep * const &time_info,
-    const APart_Node * const &pNode_ptr,
-    const FEANode * const &feanode_ptr,
     const ALocal_InflowBC * const &infnbc_part,
     const ALocal_RotatedBC * const &rotnbc_part,
     IGenBC * const &gbc,
-    const ALocal_Interface * const &itf_part,
     const SI_rotation_info * const &rot_info,
-    IPLocAssem * const &lassem_fluid_ptr,
     IPGAssem * const &gassem_ptr,
     Mat &shell ) const
 {
@@ -82,6 +78,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
+
+  const APart_Node * pNode_ptr = gassem_ptr->Get_pnode();
+  const FEANode * feanode_ptr = gassem_ptr->Get_fnode();
 
   // Enter into time integration
   while( time_info->get_time() < final_time )
@@ -153,9 +152,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
         pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
-        feanode_ptr, infnbc_part, rotnbc_part,
-        gbc, itf_part, lassem_fluid_ptr, gassem_ptr,
-        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh, alpha_velo_mesh, alpha_disp_mesh, conv_flag, nl_counter, shell );
+        infnbc_part, rotnbc_part, gbc, gassem_ptr,
+        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh,
+        alpha_velo_mesh, alpha_disp_mesh,
+        conv_flag, nl_counter, shell );
 
     // Update the time step information
     time_info->TimeIncrement();
