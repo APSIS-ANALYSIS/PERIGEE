@@ -4,8 +4,6 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
   const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
   const double &in_vis_mu, const double &in_beta,
-  const double &angular, const Vector_3 &point_xyz, 
-  const Vector_3 &angular_direc,
   const double &in_ct, const double &in_ctauc )
 : elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
@@ -18,8 +16,7 @@ PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
   CI( (elemType == FEType::Tet4 || elemType == FEType::Hex8) ? 36.0 : 60.0 ),
   CT( in_ct ), Ctauc( in_ctauc ),
   nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
-  vec_size( nLocBas * 4 ), sur_size ( snLocBas * 4 ), angular_velo(angular),
-  point_rotated(point_xyz), direction_rotated(angular_direc),
+  vec_size( nLocBas * 4 ), sur_size ( snLocBas * 4 ),
   coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
   mm( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                                              std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )

@@ -308,7 +308,6 @@ int main(int argc, char *argv[])
   std::unique_ptr<IPLocAssem> locAssem_ptr = SYS_T::make_unique<PLocAssem_VMS_NS_GenAlpha_Interface>(
     GMIptr->get_elemType(), nqp_vol, nqp_sur,
     tm_galpha.get(), fluid_density, fluid_mu, bs_beta,
-    angular_velo, point_rotated, angular_direction,
     c_ct, c_tauc, C_bI );
 
   // ===== Initial condition =====

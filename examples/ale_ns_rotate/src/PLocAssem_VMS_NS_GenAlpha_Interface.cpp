@@ -4,12 +4,10 @@ PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
   const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
   const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
   const double &in_vis_mu, const double &in_beta,
-  const double &angular,
-  const Vector_3 &point_xyz, const Vector_3 &angular_direc,
   const double &in_ct, const double &in_ctauc,
   const double &in_C_bI)
   : PLocAssem_VMS_NS_GenAlpha_WeakBC(in_type, in_nqp_v, in_nqp_s,
-  tm_gAlpha, in_rho, in_vis_mu, in_beta, angular, point_xyz, angular_direc,
+  tm_gAlpha, in_rho, in_vis_mu, in_beta,
   in_ct, in_ctauc, in_C_bI)
 {
   Tangent_ss = new PetscScalar[vec_size * vec_size];
