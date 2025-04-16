@@ -15,7 +15,7 @@
 class ITimeMethod_RungeKutta 
 {
   public:
-    // Constructor, initialize RK coefficients
+    // Constructor, initialize the number of steps
     ITimeMethod_RungeKutta(int steps) : ss(steps)
     {}
 
@@ -27,13 +27,13 @@ class ITimeMethod_RungeKutta
 
     int get_RK_step() const { return ss; }
 
-    // Return the coefficients aij
+    // Return the RK coefficients aij
     virtual double get_RK_a(const int &ii, const int &jj) const = 0;
 
-    // Return the coefficients bi
+    // Return the RK coefficients bi
     virtual double get_RK_b(const int &ii) const = 0;
 
-    // Return the coefficients ci
+    // Return the RK coefficients ci
     virtual double get_RK_c(const int &ii) const = 0;
 
   protected:
