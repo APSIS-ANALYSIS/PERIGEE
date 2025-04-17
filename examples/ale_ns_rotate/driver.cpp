@@ -128,7 +128,6 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
-  SYS_T::GetOptionReal("-angular_velo", angular_velo);
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
@@ -369,10 +368,6 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
-  SI_sol->update_node_sol(sol.get());
-  SI_sol->update_node_mdisp(disp_mesh.get());
-  SI_sol->update_node_mvelo(velo_mesh.get());
-  
   // ===== Time step info =====
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
@@ -388,7 +383,6 @@ int main(int argc, char *argv[])
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  SI_qp->search_all_opposite_point(locitf.get(), SI_sol.get());
 
   std::unique_ptr<IPGAssem> gloAssem_ptr = SYS_T::make_unique<PGAssem_NS_FEM>
     ( GMIptr->get_elemType(), nqp_sur,
@@ -396,6 +390,8 @@ int main(int argc, char *argv[])
     std::move(fNode), std::move(pNode), 
     std::move(locnbc), std::move(locebc), std::move(locwbc), std::move(locitf),
     std::move(locAssem_ptr), std::move(SI_sol), std::move(SI_qp), gbc.get(), nz_estimate );
+
+  gloAssem_ptr->Update_SI_situation(sol.get(), velo_mesh.get(), disp_mesh.get());
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( gbc.get() );

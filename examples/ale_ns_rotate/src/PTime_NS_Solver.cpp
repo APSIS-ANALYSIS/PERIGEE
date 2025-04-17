@@ -41,16 +41,18 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     std::unique_ptr<IPGAssem> gassem_ptr,
     Mat &shell ) const
 {
-  PDNSolution * pre_sol = new PDNSolution(*init_sol);
-  PDNSolution * cur_sol = new PDNSolution(*init_sol);
-  PDNSolution * pre_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
-  PDNSolution * pre_disp_mesh = new PDNSolution(*init_mdisp);
-  PDNSolution * cur_disp_mesh = new PDNSolution(*init_mdisp);
-  PDNSolution * alpha_disp_mesh = new PDNSolution(*init_mdisp);
-  PDNSolution * pre_velo_mesh = new PDNSolution(*init_mvelo);
-  PDNSolution * cur_velo_mesh = new PDNSolution(*init_mvelo);
-  PDNSolution * alpha_velo_mesh = new PDNSolution(*init_mvelo);  
+  auto pre_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto cur_sol     = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto pre_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+  auto cur_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+
+  auto pre_disp_mesh   = SYS_T::make_unique<PDNSolution>(*init_mdisp);
+  auto cur_disp_mesh   = SYS_T::make_unique<PDNSolution>(*init_mdisp);
+  auto alpha_disp_mesh = SYS_T::make_unique<PDNSolution>(*init_mdisp);
+
+  auto pre_velo_mesh   = SYS_T::make_unique<PDNSolution>(*init_mvelo);
+  auto cur_velo_mesh   = SYS_T::make_unique<PDNSolution>(*init_mvelo);
+  auto alpha_velo_mesh = SYS_T::make_unique<PDNSolution>(*init_mvelo); 
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
@@ -74,6 +76,8 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
   bool rest_flag = restart_init_assembly_flag;
 
   const double alpha_f = nsolver->get_alpha_f();
+
+  SYS_T::commPrint("af: %e\n", alpha_f);
 
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -151,10 +155,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Call the nonlinear equation solver
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), 
-        pre_dot_sol, pre_sol, pre_velo_mesh, pre_disp_mesh,
+        pre_dot_sol.get(), pre_sol.get(), pre_velo_mesh.get(), pre_disp_mesh.get(),
         infnbc_part.get(), rotnbc_part.get(), gbc.get(), gassem_ptr.get(),
-        cur_dot_sol, cur_sol, cur_velo_mesh, cur_disp_mesh,
-        alpha_velo_mesh, alpha_disp_mesh,
+        cur_dot_sol.get(), cur_sol.get(), cur_velo_mesh.get(), cur_disp_mesh.get(),
+        alpha_velo_mesh.get(), alpha_disp_mesh.get(),
         conv_flag, nl_counter, shell );
 
     // Update the time step information
@@ -185,15 +189,15 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     {
       // Calculate the 3D dot flow rate on the outlet
       const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol, face); 
+          cur_dot_sol.get(), face); 
 
       // Calculate the 3D flow rate on the outlet
       const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol, face); 
+          cur_sol.get(), face); 
 
       // Calculate the 3D averaged pressure on the outlet
       const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
-          cur_sol, face);
+          cur_sol.get(), face);
 
       // Calculate the 0D pressure from LPN model
       const double dot_lpn_flowrate = dot_face_flrate;
@@ -221,10 +225,10 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_sol, infnbc_part.get(), face ); 
+          cur_sol.get(), infnbc_part.get(), face ); 
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_sol, infnbc_part.get(), face );
+          cur_sol.get(), infnbc_part.get(), face );
 
       if( SYS_T::get_MPI_rank() == 0 )
       {
@@ -242,10 +246,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     pre_disp_mesh->Copy(*cur_disp_mesh);    
     pre_velo_mesh->Copy(*cur_velo_mesh);
   }
-
-  delete pre_sol; delete cur_sol; delete pre_dot_sol; delete cur_dot_sol; 
-  delete pre_velo_mesh; delete cur_velo_mesh; delete pre_disp_mesh; 
-  delete cur_disp_mesh; delete alpha_velo_mesh; delete alpha_disp_mesh;
 }
 
 // EOF

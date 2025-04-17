@@ -1029,22 +1029,18 @@ class IPGAssem
         Tissue_prestress * const &ps_ptr ) const
     {SYS_T::commPrint("Warning: Update_Wall_Prestress() is not implemented. \n");}
 
-    virtual SI_T::SI_solution * Get_SI_sol()
+    virtual void Update_SI_situation(
+        const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp )
     {
-      SYS_T::print_fatal("Warning: Get_SI_sol() is not implemented. \n");
-      return {};
+      SYS_T::print_fatal("Warning: Update_SI_situation() is not implemented. \n");
     }
 
-    virtual SI_T::SI_quad_point * Get_SI_qp()
+    virtual void Update_SI_sol(
+        const PDNSolution * const &sol )
     {
-      SYS_T::print_fatal("Warning: Get_SI_qp() is not implemented. \n");
-      return {};
-    }
-
-    virtual const ALocal_Interface * Get_itf()
-    {
-      SYS_T::print_fatal("Warning: Get_itf() is not implemented. \n");
-      return {};
+      SYS_T::print_fatal("Warning: Update_SI_sol() is not implemented. \n");
     }
 
     virtual const FEANode * Get_fnode()

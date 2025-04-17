@@ -114,13 +114,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   update_rotatedbc_value(rotnbc_part, mvelo_alpha, &sol_alpha);
   // ------------------------------------------------- 
 
-  SI_T::SI_solution * SI_sol = gassem_ptr->Get_SI_sol();
-  SI_T::SI_quad_point * SI_qp = gassem_ptr->Get_SI_qp();
-  const ALocal_Interface * itf = gassem_ptr->Get_itf();
-  SI_sol->update_node_mvelo(mvelo_alpha);
-  SI_sol->update_node_mdisp(mdisp_alpha);
-  SI_sol->update_node_sol(&sol_alpha);
-  SI_qp->search_all_opposite_point(itf, SI_sol);
+  gassem_ptr->Update_SI_situation(&sol_alpha, mvelo_alpha, mdisp_alpha);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
@@ -190,7 +184,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     dot_sol_alpha.PlusAX( dot_step.get(), (-1.0) * alpha_m );
     sol_alpha.PlusAX( dot_step.get(), (-1.0) * alpha_f * gamma * dt );
 
-    SI_sol->update_node_sol(&sol_alpha);
+    gassem_ptr->Update_SI_sol(&sol_alpha);
 
     // Assembly residual (& tangent if condition satisfied) 
     if( nl_counter % nrenew_freq == 0 || nl_counter >= nrenew_threshold )

@@ -104,14 +104,20 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
-    virtual SI_T::SI_solution * Get_SI_sol()
-    { return SI_sol.get(); }
+    virtual void Update_SI_situation(
+        const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp )
+    {
+      SI_sol->update_node_sol(sol);
+      SI_sol->update_node_mvelo(mvelo);
+      SI_sol->update_node_mdisp(mdisp);
+      SI_qp->search_all_opposite_point(itf.get(), SI_sol.get());
+    }
 
-    virtual SI_T::SI_quad_point * Get_SI_qp()
-    { return SI_qp.get(); }
-
-    virtual const ALocal_Interface * Get_itf()
-    { return itf.get(); }
+    virtual void Update_SI_sol(
+        const PDNSolution * const &sol )
+    { SI_sol->update_node_sol(sol); }
 
     virtual const FEANode * Get_fnode()
     { return fnode.get(); }
