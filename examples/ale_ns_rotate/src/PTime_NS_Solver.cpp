@@ -105,9 +105,9 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
       const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info.get()); //get_currPts() may be writtern into Sl_tools
-      const Vector_3 aplha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info.get());
+      const Vector_3 alpha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info.get());
 
-      const Vector_3 radius_alpha = get_radius(aplha_pt_xyz, rot_info.get()); 
+      const Vector_3 radius_alpha = get_radius(alpha_pt_xyz, rot_info.get()); 
       const Vector_3 velo_mesh_alpha = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*rot_info->get_direction_rotated(), radius_alpha);
 
       const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info.get()); //get_radius() may be writtern into Sl_tools  
@@ -121,7 +121,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         array_cur_disp_mesh[offset + jj] = curr_pt_xyz(jj)-init_pt_xyz(jj);  
 
         array_alp_velo_mesh[offset + jj] = velo_mesh_alpha(jj);
-        array_alp_disp_mesh[offset + jj] = aplha_pt_xyz(jj)-init_pt_xyz(jj);  
+        array_alp_disp_mesh[offset + jj] = alpha_pt_xyz(jj)-init_pt_xyz(jj);  
       }
     }
 
