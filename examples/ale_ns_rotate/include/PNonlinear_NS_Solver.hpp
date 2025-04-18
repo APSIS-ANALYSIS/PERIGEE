@@ -35,7 +35,7 @@ class PNonlinear_NS_Solver
 
     int get_non_max_its() const {return nmaxits;}
 
-    int get_alpha_f() const {return tmga->get_alpha_f();}
+    double get_alpha_f() const {return tmga->get_alpha_f();}
 
     void print_info() const;
 

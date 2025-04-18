@@ -77,8 +77,6 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   const double alpha_f = nsolver->get_alpha_f();
 
-  SYS_T::commPrint("af: %e\n", alpha_f);
-
   SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
       SYS_T::get_time().c_str());
