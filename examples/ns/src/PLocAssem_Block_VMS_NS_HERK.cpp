@@ -567,8 +567,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
     }
 
     const std::array<double, 2> tau_n = get_tau_Darcy(dt);
-
-    std::vector<double> tau_m(subindex+1, tau_n[0]); std::vector<double> tau_c(subindex+1, tau_n[1]);
+    const double tau_m = tau_n[0];
+    const double tau_c = tau_n[1];
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -612,19 +612,19 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
         sum_p_z[index] += tm_RK_ptr->get_RK_a(index, jj) * p_z[jj];
       }
 
-      u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt
+      u_prime[index] = -1.0 * tau_m * ( rho0 * (u[index] - u_n)/dt
                        + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1]
                        + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index]
                        + sum_p_x[index] - rho0 * sum_a_fx[index] );
-      v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt
+      v_prime[index] = -1.0 * tau_m * ( rho0 * (v[index] - v_n)/dt
                        + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1]
                        + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index]
                        + sum_p_y[index] - rho0 * sum_a_fy[index] );
-      w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt
+      w_prime[index] = -1.0 * tau_m * ( rho0 * (w[index] - w_n)/dt
                        + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1]
                        + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index]
                        + sum_p_z[index] - rho0 * sum_a_fz[index] );
-      p_prime[index-1]= -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
+      p_prime[index-1]= -1.0 * tau_c * (u_x[index] + v_y[index] + w_z[index]);
     }
 
     double sum_u_pre_advec = 0.0, sum_u_pre_diffu = 0.0, sum_a_fx_pre = 0.0, sum_p_pre_x = 0;
@@ -982,11 +982,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
     }
 
     const std::array<double, 2> tau_n = get_tau_Darcy(dt);
-
-    std::vector<double> tau_m(num_steps, tau_n[0]); std::vector<double> tau_c(num_steps, tau_n[1]);
-
-    const double& tau_m_n = tau_n[0];
-    const double& tau_c_n = tau_n[1];
+    const double tau_m = tau_n[0];
+    const double tau_c = tau_n[1];
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -1030,22 +1027,22 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
         sum_p_z[index] += tm_RK_ptr->get_RK_a(index, jj) * p_z[jj];
       }
 
-      u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt
+      u_prime[index] = -1.0 * tau_m * ( rho0 * (u[index] - u_n)/dt
                       + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1]
                       + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index]
                       + sum_p_x[index] - rho0 * sum_a_fx[index] );
-      v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt
+      v_prime[index] = -1.0 * tau_m * ( rho0 * (v[index] - v_n)/dt
                       + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1]
                       + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index]
                       + sum_p_y[index] - rho0 * sum_a_fy[index] );
-      w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt
+      w_prime[index] = -1.0 * tau_m * ( rho0 * (w[index] - w_n)/dt
                       + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1]
                       + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index]
                       + sum_p_z[index] - rho0 * sum_a_fz[index] );
-      p_prime[index-1] = -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
+      p_prime[index-1] = -1.0 * tau_c * (u_x[index] + v_y[index] + w_z[index]);
     }
     
-    p_prime[num_steps-1] = -1.0 * tau_c_n * (u_np1_x + v_np1_y + w_np1_z);
+    p_prime[num_steps-1] = -1.0 * tau_c * (u_np1_x + v_np1_y + w_np1_z);
 
     double sum_u_pre_advec = 0.0, sum_u_pre_diffu = 0.0, sum_a_fx_pre = 0.0, sum_p_pre_x = 0;
     double sum_v_pre_advec = 0.0, sum_v_pre_diffu = 0.0, sum_a_fy_pre = 0.0, sum_p_pre_y = 0;
@@ -1121,15 +1118,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       sum_last_p_z += tm_RK_ptr->get_RK_b(jj) * p_z[jj];
     }
 
-    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt
+    const double u_np1_prime = -1.0 * tau_m * ( rho0 * (u_np1 - u_n)/dt
                               + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1]
                               + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu
                               + sum_last_p_x - rho0 * sum_a_fx_cur ); 
-    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt
+    const double v_np1_prime = -1.0 * tau_m * ( rho0 * (v_np1 - v_n)/dt
                               + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1]
                               + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu
                               + sum_last_p_y - rho0 * sum_a_fy_cur );
-    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt
+    const double w_np1_prime = -1.0 * tau_m * ( rho0 * (w_np1 - w_n)/dt
                               + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1]
                               + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu
                               + sum_last_p_z - rho0 * sum_a_fz_cur );
@@ -1437,11 +1434,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
     }
 
     const std::array<double, 2> tau_np1_dot = get_tau_Darcy(dt);
-
     const double tau_m = tau_np1_dot[0];
     const double tau_c = tau_np1_dot[1];
-
-    const double& tau_m_n = tau_np1_dot[0];
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
@@ -1477,15 +1471,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
       sum_last_p_z += tm_RK_ptr->get_RK_b(jj) * p_z[jj];
     }
 
-    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt 
+    const double u_np1_prime = -1.0 * tau_m * ( rho0 * (u_np1 - u_n)/dt 
                               + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1]
                               + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu
                               + sum_last_p_x - rho0 * sum_a_fx_cur ); 
-    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt
+    const double v_np1_prime = -1.0 * tau_m * ( rho0 * (v_np1 - v_n)/dt
                               + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1]
                               + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu
                               + sum_last_p_y - rho0 * sum_a_fy_cur );
-    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt
+    const double w_np1_prime = -1.0 * tau_m * ( rho0 * (w_np1 - w_n)/dt
                               + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1]
                               + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu
                               + sum_last_p_z - rho0 * sum_a_fz_cur );
