@@ -16,8 +16,7 @@ class ITimeMethod_RungeKutta
 {
   public:
     // Constructor, initialize the number of steps
-    ITimeMethod_RungeKutta(int steps) : ss(steps)
-    {}
+    ITimeMethod_RungeKutta(int steps) : ss(steps) {}
 
     virtual ~ITimeMethod_RungeKutta() = default;
 
