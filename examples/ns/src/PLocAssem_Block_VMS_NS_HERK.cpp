@@ -1627,13 +1627,13 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
     std::vector<double> u_z(subindex+1, 0); std::vector<double> v_z(subindex+1, 0); 
     std::vector<double> w_z(subindex+1, 0); std::vector<double> p_z(subindex+1, 0); 
 
-    std::vector<double> u_xx(subindex+1, 0); std::vector<double> v_xx(subindex+1, 0); std::vector<double> w_xx(subindex+1, 0); 
-    std::vector<double> u_yy(subindex+1, 0); std::vector<double> v_yy(subindex+1, 0); std::vector<double> w_yy(subindex+1, 0); 
-    std::vector<double> u_zz(subindex+1, 0); std::vector<double> v_zz(subindex+1, 0); std::vector<double> w_zz(subindex+1, 0); 
+    std::vector<double> u_xx(subindex+1, 0), v_xx(subindex+1, 0), w_xx(subindex+1, 0); 
+    std::vector<double> u_yy(subindex+1, 0), v_yy(subindex+1, 0), w_yy(subindex+1, 0); 
+    std::vector<double> u_zz(subindex+1, 0), v_zz(subindex+1, 0), w_zz(subindex+1, 0); 
 
-    std::vector<double> u_xy(subindex+1, 0); std::vector<double> v_xy(subindex+1, 0); std::vector<double> w_xy(subindex+1, 0); 
-    std::vector<double> u_xz(subindex+1, 0); std::vector<double> v_xz(subindex+1, 0); std::vector<double> w_xz(subindex+1, 0); 
-    std::vector<double> u_yz(subindex+1, 0); std::vector<double> v_yz(subindex+1, 0); std::vector<double> w_yz(subindex+1, 0);
+    std::vector<double> u_xy(subindex+1, 0), v_xy(subindex+1, 0), w_xy(subindex+1, 0); 
+    std::vector<double> u_xz(subindex+1, 0), v_xz(subindex+1, 0), w_xz(subindex+1, 0); 
+    std::vector<double> u_yz(subindex+1, 0), v_yz(subindex+1, 0), w_yz(subindex+1, 0);
 
     // All sub steps at the previous time step
     std::vector<double> u_pre(num_steps, 0); std::vector<double> v_pre(num_steps, 0); 
@@ -1648,13 +1648,13 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
     std::vector<double> u_pre_z(num_steps, 0); std::vector<double> v_pre_z(num_steps, 0); 
     std::vector<double> w_pre_z(num_steps, 0); std::vector<double> p_pre_z(num_steps, 0); 
 
-    std::vector<double> u_pre_xx(num_steps, 0); std::vector<double> v_pre_xx(num_steps, 0); std::vector<double> w_pre_xx(num_steps, 0); 
-    std::vector<double> u_pre_yy(num_steps, 0); std::vector<double> v_pre_yy(num_steps, 0); std::vector<double> w_pre_yy(num_steps, 0); 
-    std::vector<double> u_pre_zz(num_steps, 0); std::vector<double> v_pre_zz(num_steps, 0); std::vector<double> w_pre_zz(num_steps, 0); 
+    std::vector<double> u_pre_xx(num_steps, 0), v_pre_xx(num_steps, 0), w_pre_xx(num_steps, 0); 
+    std::vector<double> u_pre_yy(num_steps, 0), v_pre_yy(num_steps, 0), w_pre_yy(num_steps, 0); 
+    std::vector<double> u_pre_zz(num_steps, 0), v_pre_zz(num_steps, 0), w_pre_zz(num_steps, 0); 
 
-    std::vector<double> u_pre_xy(num_steps, 0); std::vector<double> v_pre_xy(num_steps, 0); std::vector<double> w_pre_xy(num_steps, 0); 
-    std::vector<double> u_pre_xz(num_steps, 0); std::vector<double> v_pre_xz(num_steps, 0); std::vector<double> w_pre_xz(num_steps, 0); 
-    std::vector<double> u_pre_yz(num_steps, 0); std::vector<double> v_pre_yz(num_steps, 0); std::vector<double> w_pre_yz(num_steps, 0);
+    std::vector<double> u_pre_xy(num_steps, 0), v_pre_xy(num_steps, 0), w_pre_xy(num_steps, 0); 
+    std::vector<double> u_pre_xz(num_steps, 0), v_pre_xz(num_steps, 0), w_pre_xz(num_steps, 0); 
+    std::vector<double> u_pre_yz(num_steps, 0), v_pre_yz(num_steps, 0), w_pre_yz(num_steps, 0);
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -1688,22 +1688,22 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         u[jj] += cur_velo_sols[jj][ii3+0] * R[ii];
         v[jj] += cur_velo_sols[jj][ii3+1] * R[ii];
         w[jj] += cur_velo_sols[jj][ii3+2] * R[ii];
-        p[jj] += cur_pres_sols[jj][ii] * R[ii];
+        p[jj] += cur_pres_sols[jj][ii]    * R[ii];
 
         u_x[jj] += cur_velo_sols[jj][ii3+0] * dR_dx[ii];
         v_x[jj] += cur_velo_sols[jj][ii3+1] * dR_dx[ii];
         w_x[jj] += cur_velo_sols[jj][ii3+2] * dR_dx[ii];
-        p_x[jj] += cur_pres_sols[jj][ii] * dR_dx[ii];
+        p_x[jj] += cur_pres_sols[jj][ii]    * dR_dx[ii];
 
         u_y[jj] += cur_velo_sols[jj][ii3+0] * dR_dy[ii];
         v_y[jj] += cur_velo_sols[jj][ii3+1] * dR_dy[ii];
         w_y[jj] += cur_velo_sols[jj][ii3+2] * dR_dy[ii];
-        p_y[jj] += cur_pres_sols[jj][ii] * dR_dy[ii];
+        p_y[jj] += cur_pres_sols[jj][ii]    * dR_dy[ii];
 
         u_z[jj] += cur_velo_sols[jj][ii3+0] * dR_dz[ii];
         v_z[jj] += cur_velo_sols[jj][ii3+1] * dR_dz[ii];
         w_z[jj] += cur_velo_sols[jj][ii3+2] * dR_dz[ii];
-        p_z[jj] += cur_pres_sols[jj][ii] * dR_dz[ii];
+        p_z[jj] += cur_pres_sols[jj][ii]    * dR_dz[ii];
 
         u_xx[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxx[ii];
         u_yy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyy[ii];
@@ -1737,22 +1737,22 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         u_pre[jj] += pre_velo_sols[jj][ii3+0] * R[ii];
         v_pre[jj] += pre_velo_sols[jj][ii3+1] * R[ii];
         w_pre[jj] += pre_velo_sols[jj][ii3+2] * R[ii];
-        p_pre[jj] += pre_pres_sols[jj][ii] * R[ii];
+        p_pre[jj] += pre_pres_sols[jj][ii]    * R[ii];
 
         u_pre_x[jj] += pre_velo_sols[jj][ii3+0] * dR_dx[ii];
         v_pre_x[jj] += pre_velo_sols[jj][ii3+1] * dR_dx[ii];
         w_pre_x[jj] += pre_velo_sols[jj][ii3+2] * dR_dx[ii];
-        p_pre_x[jj] += pre_pres_sols[jj][ii] * dR_dx[ii];
+        p_pre_x[jj] += pre_pres_sols[jj][ii]    * dR_dx[ii];
 
         u_pre_y[jj] += pre_velo_sols[jj][ii3+0] * dR_dy[ii];
         v_pre_y[jj] += pre_velo_sols[jj][ii3+1] * dR_dy[ii];
         w_pre_y[jj] += pre_velo_sols[jj][ii3+2] * dR_dy[ii];
-        p_pre_y[jj] += pre_pres_sols[jj][ii] * dR_dy[ii];
+        p_pre_y[jj] += pre_pres_sols[jj][ii]    * dR_dy[ii];
 
         u_pre_z[jj] += pre_velo_sols[jj][ii3+0] * dR_dz[ii];
         v_pre_z[jj] += pre_velo_sols[jj][ii3+1] * dR_dz[ii];
         w_pre_z[jj] += pre_velo_sols[jj][ii3+2] * dR_dz[ii];
-        p_pre_z[jj] += pre_pres_sols[jj][ii] * dR_dz[ii];
+        p_pre_z[jj] += pre_pres_sols[jj][ii]    * dR_dz[ii];
 
         u_pre_xx[jj] += pre_velo_sols[jj][ii3+0] * d2R_dxx[ii];
         u_pre_yy[jj] += pre_velo_sols[jj][ii3+0] * d2R_dyy[ii];
@@ -1793,9 +1793,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
-    std::vector<double> sum_u_advec(subindex+1, 0); std::vector<double> sum_u_diffu(subindex+1, 0); std::vector<double> sum_a_fx(subindex+1, 0); std::vector<double> sum_p_x(subindex+1, 0);
-    std::vector<double> sum_v_advec(subindex+1, 0); std::vector<double> sum_v_diffu(subindex+1, 0); std::vector<double> sum_a_fy(subindex+1, 0); std::vector<double> sum_p_y(subindex+1, 0);
-    std::vector<double> sum_w_advec(subindex+1, 0); std::vector<double> sum_w_diffu(subindex+1, 0); std::vector<double> sum_a_fz(subindex+1, 0); std::vector<double> sum_p_z(subindex+1, 0);
+    std::vector<double> sum_u_advec(subindex+1, 0), sum_u_diffu(subindex+1, 0); 
+    std::vector<double> sum_a_fx(subindex+1, 0), sum_p_x(subindex+1, 0);
+    std::vector<double> sum_v_advec(subindex+1, 0), sum_v_diffu(subindex+1, 0);
+    std::vector<double> sum_a_fy(subindex+1, 0), sum_p_y(subindex+1, 0);
+    std::vector<double> sum_w_advec(subindex+1, 0), sum_w_diffu(subindex+1, 0);
+    std::vector<double> sum_a_fz(subindex+1, 0), sum_p_z(subindex+1, 0);
 
     std::vector<double> u_prime(subindex+1, 0); std::vector<double> v_prime(subindex+1, 0); 
     std::vector<double> w_prime(subindex+1, 0); std::vector<double> p_prime(subindex, 0); 
@@ -1824,9 +1827,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         sum_p_z[index] += tm_RK_ptr->get_RK_a(index, jj) * p_z[jj];
       }
 
-      u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1] + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index] + sum_p_x[index] - rho0 * sum_a_fx[index] );
-      v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1] + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index] + sum_p_y[index] - rho0 * sum_a_fy[index] );
-      w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1] + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index] + sum_p_z[index] - rho0 * sum_a_fz[index] );
+      u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1]
+                      + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index] + sum_p_x[index] - rho0 * sum_a_fx[index] );
+      v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1]
+                      + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index] + sum_p_y[index] - rho0 * sum_a_fy[index] );
+      w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1]
+                      + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index] + sum_p_z[index] - rho0 * sum_a_fz[index] );
       p_prime[index-1]= -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
     }
 
@@ -1856,9 +1862,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
       sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
     }
 
-    const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
-    const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
-    const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+    const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1]
+                                        + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
+    const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1]
+                                        + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
+    const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1]
+                                        + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
 
     u_prime[0] = u_n_prime;
     v_prime[0] = v_n_prime;
@@ -1975,7 +1984,9 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
       {
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         // Continuity equation with respect to p, u, v, w
-        Tangent0[  nLocBas*A+B          ] += gwts * (NA_x * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x + NA_y * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_y + NA_z * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_z);
+        Tangent0[  nLocBas*A+B          ] += gwts * (NA_x * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x
+                                                   + NA_y * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_y
+                                                   + NA_z * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_z);
         
         Tangent1[3*nLocBas*A+3*B+0      ] += gwts * (NA * NB_x + NA_x * tau_m[subindex] * NB * rho0/dt);
 
@@ -1984,7 +1995,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         Tangent1[3*nLocBas*A+3*B+2      ] += gwts * (NA * NB_z + NA_z * tau_m[subindex] * NB * rho0/dt);
 
         // Momentum-x with respect to p, u, v, w
-        Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x);
+        Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB 
+                                                    - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_x);
         
         Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0 /dt);
 
@@ -1995,7 +2007,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         Tangent4[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z);
 
         // Momentum-y with repspect to p, u, v, w
-        Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_y);
+        Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB
+                                                    - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_y);
 
         Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt);
 
@@ -2006,7 +2019,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
         Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * tau_c[subindex] * NB_z );
 
         // Momentum-z with repspect to p, u, v, w
-        Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_z);
+        Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB
+                                                    - NA * rho0/dt * tau_m[subindex] * tm_RK_ptr->get_RK_a(subindex, subindex-1) * NB_z);
 
         Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m[subindex] * NB * rho0/dt);        
 
@@ -2063,13 +2077,13 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
     std::vector<double> u_z(num_steps, 0); std::vector<double> v_z(num_steps, 0); 
     std::vector<double> w_z(num_steps, 0); std::vector<double> p_z(num_steps, 0); 
 
-    std::vector<double> u_xx(num_steps, 0); std::vector<double> v_xx(num_steps, 0); std::vector<double> w_xx(num_steps, 0); 
-    std::vector<double> u_yy(num_steps, 0); std::vector<double> v_yy(num_steps, 0); std::vector<double> w_yy(num_steps, 0); 
-    std::vector<double> u_zz(num_steps, 0); std::vector<double> v_zz(num_steps, 0); std::vector<double> w_zz(num_steps, 0); 
+    std::vector<double> u_xx(num_steps, 0), v_xx(num_steps, 0), w_xx(num_steps, 0); 
+    std::vector<double> u_yy(num_steps, 0), v_yy(num_steps, 0), w_yy(num_steps, 0); 
+    std::vector<double> u_zz(num_steps, 0), v_zz(num_steps, 0), w_zz(num_steps, 0); 
 
-    std::vector<double> u_xy(num_steps, 0); std::vector<double> v_xy(num_steps, 0); std::vector<double> w_xy(num_steps, 0); 
-    std::vector<double> u_xz(num_steps, 0); std::vector<double> v_xz(num_steps, 0); std::vector<double> w_xz(num_steps, 0); 
-    std::vector<double> u_yz(num_steps, 0); std::vector<double> v_yz(num_steps, 0); std::vector<double> w_yz(num_steps, 0);
+    std::vector<double> u_xy(num_steps, 0), v_xy(num_steps, 0), w_xy(num_steps, 0); 
+    std::vector<double> u_xz(num_steps, 0), v_xz(num_steps, 0), w_xz(num_steps, 0); 
+    std::vector<double> u_yz(num_steps, 0), v_yz(num_steps, 0), w_yz(num_steps, 0);
 
     // All sub steps at the previous time step
     std::vector<double> u_pre(num_steps, 0); std::vector<double> v_pre(num_steps, 0); 
@@ -2084,13 +2098,13 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
     std::vector<double> u_pre_z(num_steps, 0); std::vector<double> v_pre_z(num_steps, 0); 
     std::vector<double> w_pre_z(num_steps, 0); std::vector<double> p_pre_z(num_steps, 0); 
 
-    std::vector<double> u_pre_xx(num_steps, 0); std::vector<double> v_pre_xx(num_steps, 0); std::vector<double> w_pre_xx(num_steps, 0); 
-    std::vector<double> u_pre_yy(num_steps, 0); std::vector<double> v_pre_yy(num_steps, 0); std::vector<double> w_pre_yy(num_steps, 0); 
-    std::vector<double> u_pre_zz(num_steps, 0); std::vector<double> v_pre_zz(num_steps, 0); std::vector<double> w_pre_zz(num_steps, 0); 
+    std::vector<double> u_pre_xx(num_steps, 0), v_pre_xx(num_steps, 0), w_pre_xx(num_steps, 0); 
+    std::vector<double> u_pre_yy(num_steps, 0), v_pre_yy(num_steps, 0), w_pre_yy(num_steps, 0); 
+    std::vector<double> u_pre_zz(num_steps, 0), v_pre_zz(num_steps, 0), w_pre_zz(num_steps, 0); 
 
-    std::vector<double> u_pre_xy(num_steps, 0); std::vector<double> v_pre_xy(num_steps, 0); std::vector<double> w_pre_xy(num_steps, 0); 
-    std::vector<double> u_pre_xz(num_steps, 0); std::vector<double> v_pre_xz(num_steps, 0); std::vector<double> w_pre_xz(num_steps, 0); 
-    std::vector<double> u_pre_yz(num_steps, 0); std::vector<double> v_pre_yz(num_steps, 0); std::vector<double> w_pre_yz(num_steps, 0);
+    std::vector<double> u_pre_xy(num_steps, 0), v_pre_xy(num_steps, 0), w_pre_xy(num_steps, 0); 
+    std::vector<double> u_pre_xz(num_steps, 0), v_pre_xz(num_steps, 0), w_pre_xz(num_steps, 0); 
+    std::vector<double> u_pre_yz(num_steps, 0), v_pre_yz(num_steps, 0), w_pre_yz(num_steps, 0);
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -2140,22 +2154,22 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         u[jj] += cur_velo_sols[jj][ii3+0] * R[ii];
         v[jj] += cur_velo_sols[jj][ii3+1] * R[ii];
         w[jj] += cur_velo_sols[jj][ii3+2] * R[ii];
-        p[jj] += cur_pres_sols[jj][ii] * R[ii];
+        p[jj] += cur_pres_sols[jj][ii]    * R[ii];
 
         u_x[jj] += cur_velo_sols[jj][ii3+0] * dR_dx[ii];
         v_x[jj] += cur_velo_sols[jj][ii3+1] * dR_dx[ii];
         w_x[jj] += cur_velo_sols[jj][ii3+2] * dR_dx[ii];
-        p_x[jj] += cur_pres_sols[jj][ii] * dR_dx[ii];
+        p_x[jj] += cur_pres_sols[jj][ii]    * dR_dx[ii];
 
         u_y[jj] += cur_velo_sols[jj][ii3+0] * dR_dy[ii];
         v_y[jj] += cur_velo_sols[jj][ii3+1] * dR_dy[ii];
         w_y[jj] += cur_velo_sols[jj][ii3+2] * dR_dy[ii];
-        p_y[jj] += cur_pres_sols[jj][ii] * dR_dy[ii];
+        p_y[jj] += cur_pres_sols[jj][ii]    * dR_dy[ii];
 
         u_z[jj] += cur_velo_sols[jj][ii3+0] * dR_dz[ii];
         v_z[jj] += cur_velo_sols[jj][ii3+1] * dR_dz[ii];
         w_z[jj] += cur_velo_sols[jj][ii3+2] * dR_dz[ii];
-        p_z[jj] += cur_pres_sols[jj][ii] * dR_dz[ii];
+        p_z[jj] += cur_pres_sols[jj][ii]    * dR_dz[ii];
 
         u_xx[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxx[ii];
         u_yy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyy[ii];
@@ -2181,22 +2195,22 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         u_pre[jj] += pre_velo_sols[jj][ii3+0] * R[ii];
         v_pre[jj] += pre_velo_sols[jj][ii3+1] * R[ii];
         w_pre[jj] += pre_velo_sols[jj][ii3+2] * R[ii];
-        p_pre[jj] += pre_pres_sols[jj][ii] * R[ii];
+        p_pre[jj] += pre_pres_sols[jj][ii]    * R[ii];
 
         u_pre_x[jj] += pre_velo_sols[jj][ii3+0] * dR_dx[ii];
         v_pre_x[jj] += pre_velo_sols[jj][ii3+1] * dR_dx[ii];
         w_pre_x[jj] += pre_velo_sols[jj][ii3+2] * dR_dx[ii];
-        p_pre_x[jj] += pre_pres_sols[jj][ii] * dR_dx[ii];
+        p_pre_x[jj] += pre_pres_sols[jj][ii]    * dR_dx[ii];
 
         u_pre_y[jj] += pre_velo_sols[jj][ii3+0] * dR_dy[ii];
         v_pre_y[jj] += pre_velo_sols[jj][ii3+1] * dR_dy[ii];
         w_pre_y[jj] += pre_velo_sols[jj][ii3+2] * dR_dy[ii];
-        p_pre_y[jj] += pre_pres_sols[jj][ii] * dR_dy[ii];
+        p_pre_y[jj] += pre_pres_sols[jj][ii]    * dR_dy[ii];
 
         u_pre_z[jj] += pre_velo_sols[jj][ii3+0] * dR_dz[ii];
         v_pre_z[jj] += pre_velo_sols[jj][ii3+1] * dR_dz[ii];
         w_pre_z[jj] += pre_velo_sols[jj][ii3+2] * dR_dz[ii];
-        p_pre_z[jj] += pre_pres_sols[jj][ii] * dR_dz[ii];
+        p_pre_z[jj] += pre_pres_sols[jj][ii]    * dR_dz[ii];
 
         u_pre_xx[jj] += pre_velo_sols[jj][ii3+0] * d2R_dxx[ii];
         u_pre_yy[jj] += pre_velo_sols[jj][ii3+0] * d2R_dyy[ii];
@@ -2238,9 +2252,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
-    std::vector<double> sum_u_advec(num_steps, 0); std::vector<double> sum_u_diffu(num_steps, 0); std::vector<double> sum_a_fx(num_steps, 0); std::vector<double> sum_p_x(num_steps, 0);
-    std::vector<double> sum_v_advec(num_steps, 0); std::vector<double> sum_v_diffu(num_steps, 0); std::vector<double> sum_a_fy(num_steps, 0); std::vector<double> sum_p_y(num_steps, 0);
-    std::vector<double> sum_w_advec(num_steps, 0); std::vector<double> sum_w_diffu(num_steps, 0); std::vector<double> sum_a_fz(num_steps, 0); std::vector<double> sum_p_z(num_steps, 0);
+    std::vector<double> sum_u_advec(num_steps, 0), sum_u_diffu(num_steps, 0); 
+    std::vector<double> sum_a_fx(num_steps, 0), sum_p_x(num_steps, 0);
+    std::vector<double> sum_v_advec(num_steps, 0), sum_v_diffu(num_steps, 0); 
+    std::vector<double> sum_a_fy(num_steps, 0), sum_p_y(num_steps, 0);
+    std::vector<double> sum_w_advec(num_steps, 0), sum_w_diffu(num_steps, 0); 
+    std::vector<double> sum_a_fz(num_steps, 0), sum_p_z(num_steps, 0);
 
     std::vector<double> u_prime(num_steps, 0); std::vector<double> v_prime(num_steps, 0); 
     std::vector<double> w_prime(num_steps, 0); std::vector<double> p_prime(num_steps, 0); 
@@ -2269,9 +2286,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         sum_p_z[index] += tm_RK_ptr->get_RK_a(index, jj) * p_z[jj];
       }
 
-      u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1] + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index] + sum_p_x[index] - rho0 * sum_a_fx[index] );
-      v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1] + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index] + sum_p_y[index] - rho0 * sum_a_fy[index] );
-      w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1] + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index] + sum_p_z[index] - rho0 * sum_a_fz[index] );
+      u_prime[index] = -1.0 * tau_m[index] * ( rho0 * (u[index] - u_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_x[index-1]
+                     + rho0 * sum_u_advec[index] - vis_mu * sum_u_diffu[index] + sum_p_x[index] - rho0 * sum_a_fx[index] );
+      v_prime[index] = -1.0 * tau_m[index] * ( rho0 * (v[index] - v_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_y[index-1]
+                     + rho0 * sum_v_advec[index] - vis_mu * sum_v_diffu[index] + sum_p_y[index] - rho0 * sum_a_fy[index] );
+      w_prime[index] = -1.0 * tau_m[index] * ( rho0 * (w[index] - w_n)/dt + tm_RK_ptr->get_RK_a(index, index-1) * p_z[index-1]
+                     + rho0 * sum_w_advec[index] - vis_mu * sum_w_diffu[index] + sum_p_z[index] - rho0 * sum_a_fz[index] );
       p_prime[index-1] = -1.0 * tau_c[index] * (u_x[index] + v_y[index] + w_z[index]);
     }
     
@@ -2303,9 +2323,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
       sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
     }
 
-    const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1] + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
-    const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1] + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
-    const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1] + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
+    const double u_n_prime = -1.0 * tau_m_n * ( rho0 * (u_n - u_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_x[num_steps-1]
+                             + rho0 * sum_u_pre_advec - vis_mu * sum_u_pre_diffu + sum_p_pre_x - rho0 * sum_a_fx_pre ); 
+    const double v_n_prime = -1.0 * tau_m_n * ( rho0 * (v_n - v_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_y[num_steps-1]
+                             + rho0 * sum_v_pre_advec - vis_mu * sum_v_pre_diffu + sum_p_pre_y - rho0 * sum_a_fy_pre );
+    const double w_n_prime = -1.0 * tau_m_n * ( rho0 * (w_n - w_nm1)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_pre_z[num_steps-1]
+                             + rho0 * sum_w_pre_advec - vis_mu * sum_w_pre_diffu + sum_p_pre_z - rho0 * sum_a_fz_pre );
     
     u_prime[0] = u_n_prime;
     v_prime[0] = v_n_prime;
@@ -2337,9 +2360,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
       sum_last_p_z += tm_RK_ptr->get_RK_b(jj) * p_z[jj];
     }
 
-    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1] + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu + sum_last_p_x - rho0 * sum_a_fx_cur ); 
-    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1] + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu + sum_last_p_y - rho0 * sum_a_fy_cur );
-    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1] + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu + sum_last_p_z - rho0 * sum_a_fz_cur );
+    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1]
+                              + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu + sum_last_p_x - rho0 * sum_a_fx_cur ); 
+    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1]
+                              + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu + sum_last_p_y - rho0 * sum_a_fy_cur );
+    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1]
+                              + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu + sum_last_p_z - rho0 * sum_a_fz_cur );
   
     const double div_vel_np1 = u_np1_x + v_np1_y + w_np1_z;
     
@@ -2452,7 +2478,9 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
       {
         const double NB = R[B], NB_x = dR_dx[B], NB_y = dR_dy[B], NB_z = dR_dz[B];
         // Continuity equation with respect to p, u, v, w
-        Tangent0[  nLocBas*A+B          ] += gwts * (NA_x * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_x + NA_y * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_y + NA_z * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_z);
+        Tangent0[  nLocBas*A+B          ] += gwts * (NA_x * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_x 
+                                                   + NA_y * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_y
+                                                   + NA_z * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_z);
 
         Tangent1[3*nLocBas*A+3*B+0      ] += gwts * (NA * NB_x + NA_x * tau_m_n * NB * rho0/dt);
 
@@ -2461,7 +2489,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         Tangent1[3*nLocBas*A+3*B+2      ] += gwts * (NA * NB_z + NA_z * tau_m_n * NB * rho0/dt);
 
         // Momentum-x with respect to p, u, v, w
-        Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_x);
+        Tangent2[  nLocBas*3*A+B        ] += gwts * (-NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * NB
+                                                    - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_x);
         
         Tangent3[3*nLocBas*3*A+3*B+0    ] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0 /dt);
         
@@ -2472,7 +2501,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         Tangent4[3*nLocBas*3*A+3*B+2    ] += gwts * (NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z);
 
         // Momentum-y with repspect to p, u, v, w
-        Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_y);
+        Tangent2[  nLocBas*(3*A+1)+B    ] += gwts * (-NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * NB
+                                                    - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_y);
 
         Tangent3[3*nLocBas*(3*A+1)+3*B+1] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt);
 
@@ -2483,7 +2513,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
         Tangent4[3*nLocBas*(3*A+1)+3*B+2] += gwts * (NA_y * tm_RK_ptr->get_RK_b(num_steps-1) * tau_c_n * NB_z );
 
         // Momentum-z with repspect to p, u, v, w
-        Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * NB - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_z);
+        Tangent2[  nLocBas*(3*A+2)+B    ] += gwts * (-NA_z * tm_RK_ptr->get_RK_b(num_steps-1) * NB
+                                                    - NA * rho0/dt * tau_m_n * tm_RK_ptr->get_RK_b(num_steps-1) * NB_z);
 
         Tangent3[3*nLocBas*(3*A+2)+3*B+2] += gwts * (NA * rho0/dt * NB - NA * rho0/dt * tau_m_n * NB * rho0/dt);   
 
@@ -2554,13 +2585,13 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
     std::vector<double> u_z(num_steps, 0); std::vector<double> v_z(num_steps, 0); 
     std::vector<double> w_z(num_steps, 0); std::vector<double> p_z(num_steps, 0); 
 
-    std::vector<double> u_xx(num_steps, 0); std::vector<double> v_xx(num_steps, 0); std::vector<double> w_xx(num_steps, 0); 
-    std::vector<double> u_yy(num_steps, 0); std::vector<double> v_yy(num_steps, 0); std::vector<double> w_yy(num_steps, 0); 
-    std::vector<double> u_zz(num_steps, 0); std::vector<double> v_zz(num_steps, 0); std::vector<double> w_zz(num_steps, 0); 
+    std::vector<double> u_xx(num_steps, 0), v_xx(num_steps, 0), w_xx(num_steps, 0); 
+    std::vector<double> u_yy(num_steps, 0), v_yy(num_steps, 0), w_yy(num_steps, 0); 
+    std::vector<double> u_zz(num_steps, 0), v_zz(num_steps, 0), w_zz(num_steps, 0); 
 
-    std::vector<double> u_xy(num_steps, 0); std::vector<double> v_xy(num_steps, 0); std::vector<double> w_xy(num_steps, 0); 
-    std::vector<double> u_xz(num_steps, 0); std::vector<double> v_xz(num_steps, 0); std::vector<double> w_xz(num_steps, 0); 
-    std::vector<double> u_yz(num_steps, 0); std::vector<double> v_yz(num_steps, 0); std::vector<double> w_yz(num_steps, 0);
+    std::vector<double> u_xy(num_steps, 0), v_xy(num_steps, 0), w_xy(num_steps, 0); 
+    std::vector<double> u_xz(num_steps, 0), v_xz(num_steps, 0), w_xz(num_steps, 0); 
+    std::vector<double> u_yz(num_steps, 0), v_yz(num_steps, 0), w_yz(num_steps, 0);
 
     Vector_3 coor(0.0, 0.0, 0.0);
 
@@ -2583,7 +2614,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
       p_np1_x += cur_pres[ii] * dR_dx[ii];
       p_np1_y += cur_pres[ii] * dR_dy[ii];
       p_np1_z += cur_pres[ii] * dR_dz[ii];     
-      p_np1 += cur_pres[ii] * R[ii];
+      p_np1   += cur_pres[ii] * R[ii];
 
       u_np1_x += cur_velo[ii3+0] * dR_dx[ii];
       u_np1_y += cur_velo[ii3+0] * dR_dy[ii];
@@ -2648,22 +2679,22 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
         u[jj] += cur_velo_sols[jj][ii3+0] * R[ii];
         v[jj] += cur_velo_sols[jj][ii3+1] * R[ii];
         w[jj] += cur_velo_sols[jj][ii3+2] * R[ii];
-        p[jj] += cur_pres_sols[jj][ii] * R[ii];
+        p[jj] += cur_pres_sols[jj][ii]    * R[ii];
 
         u_x[jj] += cur_velo_sols[jj][ii3+0] * dR_dx[ii];
         v_x[jj] += cur_velo_sols[jj][ii3+1] * dR_dx[ii];
         w_x[jj] += cur_velo_sols[jj][ii3+2] * dR_dx[ii];
-        p_x[jj] += cur_pres_sols[jj][ii] * dR_dx[ii];
+        p_x[jj] += cur_pres_sols[jj][ii]    * dR_dx[ii];
 
         u_y[jj] += cur_velo_sols[jj][ii3+0] * dR_dy[ii];
         v_y[jj] += cur_velo_sols[jj][ii3+1] * dR_dy[ii];
         w_y[jj] += cur_velo_sols[jj][ii3+2] * dR_dy[ii];
-        p_y[jj] += cur_pres_sols[jj][ii] * dR_dy[ii];
+        p_y[jj] += cur_pres_sols[jj][ii]    * dR_dy[ii];
 
         u_z[jj] += cur_velo_sols[jj][ii3+0] * dR_dz[ii];
         v_z[jj] += cur_velo_sols[jj][ii3+1] * dR_dz[ii];
         w_z[jj] += cur_velo_sols[jj][ii3+2] * dR_dz[ii];
-        p_z[jj] += cur_pres_sols[jj][ii] * dR_dz[ii];
+        p_z[jj] += cur_pres_sols[jj][ii]    * dR_dz[ii];
 
         u_xx[jj] += cur_velo_sols[jj][ii3+0] * d2R_dxx[ii];
         u_yy[jj] += cur_velo_sols[jj][ii3+0] * d2R_dyy[ii];
@@ -2725,9 +2756,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
       sum_last_p_z += tm_RK_ptr->get_RK_b(jj) * p_z[jj];
     }
 
-    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1] + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu + sum_last_p_x - rho0 * sum_a_fx_cur ); 
-    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1] + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu + sum_last_p_y - rho0 * sum_a_fy_cur );
-    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1] + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu + sum_last_p_z - rho0 * sum_a_fz_cur );
+    const double u_np1_prime = -1.0 * tau_m_n * ( rho0 * (u_np1 - u_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_x[num_steps-1] 
+                             + rho0 * sum_u_cur_advec - vis_mu * sum_u_cur_diffu + sum_last_p_x - rho0 * sum_a_fx_cur ); 
+    const double v_np1_prime = -1.0 * tau_m_n * ( rho0 * (v_np1 - v_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_y[num_steps-1]
+                             + rho0 * sum_v_cur_advec - vis_mu * sum_v_cur_diffu + sum_last_p_y - rho0 * sum_a_fy_cur );
+    const double w_np1_prime = -1.0 * tau_m_n * ( rho0 * (w_np1 - w_n)/dt + tm_RK_ptr->get_RK_b(num_steps-1) * p_z[num_steps-1]
+                             + rho0 * sum_w_cur_advec - vis_mu * sum_w_cur_diffu + sum_last_p_z - rho0 * sum_a_fz_cur );
 
     const double u_np1_adevc = u_np1 * u_np1_x + v_np1 * u_np1_y + w_np1 * u_np1_z;
     const double u_np1_diffu = u_np1_xx + v_np1_xy + w_np1_xz + u_np1_xx + u_np1_yy + u_np1_zz;
@@ -2738,9 +2772,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
     const double w_np1_adevc = u_np1 * w_np1_x + v_np1 * w_np1_y + w_np1 * w_np1_z;
     const double w_np1_diffu = u_np1_xz + v_np1_yz + w_np1_zz + w_np1_xx + w_np1_yy + w_np1_zz;
 
-    const double dot_u_np1_prime = -1.0 * tau_m * ( rho0 * dot_u_np1 +  p_np1_x + rho0 * u_np1_adevc - vis_mu * u_np1_diffu - rho0 * get_f( coor, time + dt ).x() );
-    const double dot_v_np1_prime = -1.0 * tau_m * ( rho0 * dot_v_np1 +  p_np1_y + rho0 * v_np1_adevc - vis_mu * v_np1_diffu - rho0 * get_f( coor, time + dt ).y() );
-    const double dot_w_np1_prime = -1.0 * tau_m * ( rho0 * dot_w_np1 +  p_np1_z + rho0 * w_np1_adevc - vis_mu * w_np1_diffu - rho0 * get_f( coor, time + dt ).z() );    
+    const double dot_u_np1_prime = -1.0 * tau_m * ( rho0 * dot_u_np1 +  p_np1_x + rho0 * u_np1_adevc 
+                                        - vis_mu * u_np1_diffu - rho0 * get_f( coor, time + dt ).x() );
+    const double dot_v_np1_prime = -1.0 * tau_m * ( rho0 * dot_v_np1 +  p_np1_y + rho0 * v_np1_adevc
+                                        - vis_mu * v_np1_diffu - rho0 * get_f( coor, time + dt ).y() );
+    const double dot_w_np1_prime = -1.0 * tau_m * ( rho0 * dot_w_np1 +  p_np1_z + rho0 * w_np1_adevc
+                                        - vis_mu * w_np1_diffu - rho0 * get_f( coor, time + dt ).z() );    
 
     const double div_dot_vel_np1 = dot_u_np1_x + dot_v_np1_y + dot_w_np1_z;
     const double p_np1_prime = -1.0 * tau_c * div_dot_vel_np1;
@@ -2797,21 +2834,24 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
 
       Residual0[ A     ] += gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 
-      Residual1[3*A + 0] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
+      Residual1[3*A + 0] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime 
+                                   - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
                                    + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu *  u_diffu1_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
                                    + NA * rho0 * u_stab1_1 + NA * rho0 * u_stab1_2 + NA * rho0 * u_stab1_3 
                                    - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
 
-      Residual1[3*A + 1] += gwts * ( NA * rho0 * dot_v_np1 - NA_y * p_np1 + NA * rho0 * dot_v_np1_prime - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).y() 
+      Residual1[3*A + 1] += gwts * ( NA * rho0 * dot_v_np1 - NA_y * p_np1 + NA * rho0 * dot_v_np1_prime 
+                                   - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).y() 
                                    + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
                                    - NA_xy * vis_mu * u_diffu2_1 - NA_yy * vis_mu * v_diffu2_2 - NA_yz * vis_mu * w_diffu2_3
                                    - NA_xx * vis_mu * v_diffu2_2 - NA_yy * vis_mu * v_diffu2_2 - NA_zz * vis_mu * v_diffu2_2
                                    + NA * rho0 * v_stab1_1 + NA * rho0 * v_stab1_2 + NA * rho0 * v_stab1_3
                                    - NA_x * rho0 * v_stab2_1 - NA_y * rho0 * v_stab2_2 - NA_z * rho0 * v_stab2_3 );
 
-      Residual1[3*A + 2] += gwts * ( NA * rho0 * dot_w_np1 - NA_z * p_np1+ NA * rho0 * dot_w_np1_prime - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).z()
+      Residual1[3*A + 2] += gwts * ( NA * rho0 * dot_w_np1 - NA_z * p_np1+ NA * rho0 * dot_w_np1_prime
+                                   - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).z()
                                    + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
                                    - NA_xz * vis_mu * u_diffu2_1 - NA_yz * vis_mu * v_diffu2_2 - NA_zz * vis_mu * w_diffu2_3
                                    - NA_xx * vis_mu * w_diffu2_3 - NA_yy * vis_mu * w_diffu2_3 - NA_zz * vis_mu * w_diffu2_3
