@@ -99,31 +99,11 @@ SymmTensor2_3D PLocAssem_Block_VMS_NS_HERK::get_metric(
 }
 
 std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
-  const double &dt, const std::array<double, 9> &dxi_dx ) const
+  const double &dt) const
 {
-  // const SymmTensor2_3D G = get_metric( dxi_dx );
-
-  // const double dh = 1.0/std::sqrt( G.MatContraction( G ) );
-
-  // const double tau_m = 1.0/(cu * rho0/dt * L0) * dh;
-  
-  // const double tau_c = cp * rho0/dt * L0 * dh; 
-
-  // return {tau_m, tau_c};
-
   const double tau_m = 1.0/(cu * rho0/dt * L0);
 
-  return {tau_m, 0.0};  
-
-  // const SymmTensor2_3D G = get_metric( dxi_dx );
-
-  // const double temp_nu = vis_mu / rho0;
-
-  // const double denom_m = std::sqrt( CT / (dt*dt) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
-
-  // // return tau_m followed by tau_c
-  // return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
-  // return {{1.0 / ( rho0 * denom_m ), 0.0 * rho0 * denom_m / G.tr()}};
+  return {tau_m, 0.0};
 }
 
 std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau(
@@ -320,16 +300,12 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Matrix(
   Zero_Tangent();
 
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
-  std::vector<double> d2R_dxx(nLocBas, 0.0), d2R_dyy(nLocBas, 0.0), d2R_dzz(nLocBas, 0.0);
-  std::vector<double> d2R_dxy(nLocBas, 0.0), d2R_dxz(nLocBas, 0.0), d2R_dyz(nLocBas, 0.0);
-
+  
   for(int qua=0; qua<nqpv; ++qua)
   {
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    elementv->get_3D_R_dR_d2R( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0], 
-                              &d2R_dxx[0], &d2R_dyy[0], &d2R_dzz[0],
-                              &d2R_dxy[0], &d2R_dxz[0], &d2R_dyz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -338,9 +314,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Matrix(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const auto dxi_dx = elementv->get_invJacobian(qua);
-
-    const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
+    const std::array<double, 2> tau_n = get_tau_Darcy(dt);
     const double tau_m = tau_n[0];
     const double tau_c = tau_n[1];
 
@@ -592,22 +566,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
       }
     }
 
-    const auto dxi_dx = elementv->get_invJacobian(qua);
-
-    // std::vector<double> tau_m(subindex+1, 0); std::vector<double> tau_c(subindex+1, 0);
-
-    // for(int index=1; index<=subindex; ++index)
-    // {
-    //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index-1], v[index-1], w[index-1] );
-    //   tau_m[index] = tau_sub[0];
-    //   tau_c[index] = tau_sub[1];
-    // }
-
-    // const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
-    // const double tau_m_n = tau_n[0];
-    // const double tau_c_n = tau_n[1];
-
-    const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
+    const std::array<double, 2> tau_n = get_tau_Darcy(dt);
 
     std::vector<double> tau_m(subindex+1, tau_n[0]); std::vector<double> tau_c(subindex+1, tau_n[1]);
 
@@ -759,7 +718,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
 
       Residual1[3*A + 0] += gwts * ( NA * rho0/dt * u[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
                                   + NA * rho0/dt * u_prime[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
-                                  - NA * rho0 * sum_a_fx[subindex] - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime // 缺一个自然边界条件 
+                                  - NA * rho0 * sum_a_fx[subindex] - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
                                   + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu * u_diffu1_3
                                   - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                   - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
@@ -991,22 +950,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       }
     }
 
-    const auto dxi_dx = elementv->get_invJacobian(qua);
-
-    // std::vector<double> tau_m(num_steps, 0); std::vector<double> tau_c(num_steps, 0);
-
-    // for(int index=1; index<num_steps; ++index)
-    // {
-    //   const std::array<double, 2> tau_sub = get_tau( dt, dxi_dx, u[index], v[index], w[index] );
-    //   tau_m[index] = tau_sub[0];
-    //   tau_c[index] = tau_sub[1];
-    // }
-
-    // const std::array<double, 2> tau_n = get_tau( dt, dxi_dx, u_n, v_n, w_n );
-    // const double tau_m_n = tau_n[0];
-    // const double tau_c_n = tau_n[1];
-
-    const std::array<double, 2> tau_n = get_tau_Darcy( dt, dxi_dx );
+    const std::array<double, 2> tau_n = get_tau_Darcy(dt);
 
     std::vector<double> tau_m(num_steps, tau_n[0]); std::vector<double> tau_c(num_steps, tau_n[1]);
 
@@ -1415,9 +1359,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
       }
     }
 
-    const auto dxi_dx = elementv->get_invJacobian(qua);
-
-    const std::array<double, 2> tau_np1_dot = get_tau_Darcy( dt, dxi_dx );
+    const std::array<double, 2> tau_np1_dot = get_tau_Darcy(dt);
 
     const double tau_m = tau_np1_dot[0];
     const double tau_c = tau_np1_dot[1];

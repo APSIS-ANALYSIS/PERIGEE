@@ -239,8 +239,7 @@ class PLocAssem_Block_VMS_NS_HERK
         const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    std::array<double, 2> get_tau_Darcy( const double &dt, 
-        const std::array<double, 9> &dxi_dx ) const;
+    std::array<double, 2> get_tau_Darcy( const double &dt ) const;
 
     // Return tau_m_dot and tau_c_dot in RB-VMS
     std::array<double, 2> get_tau_dot( const double &dt, 
