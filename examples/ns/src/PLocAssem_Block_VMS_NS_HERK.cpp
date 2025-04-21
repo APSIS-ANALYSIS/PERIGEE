@@ -665,6 +665,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
       sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
     }
 
+    // velo_n_prime represents the fine-scale velocity solution at the n-th step and can be omitted
     const double u_n_prime = 0.0;
     const double v_n_prime = 0.0;
     const double w_n_prime = 0.0;
@@ -1082,6 +1083,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       sum_p_pre_z += tm_RK_ptr->get_RK_b(jj) * p_pre_z[jj] ;
     }
 
+    // velo_n_prime represents the fine-scale velocity solution at the n-th step and can be omitted
     const double u_n_prime = 0.0;
     const double v_n_prime = 0.0;
     const double w_n_prime = 0.0;
