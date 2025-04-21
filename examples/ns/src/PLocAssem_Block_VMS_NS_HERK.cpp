@@ -749,34 +749,34 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
                                    - NA_y * v_prime[subindex] - NA_z * w_prime[subindex] );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0/dt * u[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
-                                  + NA * rho0/dt * u_prime[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
-                                  - NA * rho0 * sum_a_fx[subindex] - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
-                                  + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu * u_diffu1_3
-                                  - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
-                                  - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
-                                  - NA_x * grad_p - NA_x * grad_p_stab
-                                  + NA * rho0 * u_stab1_1 + NA * rho0 * u_stab1_2 + NA * rho0 * u_stab1_3 
-                                  - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
+                                   + NA * rho0/dt * u_prime[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
+                                   - NA * rho0 * sum_a_fx[subindex] - NA * rho0/dt * u_n - NA * rho0/dt * u_n_prime
+                                   + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu * u_diffu1_3
+                                   - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
+                                   - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
+                                   - NA_x * grad_p - NA_x * grad_p_stab
+                                   + NA * rho0 * u_stab1_1 + NA * rho0 * u_stab1_2 + NA * rho0 * u_stab1_3 
+                                   - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
 
       Residual1[3*A + 1] += gwts * ( NA * rho0/dt * v[subindex] - NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
-                                  + NA * rho0/dt * v_prime[subindex] - NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
-                                  - NA * rho0 * sum_a_fy[subindex] - NA * rho0/dt * v_n - NA * rho0/dt * v_n_prime
-                                  + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
-                                  - NA_xy * vis_mu * u_diffu2_1 - NA_yy * vis_mu * v_diffu2_2 - NA_yz * vis_mu * w_diffu2_3
-                                  - NA_xx * vis_mu * v_diffu2_2 - NA_yy * vis_mu * v_diffu2_2 - NA_zz * vis_mu * v_diffu2_2
-                                  - NA_y * grad_p - NA_y * grad_p_stab
-                                  + NA * rho0 * v_stab1_1 + NA * rho0 * v_stab1_2 + NA * rho0 * v_stab1_3
-                                  - NA_x * rho0 * v_stab2_1 - NA_y * rho0 * v_stab2_2 - NA_z * rho0 * v_stab2_3 );
+                                   + NA * rho0/dt * v_prime[subindex] - NA_y * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
+                                   - NA * rho0 * sum_a_fy[subindex] - NA * rho0/dt * v_n - NA * rho0/dt * v_n_prime
+                                   + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
+                                   - NA_xy * vis_mu * u_diffu2_1 - NA_yy * vis_mu * v_diffu2_2 - NA_yz * vis_mu * w_diffu2_3
+                                   - NA_xx * vis_mu * v_diffu2_2 - NA_yy * vis_mu * v_diffu2_2 - NA_zz * vis_mu * v_diffu2_2
+                                   - NA_y * grad_p - NA_y * grad_p_stab
+                                   + NA * rho0 * v_stab1_1 + NA * rho0 * v_stab1_2 + NA * rho0 * v_stab1_3
+                                   - NA_x * rho0 * v_stab2_1 - NA_y * rho0 * v_stab2_2 - NA_z * rho0 * v_stab2_3 );
       
       Residual1[3*A + 2] += gwts * ( NA * rho0/dt * w[subindex] - NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
-                                  + NA * rho0/dt * w_prime[subindex] - NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
-                                  - NA * rho0 * sum_a_fz[subindex] - NA * rho0/dt * w_n - NA * rho0/dt * w_n_prime
-                                  + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
-                                  - NA_xz * vis_mu * u_diffu2_1 - NA_yz * vis_mu * v_diffu2_2 - NA_zz * vis_mu * w_diffu2_3
-                                  - NA_xx * vis_mu * w_diffu2_3 - NA_yy * vis_mu * w_diffu2_3 - NA_zz * vis_mu * w_diffu2_3
-                                  - NA_z * grad_p - NA_z * grad_p_stab
-                                  + NA * rho0 * w_stab1_1 + NA * rho0 * w_stab1_2 + NA * rho0 * w_stab1_3
-                                  - NA_x * rho0 * w_stab2_1 - NA_y * rho0 * w_stab2_2 - NA_z * rho0 * w_stab2_3 );      
+                                   + NA * rho0/dt * w_prime[subindex] - NA_z * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
+                                   - NA * rho0 * sum_a_fz[subindex] - NA * rho0/dt * w_n - NA * rho0/dt * w_n_prime
+                                   + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
+                                   - NA_xz * vis_mu * u_diffu2_1 - NA_yz * vis_mu * v_diffu2_2 - NA_zz * vis_mu * w_diffu2_3
+                                   - NA_xx * vis_mu * w_diffu2_3 - NA_yy * vis_mu * w_diffu2_3 - NA_zz * vis_mu * w_diffu2_3
+                                   - NA_z * grad_p - NA_z * grad_p_stab
+                                   + NA * rho0 * w_stab1_1 + NA * rho0 * w_stab1_2 + NA * rho0 * w_stab1_3
+                                   - NA_x * rho0 * w_stab2_1 - NA_y * rho0 * w_stab2_2 - NA_z * rho0 * w_stab2_3 );      
     }
   } 
 }
