@@ -68,7 +68,7 @@ namespace VEC_T
   // determine if two vector object are identical up to a tolerance.
   // --------------------------------------------------------------------------
   template<typename T> bool is_equal( const std::vector<T> &a, 
-      const std::vector<T> &b, const double &tol = 1.0e-12 )
+      const std::vector<T> &b, double tol = 1.0e-12 )
   {
     if( a.size() != b.size() ) return false;
     for(unsigned int ii=0; ii<a.size(); ++ii)
@@ -82,7 +82,7 @@ namespace VEC_T
   // ! fillArray
   //   fill the array data into a vector, with array length len
   // --------------------------------------------------------------------------
-  template<typename T> std::vector<T> fillArray( const T * const &input, const int &len )
+  template<typename T> std::vector<T> fillArray( const T * const &input, int len )
   {
     std::vector<T> vec(len);
     for(int ii=0; ii<len; ++ii) vec[ii] = input[ii];
@@ -262,7 +262,7 @@ namespace VEC_T
   //   erase the element stored in the vector vec at the position at begin() +
   //   pos
   // --------------------------------------------------------------------------
-  template<typename T> void erase_pos( std::vector<T> &vec, const int &pos )
+  template<typename T> void erase_pos( std::vector<T> &vec, int pos )
   {
     vec.erase( vec.begin() + pos );
   }

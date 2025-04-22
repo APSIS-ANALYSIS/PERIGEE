@@ -349,6 +349,14 @@ class IPLocAssem_2x2Block
         const IQuadPts * const &quad )
     {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
 
+    virtual void Assem_Residual_EBC(
+        const int &ebc_id,
+        const double &time, const double &dt,
+        const double * const &eleCtrlPts_x,
+        const double * const &eleCtrlPts_y,
+        const double * const &eleCtrlPts_z )
+    {SYS_T::commPrint("Warning: IPLocAssem_2x2Block::Assem_Residual_EBC is not implemented.\n");}
+
         virtual void Assem_Residual_EBC(
         const int &ebc_id,
         const double &time, const double &dt,

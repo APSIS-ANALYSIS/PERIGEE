@@ -17,12 +17,10 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   dot_step = new PDNSolution_NS( anode_ptr, 0, false );
 }
 
-
 PNonlinear_NS_Solver::~PNonlinear_NS_Solver()
 {
   delete dot_step; dot_step = nullptr;
 }
-
 
 void PNonlinear_NS_Solver::print_info() const
 {
@@ -36,7 +34,6 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("  tangent matrix renew threshold: %d \n", nrenew_threshold);
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
-
 
 void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
@@ -270,7 +267,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
   else conv_flag = false;
 }
-
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
