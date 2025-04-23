@@ -28,6 +28,7 @@ nbc_face_name: ["top", "bot"]
 nbc_vol_id: [0, 0]
 nbc_face_file_name: ["test_top", "test_bot"]
 nbc_isXML: [false, false]
+nbc_isSlave: [false, true]
 
 ebc_face_id: [ 2, 3, 4, 5 ]
 ebc_face_name: [ "lef", "rig", "fro", "bac" ]
