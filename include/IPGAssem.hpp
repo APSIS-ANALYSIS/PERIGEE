@@ -263,29 +263,8 @@ class IPGAssem
     //        v_x n_x + v_y n_y + v_z n_z
     // and then a MPI_Reduce is called to collect the value over multiple
     // CPUs    
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
 
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
-
+    // FSI
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &disp,
         const PDNSolution * const &velo,
@@ -296,6 +275,7 @@ class IPGAssem
       return 0.0;
     }
 
+    // NS
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &vec,
         const ALocal_InflowBC * const &infbc_part,
@@ -305,59 +285,12 @@ class IPGAssem
       return 0.0;
     }
 
+    // NS
     virtual double Assem_surface_flowrate(
         const PDNSolution * const &vec,
         const int &ebc_id ) const
     {
       SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate is not implemented. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_flowrate(
-        const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_EBC * const &ebc_part,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
-      return 0.0;
-    }
-
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &sol,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id )
-    {
-      SYS_T::commPrint("Warning: IPGAssem::Assem_surface_flowrate to be removed. \n");
       return 0.0;
     }
 
@@ -368,29 +301,8 @@ class IPGAssem
     // averaged pressure. Before division, the values will be collected
     // from multiple CPUs by MPI_Reduce.
     //  integration p dGamma / integration 1 dGamma
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const int &ebc_id )
-    {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented. \n");
-      return 0.0;
-    }
 
-    virtual double Assem_surface_ave_pressure(
-        const PDNSolution * const &vec,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_InflowBC * const &infbc_part,
-        const int &nbc_id ) const
-    {
-      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented.\n");
-      return 0.0;
-    }
-
+    // NS
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &vec,
         const int &ebc_id ) const
@@ -399,6 +311,16 @@ class IPGAssem
       return 0.0;
     }
 
+    virtual double Assem_surface_ave_pressure(
+        const PDNSolution * const &vec,
+        const ALocal_InflowBC * const &infbc_part,
+        const int &nbc_id ) const
+    {
+      SYS_T::commPrint("Warning: Assem_surface_ave_pressure is not implemented.\n");
+      return 0.0;
+    }
+
+    // FSI
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,
@@ -408,6 +330,7 @@ class IPGAssem
       return 0.0;
     }
 
+    // FSI
     virtual double Assem_surface_ave_pressure(
         const PDNSolution * const &disp,
         const PDNSolution * const &pres,

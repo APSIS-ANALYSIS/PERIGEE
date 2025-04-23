@@ -581,7 +581,7 @@ void PGAssem_NS_FEM::BackFlow_KG( const double &dt,
 
 double PGAssem_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
-    const int &ebc_id )
+    const int &ebc_id ) const
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -627,7 +627,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 double PGAssem_NS_FEM::Assem_surface_flowrate(
     const PDNSolution * const &vec,
     const ALocal_InflowBC * const &infbc_part,
-    const int &nbc_id )
+    const int &nbc_id ) const
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -672,7 +672,7 @@ double PGAssem_NS_FEM::Assem_surface_flowrate(
 
 double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
-    const int &ebc_id )
+    const int &ebc_id ) const
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
@@ -726,7 +726,7 @@ double PGAssem_NS_FEM::Assem_surface_ave_pressure(
 double PGAssem_NS_FEM::Assem_surface_ave_pressure(
     const PDNSolution * const &vec,
     const ALocal_InflowBC * const &infbc_part,
-    const int &nbc_id )
+    const int &nbc_id ) const
 {
   double * array = new double [nlgn * dof_sol];
   double * local = new double [snLocBas * dof_sol];
