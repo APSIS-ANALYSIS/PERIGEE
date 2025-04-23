@@ -56,6 +56,12 @@ namespace SYS_T
     return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
   }
 
+  // Overload of make_unique for arrays with specified size for C++11
+  template <typename T> std::unique_ptr<T[]> make_unique(std::size_t size)
+  {
+    return std::unique_ptr<T[]>(new T[size]());  // Array of T with zero initialization
+  }
+
   // Return the OS environmental variable
   inline std::string get_Env_Var( const std::string &key )
   {
@@ -84,7 +90,7 @@ namespace SYS_T
   //   Generate a partition file's name (hdf5 file) in the form baseName_pxxxxx.h5.
   // --------------------------------------------------------------------------
   inline std::string gen_partfile_name( const std::string &baseName, 
-      const int &rank )
+      int rank )
   {
     std::ostringstream ss;
     ss << baseName <<"_p";
@@ -107,7 +113,7 @@ namespace SYS_T
   //   Generate a file (usually for cap surfaces) in the form baseName_xxx.vtp(vtu)
   // --------------------------------------------------------------------------
   inline std::string gen_capfile_name( const std::string &baseName,
-      const int &index, const std::string &filename )
+      int index, const std::string &filename )
   {
     std::ostringstream ss;
     ss<<baseName;
@@ -148,13 +154,13 @@ namespace SYS_T
   // 1. Synchronized print on screen. Here we use petsc functions:
   //    PetscSynchronizedPrintf() and PetscSynchronizedFlush().
   //    The output should be lised from proc 0, 1, ... to n in sequence.
-  inline void synPrint(const std::string &output, const int &cpu_rank)
+  inline void synPrint(const std::string &output, int cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
     PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
   }
-  inline void synPrint(const char * const &output, const int &cpu_rank)
+  inline void synPrint(const char * const &output, int cpu_rank)
   {
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
     PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
@@ -210,9 +216,9 @@ namespace SYS_T
   // 3. Print the data name and its value on screen using PetscPrintf
   //    and PETSC_COMM_WORLD. This is particularly designed to print
   //    command line arguments.
-  inline void cmdPrint(const char * const &dataname, const int &datavalue)
+  inline void cmdPrint(const char * const &dataname, int datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
-  inline void cmdPrint(const char * const &dataname, const double &datavalue)
+  inline void cmdPrint(const char * const &dataname, double datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
@@ -581,7 +587,7 @@ namespace SYS_T
     public:
       Timer() { startedAt = 0; stoppedAt = 0; }
 
-      ~Timer() {};
+      ~Timer() = default;
 
       void Reset() { startedAt = 0; stoppedAt = 0; }
 

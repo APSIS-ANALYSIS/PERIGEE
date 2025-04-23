@@ -1,13 +1,18 @@
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 
 PLocAssem_2x2Block_VMS_Incompressible::PLocAssem_2x2Block_VMS_Incompressible(
-    std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel,
+    const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nlocbas, const int &in_snlocbas )
-: rho0( in_matmodel->get_rho_0() ),
+    std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel )
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
+  elementv( ElementFactory::createVolElement(elemType, nqpv) ),
+  elements( ElementFactory::createSurElement(elemType, nqps) ),
+  quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
+  quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
+  rho0( in_matmodel->get_rho_0() ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()),
-  nLocBas( in_nlocbas ), snLocBas( in_snlocbas ), 
+  nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ), 
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ),
   sur_size_0( snLocBas * 3 ),
   matmodel( std::move(in_matmodel) )
@@ -45,10 +50,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Hyper-elastic solid model:\n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  elementv->print_info();
   SYS_T::commPrint("  Spatial: Finite element with VMS stabilization \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha method \n");
   SYS_T::commPrint("  Solid density rho0 = %e g/cm3\n", rho0);
@@ -101,24 +103,20 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
     const double * const &disp,
     const double * const &velo,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const double * const &qua_prestress,
-    const IQuadPts * const &quad )
+    const double * const &qua_prestress )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  const double h_e = elementv->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = time + alpha_f * dt;
 
   Zero_Residual();
 
-  const int nqp = quad -> get_num_quadPts();
-
-  for(int qua=0; qua < nqp; ++qua)
+  for(int qua=0; qua < nqpv; ++qua)
   {
     double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
 
@@ -136,7 +134,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -178,7 +176,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -253,16 +251,14 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad )
+        const double * const &qua_prestress )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const double h_e = element->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  const double h_e = elementv->get_h( eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = time + alpha_f * dt;
 
@@ -272,9 +268,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
 
   Zero_Tangent_Residual();
 
-  const int nqp = quad -> get_num_quadPts();
-
-  for(int qua=0; qua < nqp; ++qua)
+  for(int qua=0; qua < nqpv; ++qua)
   {
     double p = 0.0, p_x = 0.0, p_y = 0.0, p_z = 0.0;
 
@@ -292,7 +286,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -334,7 +328,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Tangent_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -535,22 +529,18 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
         const double * const &disp,
         const double * const &velo,
         const double * const &pres,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress,
-        const IQuadPts * const &quad )
+        const double * const &qua_prestress )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = 0.0;
 
   Zero_Tangent_Residual();
 
-  const int nqp = quad -> get_num_quadPts();
-
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double p = 0.0;
     double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
@@ -565,7 +555,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
 
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -600,7 +590,7 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
     
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -666,26 +656,22 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Mass_Residual(
 void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   const double curr = time + alpha_f * dt;
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
@@ -699,9 +685,9 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * gg.x();
-      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gg.y();
-      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gg.z();
+      sur_Residual0[3*A  ] -= surface_area * quads -> get_qw(qua) * R[A] * gg.x();
+      sur_Residual0[3*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * gg.y();
+      sur_Residual0[3*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * gg.z();
     }
   }
 }
@@ -709,33 +695,31 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual_EBC(
 void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual_Interior_Wall_EBC(
     const double &time,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   const double factor = 1.0; //time >= 1.0 ? 1.0 : time;
 
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < quad -> get_num_quadPts(); ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += pres[ii] * R[ii];
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A  ] -= surface_area * quad -> get_qw(qua) * R[A] * factor * pp * n_out.x();
-      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * pp * n_out.y();
-      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * pp * n_out.z();
+      sur_Residual0[3*A  ] -= surface_area * quads -> get_qw(qua) * R[A] * factor * pp * n_out.x();
+      sur_Residual0[3*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * factor * pp * n_out.y();
+      sur_Residual0[3*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * factor * pp * n_out.z();
     }
   }
 }
@@ -743,23 +727,19 @@ void PLocAssem_2x2Block_VMS_Incompressible::Assem_Residual_Interior_Wall_EBC(
 std::vector<SymmTensor2_3D> PLocAssem_2x2Block_VMS_Incompressible::get_Wall_CauchyStress(
     const double * const &disp,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad ) const
+    const double * const &eleCtrlPts_z ) const
 {
-  element->buildBasis( quad, eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
+  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
-  const int nqp = quad -> get_num_quadPts();
+  std::vector<SymmTensor2_3D> stress( nqpv );
 
-  std::vector<SymmTensor2_3D> stress( nqp );
-
-  for( int qua = 0; qua < nqp; ++qua )
+  for( int qua = 0; qua < nqpv; ++qua )
   {
     std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     double pp = 0.0;
     double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;

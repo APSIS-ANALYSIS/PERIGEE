@@ -48,19 +48,19 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  const std::string elemType_str      = paras["elem_type"].as<std::string>();
-  const int num_inlet                 = paras["num_inlet"].as<int>();
-  const int num_outlet                = paras["num_outlet"].as<int>();
-  const std::string fixed_geo_file          = paras["fixed_geo_file"].as<std::string>();
-  const std::string sur_file_in_base  = paras["sur_file_in_base"].as<std::string>();
-  const std::string sur_file_inner_wall     = paras["sur_file_inner_wall"].as<std::string>();
-  const std::string sur_file_outer_wall     = paras["sur_file_outer_wall"].as<std::string>();
+  const std::string elemType_str        = paras["elem_type"].as<std::string>();
+  const int num_inlet                   = paras["num_inlet"].as<int>();
+  const int num_outlet                  = paras["num_outlet"].as<int>();
+  const std::string fixed_geo_file      = paras["fixed_geo_file"].as<std::string>();
+  const std::string sur_file_in_base    = paras["sur_file_in_base"].as<std::string>();
+  const std::string sur_file_inner_wall = paras["sur_file_inner_wall"].as<std::string>();
+  const std::string sur_file_outer_wall = paras["sur_file_outer_wall"].as<std::string>();
 
-  const std::string sur_file_out_base = paras["sur_file_out_base"].as<std::string>();
+  const std::string sur_file_out_base   = paras["sur_file_out_base"].as<std::string>();
 
-  const int num_interface_pair        = paras["num_interface_pair"].as<int>();
-  const std::string rotated_geo_file  = paras["rotated_geo_file"].as<std::string>();
-  const std::string rotated_sur_file  = paras["rotated_sur_file"].as<std::string>();
+  const int num_interface_pair          = paras["num_interface_pair"].as<int>();
+  const std::string rotated_geo_file    = paras["rotated_geo_file"].as<std::string>();
+  const std::string rotated_sur_file    = paras["rotated_sur_file"].as<std::string>();
   const std::string fixed_interface_base   = paras["fixed_interface_base"].as<std::string>();
   const std::string rotated_interface_base = paras["rotated_interface_base"].as<std::string>();
 
@@ -221,12 +221,12 @@ int main( int argc, char * argv[] )
   nFunc += rotated_nFunc;
   nElem += rotated_nElem;
 
-  // fixed_geo: tag = 0
-  // rotated_geo: tag = 1
+  // fixed_geo   : tag = 0
+  // rotated_geo : tag = 1
   std::vector<int> rotated_tag (nElem, 1);
   
   for (int ee=0; ee < fixed_nElem; ++ee)
-    rotated_tag [ee] = 0;
+    rotated_tag[ee] = 0;
 
   for (int &nodeid : rotated_vecIEN)
     nodeid += fixed_nFunc;
@@ -235,7 +235,7 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
 
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
-  VEC_T::clean( vecIEN ); // clean the vector
+  VEC_T::clean( vecIEN );
   VEC_T::clean( rotated_vecIEN );
   VEC_T::clean( rotated_ctrlPts );
 
@@ -430,9 +430,6 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
 
-    // IPart * part = new Part_FEM( mesh, global_part, mnindex, IEN,
-    //     ctrlPts, rotated_tag, proc_rank, cpu_size, elemType, {0, dofNum, true, "NS"} );
-
     IPart * part = new Part_FEM_Rotated( nElem, nFunc, nLocBas, global_part, mnindex, IEN,
         ctrlPts, rotated_tag, node_f, node_r, proc_rank, cpu_size, elemType, 
         {0, dofNum, true, "ROTATED_NS"} );
@@ -440,7 +437,7 @@ int main( int argc, char * argv[] )
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
-    // write the part hdf5 file
+    // write the part h5 file
     part -> write( part_file );
 
     part -> print_part_loadbalance_edgecut();

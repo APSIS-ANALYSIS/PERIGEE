@@ -87,8 +87,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, sol_base.get(), sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, sol_base.get(), &sol_alpha);
+  rescale_inflow_value(curr_time+dt, infnbc_part, sol);
+  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, &sol_alpha);
   // ------------------------------------------------- 
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
@@ -214,7 +214,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
     const ALocal_InflowBC * const &infbc,
-    const PDNSolution * const &sol_base,
     PDNSolution * const &sol ) const
 {
   const int num_nbc = infbc -> get_num_nbc();

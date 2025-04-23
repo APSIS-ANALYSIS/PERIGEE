@@ -27,7 +27,7 @@ class PDNSolution_V : public PDNSolution
         const int &type, const bool &isprint = false,
         const std::string &in_name = "solution_kinematics" );
 
-    virtual ~PDNSolution_V() {};
+    virtual ~PDNSolution_V() = default;
 
   private:
     const std::string sol_name;

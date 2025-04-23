@@ -1,9 +1,9 @@
 // ==================================================================
-// ns_tet_driver.cpp
+// ns code driver.cpp
 //
-// Tetrahedral element based finite element code for 3D Navier-Stokes
-// equations using Variational Multiscale Formulation and Generalized
-// alpha time stepping.
+// Finite element code for 3D Navier-Stokes equations using the 
+// Variational Multiscale Formulation and Generalized-alpha time 
+// stepping.
 //
 // Author: Ju Liu, liujuy@gmail.com
 // Date: Feb. 6 2020
@@ -12,7 +12,6 @@
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
 #include "GenBCFactory.hpp"
-#include "PLocAssem_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
@@ -35,7 +34,7 @@ int main(int argc, char *argv[])
   double fluid_density = 1.065;
   double fluid_mu = 3.5e-2;
   double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
-  double c_ct = 4.0; // C_T parameter for defining tau_M
+  double c_ct = 4.0;   // C_T parameter for defining tau_M
 
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
@@ -72,9 +71,9 @@ int main(int argc, char *argv[])
 
   // Restart options
   bool is_restart = false;
-  int restart_index = 0;     // restart solution time index
-  double restart_time = 0.0; // restart time
-  double restart_step = 1.0e-3; // restart simulation time step size
+  int restart_index = 0;             // restart solution time index
+  double restart_time = 0.0;         // restart time
+  double restart_step = 1.0e-3;      // restart simulation time step size
   std::string restart_name = "SOL_"; // restart solution base name
 
   // Yaml options
@@ -232,6 +231,16 @@ int main(int argc, char *argv[])
 
   inflow_rate->print_info();
 
+  // ===== LPN models =====
+  auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
+      initial_index, 1000);
+
+  gbc -> print_info();
+
+  // Make sure the gbc number of faces matches that of ALocal_EBC
+  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
+      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
+
   // ===== Generate a sparse matrix for the enforcement of essential BCs
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
 
@@ -299,24 +308,10 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
   }
 
-  // ===== Time step info =====
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
-
-  // ===== LPN models =====
-  auto gbc = GenBCFactory::createGenBC(
-      lpn_file, initial_time, initial_step, initial_index, 1000);
-
-  gbc -> print_info();
-
-  // Make sure the gbc number of faces matches that of ALocal_EBC
-  SYS_T::print_fatal_if(gbc->get_num_ebc() != locebc->get_num_ebc(),
-      "Error: GenBC number of faces does not match with that in ALocal_EBC.\n");
-
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
-  std::unique_ptr<IPGAssem> gloAssem =
-    SYS_T::make_unique<PGAssem_NS_FEM>( gbc.get(), 
-      std::move(locIEN), std::move(locElem), std::move(fNode), 
+  std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_NS_FEM>( 
+      gbc.get(), std::move(locIEN), std::move(locElem), std::move(fNode), 
       std::move(pNode), std::move(locnbc), std::move(locebc), 
       std::move(locwbc), std::move(locAssem_ptr), nz_estimate );
 
@@ -372,6 +367,10 @@ int main(int argc, char *argv[])
 
   nsolver->print_info();
 
+  // ===== Time step info =====
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
+      initial_step);
+
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_NS_Solver>(
       std::move(nsolver), sol_bName, sol_record_freq, 
@@ -379,78 +378,15 @@ int main(int argc, char *argv[])
 
   tsolver->print_info();
 
-  // ===== Outlet data recording files =====
-  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
-  {
-    const double dot_face_flrate = gloAssem -> Assem_surface_flowrate(
-        dot_sol.get(), ff );
-
-    const double face_flrate = gloAssem -> Assem_surface_flowrate(
-        sol.get(), ff );
-
-    const double face_avepre = gloAssem -> Assem_surface_ave_pressure(
-        sol.get(), ff );
-
-    // set the gbc initial conditions using the 3D data
-    gbc -> reset_initial_sol( ff, face_flrate, face_avepre, timeinfo->get_time(), is_restart );
-
-    const double dot_lpn_flowrate = dot_face_flrate;
-    const double lpn_flowrate = face_flrate;
-    const double lpn_pressure = gbc -> get_P( ff, dot_lpn_flowrate, lpn_flowrate, timeinfo->get_time() );
-
-    // Create the txt files and write the initial flow rates
-    if(rank == 0)
-    {
-      std::ofstream ofile;
-
-      // If this is NOT a restart run, generate a new file, otherwise append to
-      // existing file
-      if( !is_restart )
-        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( tsolver->gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      // If this is NOT a restart, then record the initial values
-      if( !is_restart )
-      {
-        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"dot Flow rate"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\t'<<"Reduced model pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<dot_face_flrate<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
-
   MPI_Barrier(PETSC_COMM_WORLD);
+
+  // ===== Outlet data recording files =====
+  tsolver->record_outlet_data(sol.get(), dot_sol.get(), timeinfo.get(), gbc.get(),
+      gloAssem.get(), true, is_restart);
 
   // ===== Inlet data recording files =====
-  for(int ff=0; ff<locinfnbc->get_num_nbc(); ++ff)
-  {
-    const double inlet_face_flrate = gloAssem -> Assem_surface_flowrate(
-        sol.get(), locinfnbc.get(), ff );
-
-    const double inlet_face_avepre = gloAssem -> Assem_surface_ave_pressure(
-        sol.get(), locinfnbc.get(), ff );
-
-    if( rank == 0 )
-    {
-      std::ofstream ofile;
-      if( !is_restart )
-        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::trunc );
-      else
-        ofile.open( tsolver->gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | std::ofstream::app );
-
-      if( !is_restart )
-      {
-        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'<<"Face averaged pressure"<<'\n';
-        ofile<<timeinfo->get_index()<<'\t'<<timeinfo->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-      }
-
-      ofile.close();
-    }
-  }
-
-  MPI_Barrier(PETSC_COMM_WORLD);
+  tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), 
+      gloAssem.get(), true, is_restart);
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");

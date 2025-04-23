@@ -14,80 +14,51 @@
 class PGAssem_Mesh : public IPGAssem
 {
   public:
-    PGAssem_Mesh( IPLocAssem * const &locassem_ptr,
-        ALocal_Elem const * const &alelem_ptr,
-        ALocal_IEN const * const &aien_ptr,
-        APart_Node const * const &pnode_ptr,
-        ALocal_NBC const * const &part_nbc,
-        ALocal_EBC const * const &part_ebc,
+    PGAssem_Mesh(
+        std::unique_ptr<ALocal_IEN> in_locien_v,
+        std::unique_ptr<ALocal_Elem> in_locelem,
+        std::unique_ptr<FEANode> in_fnode,
+        std::unique_ptr<APart_Node> in_pnode_v,
+        std::unique_ptr<ALocal_NBC> in_mesh_nbc,
+        std::unique_ptr<ALocal_EBC> in_mesh_ebc,
+        std::unique_ptr<IPLocAssem> in_locassem,
         const int &in_nz_estimate );
 
     virtual ~PGAssem_Mesh();
 
-    virtual void Assem_nonzero_estimate(
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const ALocal_NBC * const &nbc_part );
+    virtual void Assem_nonzero_estimate();
 
     virtual void Assem_mass_residual(
-        const PDNSolution * const &sol_a,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const PDNSolution * const &sol_a );
 
     virtual void Assem_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
         const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const double &dt );
 
     virtual void Assem_tangent_residual(
         const PDNSolution * const &sol_a,
         const PDNSolution * const &sol_b,
         const double &curr_time,
-        const double &dt,
-        const ALocal_Elem * const &alelem_ptr,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &fnode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+        const double &dt );
 
   private:
+    const std::unique_ptr<const ALocal_IEN> locien;
+    const std::unique_ptr<const ALocal_Elem> locelem;
+    const std::unique_ptr<const FEANode> fnode;
+    const std::unique_ptr<const APart_Node> pnode;
+    const std::unique_ptr<const ALocal_NBC> mesh_nbc;
+    const std::unique_ptr<const ALocal_EBC> mesh_ebc;
+    const std::unique_ptr<IPLocAssem> locassem;
+
     const int nLocBas, snLocBas, dof, num_ebc, nlgn;
     
-    void EssBC_KG( const ALocal_NBC * const &nbc_part );
+    void EssBC_KG();
 
-    void EssBC_G(  const ALocal_NBC * const &nbc_part );
+    void EssBC_G();
 
-    void NatBC_G( const double &curr_time, const double &dt,
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &element_s,
-        const IQuadPts * const &quad_s,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_EBC * const &ebc_part );
+    void NatBC_G( const double &curr_time, const double &dt );
 
     std::vector<double> GetLocal( const std::vector<double> &array,
         const std::vector<int> &IEN, const int &in_locbas ) const

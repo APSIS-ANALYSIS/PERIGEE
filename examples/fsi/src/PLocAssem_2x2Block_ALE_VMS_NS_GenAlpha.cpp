@@ -1,17 +1,21 @@
 #include "PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha.hpp"
 
 PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha(
-    const TimeMethod_GenAlpha * const &tm_gAlpha,
-    const int &in_nlocbas, const int &in_snlocbas,
-    const double &in_rho, const double &in_vis_mu, 
-    const double &in_beta, const FEType &elemtype )
-: rho0( in_rho ), vis_mu( in_vis_mu ),
+    const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+    const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
+    const double &in_vis_mu, const double &in_beta )
+: elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
+  elementv( ElementFactory::createVolElement(elemType, nqpv) ),
+  elements( ElementFactory::createSurElement(elemType, nqps) ),
+  quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
+  quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
+  rho0( in_rho ), vis_mu( in_vis_mu ),
   alpha_f(tm_gAlpha->get_alpha_f()), alpha_m(tm_gAlpha->get_alpha_m()),
   gamma(tm_gAlpha->get_gamma()), beta(in_beta), CI(36.0), CT(4.0),
-  nLocBas(in_nlocbas), snLocBas(in_snlocbas),
+  nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
   vec_size_0( nLocBas * 3 ), vec_size_1( nLocBas ), 
-  sur_size_0( snLocBas * 3 ), coef( (elemtype == FEType::Tet4) ? 0.6299605249474365 : 1.0 ),
-  mm( (elemtype == FEType::Tet4) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
+  sur_size_0( snLocBas * 3 ), coef( (elemType == FEType::Tet4) ? 0.6299605249474365 : 1.0 ),
+  mm( (elemType == FEType::Tet4) ? std::array<double, 9>{2.0, 1.0, 1.0, 1.0, 2.0, 1.0, 1.0, 1.0, 2.0} :
                           std::array<double, 9>{1.0, 0.0, 0.0, 0.0, 1.0 ,0.0, 0.0, 0.0 ,1.0} )
 {
   Tangent00 = new PetscScalar[vec_size_0 * vec_size_0];
@@ -51,10 +55,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("  Three-dimensional Incompressible Navier-Stokes equations: \n");
-  if(nLocBas == 4)
-    SYS_T::commPrint("  FEM: 4-node Tetrahedral element \n");
-  else if(nLocBas == 8)
-    SYS_T::commPrint("  FEM: 8-node Hexahedral element \n");
+  elementv->print_info();
   SYS_T::commPrint("  Spatial: ALE-VMS \n");
   SYS_T::commPrint("  Temporal: Generalized-alpha Method \n");
   SYS_T::commPrint("  Density rho = %e \n", rho0);
@@ -133,18 +134,16 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     const double * const &disp,
     const double * const &velo,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementv->buildBasis( quadv.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -152,9 +151,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
 
   Zero_Residual();
 
-  const int nqp = quad -> get_num_quadPts();
-
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
@@ -163,7 +160,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     double mu = 0.0, mv = 0.0, mw = 0.0; // mesh velocity, i.e. hat-v
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -205,14 +202,14 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual(
     const double cv = v - mv;
     const double cw = w - mw;
 
-    const auto dxi_dx = element->get_invJacobian(qua);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
     const std::array<double, 2> tau = get_tau(dt, dxi_dx, cu, cv, cw);
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
     const double tau_m_2 = tau_m * tau_m;
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -294,18 +291,16 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double * const &disp,
     const double * const &velo,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementv->buildBasis( quadv.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -317,9 +312,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
   Zero_Tangent_Residual();
 
-  const int nqp = quad -> get_num_quadPts();
-
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u = 0.0, u_t = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_t = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
@@ -328,7 +321,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     double mu = 0.0, mv = 0.0, mw = 0.0;
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -369,14 +362,14 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual(
     const double cv = v - mv;
     const double cw = w - mw;
 
-    const auto dxi_dx = element->get_invJacobian(qua);
+    const auto dxi_dx = elementv->get_invJacobian(qua);
     const std::array<double, 2> tau = get_tau(dt, dxi_dx, cu, cv, cw);
     const double tau_m = tau[0];
     const double tau_c = tau[1];
 
     const double tau_m_2 = tau_m * tau_m;
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -637,18 +630,16 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
     const double * const &disp,
     const double * const &velo,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
   std::vector<double> curPt_x(nLocBas, 0.0), curPt_y(nLocBas, 0.0), curPt_z(nLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, nLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
+  elementv->buildBasis( quadv.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   const double two_mu = 2.0 * vis_mu;
 
@@ -656,9 +647,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
   Zero_Tangent_Residual();
 
-  const int nqp = quad -> get_num_quadPts();
-
-  for(int qua=0; qua<nqp; ++qua)
+  for(int qua=0; qua<nqpv; ++qua)
   {
     double u = 0.0, u_x = 0.0, u_y = 0.0, u_z = 0.0;
     double v = 0.0, v_x = 0.0, v_y = 0.0, v_z = 0.0;
@@ -666,7 +655,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
     double p = 0.0;
     Vector_3 coor(0.0, 0.0, 0.0);
 
-    element->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
+    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -692,7 +681,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Mass_Residual(
       coor.z() += curPt_z[ii] * R[ii];
     }
 
-    const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
+    const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     const Vector_3 f_body = get_f(coor, curr);
 
@@ -737,19 +726,15 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
     const int &ebc_id,
     const double &time, const double &dt,
     const double * const &disp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(snLocBas, 0.0), curPt_y(snLocBas, 0.0), curPt_z(snLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   double surface_area;
 
@@ -757,10 +742,10 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const std::vector<double> R = elements->get_R(qua);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     Vector_3 coor(0.0, 0.0, 0.0);
     for(int ii=0; ii<snLocBas; ++ii)
@@ -774,9 +759,9 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
-      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
-      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
+      sur_Residual0[3*A+0] -= surface_area * quads -> get_qw(qua) * R[A] * traction.x();
+      sur_Residual0[3*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * traction.y();
+      sur_Residual0[3*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * traction.z();
     }
   }
 }
@@ -784,29 +769,25 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC(
 double PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_flowrate( 
     const double * const &disp,
     const double * const &velo,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(snLocBas, 0.0), curPt_y(snLocBas, 0.0), curPt_z(snLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   double flrate = 0.0;
 
-  for(int qua =0; qua< face_nqp; ++qua)
+  for(int qua =0; qua< nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -816,7 +797,7 @@ double PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_flowrate(
       w += velo[3*ii+2] * R[ii];
     }
 
-    flrate += surface_area * quad->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
+    flrate += surface_area * quads->get_qw(qua) * ( u * n_out.x() + v * n_out.y() + w * n_out.z() );
   }
 
   return flrate;
@@ -825,68 +806,60 @@ double PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_flowrate(
 void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::get_pressure_area( 
     const double * const &disp,
     const double * const &pres,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
     const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad,
     double &pressure, double &area )
 {
   std::vector<double> curPt_x(snLocBas, 0.0), curPt_y(snLocBas, 0.0), curPt_z(snLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   // Initialize the two variables to be passed out
   pressure = 0.0; area = 0.0;
 
-  for(int qua =0; qua< face_nqp; ++qua)
+  for(int qua =0; qua< nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double pp = 0.0;
     for(int ii=0; ii<snLocBas; ++ii) pp += pres[ii] * R[ii];
 
-    pressure += element->get_detJac(qua) * quad->get_qw(qua) * pp;
-    area     += element->get_detJac(qua) * quad->get_qw(qua);
+    pressure += elements->get_detJac(qua) * quads->get_qw(qua) * pp;
+    area     += elements->get_detJac(qua) * quads->get_qw(qua);
   }
 }
 
 void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_EBC_Resistance(
     const double &val,
     const double * const &disp,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(snLocBas, 0.0), curPt_y(snLocBas, 0.0), curPt_z(snLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
     double surface_area;
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A+0] += surface_area * quad -> get_qw(qua) * R[A] * n_out.x() * val;
-      sur_Residual0[3*A+1] += surface_area * quad -> get_qw(qua) * R[A] * n_out.y() * val;
-      sur_Residual0[3*A+2] += surface_area * quad -> get_qw(qua) * R[A] * n_out.z() * val;
+      sur_Residual0[3*A+0] += surface_area * quads -> get_qw(qua) * R[A] * n_out.x() * val;
+      sur_Residual0[3*A+1] += surface_area * quads -> get_qw(qua) * R[A] * n_out.y() * val;
+      sur_Residual0[3*A+2] += surface_area * quads -> get_qw(qua) * R[A] * n_out.z() * val;
     }
   }
 }
@@ -895,29 +868,25 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
     const double * const &dot_disp,
     const double * const &disp,
     const double * const &velo,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(snLocBas, 0.0), curPt_y(snLocBas, 0.0), curPt_z(snLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   double surface_area, factor;
 
   Zero_sur_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -942,9 +911,9 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Residual_BackFlowStab(
 
     for(int A=0; A<snLocBas; ++A)
     {
-      sur_Residual0[3*A+0] -= surface_area * quad -> get_qw(qua) * R[A] * factor * u;
-      sur_Residual0[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * factor * v;
-      sur_Residual0[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * factor * w;
+      sur_Residual0[3*A+0] -= surface_area * quads -> get_qw(qua) * R[A] * factor * u;
+      sur_Residual0[3*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * factor * v;
+      sur_Residual0[3*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * factor * w;
     }
   }
 }
@@ -954,19 +923,15 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
     const double * const &dot_disp,
     const double * const &disp,
     const double * const &velo,
-    FEAElement * const &element,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const IQuadPts * const &quad )
+    const double * const &eleCtrlPts_z )
 {
   std::vector<double> curPt_x(snLocBas, 0.0), curPt_y(snLocBas, 0.0), curPt_z(snLocBas, 0.0);
 
   get_currPts(eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z, disp, snLocBas, &curPt_x[0], &curPt_y[0], &curPt_z[0]);
 
-  element->buildBasis( quad, &curPt_x[0], &curPt_y[0], &curPt_z[0] );
-
-  const int face_nqp = quad -> get_num_quadPts();
+  elements->buildBasis( quads.get(), &curPt_x[0], &curPt_y[0], &curPt_z[0] );
 
   double surface_area, factor;
 
@@ -974,11 +939,11 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
 
   Zero_sur_Tangent_Residual();
 
-  for(int qua = 0; qua < face_nqp; ++qua)
+  for(int qua = 0; qua < nqps; ++qua)
   {
-    const std::vector<double> R = element->get_R(qua);
+    const std::vector<double> R = elements->get_R(qua);
 
-    const Vector_3 n_out = element->get_2d_normal_out(qua, surface_area);
+    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
     double u = 0.0, v = 0.0, w = 0.0, mu = 0.0, mv = 0.0, mw = 0.0;
     for(int ii=0; ii<snLocBas; ++ii)
@@ -1001,7 +966,7 @@ void PLocAssem_2x2Block_ALE_VMS_NS_GenAlpha::Assem_Tangent_Residual_BackFlowStab
     if(temp < 0.0) factor = temp * rho0 * beta;
     else factor = 0.0;
 
-    const double gwts = surface_area * quad -> get_qw(qua);
+    const double gwts = surface_area * quads -> get_qw(qua);
 
     // snLocBas = 3 for linear tet/tri element
     for(int A=0; A<snLocBas; ++A)

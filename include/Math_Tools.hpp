@@ -26,7 +26,7 @@ namespace MATH_T
   // n = 0 : 1                  n = 1 : 1 1
   // n = 2 : 1 2 1              n = 3 : 1 3 3 1
   // n = 4 : 1 4 6 4 1          n = 5 : 1 5 10 10 5 1
-  inline double binomialCoefficient( const double &n, const double &k )
+  inline double binomialCoefficient( double n, double k )
   {
     if( (k<0) || (k>n) ) return 0.0;
 
@@ -43,7 +43,7 @@ namespace MATH_T
   // this function will return ix iy and iz based on the input ii,
   // dim_x, dim_y.
   // ----------------------------------------------------------------
-  inline void get_xyz_index( const int &ii, const int &dim_x, const int &dim_y,
+  inline void get_xyz_index( int ii, int dim_x, int dim_y,
       int &ix, int &iy, int &iz)
   {
     const int ixy = ii % (dim_x * dim_y);
@@ -55,7 +55,7 @@ namespace MATH_T
   // Assume ii = iy * dim_x + ix;
   // this function will return ix and iy based on the input ii and dim_x.
   // ----------------------------------------------------------------
-  inline void get_xy_index( const int &ii, const int &dim_x, int &ix, int &iy)
+  inline void get_xy_index( int ii, int dim_x, int &ix, int &iy)
   {
     ix = ii % dim_x;
     iy = (ii-ix)/dim_x;
@@ -67,7 +67,7 @@ namespace MATH_T
   // This is the tool to calculate if two double data are within tol
   // default tolerance is 1.0x10^-12. 
   // --------------------------------------------------------------------------
-  inline bool equals( const double &a, const double &b, const double &tol=1.0e-12 )
+  inline bool equals( double a, double b, double tol=1.0e-12 )
   {
     return ( std::abs(a-b)<tol );
   }
@@ -107,7 +107,7 @@ namespace MATH_T
   // Generate a Gaussian distribution vector with length n, mean value
   // mean, and standard deviation dev, using Marsaglia algorithm
   // ----------------------------------------------------------------
-  inline double gen_double_rand_normal( const double &mean, const double &std )
+  inline double gen_double_rand_normal( double mean, double std )
   {
     std::random_device rd;
     std::mt19937_64 gen( rd() );
@@ -120,7 +120,7 @@ namespace MATH_T
   // Generate a random double in [min, max] domain for integer and double
   // precision numbers, respectively. 
   // ----------------------------------------------------------------
-  inline int gen_int_rand( const int &min, const int &max )
+  inline int gen_int_rand( int min, int max )
   {
     std::random_device rd;
     std::mt19937_64 gen( rd() );
@@ -128,7 +128,7 @@ namespace MATH_T
     return dis(gen);
   }
 
-  inline double gen_double_rand( const double &min = -1.0, const double &max = 1.0 )
+  inline double gen_double_rand( double min = -1.0, double max = 1.0 )
   {
     std::random_device rd;
     std::mt19937_64 gen( rd() );
@@ -181,7 +181,7 @@ namespace MATH_T
   // ----------------------------------------------------------------
   // Get the angle of the given 2d vector to the x-axis, range [0, 2 * PI)
   // ----------------------------------------------------------------
-  inline double get_angle_2d(const double &xx, const double &yy)
+  inline double get_angle_2d(double xx, double yy)
   {
     const double rr = std::sqrt(xx * xx + yy * yy);
 
@@ -269,22 +269,22 @@ namespace MATH_T
           std::cout<<"Matrix is NOT factorized.\n";
       }
   
-      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      void gen_rand(double min = -1.0, double max = 1.0)
       {
         for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
 
         for(int ii=0; ii<N; ++ii) pp[ii] = ii;
       }
 
-      int get_p(const int &ii) const {return pp[ii];}
+      int get_p(int ii) const {return pp[ii];}
 
-      double& operator()(const int &index) {return mat[index];}
+      double& operator()(int index) {return mat[index];}
 
-      const double& operator()(const int &index) const {return mat[index];}
+      const double& operator()(int index) const {return mat[index];}
 
-      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
+      double& operator()(int ii, int jj) {return mat[N*ii+jj];}
 
-      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+      const double& operator()(int ii, int jj) const {return mat[N*ii+jj];}
 
       // Assignment operator
       virtual Matrix_Dense<N>& operator= (const Matrix_Dense<N> &source)
@@ -531,7 +531,7 @@ namespace MATH_T
           std::cout<<"Matrix is NOT factorized.\n";
       }
 
-      void gen_rand(const double &min = -1.0, const double &max = 1.0)
+      void gen_rand(double min = -1.0, double max = 1.0)
       {
         for(int ii=0; ii<N*N; ++ii) mat[ii] = gen_double_rand(min, max);
 
@@ -543,13 +543,13 @@ namespace MATH_T
         }
       }
 
-      double& operator()(const int &index) {return mat[index];}
+      double& operator()(int index) {return mat[index];}
 
-      const double& operator()(const int &index) const {return mat[index];}
+      const double& operator()(int index) const {return mat[index];}
 
-      double& operator()(const int &ii, const int &jj) {return mat[N*ii+jj];}
+      double& operator()(int ii, int jj) {return mat[N*ii+jj];}
 
-      const double& operator()(const int &ii, const int &jj) const {return mat[N*ii+jj];}
+      const double& operator()(int ii, int jj) const {return mat[N*ii+jj];}
       
       int get_size() const {return N;}
 

@@ -14,12 +14,23 @@
 class PTime_FSI_Solver
 {
   public:
-    PTime_FSI_Solver( const std::string &input_name, const int &input_record_freq, 
-        const int &input_renew_tang_freq, const double &input_final_time );
+    PTime_FSI_Solver(
+        std::unique_ptr<PNonlinear_FSI_Solver> in_nsolver,
+        std::unique_ptr<APart_Node> in_pnode_v,
+        std::unique_ptr<APart_Node> in_pnode_p,
+        const std::string &input_name,      
+        const int &input_record_freq, const int &input_renew_tang_freq, 
+        const double &input_final_time );        
 
-    ~PTime_FSI_Solver();
+    ~PTime_FSI_Solver() = default;
 
     void print_info() const;
+
+    void print_lsolver_info() const {nsolver -> print_lsolver_info();}
+
+    void print_lsolver_mesh_info() const {nsolver -> print_lsolver_mesh_info();}
+
+    void write_prestress_hdf5() const {nsolver->write_prestress_hdf5();}
 
     // ------------------------------------------------------------------------
     // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
@@ -36,89 +47,70 @@ class PTime_FSI_Solver
       return ss.str();
     }
 
+    // ------------------------------------------------------------------------
+    // Calculate the flow rate and averaged pressre on each inlet surface and
+    // record them into the Inlet_xxx_data.txt file
+    // User is responsible for choosing the correct openmode, including
+    // std::ofstream::app and std::ofstream::trunc
+    // ------------------------------------------------------------------------
+    void record_inlet_data( 
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNTimeStep * const &time_info,
+        const ALocal_InflowBC * const &infnbc_part,
+        const IPGAssem * const &gassem_ptr,
+        bool is_driver,
+        bool is_restart ) const;
+
+    void record_outlet_data(
+        const PDNSolution * const &disp,
+        const PDNSolution * const &velo,
+        const PDNSolution * const &pres,
+        const PDNSolution * const &dot_velo,
+        const PDNTimeStep * const &time_info,
+        IGenBC * const &gbc,
+        const IPGAssem * const &gassem_ptr,
+        bool is_driver,
+        bool is_restart) const;
+
     void TM_FSI_GenAlpha(
         const bool &restart_init_assembly_flag,
         const IS &is_v,
         const IS &is_p,
-        const PDNSolution * const &sol_base,
-        const PDNSolution * const &init_dot_disp,
-        const PDNSolution * const &init_dot_velo,
-        const PDNSolution * const &init_dot_pres,
-        const PDNSolution * const &init_disp,
-        const PDNSolution * const &init_velo,
-        const PDNSolution * const &init_pres,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        PDNTimeStep * const &time_info,
-        const IFlowRate * const flr_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
-        const FEANode * const &feanode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
+        std::unique_ptr<PDNSolution> init_dot_disp,
+        std::unique_ptr<PDNSolution> init_dot_velo,
+        std::unique_ptr<PDNSolution> init_dot_pres,
+        std::unique_ptr<PDNSolution> init_disp,
+        std::unique_ptr<PDNSolution> init_velo,
+        std::unique_ptr<PDNSolution> init_pres,
+        std::unique_ptr<PDNTimeStep> time_info,
         const ALocal_InflowBC * const &infnbc,
-        const ALocal_NBC * const &nbc_mesh,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
-        const ALocal_EBC * const &ebc_mesh,
         IGenBC * const &gbc,
-        const Matrix_PETSc * const &bc_mat,
-        const Matrix_PETSc * const &bc_mesh_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        const Tissue_prestress * const &ps_ptr,
-        IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-        IPLocAssem_2x2Block * const &lassem_solid_ptr,
-        IPLocAssem * const &lassem_mesh_ptr,
-        IPGAssem * const &gassem_ptr,
-        IPGAssem * const &gassem_mesh_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
-        const PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
+        IPGAssem * const &gassem_ptr ) const;
 
     void TM_FSI_Prestress(
         const bool &is_record_sol_flag,
         const double &prestress_tol,
         const IS &is_v,
         const IS &is_p,
-        const PDNSolution * const &init_dot_disp,
-        const PDNSolution * const &init_dot_velo,
-        const PDNSolution * const &init_dot_pres,
-        const PDNSolution * const &init_disp,
-        const PDNSolution * const &init_velo,
-        const PDNSolution * const &init_pres,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        PDNTimeStep * const &time_info,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_v,
-        const ALocal_IEN * const &lien_p,
-        const APart_Node * const &pnode_v,
-        const APart_Node * const &pnode_p,
-        const FEANode * const &feanode_ptr,
-        const ALocal_NBC * const &nbc_v,
-        const ALocal_NBC * const &nbc_p,
-        const ALocal_EBC * const &ebc_v,
-        const ALocal_EBC * const &ebc_p,
-        const Matrix_PETSc * const &bc_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        Tissue_prestress * const &ps_ptr,
-        IPLocAssem_2x2Block * const &lassem_solid_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        const PNonlinear_FSI_Solver * const &nsolver_ptr ) const;
+        std::unique_ptr<PDNSolution> init_dot_disp,
+        std::unique_ptr<PDNSolution> init_dot_velo,
+        std::unique_ptr<PDNSolution> init_dot_pres,
+        std::unique_ptr<PDNSolution> init_disp,
+        std::unique_ptr<PDNSolution> init_velo,
+        std::unique_ptr<PDNSolution> init_pres,
+        std::unique_ptr<PDNTimeStep> time_info ) const;
 
   private:
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
+
+    const std::unique_ptr<PNonlinear_FSI_Solver> nsolver;
+    const std::unique_ptr<const APart_Node> pnode_v;
+    const std::unique_ptr<const APart_Node> pnode_p;
 
     std::string Name_Generator( const std::string &middle_name, 
         const int &counter ) const;

@@ -18,7 +18,7 @@ class PDNSolution_V : public PDNSolution
   public:
     PDNSolution_V( const APart_Node * const &pNode );
 
-    virtual ~PDNSolution_V() {};
+    virtual ~PDNSolution_V() = default;
 
   private:
     // generate full zero vector 

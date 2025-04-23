@@ -22,6 +22,8 @@ class GenBCFactory
         const double &initial_time = 0.0, const double &initial_step = 0.1,
         const int &initial_index = 0, const int &num_steps_0d = 1000)
     {
+      if( !SYS_T::file_exist( lpn_file ) ) return nullptr;
+
       // Retrieve the file type
       const int file_type = GENBC_T::get_genbc_file_type(lpn_file);
 

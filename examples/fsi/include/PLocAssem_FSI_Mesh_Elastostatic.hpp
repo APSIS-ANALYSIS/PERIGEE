@@ -22,12 +22,15 @@
 // Author: Ju Liu
 // ==================================================================
 #include "IPLocAssem.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
 {
   public:
-    PLocAssem_FSI_Mesh_Elastostatic( const double &in_mat_E, 
-        const double &in_mat_nu, const int &in_nlocbas );
+    PLocAssem_FSI_Mesh_Elastostatic( 
+        const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+        const double &in_mat_E, const double &in_mat_nu );
 
     virtual ~PLocAssem_FSI_Mesh_Elastostatic();
 
@@ -39,7 +42,7 @@ class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
 
     virtual int get_nLocBas() const {return nLocBas;}
 
-    virtual int get_snLocBas() const {return 3;}
+    virtual int get_snLocBas() const {return snLocBas;}
 
     virtual void Zero_Tangent_Residual();
 
@@ -51,30 +54,24 @@ class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
     {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Residual is not implemented. \n");}
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Mass_Residual(
         const double * const &vec_b,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
     {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Mass_Residual is not implemented. \n");}
 
     virtual void Assem_Residual_EBC(
@@ -82,16 +79,22 @@ class PLocAssem_FSI_Mesh_Elastostatic : public IPLocAssem
         const double &time, const double &dt,
         const double * const &vec_a,
         const double * const &vec_b,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
     {SYS_T::print_fatal("Error: PLocAssem_FSI_Mesh_Laplacian::Assem_Residual_EBC is not implemented. \n");}
 
   private:
+    const FEType elemType;
+
+    const int nqpv, nqps;
+
+    const std::unique_ptr<FEAElement> elementv, elements;
+
+    const std::unique_ptr<IQuadPts> quadv, quads;
+
     const double E, nu, lambda, mu, kappa;
-    const int nLocBas, vec_size;
+    const int nLocBas, snLocBas, vec_size;
 
     void print_info() const;
 

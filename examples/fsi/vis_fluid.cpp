@@ -7,12 +7,8 @@
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
-#include "ALocal_Elem.hpp"
-#include "APart_Node_FSI.hpp"
-#include "QuadPts_vis_tet4.hpp"
-#include "QuadPts_vis_hex8.hpp"
-#include "FEAElement_Tet4.hpp"
-#include "FEAElement_Hex8.hpp"
+#include "QuadPtsFactory.hpp"
+#include "FEAElementFactory.hpp"
 #include "VisDataPrep_ALE_NS.hpp"
 #include "VTK_Writer_FSI.hpp"
 
@@ -99,35 +95,25 @@ int main( int argc, char * argv[] )
 
   SYS_T::commPrint("===> %d processor(s) are assigned.", size);
 
-  FEANode * fNode = new FEANode(part_v_file, rank);
+  auto fNode = SYS_T::make_unique<FEANode>(part_v_file, rank);
 
-  ALocal_IEN * locIEN_v = new ALocal_IEN(part_v_file, rank);
-  ALocal_IEN * locIEN_p = new ALocal_IEN(part_p_file, rank);
+  auto locIEN_v = SYS_T::make_unique<ALocal_IEN>(part_v_file, rank);
+  auto locIEN_p = SYS_T::make_unique<ALocal_IEN>(part_p_file, rank);
 
-  AGlobal_Mesh_Info * GMIptr_v = new AGlobal_Mesh_Info(part_v_file, rank);
-  AGlobal_Mesh_Info * GMIptr_p = new AGlobal_Mesh_Info(part_p_file, rank);
+  auto GMIptr_v = SYS_T::make_unique<AGlobal_Mesh_Info>(part_v_file, rank);
+  auto GMIptr_p = SYS_T::make_unique<AGlobal_Mesh_Info>(part_p_file, rank);
 
-  ALocal_Elem * locElem = new ALocal_Elem(part_v_file, rank);
+  auto locElem = SYS_T::make_unique<ALocal_Elem>(part_v_file, rank);
 
-  APart_Node * pNode_v = new APart_Node(part_v_file, rank);
-  APart_Node * pNode_p = new APart_Node(part_p_file, rank);
+  auto pNode_v = SYS_T::make_unique<APart_Node>(part_v_file, rank);
+  auto pNode_p = SYS_T::make_unique<APart_Node>(part_p_file, rank);
 
   // Allocate the quadrature rule and element container
-  IQuadPts * quad = nullptr;
-  FEAElement * element = nullptr; 
-
   // We assume that the same element type is used for pressure and velocity
-  if( GMIptr_v->get_elemType() == FEType::Tet4 )
-  {
-    quad = new QuadPts_vis_tet4();
-    element = new FEAElement_Tet4( quad-> get_num_quadPts() );
-  }
-  else if( GMIptr_v->get_elemType() == FEType::Hex8 )
-  {
-    quad = new QuadPts_vis_hex8();
-    element = new FEAElement_Hex8( quad-> get_num_quadPts() );
-  }
-  else SYS_T::print_fatal( "Error: unsupported element type \n" );
+  const auto elemType = GMIptr_v->get_elemType();
+  std::unique_ptr<IQuadPts> quad = QuadPtsFactory::createVisQuadrature(elemType);
+  std::unique_ptr<FEAElement> element = ElementFactory::createVolElement(elemType,
+    quad->get_num_quadPts());
 
   quad -> print_info();
 
@@ -150,7 +136,7 @@ int main( int argc, char * argv[] )
       fIEN[ee*nlocbas+ii] = VEC_T::get_pos( subdomain_nodes, locIEN_v->get_LIEN(ee, ii) );
 
   // Visualization prepration
-  IVisDataPrep * visprep = new VisDataPrep_ALE_NS();
+  std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_ALE_NS>();
   visprep->print_info();
 
   double ** pointArrays = new double * [3];
@@ -158,7 +144,7 @@ int main( int argc, char * argv[] )
   pointArrays[1] = new double [pNode_p->get_nlocghonode() * 1];
   pointArrays[2] = new double [pNode_v->get_nlocghonode() * 3];
 
-  VTK_Writer_FSI * vtk_w = new VTK_Writer_FSI( GMIptr_v->get_nElem(),
+  auto vtk_w = SYS_T::make_unique<VTK_Writer_FSI>( GMIptr_v->get_nElem(),
       element->get_nLocBas(), element_part_file );
 
   std::ostringstream time_index;
@@ -183,11 +169,11 @@ int main( int argc, char * argv[] )
     visprep->get_pointArray(disp_name_to_read, pres_name_to_read,
         velo_name_to_read, an_v_mapping_file, an_p_mapping_file,
         pn_v_mapping_file, pn_p_mapping_file,
-        pNode_v, pNode_p, GMIptr_v->get_nFunc(), GMIptr_p->get_nFunc(),
+        pNode_v.get(), pNode_p.get(), GMIptr_v->get_nFunc(), GMIptr_p->get_nFunc(),
         pointArrays);
 
-    vtk_w->writeOutput_fluid( fNode, locIEN_v, locIEN_p, fIEN, locElem,
-        visprep, element, quad, pointArrays, rank, size,
+    vtk_w->writeOutput_fluid( fNode.get(), locIEN_v.get(), locIEN_p.get(), fIEN, locElem.get(),
+        visprep.get(), element.get(), quad.get(), pointArrays, rank, size,
         num_subdomain_nodes,
         time * dt, out_bname, name_to_write, isXML );
   }
@@ -196,11 +182,8 @@ int main( int argc, char * argv[] )
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // Clean up memory
-  delete quad; delete element; delete visprep;
-  delete fNode; delete locIEN_v; delete locIEN_p; delete GMIptr_v; delete GMIptr_p;
-  delete locElem; delete pNode_v; delete pNode_p;
   delete [] pointArrays[0]; delete [] pointArrays[1]; delete [] pointArrays[2];
-  delete [] pointArrays; delete vtk_w;
+  delete [] pointArrays;
   PetscFinalize();
   return EXIT_SUCCESS;
 }

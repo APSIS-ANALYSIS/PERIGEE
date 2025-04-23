@@ -1,16 +1,17 @@
 #include "PTime_FSI_Solver.hpp"
 
-PTime_FSI_Solver::PTime_FSI_Solver( const std::string &input_name, 
+PTime_FSI_Solver::PTime_FSI_Solver(
+    std::unique_ptr<PNonlinear_FSI_Solver> in_nsolver,
+    std::unique_ptr<APart_Node> in_pnode_v,
+    std::unique_ptr<APart_Node> in_pnode_p,
+    const std::string &input_name,      
     const int &input_record_freq, const int &input_renew_tang_freq, 
     const double &input_final_time )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
-  renew_tang_freq(input_renew_tang_freq), pb_name(input_name)
+  renew_tang_freq(input_renew_tang_freq), pb_name(input_name), 
+  nsolver(std::move(in_nsolver)), pnode_v(std::move(in_pnode_v)),
+  pnode_p(std::move(in_pnode_p))
 {}
-
-
-PTime_FSI_Solver::~PTime_FSI_Solver()
-{}
-
 
 void PTime_FSI_Solver::print_info() const
 {
@@ -21,7 +22,6 @@ void PTime_FSI_Solver::print_info() const
   SYS_T::commPrint( "solution base name: %s \n", pb_name.c_str());
   SYS_T::print_sep_line();
 }
-
 
 std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
     const int &counter ) const
@@ -36,7 +36,6 @@ std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
   return out_name;
 }
 
-
 std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name,
     const int &counter ) const
 {
@@ -50,7 +49,6 @@ std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name
   out_name.append(temp.str());
   return out_name;
 }
-
 
 void PTime_FSI_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     const std::string &solname ) const
@@ -72,61 +70,32 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     const bool &restart_init_assembly_flag,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &sol_base,
-    const PDNSolution * const &init_dot_disp,
-    const PDNSolution * const &init_dot_velo,
-    const PDNSolution * const &init_dot_pres,
-    const PDNSolution * const &init_disp,
-    const PDNSolution * const &init_velo,
-    const PDNSolution * const &init_pres,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const IFlowRate * const flr_ptr,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
+    std::unique_ptr<PDNSolution> init_dot_disp,
+    std::unique_ptr<PDNSolution> init_dot_velo,
+    std::unique_ptr<PDNSolution> init_dot_pres,
+    std::unique_ptr<PDNSolution> init_disp,
+    std::unique_ptr<PDNSolution> init_velo,
+    std::unique_ptr<PDNSolution> init_pres,
+    std::unique_ptr<PDNTimeStep> time_info,
     const ALocal_InflowBC * const &infnbc,
-    const ALocal_NBC * const &nbc_mesh,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
-    const ALocal_EBC * const &ebc_mesh,
     IGenBC * const &gbc,
-    const Matrix_PETSc * const &bc_mat,
-    const Matrix_PETSc * const &bc_mesh_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    const Tissue_prestress * const &ps_ptr,
-    IPLocAssem_2x2Block * const &lassem_fluid_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
-    IPLocAssem * const &lassem_mesh_ptr,
-    IPGAssem * const &gassem_ptr,
-    IPGAssem * const &gassem_mesh_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    PLinear_Solver_PETSc * const &lsolver_mesh_ptr,
-    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    IPGAssem * const &gassem_ptr ) const
 {
-  PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * pre_dot_pres = new PDNSolution( init_dot_pres );
+  auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
-  PDNSolution * pre_disp = new PDNSolution( init_disp );
-  PDNSolution * pre_velo = new PDNSolution( init_velo );
-  PDNSolution * pre_pres = new PDNSolution( init_pres );
+  auto pre_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto pre_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto pre_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
-  PDNSolution * cur_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * cur_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * cur_dot_pres = new PDNSolution( init_dot_pres );
+  auto cur_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto cur_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto cur_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
-  PDNSolution * cur_disp = new PDNSolution( init_disp );
-  PDNSolution * cur_velo = new PDNSolution( init_velo );
-  PDNSolution * cur_pres = new PDNSolution( init_pres );
+  auto cur_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto cur_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto cur_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
   // Do NOT overwrite solution if this is a restart
   if( restart_init_assembly_flag == false )
@@ -173,17 +142,10 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     bool conv_flag;
-    nsolver_ptr->GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),
-        time_info->get_step(), is_v, is_p, sol_base, 
-        pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres, 
-        tmga_ptr, flr_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p, 
-        nbc_v, nbc_p, infnbc,
-        nbc_mesh, ebc_v, ebc_mesh, gbc, bc_mat, bc_mesh_mat,
-        elementv, elements, quad_v, quad_s, ps_ptr, 
-        lassem_fluid_ptr, lassem_solid_ptr, lassem_mesh_ptr,
-        gassem_ptr, gassem_mesh_ptr, lsolver_ptr, lsolver_mesh_ptr,
-        cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres, 
-        conv_flag, nl_counter );
+    nsolver -> GenAlpha_Seg_solve_FSI( renew_flag, time_info->get_time(),time_info->get_step(), 
+        is_v, is_p, pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(), pre_disp.get(), 
+        pre_velo.get(), pre_pres.get(), infnbc, gbc, gassem_ptr, cur_dot_disp.get(), cur_dot_velo.get(), 
+        cur_dot_pres.get(), cur_disp.get(), cur_velo.get(), cur_pres.get(), conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 
@@ -213,76 +175,23 @@ void PTime_FSI_Solver::TM_FSI_GenAlpha(
     }
 
     // Calculate the flow rate on all outlets
-    for(int face=0; face<ebc_v -> get_num_ebc(); ++face)
-    {
-      // Calculate 3D dot flow rate on the outlets
-      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_dot_velo, lassem_fluid_ptr, elements, quad_s, ebc_v, face );
-
-      // Calculate 3D flow rate on the outlets
-      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( cur_disp,
-          cur_velo, lassem_fluid_ptr, elements, quad_s, ebc_v, face);
-
-      // Calculate 3D averaged pressure on outlets
-      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, ebc_v, ebc_p, face);
-
-      // Calculate 0D pressure from LPN model
-      const double dot_lpn_flowrate = dot_face_flrate;
-      const double lpn_flowrate = face_flrate;
-      const double lpn_pressure = gbc -> get_P( face, dot_lpn_flowrate, lpn_flowrate, time_info->get_time() );
-
-      // Update the initial values in genbc
-      gbc -> reset_initial_sol( face, lpn_flowrate, lpn_pressure, time_info->get_time(), false );
-
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( gen_flowfile_name("Outlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<face_flrate<<'\t'<<face_avepre<<'\t'<<lpn_pressure<<'\n';
-        ofile.close();
-      }
-
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
+    record_outlet_data( cur_disp.get(), cur_velo.get(), cur_pres.get(), cur_dot_velo.get(), time_info.get(), gbc, gassem_ptr, false, true );
 
     // Write all 0D solutions into a file
     if( SYS_T::get_MPI_rank() == 0 )
       gbc -> write_0D_sol ( time_info->get_index(), time_info->get_time() );
 
     // Calculate the flow rate and averaged pressure on all inlets
-    for(int face=0; face<infnbc -> get_num_nbc(); ++face)
-    {
-      const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_disp, cur_velo, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+    record_inlet_data( cur_disp.get(), cur_velo.get(), cur_pres.get(), time_info.get(), infnbc, gassem_ptr, false, true );
 
-      const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
-          cur_disp, cur_pres, lassem_fluid_ptr, elements, quad_s, infnbc, face );
+    pre_dot_disp -> Copy( cur_dot_disp.get() );
+    pre_dot_velo -> Copy( cur_dot_velo.get() );
+    pre_dot_pres -> Copy( cur_dot_pres.get() );
 
-      if( SYS_T::get_MPI_rank() == 0 )
-      {
-        std::ofstream ofile;
-        ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
-        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
-        ofile.close();
-      }
-      MPI_Barrier(PETSC_COMM_WORLD);
-    }
-
-    pre_dot_disp -> Copy( cur_dot_disp );
-    pre_dot_velo -> Copy( cur_dot_velo );
-    pre_dot_pres -> Copy( cur_dot_pres );
-
-    pre_disp -> Copy( cur_disp );
-    pre_velo -> Copy( cur_velo );
-    pre_pres -> Copy( cur_pres );
+    pre_disp -> Copy( cur_disp.get() );
+    pre_velo -> Copy( cur_velo.get() );
+    pre_pres -> Copy( cur_pres.get() );
   }
-
-  delete pre_dot_disp; delete pre_dot_velo; delete pre_dot_pres;
-  delete pre_disp; delete pre_velo; delete pre_pres;
-
-  delete cur_dot_disp; delete cur_dot_velo; delete cur_dot_pres;
-  delete cur_disp; delete cur_velo; delete cur_pres;
 }
 
 void PTime_FSI_Solver::TM_FSI_Prestress(
@@ -290,53 +199,32 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     const double &prestress_tol,
     const IS &is_v,
     const IS &is_p,
-    const PDNSolution * const &init_dot_disp,
-    const PDNSolution * const &init_dot_velo,
-    const PDNSolution * const &init_dot_pres,
-    const PDNSolution * const &init_disp,
-    const PDNSolution * const &init_velo,
-    const PDNSolution * const &init_pres,
-    const TimeMethod_GenAlpha * const &tmga_ptr,
-    PDNTimeStep * const &time_info,
-    const ALocal_Elem * const &alelem_ptr,
-    const ALocal_IEN * const &lien_v,
-    const ALocal_IEN * const &lien_p,
-    const APart_Node * const &pnode_v,
-    const APart_Node * const &pnode_p,
-    const FEANode * const &feanode_ptr,
-    const ALocal_NBC * const &nbc_v,
-    const ALocal_NBC * const &nbc_p,
-    const ALocal_EBC * const &ebc_v,
-    const ALocal_EBC * const &ebc_p,
-    const Matrix_PETSc * const &bc_mat,
-    FEAElement * const &elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_v,
-    const IQuadPts * const &quad_s,
-    Tissue_prestress * const &ps_ptr,
-    IPLocAssem_2x2Block * const &lassem_solid_ptr,
-    IPGAssem * const &gassem_ptr,
-    PLinear_Solver_PETSc * const &lsolver_ptr,
-    const PNonlinear_FSI_Solver * const &nsolver_ptr ) const
+    std::unique_ptr<PDNSolution> init_dot_disp,
+    std::unique_ptr<PDNSolution> init_dot_velo,
+    std::unique_ptr<PDNSolution> init_dot_pres,
+    std::unique_ptr<PDNSolution> init_disp,
+    std::unique_ptr<PDNSolution> init_velo,
+    std::unique_ptr<PDNSolution> init_pres,
+    std::unique_ptr<PDNTimeStep> time_info ) const
 {
-  PDNSolution * pre_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * pre_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * pre_dot_pres = new PDNSolution( init_dot_pres );
+  auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto pre_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
-  PDNSolution * pre_disp = new PDNSolution( init_disp );
-  PDNSolution * pre_velo = new PDNSolution( init_velo );
-  PDNSolution * pre_pres = new PDNSolution( init_pres );
+  auto pre_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto pre_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto pre_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
-  PDNSolution * cur_dot_disp = new PDNSolution( init_dot_disp );
-  PDNSolution * cur_dot_velo = new PDNSolution( init_dot_velo );
-  PDNSolution * cur_dot_pres = new PDNSolution( init_dot_pres );
+  auto cur_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
+  auto cur_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
+  auto cur_dot_pres = SYS_T::make_unique<PDNSolution>(*init_dot_pres);
 
-  PDNSolution * cur_disp = new PDNSolution( init_disp );
-  PDNSolution * cur_velo = new PDNSolution( init_velo );
-  PDNSolution * cur_pres = new PDNSolution( init_pres );
+  auto cur_disp = SYS_T::make_unique<PDNSolution>(*init_disp);
+  auto cur_velo = SYS_T::make_unique<PDNSolution>(*init_velo);
+  auto cur_pres = SYS_T::make_unique<PDNSolution>(*init_pres);
 
   bool prestress_conv_flag = false, renew_flag;
-  int nl_counter = nsolver_ptr -> get_non_max_its();
+  int nl_counter = nsolver -> get_non_max_its();
 
   SYS_T::commPrint( "Time = %e, dt = %e, index = %d, %s \n",
       time_info->get_time(), time_info->get_step(), time_info->get_index(),
@@ -352,30 +240,27 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Nullify the solid solutions
-    Nullify_solid_dof( pnode_v, 3, pre_dot_disp );
-    Nullify_solid_dof( pnode_v, 3, pre_dot_velo );
-    Nullify_solid_dof( pnode_p, 1, pre_dot_pres );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_dot_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_dot_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, pre_dot_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, pre_disp );
-    Nullify_solid_dof( pnode_v, 3, pre_velo );
-    Nullify_solid_dof( pnode_p, 1, pre_pres );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, pre_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, pre_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, cur_dot_disp );
-    Nullify_solid_dof( pnode_v, 3, cur_dot_velo );
-    Nullify_solid_dof( pnode_p, 1, cur_dot_pres );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_dot_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_dot_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, cur_dot_pres.get() );
 
-    Nullify_solid_dof( pnode_v, 3, cur_disp );
-    Nullify_solid_dof( pnode_v, 3, cur_velo );
-    Nullify_solid_dof( pnode_p, 1, cur_pres );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_disp.get() );
+    Nullify_solid_dof( pnode_v.get(), 3, cur_velo.get() );
+    Nullify_solid_dof( pnode_p.get(), 1, cur_pres.get() );
 
-    nsolver_ptr -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
-        time_info->get_time(), time_info->get_step(), is_v, is_p,
-        pre_dot_disp, pre_dot_velo, pre_dot_pres, pre_disp, pre_velo, pre_pres,
-        tmga_ptr, alelem_ptr, lien_v, lien_p, feanode_ptr, pnode_v, pnode_p,
-        nbc_v, nbc_p, ebc_v, ebc_p, bc_mat, elementv, elements, quad_v, quad_s,
-        ps_ptr, lassem_solid_ptr, gassem_ptr, lsolver_ptr,
-        cur_dot_disp, cur_dot_velo, cur_dot_pres, cur_disp, cur_velo, cur_pres,
-        prestress_conv_flag, nl_counter );
+    nsolver -> GenAlpha_Seg_solve_Prestress( renew_flag, prestress_tol,
+        time_info->get_time(), time_info->get_step(), is_v, is_p, pre_dot_disp.get(), 
+        pre_dot_velo.get(), pre_dot_pres.get(), pre_disp.get(), pre_velo.get(), 
+        pre_pres.get(), cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(), 
+        cur_disp.get(), cur_velo.get(), cur_pres.get(), prestress_conv_flag, nl_counter );
 
     time_info->TimeIncrement();
 
@@ -405,20 +290,14 @@ void PTime_FSI_Solver::TM_FSI_Prestress(
       cur_dot_pres->WriteBinary(sol_dot_name);
     }
 
-    pre_dot_disp -> Copy( cur_dot_disp );
-    pre_dot_velo -> Copy( cur_dot_velo );
-    pre_dot_pres -> Copy( cur_dot_pres );
+    pre_dot_disp -> Copy( cur_dot_disp.get() );
+    pre_dot_velo -> Copy( cur_dot_velo.get() );
+    pre_dot_pres -> Copy( cur_dot_pres.get() );
 
-    pre_disp -> Copy( cur_disp );
-    pre_velo -> Copy( cur_velo );
-    pre_pres -> Copy( cur_pres );
+    pre_disp -> Copy( cur_disp.get() );
+    pre_velo -> Copy( cur_velo.get() );
+    pre_pres -> Copy( cur_pres.get() );
   }
-
-  delete pre_dot_disp; delete pre_dot_velo; delete pre_dot_pres;
-  delete pre_disp; delete pre_velo; delete pre_pres;
-
-  delete cur_dot_disp; delete cur_dot_velo; delete cur_dot_pres;
-  delete cur_disp; delete cur_velo; delete cur_pres;
 }
 
 void PTime_FSI_Solver::Nullify_solid_dof( const APart_Node * const &pnode,
@@ -452,6 +331,115 @@ void PTime_FSI_Solver::Nullify_solid_dof( const APart_Node * const &pnode,
   VecGhostRestoreLocalForm(sol->solution, &lsol);
 
   sol->GhostUpdate(); // update the ghost slots
+}
+
+void PTime_FSI_Solver::record_inlet_data( 
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    const PDNSolution * const &pres,
+    const PDNTimeStep * const &time_info,
+    const ALocal_InflowBC * const &infnbc_part,
+    const IPGAssem * const &gassem_ptr,
+    bool is_driver,
+    bool is_restart ) const
+{
+  auto mode = is_restart ? std::ofstream::app : std::ofstream::trunc;
+
+  for(int ff=0; ff<infnbc_part->get_num_nbc(); ++ff)
+  {
+    const double flrate = gassem_ptr->Assem_surface_flowrate(disp, velo, infnbc_part, ff); 
+
+    const double avepre = gassem_ptr->Assem_surface_ave_pressure(disp, pres, infnbc_part, ff);
+
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name("Inlet_", ff).c_str(), std::ofstream::out | mode );
+      
+      if( !is_driver )
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+           <<flrate<<'\t'<<avepre<<std::endl;
+      else
+      {
+        if( !is_restart )
+        {
+          ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"Flow-rate"<<'\t'<<"Face-averaged-pressure"<<'\n';
+      
+          ofile<<time_info->get_index()<<'\t'
+             <<time_info->get_time()<<'\t'
+             <<flrate<<'\t'<<avepre<<std::endl;
+        }
+      }
+
+      ofile.close();
+    } 
+    MPI_Barrier(PETSC_COMM_WORLD);
+  }
+}
+
+void PTime_FSI_Solver::record_outlet_data(
+    const PDNSolution * const &disp,
+    const PDNSolution * const &velo,
+    const PDNSolution * const &pres,
+    const PDNSolution * const &dot_velo,
+    const PDNTimeStep * const &time_info,
+    IGenBC * const &gbc,
+    const IPGAssem * const &gassem_ptr,
+    bool is_driver,
+    bool is_restart) const
+{
+  auto mode = is_restart ? std::ofstream::app : std::ofstream::trunc;
+
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
+  {
+    const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+        disp, dot_velo, ff); 
+
+    const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
+        disp, velo, ff); 
+
+    const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
+        disp, pres, ff);
+
+    double lpn_pressure;
+
+    if ( is_driver )
+    {
+      gbc -> reset_initial_sol( ff, face_flrate, face_avepre, time_info->get_time(), is_restart );
+      lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate, time_info -> get_time() );
+    }
+    else
+    {
+      lpn_pressure = gbc -> get_P( ff, dot_face_flrate, face_flrate, time_info -> get_time() );
+      gbc -> reset_initial_sol( ff, face_flrate, lpn_pressure, time_info->get_time(), false );
+    }
+    
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open( gen_flowfile_name("Outlet_", ff).c_str(), std::ofstream::out | mode );
+
+      if( !is_driver )
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+             <<dot_face_flrate<<'\t'<<face_flrate<<'\t'
+             <<face_avepre<<'\t'<<lpn_pressure<<std::endl;
+      else
+      {
+        if( !is_restart )
+        {
+          ofile<<"Time-index"<<'\t'<<"Time"<<'\t'<<"dot-Flow-rate"<<'\t'<<"Flow-rate"<<'\t'
+               <<"Face-averaged-pressure"<<'\t'<<"Reduced-model-pressure"<<'\n';
+          
+          ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+               <<dot_face_flrate<<'\t'<<face_flrate<<'\t'
+               <<face_avepre<<'\t'<<lpn_pressure<<std::endl;
+        }
+      }
+
+      ofile.close();
+    }
+    MPI_Barrier(PETSC_COMM_WORLD);
+  }
 }
 
 // EOF
