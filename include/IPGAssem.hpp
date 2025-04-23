@@ -343,6 +343,33 @@ class IPGAssem
 
     virtual void write_prestress_hdf5() const
     {SYS_T::commPrint("Warning: write_prestress_hdf5() is not implemented.\n");}
+
+    virtual void Update_SI_situation(
+        const PDNSolution * const &sol,
+        const PDNSolution * const &mvelo,
+        const PDNSolution * const &mdisp )
+    {
+      SYS_T::print_fatal("Warning: Update_SI_situation() is not implemented. \n");
+    }
+
+    virtual void Update_SI_sol(
+        const PDNSolution * const &sol )
+    {
+      SYS_T::print_fatal("Warning: Update_SI_sol() is not implemented. \n");
+    }
+
+    virtual const FEANode * Get_fnode()
+    {
+      SYS_T::print_fatal("Warning: Get_fnode() is not implemented. \n");
+      return {};
+    }
+
+    virtual const APart_Node * Get_pnode()
+    {
+      SYS_T::print_fatal("Warning: Get_pnode() is not implemented. \n");
+      return {};
+    }
+
 };
 
 #endif
