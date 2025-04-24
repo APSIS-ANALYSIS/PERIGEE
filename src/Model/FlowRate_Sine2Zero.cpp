@@ -1,8 +1,8 @@
-#include "FlowRateDot_Sine2Zero.hpp"
+#include "FlowRate_Sine2Zero.hpp"
 
-FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
+FlowRate_Sine2Zero::FlowRate_Sine2Zero( const std::string &filename )
 {
-  SYS_T::commPrint("FlowRateDot_Sine2Zero: data read from %s \n", filename.c_str() );
+  SYS_T::commPrint("FlowRate_Sine2Zero: data read from %s \n", filename.c_str() );
 
   SYS_T::file_check( filename );
   
@@ -40,7 +40,7 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
     TI_std_dev.resize(num_nbc);
   }
   else
-    SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
+    SYS_T::print_fatal("FlowRate_Sine2Zero Error: inlet BC type in %s should be Inflow.\n", filename.c_str());
 
   // Read in num_of_mode, w, period, coef_a, and coef_b per nbc
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
@@ -54,26 +54,26 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
         int face_id;
         sstrm >> face_id;
 
-        if( face_id != nbc_id ) SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
+        if( face_id != nbc_id ) SYS_T::print_fatal("FlowRate_Sine2Zero Error: nbc in %s should be listed in ascending order.\n", filename.c_str());
 
-        if(!(sstrm >> num_of_mode[nbc_id])) SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> num_of_mode[nbc_id])) SYS_T::print_fatal("FlowRate_Sine2Zero Error: num_of_mode of nbc %d is undefined!\n", nbc_id);
         
-        if(!(sstrm >> w[nbc_id])) SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: w of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> w[nbc_id])) SYS_T::print_fatal("FlowRate_Sine2Zero Error: w of nbc %d is undefined!\n", nbc_id);
         
-        if(!(sstrm >> period[nbc_id])) SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: period of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> period[nbc_id])) SYS_T::print_fatal("FlowRate_Sine2Zero Error: period of nbc %d is undefined!\n", nbc_id);
 
-        if(!(sstrm >> thred_time[nbc_id])) SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: thred_time of nbc %d is undefined!\n", nbc_id);
+        if(!(sstrm >> thred_time[nbc_id])) SYS_T::print_fatal("FlowRate_Sine2Zero Error: thred_time of nbc %d is undefined!\n", nbc_id);
 
         if(!(sstrm >> start_flow_rate[nbc_id]))
         {
           start_flow_rate[nbc_id] = 0.0;
-          SYS_T::commPrint("FlowRateDot_Sine2Zero: default start_flow_rate of nbc %d is 0.0\n", nbc_id);
+          SYS_T::commPrint("FlowRate_Sine2Zero: default start_flow_rate of nbc %d is 0.0\n", nbc_id);
         }
 
         if(!(sstrm >> TI_std_dev[nbc_id]))
         {
           TI_std_dev[nbc_id] = 0.0;
-          SYS_T::commPrint("FlowRateDot_Sine2Zero: default TI_std_dev of nbc %d is 0.0\n", nbc_id);
+          SYS_T::commPrint("FlowRate_Sine2Zero: default TI_std_dev of nbc %d is 0.0\n", nbc_id);
         }
 
         sstrm.clear();
@@ -83,7 +83,7 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
 
     // Check the compatibility of period and w. If the difference
     // is larger than 0.01, print a warning message
-    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 ) SYS_T::commPrint( "\nFlowRateDot_Sine2Zero WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*static_cast<double>(MATH_T::PI)/period[nbc_id], w[nbc_id] );
+    if( std::abs(2.0 * MATH_T::PI / period[nbc_id] - w[nbc_id] ) >= 0.01 ) SYS_T::commPrint( "\nFlowRate_Sine2Zero WARNING: nbc_id %d incompatible period and w, \n2xpi/period = %e and w = %e.\n", nbc_id, 2.0*static_cast<double>(MATH_T::PI)/period[nbc_id], w[nbc_id] );
 
     coef_a[nbc_id].clear(); coef_b[nbc_id].clear(); 
 
@@ -104,7 +104,7 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
     coef_a[nbc_id].shrink_to_fit();
     
     if( static_cast<int>(coef_a[nbc_id].size()) != num_of_mode[nbc_id]+1 )
-      SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
+      SYS_T::print_fatal("FlowRate_Sine2Zero Error: nbc_id %d a-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
 
     while( std::getline(reader, sline) )
     {
@@ -123,7 +123,7 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
     coef_b[nbc_id].shrink_to_fit();
 
     if( static_cast<int>(coef_b[nbc_id].size()) != num_of_mode[nbc_id]+1 )
-      SYS_T::print_fatal("FlowRateDot_Sine2Zero Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
+      SYS_T::print_fatal("FlowRate_Sine2Zero Error: nbc_id %d b-coefficients in %s incompatible with the given number of modes.\n", nbc_id, filename.c_str());
   }
 
   // Finish reading the file and close it
@@ -137,7 +137,7 @@ FlowRateDot_Sine2Zero::FlowRateDot_Sine2Zero( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRateDot_Sine2Zero::get_flow_rate( const int &nbc_id,
+double FlowRate_Sine2Zero::get_flow_rate( const int &nbc_id,
     const double &time ) const
 {
   double out_dot_rate = 0.0;
@@ -148,10 +148,10 @@ double FlowRateDot_Sine2Zero::get_flow_rate( const int &nbc_id,
   return out_dot_rate;
 }
 
-void FlowRateDot_Sine2Zero::print_info() const
+void FlowRate_Sine2Zero::print_info() const
 {
   SYS_T::print_sep_line();
-  SYS_T::commPrint("     FlowRateDot_Sine2Zero:\n");
+  SYS_T::commPrint("     FlowRate_Sine2Zero:\n");
   for(int nbc_id = 0; nbc_id < num_nbc; ++nbc_id)
   {
     SYS_T::commPrint("  -- nbc_id = %d \n", nbc_id);
