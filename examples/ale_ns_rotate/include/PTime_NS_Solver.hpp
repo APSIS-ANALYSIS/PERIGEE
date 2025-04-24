@@ -15,17 +15,20 @@
 class PTime_NS_Solver
 {
   public:
-    PTime_NS_Solver( const std::string &input_name, 
+    PTime_NS_Solver( std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
+        const std::string &input_name, 
         const int &input_record_freq, 
         const int &input_renew_tang_freq, 
         const double &input_final_time ) : final_time(input_final_time), 
     sol_record_freq(input_record_freq), 
     renew_tang_freq(input_renew_tang_freq), 
-    pb_name(input_name) {}
+    pb_name(input_name), nsolver(std::move(in_nsolver)) {}
 
     ~PTime_NS_Solver() = default;
 
     void print_info() const;
+
+    void print_lsolver_info() const {nsolver -> print_lsolver_info();}
 
     // ------------------------------------------------------------------------
     // Generate a file name for inlet/outlet face as prefix_xxx_data.txt
@@ -44,40 +47,16 @@ class PTime_NS_Solver
     
     void TM_NS_GenAlpha(
         const bool &restart_init_assembly_flag,
-        PDNSolution * const &sol_base,
-        const PDNSolution * const &init_dot_sol,
-        const PDNSolution * const &init_sol,
-        const PDNSolution * const &init_mdisp,
-        const PDNSolution * const &init_mvelo,
-        const TimeMethod_GenAlpha * const &tmga_ptr,
-        PDNTimeStep * const &time_info,
-        const IFlowRate * const flr_ptr,
-        const APart_Node * const &pNode_ptr,
-        const ALocal_Elem * const &alelem_ptr,
-        const ALocal_IEN * const &lien_ptr,
-        const FEANode * const &feanode_ptr,
-        const ALocal_NBC * const &nbc_part,
-        const ALocal_InflowBC * const &infnbc_part,
-        const ALocal_RotatedBC * const &rotnbc_part,
-        const ALocal_EBC * const &ebc_part,
-        IGenBC * const &gbc,
-        const ALocal_WeakBC * const &wbc_part,
-        const ALocal_Interface * const &itf_part,
-        const SI_rotation_info * const &rot_info,
-        SI_T::SI_solution * const &SI_sol,
-        SI_T::SI_quad_point * const &SI_qp,
-        const Matrix_PETSc * const &bc_mat,
-        FEAElement * const &elementv,
-        FEAElement * const &elements,
-        FEAElement * const &elementvs,
-        FEAElement * const &elementvs_rotated,
-        const IQuadPts * const &quad_v,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        IPLocAssem * const &lassem_ptr,
-        IPGAssem * const &gassem_ptr,
-        PLinear_Solver_PETSc * const &lsolver_ptr,
-        PNonlinear_NS_Solver * const &nsolver_ptr,
+        std::unique_ptr<PDNSolution> init_dot_sol,
+        std::unique_ptr<PDNSolution> init_sol,
+        std::unique_ptr<PDNSolution> init_mdisp,
+        std::unique_ptr<PDNSolution> init_mvelo,
+        std::unique_ptr<PDNTimeStep> time_info,
+        std::unique_ptr<ALocal_InflowBC> infnbc_part,
+        std::unique_ptr<ALocal_RotatedBC> rotnbc_part,
+        std::unique_ptr<IGenBC> gbc,
+        std::unique_ptr<SI_rotation_info> rot_info,
+        std::unique_ptr<IPGAssem> gassem_ptr,
         Mat &shell ) const;
 
   private:
@@ -85,6 +64,8 @@ class PTime_NS_Solver
     const int sol_record_freq; // the frequency for writing solutions
     const int renew_tang_freq; // the frequency for renewing tangents
     const std::string pb_name; // the problem base name for the solution
+
+    const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
 
     std::string generateNumericSuffix(const int &counter) const 
     { return std::to_string(900000000 + counter); }

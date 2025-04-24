@@ -170,8 +170,14 @@ namespace SI_T
     delete [] array; array = nullptr; 
   }
 
-  SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in)
-    : nqp_sur( nqp_sur_in )
+  SI_quad_point::SI_quad_point(const ALocal_Interface * const &itf,
+    const FEType &in_type, const int &in_nqp_sur)
+    : nqp_sur( in_nqp_sur ),
+    anchor_elementv( ElementFactory::createVolElement(in_type, in_nqp_sur) ),
+    opposite_elementv( ElementFactory::createVolElement(in_type, 1) ),
+    elements( ElementFactory::createSurElement(in_type, in_nqp_sur) ),
+    quad_s( QuadPtsFactory::createSurQuadrature(in_type, in_nqp_sur) ),
+    free_quad( QuadPtsFactory::createFreeSurQuadrature(in_type) )
   {
     fixed_qp_curr_rotated_ee.resize(itf->get_num_itf());
     fixed_qp_curr_rotated_xi.resize(itf->get_num_itf());
@@ -226,11 +232,6 @@ namespace SI_T
   }
 
   void SI_quad_point::search_all_opposite_point(
-    FEAElement * const &anchor_elementv,
-    FEAElement * const &opposite_elementv,
-    FEAElement * const &elements,
-    const IQuadPts * const &quad_s,
-    IQuadPts * const &free_quad,
     const ALocal_Interface * const &itf_part,
     const SI_solution * const &SI_sol )
   {
@@ -254,7 +255,7 @@ namespace SI_T
 
         const int fixed_face_id {itf_part->get_fixed_face_id(itf_id, ee)};
         
-        anchor_elementv->buildBasis(fixed_face_id, quad_s, ctrl_x, ctrl_y, ctrl_z);
+        anchor_elementv->buildBasis(fixed_face_id, quad_s.get(), ctrl_x, ctrl_y, ctrl_z);
 
         const int fixed_face_nqp {quad_s->get_num_quadPts()};
 
@@ -275,7 +276,7 @@ namespace SI_T
 
           int ele_tag {itf_part->get_fixed_ele_tag(itf_id, ee)};
           int rotated_ee {0};
-          search_opposite_rotated_point(coor, itf_part, SI_sol, itf_id, opposite_elementv, elements, ele_tag, rotated_ee, free_quad);
+          search_opposite_rotated_point(coor, itf_part, SI_sol, itf_id, ele_tag, rotated_ee);
 
           set_curr_rotated(itf_id, ee_index, qua, rotated_ee, free_quad->get_qp(0, 0), free_quad->get_qp(0, 1));
         }
@@ -298,7 +299,7 @@ namespace SI_T
 
         const int rotated_face_id {itf_part->get_rotated_face_id(itf_id, ee)};
 
-        anchor_elementv->buildBasis(rotated_face_id, quad_s, volctrl_x, volctrl_y, volctrl_z);
+        anchor_elementv->buildBasis(rotated_face_id, quad_s.get(), volctrl_x, volctrl_y, volctrl_z);
 
         const int rotated_face_nqp {quad_s->get_num_quadPts()};
 
@@ -319,7 +320,7 @@ namespace SI_T
 
           int ele_tag {itf_part->get_rotated_ele_tag(itf_id, ee)};
           int fixed_ee {0};
-          search_opposite_fixed_point(coor, itf_part, SI_sol, itf_id, opposite_elementv, elements, ele_tag, fixed_ee, free_quad);
+          search_opposite_fixed_point(coor, itf_part, SI_sol, itf_id, ele_tag, fixed_ee);
 
           set_curr_fixed(itf_id, ee_index, qua, fixed_ee, free_quad->get_qp(0, 0), free_quad->get_qp(0, 1));
         }
@@ -343,11 +344,8 @@ namespace SI_T
     const ALocal_Interface * const &itf_part,
     const SI_solution * const &SI_sol,
     const int &itf_id,
-    FEAElement * rotated_elementv,
-    FEAElement * elements,
     int &tag,
-    int &rotated_ee,
-    IQuadPts * const &rotated_xi )
+    int &rotated_ee)
   {
     const int nLocBas = itf_part->get_nLocBas();
     bool is_found = false;
@@ -377,12 +375,12 @@ namespace SI_T
       
       rotated_face_id = itf_part->get_rotated_face_id(itf_id, ee);
 
-      const auto facectrl = rotated_elementv->get_face_ctrlPts(rotated_face_id,
+      const auto facectrl = opposite_elementv->get_face_ctrlPts(rotated_face_id,
         volctrl_x, volctrl_y, volctrl_z);
 
-      rotated_xi->reset();
-      is_found = FE_T::search_closest_point(fixed_pt, elements,
-        facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), rotated_xi);
+      free_quad->reset();
+      is_found = FE_T::search_closest_point(fixed_pt, elements.get(),
+        facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), free_quad.get());
 
       if(is_found)
       {
@@ -409,12 +407,12 @@ namespace SI_T
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, ee);
 
-        const auto facectrl = rotated_elementv->get_face_ctrlPts(rotated_face_id,
+        const auto facectrl = opposite_elementv->get_face_ctrlPts(rotated_face_id,
           volctrl_x, volctrl_y, volctrl_z);
 
-        rotated_xi->reset();
-        is_found = FE_T::search_closest_point(fixed_pt, elements,
-          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), rotated_xi);
+        free_quad->reset();
+        is_found = FE_T::search_closest_point(fixed_pt, elements.get(),
+          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), free_quad.get());
 
         if(is_found)
         {
@@ -442,12 +440,12 @@ namespace SI_T
         
         rotated_face_id = itf_part->get_rotated_face_id(itf_id, ee);
 
-        const auto facectrl = rotated_elementv->get_face_ctrlPts(rotated_face_id,
+        const auto facectrl = opposite_elementv->get_face_ctrlPts(rotated_face_id,
           volctrl_x, volctrl_y, volctrl_z);
 
-        rotated_xi->reset();
-        is_found = FE_T::search_closest_point(fixed_pt, elements,
-          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), rotated_xi);
+        free_quad->reset();
+        is_found = FE_T::search_closest_point(fixed_pt, elements.get(),
+          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), free_quad.get());
 
         if(is_found)
         {
@@ -480,11 +478,8 @@ namespace SI_T
     const ALocal_Interface * const &itf_part,
     const SI_solution * const &SI_sol,
     const int &itf_id,
-    FEAElement * fixed_elementv,
-    FEAElement * elements,
     int &tag,
-    int &fixed_ee,
-    IQuadPts * const &fixed_xi )
+    int &fixed_ee )
   {
     const int nLocBas = itf_part->get_nLocBas();
     bool is_found = false;
@@ -506,12 +501,12 @@ namespace SI_T
       
       fixed_face_id = itf_part->get_fixed_face_id(itf_id, ee);
 
-      const auto facectrl = fixed_elementv->get_face_ctrlPts(fixed_face_id,
+      const auto facectrl = opposite_elementv->get_face_ctrlPts(fixed_face_id,
         volctrl_x, volctrl_y, volctrl_z);
 
-      fixed_xi->reset();
-      is_found = FE_T::search_closest_point(rotated_pt, elements,
-        facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), fixed_xi);
+      free_quad->reset();
+      is_found = FE_T::search_closest_point(rotated_pt, elements.get(),
+        facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), free_quad.get());
 
       if(is_found)
       {
@@ -534,12 +529,12 @@ namespace SI_T
         
         fixed_face_id = itf_part->get_fixed_face_id(itf_id, ee);
 
-        const auto facectrl = fixed_elementv->get_face_ctrlPts(fixed_face_id,
+        const auto facectrl = opposite_elementv->get_face_ctrlPts(fixed_face_id,
           volctrl_x, volctrl_y, volctrl_z);
 
-        fixed_xi->reset();
-        is_found = FE_T::search_closest_point(rotated_pt, elements,
-          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), fixed_xi);
+        free_quad->reset();
+        is_found = FE_T::search_closest_point(rotated_pt, elements.get(),
+          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), free_quad.get());
 
         if(is_found)
         {
@@ -563,12 +558,12 @@ namespace SI_T
         
         fixed_face_id = itf_part->get_fixed_face_id(itf_id, ee);
 
-        const auto facectrl = fixed_elementv->get_face_ctrlPts(fixed_face_id,
+        const auto facectrl = opposite_elementv->get_face_ctrlPts(fixed_face_id,
           volctrl_x, volctrl_y, volctrl_z);
 
-        fixed_xi->reset();
-        is_found = FE_T::search_closest_point(rotated_pt, elements,
-          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), fixed_xi);
+        free_quad->reset();
+        is_found = FE_T::search_closest_point(rotated_pt, elements.get(),
+          facectrl[0].data(), facectrl[1].data(), facectrl[2].data(), free_quad.get());
 
         if(is_found)
         {

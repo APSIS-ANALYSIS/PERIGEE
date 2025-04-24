@@ -1,16 +1,14 @@
 #include "PLocAssem_VMS_NS_GenAlpha_Interface.hpp"
 
 PLocAssem_VMS_NS_GenAlpha_Interface::PLocAssem_VMS_NS_GenAlpha_Interface(
-  const TimeMethod_GenAlpha * const &tm_gAlpha,
-  const int &in_nlocbas, const int &in_nqp,
-  const int &in_snlocbas, const double &in_rho, 
+  const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
+  const TimeMethod_GenAlpha * const &tm_gAlpha, const double &in_rho,
   const double &in_vis_mu, const double &in_beta,
-  const FEType &elemtype, const double &angular,
-  const Vector_3 &point_xyz, const Vector_3 &angular_direc,
   const double &in_ct, const double &in_ctauc,
   const double &in_C_bI)
-  : PLocAssem_VMS_NS_GenAlpha_WeakBC(tm_gAlpha, in_nlocbas, in_nqp, in_snlocbas,
-  in_rho, in_vis_mu, in_beta, elemtype, angular, point_xyz, angular_direc, in_ct, in_ctauc, in_C_bI)
+  : PLocAssem_VMS_NS_GenAlpha_WeakBC(in_type, in_nqp_v, in_nqp_s,
+  tm_gAlpha, in_rho, in_vis_mu, in_beta,
+  in_ct, in_ctauc, in_C_bI)
 {
   Tangent_ss = new PetscScalar[vec_size * vec_size];
   Tangent_sr = new PetscScalar[vec_size * vec_size];
@@ -72,8 +70,10 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::print_info() const
 
 void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
   const int &qua, const double &fixed_qw, const double &dt,
-  const FEAElement * const &fixed_elementv, const FEAElement * const &rotated_elementv,
-  const double * const &fixed_local_sol, const double * const &rotated_local_sol)
+  const FEAElement * const &fixed_elementv, 
+  const FEAElement * const &rotated_elementv,
+  const double * const &fixed_local_sol, 
+  const double * const &rotated_local_sol)
 {
   Zero_Residual_s();
   double ps {0.0};
@@ -148,7 +148,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_fixed(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
+  const double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
 
   const double gwts = fixed_J * fixed_qw;
 
@@ -276,7 +276,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Residual_itf_rotated(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
+  const double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
 
   const double gwts = rotated_J * rotated_qw;
@@ -395,7 +395,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_fixed(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
+  const double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
   double delta_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? 1.0 : 0.0);
 
   const double gwts = fixed_J * fixed_qw;
@@ -598,7 +598,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Diag_Tangent_Residual_itf_rotate
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
+  const double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
   double delta_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      1.0 : 0.0);
@@ -760,7 +760,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_fixed(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
+  const double inflow_s = (us * nsx + vs * nsy + ws * nsz < 0.0 ? us * nsx + vs * nsy + ws * nsz : 0.0);
 
   const double gwts = fixed_J * fixed_qw;
   const double dd_dv = alpha_f * gamma * dt;
@@ -901,7 +901,7 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
   const double nsx {normal_s.x()}, nsy {normal_s.y()}, nsz {normal_s.z()};
   const double nrx {normal_r.x()}, nry {normal_r.y()}, nrz {normal_r.z()};
 
-  double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
+  const double inflow_r = ((ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz ?
                      (ur - velo_mesh.x()) * nrx + (vr - velo_mesh.y()) * nry + (wr - velo_mesh.z()) * nrz : 0.0);
 
   const double gwts = rotated_J * rotated_qw;
@@ -987,3 +987,5 @@ void PLocAssem_VMS_NS_GenAlpha_Interface::Assem_Tangent_itf_MF_rotated(
     }
   }
 }
+
+// EOF

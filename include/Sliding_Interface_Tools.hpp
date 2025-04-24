@@ -10,6 +10,8 @@
 #include "IPLocAssem.hpp"
 #include "FE_Tools.hpp"
 #include "PETSc_Tools.hpp"
+#include "FEAElementFactory.hpp"
+#include "QuadPtsFactory.hpp"
 
 namespace SI_T
 {
@@ -150,7 +152,7 @@ namespace SI_T
   class SI_quad_point
   {
     public:
-      SI_quad_point(const ALocal_Interface * const &itf, const int &nqp_sur_in);
+      SI_quad_point(const ALocal_Interface * const &itf, const FEType &in_type, const int &in_nqp_sur);
 
       ~SI_quad_point() = default;
 
@@ -167,11 +169,6 @@ namespace SI_T
           int &fixed_ee, double &xi, double &eta) const;
 
       void search_all_opposite_point(
-          FEAElement * const &anchor_elementv,
-          FEAElement * const &opposite_elementv,
-          FEAElement * const &elements,
-          const IQuadPts * const &quad_s,
-          IQuadPts * const &free_quad,
           const ALocal_Interface * const &itf_part,
           const SI_solution * const &SI_sol );
 
@@ -180,25 +177,34 @@ namespace SI_T
           const ALocal_Interface * const &itf_part,
           const SI_solution * const &SI_sol,
           const int &itf_id,
-          FEAElement * rotated_elementv,
-          FEAElement * elements,
           int &tag,
-          int &rotated_ee,
-          IQuadPts * const &rotated_xi );
+          int &rotated_ee );
 
       void search_opposite_fixed_point(
           const Vector_3 &rotated_pt,
           const ALocal_Interface * const &itf_part,
           const SI_solution * const &SI_sol,
           const int &itf_id,
-          FEAElement * fixed_elementv,
-          FEAElement * elements,
           int &tag,
-          int &fixed_ee,
-          IQuadPts * const &fixed_xi );
+          int &fixed_ee );
 
     private:
       const int nqp_sur;
+
+      // For the interface integral
+      const std::unique_ptr<FEAElement> anchor_elementv;
+
+      // Defined with only one quadrature point,
+      // given by the found closest point
+      const std::unique_ptr<FEAElement> opposite_elementv;
+
+      const std::unique_ptr<FEAElement> elements;
+
+      // For the interface integral
+      const std::unique_ptr<const IQuadPts> quad_s;
+
+      // Free parametric surface quadrature point
+      std::unique_ptr<IQuadPts> free_quad;
 
       // stores the current rotated element number for each quadrature point
       // size: num_itf x num_fixed_ele[ii] x numQuadPts(surface)
@@ -213,62 +219,6 @@ namespace SI_T
       std::vector<std::vector<int>> rotated_qp_curr_fixed_ee;
       std::vector<std::vector<double>> rotated_qp_curr_fixed_xi;
       std::vector<std::vector<double>> rotated_qp_curr_fixed_eta;
-  };
-
-  // ancillary parameters for PGAssem_NS_FEM
-  class SI_ancillary
-  {
-    public:
-      SI_ancillary(
-        IPLocAssem * const &lassem_ptr,
-        FEAElement * const &anchor_elementv,
-        FEAElement * const &opposite_elementv,
-        const IQuadPts * const &quad_s,
-        IQuadPts * const &free_quad,
-        const ALocal_Interface * const &itf_part,
-        SI_T::SI_solution * const &SI_sol,
-        SI_T::SI_quad_point * const &SI_qp ):
-        A_quad_s{quad_s}, A_itf_part{itf_part}
-      {
-        A_dt = 0.0;
-        A_lassemptr = lassem_ptr;
-        A_anchor_elementv = anchor_elementv;
-        A_opposite_elementv = opposite_elementv;
-        A_quad_s = quad_s;
-        A_free_quad = free_quad;
-        A_itf_part = itf_part;
-        A_SI_sol = SI_sol;
-        A_SI_qp = SI_qp;
-      }
-
-      ~SI_ancillary()
-      {
-        A_dt = 0.0;
-        A_lassemptr = nullptr;
-        A_anchor_elementv = nullptr;
-        A_opposite_elementv = nullptr;
-        A_free_quad = nullptr;
-        A_SI_sol = nullptr;
-        A_SI_qp = nullptr;
-      }
-
-      double A_dt;
-
-      IPLocAssem * A_lassemptr;
-
-      FEAElement * A_anchor_elementv;
-
-      FEAElement * A_opposite_elementv;
-
-      const IQuadPts * A_quad_s;
-
-      IQuadPts * A_free_quad;
-
-      const ALocal_Interface * A_itf_part;
-
-      SI_T::SI_solution * A_SI_sol;
-
-      SI_T::SI_quad_point * A_SI_qp;
   };
 
   void get_currPts( const double * const &ept_x,

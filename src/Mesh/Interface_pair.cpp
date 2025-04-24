@@ -1,37 +1,51 @@
 #include "Interface_pair.hpp"
 
-Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::string &rotated_vtkfile,
-  const std::string &fixed_h5file, const std::string &rotated_h5file, 
-  const int &total_num_fixed_elem, const int &total_num_fixed_pt,
-  const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const FEType &elemtype_in,
-  const std::vector<double> &intervals_in, const int &direction_in) :
+Interface_pair::Interface_pair(const std::string &fixed_vtkfile, 
+    const std::string &rotated_vtkfile,
+    const std::string &fixed_h5file, 
+    const std::string &rotated_h5file, 
+    const int &total_num_fixed_elem, 
+    const int &total_num_fixed_pt,
+    const std::vector<double> &all_vol_ctrlPts, 
+    const IIEN * const &VIEN, 
+    const FEType &elemtype_in,
+    const std::vector<double> &intervals_in, 
+    const int &direction_in) :
   interface_type {0}, T0_axial_direction{direction_in}, T1_surface_centroid{Vector_3(0,0,0)}
 {
   Initialize(fixed_vtkfile, rotated_vtkfile, fixed_h5file, rotated_h5file,
-    total_num_fixed_elem, total_num_fixed_pt, all_vol_ctrlPts, VIEN, elemtype_in, intervals_in);
+      total_num_fixed_elem, total_num_fixed_pt, all_vol_ctrlPts, VIEN, 
+      elemtype_in, intervals_in);
 }
 
-Interface_pair::Interface_pair(const std::string &fixed_vtkfile, const std::string &rotated_vtkfile,
-  const std::string &fixed_h5file, const std::string &rotated_h5file, 
-  const int &total_num_fixed_elem, const int &total_num_fixed_pt,
-  const std::vector<double> &all_vol_ctrlPts, const IIEN * const &VIEN, const FEType &elemtype_in,
-  const std::vector<double> &intervals_in, const Vector_3 &centroid_in) :
+Interface_pair::Interface_pair(const std::string &fixed_vtkfile, 
+    const std::string &rotated_vtkfile,
+    const std::string &fixed_h5file, 
+    const std::string &rotated_h5file, 
+    const int &total_num_fixed_elem, 
+    const int &total_num_fixed_pt,
+    const std::vector<double> &all_vol_ctrlPts, 
+    const IIEN * const &VIEN, 
+    const FEType &elemtype_in,
+    const std::vector<double> &intervals_in, 
+    const Vector_3 &centroid_in) :
   interface_type {1}, T0_axial_direction{-1}, T1_surface_centroid{centroid_in}
 {
   Initialize(fixed_vtkfile, rotated_vtkfile, fixed_h5file, rotated_h5file,
-    total_num_fixed_elem, total_num_fixed_pt, all_vol_ctrlPts, VIEN, elemtype_in, intervals_in);
+    total_num_fixed_elem, total_num_fixed_pt, all_vol_ctrlPts, VIEN, 
+    elemtype_in, intervals_in);
 }
 
 void Interface_pair::Initialize(const std::string &fixed_vtkfile,
-                    const std::string &rotated_vtkfile,
-                    const std::string &fixed_h5file,
-                    const std::string &rotated_h5file,
-                    const int &total_num_fixed_elem,
-                    const int &total_num_fixed_pt,
-                    const std::vector<double> &all_vol_ctrlPts,
-                    const IIEN * const &VIEN,
-                    const FEType &elemtype_in,
-                    const std::vector<double> &intervals_in)
+    const std::string &rotated_vtkfile,
+    const std::string &fixed_h5file,
+    const std::string &rotated_h5file,
+    const int &total_num_fixed_elem,
+    const int &total_num_fixed_pt,
+    const std::vector<double> &all_vol_ctrlPts,
+    const IIEN * const &VIEN,
+    const FEType &elemtype_in,
+    const std::vector<double> &intervals_in)
 { 
   // Read the vtk files
   int num_fixed_sur_node {0};
@@ -256,8 +270,10 @@ void Interface_pair::Check_interval(const std::vector<double> &intervals)
 }
 
 void Interface_pair::Tag(const std::vector<double> &intervals,
-  const std::vector<double> &fixed_sur_pt_xyz, const std::vector<int> &fixed_sur_ien,
-  const std::vector<double> &rotated_sur_pt_xyz, const std::vector<int> &rotated_sur_ien)
+  const std::vector<double> &fixed_sur_pt_xyz, 
+  const std::vector<int> &fixed_sur_ien,
+  const std::vector<double> &rotated_sur_pt_xyz, 
+  const std::vector<int> &rotated_sur_ien)
 {
   fixed_interval_tag.resize(num_fixed_ele);
 
@@ -296,7 +312,8 @@ void Interface_pair::Tag(const std::vector<double> &intervals,
   }
 }
 
-int Interface_pair::Group(const Vector_3 &ele_centroid, const std::vector<double> &intervals)
+int Interface_pair::Group(const Vector_3 &ele_centroid, 
+    const std::vector<double> &intervals)
 {
   const int n_interval {VEC_T::get_size(intervals) - 1};
 

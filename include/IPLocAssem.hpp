@@ -159,11 +159,9 @@ class IPLocAssem
         const double * const &vec_b,
         const double * const &mvelo,
         const double * const &mdisp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
     {SYS_T::commPrint("Warning: this Assem_Residual(...) is not implemented. \n");}
 
     virtual void Assem_Residual(
@@ -201,11 +199,9 @@ class IPLocAssem
         const double * const &vec_b,
         const double * const &mvelo,
         const double * const &mdisp,
-        FEAElement * const &element,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quad )
+        const double * const &eleCtrlPts_z )
     {SYS_T::commPrint("Warning: this Assem_Tangent_Residual(...) is not implemented. \n");}
 
     virtual void Assem_Tangent_Residual(
@@ -612,11 +608,9 @@ class IPLocAssem
         const double * const &sol,
         const double * const &local_mvelo,
         const double * const &local_mdisp,
-        FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quads,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Residual_Weak_Rotated is not implemented.\n");}
 
@@ -625,11 +619,9 @@ class IPLocAssem
         const double * const &sol,
         const double * const &local_mvelo,
         const double * const &local_mdisp,
-        FEAElement * const &elementv,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z,
-        const IQuadPts * const &quads,
         const int &face_id)
     {SYS_T::commPrint("Warning: this Assem_Tangential_Residual_Weak_Rotated is not implemented.\n");}
 
