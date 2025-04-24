@@ -32,7 +32,6 @@ class PLocAssem_Block_VMS_NS_HERK
         const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
         const ITimeMethod_RungeKutta * const &tm_RK, const double &in_rho, 
         const double &in_vis_mu, const double &in_L0,
-        const double &in_ct = 4.0, const double &in_ctauc = 1.0, 
         const double &in_cu = 2.0, const double &in_cp = 2.0);
 
     ~PLocAssem_Block_VMS_NS_HERK();
@@ -173,10 +172,6 @@ class PLocAssem_Block_VMS_NS_HERK
 
     const double rho0, vis_mu;
     
-    const double CI, CT; // Constants for stabilization parameters
-    
-    const double Ctauc; // Constant scaling factor for tau_C
-    
     const double L0, cu, cp; // Stabilization parameters for Darcy problem
 
     const int nLocBas, snLocBas, vec_size_v, vec_size_p, sur_size_v;
@@ -193,17 +188,8 @@ class PLocAssem_Block_VMS_NS_HERK
 
     SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
-    // Return tau_m and tau_c in RB-VMS
-    std::array<double, 2> get_tau( const double &dt, 
-        const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
-
+    // Return tau_m and tau_c in Darcy-VMS
     std::array<double, 2> get_tau_Darcy( const double &dt ) const;
-
-    // Return tau_m_dot and tau_c_dot in RB-VMS
-    std::array<double, 2> get_tau_dot( const double &dt, 
-        const std::array<double, 9> &dxi_dx,
-        const double &u, const double &v, const double &w ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density

@@ -4,16 +4,13 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
     const ITimeMethod_RungeKutta * const &tm_RK, const double &in_rho, 
     const double &in_vis_mu, const double &in_L0,
-    const double &in_ct, const double &in_ctauc, 
     const double &in_cu, const double &in_cp )
 : elemType(in_type), nqpv(in_nqp_v), nqps(in_nqp_s),
   elementv( ElementFactory::createVolElement(elemType, nqpv) ),
   elements( ElementFactory::createSurElement(elemType, nqps) ),
   quadv( QuadPtsFactory::createVolQuadrature(elemType, nqpv) ),
   quads( QuadPtsFactory::createSurQuadrature(elemType, nqps) ),
-  rho0( in_rho ), vis_mu( in_vis_mu ),
-  CI( (elemType == FEType::Tet4 || elemType == FEType::Hex8) ? 36.0 : 60.0 ),
-  CT( in_ct ), Ctauc( in_ctauc ), L0( in_L0 ), cu( in_cu ), cp( in_cp ),
+  rho0( in_rho ), vis_mu( in_vis_mu ), L0( in_L0 ), cu( in_cu ), cp( in_cp ),
   nLocBas( elementv->get_nLocBas() ), snLocBas( elements->get_nLocBas() ),
   vec_size_v( nLocBas * 3 ), vec_size_p( nLocBas ), sur_size_v ( snLocBas * 3 ),
   coef( (elemType == FEType::Tet4 || elemType == FEType::Tet10) ? 0.6299605249474365 : 1.0 ),
@@ -67,9 +64,6 @@ void PLocAssem_Block_VMS_NS_HERK::print_info() const
   SYS_T::commPrint("  Density rho = %e \n", rho0);
   SYS_T::commPrint("  Dynamic Viscosity mu = %e \n", vis_mu);
   SYS_T::commPrint("  Kienmatic Viscosity nu = %e \n", vis_mu / rho0);
-  SYS_T::commPrint("  Stabilization para CI = %e \n", CI);
-  SYS_T::commPrint("  Stabilization para CT = %e \n", CT);
-  SYS_T::commPrint("  Scaling factor for tau_C = %e \n", Ctauc);
   SYS_T::commPrint("  Characteristic length L0 = %e \n", L0);
   SYS_T::commPrint("  Stabilization para cu for Darcy problem = %e \n", cu);
   SYS_T::commPrint("  Stabilization para cp for Darcy problem = %e \n", cp);
@@ -104,38 +98,6 @@ std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_Darcy(
   const double tau_m = 1.0/(cu * rho0/dt * L0);
 
   return {tau_m, 0.0};
-}
-
-std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau(
-    const double &dt, const std::array<double, 9> &dxi_dx,
-    const double &u, const double &v, const double &w ) const
-{
-  const SymmTensor2_3D G = get_metric( dxi_dx );
-
-  const Vector_3 velo_vec( u, v, w );
-
-  const double temp_nu = vis_mu / rho0;
-
-  const double denom_m = std::sqrt( CT / (dt*dt) + G.VecMatVec( velo_vec, velo_vec) + CI * temp_nu * temp_nu * G.MatContraction( G ) );
-
-  // return tau_m followed by tau_c
-  return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
-}
-
-std::array<double, 2> PLocAssem_Block_VMS_NS_HERK::get_tau_dot(
-    const double &dt, const std::array<double, 9> &dxi_dx,
-    const double &u, const double &v, const double &w ) const
-{
-  const SymmTensor2_3D G = get_metric( dxi_dx );
-
-  const Vector_3 velo_vec( u, v, w );
-
-  const double temp_nu = vis_mu / rho0;
-
-  const double denom_m = std::sqrt( CT + G.VecMatVec( velo_vec, velo_vec) * (dt*dt) + (dt*dt) * CI * temp_nu * temp_nu * G.MatContraction( G ) );
-
-  // return tau_m followed by tau_c
-  return {{1.0 / ( rho0 * denom_m ), Ctauc * rho0 * denom_m / G.tr()}};
 }
 
 double PLocAssem_Block_VMS_NS_HERK::get_DC(

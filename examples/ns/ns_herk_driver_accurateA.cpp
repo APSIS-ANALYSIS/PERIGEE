@@ -35,8 +35,6 @@ int main(int argc, char *argv[])
   // fluid properties
   double fluid_density = 1.065;
   double fluid_mu = 3.5e-2;
-  double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
-  double c_ct = 4.0;   // C_T parameter for defining tau_M
   
   // Stabilization para for Darcy problem
   double L0 = 0.1;
@@ -97,8 +95,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
-  SYS_T::GetOptionReal("-c_tauc", c_tauc);
-  SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionReal("-L0", L0);
   SYS_T::GetOptionReal("-cu", cu);
   SYS_T::GetOptionReal("-cp", cp);
@@ -124,8 +120,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
-  SYS_T::cmdPrint("-c_tauc:", c_tauc);
-  SYS_T::cmdPrint("-c_ct:", c_ct);
   SYS_T::cmdPrint("-L0", L0);
   SYS_T::cmdPrint("-cu", cu);
   SYS_T::cmdPrint("-cp", cp);
@@ -239,7 +233,7 @@ int main(int argc, char *argv[])
     // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_RK.get(),
-        fluid_density, fluid_mu, L0, c_ct, c_tauc, cu, cp );
+        fluid_density, fluid_mu, L0, cu, cp );
 
   // ===== Initial condition =====
   std::unique_ptr<PDNSolution> base =
