@@ -17,6 +17,8 @@
 // Date Created: Feb. 10 2020
 // ==================================================================
 #include "IPGAssem.hpp"
+#include "ALocal_Elem.hpp"
+#include "ALocal_NBC.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
 

@@ -10,6 +10,8 @@
 // Date: Jan 2 2022
 // ============================================================================
 #include "IPGAssem.hpp"
+#include "ALocal_Elem.hpp"
+#include "ALocal_NBC.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_V.hpp"
 
