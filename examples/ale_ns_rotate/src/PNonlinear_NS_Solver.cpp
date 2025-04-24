@@ -114,7 +114,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   update_rotatedbc_value(rotnbc_part, mvelo_alpha, &sol_alpha);
   // ------------------------------------------------- 
 
-  gassem_ptr->Update_SI_situation(&sol_alpha, mvelo_alpha, mdisp_alpha);
+  gassem_ptr->Update_SI_state(&sol_alpha, mvelo_alpha, mdisp_alpha);
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step

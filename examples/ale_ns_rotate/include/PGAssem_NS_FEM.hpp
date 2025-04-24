@@ -104,7 +104,7 @@ class PGAssem_NS_FEM : public IPGAssem
 
     virtual void Interface_K_MF(Vec &X, Vec &Y);
 
-    virtual void Update_SI_situation(
+    virtual void Update_SI_state(
         const PDNSolution * const &sol,
         const PDNSolution * const &mvelo,
         const PDNSolution * const &mdisp )

@@ -344,12 +344,12 @@ class IPGAssem
     virtual void write_prestress_hdf5() const
     {SYS_T::commPrint("Warning: write_prestress_hdf5() is not implemented.\n");}
 
-    virtual void Update_SI_situation(
+    virtual void Update_SI_state(
         const PDNSolution * const &sol,
         const PDNSolution * const &mvelo,
         const PDNSolution * const &mdisp )
     {
-      SYS_T::print_fatal("Warning: Update_SI_situation() is not implemented. \n");
+      SYS_T::print_fatal("Warning: Update_SI_state() is not implemented. \n");
     }
 
     virtual void Update_SI_sol(

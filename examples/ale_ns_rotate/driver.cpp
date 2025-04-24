@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
     std::move(locnbc), std::move(locebc), std::move(locwbc), std::move(locitf),
     std::move(locAssem_ptr), std::move(SI_sol), std::move(SI_qp), gbc.get(), nz_estimate );
 
-  gloAssem_ptr->Update_SI_situation(sol.get(), velo_mesh.get(), disp_mesh.get());
+  gloAssem_ptr->Update_SI_state(sol.get(), velo_mesh.get(), disp_mesh.get());
 
   SYS_T::commPrint("===> Assembly nonzero estimate matrix ... \n");
   gloAssem_ptr->Assem_nonzero_estimate( gbc.get() );
