@@ -17,6 +17,11 @@
 // Date Created: Feb. 10 2020
 // ==================================================================
 #include "IPGAssem.hpp"
+#include "ALocal_Elem.hpp"
+#include "ALocal_NBC.hpp"
+#include "ALocal_EBC.hpp"
+#include "ALocal_EBC_outflow.hpp"
+#include "ALocal_WeakBC.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
 

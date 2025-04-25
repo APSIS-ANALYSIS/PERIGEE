@@ -14,22 +14,12 @@
 // Date: July 31 2015 
 // ============================================================================
 #include "APart_Node.hpp"
-#include "APart_Node_FSI.hpp"
-#include "ALocal_Elem.hpp"
-#include "AGlobal_Mesh_Info.hpp"
 #include "IPLocAssem.hpp"
 #include "IPLocAssem_2x2Block.hpp"
 #include "FEANode.hpp"
 #include "PDNSolution.hpp"
-#include "ALocal_NBC.hpp"
 #include "ALocal_InflowBC.hpp"
-#include "ALocal_EBC.hpp"
-#include "ALocal_EBC_outflow.hpp"
-#include "ALocal_WeakBC.hpp"
-#include "ALocal_Interface.hpp"
-#include "Sliding_Interface_Tools.hpp"
 #include "IGenBC.hpp"
-#include "Tissue_prestress.hpp"
 
 class IPGAssem
 {

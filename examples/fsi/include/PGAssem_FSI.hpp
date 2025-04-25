@@ -10,8 +10,13 @@
 // Date: Jan 2 2022
 // ============================================================================
 #include "IPGAssem.hpp"
+#include "ALocal_Elem.hpp"
+#include "ALocal_NBC.hpp"
+#include "ALocal_EBC.hpp"
+#include "ALocal_EBC_outflow.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_V.hpp"
+#include "Tissue_prestress.hpp"
 
 class PGAssem_FSI : public IPGAssem
 {
