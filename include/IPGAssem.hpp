@@ -14,7 +14,6 @@
 // Date: July 31 2015 
 // ============================================================================
 #include "APart_Node.hpp"
-#include "APart_Node_FSI.hpp"
 #include "IPLocAssem.hpp"
 #include "IPLocAssem_2x2Block.hpp"
 #include "FEANode.hpp"

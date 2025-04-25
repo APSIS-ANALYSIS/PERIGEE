@@ -7,6 +7,7 @@
 // ============================================================================
 #include "HDF5_Tools.hpp"
 #include "ANL_Tools.hpp"
+#include "APart_Node_FSI.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_vol_ST91.hpp"
 #include "MaterialModel_vol_M94.hpp"
