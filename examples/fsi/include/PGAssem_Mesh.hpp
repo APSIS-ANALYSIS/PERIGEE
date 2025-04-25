@@ -11,6 +11,7 @@
 #include "IPGAssem.hpp"
 #include "ALocal_Elem.hpp"
 #include "ALocal_NBC.hpp"
+#include "ALocal_EBC.hpp"
 #include "PETSc_Tools.hpp"
 
 class PGAssem_Mesh : public IPGAssem
