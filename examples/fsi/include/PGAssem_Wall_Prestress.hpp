@@ -12,6 +12,7 @@
 #include "ALocal_NBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "PETSc_Tools.hpp"
+#include "Tissue_prestress.hpp"
 
 class PGAssem_Wall_Prestress : public IPGAssem
 {

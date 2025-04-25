@@ -20,10 +20,7 @@
 #include "FEANode.hpp"
 #include "PDNSolution.hpp"
 #include "ALocal_InflowBC.hpp"
-#include "ALocal_Interface.hpp"
-#include "Sliding_Interface_Tools.hpp"
 #include "IGenBC.hpp"
-#include "Tissue_prestress.hpp"
 
 class IPGAssem
 {

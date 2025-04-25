@@ -22,6 +22,7 @@
 #include "ALocal_EBC.hpp"
 #include "ALocal_EBC_outflow.hpp"
 #include "ALocal_WeakBC.hpp"
+#include "ALocal_Interface.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
 #include "FE_Tools.hpp"

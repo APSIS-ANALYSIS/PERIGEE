@@ -16,6 +16,7 @@
 #include "ALocal_EBC_outflow.hpp"
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_V.hpp"
+#include "Tissue_prestress.hpp"
 
 class PGAssem_FSI : public IPGAssem
 {
