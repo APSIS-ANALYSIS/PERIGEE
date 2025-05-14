@@ -13,10 +13,12 @@
 #include "FlowRateFactory.hpp"
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver.hpp"
-#include "ExplicitRK_SSPRK3p3s.hpp"
+#include "ExplicitRK_FERK1p2s.hpp"
 #include "ExplicitRK_EMRK2p2s.hpp"
 #include "ExplicitRK_HeunRK2p2s.hpp"
 #include "ExplicitRK_RalstonRK2p2s.hpp"
+#include "ExplicitRK_SSPRK3p3s.hpp"
+#include "ExplicitRK_RalstonRK3p3s.hpp"
 #include "ExplicitRK_PseudoSymplecticRK3p5q4s.hpp"
 #include "Matrix_Free_Tools.hpp"
 
