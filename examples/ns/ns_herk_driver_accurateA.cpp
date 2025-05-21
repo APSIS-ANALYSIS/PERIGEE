@@ -18,8 +18,12 @@
 #include "ExplicitRK_HeunRK2p2s.hpp"
 #include "ExplicitRK_RalstonRK2p2s.hpp"
 #include "ExplicitRK_SSPRK3p3s.hpp"
+#include "ExplicitRK_SSPRK3p4s.hpp"
 #include "ExplicitRK_RalstonRK3p3s.hpp"
 #include "ExplicitRK_PseudoSymplecticRK3p5q4s.hpp"
+#include "ExplicitRK_38RuleRK4p4s.hpp"
+#include "ExplicitRK_ClassicRK4p4s.hpp"
+#include "ExplicitRK_RalstonRK4p4s.hpp"
 #include "Matrix_Free_Tools.hpp"
 #include "Matrix_Free_Tools_AccurateA.hpp"
 
