@@ -4,7 +4,7 @@
 // Explicit Runge–Kutta method: Ralston’s method
 // Four-stage scheme with fourth-order accuracy on solution
 //
-// Ref: J.C. Butcher. Numerical methods for ordinary differential equations, 2016
+// Ref: A. Runge-Kutta methods with minimum error bounds. Mathematics of Computation, 1962
 //
 // Date: Apr. 14 2025
 // Author: Yujie Sun
