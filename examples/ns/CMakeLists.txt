@@ -165,6 +165,7 @@ ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
+ADD_EXECUTABLE( post_PLA_tet4 post_PLA_tet4.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
@@ -176,6 +177,7 @@ TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex8 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex27 perigee_postprocess )
+TARGET_LINK_LIBRARIES( post_PLA_tet4 perigee_postprocess )
 
 
 if(OPENMP_CXX_FOUND)
