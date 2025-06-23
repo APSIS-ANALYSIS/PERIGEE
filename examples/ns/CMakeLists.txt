@@ -166,6 +166,8 @@ ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
 ADD_EXECUTABLE( post_PLA_tet4 post_PLA_tet4.cpp)
+ADD_EXECUTABLE( preprocess_cell2node preprocess_cell2node.cpp)
+ADD_EXECUTABLE( cell2node_projection cell2node_projection.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
@@ -178,7 +180,8 @@ TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex8 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex27 perigee_postprocess )
 TARGET_LINK_LIBRARIES( post_PLA_tet4 perigee_postprocess )
-
+TARGET_LINK_LIBRARIES( preprocess_cell2node perigee_preprocess )
+TARGET_LINK_LIBRARIES( cell2node_projection perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )

@@ -32,6 +32,8 @@ class FEANode
     // ------------------------------------------------------------------------
     FEANode( const std::string &fileBaseName, const int &cpu_rank );
 
+    FEANode( const std::string &fileBaseName, const int &cpu_rank, const int &tt );
+
     FEANode( const HDF5_Reader * const &h5r );
 
     // ------------------------------------------------------------------------

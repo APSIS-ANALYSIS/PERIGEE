@@ -20,10 +20,12 @@
 #ifdef _OPENMP
 #define PERIGEE_OMP_PARALLEL_FOR _Pragma("omp parallel for")
 #define PERIGEE_OMP_PARALLEL _Pragma("omp parallel")
+#define PERIGEE_OMP_CRITICAL _Pragma("omp critical")
 #define PERIGEE_OMP_SINGLE _Pragma("omp single")
 #else
 #define PERIGEE_OMP_PARALLEL_FOR
 #define PERIGEE_OMP_PARALLEL
+#define PERIGEE_OMP_CRITICAL
 #define PERIGEE_OMP_SINGLE
 #endif
 

@@ -25,6 +25,39 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
   H5Fclose( file_id );
 }
 
+ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank, const int &tt)
+{
+  const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
+
+  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+
+  elem_loc = h5r->read_intVector( "/Local_Elem", "elem_loc" );
+
+  nlocalele = h5r->read_intScalar( "/Local_Elem", "nlocalele" );
+
+  isTagged = h5r -> check_data("/Local_Elem/elem_phy_tag");
+
+  if( isTagged )
+  {
+    elem_tag = h5r->read_intVector("/Local_Elem", "elem_phy_tag");
+    SYS_T::print_fatal_if( VEC_T::get_size( elem_tag ) != nlocalele, "Error: ALocal_Elem::ALocal_Elem function elem_tag_length is not equal to nlocalele.\n");
+  }
+  else
+    elem_tag.clear();
+
+  std::string g_name = "/Local_Elem/";
+  std::string subgroup_name = std::to_string(tt);
+  g_name += subgroup_name;
+  local_p = h5r->read_doubleVector(g_name.c_str(), "local_p");
+  local_u = h5r->read_doubleVector(g_name.c_str(), "local_u");
+  local_v = h5r->read_doubleVector(g_name.c_str(), "local_v");
+  local_w = h5r->read_doubleVector(g_name.c_str(), "local_w");
+    
+  H5Fclose( file_id );
+}
+
 ALocal_Elem::ALocal_Elem(const HDF5_Reader * const &h5r)
 {
   elem_loc = h5r->read_intVector( "/Local_Elem", "elem_loc" );

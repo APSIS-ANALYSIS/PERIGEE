@@ -18,6 +18,8 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     ALocal_Elem(const std::string &fbasename, const int &cpu_rank);
 
+    ALocal_Elem(const std::string &fbasename, const int &cpu_rank, const int &tt);
+
     ALocal_Elem(const HDF5_Reader * const &h5r);
 
     // ------------------------------------------------------------------------
@@ -30,6 +32,11 @@ class ALocal_Elem
     // 0 <= index < nlocalele
     // ------------------------------------------------------------------------
     virtual int get_elem_loc(const int &index) const {return elem_loc[index];}
+
+    virtual int get_local_p(const int &index) const {return local_p[index];}
+    virtual int get_local_u(const int &index) const {return local_u[index];}
+    virtual int get_local_v(const int &index) const {return local_v[index];}
+    virtual int get_local_w(const int &index) const {return local_w[index];}
    
     // ------------------------------------------------------------------------
     // Return the number of elements in this sub-domain owned by this CPU. 
@@ -87,6 +94,12 @@ class ALocal_Elem
     // elem_tag is cleared if isTagged = false
     // ------------------------------------------------------------------------
     std::vector<int> elem_tag {};
+
+    bool pla;
+    std::vector<double> local_p {};
+    std::vector<double> local_u {};
+    std::vector<double> local_v {};
+    std::vector<double> local_w {};
 
     // Disallow default constructor
     ALocal_Elem() = delete;
