@@ -159,9 +159,12 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
+    cmdh5w->write_intScalar("nqp_vol", nqp_vol);
+    cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
     cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
+    cmdh5w->write_string("sol_bName", sol_bName);
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
