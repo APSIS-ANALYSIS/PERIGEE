@@ -189,7 +189,8 @@ class PLocAssem_Block_VMS_NS_HERK
     SymmTensor2_3D get_metric( const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_m and tau_c in Darcy-VMS
-    std::array<double, 2> get_tau_Darcy( const double &dt ) const;
+    // std::array<double, 2> get_tau_Darcy( const double &dt ) const;
+    std::array<double, 2> get_tau_Darcy( const double &dt, const std::array<double, 9> &dxi_dx ) const;
 
     // Return tau_bar := (v' G v')^-0.5 x rho0, 
     //        which scales like Time x Density
