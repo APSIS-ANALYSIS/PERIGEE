@@ -339,7 +339,7 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
-  const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+  // const ITimeMethod_RungeKutta * const &tm_RK_ptr,
   const double &dt )
 {
   const int nElem = locelem->get_nlocalele();
@@ -358,8 +358,9 @@ void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
 
     fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
   
-    locassem->Assem_Tangent_Matrix(dt, tm_RK_ptr, ectrl_x, ectrl_y, ectrl_z);
-  
+    // locassem->Assem_Tangent_Matrix(dt, tm_RK_ptr, ectrl_x, ectrl_y, ectrl_z);
+    locassem->Assem_Tangent_Matrix(dt, ectrl_x, ectrl_y, ectrl_z);
+
     for(int ii=0; ii<nLocBas; ++ii)
     {
       const int loc_index  = locien->get_LIEN(ee, ii);

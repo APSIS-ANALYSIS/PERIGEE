@@ -125,7 +125,7 @@ class PGAssem_Block_NS_FEM_HERK
     
     // Assembly the tangent block matrix for the HERK
     void Assem_tangent_matrix(
-        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        // const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double &dt );
 
     // Assembly the residual vector for the sub-step of HERK        
