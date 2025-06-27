@@ -161,7 +161,7 @@ class PLocAssem_Block_VMS_NS_HERK
         const double * const &eleCtrlPts_z );
 
     void Assem_Residual_CalPres(
-        const double &time, const double &dt,
+        const double &time,
         const std::vector<double>& cur_dot_velo,
         const std::vector<double>& cur_velo,
         const std::vector<double>& cur_pres,

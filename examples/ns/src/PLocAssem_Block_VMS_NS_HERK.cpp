@@ -1567,7 +1567,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
 }
 
 void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
-  const double &time, const double &dt,
+  const double &time,
   const std::vector<double>& cur_dot_velo,
   const std::vector<double>& cur_velo,
   const std::vector<double>& cur_pres,
@@ -1694,11 +1694,11 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
     const double w_np1_diffu = u_np1_xz + v_np1_yz + w_np1_zz + w_np1_xx + w_np1_yy + w_np1_zz;
 
     const double dot_u_np1_prime = -1.0 * tau_m * ( rho0 * dot_u_np1 +  p_np1_x + rho0 * u_np1_adevc
-                                        - vis_mu * u_np1_diffu - rho0 * get_f( coor, time + dt ).x() );
+                                        - vis_mu * u_np1_diffu - rho0 * get_f( coor, time ).x() );
     const double dot_v_np1_prime = -1.0 * tau_m * ( rho0 * dot_v_np1 +  p_np1_y + rho0 * v_np1_adevc
-                                        - vis_mu * v_np1_diffu - rho0 * get_f( coor, time + dt ).y() );
+                                        - vis_mu * v_np1_diffu - rho0 * get_f( coor, time ).y() );
     const double dot_w_np1_prime = -1.0 * tau_m * ( rho0 * dot_w_np1 +  p_np1_z + rho0 * w_np1_adevc
-                                        - vis_mu * w_np1_diffu - rho0 * get_f( coor, time + dt ).z() );    
+                                        - vis_mu * w_np1_diffu - rho0 * get_f( coor, time ).z() );    
 
     const double div_dot_vel_np1 = dot_u_np1_x + dot_v_np1_y + dot_w_np1_z;
     const double p_np1_prime = -1.0 * tau_c * div_dot_vel_np1;
@@ -1719,7 +1719,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
     // Convective term
     const double u_advec1_1 = u_np1 * u_np1_x;
     const double u_advec1_2 = v_np1 * u_np1_y;
-    const double u_adevc1_3 = w_np1 * u_np1_z;
+    const double u_advec1_3 = w_np1 * u_np1_z;
 
     const double v_advec1_1 = u_np1 * v_np1_x;
     const double v_advec1_2 = v_np1 * v_np1_y;
@@ -1728,7 +1728,6 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
     const double w_advec1_1 = u_np1 * w_np1_x;
     const double w_advec1_2 = v_np1 * w_np1_y;
     const double w_advec1_3 = w_np1 * w_np1_z;
-
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -1740,17 +1739,17 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
                                    - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime 
-                                   - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
+                                   - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time ).x() 
                                    + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu *  u_diffu1_3 
                                    + NA * rho0 * u_advec1_1 + NA * rho0 * u_advec1_2 + NA * rho0 * u_advec1_3 );
 
       Residual1[3*A + 1] += gwts * ( NA * rho0 * dot_v_np1 - NA_y * p_np1 + NA * rho0 * dot_v_np1_prime
-                                   - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).y() 
+                                   - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time ).y() 
                                    + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
                                    + NA * rho0 * v_advec1_1 + NA * rho0 * v_advec1_2 + NA * rho0 * v_advec1_3 );
 
       Residual1[3*A + 2] += gwts * ( NA * rho0 * dot_w_np1 - NA_z * p_np1+ NA * rho0 * dot_w_np1_prime 
-                                   - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).z()
+                                   - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time ).z()
                                    + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
                                    + NA * rho0 * w_advec1_1 + NA * rho0 * w_advec1_2 + NA * rho0 * w_advec1_3 );
 

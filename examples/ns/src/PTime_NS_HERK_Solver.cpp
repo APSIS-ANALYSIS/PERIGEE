@@ -183,18 +183,26 @@ void PTime_NS_HERK_Solver::Cal_NS_pres(
 
   Update_velocity_from_sol(cur_velo, cur_sol);
 
+  #ifdef PETSC_USE_LOG
+    PetscLogEvent K_solve, update_dotstep;
+    PetscClassId classid_solve;
+    PetscClassIdRegister("matsolve", &classid_solve);
+    PetscLogEventRegister("K_solve", classid_solve, &K_solve);
+    PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
+  #endif
+
   auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
 
   SYS_T::commPrint(" ==> Start calculating the pressure: \n");
 
   // Make the dot_velo meet the Dirchlet boundary
-  rescale_inflow_velo(curr_time + dt, cur_dot_velo);
+  rescale_inflow_velo(time_info->get_time(), dot_flrate.get(), cur_dot_velo);
 
   gassem->Clear_G();
 
-  gassem->Assem_residual_calpres( cur_dot_velo, cur_velo, cur_pres, curr_time, dt );
+  gassem->Assem_residual_calpres( cur_dot_velo, cur_velo, cur_pres, time_info->get_time() );
 
-  gassem->Set_tangent_alpha_RK( 1.0 );
+  gassem->Update_tangent_alpha_RK( 1.0 );
     
   Vec dot_sol_vp;
   VecDuplicate( gassem->G, &dot_sol_vp );
@@ -498,8 +506,8 @@ void PTime_NS_HERK_Solver::Update_velocity_from_sol(
     PDNSolution * const &velo,
     const PDNSolution * const &sol) const
 {
-  Vec lvelo, lpres, lsol;
-  double * array_velo, * array_pres, * array_sol;
+  Vec lvelo, lsol;
+  double * array_velo, * array_sol;
 
   VecGhostGetLocalForm(velo->solution, &lvelo);        
   VecGhostGetLocalForm(sol->solution, &lsol);

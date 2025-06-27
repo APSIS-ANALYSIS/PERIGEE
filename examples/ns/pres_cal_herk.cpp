@@ -341,18 +341,18 @@ int main(int argc, char *argv[])
     // 需要重写一个, 不需要读velo
     tsolver->Cal_NS_pres(std::move(sol), std::move(dot_velo), 
         std::move(pres), std::move(dot_sol), std::move(timeinfo));
-
-    // ===== Print complete solver info =====
-    tsolver -> print_lsolver_info();
-    solverCtx -> lsolver_A -> print_info();
-    solverCtx -> lsolver_S -> print_info();
-
-    MatDestroy(&S_approx);
-    MatDestroy(&K_shell);
-    PCDestroy(&pc_shell);
-    tsolver.reset();
-    solverCtx.reset();
   }
+
+  // ===== Print complete solver info =====
+  tsolver -> print_lsolver_info();
+  solverCtx -> lsolver_A -> print_info();
+  solverCtx -> lsolver_S -> print_info();
+
+  MatDestroy(&S_approx);
+  MatDestroy(&K_shell);
+  PCDestroy(&pc_shell);
+  tsolver.reset();
+  solverCtx.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;  

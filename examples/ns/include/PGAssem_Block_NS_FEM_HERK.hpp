@@ -170,8 +170,7 @@ class PGAssem_Block_NS_FEM_HERK
         PDNSolution * const &cur_dot_velo,
         PDNSolution * const &cur_velo,
         PDNSolution * const &cur_pres,    
-        const double &curr_time,
-        const double &dt );
+        const double &curr_time );
 
     void Update_tangent_alpha_RK( const double &aa )
     {tangent_alpha_RK = aa;}
