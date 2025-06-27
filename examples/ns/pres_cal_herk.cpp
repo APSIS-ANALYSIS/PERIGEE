@@ -30,7 +30,10 @@ int main(int argc, char *argv[])
 {
   // solution file name to be loaded for calculating the pressure
   std::string read_sol_bname("SOL_");
-  int time_start = 0, time_end = 1;
+  int time_start = 0, time_step = 1, time_end = 1;
+
+  // base name of the dot_solution file
+  std::string sol_bname("dot_SOL_");
 
   // Read analysis code parameter if the solver_cmd.h5 exists
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
@@ -64,8 +67,6 @@ int main(int argc, char *argv[])
 
   // dot_inflow_file
   std::string dot_inflow_file("dot_inflow_fourier_series.txt");
-
-  // Restart options（待完善）
 
   // Yaml options
   bool is_loadYaml = true;
@@ -107,8 +108,24 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-L0", L0);
   SYS_T::GetOptionReal("-cu", cu);
   SYS_T::GetOptionReal("-cp", cp);
+  SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
+  //   SYS_T::GetOptionString("-lpn_file", lpn_file);
+  SYS_T::GetOptionReal("-dt", initial_step);
+  SYS_T::GetOptionInt("-sol_rec_freq", sol_record_freq);
+  SYS_T::GetOptionString("-read_sol_name:", read_sol_bname);
+  SYS_T::GetOptionString("-sol_name:", sol_bname);
+  SYS_T::GetOptionString("-part_file", part_file);
+
+  // time stepping parameters
+  // Assuming SOL_900000000 corresponds to a time of 0.0s
+  double initial_time = time_start * initial_step;
+  double& initial_index = time_start;
+  double final_time = initial_time + time_end * initial_step;
 
   // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint("-time_start:", time_start);
+  SYS_T::cmdPrint("-time_step:", time_step);
+  SYS_T::cmdPrint("-time_end:", time_end);
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
   SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
@@ -119,12 +136,14 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-cp", cp);
   SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
-  SYS_T::cmdPrint("-part_file:", part_file);;
-  SYS_T::cmdPrint("-init_time:", initial_time);
-  SYS_T::cmdPrint("-init_step:", initial_step);
-  SYS_T::cmdPrint("-init_index:", initial_index);
   SYS_T::cmdPrint("-sol_rec_freq:", sol_record_freq);
+  SYS_T::cmdPrint("-read_sol_name:", read_sol_bname);
   SYS_T::cmdPrint("-sol_name:", sol_bName);
+  SYS_T::cmdPrint("-part_file:", part_file);
+  SYS_T::cmdPrint("-init_time:", initial_time);
+  SYS_T::cmdPrint("-dt:", initial_step);
+  SYS_T::cmdPrint("-init_index:", initial_index);
+  SYS_T::cmdPrint("-fina_time:", final_time);
 
   // ===== Record important solver options =====
   if(rank == 0)
@@ -195,7 +214,7 @@ int main(int argc, char *argv[])
 
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
-  // ===== Half Explicit Runge Kutta scheme ===== (是否必要？)
+  // ===== Half Explicit Runge Kutta scheme ===== (是否必要？不必要，但很多组装类里面构造函数需要它)
   SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
 
   std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_PseudoSymplecticRK3p5q4s>();
@@ -228,7 +247,7 @@ int main(int argc, char *argv[])
   std::unique_ptr<PDNSolution> dot_velo =
     SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "dot_velo" );
 
-  // ===== Global assembly ===== （是否可以复用以前的全局组装？还是说单独写一个全局组装）
+  // ===== Global assembly ===== （是否可以复用以前的全局组装？还是说单独写一个全局组装）复用dt=1√
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   auto gloAssem = SYS_T::make_unique<PGAssem_Block_NS_FEM_HERK>( 
       std::move(locIEN), std::move(locElem), std::move(fNode), 
@@ -242,8 +261,8 @@ int main(int argc, char *argv[])
   gloAssem->Fix_nonzero_err_str();
   gloAssem->Clear_subKG();
 
-  // (是否可以复用以前的切矩阵组装？还是说单独写一个组装，似乎可以，dt=1.0即可）)
-  gloAssem->Assem_tangent_matrix(tm_RK.get(), 1.0);
+  // (是否可以复用以前的切矩阵组装？还是说单独写一个组装，似乎可以，dt=1.0即可）)√
+  gloAssem->Assem_tangent_matrix(1.0);
 
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
@@ -287,11 +306,11 @@ int main(int argc, char *argv[])
   lsolver->SetOperator(K_shell); 
 
   // ===== Time step info ===== 
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
-      initial_step);
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(time_start, initial_time, 
+      initial_step * time_step);
  
   // ===== Temporal solver context =====
-  // 是不是需要重写一个构造函数，不然final time如何处理？或者给0?
+  // 是不是需要重写一个构造函数，不然final time如何处理？或者给0? 复用 final_time可以推断出来√
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
       std::move(inflow_rate), std::move(dot_inflow_rate), std::move(base),
@@ -311,7 +330,7 @@ int main(int argc, char *argv[])
     read_sol_bname.append(time_index.str());
 
     SYS_T::commPrint("Time %f: Read %s. \n", 
-      time*init_step, read_sol_name.c_str() );
+      time*initial_step, read_sol_name.c_str() );
     
     SYS_T::file_check(read_sol_name);
       sol->ReadBinary(read_sol_name);
@@ -319,8 +338,8 @@ int main(int argc, char *argv[])
     // ===== FEM analysis =====
     SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-    // 是不是需要重写一个, 不需要读velo?
-    tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
+    // 需要重写一个, 不需要读velo
+    tsolver->TM_NS_HERK(std::move(sol), std::move(dot_velo), 
         std::move(pres), std::move(timeinfo));
 
     // ===== Print complete solver info =====
@@ -336,6 +355,7 @@ int main(int argc, char *argv[])
   }
 
   PetscFinalize();
-  return EXIT_SUCCESS;
-  
+  return EXIT_SUCCESS;  
 }
+
+// EOF
