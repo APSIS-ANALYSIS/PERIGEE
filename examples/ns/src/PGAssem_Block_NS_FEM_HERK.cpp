@@ -686,6 +686,74 @@ void PGAssem_Block_NS_FEM_HERK::Assem_residual_presstage(
   VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
 }
 
+void PGAssem_Block_NS_FEM_HERK::Assem_residual_calpres(
+  PDNSolution * const &cur_dot_velo,
+  PDNSolution * const &cur_velo,
+  PDNSolution * const &cur_pres,    
+  const double &curr_time,
+  const double &dt )
+{
+  const int nElem = locelem->get_nlocalele();
+  const int loc_dof_v = dof_mat_v * nLocBas;
+  const int loc_dof_p = dof_mat_p * nLocBas;
+
+  const std::vector<double> array_cur_dot_velo = cur_dot_velo -> GetLocalArray();
+  const std::vector<double> array_cur_velo = cur_velo -> GetLocalArray();
+  const std::vector<double> array_pre_velo = pre_velo -> GetLocalArray();
+  const std::vector<double> array_cur_pres = cur_pres -> GetLocalArray();
+
+  double * ectrl_x = new double [nLocBas];
+  double * ectrl_y = new double [nLocBas];
+  double * ectrl_z = new double [nLocBas];
+  PetscInt * row_idx_v = new PetscInt [nLocBas * dof_mat_v];
+  PetscInt * row_idx_p = new PetscInt [nLocBas * dof_mat_p];
+
+  for(int ee=0; ee<nElem; ++ee)
+  {
+    const std::vector<int> IEN_e = locien->get_LIEN(ee); 
+
+    const std::vector<double> local_cur_dot_velo = GetLocal( array_cur_dot_velo, IEN_e, nLocBas, 3 );
+    const std::vector<double> local_cur_velo = GetLocal( array_cur_velo, IEN_e, nLocBas, 3 );
+    const std::vector<double> local_pre_velo = GetLocal( array_pre_velo, IEN_e, nLocBas, 3 );
+    const std::vector<double> local_cur_pres = GetLocal( array_cur_pres, IEN_e, nLocBas, 1 );
+
+    fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
+
+    locassem->Assem_Residual_Pressure(curr_time, dt, local_cur_dot_velo, 
+      local_cur_velo, local_cur_pres, ectrl_x, ectrl_y, ectrl_z);
+
+    for(int ii=0; ii<nLocBas; ++ii)
+    {
+      const int loc_index  = locien->get_LIEN(ee, ii);
+
+      row_idx_v[3*ii]   = 3 * nbc->get_LID( 1, loc_index );
+      row_idx_v[3*ii+1] = 3 * nbc->get_LID( 2, loc_index ) + 1;
+      row_idx_v[3*ii+2] = 3 * nbc->get_LID( 3, loc_index ) + 2;
+
+      row_idx_p[ii] = nbc->get_LID( 0, loc_index );
+    }
+
+    VecSetValues(subG[1], loc_dof_p, row_idx_p, locassem->Residual0, ADD_VALUES);
+    VecSetValues(subG[0], loc_dof_v, row_idx_v, locassem->Residual1, ADD_VALUES);
+  }
+
+  delete [] ectrl_x; ectrl_x = nullptr;
+  delete [] ectrl_y; ectrl_y = nullptr;
+  delete [] ectrl_z; ectrl_z = nullptr;
+  delete [] row_idx_v; row_idx_v = nullptr;
+  delete [] row_idx_p; row_idx_p = nullptr;
+
+  NatBC_G_HERK_Pressure( curr_time, dt );
+
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+
+  EssBC_G();
+
+  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
+  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+}
+
 void PGAssem_Block_NS_FEM_HERK::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
   const int &substep_index,
   const ITimeMethod_RungeKutta * const &tm_RK_ptr )
