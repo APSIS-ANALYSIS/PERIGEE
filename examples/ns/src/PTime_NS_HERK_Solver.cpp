@@ -159,6 +159,83 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
   delete pre_velo; delete pre_pres; delete pre_velo_before;
 }
 
+void PTime_NS_HERK_Solver::Cal_NS_pres(
+    std::unique_ptr<PDNSolution> init_sol,
+    std::unique_ptr<PDNSolution> init_dot_velo,
+    std::unique_ptr<PDNSolution> init_pres,
+    std::unique_ptr<PDNSolution> init_dot_sol,
+    std::unique_ptr<PDNTimeStep> time_info ) const
+{  
+  // The dot_velo solution at the (n+1)-th time step
+  PDNSolution * cur_dot_velo = new PDNSolution(*init_dot_velo);
+
+  // The pres solution at the (n+1)-th time step
+  PDNSolution * cur_pres = new PDNSolution(*init_pres);
+
+  // The solution at the (n+1)-th time step
+  PDNSolution * cur_sol = new PDNSolution(*init_sol);
+
+  // The dot_solution at the (n+1)-th time step (dot_sol stores dot_velocity and pressure)
+  PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+
+  // The velo solution at the (n+1)-th time step
+  PDNSolution * cur_velo = new PDNSolution(*init_dot_velo);
+
+  Update_velocity_from_sol(cur_velo, cur_sol);
+
+  auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
+
+  SYS_T::commPrint(" ==> Start calculating the pressure: \n");
+
+  // Make the dot_velo meet the Dirchlet boundary
+  rescale_inflow_velo(curr_time + dt, cur_dot_velo);
+
+  gassem->Clear_G();
+
+  gassem->Assem_residual_calpres( cur_dot_velo, cur_velo, cur_pres, curr_time, dt );
+
+  gassem->Set_tangent_alpha_RK( 1.0 );
+    
+  Vec dot_sol_vp;
+  VecDuplicate( gassem->G, &dot_sol_vp );
+#ifdef PETSC_USE_LOG
+  PetscLogEventBegin(K_solve, 0,0,0,0);
+#endif 
+  lsolver->Solve( gassem->G, dot_sol_vp ); 
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(K_solve,0,0,0,0);
+#endif
+
+#ifdef PETSC_USE_LOG
+PetscLogEventBegin(update_dotstep, 0,0,0,0);
+#endif 
+  Update_dot_step( dot_sol_vp, dot_step.get() );
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(update_dotstep, 0,0,0,0);
+#endif
+
+  bc_mat->MatMultSol( dot_step.get() );
+
+  SYS_T::commPrint(" --- pressure calculation is finished. \n");
+
+  Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
+  
+  // Assemble dot_velo and pres at the (n+1)-th time step into a dot_solution vector
+  Update_solutions(cur_dot_velo, cur_pres, cur_dot_sol);
+
+  // Update the time step information
+  time_info->TimeIncrement();
+
+  // Record solution if meets criteria
+  if( time_info->get_index()%sol_record_freq == 0 )
+  {
+    const auto sol_name = Name_Generator( time_info->get_index() );
+    cur_dot_sol->WriteBinary(sol_name);
+  }
+
+  delete cur_velo; delete cur_dot_velo; delete cur_pres; delete cur_sol; delete cur_dot_sol;
+}
+
 void PTime_NS_HERK_Solver::HERK_Solve_NS(
     const double &curr_time, const double &dt,
     PDNSolution ** const &cur_velo_sols,
@@ -415,6 +492,35 @@ void PTime_NS_HERK_Solver::Update_init_pressure_velocity(
 
   velo->GhostUpdate();
   pres->GhostUpdate();  
+}
+
+void PTime_NS_HERK_Solver::Update_velocity_from_sol(     
+    PDNSolution * const &velo,
+    const PDNSolution * const &sol) const
+{
+  Vec lvelo, lpres, lsol;
+  double * array_velo, * array_pres, * array_sol;
+
+  VecGhostGetLocalForm(velo->solution, &lvelo);        
+  VecGhostGetLocalForm(sol->solution, &lsol);
+
+  VecGetArray(lvelo, &array_velo);
+  VecGetArray(lsol, &array_sol);
+
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    array_velo[ii*3 + 0 ] = array_sol[ii*4 + 1];
+    array_velo[ii*3 + 1 ] = array_sol[ii*4 + 2];
+    array_velo[ii*3 + 2 ] = array_sol[ii*4 + 3];
+  }
+
+  VecRestoreArray(lvelo, &array_velo);    
+  VecRestoreArray(lsol, &array_sol);
+  
+  VecGhostRestoreLocalForm(velo->solution, &lvelo);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  velo->GhostUpdate();
 }
 
 void PTime_NS_HERK_Solver::Update_solutions(     

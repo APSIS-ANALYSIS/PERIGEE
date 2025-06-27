@@ -339,8 +339,8 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
     // 需要重写一个, 不需要读velo
-    tsolver->TM_NS_HERK(std::move(sol), std::move(dot_velo), 
-        std::move(pres), std::move(timeinfo));
+    tsolver->Cal_NS_pres(std::move(sol), std::move(dot_velo), 
+        std::move(pres), std::move(dot_sol), std::move(timeinfo));
 
     // ===== Print complete solver info =====
     tsolver -> print_lsolver_info();

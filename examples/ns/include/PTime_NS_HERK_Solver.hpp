@@ -48,6 +48,13 @@ class PTime_NS_HERK_Solver
         std::unique_ptr<PDNSolution> init_pres,
         std::unique_ptr<PDNTimeStep> time_info ) const;
 
+    void Cal_NS_pres(
+        std::unique_ptr<PDNSolution> init_sol,
+        std::unique_ptr<PDNSolution> init_dot_velo,
+        std::unique_ptr<PDNSolution> init_pres,
+        std::unique_ptr<PDNSolution> init_dot_sol,
+        std::unique_ptr<PDNTimeStep> time_info ) const;
+
   private:
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions
@@ -97,6 +104,10 @@ class PTime_NS_HERK_Solver
       void Update_init_pressure_velocity(     
           PDNSolution * const &velo,
           PDNSolution * const &pres,
+          const PDNSolution * const &sol) const;  
+
+      void Update_velocity_from_sol(     
+          PDNSolution * const &velo,
           const PDNSolution * const &sol) const;  
 
       void Update_solutions(   
