@@ -48,6 +48,8 @@ int main(int argc, char *argv[])
   double initial_step = cmd_h5r -> read_doubleScalar("/","init_step");
   int nqp_vol         = cmd_h5r -> read_intScalar("/", "nqp_vol");
   int nqp_sur         = cmd_h5r -> read_intScalar("/", "nqp_sur");
+  double fluid_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
+  double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
   delete cmd_h5r; H5Fclose(solcmd_file);
 
@@ -55,8 +57,6 @@ int main(int argc, char *argv[])
   HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string part_file = pcmd_h5r -> read_string("/", "part_file" );
-  double fluid_density = pcmd_h5r -> read_doubleScalar("/", "fl_density");
-  double fluid_mu = pcmd_h5r -> read_doubleScalar("/", "fl_mu");
   const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
   const FEType elemType = FE_T::to_FEType(elemType_str);
   
@@ -203,7 +203,8 @@ int main(int argc, char *argv[])
   auto dot_inflow_rate = FlowRateFactory::createFlowRate(dot_inflow_file);
   
   dot_inflow_rate->print_info();
-
+  
+  std::cout<<"factor:"<<dot_inflow_rate -> get_flow_rate( 0, 0.025 )<<std::endl;
   // ===== LPN models =====
 //   auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
 //       initial_index, 1000);
@@ -222,7 +223,7 @@ int main(int argc, char *argv[])
   // ===== Half Explicit Runge Kutta scheme ===== (是否必要？不必要，但很多组装类里面构造函数需要它)
   SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
 
-  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_PseudoSymplecticRK3p5q4s>();
+  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_HeunRK2p2s>();
 
   tm_RK->print_coefficients();
 
@@ -331,15 +332,16 @@ int main(int argc, char *argv[])
   std::ostringstream time_index;
   for (int time = time_start; time<=time_end; time += time_step)
   {
+    std::string name_to_read(read_sol_bname);
     time_index.str("");
     time_index<< 900000000 + time;
-    read_sol_bname.append(time_index.str());
+    name_to_read.append(time_index.str());
 
     SYS_T::commPrint("Time %f: Read %s. \n", 
-      time*initial_step, read_sol_bname.c_str() );
+      time*initial_step, name_to_read.c_str() );
     
-    SYS_T::file_check(read_sol_bname);
-      sol->ReadBinary(read_sol_bname);
+    SYS_T::file_check(name_to_read);
+      sol->ReadBinary(name_to_read);
 
     // ===== FEM analysis =====
     SYS_T::commPrint("===> Start Finite Element Analysis:\n");
