@@ -35,23 +35,28 @@ int main(int argc, char *argv[])
   // base name of the dot_solution file
   std::string sol_bname("dot_SOL_");
 
+  // frequency of recording the solution
+  int sol_record_freq = 1;   
+
   // Read analysis code parameter if the solver_cmd.h5 exists
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
  
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  hid_t solcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( solcmd_file );
 
   double initial_step = cmd_h5r -> read_doubleScalar("/","init_step");
   int nqp_vol         = cmd_h5r -> read_intScalar("/", "nqp_vol");
   int nqp_sur         = cmd_h5r -> read_intScalar("/", "nqp_sur");
 
+  delete cmd_h5r; H5Fclose(solcmd_file);
+
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
   HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
 
   std::string part_file = pcmd_h5r -> read_string("/", "part_file" );
-  double fluid density = pcmd_h5r -> read_doubleScalar("/", "fl_density");
-  double fluid mu = pcmd_h5r -> read_doubleScalar("/", "fl_mu");
+  double fluid_density = pcmd_h5r -> read_doubleScalar("/", "fl_density");
+  double fluid_mu = pcmd_h5r -> read_doubleScalar("/", "fl_mu");
   const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
   const FEType elemType = FE_T::to_FEType(elemType_str);
   
@@ -119,7 +124,7 @@ int main(int argc, char *argv[])
   // time stepping parameters
   // Assuming SOL_900000000 corresponds to a time of 0.0s
   double initial_time = time_start * initial_step;
-  double& initial_index = time_start;
+  int& initial_index = time_start;
   double final_time = initial_time + time_end * initial_step;
 
   // ===== Print Command Line Arguments =====
@@ -138,7 +143,7 @@ int main(int argc, char *argv[])
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-sol_rec_freq:", sol_record_freq);
   SYS_T::cmdPrint("-read_sol_name:", read_sol_bname);
-  SYS_T::cmdPrint("-sol_name:", sol_bName);
+  SYS_T::cmdPrint("-sol_name:", sol_bname);
   SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-init_time:", initial_time);
   SYS_T::cmdPrint("-dt:", initial_step);
@@ -160,7 +165,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
-    cmdh5w->write_string("sol_bName", sol_bName);
+    cmdh5w->write_string("sol_bName", sol_bname);
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
@@ -313,8 +318,8 @@ int main(int argc, char *argv[])
   // 是不是需要重写一个构造函数，不然final time如何处理？或者给0? 复用 final_time可以推断出来√
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
-      std::move(inflow_rate), std::move(dot_inflow_rate), std::move(base),
-      std::move(locinfnbc), sol_bName, nlocalnode, sol_record_freq, final_time );
+      std::move(dot_inflow_rate), std::move(dot_inflow_rate), std::move(base),
+      std::move(locinfnbc), sol_bname, nlocalnode, sol_record_freq, final_time );
 
   tsolver->print_info();
 
@@ -323,6 +328,7 @@ int main(int argc, char *argv[])
   // ===== FEM analysis =====
 
   // Read the sol
+  std::ostringstream time_index;
   for (int time = time_start; time<=time_end; time += time_step)
   {
     time_index.str("");
@@ -330,10 +336,10 @@ int main(int argc, char *argv[])
     read_sol_bname.append(time_index.str());
 
     SYS_T::commPrint("Time %f: Read %s. \n", 
-      time*initial_step, read_sol_name.c_str() );
+      time*initial_step, read_sol_bname.c_str() );
     
-    SYS_T::file_check(read_sol_name);
-      sol->ReadBinary(read_sol_name);
+    SYS_T::file_check(read_sol_bname);
+      sol->ReadBinary(read_sol_bname);
 
     // ===== FEM analysis =====
     SYS_T::commPrint("===> Start Finite Element Analysis:\n");
