@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
   // ===== Half Explicit Runge Kutta scheme =====
   SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
 
-  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_PseudoSymplecticRK3p5q4s>();
+  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_HeunRK2p2s>();
 
   tm_RK->print_coefficients();
  
