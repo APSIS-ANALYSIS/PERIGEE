@@ -160,11 +160,11 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
 }
 
 void PTime_NS_HERK_Solver::Cal_NS_pres(
-    std::unique_ptr<PDNSolution> init_sol,
-    std::unique_ptr<PDNSolution> init_dot_velo,
-    std::unique_ptr<PDNSolution> init_pres,
-    std::unique_ptr<PDNSolution> init_dot_sol,
-    std::unique_ptr<PDNTimeStep> time_info ) const
+    const PDNSolution * const &init_sol,
+    const PDNSolution * const &init_dot_velo,
+    const PDNSolution * const &init_pres,
+    const PDNSolution * const &init_dot_sol,
+    const int &time_index, const double &dt ) const
 {  
   // The dot_velo solution at the (n+1)-th time step
   PDNSolution * cur_dot_velo = new PDNSolution(*init_dot_velo);
@@ -196,14 +196,14 @@ void PTime_NS_HERK_Solver::Cal_NS_pres(
   SYS_T::commPrint(" ==> Start calculating the pressure: \n");
 
   // Make the dot_velo meet the Dirchlet boundary
-  rescale_inflow_velo(time_info->get_time(), dot_flrate.get(), cur_dot_velo);
+  rescale_inflow_velo(time_index*dt, dot_flrate.get(), cur_dot_velo);
 
   gassem->Clear_G();
 
-  gassem->Assem_residual_calpres( cur_dot_velo, cur_velo, cur_pres, time_info->get_time() );
+  gassem->Assem_residual_calpres( cur_dot_velo, cur_velo, cur_pres, time_index*dt );
 
   gassem->Update_tangent_alpha_RK( 1.0 );
-    
+
   Vec dot_sol_vp;
   VecDuplicate( gassem->G, &dot_sol_vp );
 #ifdef PETSC_USE_LOG
@@ -231,15 +231,12 @@ PetscLogEventBegin(update_dotstep, 0,0,0,0);
   // Assemble dot_velo and pres at the (n+1)-th time step into a dot_solution vector
   Update_solutions(cur_dot_velo, cur_pres, cur_dot_sol);
 
-  // Update the time step information
-  time_info->TimeIncrement();
+  // // Update the time step information
+  // time_info->TimeIncrement();
 
-  // Record solution if meets criteria
-  if( time_info->get_index()%sol_record_freq == 0 )
-  {
-    const auto sol_name = Name_Generator( time_info->get_index() );
-    cur_dot_sol->WriteBinary(sol_name);
-  }
+  // Record solution
+  const auto sol_name = Name_Generator( time_index );
+  cur_dot_sol->WriteBinary(sol_name);
 
   delete cur_velo; delete cur_dot_velo; delete cur_pres; delete cur_sol; delete cur_dot_sol;
 }
@@ -374,7 +371,7 @@ void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
     for(int ii=0; ii<numnode; ++ii)
     {
       const int node_index = infnbc -> get_LDN( nbc_id, ii );
-      
+
       const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
 
       double base_vals[3];

@@ -35,9 +35,6 @@ int main(int argc, char *argv[])
   // base name of the dot_solution file
   std::string sol_bname("dot_SOL_");
 
-  // frequency of recording the solution
-  int sol_record_freq = 1;   
-
   // Read analysis code parameter if the solver_cmd.h5 exists
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
  
@@ -116,7 +113,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
   //   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionReal("-dt", initial_step);
-  SYS_T::GetOptionInt("-sol_rec_freq", sol_record_freq);
   SYS_T::GetOptionString("-read_sol_name:", read_sol_bname);
   SYS_T::GetOptionString("-sol_name:", sol_bname);
   SYS_T::GetOptionString("-part_file", part_file);
@@ -141,7 +137,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-cp", cp);
   SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
-  SYS_T::cmdPrint("-sol_rec_freq:", sol_record_freq);
   SYS_T::cmdPrint("-read_sol_name:", read_sol_bname);
   SYS_T::cmdPrint("-sol_name:", sol_bname);
   SYS_T::cmdPrint("-part_file:", part_file);
@@ -160,7 +155,6 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
-    cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
@@ -204,7 +198,6 @@ int main(int argc, char *argv[])
   
   dot_inflow_rate->print_info();
   
-  std::cout<<"factor:"<<dot_inflow_rate -> get_flow_rate( 0, 0.025 )<<std::endl;
   // ===== LPN models =====
 //   auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
 //       initial_index, 1000);
@@ -310,17 +303,13 @@ int main(int argc, char *argv[])
   KSPSetPC( lsolver->ksp, pc_shell ); 
   
   lsolver->SetOperator(K_shell); 
-
-  // ===== Time step info ===== 
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(time_start, initial_time, 
-      initial_step * time_step);
  
   // ===== Temporal solver context =====
   // 是不是需要重写一个构造函数，不然final time如何处理？或者给0? 复用 final_time可以推断出来√
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
-      std::move(dot_inflow_rate), std::move(dot_inflow_rate), std::move(base),
-      std::move(locinfnbc), sol_bname, nlocalnode, sol_record_freq, final_time );
+      nullptr, std::move(dot_inflow_rate), std::move(base),
+      std::move(locinfnbc), sol_bname, nlocalnode, 0.0, final_time );
 
   tsolver->print_info();
 
@@ -347,7 +336,7 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
     // 需要重写一个, 不需要读velo
-    tsolver->Cal_NS_pres(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), timeinfo.get());
+    tsolver->Cal_NS_pres(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), time, initial_step);
   }
 
   // ===== Print complete solver info =====

@@ -53,7 +53,7 @@ class PTime_NS_HERK_Solver
         const PDNSolution * const &init_dot_velo,
         const PDNSolution * const &init_pres,
         const PDNSolution * const &init_dot_sol,
-        PDNTimeStep * const &time_info ) const;
+        const int &time_index, const double &dt ) const;
 
   private:
     const double final_time;
