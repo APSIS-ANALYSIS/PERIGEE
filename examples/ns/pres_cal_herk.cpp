@@ -316,7 +316,8 @@ int main(int argc, char *argv[])
   MPI_Barrier(PETSC_COMM_WORLD);
 
   // ===== FEM analysis =====
-
+  SYS_T::commPrint("===> Start Finite Element Analysis:\n");
+  
   // Read the sol
   std::ostringstream time_index;
   for (int time = time_start; time<=time_end; time += time_step)
@@ -331,9 +332,6 @@ int main(int argc, char *argv[])
     
     SYS_T::file_check(name_to_read);
       sol->ReadBinary(name_to_read);
-
-    // ===== FEM analysis =====
-    SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
     // 需要重写一个, 不需要读velo
     tsolver->Cal_NS_pres(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), time, initial_step);
