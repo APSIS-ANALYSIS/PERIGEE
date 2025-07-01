@@ -1,5 +1,5 @@
 // ==================================================================
-// pressure calculate.cpp
+// pressure calculation.cpp
 //
 // Finite element code to calculate the pressure for the 3D Navier-Stokes equations 
 // program using the Variational Multiscale Formulation and Half-explicit RK time stepping.
@@ -340,7 +340,7 @@ int main(int argc, char *argv[])
   tsolver.reset();
   solverCtx.reset();
   sol.reset(); dot_velo.reset(); 
-  pres.get(); dot_sol.get();
+  pres.reset(); dot_sol.reset();
 
   PetscFinalize();
   return EXIT_SUCCESS;  
