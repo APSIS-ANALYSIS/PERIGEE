@@ -13,17 +13,6 @@
 #include "FlowRateFactory.hpp"
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver.hpp"
-#include "ExplicitRK_FERK1p2s.hpp"
-#include "ExplicitRK_EMRK2p2s.hpp"
-#include "ExplicitRK_HeunRK2p2s.hpp"
-#include "ExplicitRK_RalstonRK2p2s.hpp"
-#include "ExplicitRK_SSPRK3p3s.hpp"
-#include "ExplicitRK_SSPRK3p4s.hpp"
-#include "ExplicitRK_RalstonRK3p3s.hpp"
-#include "ExplicitRK_PseudoSymplecticRK3p5q4s.hpp"
-#include "ExplicitRK_38RuleRK4p4s.hpp"
-#include "ExplicitRK_ClassicRK4p4s.hpp"
-#include "ExplicitRK_RalstonRK4p4s.hpp"
 #include "Matrix_Free_Tools.hpp"
 
 int main(int argc, char *argv[])
@@ -63,7 +52,6 @@ int main(int argc, char *argv[])
 
   std::string part_file = pcmd_h5r -> read_string("/", "part_file" );
   const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
-  const FEType elemType = FE_T::to_FEType(elemType_str);
   
   delete pcmd_h5r; H5Fclose(prepcmd_file);
 

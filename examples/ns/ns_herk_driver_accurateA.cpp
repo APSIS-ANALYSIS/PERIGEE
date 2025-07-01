@@ -17,6 +17,7 @@
 #include "ExplicitRK_EMRK2p2s.hpp"
 #include "ExplicitRK_HeunRK2p2s.hpp"
 #include "ExplicitRK_RalstonRK2p2s.hpp"
+#include "ExplicitRK_WrayRK3p3s.hpp"
 #include "ExplicitRK_SSPRK3p3s.hpp"
 #include "ExplicitRK_SSPRK3p4s.hpp"
 #include "ExplicitRK_RalstonRK3p3s.hpp"
@@ -291,7 +292,6 @@ int main(int argc, char *argv[])
   gloAssem->Fix_nonzero_err_str();
   gloAssem->Clear_subKG();
 
-  // gloAssem->Assem_tangent_matrix(tm_RK.get(), initial_step);
   gloAssem->Assem_tangent_matrix(initial_step);
   
   // ===== Initialize the shell tangent matrix =====

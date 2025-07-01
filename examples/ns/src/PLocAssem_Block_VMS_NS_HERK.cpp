@@ -1731,9 +1731,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
     for(int A=0; A<nLocBas; ++A)
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
-      const double NA_xx = d2R_dxx[A], NA_yy = d2R_dyy[A], NA_zz = d2R_dzz[A];
-      const double NA_xy = d2R_dxy[A], NA_xz = d2R_dxz[A], NA_yz = d2R_dyz[A];
-
+      
       Residual0[ A     ] += gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime
                                    - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 

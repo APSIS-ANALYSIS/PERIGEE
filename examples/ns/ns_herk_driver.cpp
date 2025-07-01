@@ -17,6 +17,7 @@
 #include "ExplicitRK_EMRK2p2s.hpp"
 #include "ExplicitRK_HeunRK2p2s.hpp"
 #include "ExplicitRK_RalstonRK2p2s.hpp"
+#include "ExplicitRK_WrayRK3p3s.hpp"
 #include "ExplicitRK_SSPRK3p3s.hpp"
 #include "ExplicitRK_SSPRK3p4s.hpp"
 #include "ExplicitRK_RalstonRK3p3s.hpp"

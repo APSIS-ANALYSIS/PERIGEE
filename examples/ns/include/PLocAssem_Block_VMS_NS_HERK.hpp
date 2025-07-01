@@ -210,49 +210,14 @@ class PLocAssem_Block_VMS_NS_HERK
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt) const
     {
-      const double x = pt.x();
-      const double y = pt.y();
-      const double z = pt.z();
-
-      const double pi = MATH_T::PI;
-      const double nu = vis_mu/rho0;
-      const double Re = 1.0/nu;
-
-      const double ct = std::cos(2.0 * pi * tt);
-      const double st = std::sin(2.0 * pi * tt);
-
-      const double fx = ct * 50.0 - st * (y * y + z * z - 1.0) * 2.0 - (ct / 2.0 - 0.5) * 8.0 / (Re * pi) - 50.0;
-
-      return Vector_3( fx, 0.0, 0.0 );
+      return Vector_3( 0.0, 0.0, 0.0 );
     }
 
     Vector_3 get_H1(const Vector_3 &pt, const double &tt,
         const Vector_3 &n_out ) const
     {
-      const double x = pt.x();
-      const double y = pt.y();
-      const double z = pt.z();
-
-      const double pi = MATH_T::PI;
-      const double ft = std::cos(2.0 * pi * tt) - 1.0;
-
-      const double S12 = y * ft / pi;
-      const double S13 = z * ft / pi;
-      const double S21 = y * ft / pi;
-      const double S31 = z * ft / pi;
-
-      const Tensor2_3D S (0.0, S12, S13,
-                          S21, 0.0, 0.0,
-                          S31, 0.0, 0.0);
-
-      const Tensor2_3D I (1.0, 0.0, 0.0,
-                          0.0, 1.0, 0.0,
-                          0.0, 0.0, 1.0);
-
-      const double p = -100.0 * x * 1.0 / 2.0 * (1.0 - std::cos(2.0 * pi * tt));
-
-      const Tensor2_3D sigma = -p * I + 2.0 * vis_mu * S;
-      return sigma * n_out;
+      const double p0 = 0.0;  
+      return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
     }
 
     typedef Vector_3 ( PLocAssem_Block_VMS_NS_HERK::*locassem_vms_ns_funs )( 
