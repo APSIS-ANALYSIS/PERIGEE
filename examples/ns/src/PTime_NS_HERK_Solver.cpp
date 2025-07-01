@@ -221,6 +221,8 @@ PetscLogEventBegin(update_dotstep, 0,0,0,0);
 #ifdef PETSC_USE_LOG
   PetscLogEventEnd(update_dotstep, 0,0,0,0);
 #endif
+  
+  VecDestroy( &dot_sol_vp );
 
   bc_mat->MatMultSol( dot_step.get() );
 
