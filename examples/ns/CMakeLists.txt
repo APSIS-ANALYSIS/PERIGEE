@@ -130,6 +130,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
   ${perigee_SOURCE_DIR}/src/VisDataPrep_NS.cpp
   ${perigee_SOURCE_DIR}/src/VTK_Writer_NS.cpp
+  ${perigee_SOURCE_DIR}/src/Post_error_ES.cpp
   )
 
 INCLUDE_DIRECTORIES( ${PERIGEE_INCLUDE_DIRS} )
@@ -166,6 +167,7 @@ ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
+ADD_EXECUTABLE( postError post_compare_manu.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
@@ -178,7 +180,7 @@ TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex8 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex27 perigee_postprocess )
-
+TARGET_LINK_LIBRARIES( postError perigee_postprocess)
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
