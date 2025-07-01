@@ -224,15 +224,12 @@ PetscLogEventBegin(update_dotstep, 0,0,0,0);
 
   bc_mat->MatMultSol( dot_step.get() );
 
-  SYS_T::commPrint(" --- pressure calculation is finished. \n");
+  SYS_T::commPrint(" \n  --- pressure calculation is finished. \n");
 
   Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
   
   // Assemble dot_velo and pres at the (n+1)-th time step into a dot_solution vector
   Update_solutions(cur_dot_velo, cur_pres, cur_dot_sol);
-
-  // // Update the time step information
-  // time_info->TimeIncrement();
 
   // Record solution
   const auto sol_name = Name_Generator( time_index );

@@ -37,8 +37,6 @@ double get_manu_sol_p_errorL2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad );
-      // const double &Qt,
-      // const double &RR );
 
   double get_manu_sol_u_errorL2(
       const double &time,
@@ -50,8 +48,6 @@ double get_manu_sol_p_errorL2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad );
-      // const double &Qt,
-      // const double &RR );
 
   double get_manu_sol_u_H1(
       const double &time,
@@ -60,8 +56,6 @@ double get_manu_sol_p_errorL2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad );
-      // const double &Qt,
-      // const double &RR );
 
   double get_manu_sol_u_errorH1(
       const double &time,
@@ -73,8 +67,6 @@ double get_manu_sol_p_errorL2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad );
-      // const double &Qt,
-      // const double &RR );
 
 }
 

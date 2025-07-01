@@ -46,9 +46,8 @@ int main(int argc, char *argv[])
   double cu = 2.0;
   double cp = 2.0;
 
-  // inflow file & dot_inflow_file
+  // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
-  std::string dot_inflow_file("dot_inflow_fourier_series.txt");
 
   // LPN file
 //   std::string lpn_file("lpn_rcr_input.txt");
@@ -104,7 +103,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-cu", cu);
   SYS_T::GetOptionReal("-cp", cp);
   SYS_T::GetOptionString("-inflow_file", inflow_file);
-  SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
 //   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionString("-part_file", part_file);
   SYS_T::GetOptionReal("-init_time", initial_time);
@@ -129,7 +127,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-cu", cu);
   SYS_T::cmdPrint("-cp", cp);
   SYS_T::cmdPrint("-inflow_file:", inflow_file);
-  SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-part_file:", part_file);;
   SYS_T::cmdPrint("-init_time:", initial_time);
@@ -163,7 +160,6 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
-    cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
     cmdh5w->write_string("sol_bName", sol_bName);
     delete cmdh5w; H5Fclose(cmd_file_id);
   }
@@ -210,11 +206,7 @@ int main(int argc, char *argv[])
 
   auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
 
-  auto dot_inflow_rate = FlowRateFactory::createFlowRate(dot_inflow_file);
-
   inflow_rate->print_info();
-
-  dot_inflow_rate->print_info();
 
   // ===== LPN models =====
 //   auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
@@ -341,7 +333,7 @@ int main(int argc, char *argv[])
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
-      std::move(inflow_rate), std::move(dot_inflow_rate), std::move(base),
+      std::move(inflow_rate), nullptr, std::move(base),
       std::move(locinfnbc), sol_bName, nlocalnode, sol_record_freq, final_time );
 
   tsolver->print_info();

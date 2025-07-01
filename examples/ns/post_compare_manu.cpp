@@ -26,7 +26,11 @@ int main( int argc, char * argv[] )
   const int dof = 4;
   double tt = 0.0;
 
+#if PETSC_VERSION_LT(3,19,0)
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
 
   // Get options from command line
   SYS_T::GetOptionString("-sol_name", sol_name);
@@ -64,21 +68,13 @@ int main( int argc, char * argv[] )
   int n_loc = 4;
 
   if(  GMIptr->get_elemType() == FE_T::to_FEType("Tet4") )
-  {
     n_loc = 4;
-  }
   else if( GMIptr->get_elemType() == FE_T::to_FEType("Tet10") )
-  {
     n_loc = 10;
-  }
   else if( GMIptr->get_elemType() == FE_T::to_FEType("Hex8") )
-  {
     n_loc = 8;
-  }
   else if( GMIptr->get_elemType() == FE_T::to_FEType("Hex27") )
-  {
     n_loc = 27;
-  }
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   const FEType elemType(GMIptr->get_elemType());

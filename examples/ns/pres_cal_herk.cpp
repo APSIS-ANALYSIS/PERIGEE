@@ -35,6 +35,14 @@ int main(int argc, char *argv[])
   // base name of the dot_solution file
   std::string sol_bname("dot_SOL_");
 
+#if PETSC_VERSION_LT(3,19,0)
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
+#else
+  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
+#endif
+
+  SYS_T::print_perigee_art();
+
   // Read analysis code parameter if the solver_cmd.h5 exists
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
  
@@ -74,21 +82,13 @@ int main(int argc, char *argv[])
   bool is_loadYaml = true;
   std::string yaml_file("./runscript.yml");
 
-#if PETSC_VERSION_LT(3,19,0)
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
-#else
-  PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
-#endif
-
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
-  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
-      "Error: Assigned CPU number does not match the partition. \n");
-
   SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
 
-  SYS_T::print_perigee_art();
+  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
+      "Error: Assigned CPU number does not match the partition. \n");
 
   // ===== Yaml Arguments =====
   SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
@@ -213,16 +213,9 @@ int main(int argc, char *argv[])
 
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
-  // ===== Half Explicit Runge Kutta scheme ===== (是否必要？不必要，但很多组装类里面构造函数需要它)
-  SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
-
-  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_HeunRK2p2s>();
-
-  tm_RK->print_coefficients();
-
-    // ===== HERK Local Assembly routine =====
+  // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
-        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_RK.get(),
+        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, nullptr,
         fluid_density, fluid_mu, L0, cu, cp );
 
   // ===== Initial condition =====
@@ -246,7 +239,7 @@ int main(int argc, char *argv[])
   std::unique_ptr<PDNSolution> dot_velo =
     SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "dot_velo" );
 
-  // ===== Global assembly ===== （是否可以复用以前的全局组装？还是说单独写一个全局组装）复用dt=1√
+  // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   auto gloAssem = SYS_T::make_unique<PGAssem_Block_NS_FEM_HERK>( 
       std::move(locIEN), std::move(locElem), std::move(fNode), 
@@ -260,7 +253,6 @@ int main(int argc, char *argv[])
   gloAssem->Fix_nonzero_err_str();
   gloAssem->Clear_subKG();
 
-  // (是否可以复用以前的切矩阵组装？还是说单独写一个组装，似乎可以，dt=1.0即可）)√
   gloAssem->Assem_tangent_matrix(1.0);
 
   // ===== Initialize the shell tangent matrix =====
@@ -305,11 +297,10 @@ int main(int argc, char *argv[])
   lsolver->SetOperator(K_shell); 
  
   // ===== Temporal solver context =====
-  // 是不是需要重写一个构造函数，不然final time如何处理？或者给0? 复用 final_time可以推断出来√
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
-      std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
+      std::move(gloAssem), std::move(lsolver), std::move(pmat), nullptr,
       nullptr, std::move(dot_inflow_rate), std::move(base),
-      std::move(locinfnbc), sol_bname, nlocalnode, 0.0, final_time );
+      std::move(locinfnbc), sol_bname, nlocalnode, 1, final_time );
 
   tsolver->print_info();
 
@@ -323,17 +314,18 @@ int main(int argc, char *argv[])
   for (int time = time_start; time<=time_end; time += time_step)
   {
     std::string name_to_read(read_sol_bname);
+    std::string name_to_write(sol_bname);
     time_index.str("");
     time_index<< 900000000 + time;
     name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
 
-    SYS_T::commPrint("Time %f: Read %s. \n", 
-      time*initial_step, name_to_read.c_str() );
+    SYS_T::commPrint("Time %f: Read %s, Write %s.\n", 
+      time*initial_step, name_to_read.c_str(), name_to_write.c_str() );
     
     SYS_T::file_check(name_to_read);
       sol->ReadBinary(name_to_read);
 
-    // 需要重写一个, 不需要读velo
     tsolver->Cal_NS_pres(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), time, initial_step);
   }
 
@@ -347,6 +339,8 @@ int main(int argc, char *argv[])
   PCDestroy(&pc_shell);
   tsolver.reset();
   solverCtx.reset();
+  sol.reset(); dot_velo.reset(); 
+  pres.get(); dot_sol.get();
 
   PetscFinalize();
   return EXIT_SUCCESS;  

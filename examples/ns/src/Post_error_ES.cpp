@@ -79,8 +79,6 @@ double POST_ERROR_C::get_manu_sol_p_L2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad )
-      // const double &Qt,
-      // const double &RR )
 {
   double norm = 0.0;
 
@@ -117,8 +115,6 @@ double POST_ERROR_C::get_manu_sol_p_errorL2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad )
-      // const double &Qt,
-      // const double &RR )
 {
   double error = 0.0;
 
@@ -142,9 +138,6 @@ double POST_ERROR_C::get_manu_sol_p_errorL2(
 
     const double exact_pres = exact_pressure( pt, time );
     
-    // L2-norm of error
-    // (sol_velo - exact_velo).print();
-
     error += (sol_pres - exact_pres) * (sol_pres - exact_pres) * gwts;
   }
 
@@ -161,8 +154,6 @@ double POST_ERROR_C::get_manu_sol_u_errorL2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad )
-      // const double &Qt,
-      // const double &RR )
 {
   double error = 0.0;
 
@@ -188,9 +179,6 @@ double POST_ERROR_C::get_manu_sol_u_errorL2(
 
     const Vector_3 exact_velo = exact_velocity( pt.x(), pt.y(), pt.z(), time );
     
-    // L2-norm of error
-    // (sol_velo - exact_velo).print();
-
     error += (sol_velo - exact_velo).dot_product(sol_velo - exact_velo) * gwts;
   }
 
@@ -204,8 +192,6 @@ double POST_ERROR_C::get_manu_sol_u_L2(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad )
-      // const double &Qt,
-      // const double &RR )
 {
   double norm = 0.0;
 
@@ -244,8 +230,6 @@ double POST_ERROR_C::get_manu_sol_u_errorH1(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad )
-      // const double &Qt,
-      // const double &RR )
 {
   double errorH1 = 0.0;
 
@@ -313,8 +297,6 @@ double POST_ERROR_C::get_manu_sol_u_H1(
       const double * const &ectrlPts_y,
       const double * const &ectrlPts_z,
       const IQuadPts * const &quad )
-      // const double &Qt,
-      // const double &RR )
 {
   double norm = 0.0;
 
@@ -349,7 +331,6 @@ double POST_ERROR_C::get_manu_sol_u_H1(
 
 
     // H1 norm of error
-
     norm += exa_grad_u.dot_product(exa_grad_u) * gwts
              + exa_grad_v.dot_product(exa_grad_v) * gwts
              + exa_grad_w.dot_product(exa_grad_w) * gwts 
