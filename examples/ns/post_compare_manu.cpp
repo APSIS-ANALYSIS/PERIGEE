@@ -144,7 +144,7 @@ int main( int argc, char * argv[] )
   SYS_T::commPrint("Relative error for pres in L2 norm is : %e \n", p_err/p_sol);
   SYS_T::commPrint("Meshsize is : %e \n", meshsize);
 
-  delete locElem; delete pNode;
+  delete locElem; delete pNode; delete pSolu;
   delete fNode; delete locIEN; delete GMIptr;
   PetscFinalize();
   return EXIT_SUCCESS;
