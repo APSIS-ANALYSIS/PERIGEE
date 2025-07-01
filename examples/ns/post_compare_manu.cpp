@@ -18,7 +18,6 @@
 int main( int argc, char * argv[] )
 {
   int nqp_v = 5;
-  int nqp_s = 4;
 
   std::string sol_name("SOL_900000000");
   std::string part_file("./part");
@@ -35,13 +34,11 @@ int main( int argc, char * argv[] )
   // Get options from command line
   SYS_T::GetOptionString("-sol_name", sol_name);
   SYS_T::GetOptionInt("-nqp_v", nqp_v);
-  SYS_T::GetOptionInt("-nqp_s", nqp_s);
   SYS_T::GetOptionReal("-time", tt);
   
   // print options 
   SYS_T::cmdPrint("-sol_name:", sol_name);
   SYS_T::cmdPrint("-nqp_v", nqp_v);
-  SYS_T::cmdPrint("-nqp_s", nqp_s);
   SYS_T::cmdPrint("-time", tt);
   
   SYS_T::file_check(sol_name.c_str());
@@ -78,8 +75,7 @@ int main( int argc, char * argv[] )
   else SYS_T::print_fatal("Error: Element type not supported.\n");
 
   const FEType elemType(GMIptr->get_elemType());
-  const int nqpv = nqp_v; 
-  const int nqps = nqp_s;
+  const int nqpv = nqp_v;
 
   const std::unique_ptr<FEAElement> elementv = ElementFactory::createVolElement(elemType, nqpv);
   const std::unique_ptr<IQuadPts> quadv = QuadPtsFactory::createVolQuadrature(elemType, nqpv);
