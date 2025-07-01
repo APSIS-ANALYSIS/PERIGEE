@@ -113,14 +113,14 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
   //   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionReal("-dt", initial_step);
-  SYS_T::GetOptionString("-read_sol_name:", read_sol_bname);
-  SYS_T::GetOptionString("-sol_name:", sol_bname);
+  SYS_T::GetOptionString("-read_sol_name", read_sol_bname);
+  SYS_T::GetOptionString("-sol_name", sol_bname);
   SYS_T::GetOptionString("-part_file", part_file);
 
   // time stepping parameters
   // Assuming SOL_900000000 corresponds to a time of 0.0s
   double initial_time = time_start * initial_step;
-  int& initial_index = time_start;
+  int initial_index = time_start;
   double final_time = initial_time + time_end * initial_step;
 
   // ===== Print Command Line Arguments =====
@@ -132,9 +132,9 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
-  SYS_T::cmdPrint("-L0", L0);
-  SYS_T::cmdPrint("-cu", cu);
-  SYS_T::cmdPrint("-cp", cp);
+  SYS_T::cmdPrint("-L0:", L0);
+  SYS_T::cmdPrint("-cu:", cu);
+  SYS_T::cmdPrint("-cp:", cp);
   SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-read_sol_name:", read_sol_bname);
