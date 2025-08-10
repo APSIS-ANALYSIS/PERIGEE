@@ -127,6 +127,61 @@ void TET_T::write_tet_grid( const std::string &filename,
   grid_w->Delete();
 }
 
+void TET_T::write_tet_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, const std::vector<int> &ien_array,
+      const std::vector< DataVecStr<int> > &IOdata,
+      const std::vector< DataVecStr<double> > &doubledata,
+      const std::vector< DataVecStr<Vector_3> > &vecdata,
+      const bool &isXML )
+{
+  // Setup the VTK objects
+  vtkUnstructuredGrid * grid_w = vtkUnstructuredGrid::New();
+
+  // Generate the mesh and compute aspect ratios
+  gen_tet_grid( grid_w, numpts, numcels, pt, ien_array );
+
+  // We need to make sure there are no data in IOdata that have the same name
+  std::vector<std::string> name_list {};
+  for( auto data : IOdata ) name_list.push_back( data.get_name() );
+
+  VEC_T::sort_unique_resize( name_list );
+
+  SYS_T::print_fatal_if( name_list.size() != IOdata.size(), "Error: In TET_T::write_tet_grid, there are %d data in the IOdata that have the same name.\n", IOdata.size() - name_list.size() + 1 );
+  
+  // We add the IOdata for VTK
+  for( auto data : IOdata )
+  {
+    if( data.get_object() == AssociateObject::Node )
+      VTK_T::add_int_PointData( grid_w, data.get_data(), data.get_name() );
+    else if( data.get_object() == AssociateObject::Cell )
+      VTK_T::add_int_CellData( grid_w, data.get_data(), data.get_name() );
+    else
+      SYS_T::print_fatal( "Error: In TET_T::write_tet_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+  }
+
+  for( auto data : doubledata )
+  {
+    if( data.get_object() == AssociateObject::Node )
+      VTK_T::add_double_PointData( grid_w, data.get_data(), data.get_name() );
+    else if( data.get_object() == AssociateObject::Cell )
+      VTK_T::add_double_CellData( grid_w, data.get_data(), data.get_name() );
+    else
+      SYS_T::print_fatal( "Error: In TET_T::write_tet_grid, there is an unknown object type in DataVecStr %s", data.get_name().c_str() );
+  }
+
+  for( auto data : vecdata )
+  {
+    if( data.get_object() == AssociateObject::Node )
+      VTK_T::add_Vector3_PointData( grid_w, data.get_data(), data.get_name() );
+  }
+
+  // Write the prepared grid_w to a vtu or vtk file on disk
+  VTK_T::write_vtkPointSet(filename, grid_w, isXML);
+
+  grid_w->Delete();
+}
+
 void TET_T::write_triangle_grid( const std::string &filename,
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, 
@@ -596,6 +651,15 @@ namespace TET_T
     gindex[1] = ien_ptr->get_IEN(ee, 1);
     gindex[2] = ien_ptr->get_IEN(ee, 2);
     gindex[3] = ien_ptr->get_IEN(ee, 3);
+
+    for(int ii=0; ii<4; ++ii)
+      pts[ii] = Vector_3(ctrlPts[gindex[ii]*3], ctrlPts[gindex[ii]*3+1], ctrlPts[gindex[ii]*3+2]);
+  }
+
+  void Tet4::reset( const std::vector<double> &ctrlPts,
+    const std::array<int,4> &ien )
+  {
+    reset(ien);
 
     for(int ii=0; ii<4; ++ii)
       pts[ii] = Vector_3(ctrlPts[gindex[ii]*3], ctrlPts[gindex[ii]*3+1], ctrlPts[gindex[ii]*3+2]);

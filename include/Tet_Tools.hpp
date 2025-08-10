@@ -60,6 +60,15 @@ namespace TET_T
       const int &numpts, const int &numcels,
       const std::vector<double> &pt, const std::vector<int> &ien_array,
       const std::vector<DataVecStr<int>> &IOdata, const bool &isXML = true );
+
+
+  void write_tet_grid( const std::string &filename,
+      const int &numpts, const int &numcels,
+      const std::vector<double> &pt, const std::vector<int> &ien_array,
+      const std::vector<DataVecStr<int>> &IOdata,
+      const std::vector<DataVecStr<double>> &doubledata,
+      const std::vector<DataVecStr<Vector_3>> &vecdata,
+      const bool &isXML = true );
   
   // ----------------------------------------------------------------
   // ! gen_triangle_grid: generate the surface mesh described by linear triangular
@@ -224,6 +233,9 @@ namespace TET_T
       // coordindates
       void reset( const std::vector<double> &ctrlPts,
           const IIEN * const &ien_pt, const int &ee );
+
+      void reset( const std::vector<double> &ctrlPts,
+          const std::array<int,4> &ienval );
 
       double get_aspect_ratio() const;
 

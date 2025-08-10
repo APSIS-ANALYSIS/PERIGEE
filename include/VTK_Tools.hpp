@@ -10,6 +10,7 @@
 // ============================================================================
 #include "Sys_Tools.hpp"
 #include "Vector_3.hpp"
+#include "Wedge_Pyrimid_Tools.hpp"
 
 #include "vtkIntArray.h"
 #include "vtkDoubleArray.h"
@@ -48,8 +49,16 @@ namespace VTK_T
   //         of the VTK builtin type vtkIdType by doing a static_cast.
   // ----------------------------------------------------------------
   void read_vtu_grid( const std::string &filename,
+      int &numpts, std::vector<double> &pt);
+
+  void read_vtu_grid( const std::string &filename,
       int &numpts, int &numcels,
       std::vector<double> &pt, std::vector<int> &ien_array );
+
+  void read_vtu_grid( const std::string &filename,
+      int &numpts, int &numcels,
+      std::vector<double> &pt, std::vector<int> &ien_array,
+      std::vector<double> &cell_volume );
 
   // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
@@ -99,6 +108,9 @@ namespace VTK_T
       const std::string &dataname );
 
   std::vector<double> read_double_PointData( const std::string &filename, 
+      const std::string &dataname );
+
+  std::vector<Vector_3> read_Vector3_PointData( const std::string &filename, 
       const std::string &dataname );
 
   // ----------------------------------------------------------------

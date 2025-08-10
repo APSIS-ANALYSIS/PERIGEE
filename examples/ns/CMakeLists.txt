@@ -36,6 +36,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
+  ${perigee_source}/Mesh/Wedge_Pyrimid_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
   ${perigee_source}/Mesh/Part_FEM.cpp
   ${perigee_source}/Mesh/ElemBC_3D.cpp
@@ -125,6 +126,7 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Mesh/VTK_Tools.cpp
   ${perigee_source}/Mesh/Tet_Tools.cpp
   ${perigee_source}/Mesh/Hex_Tools.cpp
+  ${perigee_source}/Mesh/Wedge_Pyrimid_Tools.cpp
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
@@ -165,9 +167,8 @@ ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
-ADD_EXECUTABLE( post_PLA_tet4 post_PLA_tet4.cpp)
-ADD_EXECUTABLE( preprocess_cell2node preprocess_cell2node.cpp)
-ADD_EXECUTABLE( cell2node_projection cell2node_projection.cpp)
+ADD_EXECUTABLE( post_PLA_tet4_vtu post_PLA_tet4_vtu_version.cpp)
+ADD_EXECUTABLE( rewrite rewrite_vtu.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
 TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
@@ -179,17 +180,18 @@ TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex8 perigee_postprocess )
 TARGET_LINK_LIBRARIES( vis_wss_hex27 perigee_postprocess )
-TARGET_LINK_LIBRARIES( post_PLA_tet4 perigee_postprocess )
-TARGET_LINK_LIBRARIES( preprocess_cell2node perigee_preprocess )
-TARGET_LINK_LIBRARIES( cell2node_projection perigee_postprocess )
+TARGET_LINK_LIBRARIES( post_PLA_tet4_vtu perigee_postprocess )
+TARGET_LINK_LIBRARIES( rewrite perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
   SET_TARGET_PROPERTIES( preprocess3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
   SET_TARGET_PROPERTIES( prepost3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( post_PLA_tet4_vtu PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
   TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
   TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
   TARGET_INCLUDE_DIRECTORIES( prepost3d PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( post_PLA_tet4_vtu PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
   TARGET_LINK_LIBRARIES( perigee_preprocess PRIVATE ${OpenMP_CXX_LIBRARIES} )
 endif()
 
