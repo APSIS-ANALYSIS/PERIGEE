@@ -60,6 +60,12 @@ namespace VTK_T
       std::vector<double> &pt, std::vector<int> &ien_array,
       std::vector<double> &cell_volume );
 
+  void read_vtu_grid( const std::string &filename,
+      int &numpts, int &numcels,
+      std::vector<double> &pt, std::vector<int> &ien_array,
+      std::vector<double> &cell_volume,
+      std::vector<int> &inherit );
+
   // ----------------------------------------------------------------
   // ! read_vtp_grid: read the surface mesh from a .vtp file. The mesh
   //                  file is assumed to be a VTK trangle grid with 3
@@ -111,6 +117,9 @@ namespace VTK_T
       const std::string &dataname );
 
   std::vector<Vector_3> read_Vector3_PointData( const std::string &filename, 
+      const std::string &dataname );
+
+  std::vector<Vector_3> read_Vector3_CellData( const std::string &filename, 
       const std::string &dataname );
 
   // ----------------------------------------------------------------

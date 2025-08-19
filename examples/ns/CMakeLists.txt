@@ -167,7 +167,7 @@ ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
-ADD_EXECUTABLE( post_PLA_tet4_vtu post_PLA_tet4_vtu_version.cpp)
+ADD_EXECUTABLE( post_PLA_tet4_vtu post_PLA_tet4_vtu_cell_data_version.cpp)
 ADD_EXECUTABLE( rewrite rewrite_vtu.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )

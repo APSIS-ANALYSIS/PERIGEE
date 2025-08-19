@@ -252,6 +252,8 @@ namespace TET_T
       int get_face_id( const std::array<int,3> &nn ) const
       { return get_face_id(nn[0], nn[1], nn[2]); }
 
+      Vector_3 get_centroid() const;
+
       void print_info() const;
 
     private:

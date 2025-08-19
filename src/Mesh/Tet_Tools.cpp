@@ -730,6 +730,11 @@ namespace TET_T
 
     return sum / 6.0;
   }
+    
+  Vector_3 Tet4::get_centroid() const
+  {
+    return 0.25 * (pts[0] + pts[1] + pts[2] + pts[3]);
+  }
 }
 
 void TET_T::tetmesh_check(const std::vector<double> &cpts,
