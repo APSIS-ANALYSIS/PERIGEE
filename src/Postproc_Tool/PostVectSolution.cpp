@@ -6,11 +6,9 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     const APart_Node * const &aNode_ptr,
     const int &nFunc, const int &input_dof )
 : dof_per_node( input_dof ), 
-  loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node )
+  loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node ),
+  loc_solution(loc_sol_size, 0.0)
 {
-  // Allocate the space for the data loc_solution
-  loc_solution = new double [loc_sol_size];
-
   double * vec_temp = new double [ nFunc * dof_per_node ];
 
   int * analysis_old2new = new int [nFunc];
@@ -36,11 +34,6 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   delete [] analysis_old2new; analysis_old2new = nullptr;
   delete [] postproc_new2old; postproc_new2old = nullptr;
   delete [] vec_temp;         vec_temp         = nullptr;
-}
-
-PostVectSolution::~PostVectSolution()
-{
-  delete [] loc_solution; loc_solution = nullptr;
 }
 
 void PostVectSolution::print_info() const
