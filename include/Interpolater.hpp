@@ -93,12 +93,6 @@ class Interpolater
         const FEAElement * const &elem,
         vtkPoints * const &vtkpts );
 
-    void interpolateVTKPts( const int &ptoffset,
-        const double * const &ctrlPts_x,
-        const double * const &ctrlPts_y,
-        const FEAElement * const &elem,
-        vtkPoints * const &vtkpts );
-  
     // ------------------------------------------------------------------------
     // interpolateVTKPts : overloaded for the case of four points with
     //                     given point indices.

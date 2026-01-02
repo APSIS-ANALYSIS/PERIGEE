@@ -112,25 +112,6 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   }
 }
 
-void Interpolater::interpolateVTKPts( const int &ptoffset,
-    const double * const &ctrlPts_x,
-    const double * const &ctrlPts_y,
-    const FEAElement * const &elem,
-    vtkPoints * const &vtkpts )
-{
-  const int nqp = elem->get_numQuapts();
-  std::vector<double> out_x, out_y;
-
-  interpolateFE(ctrlPts_x, ctrlPts_y, elem, out_x, out_y);
-  
-  for(int ii=0; ii<nqp; ++ii)
-  {
-    const double xyz[2] { out_x[ii], out_y[ii] };
-
-    vtkpts->InsertPoint(ptoffset+ii, xyz);
-  }
-}
-
 void Interpolater::interpolateVTKPts( const int * const &ptid,
     const double * const &ctrlPts_x,
     const double * const &ctrlPts_y,
