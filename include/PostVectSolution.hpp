@@ -102,11 +102,10 @@ class PostVectSolution
     // \para node_mapping_file: the file that stores the mapping arrays
     // \para mapping_type: data_name in the file: new_2_old / old_2_new
     // \para node_size: the allocated length for nodemap
-    // \para nodemap: the array that passes out the mapping.
+    // return the array of the mapping.
     // ------------------------------------------------------------------------
-    void ReadNodeMapping( const std::string &node_mapping_file,
-        const char * const &mapping_type, const int &node_size,
-        int * const &nodemap ) const;
+    std::vector<int> ReadNodeMapping( const std::string &node_mapping_file,
+        const char * const &mapping_type, const int &node_size ) const;
 };
 
 #endif
