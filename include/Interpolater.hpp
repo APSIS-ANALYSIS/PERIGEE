@@ -56,11 +56,6 @@ namespace Interp
       const FEAElement * const &elem, std::vector<double> &output_dx,
       std::vector<double> &output_dy, std::vector<double> &output_dz );
 
-  inline void FE_Grad( const std::vector<double> &inputVal,
-      const FEAElement * const &elem, std::vector<double> &output_dx,
-      std::vector<double> &output_dy, std::vector<double> &output_dz )
-  {FE_Grad(inputVal.data(), elem, output_dx, output_dy, output_dz);}
-
   // ------------------------------------------------------------------------
   // VTKPts : given the control points of the element, evaluate
   // the coordinates of the sampling points and insert them into 
@@ -113,16 +108,6 @@ namespace Interp
       const FEAElement * const &elem,
       vtkPoints * const &vtkpts );
 
-  inline void VTKPts( const int &ptoffset,
-      const double * const &ctrlPts_x,
-      const double * const &ctrlPts_y,
-      const double * const &ctrlPts_z,
-      const std::vector<double> &disp_vect,
-      const FEAElement * const &elem,
-      vtkPoints * const &vtkpts )
-  {VTKPts(ptoffset, ctrlPts_x, ctrlPts_y, ctrlPts_z, 
-      disp_vect.data(), elem, vtkpts);}
-
   // ------------------------------------------------------------------------
   // VTKPts : overloaded for Lagrangian mesh points.
   //                     The points id are stored in ptid;
@@ -138,15 +123,6 @@ namespace Interp
       const double * const &disp_vect,
       const FEAElement * const &elem,
       vtkPoints * const &vtkpts );
-
-  inline void VTKPts( const int * const &ptid,
-      const double * const &ctrlPts_x,
-      const double * const &ctrlPts_y,
-      const double * const &ctrlPts_z,
-      const std::vector<double> &disp_vect,
-      const FEAElement * const &elem,
-      vtkPoints * const &vtkpts )
-  {VTKPts(ptid, ctrlPts_x, ctrlPts_y, ctrlPts_z, disp_vect.data(), elem, vtkpts);}
 
   // ------------------------------------------------------------------------
   // VTKData : given the inputData, i.e., the solution 
@@ -166,11 +142,6 @@ namespace Interp
       const double * const &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData );
 
-  inline void VTKData( const int &size, const int &ptoffset,
-      const std::vector<double> &inputData, const FEAElement * const &elem,
-      vtkDoubleArray * const &vtkData )
-  {VTKData(size, ptoffset, inputData.data(), elem, vtkData);}
-
   // ------------------------------------------------------------------------
   // VTKData : overload the previous function by replacing
   //                      automatic numbering by specific given point
@@ -184,11 +155,6 @@ namespace Interp
   void VTKData( const int &size, const int * const &ptid, 
       const double * const &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData );
-
-  inline void VTKData( const int &size, const int * const &ptid, 
-      const std::vector<double> &inputData, const FEAElement * const &elem,
-      vtkDoubleArray * const &vtkData )
-  {VTKData(size, ptid, inputData.data(), elem, vtkData);}
 
   // ------------------------------------------------------------------------
   // Data : given the input Data, i.e., the element sol-
