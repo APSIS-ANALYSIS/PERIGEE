@@ -1,6 +1,6 @@
 #include "Interpolater.hpp"
 
-void Interpolater::interpolateFE( const double * const &inputVal,
+void Interp::FE( const double * const &inputVal,
     const FEAElement * const &elem, std::vector<double> &output )
 {
   const int nqp = elem->get_numQuapts();
@@ -14,7 +14,7 @@ void Interpolater::interpolateFE( const double * const &inputVal,
   }
 }
 
-void Interpolater::interpolateFE( const double * const &inputVal_1,
+void Interp::FE( const double * const &inputVal_1,
     const double * const &inputVal_2,
     const FEAElement * const &elem,
     std::vector<double> &output_1, std::vector<double> &output_2 )
@@ -36,7 +36,7 @@ void Interpolater::interpolateFE( const double * const &inputVal_1,
   }
 }
 
-void Interpolater::interpolateFE( const double * const &inputVal_1,
+void Interp::FE( const double * const &inputVal_1,
     const double * const &inputVal_2,
     const double * const &inputVal_3,
     const FEAElement * const &elem,
@@ -62,7 +62,7 @@ void Interpolater::interpolateFE( const double * const &inputVal_1,
   }
 }
 
-void Interpolater::interpolateFE_Grad( const double * const &inputVal,
+void Interp::FE_Grad( const double * const &inputVal,
     const FEAElement * const &elem, std::vector<double> &output_dx,
     std::vector<double> &output_dy, std::vector<double> &output_dz )
 {
@@ -90,7 +90,7 @@ void Interpolater::interpolateFE_Grad( const double * const &inputVal,
   }
 }
 
-void Interpolater::interpolateVTKPts( const int &ptoffset,
+void Interp::VTKPts( const int &ptoffset,
     const double * const &ctrlPts_x,
     const double * const &ctrlPts_y,
     const double * const &ctrlPts_z,
@@ -100,7 +100,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   const int nqp = elem->get_numQuapts();
   std::vector<double> out_x, out_y, out_z;
 
-  interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, out_x, out_y, out_z);
+  Interp::FE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, out_x, out_y, out_z);
   
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -110,7 +110,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   }
 }
 
-void Interpolater::interpolateVTKPts( const int * const &ptid,
+void Interp::VTKPts( const int * const &ptid,
     const double * const &ctrlPts_x,
     const double * const &ctrlPts_y,
     const double * const &ctrlPts_z,
@@ -121,7 +121,7 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
   
   std::vector<double> out_x, out_y, out_z;
 
-  interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, out_x, out_y, out_z);
+  Interp::FE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, out_x, out_y, out_z);
   
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -131,7 +131,7 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
   }
 }
 
-void Interpolater::interpolateVTKData( const int &size, const int &ptoffset,
+void Interp::VTKData( const int &size, const int &ptoffset,
     const double * const &inputData, const FEAElement * const &elem,
     vtkDoubleArray * const &vtkData )
 {
@@ -147,7 +147,7 @@ void Interpolater::interpolateVTKData( const int &size, const int &ptoffset,
       compData[ii] = inputData[ii*size + comp]; // extract the comp-th component
     
     // FE Interpolation of the component 
-    interpolateFE(compData, elem, outData);
+    Interp::FE(compData, elem, outData);
     
     // Insert the comp-th component into vtkData
     for(int ii=0; ii<nqp; ++ii)
@@ -157,7 +157,7 @@ void Interpolater::interpolateVTKData( const int &size, const int &ptoffset,
   delete [] compData; compData = nullptr;
 }
 
-void Interpolater::interpolateVTKData( const int &size, 
+void Interp::VTKData( const int &size, 
     const int * const &ptid, const double * const &inputData, 
     const FEAElement * const &elem, vtkDoubleArray * const &vtkData )
 {
@@ -173,7 +173,7 @@ void Interpolater::interpolateVTKData( const int &size,
       compData[ii] = inputData[ii*size + comp]; // extract the comp-th component
     
     // FE Interpolation of the component 
-    interpolateFE(compData, elem, outData);
+    Interp::FE(compData, elem, outData);
     
     // Insert the comp-th component into vtkData
     for(int ii=0; ii<nqp; ++ii)
@@ -183,7 +183,7 @@ void Interpolater::interpolateVTKData( const int &size,
   delete [] compData; compData = nullptr;
 }
 
-void Interpolater::interpolateData( const int &size,
+void Interp::Data( const int &size,
     const double * const &inputData, const FEAElement * const &elem,
     std::vector< std::vector<double> > &outData )
 {
@@ -199,13 +199,13 @@ void Interpolater::interpolateData( const int &size,
       compData[ii] = inputData[ii*size + comp];
     
     // FE Interpolation of the component 
-    interpolateFE( compData, elem, outData[comp] );
+    Interp::FE( compData, elem, outData[comp] );
   }
 
   delete [] compData; compData = nullptr;
 }
 
-void Interpolater::interpolateVTKPts( const int &ptoffset,
+void Interp::VTKPts( const int &ptoffset,
     const double * const &ctrlPts_x,
     const double * const &ctrlPts_y,
     const double * const &ctrlPts_z,
@@ -217,21 +217,21 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   const int nLocBas = elem->get_nLocBas();
   std::vector<double> disp_x, disp_y, disp_z, ref_x, ref_y, ref_z;
 
-  interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
+  Interp::FE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
  
   double * compData = new double [nLocBas];
 
   // Get the x-component of displacement
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+0];
-  interpolateFE(compData, elem, disp_x);
+  Interp::FE(compData, elem, disp_x);
 
   // Get the y-component of displacement  
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+1];
-  interpolateFE(compData, elem, disp_y);
+  Interp::FE(compData, elem, disp_y);
 
   // Get the z-component of displacement
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+2];
-  interpolateFE(compData, elem, disp_z);
+  Interp::FE(compData, elem, disp_z);
 
   delete [] compData; compData = nullptr;
 
@@ -243,7 +243,7 @@ void Interpolater::interpolateVTKPts( const int &ptoffset,
   }
 }
 
-void Interpolater::interpolateVTKPts( const int * const &ptid,
+void Interp::VTKPts( const int * const &ptid,
     const double * const &ctrlPts_x,
     const double * const &ctrlPts_y,
     const double * const &ctrlPts_z,
@@ -255,21 +255,21 @@ void Interpolater::interpolateVTKPts( const int * const &ptid,
   const int nLocBas = elem->get_nLocBas();
   std::vector<double> disp_x, disp_y, disp_z, ref_x, ref_y, ref_z;
 
-  interpolateFE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
+  Interp::FE(ctrlPts_x, ctrlPts_y, ctrlPts_z, elem, ref_x, ref_y, ref_z);
  
   double * compData = new double [nLocBas];
 
   // Get the x-component of displacement
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+0];
-  interpolateFE(compData, elem, disp_x);
+  Interp::FE(compData, elem, disp_x);
 
   // Get the y-component of displacement  
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+1];
-  interpolateFE(compData, elem, disp_y);
+  Interp::FE(compData, elem, disp_y);
 
   // Get the z-component of displacement
   for(int ii=0; ii<nLocBas; ++ii) compData[ii] = disp_vect[ii*3+2];
-  interpolateFE(compData, elem, disp_z);
+  Interp::FE(compData, elem, disp_z);
 
   delete [] compData; compData = nullptr;
 

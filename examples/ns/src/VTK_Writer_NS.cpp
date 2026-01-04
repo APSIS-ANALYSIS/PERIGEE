@@ -22,8 +22,6 @@ void VTK_Writer_NS::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
-  Interpolater intep;
-
   // Allocate VTK gridData object
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -60,7 +58,7 @@ void VTK_Writer_NS::writeOutput(
     elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
     
     // Interpolate nodal coordinates
-    intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
+    Interp::VTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
         elemptr, points );
   
     std::vector<double> inputInfo; inputInfo.clear();
@@ -75,7 +73,7 @@ void VTK_Writer_NS::writeOutput(
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk] );
     }
  
-    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+    Interp::VTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[0] ); 
 
     // Interpolate velocity vector
@@ -87,7 +85,7 @@ void VTK_Writer_NS::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+    Interp::VTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[1] );
 
     // Set mesh connectivity

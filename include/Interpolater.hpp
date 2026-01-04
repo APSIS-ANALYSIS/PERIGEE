@@ -56,7 +56,7 @@ namespace Interp
       const FEAElement * const &elem, std::vector<double> &output_dx,
       std::vector<double> &output_dy, std::vector<double> &output_dz );
 
-  void FE_Grad( const std::vector<double> &inputVal,
+  inline void FE_Grad( const std::vector<double> &inputVal,
       const FEAElement * const &elem, std::vector<double> &output_dx,
       std::vector<double> &output_dy, std::vector<double> &output_dz )
   {FE_Grad(inputVal.data(), elem, output_dx, output_dy, output_dz);}
@@ -113,7 +113,7 @@ namespace Interp
       const FEAElement * const &elem,
       vtkPoints * const &vtkpts );
 
-  void VTKPts( const int &ptoffset,
+  inline void VTKPts( const int &ptoffset,
       const double * const &ctrlPts_x,
       const double * const &ctrlPts_y,
       const double * const &ctrlPts_z,
@@ -139,7 +139,7 @@ namespace Interp
       const FEAElement * const &elem,
       vtkPoints * const &vtkpts );
 
-  void VTKPts( const int * const &ptid,
+  inline void VTKPts( const int * const &ptid,
       const double * const &ctrlPts_x,
       const double * const &ctrlPts_y,
       const double * const &ctrlPts_z,
@@ -166,7 +166,7 @@ namespace Interp
       const double * const &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData );
 
-  void VTKData( const int &size, const int &ptoffset,
+  inline void VTKData( const int &size, const int &ptoffset,
       const std::vector<double> &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData )
   {VTKData(size, ptoffset, inputData.data(), elem, vtkData);}
@@ -185,7 +185,7 @@ namespace Interp
       const double * const &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData );
 
-  void VTKData( const int &size, const int * const &ptid, 
+  inline void VTKData( const int &size, const int * const &ptid, 
       const std::vector<double> &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData )
   {VTKData(size, ptid, inputData.data(), elem, vtkData);}
