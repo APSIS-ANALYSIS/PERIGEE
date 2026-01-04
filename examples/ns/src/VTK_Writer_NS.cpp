@@ -22,7 +22,7 @@ void VTK_Writer_NS::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
-  Interpolater intep( nLocBas );
+  Interpolater intep;
 
   // Allocate VTK gridData object
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();

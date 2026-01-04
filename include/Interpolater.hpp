@@ -22,16 +22,11 @@ class Interpolater
   public:
     // ------------------------------------------------------------------------
     // Construct the FE basis containers based on the input
-    // nLocBas : number of basis functions and
-    // isDer   : the flag telling if the derivatives are needed
     // ------------------------------------------------------------------------
-    Interpolater( const int &in_nlocbas ) : nLocBas( in_nlocbas ) {};
+    Interpolater() = default;
     
     virtual ~Interpolater() = default;
     
-    // print the basic info on screen.
-    void print_info() const;
-
     // ------------------------------------------------------------------------
     // interpolateFE : return a value based on the inputVal, which is
     // the coefficients for the element elem's basis functions.
@@ -219,13 +214,6 @@ class Interpolater
         const double * const &inputData,
         const FEAElement * const &elem, 
         std::vector< std::vector<double> > &outData );
-
-  private:
-    // number of local(elemental) basis functions
-    const int nLocBas;
-
-    // Disable empty constructor
-    Interpolater() = delete;
 };
 
 #endif
