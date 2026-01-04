@@ -139,12 +139,12 @@ int main( int argc, char * argv[] )
     // Partition Nodal BC and write to h5 file
     auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex, NBC_list);
 
-    //nbcpart -> write_hdf5( part_file );
+    nbcpart -> write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
     auto ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex, ebc);
 
-    //ebcpart -> write_hdf5( part_file );
+    ebcpart -> write_hdf5( part_file );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
