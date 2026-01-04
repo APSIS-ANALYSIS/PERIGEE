@@ -59,7 +59,7 @@ namespace Interp
   void FE_Grad( const std::vector<double> &inputVal,
       const FEAElement * const &elem, std::vector<double> &output_dx,
       std::vector<double> &output_dy, std::vector<double> &output_dz )
-  {interpolateFE_Grad(&inputVal[0], elem, output_dx, output_dy, output_dz);}
+  {FE_Grad(&inputVal[0], elem, output_dx, output_dy, output_dz);}
 
   // ------------------------------------------------------------------------
   // VTKPts : given the control points of the element, evaluate
@@ -120,7 +120,7 @@ namespace Interp
       const std::vector<double> &disp_vect,
       const FEAElement * const &elem,
       vtkPoints * const &vtkpts )
-  {interpolateVTKPts(ptoffset, ctrlPts_x, ctrlPts_y, ctrlPts_z, 
+  {VTKPts(ptoffset, ctrlPts_x, ctrlPts_y, ctrlPts_z, 
       &disp_vect[0], elem, vtkpts);}
 
   // ------------------------------------------------------------------------
@@ -146,7 +146,7 @@ namespace Interp
       const std::vector<double> &disp_vect,
       const FEAElement * const &elem,
       vtkPoints * const &vtkpts )
-  {interpolateVTKPts(ptid, ctrlPts_x, ctrlPts_y, ctrlPts_z, &disp_vect[0], elem, vtkpts);}
+  {VTKPts(ptid, ctrlPts_x, ctrlPts_y, ctrlPts_z, &disp_vect[0], elem, vtkpts);}
 
   // ------------------------------------------------------------------------
   // VTKData : given the inputData, i.e., the solution 
@@ -169,7 +169,7 @@ namespace Interp
   void VTKData( const int &size, const int &ptoffset,
       const std::vector<double> &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData )
-  {interpolateVTKData(size, ptoffset, &inputData[0], elem, vtkData);}
+  {VTKData(size, ptoffset, &inputData[0], elem, vtkData);}
 
   // ------------------------------------------------------------------------
   // VTKData : overload the previous function by replacing
@@ -188,7 +188,7 @@ namespace Interp
   void VTKData( const int &size, const int * const &ptid, 
       const std::vector<double> &inputData, const FEAElement * const &elem,
       vtkDoubleArray * const &vtkData )
-  {interpolateVTKData(size, ptid, &inputData[0], elem, vtkData);}
+  {VTKData(size, ptid, &inputData[0], elem, vtkData);}
 
   // ------------------------------------------------------------------------
   // Data : given the input Data, i.e., the element sol-
