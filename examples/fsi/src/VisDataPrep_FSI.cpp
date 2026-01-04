@@ -19,9 +19,6 @@ VisDataPrep_FSI::VisDataPrep_FSI()
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_FSI::~VisDataPrep_FSI()
-{}
-
 void VisDataPrep_FSI::get_pointArray(
     const std::string &disp_sol_file_name,
     const std::string &pres_sol_file_name,

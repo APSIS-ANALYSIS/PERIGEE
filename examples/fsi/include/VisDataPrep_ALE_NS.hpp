@@ -14,7 +14,7 @@ class VisDataPrep_ALE_NS : public IVisDataPrep
   public:
     VisDataPrep_ALE_NS();
 
-    virtual ~VisDataPrep_ALE_NS();
+    virtual ~VisDataPrep_ALE_NS() = default;
 
     virtual int get_ptarray_size() const {return 3;}
 

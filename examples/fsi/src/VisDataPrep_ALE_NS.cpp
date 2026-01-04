@@ -17,9 +17,6 @@ VisDataPrep_ALE_NS::VisDataPrep_ALE_NS()
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_ALE_NS::~VisDataPrep_ALE_NS()
-{}
-
 void VisDataPrep_ALE_NS::get_pointArray(
     const std::string &disp_sol_file_name,
     const std::string &pres_sol_file_name,

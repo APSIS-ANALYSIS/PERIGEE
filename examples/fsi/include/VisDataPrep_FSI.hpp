@@ -14,7 +14,7 @@ class VisDataPrep_FSI : public IVisDataPrep
   public:
     VisDataPrep_FSI();
 
-    virtual ~VisDataPrep_FSI();
+    virtual ~VisDataPrep_FSI() = default;
 
     virtual int get_ptarray_size() const {return 3;}
 

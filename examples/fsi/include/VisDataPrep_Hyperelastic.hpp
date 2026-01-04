@@ -14,7 +14,7 @@ class VisDataPrep_Hyperelastic : public IVisDataPrep
   public:
     VisDataPrep_Hyperelastic( const bool &is_ref );
 
-    virtual ~VisDataPrep_Hyperelastic();
+    virtual ~VisDataPrep_Hyperelastic() = default;
 
     virtual int get_ptarray_size() const {return 3;}
 

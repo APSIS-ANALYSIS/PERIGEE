@@ -33,9 +33,6 @@ VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
   pt_array_len.push_back(3);
 }
 
-VisDataPrep_Hyperelastic::~VisDataPrep_Hyperelastic()
-{}
-
 void VisDataPrep_Hyperelastic::get_pointArray(
     const std::string &disp_sol_file_name,
     const std::string &pres_sol_file_name,
