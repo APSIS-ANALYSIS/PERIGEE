@@ -31,7 +31,7 @@ int main( int argc, char * argv[] )
   constexpr int dofMat = 4; // degree-of-freedom in the matrix problem
 
   // Yaml options
-  const std::string yaml_file("ns_preprocess.yml");
+  const std::string yaml_file("preprocess.yml");
 
   // Check if the yaml file exist on disk
   SYS_T::file_check(yaml_file);
@@ -83,7 +83,7 @@ int main( int argc, char * argv[] )
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
 
-  SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas() );
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the given element type is %d and the mesh file is %d, which do not match. \n", nLocBas, IEN->get_nLocBas() );
 
   // Call METIS to partition the mesh
   IGlobal_Part * global_part = nullptr;
@@ -139,12 +139,12 @@ int main( int argc, char * argv[] )
     // Partition Nodal BC and write to h5 file
     auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex, NBC_list);
 
-    nbcpart -> write_hdf5( part_file );
+    //nbcpart -> write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
     auto ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex, ebc);
 
-    ebcpart -> write_hdf5( part_file );
+    //ebcpart -> write_hdf5( part_file );
 
     // Collect partition statistics
     list_nlocalnode.push_back(part->get_nlocalnode());
