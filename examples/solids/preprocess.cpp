@@ -23,8 +23,8 @@ int main( int argc, char * argv[] )
   SYS_T::set_omp_num_threads();
 
   // Clean the potentially pre-existing hdf5 files in the job folder
-  SYS_T::execute("rm -rf part_p*.h5");
-  SYS_T::execute("rm -rf preprocessor_cmd.h5");
+  SYS_T::execute("rm -rf apart");
+  SYS_T::execute("mkdir apart");
 
   // Define basic problem settins
   constexpr int dofNum = 7; // degree-of-freedom for the physical problem
@@ -38,15 +38,17 @@ int main( int argc, char * argv[] )
 
   YAML::Node paras = YAML::LoadFile( yaml_file );
 
-  const std::string elemType_str  = paras["elem_type"].as<std::string>();
-  const std::string geo_file      = paras["geo_file"].as<std::string>();
-  const std::string sur_file_dir  = paras["sur_file_dir"].as<std::string>();
-  const std::string sur_file_neu  = paras["sur_file_neu"].as<std::string>();
-  const std::string part_file     = paras["part_file"].as<std::string>();
-  const int cpu_size              = paras["cpu_size"].as<int>();
-  const int in_ncommon            = paras["in_ncommon"].as<int>();
-  const bool isDualGraph          = paras["is_dualgraph"].as<bool>();
-  const FEType elemType           = FE_T::to_FEType(elemType_str);
+  const std::string elemType_str = paras["elem_type"].as<std::string>();
+  const std::string geo_file     = paras["geo_file"].as<std::string>();
+  const std::string part_file    = paras["part_file"].as<std::string>();
+  const int cpu_size             = paras["cpu_size"].as<int>();
+  const int in_ncommon           = paras["in_ncommon"].as<int>();
+  const bool isDualGraph         = paras["is_dualgraph"].as<bool>();
+  const FEType elemType          = FE_T::to_FEType(elemType_str);
+  const std::vector<std::string> sur_file_neu   = paras["sur_file_neu"].as<std::vector<std::string>>();
+  const std::vector<std::string> sur_file_dir_x = paras["sur_file_dir_x"].as<std::vector<std::string>>();
+  const std::vector<std::string> sur_file_dir_y = paras["sur_file_dir_y"].as<std::vector<std::string>>();
+  const std::vector<std::string> sur_file_dir_z = paras["sur_file_dir_z"].as<std::vector<std::string>>();
 
   if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
@@ -54,8 +56,18 @@ int main( int argc, char * argv[] )
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -elem_type: "<<elemType_str<<endl;
   cout<<" -geo_file: "<<geo_file<<endl;
-  cout<<" -sur_file_dir: "<<sur_file_dir<<endl;
-  cout<<" -sur_file_neu: "<<sur_file_neu<<endl;
+  cout<<" -sur_file_dir_x: ";
+  for(const auto &fname : sur_file_dir_x) cout<<fname<<" ";
+  cout<<endl;
+  cout<<" -sur_file_dir_y: ";
+  for(const auto &fname : sur_file_dir_y) cout<<fname<<" ";
+  cout<<endl;
+  cout<<" -sur_file_dir_z: ";
+  for(const auto &fname : sur_file_dir_z) cout<<fname<<" ";
+  cout<<endl;
+  cout<<" -sur_file_neu: ";
+  for(const auto &fname : sur_file_neu) cout<<fname<<" ";
+  cout<<endl;
   cout<<" -part_file: "<<part_file<<endl;
   cout<<" -cpu_size: "<<cpu_size<<endl;
   cout<<" -in_ncommon: "<<in_ncommon<<endl;
@@ -67,9 +79,16 @@ int main( int argc, char * argv[] )
   cout<<"====  Command Line Arguments/ ===="<<endl;
 
   // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
-  SYS_T::file_check(sur_file_dir); cout<<sur_file_dir<<" found. \n";
-  SYS_T::file_check(sur_file_neu); cout<<sur_file_neu<<" found. \n";
+  SYS_T::file_check(geo_file);
+  std::cout << geo_file << " found. \n";
+  for( const auto &fname : sur_file_dir_x )
+  { SYS_T::file_check( fname ); std::cout << fname << " found. \n"; }
+  for( const auto &fname : sur_file_dir_y )
+  { SYS_T::file_check( fname ); std::cout << fname << " found. \n"; }
+  for( const auto &fname : sur_file_dir_z )
+  { SYS_T::file_check( fname ); std::cout << fname << " found. \n"; }
+  for( const auto &fname : sur_file_neu )
+  { SYS_T::file_check( fname ); std::cout << fname << " found. \n"; }
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
@@ -77,7 +96,7 @@ int main( int argc, char * argv[] )
   std::vector<double> ctrlPts;
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
-  
+
   IIEN * IEN = new IEN_FEM(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
 
@@ -100,15 +119,13 @@ int main( int argc, char * argv[] )
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
   std::vector<INodalBC *> NBC_list( dofMat, nullptr );
-  
-  std::vector<std::string> dir_list { sur_file_dir };
 
   NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, nFunc );
+  NBC_list[1] = new NodalBC( sur_file_dir_x, nFunc );
+  NBC_list[2] = new NodalBC( sur_file_dir_y, nFunc );
+  NBC_list[3] = new NodalBC( sur_file_dir_z, nFunc );
 
-  ElemBC * ebc = new ElemBC_3D( {sur_file_neu}, elemType );
+  ElemBC * ebc = new ElemBC_3D( sur_file_neu, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
 
   // Start partitioning the mesh for each cpu rank
