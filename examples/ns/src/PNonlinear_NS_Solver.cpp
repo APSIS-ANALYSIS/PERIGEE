@@ -34,7 +34,6 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-
 void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
