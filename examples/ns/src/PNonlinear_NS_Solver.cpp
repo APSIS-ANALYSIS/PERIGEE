@@ -19,7 +19,15 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   tmga(std::move(in_tmga)),
   flrate(std::move(in_flrate)),
   sol_base(std::move(in_sol_base))
-{}
+{
+#ifdef PETSC_USE_LOG
+  PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
+  PetscLogEventRegister("assembly mat 0", classid_assembly, &mat_assem_0_event);
+  PetscLogEventRegister("assembly mat 1", classid_assembly, &mat_assem_1_event);
+  PetscLogEventRegister("assembly vec 0", classid_assembly, &vec_assem_0_event);
+  PetscLogEventRegister("assembly vec 1", classid_assembly, &vec_assem_1_event);
+#endif
+}
 
 void PNonlinear_NS_Solver::print_info() const
 {
@@ -47,19 +55,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     IPGAssem * const &gassem_ptr,
     bool &conv_flag, int &nl_counter ) const
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent mat_assem_0_event, mat_assem_1_event;
-  PetscLogEvent vec_assem_0_event, vec_assem_1_event;
-  PetscLogEvent lin_solve_event;
-  PetscClassId classid_assembly;
-  PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
-  PetscLogEventRegister("assembly mat 0", classid_assembly, &mat_assem_0_event);
-  PetscLogEventRegister("assembly mat 1", classid_assembly, &mat_assem_1_event);
-  PetscLogEventRegister("assembly vec 0", classid_assembly, &vec_assem_0_event);
-  PetscLogEventRegister("assembly vec 1", classid_assembly, &vec_assem_1_event);
-  PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
-#endif
-
   // Initialize the counter and error
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
@@ -137,16 +132,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // Now do consistent Newton-Raphson iteration
   do
   {
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(lin_solve_event, 0,0,0,0);
-#endif
-    
     // solve the equation K dot_step = G
     lsolver->Solve( gassem_ptr->G, dot_step.get() );
-
-#ifdef PETSC_USE_LOG
-    PetscLogEventEnd(lin_solve_event,0,0,0,0);
-#endif
 
     bc_mat->MatMultSol( dot_step.get() );
 
