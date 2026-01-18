@@ -30,7 +30,7 @@ class FEANode
     //   and cpu index. If weights exist in the h5 file, they will also be read; 
     //   otherwise, the ctrlPts_w vector will be empty.
     // ------------------------------------------------------------------------
-    FEANode( const std::string &fileBaseName, const int &cpu_rank );
+    FEANode( const std::string &fileBaseName, int cpu_rank );
 
     FEANode( const HDF5_Reader * const &h5r );
 
@@ -43,16 +43,16 @@ class FEANode
     // ! Functions that give access to the coordinates (and weights).
     //   Input: index ranges in [ 0 , nlocghonode )
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_ctrlPts_xyz(const int &index) const
+    virtual Vector_3 get_ctrlPts_xyz(int index) const
     { return Vector_3( ctrlPts_x[index], ctrlPts_y[index], ctrlPts_z[index] ); }
     
-    virtual double get_ctrlPts_x(const int &index) const {return ctrlPts_x[index];}
+    virtual double get_ctrlPts_x(int index) const {return ctrlPts_x[index];}
     
-    virtual double get_ctrlPts_y(const int &index) const {return ctrlPts_y[index];}
+    virtual double get_ctrlPts_y(int index) const {return ctrlPts_y[index];}
     
-    virtual double get_ctrlPts_z(const int &index) const {return ctrlPts_z[index];}
+    virtual double get_ctrlPts_z(int index) const {return ctrlPts_z[index];}
     
-    virtual double get_ctrlPts_w(const int &index) const {return ctrlPts_w[index];}
+    virtual double get_ctrlPts_w(int index) const {return ctrlPts_w[index];}
 
     // ------------------------------------------------------------------------
     // ! Get n control points' x-y-z in a batch
@@ -63,7 +63,7 @@ class FEANode
     //   Note: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/z).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz( const int &num, const int * const &index, 
+    virtual void get_ctrlPts_xyz( int num, const int * const &index, 
         double * const &ctrl_x, double * const &ctrl_y, 
         double * const &ctrl_z ) const;
 
@@ -75,7 +75,7 @@ class FEANode
     //   Note: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/z/w).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyzw( const int &num, const int * const &index, 
+    virtual void get_ctrlPts_xyzw( int num, const int * const &index, 
         double * const &ctrl_x, double * const &ctrl_y, 
         double * const &ctrl_z, double * const &ctrl_w ) const;
    
@@ -84,7 +84,7 @@ class FEANode
     //   NOTE: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/w).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyw( const int &num, const int * const &index,
+    virtual void get_ctrlPts_xyw( int num, const int * const &index,
         double * const &ctrl_x, double * const &ctrl_y,
         double * const &ctrl_w ) const;
 
@@ -93,7 +93,7 @@ class FEANode
     //   NOTE: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xy( const int &num, const int * const &index,
+    virtual void get_ctrlPts_xy( int num, const int * const &index,
         double * const &ctrl_x, double * const &ctrl_y ) const;
 
     // ------------------------------------------------------------------------
