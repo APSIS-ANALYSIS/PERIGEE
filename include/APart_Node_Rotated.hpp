@@ -29,7 +29,7 @@
 class APart_Node_Rotated : public APart_Node
 {
   public:
-    APart_Node_Rotated(const std::string &fileBaseName, const int &rank );
+    APart_Node_Rotated(const std::string &fileBaseName, int rank );
 
     APart_Node_Rotated(const HDF5_Reader * const &h5r);
 
@@ -41,14 +41,14 @@ class APart_Node_Rotated : public APart_Node
     virtual int get_nlocalnode_rotated() const 
     {return nlocalnode_rotated;}
 
-    virtual int get_node_loc_rotated(const int &index) const
+    virtual int get_node_loc_rotated(int index) const
     {return node_loc_rotated[index];}
 
     // Get the fluid local node number and indices
     virtual int get_nlocalnode_fixed() const 
     {return nlocalnode_fixed;}
 
-    virtual int get_node_loc_fixed(const int &index) const
+    virtual int get_node_loc_fixed(int index) const
     {return node_loc_fixed[index];}
 
   private:
