@@ -53,7 +53,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
   int ptOffset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
+    const auto IEN_e = lien_ptr -> get_LIEN( ee );
 
     std::vector<double> ectrl_x ( nLocBas, 0.0 );
     std::vector<double> ectrl_y ( nLocBas, 0.0 );
