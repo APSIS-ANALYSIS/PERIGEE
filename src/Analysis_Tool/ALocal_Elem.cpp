@@ -1,6 +1,6 @@
 #include "ALocal_Elem.hpp"
 
-ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, const int &cpu_rank)
+ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, int cpu_rank)
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -42,7 +42,7 @@ ALocal_Elem::ALocal_Elem(const HDF5_Reader * const &h5r)
     elem_tag.clear();
 }
 
-int ALocal_Elem::get_nlocalele( const int &tag_val ) const
+int ALocal_Elem::get_nlocalele( int tag_val ) const
 {
   if( isTagged )
   {
