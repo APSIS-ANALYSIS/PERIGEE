@@ -1,4 +1,5 @@
 #include "ALocal_Elem.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, int cpu_rank)
 {

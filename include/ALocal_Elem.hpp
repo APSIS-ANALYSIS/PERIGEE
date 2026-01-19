@@ -8,7 +8,10 @@
 // Author: Ju Liu
 // Date: Nov. 10 2013
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include "Sys_Tools.hpp"
+#include "Vec_Tools.hpp"
+
+class HDF5_Reader;
 
 class ALocal_Elem
 {

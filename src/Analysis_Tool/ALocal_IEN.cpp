@@ -1,4 +1,5 @@
 #include "ALocal_IEN.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, int cpu_rank )
 {

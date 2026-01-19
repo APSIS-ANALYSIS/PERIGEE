@@ -14,7 +14,10 @@
 // Author: Ju Liu
 // Date: Nov. 10th 2013
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include <string>
+#include <vector>
+
+class HDF5_Reader;
 
 class ALocal_IEN
 {
