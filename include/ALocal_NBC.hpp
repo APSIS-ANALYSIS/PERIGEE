@@ -8,7 +8,10 @@
 // Author: Ju Liu
 // Date: Oct. 8th 2015
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include <string>
+#include "Vec_Tools.hpp"
+
+class HDF5_Reader;
 
 class ALocal_NBC
 {
@@ -20,7 +23,7 @@ class ALocal_NBC
     // equations in FSI problem, which are stored under the gname mesh_nbc.
     // ------------------------------------------------------------------------
     ALocal_NBC( const std::string &fileBaseName, 
-        const int &cpu_rank, const std::string &gname="/nbc" );
+        int cpu_rank, const std::string &gname="/nbc" );
 
     ALocal_NBC( const HDF5_Reader * const &h5r,
         const std::string &gname="/nbc" );
@@ -36,7 +39,7 @@ class ALocal_NBC
     // get the Local ID value for the node's dof-th degree-of-freedom.
     // 0 <= dof_index < dof , 0 <= node < nlocghonode
     // ------------------------------------------------------------------------
-    virtual int get_LID(const int &dof_index, const int &node) const
+    virtual int get_LID(int dof_index, int node) const
     {return LID[dof_index * nlocghonode + node];}
 
     // ------------------------------------------------------------------------
@@ -44,7 +47,7 @@ class ALocal_NBC
     // attached to this node.
     // 0 <= node < nlocghonode
     // ------------------------------------------------------------------------
-    virtual int get_LID( const int &node ) const {return LID[node];}
+    virtual int get_LID( int node ) const {return LID[node];}
 
     // ------------------------------------------------------------------------
     // get_dof_LID: the Local ID array's dof number
@@ -55,51 +58,51 @@ class ALocal_NBC
     // ------------------------------------------------------------------------
     // get global indices of the Dirichlet nodes in the local subdomain
     // ------------------------------------------------------------------------
-    virtual int get_LDN(const int &dof_index, const int &node) const
+    virtual int get_LDN(int dof_index, int node) const
     {return LDN[LD_offset[dof_index] + node];}
 
     // ------------------------------------------------------------------------
     // get global indices of the slave nodes in the local subdomain
     // ------------------------------------------------------------------------
-    virtual int get_LPSN(const int &dof_index, const int &ii) const
+    virtual int get_LPSN(int dof_index, int ii) const
     {return LPSN[LPS_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get global indices of the master nodes corresponding to the
     // slave nodes in the local subdomain, i.e. from get_LPSN() 
     // ------------------------------------------------------------------------
-    virtual int get_LPMN(const int &dof_index, const int &ii) const
+    virtual int get_LPMN(int dof_index, int ii) const
     {return LPMN[LPS_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get global indices of the master nodes in the local subdomain 
     // ------------------------------------------------------------------------
-    virtual int get_LocalMaster(const int &dof_index, const int &ii) const
+    virtual int get_LocalMaster(int dof_index, int ii) const
     {return LocalMaster[LPM_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get global indices of the slave nodes corresponding to the
     // master nodes in the local subdomain, i.e. from get_LocalMaster()
     // ------------------------------------------------------------------------
-    virtual int get_LocalMasterSlave(const int &dof_index, const int &ii) const
+    virtual int get_LocalMasterSlave(int dof_index, int ii) const
     {return LocalMasterSlave[LPM_offset[dof_index] + ii];}
 
     // ------------------------------------------------------------------------
     // get the number of Dirichlet nodes in the local subdomain
     // ------------------------------------------------------------------------
-    virtual int get_Num_LD(const int &dof_index) const 
+    virtual int get_Num_LD(int dof_index) const 
     {return Num_LD[dof_index];}
     
     // ------------------------------------------------------------------------
     // get the number of slave nodes in the local subdomain
     // ------------------------------------------------------------------------
-    virtual int get_Num_LPS(const int &dof_index) const 
+    virtual int get_Num_LPS(int dof_index) const 
     {return Num_LPS[dof_index];}
 
     // ------------------------------------------------------------------------
     // get the number of master nodes in the local subdomain
     // ------------------------------------------------------------------------
-    virtual int get_Num_LPM(const int &dof_index) const 
+    virtual int get_Num_LPM(int dof_index) const 
     {return Num_LPM[dof_index];}
 
     // ------------------------------------------------------------------------
