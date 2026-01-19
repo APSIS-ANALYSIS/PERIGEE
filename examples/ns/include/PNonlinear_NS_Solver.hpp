@@ -74,9 +74,15 @@ class PNonlinear_NS_Solver
           count, rel_err, abs_err);
     }
 
+    // Rescale the inflow rate prescribed at the inlet boundary.
     void rescale_inflow_value( const double &stime,
         const ALocal_InflowBC * const &infbc,
         PDNSolution * const &sol ) const;
+
+    // Rescale the time derivative of the inflow rate prescribed at the inlet boundary.
+    void rescale_dot_inflow_value( const double &stime,
+        const ALocal_InflowBC * const &infbc,
+        PDNSolution * const &sol ) const;        
 };
 
 #endif
