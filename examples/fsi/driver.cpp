@@ -575,27 +575,12 @@ int main(int argc, char *argv[])
       gloAssem.get(), true, is_restart );
 
   // ===== FEM analysis =====
-#ifdef PETSC_USE_LOG
-  PetscLogEvent tsolver_event;
-  PetscClassId classid;
-  PetscClassIdRegister("user-log-info-time-solver", &classid);
-  PetscLogEventRegister("time_solver", classid, &tsolver_event);
-#endif
-
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-
-#ifdef PETSC_USE_LOG
-  PetscLogEventBegin(tsolver_event, 0,0,0,0);
-#endif
 
   tsolver->TM_FSI_GenAlpha( is_restart, is_velo, is_pres, std::move(dot_disp), 
       std::move(dot_velo), std::move(dot_pres), std::move(disp), std::move(velo), 
       std::move(pres), std::move(timeinfo), locinfnbc.get(), gbc.get(), 
       gloAssem.get() );
-
-#ifdef PETSC_USE_LOG
-  PetscLogEventEnd(tsolver_event,0,0,0,0);
-#endif
 
   // Print complete solver info
   tsolver -> print_lsolver_info();

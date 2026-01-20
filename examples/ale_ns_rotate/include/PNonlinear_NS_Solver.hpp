@@ -79,6 +79,12 @@ class PNonlinear_NS_Solver
     const std::unique_ptr<IFlowRate> flrate;
     const std::unique_ptr<PDNSolution> sol_base;
 
+#ifdef PETSC_USE_LOG
+    PetscLogEvent mat_assem_0_event, mat_assem_1_event;
+    PetscLogEvent vec_assem_0_event, vec_assem_1_event;
+    PetscClassId classid_assembly;
+#endif
+
     void Print_convergence_info( int count, double rel_err, double abs_err ) const
     {
       SYS_T::commPrint("  === NR ite: %d, r_error: %e, a_error: %e \n",

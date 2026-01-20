@@ -121,6 +121,12 @@ class PNonlinear_FSI_Solver
     const std::unique_ptr<PDNSolution> sol_base;
     const std::unique_ptr<const APart_Node> pnode_v;
 
+#ifdef PETSC_USE_LOG
+    PetscLogEvent assem_event_0, assem_event_1, assem_event_2;
+    PetscLogEvent solve_mech_event, solve_mesh_event;
+    PetscClassId classid;
+#endif
+
     void Print_convergence_info( const int &count, const double &rel_err,
         const double &abs_err ) const
     {
