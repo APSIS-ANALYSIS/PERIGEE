@@ -62,6 +62,11 @@ class PTime_NS_HERK_Solver
     const std::unique_ptr<IFlowRate> dot_flrate;
     const std::unique_ptr<PDNSolution> sol_base;
     const std::unique_ptr<const ALocal_InflowBC> infnbc;
+
+#ifdef PETSC_USE_LOG
+    PetscLogEvent K_solve, update_dotstep;
+    PetscClassId classid_solve;
+#endif
   
     std::string Name_Generator( const int &counter ) const;
 
