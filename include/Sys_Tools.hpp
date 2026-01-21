@@ -48,6 +48,9 @@
   #define ASSERT(cond, ...) ((void)0)
 #endif
 
+// UNUSED makes a var x as intentionally unused to suppress compiler warnings.
+#define UNUSED(x) (void)(x)
+
 namespace SYS_T
 {
   // Implementation of make_unique for C++11
