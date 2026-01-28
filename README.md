@@ -126,7 +126,7 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 * [C++ Core Guidelines](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines)
 
 ## Contact
-[Dr. Ju Liu](ju-liu.github.io), liujuy@gmail.com, liuj36@sustech.edu.cn
+[Dr. Ju Liu](https://ju-liu.github.io), liujuy@gmail.com, liuj36@sustech.edu.cn
 
 ## Acknowledgement
 National Natural Science Foundation of China, Grant numbers 12172160, 12472201
