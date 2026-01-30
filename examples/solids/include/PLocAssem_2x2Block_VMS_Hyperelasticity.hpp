@@ -94,24 +94,6 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const double * const &eleCtrlPts_y,
         const double * const &eleCtrlPts_z );
 
-    virtual void Assem_Residual_Interior_Wall_EBC(
-        const double &time,
-        const double * const &pres,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z );
-
-    // ------------------------------------------------------------------------
-    // This function will calculate the Cauchy stress at every quadrature points
-    // within this element. The output stress has length quad -> get_num_quadPts()
-    // ------------------------------------------------------------------------
-    virtual std::vector<SymmTensor2_3D> get_Wall_CauchyStress(
-        const double * const &disp,
-        const double * const &pres,
-        const double * const &eleCtrlPts_x,
-        const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z ) const;
-
   private:
     const FEType elemType;
 
@@ -137,18 +119,8 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
       return Vector_3( 0.0, 0.0, 0.0 );
     }
 
-    // Use pointers to the member functions to facilitate the automatic
-    // treatment of ebc surface integration.
-    typedef Vector_3 ( PLocAssem_2x2Block_VMS_Hyperelasticity::*locassem_2x2block_vms_comp_ela_fem_funs )( 
+    Vector_3 get_traction( const int &ebc_id,
         const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const;
-
-    locassem_2x2block_vms_comp_ela_fem_funs * flist;
-
-    Vector_3 get_ebc_fun( const int &ebc_id,
-        const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
-    {
-      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
-    }
 };
 
 #endif

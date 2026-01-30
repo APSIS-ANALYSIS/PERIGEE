@@ -706,7 +706,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_EBC(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 gg = get_ebc_fun( ebc_id, coor, curr, n_out );
+    const Vector_3 gg = get_traction( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -717,87 +717,21 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_EBC(
   }
 }
 
-void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_Interior_Wall_EBC(
-    const double &time,
-    const double * const &pres,
-    const double * const &eleCtrlPts_x,
-    const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z )
+Vector_3 PLocAssem_2x2Block_VMS_Hyperelasticity::get_traction(
+    const int &ebc_id,
+    const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
 {
-  const double factor = 1.0; //time >= 1.0 ? 1.0 : time;
+  (void)pt; (void)tt;
+  const double p0 = 1.0e4;
 
-  elements->buildBasis( quads.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  Zero_sur_Residual();
-
-  for(int qua = 0; qua < nqps; ++qua)
+  switch(ebc_id)
   {
-    const std::vector<double> R = elements->get_R(qua);
-
-    double surface_area;
-    const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
-
-    double pp = 0.0;
-    for(int ii=0; ii<snLocBas; ++ii) pp += pres[ii] * R[ii];
-
-    for(int A=0; A<snLocBas; ++A)
-    {
-      sur_Residual0[3*A  ] -= surface_area * quads -> get_qw(qua) * R[A] * factor * pp * n_out.x();
-      sur_Residual0[3*A+1] -= surface_area * quads -> get_qw(qua) * R[A] * factor * pp * n_out.y();
-      sur_Residual0[3*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * factor * pp * n_out.z();
-    }
+    case 0:
+      return Vector_3( p0 * n_out.x(), p0 * n_out.y(), p0 * n_out.z() );
+    default:
+      SYS_T::print_fatal("Error: unsupported ebc_id %d in get_traction.\n", ebc_id);
+      return Vector_3( 0.0, 0.0, 0.0 );
   }
-}
-
-std::vector<SymmTensor2_3D> PLocAssem_2x2Block_VMS_Hyperelasticity::get_Wall_CauchyStress(
-    const double * const &disp,
-    const double * const &pres,
-    const double * const &eleCtrlPts_x,
-    const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z ) const
-{
-  elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
-
-  std::vector<SymmTensor2_3D> stress( nqpv );
-
-  for( int qua = 0; qua < nqpv; ++qua )
-  {
-    std::vector<double> R(nLocBas, 0.0), dR_dx(nLocBas, 0.0), dR_dy(nLocBas, 0.0), dR_dz(nLocBas, 0.0);
-
-    elementv->get_R_gradR( qua, &R[0], &dR_dx[0], &dR_dy[0], &dR_dz[0] );
-
-    double pp = 0.0;
-    double ux_x = 0.0, uy_x = 0.0, uz_x = 0.0;
-    double ux_y = 0.0, uy_y = 0.0, uz_y = 0.0;
-    double ux_z = 0.0, uy_z = 0.0, uz_z = 0.0;
-
-    for(int ii=0; ii<nLocBas; ++ii)
-    {
-      pp   += pres[ii] * R[ii];
-
-      ux_x += disp[ii*3+0] * dR_dx[ii];
-      uy_x += disp[ii*3+1] * dR_dx[ii];
-      uz_x += disp[ii*3+2] * dR_dx[ii];
-
-      ux_y += disp[ii*3+0] * dR_dy[ii];
-      uy_y += disp[ii*3+1] * dR_dy[ii];
-      uz_y += disp[ii*3+2] * dR_dy[ii];
-
-      ux_z += disp[ii*3+0] * dR_dz[ii];
-      uy_z += disp[ii*3+1] * dR_dz[ii];
-      uz_z += disp[ii*3+2] * dR_dz[ii];
-    }
-
-    const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
-
-    stress[qua] = matmodel -> get_Cauchy_stress( F );
-
-    stress[qua].xx() -= pp;
-    stress[qua].yy() -= pp;
-    stress[qua].zz() -= pp;
-  }
-
-  return stress;
 }
 
 // EOF
