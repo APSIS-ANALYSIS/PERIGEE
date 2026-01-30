@@ -198,7 +198,8 @@ int main( int argc, char * argv[] )
   FEAElement * element_quad = new FEAElement_Quad9_3D_der0( quad_vis->get_num_quadPts() );
 
   // Read the mappings of the nodal indices
-  const std::vector<int> analysis_new2old = VIS_T::readNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
+  const std::vector<int> analysis_new2old = VIS_T::readNodeMapping
+    ("node_mapping.h5", "new_2_old", v_nFunc );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
@@ -226,7 +227,8 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Time %d: Read %s and Write %s \n", time, name_to_read.c_str(), name_to_write.c_str());
 
     // Read the solution vector and renumber them based on the nodal mappings
-    const auto sol = VIS_T::readPETSc_vec_and_map( name_to_read, analysis_new2old, v_nFunc*dof, dof );
+    const auto sol = VIS_T::readPETSc_vec_and_map
+      ( name_to_read, analysis_new2old, v_nFunc*dof, dof );
 
     // Container for (averaged) WSS
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
