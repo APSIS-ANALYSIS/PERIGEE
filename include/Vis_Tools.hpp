@@ -29,6 +29,8 @@
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 
+#include "petscvec.h"
+
 namespace VIS_T
 {
   // ================================================================
@@ -207,7 +209,7 @@ namespace VIS_T
   std::vector<int> read_epart( const std::string &epart_file, const int &esize );
 
   // ------------------------------------------------------------------------
-  // !readNodeMapping: reads the old_2_new or new_2_old array into the nodemap 
+  // ! readNodeMapping: reads the old_2_new or new_2_old array into the nodemap 
   //                  array, and check the length with node_size.
   // \para node_mapping_file: the file that stores the mapping arrays
   // \para mapping_type: data_name in the file: new_2_old / old_2_new
@@ -215,6 +217,33 @@ namespace VIS_T
   // ------------------------------------------------------------------------
   std::vector<int> readNodeMapping( const std::string &node_mapping_file,
         const char * const &mapping_type, const int &node_size );
+
+  // ------------------------------------------------------------------------
+  // ! readPETSc_vec: read a PETSc vector into memory as a double array
+  // \para vec_size: the total length of the PETSc vector. This is used
+  //                   to check the correcness of the reading.
+  //
+  // Note: this function is rarely used alone, since the solution vector usually
+  // needs to be renumbered based on the nodemap.
+  // ------------------------------------------------------------------------
+  std::vector<double> readPETSc_vec( const std::string &solution_file_name,
+        const int &vec_size );
+  
+  // ------------------------------------------------------------------------
+    // ! readPETSc_vec_and_map: read a PETSc vector into memory as a
+    //   double array, and map the solution to the correct location based
+    //   on the given nodemap.
+    // \para nodemap: the mapping from local node index to global node
+    //                 index.
+    // \para vec_size: the total length of the PETSc vector. This is used
+    //                   to check the correcness of the reading.
+    // \para in_dof: the dof per node for the solution vector.
+    // Note: the length of nodemap * in_dof should be equal to vec_size.
+    // ------------------------------------------------------------------------
+  std::vector<double> readPETSc_vec_and_map( const std::string &solution_file_name,
+      const std::vector<int> &nodemap,
+      const int &vec_size, const int &in_dof );
+
 }
 
 #endif
