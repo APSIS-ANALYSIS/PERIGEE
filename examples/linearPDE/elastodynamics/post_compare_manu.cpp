@@ -65,8 +65,13 @@ int main( int argc, char * argv[] )
   std::unique_ptr<IQuadPts> quadv = QuadPtsFactory::createVolQuadrature(elemType, nqp_vol);
   std::unique_ptr<FEAElement> elementv = ElementFactory::createVolElement(elemType, nqp_vol);
 
+  const std::vector<int> anode_mapping = VIS_T::readNodeMapping
+    ("node_mapping.h5", "old_2_new", GMIptr->get_nFunc());
+  const std::vector<int> pnode_mapping = VIS_T::readNodeMapping
+    ("post_node_mapping.h5", "new_2_old", GMIptr->get_nFunc());
+    
   PostVectSolution * pSolu = new PostVectSolution( sol_name,
-      "node_mapping.h5", "post_node_mapping.h5", pNode.get(), GMIptr->get_nFunc(), dof );
+      anode_mapping, pnode_mapping, pNode.get(), GMIptr->get_nFunc(), dof );
 
   int * IEN_e = new int[elementv->get_nLocBas()];
   double * ectrl_x = new double[elementv->get_nLocBas()];
