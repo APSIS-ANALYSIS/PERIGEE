@@ -49,49 +49,4 @@ void PostVectSolution::get_esol(const int &field, const int &nLocBas,
     esol[ii] = loc_solution[dof_per_node * eien[ii] + field];
 }
 
-void PostVectSolution::ReadPETSc_vec( const std::string &solution_file_name,
-    const int &vec_size, double * const &veccopy )
-{
-  Vec sol_temp;
-  VecCreate(PETSC_COMM_SELF, &sol_temp);
-  VecSetType(sol_temp, VECSEQ);
-
-  PetscViewer viewer;
-  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(), FILE_MODE_READ, &viewer);
-  VecLoad(sol_temp, viewer);
-  PetscViewerDestroy(&viewer);
-
-  // Check the sol_temp has correct size
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  if( get_sol_temp_size != vec_size )
-  {
-    PetscPrintf(PETSC_COMM_SELF,
-        "The solution size %d is not compatible with the size %d given by partition file! \n",
-        get_sol_temp_size, vec_size);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  // read in array
-  double * array_temp;
-  VecGetArray(sol_temp, &array_temp);
-
-  for(int ii=0; ii<vec_size; ++ii)
-    veccopy[ii] = array_temp[ii];
-
-  VecRestoreArray(sol_temp, &array_temp);
-  VecDestroy(&sol_temp);
-}
-
-void PostVectSolution::ReadNodeMapping( const std::string &node_mapping_file,
-    const char * const &mapping_type, const int &node_size,
-    int * const &nodemap ) const
-{
-  const std::vector<int> temp_nodemap = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
-
-  SYS_T::print_fatal_if(int( temp_nodemap.size() ) != node_size, "Error: PostVectSolution the allocated array has wrong size! \n");
-
-  for(int ii=0; ii<node_size; ++ii) nodemap[ii] = temp_nodemap[ii];
-}
-
 // EOF

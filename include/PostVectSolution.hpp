@@ -83,30 +83,6 @@ class PostVectSolution
     // loc_solution is the data structure that holds the solution vector of the
     // local postprocessing partition.
     double * loc_solution;
-    
-    // ------------------------------------------------------------------------
-    // ReadPETSc_vec: read a PETSc vector into memory as a double array
-    //   \para vec_size: the total length of the PETSc vector. This is used
-    //                   to check the correcness of the reading.
-    //   \para veccopy: the double array that is used to allocate the solution
-    //                  users are responsible for allocating and deleting this
-    //                  dynamic array. This array should have length vec_size.
-    // ------------------------------------------------------------------------
-    void ReadPETSc_vec( const std::string &solution_file_name,
-        const int &vec_size, double * const &veccopy );
-
-    // ------------------------------------------------------------------------
-    // ReadNodeMapping: reads the old_2_new or new_2_old array into the nodemap 
-    //                  array. The users are responsible for allocating nFunc 
-    //                  length for nodemap and deleting it after use.
-    // \para node_mapping_file: the file that stores the mapping arrays
-    // \para mapping_type: data_name in the file: new_2_old / old_2_new
-    // \para node_size: the allocated length for nodemap
-    // \para nodemap: the array that passes out the mapping.
-    // ------------------------------------------------------------------------
-    void ReadNodeMapping( const std::string &node_mapping_file,
-        const char * const &mapping_type, const int &node_size,
-        int * const &nodemap ) const;
 };
 
 #endif
