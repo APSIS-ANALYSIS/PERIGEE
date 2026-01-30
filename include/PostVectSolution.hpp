@@ -22,7 +22,7 @@
 // ============================================================================
 #include "APart_Node.hpp"
 #include "HDF5_Tools.hpp"
-#include "petscvec.h"
+#include "Vis_Tools.hpp"
 
 class PostVectSolution
 {
@@ -41,8 +41,8 @@ class PostVectSolution
     //         processes' local_to_global indices. 
     // ------------------------------------------------------------------------
     PostVectSolution( const std::string &solution_file_name,
-       const std::string &analysis_node_mapping_file,
-       const std::string &post_node_mapping_file,
+       const std::vector<int> &analysis_node_mapping,
+       const std::vector<int> &post_node_mapping,
        const APart_Node * const &aNode_ptr,
        const int &in_nfunc, const int &input_dof );
 

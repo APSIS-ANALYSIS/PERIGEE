@@ -1,8 +1,8 @@
 #include "PostVectSolution.hpp"
 
 PostVectSolution::PostVectSolution( const std::string &solution_file_name,
-    const std::string &analysis_node_mapping_file,
-    const std::string &post_node_mapping_file,
+    const std::vector<int> &analysis_node_mapping,
+    const std::vector<int> &post_node_mapping,
     const APart_Node * const &aNode_ptr,
     const int &nFunc, const int &input_dof )
 : dof_per_node( input_dof ), 
@@ -11,31 +11,18 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   // Allocate the space for the data loc_solution
   loc_solution = new double [loc_sol_size];
 
-  double * vec_temp = new double [ nFunc * dof_per_node ];
-
-  int * analysis_old2new = new int [nFunc];
-  int * postproc_new2old = new int [nFunc];
-
   // Read the full PETSc solution vector into vec_temp
-  ReadPETSc_vec(solution_file_name, nFunc * dof_per_node, vec_temp);
-
-  // Read new2old and old2new mappings from HDF5 files
-  ReadNodeMapping(analysis_node_mapping_file, "old_2_new", nFunc, analysis_old2new );
-  ReadNodeMapping(post_node_mapping_file, "new_2_old", nFunc, postproc_new2old );
+  std::vector<double> vec_temp = VIS_T::readPETSc_vec(solution_file_name, nFunc * dof_per_node);
 
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {
     int index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
-    index = postproc_new2old[index];                // map back to natural global index
-    index = analysis_old2new[index];                // map forward to analysis partitioned new index
+    index = post_node_mapping[index];                // map back to natural global index
+    index = analysis_node_mapping[index];                // map forward to analysis partitioned new index
 
     for(int jj=0; jj<dof_per_node; ++jj)
       loc_solution[ii*dof_per_node + jj] = vec_temp[index*dof_per_node + jj];
   }
-
-  delete [] analysis_old2new; analysis_old2new = nullptr;
-  delete [] postproc_new2old; postproc_new2old = nullptr;
-  delete [] vec_temp;         vec_temp         = nullptr;
 }
 
 PostVectSolution::~PostVectSolution()
