@@ -6,6 +6,7 @@
 
 #include "Sys_Tools.hpp"
 #include "HDF5_Tools.hpp"
+#include "Vis_Tools.hpp"
 
 // This ReadNodeMapping function is from PostVectSolution class
 void ReadNodeMapping_1( const std::string &node_mapping_file,
@@ -93,6 +94,11 @@ int main()
   VEC_T::print(old2new_map_2);
 
   if(VEC_T::is_equal(old2new_map_1, old2new_map_2, 0)) std::cout<<"good!\n";
+  else std::cout<<"bad\n";
+
+  std::vector<int> old2new_map_3 = VIS_T::readNodeMapping( node_mapping_file, "old_2_new", nNode );
+
+  if(VEC_T::is_equal(old2new_map_1, old2new_map_3, 0)) std::cout<<"good!\n";
   else std::cout<<"bad\n";
 
   return EXIT_SUCCESS;

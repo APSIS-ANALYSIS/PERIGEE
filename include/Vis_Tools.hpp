@@ -205,6 +205,16 @@ namespace VIS_T
   //                    usage.
   // --------------------------------------------------------------
   std::vector<int> read_epart( const std::string &epart_file, const int &esize );
+
+  // ------------------------------------------------------------------------
+  // !readNodeMapping: reads the old_2_new or new_2_old array into the nodemap 
+  //                  array, and check the length with node_size.
+  // \para node_mapping_file: the file that stores the mapping arrays
+  // \para mapping_type: data_name in the file: new_2_old / old_2_new
+  // \para node_size: the allocated length for nodemap
+  // ------------------------------------------------------------------------
+  std::vector<int> readNodeMapping( const std::string &node_mapping_file,
+        const char * const &mapping_type, const int &node_size );
 }
 
 #endif
