@@ -67,6 +67,8 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/System/Vector_3.cpp
   ${perigee_source}/System/Tensor2_3D.cpp
   ${perigee_source}/System/SymmTensor2_3D.cpp
+  ${perigee_source}/System/Tensor4_3D.cpp
+  ${perigee_source}/System/SymmTensor4_3D.cpp
   ${perigee_source}/System/HDF5_Writer.cpp
   ${perigee_source}/System/HDF5_Reader.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
@@ -107,6 +109,10 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
+  ${perigee_SOURCE_DIR}/src/PNonlinear_Solid_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PTime_Solid_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_Solid_FEM.cpp
   )
 
 SET( perigee_postprocess_lib_src
@@ -142,7 +148,7 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # BUILD THE MAIN DRIVERS
 # ===================================================================
 ADD_EXECUTABLE( preprocess3d preprocess.cpp)
-#ADD_EXECUTABLE( ns3d driver.cpp)
+ADD_EXECUTABLE( solid3d driver.cpp)
 #ADD_EXECUTABLE( ns3dherk ns_herk_driver.cpp)
 #ADD_EXECUTABLE( ns3dherkA ns_herk_driver_accurateA.cpp)
 ADD_EXECUTABLE( prepost3d prepost.cpp)
@@ -153,7 +159,7 @@ ADD_EXECUTABLE( prepost3d prepost.cpp)
 #ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
 
 TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
-#TARGET_LINK_LIBRARIES( ns3d perigee_analysis )
+TARGET_LINK_LIBRARIES( solid3d perigee_analysis )
 #TARGET_LINK_LIBRARIES( ns3dherk perigee_analysis )
 #TARGET_LINK_LIBRARIES( ns3dherkA perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
