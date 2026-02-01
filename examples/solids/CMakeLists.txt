@@ -109,6 +109,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
+  ${perigee_SOURCE_DIR}/src/PDNSolution_Solid.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp

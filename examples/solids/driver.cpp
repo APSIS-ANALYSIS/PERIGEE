@@ -12,6 +12,7 @@
 #include "MaterialModel_vol_M94.hpp"
 #include "MaterialModel_Mixed_Elasticity.hpp"
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "PDNSolution_Solid.hpp"
 #include "PGAssem_Solid_FEM.hpp"
 #include "PNonlinear_Solid_Solver.hpp"
 #include "PTime_Solid_Solver.hpp"
@@ -231,35 +232,28 @@ int main(int argc, char *argv[])
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
 
   std::unique_ptr<PDNSolution> disp =
-    SYS_T::make_unique<PDNSolution>( pNode_sol.get(), 3 );
+    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "disp" );
 
   std::unique_ptr<PDNSolution> velo =
-    SYS_T::make_unique<PDNSolution>( pNode_sol.get(), 3 );
+    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "velo" );
 
   std::unique_ptr<PDNSolution> pres =
-    SYS_T::make_unique<PDNSolution>( pNode_sol.get(), 1 );
+    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 1, 0, false, "pres" );
 
   std::unique_ptr<PDNSolution> dot_disp =
-    SYS_T::make_unique<PDNSolution>( pNode_sol.get(), 3 );
+    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "dot_disp" );
 
   std::unique_ptr<PDNSolution> dot_velo =
-    SYS_T::make_unique<PDNSolution>( pNode_sol.get(), 3 );
+    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "dot_velo" );
 
   std::unique_ptr<PDNSolution> dot_pres =
-    SYS_T::make_unique<PDNSolution>( pNode_sol.get(), 1 );
+    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 1, 0, false, "dot_pres" );
 
   auto init_zero = []( PDNSolution * const &sol )
   {
     VecSet(sol->solution, 0.0);
     sol->Assembly_GhostUpdate();
   };
-
-  init_zero( disp.get() );
-  init_zero( velo.get() );
-  init_zero( pres.get() );
-  init_zero( dot_disp.get() );
-  init_zero( dot_velo.get() );
-  init_zero( dot_pres.get() );
 
   // ===== Restart options =====
   if( is_restart )
