@@ -5,7 +5,7 @@ PGAssem_Solid_FEM::PGAssem_Solid_FEM(
     std::unique_ptr<ALocal_Elem> in_locelem,
     std::unique_ptr<FEANode> in_fnode,
     std::unique_ptr<APart_Node> in_pnode,
-    std::unique_ptr<ALocal_NBC> in_nbc,
+    std::unique_ptr<ALocal_NBC_Solid> in_nbc,
     std::unique_ptr<ALocal_EBC> in_ebc,
     std::unique_ptr<IPLocAssem_2x2Block> in_locassem,
     const int &in_nz_estimate )
@@ -25,7 +25,6 @@ PGAssem_Solid_FEM::PGAssem_Solid_FEM(
 {
   SYS_T::print_fatal_if( dof_mat != nbc->get_dof_LID(),
       "Error: PGAssem_Solid_FEM, dof_mat and nbc dof mismatch.\n" );
-
   for(int ebc_id=0; ebc_id < num_ebc; ++ebc_id)
   {
     SYS_T::print_fatal_if( snLocBas != ebc->get_cell_nLocBas(ebc_id),
@@ -78,25 +77,25 @@ PGAssem_Solid_FEM::~PGAssem_Solid_FEM()
 
 void PGAssem_Solid_FEM::EssBC_KG( const int &field )
 {
-  const int local_dir = nbc -> get_Num_LD(field);
+  const int local_dir = nbc->get_Num_LD(field);
 
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc -> get_LDN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LDN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
       MatSetValue(K, row, row, 1.0, ADD_VALUES);
     }
   }
 
-  const int local_sla = nbc -> get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(field);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc -> get_LPSN(field, ii) * dof_mat + field;
-      const int col = nbc -> get_LPMN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LPSN(field, ii) * dof_mat + field;
+      const int col = nbc->get_LPMN(field, ii) * dof_mat + field;
       MatSetValue(K, row, col, 1.0, ADD_VALUES);
       MatSetValue(K, row, row, -1.0, ADD_VALUES);
       VecSetValue(G, row, 0.0, INSERT_VALUES);
@@ -106,23 +105,23 @@ void PGAssem_Solid_FEM::EssBC_KG( const int &field )
 
 void PGAssem_Solid_FEM::EssBC_G( const int &field )
 {
-  const int local_dir = nbc -> get_Num_LD(field);
+  const int local_dir = nbc->get_Num_LD(field);
 
   if( local_dir > 0 )
   {
     for(int ii=0; ii<local_dir; ++ii)
     {
-      const int row = nbc -> get_LDN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LDN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
 
-  const int local_sla = nbc -> get_Num_LPS(field);
+  const int local_sla = nbc->get_Num_LPS(field);
   if( local_sla > 0 )
   {
     for(int ii=0; ii<local_sla; ++ii)
     {
-      const int row = nbc -> get_LPSN(field, ii) * dof_mat + field;
+      const int row = nbc->get_LPSN(field, ii) * dof_mat + field;
       VecSetValue(G, row, 0.0, INSERT_VALUES);
     }
   }
@@ -213,6 +212,53 @@ void PGAssem_Solid_FEM::NatBC_G( const double &curr_time, const double &dt )
   delete [] sctrl_y; sctrl_y = nullptr;
   delete [] sctrl_z; sctrl_z = nullptr;
   delete [] srow_index; srow_index = nullptr;
+}
+
+void PGAssem_Solid_FEM::Apply_Dirichlet_BC( const double &time,
+    PDNSolution * const &dot_disp,
+    PDNSolution * const &dot_velo,
+    PDNSolution * const &disp,
+    PDNSolution * const &velo ) const
+{
+  // Direction-dependent displacement loading (edit the arrays below).
+  const double ramp_time[3] = {1.0, 1.0, 1.0};
+  const double target_disp[3] = {0.0, 0.5, 1.0};
+
+  for(int field=1; field<=3; ++field)
+  {
+    const int dir = field - 1;
+    const double t = (time < ramp_time[dir]) ? time : ramp_time[dir];
+
+    const double uval = target_disp[dir] * t / ramp_time[dir];
+    const double vval = (time < ramp_time[dir]) ? (target_disp[dir] / ramp_time[dir]) : 0.0;
+    const double aval = 0.0;
+
+    const int num_ld = nbc->get_Num_LD(field);
+    for(int ii=0; ii<num_ld; ++ii)
+    {
+      const PetscInt gid = nbc->get_LDN(field, ii);
+      const PetscInt idx = gid * 3 + (field - 1);
+      if( nbc->get_LDN_is_disp_driven(field, ii) == 1 )
+      {
+        VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
+        VecSetValue(velo->solution, idx, vval, INSERT_VALUES);
+        VecSetValue(dot_disp->solution, idx, vval, INSERT_VALUES);
+        VecSetValue(dot_velo->solution, idx, aval, INSERT_VALUES);
+      }
+      else
+      {
+        VecSetValue(disp->solution, idx, 0.0, INSERT_VALUES);
+        VecSetValue(velo->solution, idx, 0.0, INSERT_VALUES);
+        VecSetValue(dot_disp->solution, idx, 0.0, INSERT_VALUES);
+        VecSetValue(dot_velo->solution, idx, 0.0, INSERT_VALUES);
+      }
+    }
+  }
+
+  disp->Assembly_GhostUpdate();
+  velo->Assembly_GhostUpdate();
+  dot_disp->Assembly_GhostUpdate();
+  dot_velo->Assembly_GhostUpdate();
 }
 
 void PGAssem_Solid_FEM::Assem_mass_residual(
