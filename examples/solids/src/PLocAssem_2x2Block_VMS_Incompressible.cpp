@@ -697,12 +697,14 @@ Vector_3 PLocAssem_2x2Block_VMS_Incompressible::get_traction(
     const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
 {
   (void)pt; (void)tt;
-  const double p0 = 1.0e5;
+  // Default traction: zero (set p0 or add cases to apply loads).
+  const double p0 = 0.0;
 
   switch(ebc_id)
   {
     case 0:
-      return Vector_3( 0.0, 0.0, p0 * tt );
+      // Traction is applied along the current outward unit normal.
+      return Vector_3( p0 * n_out.x(), p0 * n_out.y(), p0 * n_out.z() );
     default:
       SYS_T::print_fatal("Error: unsupported ebc_id %d in get_traction.\n", ebc_id);
       return Vector_3( 0.0, 0.0, 0.0 );
