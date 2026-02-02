@@ -9,9 +9,8 @@
 #include "ANL_Tools.hpp"
 #include "MaterialModel_ich_NeoHookean.hpp"
 #include "MaterialModel_vol_Incompressible.hpp"
-#include "MaterialModel_vol_M94.hpp"
 #include "MaterialModel_Mixed_Elasticity.hpp"
-#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PDNSolution_Solid.hpp"
 #include "PGAssem_Solid_FEM.hpp"
 #include "PNonlinear_Solid_Solver.hpp"
@@ -33,8 +32,8 @@ int main(int argc, char *argv[])
   std::string part_file("./apart/part");
 
   // nonlinear solver parameters
-  double nl_rtol = 1.0e-3; // convergence criterion relative tolerance
-  double nl_atol = 1.0e-6; // convergence criterion absolute tolerance
+  double nl_rtol = 1.0e-10; // convergence criterion relative tolerance
+  double nl_atol = 1.0e-10; // convergence criterion absolute tolerance
   double nl_dtol = 10.0;   // divergence criterion
   int nl_maxits = 20;      // maximum number if nonlinear iterations
   int nl_refreq = 4;       // frequency of tangent matrix renewal
@@ -42,12 +41,16 @@ int main(int argc, char *argv[])
 
   // time stepping parameters
   double initial_time = 0.0; // time of the initial condition
-  double initial_step = 0.1; // time step size
+  double initial_step = 0.01; // time step size
   int initial_index = 0;     // indiex of the initial condition
   double final_time = 1.0;   // final time
   std::string sol_bName("SOL_"); // base name of the solution file
   int ttan_renew_freq = 1;   // frequency of tangent matrix renewal
   int sol_record_freq = 1;   // frequency of recording the solution
+
+  // solid material parameters
+  const double solid_density = 1.0e3;
+  const double solid_mu = 6.666666666e4;
 
   // Restart options
   bool is_restart = false;
@@ -155,7 +158,16 @@ int main(int argc, char *argv[])
     hid_t cmd_file_id = H5Fcreate("solver_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
+    const double nstep_real = (final_time - initial_time) / initial_step;
+    int nstep = static_cast<int>(nstep_real);
+    if( initial_time + nstep * initial_step < final_time - 1.0e-12 ) nstep += 1;
+    const int final_index = initial_index + nstep;
+
+    cmdh5w->write_doubleScalar("init_time", initial_time);
+    cmdh5w->write_intScalar("init_index", initial_index);
     cmdh5w->write_doubleScalar("init_step", initial_step);
+    cmdh5w->write_doubleScalar("final_time", final_time);
+    cmdh5w->write_intScalar("final_index", final_index);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
@@ -202,21 +214,17 @@ int main(int argc, char *argv[])
   tm_galpha->print_info();
 
   // ===== Local Assembly Routine =====
-  const double solid_density = 1.0e3;
-  const double solid_mu = 6.666666666e5;
-  const double solid_kappa = 1.0e7;
-
   std::unique_ptr<IMaterialModel_ich> imodel =
     SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
 
   std::unique_ptr<IMaterialModel_vol> vmodel =
-    SYS_T::make_unique<MaterialModel_vol_M94>(solid_density, solid_kappa);
+    SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
 
   std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel =
     SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
 
   std::unique_ptr<IPLocAssem_2x2Block> locAssem_ptr =
-    SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
+    SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
         elemType, nqp_vol, nqp_sur,
         tm_galpha.get(), std::move(matmodel));
 

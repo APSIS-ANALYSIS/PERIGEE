@@ -113,6 +113,7 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PNonlinear_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Incompressible.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Solid_FEM.cpp
   )
 
@@ -123,6 +124,8 @@ SET( perigee_postprocess_lib_src
   ${perigee_source}/Postproc_Tool/PostVectSolution.cpp
   ${perigee_source}/Postproc_Tool/Vis_Tools.cpp
   ${perigee_source}/Postproc_Tool/Interpolater.cpp
+  ${perigee_SOURCE_DIR}/src/VisDataPrep_Solid.cpp
+  ${perigee_SOURCE_DIR}/src/VTK_Writer_Solid.cpp
   )
 
 INCLUDE_DIRECTORIES( ${PERIGEE_INCLUDE_DIRS} )
@@ -153,6 +156,7 @@ ADD_EXECUTABLE( solid3d driver.cpp)
 #ADD_EXECUTABLE( ns3dherk ns_herk_driver.cpp)
 #ADD_EXECUTABLE( ns3dherkA ns_herk_driver_accurateA.cpp)
 ADD_EXECUTABLE( prepost3d prepost.cpp)
+ADD_EXECUTABLE( vis_solid vis_solid.cpp)
 #ADD_EXECUTABLE( vis_ns vis.cpp)
 #ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 #ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
@@ -164,6 +168,7 @@ TARGET_LINK_LIBRARIES( solid3d perigee_analysis )
 #TARGET_LINK_LIBRARIES( ns3dherk perigee_analysis )
 #TARGET_LINK_LIBRARIES( ns3dherkA perigee_analysis )
 TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
+TARGET_LINK_LIBRARIES( vis_solid perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
