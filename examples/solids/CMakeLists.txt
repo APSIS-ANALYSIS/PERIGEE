@@ -110,6 +110,7 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_Solid.cpp
+  ${perigee_SOURCE_DIR}/src/ALocal_NBC_Solid.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp
@@ -151,24 +152,24 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 # ===================================================================
 # BUILD THE MAIN DRIVERS
 # ===================================================================
-ADD_EXECUTABLE( preprocess3d preprocess.cpp)
-ADD_EXECUTABLE( solid3d driver.cpp)
+ADD_EXECUTABLE( preprocess preprocess.cpp)
+ADD_EXECUTABLE( driver driver.cpp)
 #ADD_EXECUTABLE( ns3dherk ns_herk_driver.cpp)
 #ADD_EXECUTABLE( ns3dherkA ns_herk_driver_accurateA.cpp)
-ADD_EXECUTABLE( prepost3d prepost.cpp)
-ADD_EXECUTABLE( vis_solid vis_solid.cpp)
+ADD_EXECUTABLE( prepost prepost.cpp)
+ADD_EXECUTABLE( visualization vis_solid.cpp)
 #ADD_EXECUTABLE( vis_ns vis.cpp)
 #ADD_EXECUTABLE( vis_wss_tet4 vis_wss_tet4.cpp)
 #ADD_EXECUTABLE( vis_wss_tet10 vis_wss_tet10.cpp)
 #ADD_EXECUTABLE( vis_wss_hex8 vis_wss_hex8.cpp)
 #ADD_EXECUTABLE( vis_wss_hex27 vis_wss_hex27.cpp)
 
-TARGET_LINK_LIBRARIES( preprocess3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( solid3d perigee_analysis )
+TARGET_LINK_LIBRARIES( preprocess perigee_preprocess )
+TARGET_LINK_LIBRARIES( driver perigee_analysis )
 #TARGET_LINK_LIBRARIES( ns3dherk perigee_analysis )
 #TARGET_LINK_LIBRARIES( ns3dherkA perigee_analysis )
-TARGET_LINK_LIBRARIES( prepost3d perigee_preprocess )
-TARGET_LINK_LIBRARIES( vis_solid perigee_postprocess )
+TARGET_LINK_LIBRARIES( prepost perigee_preprocess )
+TARGET_LINK_LIBRARIES( visualization perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_ns perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_wss_tet4 perigee_postprocess )
 #TARGET_LINK_LIBRARIES( vis_wss_tet10 perigee_postprocess )
@@ -178,11 +179,11 @@ TARGET_LINK_LIBRARIES( vis_solid perigee_postprocess )
 
 if(OPENMP_CXX_FOUND)
   SET_TARGET_PROPERTIES( perigee_preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
-  SET_TARGET_PROPERTIES( preprocess3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
-  SET_TARGET_PROPERTIES( prepost3d PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( preprocess PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
+  SET_TARGET_PROPERTIES( prepost PROPERTIES COMPILE_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -DUSE_OPENMP" )
   TARGET_INCLUDE_DIRECTORIES( perigee_preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
-  TARGET_INCLUDE_DIRECTORIES( preprocess3d PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
-  TARGET_INCLUDE_DIRECTORIES( prepost3d PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( preprocess PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
+  TARGET_INCLUDE_DIRECTORIES( prepost PRIVATE ${OpenMP_CXX_INCLUDE_DIR} )
   TARGET_LINK_LIBRARIES( perigee_preprocess PRIVATE ${OpenMP_CXX_LIBRARIES} )
 endif()
 
