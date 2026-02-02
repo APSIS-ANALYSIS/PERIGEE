@@ -1,7 +1,7 @@
 #include "PNonlinear_Solid_Solver.hpp"
 
 PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
-    std::unique_ptr<IPGAssem> in_gassem,
+    std::unique_ptr<PGAssem_Solid_FEM> in_gassem,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
@@ -97,6 +97,8 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
   disp -> Copy( pre_disp );
   velo -> Copy( pre_velo );
   pres -> Copy( pre_pres );
+
+  gassem->Apply_Dirichlet_BC( curr_time + dt, dot_disp, dot_velo, disp, velo );
 
   // Define intermediate solutions
   auto dot_disp_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_disp);
@@ -220,6 +222,8 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
     }
 
   }while( nl_counter < nmaxits && relative_error > nr_tol && residual_norm > na_tol );
+
+  gassem->Apply_Dirichlet_BC( curr_time + dt, dot_disp, dot_velo, disp, velo );
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 

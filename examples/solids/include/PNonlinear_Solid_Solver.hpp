@@ -8,17 +8,18 @@
 // Date: Jan 29 2026
 // ==========================================================================
 #include "TimeMethod_GenAlpha.hpp"
-#include "IPGAssem.hpp"
+#include "PGAssem_Solid_FEM.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution.hpp"
 #include "APart_Node.hpp"
+#include "ALocal_NBC_Solid.hpp"
 
 class PNonlinear_Solid_Solver
 {
   public:
     PNonlinear_Solid_Solver(
-        std::unique_ptr<IPGAssem> in_gassem,
+        std::unique_ptr<PGAssem_Solid_FEM> in_gassem,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
@@ -59,12 +60,11 @@ class PNonlinear_Solid_Solver
     const double nr_tol, na_tol, nd_tol;
     const int nmaxits, nrenew_freq, nrenew_threshold;
 
-    const std::unique_ptr<IPGAssem> gassem;
+    const std::unique_ptr<PGAssem_Solid_FEM> gassem;
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<const APart_Node> pnode;
-
     void Print_convergence_info( const int &count,
         const double &rel_err, const double &abs_err ) const
     {
