@@ -313,7 +313,6 @@ class FEAElement
     
       return {{ }};
     }
-
 };
 
 #endif
