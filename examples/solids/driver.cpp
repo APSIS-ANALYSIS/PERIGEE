@@ -12,6 +12,7 @@
 #include "MaterialModel_Mixed_Elasticity.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PDNSolution_Solid.hpp"
+#include "ALocal_NBC_Solid.hpp"
 #include "PGAssem_Solid_FEM.hpp"
 #include "PNonlinear_Solid_Solver.hpp"
 #include "PTime_Solid_Solver.hpp"
@@ -52,14 +53,16 @@ int main(int argc, char *argv[])
   const double solid_density = 1.0e3;
   const double solid_mu = 6.666666666e4;
 
+  // displacement-driven BC parameters (edit here)
+
   // Restart options
   bool is_restart = false;
   int restart_index = 0;     // restart solution time index
   double restart_time = 0.0; // restart time
   double restart_step = 1.0e-3; // restart simulation time step size
-  std::string restart_u_name = "SOL_disp_";
-  std::string restart_v_name = "SOL_velo_";
-  std::string restart_p_name = "SOL_pres_";
+  const std::string restart_u_name = "SOL_disp_";
+  const std::string restart_v_name = "SOL_velo_";
+  const std::string restart_p_name = "SOL_pres_";
 
   // Yaml options
   bool is_loadYaml = true;
@@ -178,7 +181,7 @@ int main(int argc, char *argv[])
   auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
-  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+  auto locnbc = SYS_T::make_unique<ALocal_NBC_Solid>(part_file, rank);
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
@@ -230,7 +233,7 @@ int main(int argc, char *argv[])
 
   // ===== Global Assembly Routine =====
   auto pNode_gassem = SYS_T::make_unique<APart_Node>(part_file, rank);
-  std::unique_ptr<IPGAssem> gloAssem_ptr =
+  std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
         std::move(locIEN), std::move(locElem), std::move(fNode),
         std::move(pNode_gassem), std::move(locnbc), std::move(locebc),
@@ -306,6 +309,9 @@ int main(int argc, char *argv[])
     SYS_T::commPrint("     restart_time: %e \n", restart_time);
     SYS_T::commPrint("     restart_index: %d \n", restart_index);
     SYS_T::commPrint("     restart_step: %e \n", restart_step);
+
+    gloAssem_ptr->Apply_Dirichlet_BC( restart_time, dot_disp.get(), dot_velo.get(),
+        disp.get(), velo.get() );
   }
 
 
@@ -316,6 +322,9 @@ int main(int argc, char *argv[])
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
   if( is_restart == false )
   {
+    gloAssem_ptr->Apply_Dirichlet_BC( initial_time, dot_disp.get(), dot_velo.get(),
+        disp.get(), velo.get() );
+
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
 
     auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
@@ -359,9 +368,6 @@ int main(int argc, char *argv[])
     SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
   }
 
-  // ===== Time step info =====
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
-
   // ===== Linear and nonlinear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
@@ -371,6 +377,9 @@ int main(int argc, char *argv[])
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
+
+  // ===== Time step info =====
+  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_Solid_Solver>(
