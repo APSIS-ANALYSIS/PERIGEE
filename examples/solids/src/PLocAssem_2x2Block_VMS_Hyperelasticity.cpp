@@ -721,13 +721,13 @@ Vector_3 PLocAssem_2x2Block_VMS_Hyperelasticity::get_traction(
     const int &ebc_id,
     const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
 {
-  (void)pt; (void)tt;
-  const double p0 = 1.0e4;
+  (void)pt; (void)tt; (void)n_out;
+  const double p0 = 1.0e6;
 
   switch(ebc_id)
   {
     case 0:
-      return Vector_3( p0 * n_out.x(), p0 * n_out.y(), p0 * n_out.z() );
+      return Vector_3( 0.0, 0.0, p0 * tt );
     default:
       SYS_T::print_fatal("Error: unsupported ebc_id %d in get_traction.\n", ebc_id);
       return Vector_3( 0.0, 0.0, 0.0 );
