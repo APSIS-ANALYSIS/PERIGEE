@@ -6,13 +6,11 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     const APart_Node * const &aNode_ptr,
     const int &nFunc, const int &input_dof )
 : dof_per_node( input_dof ), 
-  loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node )
+  loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node ),
+  loc_solution(loc_sol_size, 0.0)
 {
-  // Allocate the space for the data loc_solution
-  loc_solution = new double [loc_sol_size];
-
   // Read the full PETSc solution vector into vec_temp
-  std::vector<double> vec_temp = VIS_T::readPETSc_vec(solution_file_name, nFunc * dof_per_node);
+  const auto vec_temp = VIS_T::readPETSc_vec(solution_file_name, nFunc * dof_per_node);
 
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {
@@ -23,11 +21,6 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     for(int jj=0; jj<dof_per_node; ++jj)
       loc_solution[ii*dof_per_node + jj] = vec_temp[index*dof_per_node + jj];
   }
-}
-
-PostVectSolution::~PostVectSolution()
-{
-  delete [] loc_solution; loc_solution = nullptr;
 }
 
 void PostVectSolution::print_info() const

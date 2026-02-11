@@ -222,9 +222,9 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
         velo_sol_name.c_str(), name_to_write.c_str() );
 
-    const std::vector<double> disp_sol = VIS_T::readPETSc_vec_and_map
+    const std::vector<double> disp_sol = VIS_T::readPETSc_vec
       ( disp_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
-    const std::vector<double> velo_sol = VIS_T::readPETSc_vec_and_map
+    const std::vector<double> velo_sol = VIS_T::readPETSc_vec
       ( velo_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );   
 
     // Ensure that the coordinates of the control points remain in the undeformed state
