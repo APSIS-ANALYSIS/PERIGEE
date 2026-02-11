@@ -71,7 +71,7 @@ class PDNSolution
     // ------------------------------------------------------------------------
     // ! Compute 1-, 2-, and infinity- Norms of the solution vector 
     // ------------------------------------------------------------------------
-		virtual double Norm_1() const;
+    virtual double Norm_1() const;
 		
     virtual double Norm_2() const;
 		

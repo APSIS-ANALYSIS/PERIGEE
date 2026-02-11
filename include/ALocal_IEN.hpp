@@ -14,7 +14,10 @@
 // Author: Ju Liu
 // Date: Nov. 10th 2013
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include <string>
+#include <vector>
+
+class HDF5_Reader;
 
 class ALocal_IEN
 {
@@ -23,7 +26,7 @@ class ALocal_IEN
     // ! Constructor : read data by specifying the part file base name and cpu 
     //   rank
     // ------------------------------------------------------------------------
-    ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank );
+    ALocal_IEN( const std::string &fileBaseName, int cpu_rank );
 
     ALocal_IEN( const HDF5_Reader * const &h5r );
 
@@ -52,10 +55,10 @@ class ALocal_IEN
     // ------------------------------------------------------------------------
     // ! Data access functions
     // ------------------------------------------------------------------------
-    virtual int get_LIEN(const int &elem, const int &node) const
+    virtual int get_LIEN(int elem, int node) const
     { return LIEN[elem*nLocBas + node]; }
     
-    virtual std::vector<int> get_LIEN( const int &ee ) const
+    virtual std::vector<int> get_LIEN( int ee ) const
     {
       std::vector<int> elem_ien(nLocBas, 0);
       for(int ii=0; ii<nLocBas; ++ii) elem_ien[ii] = LIEN[ee * nLocBas + ii];
@@ -67,7 +70,7 @@ class ALocal_IEN
     // ! get the element e's ien array in an int array: elem_ien.
     //   User is responsible for allocating and deallocating memory for elem_ien.
     // ------------------------------------------------------------------------
-    virtual void get_LIEN(const int &ee, int * const &elem_ien) const
+    virtual void get_LIEN(int ee, int * const &elem_ien) const
     {
       for(int ii=0; ii<nLocBas; ++ii) elem_ien[ii] = LIEN[ee * nLocBas + ii];
     }
@@ -79,7 +82,7 @@ class ALocal_IEN
     //   ee : the local processor's index for element
     //   ii : the local processor's index for node
     // ------------------------------------------------------------------------
-    virtual bool isNode_in_Elem(const int &elem, const int &node) const
+    virtual bool isNode_in_Elem(int elem, int node) const
     {
       const std::vector<int> eIEN = get_LIEN( elem );
       std::vector<int>::const_iterator it = find(eIEN.begin(), eIEN.end(), node);

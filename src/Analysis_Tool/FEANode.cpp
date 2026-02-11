@@ -1,6 +1,6 @@
 #include "FEANode.hpp"
 
-FEANode::FEANode( const std::string &fileBaseName, const int &cpu_rank )
+FEANode::FEANode( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -47,7 +47,7 @@ void FEANode::print_info() const
 }
 
 void FEANode::get_ctrlPts_xyz( 
-    const int &num, const int * const &index,
+    int num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, double * const &ctrl_z ) const
 {
   for(int ii=0; ii<num; ++ii)
@@ -77,7 +77,7 @@ std::array<std::vector<double>, 3> FEANode::get_ctrlPts_xyz(
 }
 
 void FEANode::get_ctrlPts_xyzw( 
-    const int &num, const int * const &index,
+    int num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_z, double * const &ctrl_w ) const
 {
@@ -91,7 +91,7 @@ void FEANode::get_ctrlPts_xyzw(
 }
 
 void FEANode::get_ctrlPts_xyw( 
-    const int &num, const int * const &index,
+    int num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_w ) const
 {
@@ -104,7 +104,7 @@ void FEANode::get_ctrlPts_xyw(
 }
 
 void FEANode::get_ctrlPts_xy( 
-    const int &num, const int * const &index,
+    int num, const int * const &index,
     double * const &ctrl_x, double * const &ctrl_y ) const
 {
   for(int ii=0; ii<num; ++ii)

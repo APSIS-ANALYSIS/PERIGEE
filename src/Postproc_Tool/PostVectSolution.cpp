@@ -1,32 +1,34 @@
 #include "PostVectSolution.hpp"
 
 PostVectSolution::PostVectSolution( const std::string &solution_file_name,
-    const std::string &analysis_node_mapping_file,
-    const std::string &post_node_mapping_file,
+    const std::vector<int> &analysis_node_mapping,
+    const std::vector<int> &post_node_mapping,
     const APart_Node * const &aNode_ptr,
     const int &nFunc, const int &input_dof )
 : dof_per_node( input_dof ), 
   loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node ),
   loc_solution(loc_sol_size, 0.0)
 {
-  std::vector<double> vec_temp( nFunc * dof_per_node, 0.0 );
-
-  // Read new2old and old2new mappings from HDF5 files
-  const auto analysis_old2new = ReadNodeMapping(analysis_node_mapping_file, "old_2_new", nFunc);
-  const auto postproc_new2old = ReadNodeMapping(post_node_mapping_file, "new_2_old", nFunc);
+  // Allocate the space for the data loc_solution
+  loc_solution = new double [loc_sol_size];
 
   // Read the full PETSc solution vector into vec_temp
-  ReadPETSc_vec(solution_file_name, nFunc * dof_per_node, vec_temp.data());
+  const auto vec_temp = VIS_T::readPETSc_vec(solution_file_name, nFunc * dof_per_node);
 
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {
     int index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
-    index = postproc_new2old[index];                // map back to natural global index
-    index = analysis_old2new[index];                // map forward to analysis partitioned new index
+    index = post_node_mapping[index];                // map back to natural global index
+    index = analysis_node_mapping[index];                // map forward to analysis partitioned new index
 
     for(int jj=0; jj<dof_per_node; ++jj)
       loc_solution[ii*dof_per_node + jj] = vec_temp[index*dof_per_node + jj];
   }
+}
+
+PostVectSolution::~PostVectSolution()
+{
+  delete [] loc_solution; loc_solution = nullptr;
 }
 
 void PostVectSolution::print_info() const
@@ -46,51 +48,6 @@ void PostVectSolution::get_esol(const int &field, const int &nLocBas,
 
   for(int ii=0; ii<nLocBas; ++ii)
     esol[ii] = loc_solution[dof_per_node * eien[ii] + field];
-}
-
-void PostVectSolution::ReadPETSc_vec( const std::string &solution_file_name,
-    const int &vec_size, double * const &veccopy )
-{
-  Vec sol_temp;
-  VecCreate(PETSC_COMM_SELF, &sol_temp);
-  VecSetType(sol_temp, VECSEQ);
-
-  PetscViewer viewer;
-  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(), FILE_MODE_READ, &viewer);
-  VecLoad(sol_temp, viewer);
-  PetscViewerDestroy(&viewer);
-
-  // Check the sol_temp has correct size
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  if( get_sol_temp_size != vec_size )
-  {
-    PetscPrintf(PETSC_COMM_SELF,
-        "The solution size %d is not compatible with the size %d given by partition file! \n",
-        get_sol_temp_size, vec_size);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  // read in array
-  double * array_temp;
-  VecGetArray(sol_temp, &array_temp);
-
-  for(int ii=0; ii<vec_size; ++ii)
-    veccopy[ii] = array_temp[ii];
-
-  VecRestoreArray(sol_temp, &array_temp);
-  VecDestroy(&sol_temp);
-}
-
-std::vector<int> PostVectSolution::ReadNodeMapping( 
-    const std::string &node_mapping_file,
-    const char * const &mapping_type, const int &node_size ) const
-{
-  const auto out = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
-
-  SYS_T::print_fatal_if(VEC_T::get_size(out) != node_size, "Error: PostVectSolution the allocated array has wrong size! \n");
-
-  return out;
 }
 
 // EOF

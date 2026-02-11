@@ -16,7 +16,7 @@ class Gmsh_FileIO
   public:
     Gmsh_FileIO( const std::string &in_file_name );
 
-    ~Gmsh_FileIO();
+    ~Gmsh_FileIO() = default;
 
     void print_info() const;
 
@@ -28,21 +28,21 @@ class Gmsh_FileIO
 
     int get_num_phy_domain_1d() const {return num_phy_domain_1d;}
 
-    int get_phy_id_3d( const int &ii ) const {return phy_3d_index[ii];}
+    int get_phy_id_3d( int ii ) const {return phy_3d_index[ii];}
     
-    int get_phy_id_2d( const int &ii ) const {return phy_2d_index[ii];}
+    int get_phy_id_2d( int ii ) const {return phy_2d_index[ii];}
     
-    int get_phy_id_1d( const int &ii ) const {return phy_1d_index[ii];}
+    int get_phy_id_1d( int ii ) const {return phy_1d_index[ii];}
 
-    std::string get_phy_name_3d( const int &ii ) const {return phy_3d_name[ii];} 
+    std::string get_phy_name_3d( int ii ) const {return phy_3d_name[ii];} 
     
-    std::string get_phy_name_2d( const int &ii ) const {return phy_2d_name[ii];} 
+    std::string get_phy_name_2d( int ii ) const {return phy_2d_name[ii];} 
     
-    std::string get_phy_name_1d( const int &ii ) const {return phy_1d_name[ii];} 
+    std::string get_phy_name_1d( int ii ) const {return phy_1d_name[ii];} 
 
-    int get_nlocbas( const int &ii ) const {return ele_nlocbas[ii];}
+    int get_nlocbas( int ii ) const {return ele_nlocbas[ii];}
 
-    int get_eleType( const int &ii ) const {return ele_type[ii];}
+    int get_eleType( int ii ) const {return ele_type[ii];}
 
     // --------------------------------------------------------------
     // In FSI problems, we require that the 3d physical domain index
@@ -75,7 +75,7 @@ class Gmsh_FileIO
     //                  eIEN[ phy_3d_index[index_3d]][ ]
     //                  will be modified.
     // --------------------------------------------------------------
-    void update_quadratic_tet_IEN( const int &index_3d );
+    void update_quadratic_tet_IEN( int index_3d );
 
     // --------------------------------------------------------------
     // Update the IEN array to accomodate for the VTK ordering for
@@ -88,7 +88,7 @@ class Gmsh_FileIO
     //                  eIEN[ phy_3d_index[index_3d]][ ]
     //                  will be modified.
     // --------------------------------------------------------------
-    void update_quadratic_hex_IEN( const int &index_3d );
+    void update_quadratic_hex_IEN( int index_3d );
 
     // --------------------------------------------------------------
     // Write a vtp file for an interior surface between two physical
@@ -108,10 +108,10 @@ class Gmsh_FileIO
     // elemental quantities.
     // --------------------------------------------------------------
     void write_interior_vtp( const std::string &vtp_filename, 
-        const int &index_sur,const int &index_vol1, const int &index_vol2 ) const;
+        int index_sur, int index_vol1, int index_vol2 ) const;
 
-    void write_interior_vtp( const int &index_sur,
-       const int &index_vol1, const int &index_vol2 ) const;
+    void write_interior_vtp( int index_sur,
+       int index_vol1, int index_vol2 ) const;
 
     // --------------------------------------------------------------
     // Write a vtp file for a surface associated with a volume mesh
@@ -142,7 +142,7 @@ class Gmsh_FileIO
     // 'MasterNodeID': the global indices of the master nodes.
     // --------------------------------------------------------------
     void write_vtp(const std::string &vtp_filename,
-        const int &index_sur, const int &index_vol,
+        int index_sur, int index_vol,
         const bool &isf2e = false, const bool &is_slave = false) const;
 
     void write_vtp(const std::string &vtp_filename,
@@ -157,7 +157,7 @@ class Gmsh_FileIO
     // Its functionality is quite close to write_vtp.
     // --------------------------------------------------------------
     void write_quadratic_sur_vtu( const std::string &vtu_filename,
-        const int &index_sur, const int &index_vol,
+        int index_sur, int index_vol,
         const bool &isf2e = false, const bool &is_slave = false ) const;
 
     void write_quadratic_sur_vtu(const std::string &vtu_filename,
@@ -189,7 +189,7 @@ class Gmsh_FileIO
     // index_2d in [ 0, num_phy_domain_2d ),
     // index_1d in [ 0, num_phy_domain_1d ).
     // --------------------------------------------------------------
-    void write_sur_h5(const int &index_2d, const std::vector<int> &index_1d ) const;
+    void write_sur_h5(int index_2d, const std::vector<int> &index_1d ) const;
 
     // --------------------------------------------------------------
     // Write a h5 file for the 3D simplex domain with given index :
@@ -198,7 +198,7 @@ class Gmsh_FileIO
     // index_3d in [ 0, num_phy_domain_3d ),
     // index_2d in [ 0, num_phy_domain_2d ).
     // --------------------------------------------------------------
-    void write_vol_h5( const int &index_3d, const std::vector<int> &index_2d ) const;
+    void write_vol_h5( int index_3d, const std::vector<int> &index_2d ) const;
 
     // --------------------------------------------------------------
     // Write a h5 file for the 3D simplex domain with given index,
@@ -210,7 +210,7 @@ class Gmsh_FileIO
     // face2elem array;
     // otherwise, the face2elem array will be empty. 
     // --------------------------------------------------------------
-    void write_vol_h5( const int &index_3d,
+    void write_vol_h5( int index_3d,
         const std::vector<int> &index_2d,
         const std::vector<int> &index_2d_need_facemap ) const;
 

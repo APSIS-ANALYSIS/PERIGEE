@@ -1,6 +1,6 @@
 #include "APart_Node.hpp"
 
-APart_Node::APart_Node( const std::string &fbasename, const int &rank )
+APart_Node::APart_Node( const std::string &fbasename, int rank )
 : cpu_rank( rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fbasename, cpu_rank );

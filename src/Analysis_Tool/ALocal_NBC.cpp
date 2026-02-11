@@ -1,7 +1,8 @@
 #include "ALocal_NBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_NBC::ALocal_NBC( const std::string &fileBaseName, 
-    const int &cpu_rank, const std::string &gname )
+    int cpu_rank, const std::string &gname )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
