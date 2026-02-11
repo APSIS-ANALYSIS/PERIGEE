@@ -502,7 +502,7 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
   return sol_vec;
 }
 
-std::vector<double> VIS_T::readPETSc_vec_and_map( const std::string &solution_file_name,
+std::vector<double> VIS_T::readPETSc_vec( const std::string &solution_file_name,
     const std::vector<int> &nodemap,
     const int &vec_size, const int &in_dof )
 {

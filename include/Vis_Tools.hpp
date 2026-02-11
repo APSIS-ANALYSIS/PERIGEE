@@ -230,7 +230,7 @@ namespace VIS_T
         const int &vec_size );
   
   // ------------------------------------------------------------------------
-    // ! readPETSc_vec_and_map: read a PETSc vector into memory as a
+    // ! readPETSc_vec: read a PETSc vector into memory as a
     //   double array, and map the solution to the correct location based
     //   on the given nodemap.
     // \para nodemap: the mapping from local node index to global node
@@ -240,7 +240,7 @@ namespace VIS_T
     // \para in_dof: the dof per node for the solution vector.
     // Note: the length of nodemap * in_dof should be equal to vec_size.
     // ------------------------------------------------------------------------
-  std::vector<double> readPETSc_vec_and_map( const std::string &solution_file_name,
+  std::vector<double> readPETSc_vec( const std::string &solution_file_name,
       const std::vector<int> &nodemap,
       const int &vec_size, const int &in_dof );
 
