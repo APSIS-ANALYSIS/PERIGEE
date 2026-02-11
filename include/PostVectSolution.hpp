@@ -49,7 +49,7 @@ class PostVectSolution
     // ------------------------------------------------------------------------
     // Destructor
     // ------------------------------------------------------------------------
-    ~PostVectSolution();
+    ~PostVectSolution() = default;
 
     // ------------------------------------------------------------------------
     // Print the loc_solution vector
@@ -82,7 +82,7 @@ class PostVectSolution
     
     // loc_solution is the data structure that holds the solution vector of the
     // local postprocessing partition.
-    double * loc_solution;
+    std::vector<double> loc_solution;
 };
 
 #endif
