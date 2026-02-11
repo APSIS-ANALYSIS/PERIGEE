@@ -73,7 +73,7 @@ namespace VEC_T
     if( a.size() != b.size() ) return false;
     for(unsigned int ii=0; ii<a.size(); ++ii)
     {
-      if( std::abs(a[ii]-b[ii]) >= tol ) return false;
+      if( std::abs(a[ii]-b[ii]) > tol )return false;
     }
     return true;
   }
