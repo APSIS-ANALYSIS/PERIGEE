@@ -440,8 +440,7 @@ void VIS_T::setQuadTetraelem( const int &ptid0, const int &ptid1,
   cell->Delete();
 }
 
-std::vector<int> VIS_T::read_epart( const std::string &epart_file, 
-    const int &esize )
+std::vector<int> VIS_T::read_epart( const std::string &epart_file, int esize )
 {
   std::string fname(epart_file);
   fname.erase( fname.end()-3, fname.end() );
@@ -455,7 +454,7 @@ std::vector<int> VIS_T::read_epart( const std::string &epart_file,
 }
 
 std::vector<int> VIS_T::readNodeMapping( const std::string &node_mapping_file,
-    const char * const &mapping_type, const int &node_size )
+    const char * const &mapping_type, int node_size )
 {
   const std::vector<int> nodemap = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
 
@@ -466,7 +465,7 @@ std::vector<int> VIS_T::readNodeMapping( const std::string &node_mapping_file,
 }
 
 std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
-    const int &vec_size)
+    int vec_size)
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -480,13 +479,7 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
   // Check the sol_temp has correct size
   PetscInt get_sol_temp_size;
   VecGetSize(sol_temp, &get_sol_temp_size);
-  if( get_sol_temp_size != vec_size )
-  {
-    PetscPrintf(PETSC_COMM_SELF,
-        "The solution size %d is not compatible with the size %d given by partition file! \n",
-        get_sol_temp_size, vec_size);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
+  SYS_T::print_fatal_if( get_sol_temp_size != vec_size, "The solution size %d is not compatible with the size %d given by partition file! \n", get_sol_temp_size, vec_size);
 
   // read in array
   double * array_temp;
@@ -503,8 +496,7 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
 }
 
 std::vector<double> VIS_T::readPETSc_vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof )
+    const std::vector<int> &nodemap, int vec_size, int in_dof )
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
