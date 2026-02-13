@@ -27,7 +27,6 @@ void VisDataPrep_NS::get_pointArray(
     const std::vector<int> &analysis_node_mapping,
     const std::vector<int> &post_node_mapping,
     const APart_Node * const &nNode_ptr,
-    const int &input_nfunc,
     double ** &solArrays ) const
 {
   PostVectSolution pvsolu(solution_file_names[0], analysis_node_mapping,

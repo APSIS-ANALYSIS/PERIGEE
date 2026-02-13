@@ -131,7 +131,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
-        pNode.get(), GMIptr->get_nFunc(), dof, solArrays);
+        pNode.get(), dof, solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays,

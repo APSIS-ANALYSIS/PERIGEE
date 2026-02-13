@@ -27,8 +27,6 @@ void VisDataPrep_ALE_NS::get_pointArray(
     const std::vector<int> &pn_p_mapping,
     const APart_Node * const &pNode_v,
     const APart_Node * const &pNode_p,
-    const int &input_nfunc_v,
-    const int &input_nfunc_p,
     double ** &pointArrays ) const
 {
   // Read local disp vector

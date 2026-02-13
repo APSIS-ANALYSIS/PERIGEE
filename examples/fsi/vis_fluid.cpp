@@ -177,7 +177,7 @@ int main( int argc, char * argv[] )
     visprep->get_pointArray(disp_name_to_read, pres_name_to_read,
         velo_name_to_read, an_v_mapping, an_p_mapping,
         pn_v_mapping, pn_p_mapping,
-        pNode_v.get(), pNode_p.get(), GMIptr_v->get_nFunc(), GMIptr_p->get_nFunc(),
+        pNode_v.get(), pNode_p.get(),
         pointArrays);
 
     vtk_w->writeOutput_fluid( fNode.get(), locIEN_v.get(), locIEN_p.get(), fIEN, locElem.get(),

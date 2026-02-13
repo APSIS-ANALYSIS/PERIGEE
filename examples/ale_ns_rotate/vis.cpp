@@ -169,7 +169,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_read_disp.c_str(), name_to_read_mvelo.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read_list, anode_mapping, pnode_mapping,
-        pNode, GMIptr->get_nFunc(), solArrays);
+        pNode, solArrays);
 
     vtk_w->writeOutput( fNode, locIEN, locElem,
         visprep, element, quad, solArrays,
