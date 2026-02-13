@@ -94,8 +94,7 @@ int main( int argc, char * argv[] )
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
   // Read the node mappings
-  const std::vector<int> analysis_new2old = VIS_T::readNodeMapping
-    ( "node_mapping_v.h5", "new_2_old", v_nFunc );
+  const auto analysis_new2old = VIS_T::readNodeMapping( "node_mapping_v.h5", "new_2_old" );
 
   // Read solution files
   std::string disp_sol_name(sol_bname), velo_sol_name(sol_bname);
@@ -113,10 +112,8 @@ int main( int argc, char * argv[] )
   SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
       velo_sol_name.c_str(), name_to_write.c_str() );
 
-  const std::vector<double> disp_sol = VIS_T::readPETSc_vec
-    ( disp_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
-  const std::vector<double> velo_sol = VIS_T::readPETSc_vec
-    ( velo_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
+  const auto disp_sol = VIS_T::readPETSc_vec( disp_sol_name, analysis_new2old, dof_v );
+  const auto velo_sol = VIS_T::readPETSc_vec( velo_sol_name, analysis_new2old, dof_v );
 
   // Use the solution displacement field to update the control points
   for(int ii=0; ii<v_nFunc; ++ii)

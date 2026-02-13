@@ -213,21 +213,17 @@ namespace VIS_T
   //                  array, and check the length with node_size.
   // \para node_mapping_file: the file that stores the mapping arrays
   // \para mapping_type: data_name in the file: new_2_old / old_2_new
-  // \para node_size: the allocated length for nodemap
   // ------------------------------------------------------------------------
   std::vector<int> readNodeMapping( const std::string &node_mapping_file,
-        const char * const &mapping_type, int node_size );
+        const char * const &mapping_type );
 
   // ------------------------------------------------------------------------
   // ! readPETSc_vec: read a PETSc vector into memory as a double array
-  // \para vec_size: the total length of the PETSc vector. This is used
-  //                   to check the correcness of the reading.
   //
   // Note: this function is rarely used alone, since the solution vector usually
   // needs to be renumbered based on the nodemap.
   // ------------------------------------------------------------------------
-  std::vector<double> readPETSc_vec( const std::string &solution_file_name,
-        int vec_size );
+  std::vector<double> readPETSc_vec( const std::string &solution_file_name );
   
   // ------------------------------------------------------------------------
   // ! readPETSc_vec: read a PETSc vector into memory as a
@@ -242,7 +238,7 @@ namespace VIS_T
   // ------------------------------------------------------------------------
   std::vector<double> readPETSc_vec( const std::string &solution_file_name,
       const std::vector<int> &nodemap,
-      int vec_size, int in_dof );
+      int in_dof );
 }
 
 #endif

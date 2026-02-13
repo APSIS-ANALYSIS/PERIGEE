@@ -454,18 +454,12 @@ std::vector<int> VIS_T::read_epart( const std::string &epart_file, int esize )
 }
 
 std::vector<int> VIS_T::readNodeMapping( const std::string &node_mapping_file,
-    const char * const &mapping_type, int node_size )
+    const char * const &mapping_type )
 {
-  const std::vector<int> nodemap = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
-
-  SYS_T::print_fatal_if( int(nodemap.size()) != node_size, 
-      "Error: the node mapping file's array length does not match given size. \n" );
-
-  return nodemap;
+  return HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
 }
 
-std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
-    int vec_size)
+std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name)
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -477,9 +471,8 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
   PetscViewerDestroy(&viewer);
 
   // Check the sol_temp has correct size
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  SYS_T::print_fatal_if( get_sol_temp_size != vec_size, "The solution size %d is not compatible with the size %d given by partition file! \n", get_sol_temp_size, vec_size);
+  PetscInt vec_size;
+  VecGetSize(sol_temp, &vec_size);
 
   // read in array
   double * array_temp;
@@ -496,7 +489,7 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
 }
 
 std::vector<double> VIS_T::readPETSc_vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap, int vec_size, int in_dof )
+    const std::vector<int> &nodemap, int in_dof )
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -509,14 +502,8 @@ std::vector<double> VIS_T::readPETSc_vec( const std::string &solution_file_name,
   PetscViewerDestroy(&viewer);
 
   // Check the solution length
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  if( get_sol_temp_size != vec_size )
-  {
-    SYS_T::commPrint("The solution size %d is not compatible with the size %d given by partition file! \n",
-        get_sol_temp_size, vec_size);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
+  PetscInt vec_size;
+  VecGetSize(sol_temp, &vec_size);
 
   std::vector<double> veccopy(vec_size, 0.0);
   double * array_temp;

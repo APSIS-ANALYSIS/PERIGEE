@@ -110,10 +110,8 @@ int main( int argc, char * argv[] )
   
   std::ostringstream time_index;
 
-  const std::vector<int> anode_mapping = VIS_T::readNodeMapping
-    (anode_mapping_file, "old_2_new", GMIptr->get_nFunc());
-  const std::vector<int> pnode_mapping = VIS_T::readNodeMapping
-    (pnode_mapping_file, "new_2_old", GMIptr->get_nFunc());
+  const auto anode_mapping = VIS_T::readNodeMapping(anode_mapping_file, "old_2_new");
+  const auto pnode_mapping = VIS_T::readNodeMapping(pnode_mapping_file, "new_2_old");
 
   for(int time = time_start; time<=time_end; time+= time_step)
   {
@@ -128,7 +126,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
-        pNode.get(), GMIptr->get_nFunc(), dof, solArrays);
+        pNode.get(), dof, solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays,

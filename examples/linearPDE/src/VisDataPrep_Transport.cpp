@@ -18,12 +18,11 @@ void VisDataPrep_Transport::get_pointArray(
     const std::vector<int> &analysis_node_mapping,
     const std::vector<int> &post_node_mapping,
     const APart_Node * const &nNode_ptr,
-    const int &input_nfunc,
     const int &input_dof,
     double ** &solArrays ) const
 {
   PostVectSolution pvsolu(solution_file_name, analysis_node_mapping,
-      post_node_mapping, nNode_ptr, input_nfunc, input_dof);
+      post_node_mapping, nNode_ptr, input_dof);
 
   // Total number of nodes to be read from the solution vector
   const int ntotal = nNode_ptr->get_nlocghonode();

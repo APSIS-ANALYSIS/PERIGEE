@@ -27,21 +27,19 @@ void VisDataPrep_ALE_NS::get_pointArray(
     const std::vector<int> &pn_p_mapping,
     const APart_Node * const &pNode_v,
     const APart_Node * const &pNode_p,
-    const int &input_nfunc_v,
-    const int &input_nfunc_p,
     double ** &pointArrays ) const
 {
   // Read local disp vector
   PostVectSolution pvsolu_disp(disp_sol_file_name, an_v_mapping,
-      pn_v_mapping, pNode_v, input_nfunc_v, 3);
+      pn_v_mapping, pNode_v, 3);
 
   // Read local velo vector
   PostVectSolution pvsolu_velo(velo_sol_file_name, an_v_mapping,
-      pn_v_mapping, pNode_v, input_nfunc_v, 3);
+      pn_v_mapping, pNode_v, 3);
 
   // Read local pres vector
   PostVectSolution pvsolu_pres(pres_sol_file_name, an_p_mapping,
-      pn_p_mapping, pNode_p, input_nfunc_p, 1);
+      pn_p_mapping, pNode_p, 1);
 
   const int ntotal_v = pNode_v -> get_nlocghonode();
   const int ntotal_p = pNode_p -> get_nlocghonode();

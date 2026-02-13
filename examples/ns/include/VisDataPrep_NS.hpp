@@ -30,7 +30,6 @@ class VisDataPrep_NS : public IVisDataPrep
         const std::vector<int> &analysis_node_mapping,
         const std::vector<int> &post_node_mapping,
         const APart_Node * const &nNode_ptr,
-        const int &input_nfunc,
         const int &input_dof,
         double ** &solArrays ) const;
 

@@ -44,7 +44,7 @@ class PostVectSolution
        const std::vector<int> &analysis_node_mapping,
        const std::vector<int> &post_node_mapping,
        const APart_Node * const &aNode_ptr,
-       int in_nfunc, int input_dof );
+       int input_dof );
 
     // ------------------------------------------------------------------------
     // Destructor
