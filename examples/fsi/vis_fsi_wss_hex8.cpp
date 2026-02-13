@@ -190,8 +190,7 @@ int main( int argc, char * argv[] )
   FEAElement * element_quad = new FEAElement_Quad4_3D_der0( quad_vis->get_num_quadPts() );
 
   // Read the node mappings
-  const std::vector<int> analysis_new2old = VIS_T::readNodeMapping
-    ( "node_mapping_v.h5", "new_2_old", v_nFunc );
+  const auto analysis_new2old = VIS_T::readNodeMapping( "node_mapping_v.h5", "new_2_old" );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];

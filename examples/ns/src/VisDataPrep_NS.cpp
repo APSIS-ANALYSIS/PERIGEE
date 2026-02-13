@@ -26,7 +26,7 @@ void VisDataPrep_NS::get_pointArray(
     double ** &solArrays ) const
 {
   PostVectSolution pvsolu(solution_file_name, analysis_node_mapping,
-      post_node_mapping, nNode_ptr, input_nfunc, input_dof);
+      post_node_mapping, nNode_ptr, input_dof);
 
   // Total number of nodes to be read from the solution vector
   const int ntotal = nNode_ptr->get_nlocghonode();

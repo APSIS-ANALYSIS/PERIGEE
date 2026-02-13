@@ -69,7 +69,7 @@ int main( int argc, char * argv[] )
   const auto pnode_mapping = VIS_T::readNodeMapping("post_node_mapping.h5", "new_2_old");
     
   PostVectSolution * pSolu = new PostVectSolution( sol_name,
-      anode_mapping, pnode_mapping, pNode.get(), GMIptr->get_nFunc(), dof );
+      anode_mapping, pnode_mapping, pNode.get(), dof );
 
   int * IEN_e = new int[elementv->get_nLocBas()];
   double * ectrl_x = new double[elementv->get_nLocBas()];

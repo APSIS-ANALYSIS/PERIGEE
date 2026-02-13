@@ -238,7 +238,7 @@ namespace VIS_T
   // ------------------------------------------------------------------------
   std::vector<double> readPETSc_vec( const std::string &solution_file_name,
       const std::vector<int> &nodemap,
-      int vec_size, int in_dof );
+      int in_dof );
 }
 
 #endif
