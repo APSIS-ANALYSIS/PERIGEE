@@ -150,16 +150,12 @@ int main( int argc, char * argv[] )
   std::ostringstream time_index;
 
   // Velocity and displacement node mappings
-  const std::vector<int> an_v_mapping = VIS_T::readNodeMapping
-    (an_v_mapping_file, "old_2_new", GMIptr_v->get_nFunc());
-  const std::vector<int> pn_v_mapping = VIS_T::readNodeMapping
-    (pn_v_mapping_file, "new_2_old", GMIptr_v->get_nFunc());
+  const auto an_v_mapping = VIS_T::readNodeMapping(an_v_mapping_file, "old_2_new");
+  const auto pn_v_mapping = VIS_T::readNodeMapping(pn_v_mapping_file, "new_2_old");
 
   // Pressure node mappings
-  const std::vector<int> an_p_mapping = VIS_T::readNodeMapping
-    (an_p_mapping_file, "old_2_new", GMIptr_p->get_nFunc());
-  const std::vector<int> pn_p_mapping = VIS_T::readNodeMapping
-    (pn_p_mapping_file, "new_2_old", GMIptr_p->get_nFunc());
+  const auto an_p_mapping = VIS_T::readNodeMapping(an_p_mapping_file, "old_2_new");
+  const auto pn_p_mapping = VIS_T::readNodeMapping(pn_p_mapping_file, "new_2_old");
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
