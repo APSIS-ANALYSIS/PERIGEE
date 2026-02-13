@@ -454,14 +454,9 @@ std::vector<int> VIS_T::read_epart( const std::string &epart_file, int esize )
 }
 
 std::vector<int> VIS_T::readNodeMapping( const std::string &node_mapping_file,
-    const char * const &mapping_type, int node_size )
+    const char * const &mapping_type )
 {
-  const std::vector<int> nodemap = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
-
-  SYS_T::print_fatal_if( int(nodemap.size()) != node_size, 
-      "Error: the node mapping file's array length does not match given size. \n" );
-
-  return nodemap;
+  return HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
 }
 
 std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,

@@ -216,7 +216,7 @@ namespace VIS_T
   // \para node_size: the allocated length for nodemap
   // ------------------------------------------------------------------------
   std::vector<int> readNodeMapping( const std::string &node_mapping_file,
-        const char * const &mapping_type, int node_size );
+        const char * const &mapping_type );
 
   // ------------------------------------------------------------------------
   // ! readPETSc_vec: read a PETSc vector into memory as a double array

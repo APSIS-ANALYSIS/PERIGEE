@@ -193,8 +193,7 @@ int main( int argc, char * argv[] )
   FEAElement * element_tri = new FEAElement_Triangle6_3D_der0( quad_tri_vis-> get_num_quadPts() );
 
   // Read the mappings of the nodal indices
-  const std::vector<int> analysis_new2old = VIS_T::readNodeMapping
-    ("node_mapping.h5", "new_2_old", v_nFunc );
+  const auto analysis_new2old = VIS_T::readNodeMapping("node_mapping.h5", "new_2_old" );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
