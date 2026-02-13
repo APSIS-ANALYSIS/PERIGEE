@@ -44,7 +44,7 @@ class PostVectSolution
        const std::vector<int> &analysis_node_mapping,
        const std::vector<int> &post_node_mapping,
        const APart_Node * const &aNode_ptr,
-       const int &in_nfunc, const int &input_dof );
+       int in_nfunc, int input_dof );
 
     // ------------------------------------------------------------------------
     // Destructor
@@ -59,7 +59,7 @@ class PostVectSolution
     // ------------------------------------------------------------------------
     // get functions that give read permission to private data
     // ------------------------------------------------------------------------
-    double get_locsol(const int &pos) const {return loc_solution[pos];}
+    double get_locsol(int pos) const {return loc_solution[pos];}
     
     int get_dof() const {return dof_per_node;}
     
@@ -73,7 +73,7 @@ class PostVectSolution
     //   \para esol: the double array that passes the solution vector
     // Users are responsible for allocating and deleting eien & esol
     // ------------------------------------------------------------------------
-    void get_esol( const int &field, const int &nLocBas, 
+    void get_esol( int field, int nLocBas, 
         const int * const &eien, double * const &esol) const;
 
   private:

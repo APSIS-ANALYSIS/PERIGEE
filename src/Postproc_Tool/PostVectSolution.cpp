@@ -4,7 +4,7 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
     const std::vector<int> &analysis_node_mapping,
     const std::vector<int> &post_node_mapping,
     const APart_Node * const &aNode_ptr,
-    const int &nFunc, const int &input_dof )
+    int nFunc, int input_dof )
 : dof_per_node( input_dof ), 
   loc_sol_size( aNode_ptr->get_nlocghonode() * dof_per_node ),
   loc_solution(loc_sol_size, 0.0)
@@ -15,8 +15,8 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {
     int index = aNode_ptr->get_local_to_global(ii); // in postprocess partition's new index
-    index = post_node_mapping[index];                // map back to natural global index
-    index = analysis_node_mapping[index];                // map forward to analysis partitioned new index
+    index = post_node_mapping[index];               // map back to natural global index
+    index = analysis_node_mapping[index];           // map forward to analysis partitioned new index
 
     for(int jj=0; jj<dof_per_node; ++jj)
       loc_solution[ii*dof_per_node + jj] = vec_temp[index*dof_per_node + jj];
@@ -32,7 +32,7 @@ void PostVectSolution::print_info() const
   std::cout<<std::endl;
 }
 
-void PostVectSolution::get_esol(const int &field, const int &nLocBas,
+void PostVectSolution::get_esol( int field, int nLocBas,
     const int * const &eien, double * const &esol) const
 {
   // check the input field index
