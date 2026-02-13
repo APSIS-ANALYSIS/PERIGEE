@@ -10,7 +10,7 @@ PostVectSolution::PostVectSolution( const std::string &solution_file_name,
   loc_solution(loc_sol_size, 0.0)
 {
   // Read the full PETSc solution vector into vec_temp
-  const auto vec_temp = VIS_T::readPETSc_vec(solution_file_name, nFunc * dof_per_node);
+  const auto vec_temp = VIS_T::readPETSc_vec(solution_file_name);
 
   for( int ii=0; ii<aNode_ptr->get_nlocghonode(); ++ii )
   {

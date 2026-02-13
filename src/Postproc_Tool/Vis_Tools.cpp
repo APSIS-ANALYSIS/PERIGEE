@@ -459,8 +459,7 @@ std::vector<int> VIS_T::readNodeMapping( const std::string &node_mapping_file,
   return HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
 }
 
-std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
-    int vec_size)
+std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name)
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -472,9 +471,8 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name,
   PetscViewerDestroy(&viewer);
 
   // Check the sol_temp has correct size
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  SYS_T::print_fatal_if( get_sol_temp_size != vec_size, "The solution size %d is not compatible with the size %d given by partition file! \n", get_sol_temp_size, vec_size);
+  PetscInt vec_size;
+  VecGetSize(sol_temp, &vec_size);
 
   // read in array
   double * array_temp;
