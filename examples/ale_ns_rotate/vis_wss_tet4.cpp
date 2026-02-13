@@ -220,8 +220,7 @@ int main( int argc, char * argv[] )
     std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 
     // Read in the solution vector and arrange them into the natural numbering
-    const auto sol = VIS_T::readPETSc_vec
-      ( name_to_read, analysis_new2old, v_nFunc*dof, dof );
+    const auto sol = VIS_T::readPETSc_vec( name_to_read, analysis_new2old, dof );
 
     // Container for WSS averaged value
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );

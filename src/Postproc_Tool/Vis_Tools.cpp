@@ -489,7 +489,7 @@ std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name)
 }
 
 std::vector<double> VIS_T::readPETSc_vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap, int vec_size, int in_dof )
+    const std::vector<int> &nodemap, int in_dof )
 {
   Vec sol_temp;
   VecCreate(PETSC_COMM_SELF, &sol_temp);
@@ -502,14 +502,8 @@ std::vector<double> VIS_T::readPETSc_vec( const std::string &solution_file_name,
   PetscViewerDestroy(&viewer);
 
   // Check the solution length
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  if( get_sol_temp_size != vec_size )
-  {
-    SYS_T::commPrint("The solution size %d is not compatible with the size %d given by partition file! \n",
-        get_sol_temp_size, vec_size);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
+  PetscInt vec_size;
+  VecGetSize(sol_temp, &vec_size);
 
   std::vector<double> veccopy(vec_size, 0.0);
   double * array_temp;
