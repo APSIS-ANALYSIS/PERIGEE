@@ -24,20 +24,19 @@ VisDataPrep_NS::VisDataPrep_NS()
 
 void VisDataPrep_NS::get_pointArray(
     const std::vector<std::string> solution_file_names,
-    const std::string analysis_node_mapping_file,
-    const std::string post_node_mapping_file,
+    const std::vector<int> &analysis_node_mapping,
+    const std::vector<int> &post_node_mapping,
     const APart_Node * const &nNode_ptr,
-    const int &input_nfunc,
     double ** &solArrays ) const
 {
-  PostVectSolution pvsolu(solution_file_names[0], analysis_node_mapping_file,
-      post_node_mapping_file, nNode_ptr, input_nfunc, 4);
+  PostVectSolution pvsolu(solution_file_names[0], analysis_node_mapping,
+      post_node_mapping, nNode_ptr, 4);
 
-  PostVectSolution pvsolu_disp(solution_file_names[1], analysis_node_mapping_file,
-      post_node_mapping_file, nNode_ptr, input_nfunc, 3);
+  PostVectSolution pvsolu_disp(solution_file_names[1], analysis_node_mapping,
+      post_node_mapping, nNode_ptr, 3);
 
-  PostVectSolution pvsolu_mvelo(solution_file_names[2], analysis_node_mapping_file,
-      post_node_mapping_file, nNode_ptr, input_nfunc, 3);
+  PostVectSolution pvsolu_mvelo(solution_file_names[2], analysis_node_mapping,
+      post_node_mapping, nNode_ptr, 3);
 
   // Total number of nodes to be read from the solution vector
   const int ntotal = nNode_ptr->get_nlocghonode();

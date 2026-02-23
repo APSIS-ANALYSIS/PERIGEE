@@ -110,6 +110,9 @@ int main( int argc, char * argv[] )
   
   std::ostringstream time_index;
 
+  const auto anode_mapping = VIS_T::readNodeMapping(anode_mapping_file, "old_2_new");
+  const auto pnode_mapping = VIS_T::readNodeMapping(pnode_mapping_file, "new_2_old");
+
   for(int time = time_start; time<=time_end; time+= time_step)
   {
     std::string name_to_read(sol_bname);
@@ -122,8 +125,8 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );
 
-    visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
-        pNode.get(), GMIptr->get_nFunc(), dof, solArrays);
+    visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
+        pNode.get(), dof, solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays,

@@ -7,6 +7,7 @@
 // ============================================================================
 #include "HDF5_Reader.hpp"
 #include "Tet_Tools.hpp"
+#include "Vis_Tools.hpp"
 #include "QuadPts_vis_tri6.hpp"
 #include "QuadPts_Gauss_Triangle.hpp"
 #include "QuadPts_vis_tet10.hpp"
@@ -14,13 +15,6 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 
 std::vector<int> range_generator( const int &ii );
-
-std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size );
-
-std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof );
 
 int get_tri_local_id( const double * const &coor_x,
     const double * const &coor_y,
@@ -199,7 +193,7 @@ int main( int argc, char * argv[] )
   FEAElement * element_tri = new FEAElement_Triangle6_3D_der0( quad_tri_vis-> get_num_quadPts() );
 
   // Read the mappings of the nodal indices
-  const std::vector<int> analysis_new2old = ReadNodeMapping("node_mapping.h5", "new_2_old", v_nFunc );
+  const auto analysis_new2old = VIS_T::readNodeMapping("node_mapping.h5", "new_2_old" );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
@@ -227,7 +221,7 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Time %d: Read %s and Write %s \n", time, name_to_read.c_str(), name_to_write.c_str());
 
     // Read the solution vector and renumber them based on the nodal mappings
-    const auto sol = ReadPETSc_Vec( name_to_read, analysis_new2old, v_nFunc*dof, dof );
+    const auto sol = VIS_T::readPETSc_vec( name_to_read, analysis_new2old, dof );
 
     // Container for (averaged) WSS
     std::vector< Vector_3 > wss_ave( nFunc, Vector_3(0.0, 0.0, 0.0) );
@@ -446,99 +440,6 @@ std::vector<int> range_generator( const int &ii )
   }
   
   return surface_id_range;
-}
-
-std::vector<int> ReadNodeMapping( const char * const &node_mapping_file,
-    const char * const &mapping_type, const int &node_size )
-{
-  hid_t file_id = H5Fopen(node_mapping_file, H5F_ACC_RDONLY, H5P_DEFAULT);
-  hid_t data_id = H5Dopen(file_id, mapping_type, H5P_DEFAULT);
-
-  hid_t data_space = H5Dget_space( data_id );
-  hid_t data_rank = H5Sget_simple_extent_ndims( data_space );
-
-  if( data_rank != 1)
-  {
-    SYS_T::commPrint("Error: the node mapping file has wrong format. \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  hsize_t * data_dims = new hsize_t [1];
-
-  H5Sget_simple_extent_dims( data_space, data_dims, NULL );
-
-  hid_t mem_space = H5Screate_simple(data_rank, data_dims, NULL);
-
-  hsize_t dSize = data_dims[0];
-
-  if( int(dSize) != node_size )
-  {
-    SYS_T::commPrint("Error: the allocated array has wrong size! \n");
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  std::vector<int> out(node_size, -1);
-
-  H5Dread( data_id, H5T_NATIVE_INT, mem_space, data_space,
-      H5P_DEFAULT, &out[0] );
-
-  delete [] data_dims;
-  H5Sclose( mem_space );
-  H5Sclose(data_space);
-  H5Dclose(data_id);
-  H5Fclose(file_id);
-
-  return out;
-}
-
-std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap,
-    const int &vec_size, const int &in_dof )
-{
-  Vec sol_temp;
-  VecCreate(PETSC_COMM_SELF, &sol_temp);
-  VecSetType(sol_temp, VECSEQ);
-
-  PetscViewer viewer;
-  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(),
-      FILE_MODE_READ, &viewer);
-  VecLoad(sol_temp, viewer);
-  PetscViewerDestroy(&viewer);
-
-  // Check the solution length
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  if( get_sol_temp_size != vec_size )
-  {
-    SYS_T::commPrint("The solution size %d is not compatible with the size %d given by partition file! \n",
-        get_sol_temp_size, vec_size);
-    MPI_Abort(PETSC_COMM_WORLD, 1);
-  }
-
-  std::vector<double> veccopy(vec_size, 0.0);
-  double * array_temp;
-  VecGetArray(sol_temp, &array_temp);
-
-  for(int ii=0; ii<vec_size; ++ii)
-    veccopy[ii] = array_temp[ii];
-
-  VecRestoreArray(sol_temp, &array_temp);
-  VecDestroy(&sol_temp);
-
-  // copy the solution varibles to the correct location
-  std::vector<double> sol(vec_size, 0.0);
-
-  // check the nodemap size
-  if( (int)nodemap.size() * in_dof != vec_size ) SYS_T::print_fatal("Error: node map size is incompatible with the solution length. \n");
-
-  for(unsigned int ii=0; ii<nodemap.size(); ++ii)
-  {
-    const int index = nodemap[ii];
-    for(int jj=0; jj<in_dof; ++jj)
-      sol[in_dof*index+jj] = veccopy[in_dof*ii+jj];
-  }
-
-  return sol;
 }
 
 int get_tri_local_id( const double * const &coor_x,

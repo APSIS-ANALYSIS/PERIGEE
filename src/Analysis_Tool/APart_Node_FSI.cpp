@@ -1,6 +1,6 @@
 #include "APart_Node_FSI.hpp"
 
-APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, const int &rank )
+APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, int rank )
 : APart_Node(fileBaseName, rank)
 {
   std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );

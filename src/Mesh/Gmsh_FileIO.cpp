@@ -96,9 +96,6 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   }
 }
 
-Gmsh_FileIO::~Gmsh_FileIO()
-{}
-
 void Gmsh_FileIO::print_info() const
 {
   std::cout<<"File name : "<<filename<<std::endl;
@@ -156,7 +153,7 @@ void Gmsh_FileIO::print_info() const
 }
 
 void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename, 
-  const int &index_sur,const int &index_vol1, const int &index_vol2 ) const
+  int index_sur, int index_vol1, int index_vol2 ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -367,8 +364,8 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   delete mytimer;
 }
 
-void Gmsh_FileIO::write_interior_vtp( const int &index_sur, 
-    const int &index_vol1, const int &index_vol2 ) const
+void Gmsh_FileIO::write_interior_vtp( int index_sur, 
+    int index_vol1, int index_vol2 ) const
 {
   std::string vtp_file_name(phy_2d_name[index_sur]);
   vtp_file_name += "_";
@@ -380,7 +377,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
 }
 
 void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
-  const int &index_sur, const int &index_vol, const bool &isf2e, const bool &is_slave ) const
+  int index_sur, int index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -773,7 +770,7 @@ void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
   SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
 
-void Gmsh_FileIO::write_sur_h5( const int &index_2d, 
+void Gmsh_FileIO::write_sur_h5( int index_2d, 
     const std::vector<int> &index_1d ) const
 {
   // Perform basic logical checks
@@ -940,7 +937,7 @@ void Gmsh_FileIO::write_sur_h5( const int &index_2d,
   H5Fclose( file_id );
 }
 
-void Gmsh_FileIO::write_vol_h5( const int &index_3d,
+void Gmsh_FileIO::write_vol_h5( int index_3d,
     const std::vector<int> &index_2d ) const
 {
   // Perform basic index boundary check
@@ -1112,7 +1109,7 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
   H5Fclose( file_id ); 
 }
 
-void Gmsh_FileIO::write_vol_h5( const int &index_3d,
+void Gmsh_FileIO::write_vol_h5( int index_3d,
     const std::vector<int> &index_2d,
     const std::vector<int> &index_2d_need_facemap ) const
 {
@@ -1342,7 +1339,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   }
 }
 
-void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
+void Gmsh_FileIO::update_quadratic_tet_IEN( int index_3d )
 {
   SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
@@ -1367,7 +1364,7 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
   }
 }
 
-void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
+void Gmsh_FileIO::update_quadratic_hex_IEN( int index_3d )
 {
   SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
@@ -1427,7 +1424,7 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 }
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
-    const int &index_sur, const int &index_vol, const bool &isf2e, const bool &is_slave ) const
+    int index_sur, int index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, surface index is wrong. \n");

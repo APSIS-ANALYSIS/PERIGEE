@@ -14,7 +14,7 @@ class VisDataPrep_ALE_NS : public IVisDataPrep
   public:
     VisDataPrep_ALE_NS();
 
-    virtual ~VisDataPrep_ALE_NS();
+    virtual ~VisDataPrep_ALE_NS() = default;
 
     virtual int get_ptarray_size() const {return 3;}
 
@@ -25,14 +25,12 @@ class VisDataPrep_ALE_NS : public IVisDataPrep
         const std::string &disp_sol_file_name,
         const std::string &pres_sol_file_name,
         const std::string &velo_sol_file_name,
-        const std::string &an_v_mapping_file,
-        const std::string &an_p_mapping_file,
-        const std::string &pn_v_mapping_file,
-        const std::string &pn_p_mapping_file,
+        const std::vector<int> &an_v_mapping,
+        const std::vector<int> &an_p_mapping,
+        const std::vector<int> &pn_v_mapping,
+        const std::vector<int> &pn_p_mapping,
         const APart_Node * const &pNode_v,
         const APart_Node * const &pNode_p,
-        const int &input_nfunc_v,
-        const int &input_nfunc_p,
         double ** &pointArrays ) const;
 
   private:

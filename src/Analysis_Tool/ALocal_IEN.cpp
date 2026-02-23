@@ -1,6 +1,7 @@
 #include "ALocal_IEN.hpp"
+#include "HDF5_Reader.hpp"
 
-ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, const int &cpu_rank )
+ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 

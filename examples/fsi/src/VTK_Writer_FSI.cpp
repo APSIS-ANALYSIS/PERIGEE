@@ -23,13 +23,11 @@ void VTK_Writer_FSI::interpolateJ( const int * const &ptid,
     w[ii] = inputData[ii*3+2];
   }
 
-  Interpolater intep( nLocBas );
-
   std::vector<double> ux, uy, uz, vx, vy, vz, wx, wy, wz;
 
-  intep.interpolateFE_Grad(u, elem, ux, uy, uz);
-  intep.interpolateFE_Grad(v, elem, vx, vy, vz);
-  intep.interpolateFE_Grad(w, elem, wx, wy, wz);
+  Interp::FE_Grad(u.data(), elem, ux, uy, uz);
+  Interp::FE_Grad(v.data(), elem, vx, vy, vz);
+  Interp::FE_Grad(w.data(), elem, wx, wy, wz);
 
   for(int ii=0; ii<nqp; ++ii)
   {
@@ -68,8 +66,6 @@ void VTK_Writer_FSI::writeOutput(
     SYS_T::print_fatal_if(quad->get_num_quadPts() != 8, "Error: VTK_Writer requires 8 quadrature points for Hex8.\n");    
   }
   else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput function: unsupported element type \n" );
-
-  Interpolater intep( nLocBas );
 
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
@@ -129,10 +125,11 @@ void VTK_Writer_FSI::writeOutput(
     }
 
     // displacement interpolation
-    intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[0] );
+    Interp::VTKData( asize, &IEN_p[0], inputInfo.data(), elemptr, dataVecs[0] );
 
     // use displacement to update points
-    intep.interpolateVTKPts( &IEN_p[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points);
+    Interp::VTKPts( &IEN_p[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], 
+        inputInfo.data(), elemptr, points);
 
     // Interpolate detF
     interpolateJ( &IEN_p[0], inputInfo, elemptr, dataVecs[1] );
@@ -146,7 +143,7 @@ void VTK_Writer_FSI::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[2] );
+    Interp::VTKData( asize, &IEN_p[0], inputInfo.data(), elemptr, dataVecs[2] );
 
     // Interpolate the velocity vector
     inputInfo.clear();
@@ -157,7 +154,7 @@ void VTK_Writer_FSI::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, &IEN_p[0], inputInfo, elemptr, dataVecs[3] );
+    Interp::VTKData( asize, &IEN_p[0], inputInfo.data(), elemptr, dataVecs[3] );
 
     // Set mesh connectivity
     if( elemptr->get_Type() == FEType::Tet4 )
@@ -241,8 +238,6 @@ void VTK_Writer_FSI::writeOutput_fluid(
   }
   else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_fluid function: unsupported element type \n" );
 
-  Interpolater intep( nLocBas );
-
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -316,10 +311,11 @@ void VTK_Writer_FSI::writeOutput_fluid(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[0] );
+      Interp::VTKData( asize, &IEN_f[0], inputInfo.data(), elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( &IEN_f[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
+      Interp::VTKPts( &IEN_f[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], 
+          inputInfo.data(), elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -330,7 +326,7 @@ void VTK_Writer_FSI::writeOutput_fluid(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[1] );
+      Interp::VTKData( asize, &IEN_f[0], inputInfo.data(), elemptr, dataVecs[1] );
 
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -341,7 +337,7 @@ void VTK_Writer_FSI::writeOutput_fluid(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_f[0], inputInfo, elemptr, dataVecs[2] );
+      Interp::VTKData( asize, &IEN_f[0], inputInfo.data(), elemptr, dataVecs[2] );
       
       // Interpolate for velocity gradient
       std::vector<double> input_u, input_v, input_w;
@@ -354,13 +350,13 @@ void VTK_Writer_FSI::writeOutput_fluid(
       }
 
       std::vector<double> dudx, dudy, dudz;
-      intep.interpolateFE_Grad(input_u, elemptr, dudx, dudy, dudz);
+      Interp::FE_Grad(input_u.data(), elemptr, dudx, dudy, dudz);
 
       std::vector<double> dvdx, dvdy, dvdz;
-      intep.interpolateFE_Grad(input_v, elemptr, dvdx, dvdy, dvdz);
+      Interp::FE_Grad(input_v.data(), elemptr, dvdx, dvdy, dvdz);
 
       std::vector<double> dwdx, dwdy, dwdz;
-      intep.interpolateFE_Grad(input_w, elemptr, dwdx, dwdy, dwdz);
+      Interp::FE_Grad(input_w.data(), elemptr, dwdx, dwdy, dwdz);
 
       for(int ii=0; ii<nLocBas; ++ii)
       {
@@ -482,8 +478,6 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
   }
   else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_solid_cur function: unsupported element type \n" );
 
-  Interpolater intep( nLocBas );
-
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -542,10 +536,11 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
+      Interp::VTKData( asize, &IEN_s[0], inputInfo.data(), elemptr, dataVecs[0] );
 
       // use displacement to update points
-      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], inputInfo, elemptr, points );
+      Interp::VTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], 
+          inputInfo.data(), elemptr, points );
 
       // Interpolate detF
       interpolateJ( &IEN_s[0], inputInfo, elemptr, dataVecs[1] );
@@ -559,7 +554,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] ); 
+      Interp::VTKData( asize, &IEN_s[0], inputInfo.data(), elemptr, dataVecs[2] ); 
       
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -570,7 +565,7 @@ void VTK_Writer_FSI::writeOutput_solid_cur(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[3] );
+      Interp::VTKData( asize, &IEN_s[0], inputInfo.data(), elemptr, dataVecs[3] );
       
       // Set mesh connectivity
       if( elemptr->get_Type() == FEType::Tet4 )
@@ -649,8 +644,6 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
   }
   else SYS_T::print_fatal( "Error: VTK_Writer_FSI::writeOutput_solid_cur function: unsupported element type \n" );
 
-  Interpolater intep( nLocBas );
-
   // Allocate gridData
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -709,10 +702,10 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
       }
 
       // displacement interpolation
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[0] );
+      Interp::VTKData( asize, &IEN_s[0], inputInfo.data(), elemptr, dataVecs[0] );
 
       // interpolate the coordinates of the points
-      intep.interpolateVTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], elemptr, points );
+      Interp::VTKPts( &IEN_s[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0], elemptr, points );
 
       // Interpolate the pressure scalar
       inputInfo.clear();
@@ -723,7 +716,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[1] ); 
+      Interp::VTKData( asize, &IEN_s[0], inputInfo.data(), elemptr, dataVecs[1] ); 
      
       // Interpolate the velocity vector
       inputInfo.clear();
@@ -734,7 +727,7 @@ void VTK_Writer_FSI::writeOutput_solid_ref(
         for(int kk=0; kk<asize; ++kk)
           inputInfo.push_back( pointArrays[2][pt_index * asize + kk ] );
       }
-      intep.interpolateVTKData( asize, &IEN_s[0], inputInfo, elemptr, dataVecs[2] );
+      Interp::VTKData( asize, &IEN_s[0], inputInfo.data(), elemptr, dataVecs[2] );
       
       // Set mesh connectivity
       if( elemptr->get_Type() == FEType::Tet4 )

@@ -52,10 +52,9 @@ class IVisDataPrep
     // -------------------------------------------------------------------
     virtual void get_pointArray(
         const std::string solution_file_name,
-        const std::string analysis_node_mapping_file,
-        const std::string post_node_mapping_file,
+        const std::vector<int> &analysis_node_mapping,
+        const std::vector<int> &post_node_mapping,
         const APart_Node * const &nNode_ptr,
-        const int &input_nfunc,
         const int &input_dof,
         double ** &pointArrays ) const
     {
@@ -70,10 +69,9 @@ class IVisDataPrep
     // -------------------------------------------------------------------
     virtual void get_pointArray(
         const std::vector<std::string> solution_file_names,
-        const std::string analysis_node_mapping_file,
-        const std::string post_node_mapping_file,
+        const std::vector<int> &analysis_node_mapping,
+        const std::vector<int> &post_node_mapping,
         const APart_Node * const &nNode_ptr,
-        const int &in_nfunc,
         double ** &pointArrays ) const
     {
       SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");
@@ -89,14 +87,12 @@ class IVisDataPrep
         const std::string &disp_solution_file_name,
         const std::string &pres_solution_file_name,
         const std::string &velo_solution_file_name,
-        const std::string &an_v_node_mapping_file,
-        const std::string &an_p_node_mapping_file,
-        const std::string &pn_v_node_mapping_file,
-        const std::string &pn_p_node_mapping_file,
+        const std::vector<int> &an_v_node_mapping,
+        const std::vector<int> &an_p_node_mapping,
+        const std::vector<int> &pn_v_node_mapping,
+        const std::vector<int> &pn_p_node_mapping,
         const APart_Node * const &pNode_v,
         const APart_Node * const &pNode_p,
-        const int &input_nfunc_v,
-        const int &input_nfunc_p,
         double ** &pointArrays ) const
     {
       SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");
@@ -161,7 +157,6 @@ class IVisDataPrep
 
       return get_arraySizes(ii);
     }
-
 
     // -------------------------------------------------------------------
     // ! print_info:
