@@ -190,8 +190,7 @@ int main( int argc, char * argv[] )
   FEAElement * element_quad = new FEAElement_Quad4_3D_der0( quad_vis->get_num_quadPts() );
 
   // Read the node mappings
-  const std::vector<int> analysis_new2old = VIS_T::readNodeMapping
-    ( "node_mapping_v.h5", "new_2_old", v_nFunc );
+  const auto analysis_new2old = VIS_T::readNodeMapping( "node_mapping_v.h5", "new_2_old" );
 
   double * Rx = new double [v_nLocBas];
   double * Ry = new double [v_nLocBas];
@@ -222,10 +221,8 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
         velo_sol_name.c_str(), name_to_write.c_str() );
 
-    const std::vector<double> disp_sol = VIS_T::readPETSc_vec
-      ( disp_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
-    const std::vector<double> velo_sol = VIS_T::readPETSc_vec
-      ( velo_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );   
+    const auto disp_sol = VIS_T::readPETSc_vec( disp_sol_name, analysis_new2old, dof_v );
+    const auto velo_sol = VIS_T::readPETSc_vec( velo_sol_name, analysis_new2old, dof_v );   
 
     // Ensure that the coordinates of the control points remain in the undeformed state
     v_ctrlPts = v_ctrlPts_origin;
