@@ -4,7 +4,7 @@
 // FEAElement_Hex8.hpp
 // Element routine for the linear hexagon element, with evaluation
 // of shape functions and their derivatives.
-// 
+//
 // Hex8 means 8-node hex, aka trilinear hex.
 //
 //                    t
@@ -52,51 +52,51 @@ class FEAElement_Hex8 final : public FEAElement
 
     void print_info() const override;
 
-    // Given the quadrature points and nodal coordinates, evaluate the basis 
+    // Given the quadrature points and nodal coordinates, evaluate the basis
     // functions and their derivatives up to second order
     void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) override;
-    
+
     double get_h( const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const override;
-    
-    // Get functions give access to function evaluations at the quadrature point 
+
+    // Get functions give access to function evaluations at the quadrature point
     // corresponding to quaindex
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * const &basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
-    void get_gradR( const int &quaindex, double * const &basis_x,
+    void get_gradR( int quaindex, double * const &basis_x,
         double * const &basis_y, double * const &basis_z ) const override;
 
-    void get_R_gradR( const int &quaindex, double * const &basis,
+    void get_R_gradR( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const override;
 
-    void get_3D_R_dR_d2R( const int &quaindex, 
-        double * const &basis, double * const &basis_x, 
+    void get_3D_R_dR_d2R( int quaindex,
+        double * const &basis, double * const &basis_x,
         double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_zz, double * const &basis_xy, 
+        double * const &basis_xx, double * const &basis_yy,
+        double * const &basis_zz, double * const &basis_xy,
         double * const &basis_xz, double * const &basis_yz ) const override;
 
-    void get_3D_R_gradR_LaplacianR( const int &quaindex,
-        double * const &basis, double * const &basis_x, 
-        double * const &basis_y, double * const &basis_z, 
-        double * const &basis_xx, double * const &basis_yy, 
+    void get_3D_R_gradR_LaplacianR( int quaindex,
+        double * const &basis, double * const &basis_x,
+        double * const &basis_y, double * const &basis_z,
+        double * const &basis_xx, double * const &basis_yy,
         double * const &basis_zz ) const override;
 
     // Get the Jacobian matrix dx/dr
-    std::array<double,9> get_Jacobian( const int &quaindex ) const override;
+    std::array<double,9> get_Jacobian( int quaindex ) const override;
 
     // Get the inverse Jacobian matrix dr/dx
-    std::array<double,9> get_invJacobian( const int &quaindex ) const override;
+    std::array<double,9> get_invJacobian( int quaindex ) const override;
 
     // Get the determinant of the Jacobian matrix
-    double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
+    double get_detJac(int quaindex) const override {return detJac[quaindex];}
 
     // Build basis and build the boundary element
     //   Hex-Face-0 : Node 0 3 2 1
@@ -111,7 +111,7 @@ class FEAElement_Hex8 final : public FEAElement
         const double * const &ctrl_z ) override;
 
     // Get the outwardnormal on faces
-    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override
+    Vector_3 get_2d_normal_out( int quaindex, double &area ) const override
     {return quadrilateral_face->get_2d_normal_out( quaindex, area );}
 
   private:

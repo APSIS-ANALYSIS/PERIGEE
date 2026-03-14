@@ -2,7 +2,7 @@
 #define FEAELEMENT_TRIANGLE3_HPP
 // ==================================================================
 // FEAElement_Triangle3.hpp
-// This is an implementation of the element routine for linear 
+// This is an implementation of the element routine for linear
 // triangle element in 2D.
 //
 // This class is designed mainly for the 2D FEM assembly.
@@ -35,27 +35,27 @@ class FEAElement_Triangle3 final : public FEAElement
     double get_h( const double * const &ctrl_x,
         const double * const &ctrl_y ) const override;
 
-    void get_R( const int &quaindex, double * const &basis ) const override;
-    
-    std::vector<double> get_R( const int &quaindex ) const override;
+    void get_R( int quaindex, double * const &basis ) const override;
 
-    void get_gradR( const int &quaindex, double * const &basis_x,
+    std::vector<double> get_R( int quaindex ) const override;
+
+    void get_gradR( int quaindex, double * const &basis_x,
         double * const &basis_y ) const override;
 
-    void get_R_gradR( const int &quaindex, double * const &basis,
+    void get_R_gradR( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y ) const override;
 
-    void get_2D_R_dR_d2R( const int &quaindex, 
-        double * const &basis, 
-        double * const &basis_x, double * const &basis_y, 
-        double * const &basis_xx, double * const &basis_yy, 
+    void get_2D_R_dR_d2R( int quaindex,
+        double * const &basis,
+        double * const &basis_x, double * const &basis_y,
+        double * const &basis_xx, double * const &basis_yy,
         double * const &basis_xy ) const override;
 
-    std::array<double,4> get_Jacobian_2D(const int &quaindex) const override;
+    std::array<double,4> get_Jacobian_2D(int quaindex) const override;
 
-    std::array<double,4> get_invJacobian_2D(const int &quaindex) const override;
+    std::array<double,4> get_invJacobian_2D(int quaindex) const override;
 
-    double get_detJac(const int &quaindex) const override {return detJac;}
+    double get_detJac(int quaindex) const override {return detJac;}
 
   private:
     static constexpr int nLocBas = 3;
@@ -66,7 +66,7 @@ class FEAElement_Triangle3 final : public FEAElement
     // tri3 is linear element, hence the derivatives are constant
     std::array<double, 3> dR_dx {}, dR_dy {};
 
-    // Container for 
+    // Container for
     // dx_dr : 0 <= ii < 4
     // dr_dx : 4 <= ii < 8
     std::array<double, 8> Jac {};

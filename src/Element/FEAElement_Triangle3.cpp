@@ -75,7 +75,7 @@ double FEAElement_Triangle3::get_h( const double * const &ctrl_x,
   return 2.0 * radius;
 }
 
-void FEAElement_Triangle3::get_R( const int &quaindex, 
+void FEAElement_Triangle3::get_R( int quaindex,
     double * const &basis ) const
 {
   const int offset = quaindex * nLocBas;
@@ -84,24 +84,24 @@ void FEAElement_Triangle3::get_R( const int &quaindex,
   basis[2] = R[offset+2];
 }
 
-std::vector<double> FEAElement_Triangle3::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Triangle3::get_R( int quaindex ) const
 {
   const int offset = quaindex * nLocBas;
 
   return { R[offset], R[offset+1], R[offset+2] };
 }
 
-void FEAElement_Triangle3::get_gradR( const int &quaindex, 
+void FEAElement_Triangle3::get_gradR( int quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
   for(int ii=0; ii<nLocBas; ++ii)
   {
     basis_x[ii] = dR_dx[ii];
     basis_y[ii] = dR_dy[ii];
-  } 
+  }
 }
 
-void FEAElement_Triangle3::get_R_gradR( const int &quaindex, 
+void FEAElement_Triangle3::get_R_gradR( int quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y ) const
 {
@@ -114,7 +114,7 @@ void FEAElement_Triangle3::get_R_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
+void FEAElement_Triangle3::get_2D_R_dR_d2R( int quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_xx, double * const &basis_yy,
@@ -133,12 +133,12 @@ void FEAElement_Triangle3::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-std::array<double,4> FEAElement_Triangle3::get_Jacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Triangle3::get_Jacobian_2D(int quaindex) const
 {
   return {{ Jac[0], Jac[1], Jac[2], Jac[3] }};
 }
 
-std::array<double,4> FEAElement_Triangle3::get_invJacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Triangle3::get_invJacobian_2D(int quaindex) const
 {
   return {{ Jac[4], Jac[5], Jac[6], Jac[7] }};
 }

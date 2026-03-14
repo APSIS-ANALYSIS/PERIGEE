@@ -42,7 +42,7 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
     const double qua_r = quad -> get_qp( qua, 0 );
     const double qua_s = quad -> get_qp( qua, 1 );
     const double qua_t = quad -> get_qp( qua, 2 );
-    
+
     R[q8  ] = (1.0 - qua_r) * (1.0 - qua_s) * (1.0 - qua_t);
     R[q8+1] = qua_r * (1.0 - qua_s) * (1.0 - qua_t);
     R[q8+2] = qua_r * qua_s * (1.0 - qua_t);
@@ -76,18 +76,18 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
                             (1.0 - qua_s) * qua_r,
                              qua_s * qua_r,
                              qua_s * (1.0 - qua_r) };
-    
-    const double d2R_drs[8] = { 1.0 - qua_t, qua_t - 1.0, 1.0 - qua_t, qua_t - 1.0, 
+
+    const double d2R_drs[8] = { 1.0 - qua_t, qua_t - 1.0, 1.0 - qua_t, qua_t - 1.0,
                                 qua_t, -qua_t, qua_t, -qua_t };
     const double d2R_drt[8] = { 1.0 - qua_s, qua_s - 1.0, -qua_s, qua_s,
                                 qua_s - 1.0, 1.0 - qua_s, qua_s, -qua_s};
     const double d2R_dst[8] = { 1.0 - qua_r, qua_r, -qua_r, qua_r - 1.0,
                                 qua_r - 1.0, -qua_r, qua_r, 1.0 - qua_r};
-    
+
     double xr = 0.0, xs = 0.0, xt = 0.0;
     double yr = 0.0, ys = 0.0, yt = 0.0;
     double zr = 0.0, zs = 0.0, zt = 0.0;
-    
+
     double xrs = 0.0, xrt = 0.0, xst = 0.0;
     double yrs = 0.0, yrt = 0.0, yst = 0.0;
     double zrs = 0.0, zrt = 0.0, zst = 0.0;
@@ -97,11 +97,11 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
       xr += ctrl_x[ii] * dR_dr[ii];
       xs += ctrl_x[ii] * dR_ds[ii];
       xt += ctrl_x[ii] * dR_dt[ii];
-      
+
       yr += ctrl_y[ii] * dR_dr[ii];
       ys += ctrl_y[ii] * dR_ds[ii];
       yt += ctrl_y[ii] * dR_dt[ii];
-      
+
       zr += ctrl_z[ii] * dR_dr[ii];
       zs += ctrl_z[ii] * dR_ds[ii];
       zt += ctrl_z[ii] * dR_dt[ii];
@@ -109,11 +109,11 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
       xrs += ctrl_x[ii] * d2R_drs[ii];
       xrt += ctrl_x[ii] * d2R_drt[ii];
       xst += ctrl_x[ii] * d2R_dst[ii];
-      
+
       yrs += ctrl_y[ii] * d2R_drs[ii];
       yrt += ctrl_y[ii] * d2R_drt[ii];
       yst += ctrl_y[ii] * d2R_dst[ii];
-      
+
       zrs += ctrl_z[ii] * d2R_drs[ii];
       zrt += ctrl_z[ii] * d2R_drt[ii];
       zst += ctrl_z[ii] * d2R_dst[ii];
@@ -122,7 +122,7 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
     FE_T::Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
 
     detJac[qua] = mdrdx.det(); // detJac = |dx/dr|
- 
+
     mdrdx.inverse();
 
     const int q9 = qua * 9;
@@ -130,7 +130,7 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
     dx_dr[q9+3] = yr; dx_dr[q9+4] = ys; dx_dr[q9+5] = yt;
     dx_dr[q9+6] = zr; dx_dr[q9+7] = zs; dx_dr[q9+8] = zt;
 
-    dr_dx[q9  ] = mdrdx(0); // dr_dx 
+    dr_dx[q9  ] = mdrdx(0); // dr_dx
     dr_dx[q9+1] = mdrdx(1); // dr_dy
     dr_dx[q9+2] = mdrdx(2); // dr_dz
     dr_dx[q9+3] = mdrdx(3); // ds_dx
@@ -142,9 +142,9 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      dR_dx[q8+ii] = dR_dr[ii]*mdrdx(0) + dR_ds[ii]*mdrdx(3) + dR_dt[ii]*mdrdx(6); 
-      dR_dy[q8+ii] = dR_dr[ii]*mdrdx(1) + dR_ds[ii]*mdrdx(4) + dR_dt[ii]*mdrdx(7); 
-      dR_dz[q8+ii] = dR_dr[ii]*mdrdx(2) + dR_ds[ii]*mdrdx(5) + dR_dt[ii]*mdrdx(8); 
+      dR_dx[q8+ii] = dR_dr[ii]*mdrdx(0) + dR_ds[ii]*mdrdx(3) + dR_dt[ii]*mdrdx(6);
+      dR_dy[q8+ii] = dR_dr[ii]*mdrdx(1) + dR_ds[ii]*mdrdx(4) + dR_dt[ii]*mdrdx(7);
+      dR_dz[q8+ii] = dR_dr[ii]*mdrdx(2) + dR_ds[ii]*mdrdx(5) + dR_dt[ii]*mdrdx(8);
     }
 
     // Setup the 6x6 matrix
@@ -186,7 +186,7 @@ double FEAElement_Hex8::get_h( const double * const &ctrl_x,
       + std::pow((ctrl_y[2] - ctrl_y[4]), 2.0) + std::pow((ctrl_z[2] - ctrl_z[4]), 2.0),
       std::pow((ctrl_x[3] - ctrl_x[5]), 2.0)
       + std::pow((ctrl_y[3] - ctrl_y[5]), 2.0) + std::pow((ctrl_z[3] - ctrl_z[5]), 2.0) };
-    
+
   double d = diag[0];
   for(int ii = 1; ii<4; ++ii)
   {
@@ -196,14 +196,14 @@ double FEAElement_Hex8::get_h( const double * const &ctrl_x,
   return std::sqrt(d);
 }
 
-void FEAElement_Hex8::get_R( const int &quaindex, double * const &basis ) const
+void FEAElement_Hex8::get_R( int quaindex, double * const &basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
-std::vector<double> FEAElement_Hex8::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Hex8::get_R( int quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -211,7 +211,7 @@ std::vector<double> FEAElement_Hex8::get_R( const int &quaindex ) const
          R[offset+4], R[offset+5], R[offset+6], R[offset+7] };
 }
 
-void FEAElement_Hex8::get_gradR( const int &quaindex, double * const &basis_x,
+void FEAElement_Hex8::get_gradR( int quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_gradR function error.\n" );
@@ -224,7 +224,7 @@ void FEAElement_Hex8::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Hex8::get_R_gradR( const int &quaindex, double * const &basis,
+void FEAElement_Hex8::get_R_gradR( int quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
 {
@@ -239,7 +239,7 @@ void FEAElement_Hex8::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-void FEAElement_Hex8::get_3D_R_dR_d2R( const int &quaindex,
+void FEAElement_Hex8::get_3D_R_dR_d2R( int quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -263,7 +263,7 @@ void FEAElement_Hex8::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Hex8::get_3D_R_gradR_LaplacianR( const int &quaindex,
+void FEAElement_Hex8::get_3D_R_gradR_LaplacianR( int quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -283,7 +283,7 @@ void FEAElement_Hex8::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-std::array<double,9> FEAElement_Hex8::get_Jacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Hex8::get_Jacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_Jacobian function error.\n" );
   return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2],
@@ -291,7 +291,7 @@ std::array<double,9> FEAElement_Hex8::get_Jacobian(const int &quaindex) const
     dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
 }
 
-std::array<double,9> FEAElement_Hex8::get_invJacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Hex8::get_invJacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_invJacobian function error.\n" );
   return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2],
@@ -299,7 +299,7 @@ std::array<double,9> FEAElement_Hex8::get_invJacobian(const int &quaindex) const
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Hex8::buildBasis( const int &face_id, const IQuadPts * const &quad_s, 
+void FEAElement_Hex8::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
     const double * const &ctrl_x,
     const double * const &ctrl_y,
     const double * const &ctrl_z )

@@ -4,7 +4,7 @@
 // FEAElement_Tet4.hpp
 // Element routine for the linear tetrahedral element, with evaluation of shape
 // functions and their derivatives.
-// 
+//
 // Tet4 means 4-node tet, aka linear tets.
 //
 // Date Created: Jan 19 2017
@@ -29,7 +29,7 @@ class FEAElement_Tet4 final : public FEAElement
 
     void print_info() const override;
 
-    // Given the quadrature points and nodal coordinates, evaluate the basis 
+    // Given the quadrature points and nodal coordinates, evaluate the basis
     // functions and their derivatives up to second order
     void buildBasis( const IQuadPts * const &quad_rule,
         const double * const &ctrl_x,
@@ -43,48 +43,48 @@ class FEAElement_Tet4 final : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const override;
 
-    // Get functions give access to function evaluations at the quadrature point 
+    // Get functions give access to function evaluations at the quadrature point
     // corresponding to quaindex
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * const &basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
-    void get_gradR( const int &quaindex, double * const &basis_x,
+    void get_gradR( int quaindex, double * const &basis_x,
         double * const &basis_y, double * const &basis_z ) const override;
 
-    void get_R_gradR( const int &quaindex, double * const &basis,
+    void get_R_gradR( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const override;
 
-    void get_3D_R_dR_d2R( const int &quaindex, 
-        double * const &basis, double * const &basis_x, 
+    void get_3D_R_dR_d2R( int quaindex,
+        double * const &basis, double * const &basis_x,
         double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_zz, double * const &basis_xy, 
+        double * const &basis_xx, double * const &basis_yy,
+        double * const &basis_zz, double * const &basis_xy,
         double * const &basis_xz, double * const &basis_yz ) const override;
 
-    void get_3D_R_gradR_LaplacianR( const int &quaindex,
-        double * const &basis, double * const &basis_x, 
-        double * const &basis_y, double * const &basis_z, 
-        double * const &basis_xx, double * const &basis_yy, 
+    void get_3D_R_gradR_LaplacianR( int quaindex,
+        double * const &basis, double * const &basis_x,
+        double * const &basis_y, double * const &basis_z,
+        double * const &basis_xx, double * const &basis_yy,
         double * const &basis_zz ) const override;
 
     // Get the Jacobian matrix dx/dr
-    std::array<double,9> get_Jacobian( const int &quaindex ) const override
+    std::array<double,9> get_Jacobian( int quaindex ) const override
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_Jacobian function error.\n"  );
       return {{Jac[0], Jac[1], Jac[2], Jac[3], Jac[4], Jac[5], Jac[6], Jac[7], Jac[8]}};
     }
 
     // Get the inverse Jacobian matrix dr/dx
-    std::array<double,9> get_invJacobian( const int &quaindex ) const override
+    std::array<double,9> get_invJacobian( int quaindex ) const override
     {
       ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_invJacobian function error.\n"  );
       return {{Jac[9], Jac[10], Jac[11], Jac[12], Jac[13], Jac[14], Jac[15], Jac[16], Jac[17]}};
     }
 
     // Get the determinant of the Jacobian matrix
-    double get_detJac(const int &quaindex) const override {return detJac;}
+    double get_detJac(int quaindex) const override {return detJac;}
 
     // Build basis and build the boundary element
     //   Tet-Face-0 : Node 1 2 3
@@ -102,7 +102,7 @@ class FEAElement_Tet4 final : public FEAElement
     // The node numbering of the face element guarantees the get_2d_normal_out
     // returns the outward normal vector
     // See FE_T::QuadPts_on_face function for more details.
-    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override
+    Vector_3 get_2d_normal_out( int quaindex, double &area ) const override
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
     std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
@@ -125,7 +125,7 @@ class FEAElement_Tet4 final : public FEAElement
     // Container for
     // dx_dr : 0 <= ii < 9
     // dr_dx : 9 <= ii < 18
-    std::array<double,18> Jac {}; 
+    std::array<double,18> Jac {};
 
     double detJac {};
 

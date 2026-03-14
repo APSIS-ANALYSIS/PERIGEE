@@ -2,7 +2,7 @@
 #define FEAELEMENT_QUAD4_3D_DER0_HPP
 // ==================================================================
 // FEAElement_Quad4_3D_der0.hpp
-// Element routine for the bilinear quadrilateral element in 
+// Element routine for the bilinear quadrilateral element in
 // three-dimensional space, with evaluation of the basis functions
 // only (no derivatives).
 //
@@ -54,20 +54,20 @@ class FEAElement_Quad4_3D_der0 final : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z ) override;
 
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * const &basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
     // Assuming the quad nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
-    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override;
-    
+    Vector_3 get_2d_normal_out( int quaindex, double &area ) const override;
+
     // If the quad nodes are NOT arranged in any particular order,
-    // use an interior node to define the outward direction. 
-    Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
+    // use an interior node to define the outward direction.
+    Vector_3 get_normal_out( int quaindex, const Vector_3 &sur_pt,
         const Vector_3 &int_pt, double &len ) const override;
 
-    double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
+    double get_detJac(int quaindex) const override {return detJac[quaindex];}
 
   private:
     static constexpr int nLocBas = 4;

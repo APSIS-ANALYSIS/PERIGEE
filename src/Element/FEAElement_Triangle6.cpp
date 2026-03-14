@@ -11,7 +11,7 @@ FEAElement_Triangle6::FEAElement_Triangle6( const int &in_nqua )
   d2R_dxx.resize(nLocBas * numQuapts, 0.0);
   d2R_dyy.resize(nLocBas * numQuapts, 0.0);
   d2R_dxy.resize(nLocBas * numQuapts, 0.0);
-  
+
   Jac.resize(9 * numQuapts, 0.0);
 }
 
@@ -67,11 +67,11 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     const double dR_dr[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
       4.0 * qua_r - 1.0, 0.0, 4.0 - 8.0 * qua_r - 4.0 * qua_s,
       4.0 * qua_s, -4.0 * qua_s };
-    
+
     const double dR_ds[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
       0.0, 4.0 * qua_s - 1.0, -4.0 * qua_r, 4.0 * qua_r,
-      4.0 - 4.0 * qua_r - 8.0 * qua_s };  
-    
+      4.0 - 4.0 * qua_r - 8.0 * qua_s };
+
     double dx_dr = 0.0, dx_ds = 0.0, dy_dr = 0.0, dy_ds = 0.0;
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -80,7 +80,7 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
       dy_dr += ctrl_y[ii] * dR_dr[ii];
       dy_ds += ctrl_y[ii] * dR_ds[ii];
     }
-    
+
     Jac[4*qua+0] = dx_dr;
     Jac[4*qua+1] = dx_ds;
     Jac[4*qua+2] = dy_dr;
@@ -99,7 +99,7 @@ void FEAElement_Triangle6::buildBasis( const IQuadPts * const &quad,
     Jac[4*numQuapts + 4*qua + 1] = dr_dy;
     Jac[4*numQuapts + 4*qua + 2] = ds_dx;
     Jac[4*numQuapts + 4*qua + 3] = ds_dy;
-  
+
     for(int ii=0; ii<nLocBas; ++ii)
     {
       dR_dx[offset+ii] = dR_dr[ii] * dr_dx + dR_ds[ii] * ds_dx;
@@ -161,7 +161,7 @@ double FEAElement_Triangle6::get_h( const double * const &ctrl_x,
   return 2.0 * radius;
 }
 
-void FEAElement_Triangle6::get_R( const int &quaindex, 
+void FEAElement_Triangle6::get_R( int quaindex,
     double * const &basis ) const
 {
   const int offset = quaindex * nLocBas;
@@ -170,13 +170,13 @@ void FEAElement_Triangle6::get_R( const int &quaindex,
   basis[4] = R[offset+4]; basis[5] = R[offset+5];
 }
 
-std::vector<double> FEAElement_Triangle6::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Triangle6::get_R( int quaindex ) const
 {
   const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3], R[offset+4], R[offset+5] };
 }
 
-void FEAElement_Triangle6::get_gradR( const int &quaindex, 
+void FEAElement_Triangle6::get_gradR( int quaindex,
     double * const &basis_x, double * const &basis_y ) const
 {
   const int offset = quaindex * nLocBas;
@@ -187,8 +187,8 @@ void FEAElement_Triangle6::get_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Triangle6::get_R_gradR( const int &quaindex, 
-    double * const &basis, double * const &basis_x, 
+void FEAElement_Triangle6::get_R_gradR( int quaindex,
+    double * const &basis, double * const &basis_x,
     double * const &basis_y ) const
 {
   const int offset = quaindex * nLocBas;
@@ -200,7 +200,7 @@ void FEAElement_Triangle6::get_R_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
+void FEAElement_Triangle6::get_2D_R_dR_d2R( int quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_xx, double * const &basis_yy,
@@ -219,13 +219,13 @@ void FEAElement_Triangle6::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-std::array<double,4> FEAElement_Triangle6::get_Jacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Triangle6::get_Jacobian_2D(int quaindex) const
 {
   return {{ Jac[4*quaindex], Jac[4*quaindex+1],
     Jac[4*quaindex+2], Jac[4*quaindex+3] }};
 }
 
-std::array<double,4> FEAElement_Triangle6::get_invJacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Triangle6::get_invJacobian_2D(int quaindex) const
 {
   const int offset = 4 * numQuapts + 4 * quaindex;
   return {{ Jac[offset], Jac[offset+1], Jac[offset+2], Jac[offset+3] }};

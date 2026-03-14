@@ -3,9 +3,9 @@
 // ==================================================================
 // FEAElement_Tet10.hpp
 // Element routine for quadratic 10-node tetrahedral element.
-// The node numbering is made compatible with the vtk format -- see 
+// The node numbering is made compatible with the vtk format -- see
 // the graph below.
-// 
+//
 // Tet10 : 10-node tet element, aka, quadratic tet.
 //
 //                     t
@@ -18,14 +18,14 @@
 //                     7        9
 //                 /   |           -
 //                     |             -
-//                8    |                - 
+//                8    |                -
 //                    /0--------6---------2-------> s
 //               /   /                -
 //                  /              -
-//              /  4           -   
-//                /        5    
+//              /  4           -
+//                /        5
 //             / /     -
-//              /  - 
+//              /  -
 //             1
 //            /
 //           *
@@ -71,35 +71,35 @@ class FEAElement_Tet10 final : public FEAElement
 
     // get_xxx functions give access to function evaluations at the
     // quadrature point corresponding to quaindex
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * const &basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
-    void get_gradR( const int &quaindex, double * const &basis_x,
+    void get_gradR( int quaindex, double * const &basis_x,
         double * const &basis_y, double * const &basis_z ) const override;
 
-    void get_R_gradR( const int &quaindex, double * const &basis,
+    void get_R_gradR( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y,
         double * const &basis_z ) const override;
 
-    void get_3D_R_dR_d2R( const int &quaindex,
+    void get_3D_R_dR_d2R( int quaindex,
         double * const &basis, double * const &basis_x,
         double * const &basis_y, double * const &basis_z,
         double * const &basis_xx, double * const &basis_yy,
         double * const &basis_zz, double * const &basis_xy,
         double * const &basis_xz, double * const &basis_yz ) const override;
 
-    void get_3D_R_gradR_LaplacianR( const int &quaindex,
+    void get_3D_R_gradR_LaplacianR( int quaindex,
         double * const &basis, double * const &basis_x,
         double * const &basis_y, double * const &basis_z,
         double * const &basis_xx, double * const &basis_yy,
         double * const &basis_zz ) const override;
 
-    std::array<double,9> get_Jacobian( const int &quaindex ) const override;
+    std::array<double,9> get_Jacobian( int quaindex ) const override;
 
-    std::array<double,9> get_invJacobian( const int &quaindex ) const override;
+    std::array<double,9> get_invJacobian( int quaindex ) const override;
 
-    double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
+    double get_detJac(int quaindex) const override {return detJac[quaindex];}
 
     // Build basis and build the boundary element
     //   Tet-Face-0 : Node 1 2 3 5 9 8
@@ -112,7 +112,7 @@ class FEAElement_Tet10 final : public FEAElement
         const double * const &ctrl_z ) override;
 
     // Get the outwardnormal on faces
-    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override
+    Vector_3 get_2d_normal_out( int quaindex, double &area ) const override
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
   private:

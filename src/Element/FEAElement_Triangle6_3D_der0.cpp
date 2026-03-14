@@ -36,15 +36,15 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
     R[offset + 3] = 4.0 * qua_r * qua_t;
     R[offset + 4] = 4.0 * qua_r * qua_s;
     R[offset + 5] = 4.0 * qua_s * qua_t;
- 
+
     const double Rr[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
      4.0 * qua_r - 1.0, 0.0, 4.0 - 8.0 * qua_r - 4.0 * qua_s,
      4.0 * qua_s, -4.0 * qua_s };
-    
+
     const double Rs[6] { 4.0 * qua_r + 4.0 * qua_s - 3.0,
       0.0, 4.0 * qua_s - 1.0, -4.0 * qua_r, 4.0 * qua_r,
       4.0 - 4.0 * qua_r - 8.0 * qua_s };
-    
+
     Vector_3 dx_dr( 0.0, 0.0, 0.0 );
     Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
@@ -59,8 +59,8 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-void FEAElement_Triangle6_3D_der0::get_R( 
-    const int &quaindex, double * const &basis ) const
+void FEAElement_Triangle6_3D_der0::get_R(
+    int quaindex, double * const &basis ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -72,8 +72,8 @@ void FEAElement_Triangle6_3D_der0::get_R(
   basis[5] = R[offset+5];
 }
 
-std::vector<double> FEAElement_Triangle6_3D_der0::get_R( 
-    const int &quaindex ) const
+std::vector<double> FEAElement_Triangle6_3D_der0::get_R(
+    int quaindex ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;

@@ -36,14 +36,14 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
 {
   ASSERT( quad -> get_dim() == 4, "FEAElement_Tet10::buildBasis function error.\n" );
 
-  // second der wrt ref var  0    1    2    3     4    5     6     7    8    9 
+  // second der wrt ref var  0    1    2    3     4    5     6     7    8    9
   const double d2R_drr[10] { 4.0, 4.0, 0.0, 0.0, -8.0, 0.0,  0.0,  0.0, 0.0, 0.0 };
   const double d2R_dss[10] { 4.0, 0.0, 4.0, 0.0,  0.0, 0.0, -8.0,  0.0, 0.0, 0.0 };
   const double d2R_dtt[10] { 4.0, 0.0, 0.0, 4.0,  0.0, 0.0,  0.0, -8.0, 0.0, 0.0 };
   const double d2R_drs[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 4.0, -4.0,  0.0, 0.0, 0.0 };
   const double d2R_drt[10] { 4.0, 0.0, 0.0, 0.0, -4.0, 0.0,  0.0, -4.0, 4.0, 0.0 };
   const double d2R_dst[10] { 4.0, 0.0, 0.0, 0.0,  0.0, 0.0, -4.0, -4.0, 0.0, 4.0 };
-  
+
   // Caclulate second derivative of geometry
   // Here, second derivatives d2R_drr, etc are constant. We can calculate
   // xrr, etc. out of the quadrature loop.
@@ -59,14 +59,14 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
     xrs += ctrl_x[ii] * d2R_drs[ii];
     xrt += ctrl_x[ii] * d2R_drt[ii];
     xst += ctrl_x[ii] * d2R_dst[ii];
-    
+
     yrr += ctrl_y[ii] * d2R_drr[ii];
     yss += ctrl_y[ii] * d2R_dss[ii];
     ytt += ctrl_y[ii] * d2R_dtt[ii];
     yrs += ctrl_y[ii] * d2R_drs[ii];
     yrt += ctrl_y[ii] * d2R_drt[ii];
     yst += ctrl_y[ii] * d2R_dst[ii];
-    
+
     zrr += ctrl_z[ii] * d2R_drr[ii];
     zss += ctrl_z[ii] * d2R_dss[ii];
     ztt += ctrl_z[ii] * d2R_dtt[ii];
@@ -82,7 +82,7 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
     const double qua_r = quad -> get_qp( qua, 0 );
     const double qua_s = quad -> get_qp( qua, 1 );
     const double qua_t = quad -> get_qp( qua, 2 );
-    const double qua_u = quad -> get_qp( qua, 3 ); 
+    const double qua_u = quad -> get_qp( qua, 3 );
 
     R[q10+0] = qua_u * (2.0*qua_u - 1.0);
     R[q10+1] = qua_r * (2.0*qua_r - 1.0);
@@ -95,15 +95,15 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
     R[q10+8] = 4.0 * qua_r * qua_t;
     R[q10+9] = 4.0 * qua_s * qua_t;
 
-    const double dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0, 0.0, 
+    const double dR_dr[10] { 1.0 - 4.0 * qua_u, 4.0 * qua_r - 1.0, 0.0, 0.0,
       4.0 * (qua_u - qua_r), 4.0 * qua_s, -4.0 * qua_s, -4.0 * qua_t, 4.0 * qua_t, 0.0 };
 
-    const double dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0, 0.0, 
+    const double dR_ds[10] { 1.0 - 4.0 * qua_u, 0.0, 4.0 * qua_s - 1.0, 0.0,
       -4.0 * qua_r, 4.0 * qua_r, 4.0 * (qua_u - qua_s), -4.0 * qua_t, 0.0, 4.0 * qua_t };
-    
-    const double dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0, 4.0 * qua_t - 1.0, -4.0 * qua_r, 
+
+    const double dR_dt[10] { 1.0 - 4.0 * qua_u, 0.0, 0.0, 4.0 * qua_t - 1.0, -4.0 * qua_r,
       0.0, -4.0 * qua_s, 4.0 * (qua_u - qua_t), 4.0 * qua_r, 4.0 * qua_s };
-    
+
     double xr = 0.0, xs = 0.0, xt = 0.0;
     double yr = 0.0, ys = 0.0, yt = 0.0;
     double zr = 0.0, zs = 0.0, zt = 0.0;
@@ -112,27 +112,27 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
       xr += ctrl_x[ii] * dR_dr[ii];
       xs += ctrl_x[ii] * dR_ds[ii];
       xt += ctrl_x[ii] * dR_dt[ii];
-      
+
       yr += ctrl_y[ii] * dR_dr[ii];
       ys += ctrl_y[ii] * dR_ds[ii];
       yt += ctrl_y[ii] * dR_dt[ii];
-      
+
       zr += ctrl_z[ii] * dR_dr[ii];
       zs += ctrl_z[ii] * dR_ds[ii];
       zt += ctrl_z[ii] * dR_dt[ii];
     }
-  
+
     FE_T::Matrix_double_3by3_Array mdrdx(xr, xs, xt, yr, ys, yt, zr, zs, zt);
 
     detJac[qua] = mdrdx.det(); // detJac = |dx/dr|
- 
+
     mdrdx.inverse();
-    
+
     dx_dr[9*qua + 0] = xr; dx_dr[9*qua + 1] = xs; dx_dr[9*qua + 2] = xt;
     dx_dr[9*qua + 3] = yr; dx_dr[9*qua + 4] = ys; dx_dr[9*qua + 5] = yt;
     dx_dr[9*qua + 6] = zr; dx_dr[9*qua + 7] = zs; dx_dr[9*qua + 8] = zt;
-    
-    dr_dx[9*qua + 0] = mdrdx(0); // dr_dx 
+
+    dr_dx[9*qua + 0] = mdrdx(0); // dr_dx
     dr_dx[9*qua + 1] = mdrdx(1); // dr_dy
     dr_dx[9*qua + 2] = mdrdx(2); // dr_dz
     dr_dx[9*qua + 3] = mdrdx(3); // ds_dx
@@ -144,9 +144,9 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
-      dR_dx[q10+ii] = dR_dr[ii]*mdrdx(0) + dR_ds[ii]*mdrdx(3) + dR_dt[ii]*mdrdx(6); 
-      dR_dy[q10+ii] = dR_dr[ii]*mdrdx(1) + dR_ds[ii]*mdrdx(4) + dR_dt[ii]*mdrdx(7); 
-      dR_dz[q10+ii] = dR_dr[ii]*mdrdx(2) + dR_ds[ii]*mdrdx(5) + dR_dt[ii]*mdrdx(8); 
+      dR_dx[q10+ii] = dR_dr[ii]*mdrdx(0) + dR_ds[ii]*mdrdx(3) + dR_dt[ii]*mdrdx(6);
+      dR_dy[q10+ii] = dR_dr[ii]*mdrdx(1) + dR_ds[ii]*mdrdx(4) + dR_dt[ii]*mdrdx(7);
+      dR_dz[q10+ii] = dR_dr[ii]*mdrdx(2) + dR_ds[ii]*mdrdx(5) + dR_dt[ii]*mdrdx(8);
     }
 
     // Setup the 6x6 matrix
@@ -183,17 +183,17 @@ double FEAElement_Tet10::get_h( const double * const &ctrl_x,
   return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
-      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] ); 
+      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );
 }
 
-void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
+void FEAElement_Tet10::get_R( int quaindex, double * const &basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
-std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Tet10::get_R( int quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -201,7 +201,7 @@ std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
     R[offset+4], R[offset+5], R[offset+6], R[offset+7], R[offset+8], R[offset+9] };
 }
 
-void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
+void FEAElement_Tet10::get_gradR( int quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_gradR function error.\n" );
@@ -214,7 +214,7 @@ void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
+void FEAElement_Tet10::get_R_gradR( int quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
 {
@@ -229,7 +229,7 @@ void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
+void FEAElement_Tet10::get_3D_R_dR_d2R( int quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -253,7 +253,7 @@ void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
+void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( int quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -273,7 +273,7 @@ void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Tet10::get_Jacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_Jacobian function error.\n" );
   return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2],
@@ -281,7 +281,7 @@ std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
     dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
 }
 
-std::array<double,9> FEAElement_Tet10::get_invJacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Tet10::get_invJacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_invJacobian function error.\n" );
   return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2],

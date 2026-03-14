@@ -33,11 +33,11 @@ void FEAElement_Quad4_3D_der0::buildBasis( const IQuadPts * const &quad,
     R[offset + 1] = qua_r * (1.0 - qua_s);
     R[offset + 2] = qua_r * qua_s;
     R[offset + 3] = (1.0 - qua_r) * qua_s;
- 
+
     const double Rr[4] { qua_s - 1.0, 1.0 - qua_s, qua_s, -qua_s };
-    
+
     const double Rs[4] { qua_r - 1.0, -qua_r, qua_r, 1.0 - qua_r };
-    
+
     Vector_3 dx_dr( 0.0, 0.0, 0.0 );
     Vector_3 dx_ds( 0.0, 0.0, 0.0 );
 
@@ -52,8 +52,8 @@ void FEAElement_Quad4_3D_der0::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-void FEAElement_Quad4_3D_der0::get_R( 
-    const int &quaindex, double * const &basis ) const
+void FEAElement_Quad4_3D_der0::get_R(
+    int quaindex, double * const &basis ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Quad4_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -63,8 +63,8 @@ void FEAElement_Quad4_3D_der0::get_R(
   basis[3] = R[offset+3];
 }
 
-std::vector<double> FEAElement_Quad4_3D_der0::get_R( 
-    const int &quaindex ) const
+std::vector<double> FEAElement_Quad4_3D_der0::get_R(
+    int quaindex ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Quad4_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -76,7 +76,7 @@ Vector_3 FEAElement_Quad4_3D_der0::get_2d_normal_out( const int &qua,
 {
   ASSERT(qua >= 0 && qua < numQuapts, "FEAElement_Quad4_3D_der0::get_2d_normal_out function error.\n" );
   area = detJac[qua];
-  return un[qua]; 
+  return un[qua];
 }
 
 Vector_3 FEAElement_Quad4_3D_der0::get_normal_out( const int &qua,

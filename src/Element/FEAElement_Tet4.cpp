@@ -32,11 +32,11 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
     R[qua*4+2] = qua_s;
     R[qua*4+3] = qua_t;
   }
-  
+
   Jac[0] = -ctrl_x[0] + ctrl_x[1]; // dx_dr
   Jac[1] = -ctrl_x[0] + ctrl_x[2]; // dx_ds
   Jac[2] = -ctrl_x[0] + ctrl_x[3]; // dx_dt
-  
+
   Jac[3] = -ctrl_y[0] + ctrl_y[1]; // dy_dr
   Jac[4] = -ctrl_y[0] + ctrl_y[2]; // dy_ds
   Jac[5] = -ctrl_y[0] + ctrl_y[3]; // dy_dt
@@ -56,10 +56,10 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
 
   // dr_dx
   Jac[9]  = mdrdx(0); Jac[10] = mdrdx(1); Jac[11] = mdrdx(2);
-  
+
   // ds_dx
   Jac[12] = mdrdx(3); Jac[13] = mdrdx(4); Jac[14] = mdrdx(5);
-  
+
   // dt_dx
   Jac[15] = mdrdx(6); Jac[16] = mdrdx(7); Jac[17] = mdrdx(8);
 
@@ -79,7 +79,7 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
   dR_dz[3] = Jac[17];
 }
 
-void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
+void FEAElement_Tet4::get_R( int quaindex, double * const &basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -89,14 +89,14 @@ void FEAElement_Tet4::get_R( const int &quaindex, double * const &basis ) const
   basis[3] = R[offset+3];
 }
 
-std::vector<double> FEAElement_Tet4::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Tet4::get_R( int quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3] };
 }
 
-void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
+void FEAElement_Tet4::get_gradR( int quaindex, double * const &basis_x,
     double * const &basis_y, double * const &basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_gradR function error.\n" );
@@ -108,7 +108,7 @@ void FEAElement_Tet4::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
+void FEAElement_Tet4::get_R_gradR( int quaindex, double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_z ) const
 {
@@ -123,7 +123,7 @@ void FEAElement_Tet4::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
+void FEAElement_Tet4::get_3D_R_dR_d2R( int quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -147,7 +147,7 @@ void FEAElement_Tet4::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( const int &quaindex,
+void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( int quaindex,
     double * const &basis, double * const &basis_x,
     double * const &basis_y, double * const &basis_z,
     double * const &basis_xx, double * const &basis_yy,
@@ -174,7 +174,7 @@ double FEAElement_Tet4::get_h( const double * const &ctrl_x,
   return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
       ctrl_y[0], ctrl_y[1], ctrl_y[2], ctrl_y[3],
-      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );  
+      ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );
 }
 
 void FEAElement_Tet4::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
