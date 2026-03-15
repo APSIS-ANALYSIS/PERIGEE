@@ -15,12 +15,12 @@ class ALocal_EBC
 {
   public:
     // ------------------------------------------------------------------------
-    // ! Constructor. 
-    //   Read from part file, and the EBC info is stored in the group /ebc by 
+    // ! Constructor.
+    //   Read from part file, and the EBC info is stored in the group /ebc by
     //   default. User may specify a group name for gname if the data is written
     //   under a different groupname.
     // ------------------------------------------------------------------------
-    ALocal_EBC( const std::string &fileBaseName, const int &cpu_rank, 
+    ALocal_EBC( const std::string &fileBaseName, int cpu_rank,
         const std::string &gname="/ebc" );
 
     ALocal_EBC( const HDF5_Reader * const &h5r,
@@ -44,31 +44,31 @@ class ALocal_EBC
     // The following are functions that access the geometrical data of
     // the ii-th surface that is prescribed with the elemental BC
     // 0 <= ii < num_ebc
-    // ! get the number of all nodes associated with the surface cells within 
+    // ! get the number of all nodes associated with the surface cells within
     //   this partition.
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell_node(const int &ii) const 
+    virtual int get_num_local_cell_node(int ii) const
     {return num_local_cell_node[ii];}
 
     // ------------------------------------------------------------------------
     // ! get the number of surface cells within this partition.
     //   \para 0 <= ii < num_ebc
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell(const int &ii) const {return num_local_cell[ii];}
+    virtual int get_num_local_cell(int ii) const {return num_local_cell[ii];}
 
     // ------------------------------------------------------------------------
     // ! get the number of local basis functions of the surface cells. This is
     //   directly associated with the cell element type.
     //   \para 0 <= ii < num_ebc
     // ------------------------------------------------------------------------
-    virtual int get_cell_nLocBas(const int &ii) const {return cell_nLocBas[ii];}
+    virtual int get_cell_nLocBas(int ii) const {return cell_nLocBas[ii];}
 
     // ------------------------------------------------------------------------
     // ! get the local cell node's spatial coordinates.
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < 3 x num_local_cell_node[ii]
     // ------------------------------------------------------------------------
-    virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
+    virtual double get_local_cell_node_xyz(int ii, int jj) const
     {return local_cell_node_xyz[ii][jj];}
 
     // ------------------------------------------------------------------------
@@ -77,7 +77,7 @@ class ALocal_EBC
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < cell_nLocBas[ii] x num_local_cell[ii]
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien(const int &ii, const int &jj) const
+    virtual int get_local_cell_ien(int ii, int jj) const
     {return local_cell_ien[ii][jj];}
 
     // ------------------------------------------------------------------------
@@ -85,7 +85,7 @@ class ALocal_EBC
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell_node[ii]
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
+    virtual int get_local_cell_node_vol_id(int ii, int jj) const
     {return local_cell_node_vol_id[ii][jj];}
 
     // ------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class ALocal_EBC
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell_node[ii]
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_node_pos(const int &ii, const int &jj) const
+    virtual int get_local_cell_node_pos(int ii, int jj) const
     {return local_cell_node_pos[ii][jj];}
 
     // ------------------------------------------------------------------------
@@ -101,7 +101,7 @@ class ALocal_EBC
     //   \para 0 <= ii < num_ebc
     //   \para 0 <= jj < num_local_cell[ii]
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_vol_id(const int &ii, const int &jj) const
+    virtual int get_local_cell_vol_id(int ii, int jj) const
     {return local_cell_vol_id[ii][jj];}
 
     // ------------------------------------------------------------------------
@@ -110,10 +110,10 @@ class ALocal_EBC
     // Users are responsible for allocating & deleting the ctrl_xyz arrays.
     // ebc_id : 0 <= ii < num_ebc;
     // surface element id: 0 <= eindex < num_local_cell[ii];
-    // ctrl_x/y/z : output geometry array, length is 
+    // ctrl_x/y/z : output geometry array, length is
     //              cell_nLocBas[ii].
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz(const int &ii, const int &eindex, 
+    virtual void get_ctrlPts_xyz(int ii, int eindex,
         double * const &ctrl_x, double * const &ctrl_y, double * const &ctrl_z ) const;
 
     // ------------------------------------------------------------------------
@@ -123,9 +123,9 @@ class ALocal_EBC
     // eindex : 0 <= eindex < num_local_cell[ii]
     // sien : length cell_nLocBas[ii].
     // ------------------------------------------------------------------------
-    virtual void get_SIEN( const int &ii, const int &eindex, int * const &sien ) const;
+    virtual void get_SIEN( int ii, int eindex, int * const &sien ) const;
 
-    virtual std::vector<int> get_SIEN( const int &ii, const int &eindex ) const;
+    virtual std::vector<int> get_SIEN( int ii, int eindex ) const;
 
     // ------------------------------------------------------------------------
     // get_intPts_xyz: returns the surface element's interior point
@@ -134,7 +134,7 @@ class ALocal_EBC
     // eindex : 0 <= eindex < num_local_cell[ii];
     // coor_x/y/z : output interior point coordinates
     // ------------------------------------------------------------------------
-    virtual void get_intPts_xyz(const int &ii, const int &eindex, 
+    virtual void get_intPts_xyz(int ii, int eindex,
         double &coor_x, double &coor_y, double &coor_z ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_intPts_xyz is not implemented. \n");
@@ -149,7 +149,7 @@ class ALocal_EBC
     //                      surface; otherwise return 0.
     //                      ii : face id ranging from 0 <= ii < num_ebc.
     // ------------------------------------------------------------------------
-    virtual int get_num_face_nodes(const int &ii) const
+    virtual int get_num_face_nodes(int ii) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_num_face_nodes is not implemented. \n");
       return -1;
@@ -161,12 +161,12 @@ class ALocal_EBC
     //             ii : face_id ranging 0 <= ii < num_ebc.
     //             output vector's length is get_num_face_nodes(ii).
     // ------------------------------------------------------------------------
-    virtual std::vector<double> get_intNA( const int &ii ) const
+    virtual std::vector<double> get_intNA( int ii ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_intNA is not implemented. \n");
       return {};
     }
-    
+
     // ------------------------------------------------------------------------
     // get_LID : returns the LID for the nodes associated with intNA,
     //           if this partition owns any cell on this surface.
@@ -174,7 +174,7 @@ class ALocal_EBC
     //           output is a vector, whose length is 3 x get_num_face_nodes(ii),
     //           and is the LID of node 0 x, y, z, node1 x, y, z, ...
     // ------------------------------------------------------------------------
-    virtual std::vector<int> get_LID( const int &ii ) const
+    virtual std::vector<int> get_LID( int ii ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_LID is not implemented. \n");
       return {};
@@ -185,7 +185,7 @@ class ALocal_EBC
     //              this partition owns any cell on this surface.
     //              ii : face_id ranging from 0 <= ii < num_ebc,
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_outvec( const int &ii ) const
+    virtual Vector_3 get_outvec( int ii ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_outvec is not implemented. \n");
       return Vector_3();
@@ -199,7 +199,7 @@ class ALocal_EBC
     // num_local_cell_node[ii] gives the ii-th ebc's local cell node number. These are
     //                    nodes associated with local cells.
     // num_local_cell[ii] gives the ii-th ebc's local cell number.
-    // cell_nLocBas[ii]   gives the cell's number of node. e.g., 
+    // cell_nLocBas[ii]   gives the cell's number of node. e.g.,
     //                    triangle surface is 3,
     //                    quadralaterial surface is 4,
     //                    quadratic triangle surface is 6.
@@ -210,7 +210,7 @@ class ALocal_EBC
     std::vector< std::vector<double> > local_cell_node_xyz;
 
     // local_cell_ien[ii] gives the local cell's IEN array
-    // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
+    // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii])
     std::vector< std::vector<int> > local_cell_ien;
 
     // local cell nodes' global indices
@@ -224,8 +224,8 @@ class ALocal_EBC
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
     std::vector< std::vector<int> > local_cell_vol_id;
-    
-    ALocal_EBC() = delete; 
+
+    ALocal_EBC() = delete;
 };
 
 #endif

@@ -1,7 +1,7 @@
 #include "ALocal_RotatedBC.hpp"
 
-ALocal_RotatedBC::ALocal_RotatedBC( 
-    const std::string &fileBaseName, const int &cpu_rank )
+ALocal_RotatedBC::ALocal_RotatedBC(
+    const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -9,7 +9,7 @@ ALocal_RotatedBC::ALocal_RotatedBC(
 
   auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
 
-  const std::string gname("/rotated_nbc"); 
+  const std::string gname("/rotated_nbc");
 
   Num_LD = h5r -> read_intScalar( gname.c_str(), "Num_LD" );
 
@@ -23,7 +23,7 @@ ALocal_RotatedBC::ALocal_RotatedBC(
     ASSERT( VEC_T::get_size(temp_ldn_xyz) == Num_LD*3, "Error: ALocal_RotatedBC LDN_pt_xyz format is wrong.\n");
 
     LDN_pt_xyz = std::vector<Vector_3> (Num_LD, Vector_3{ 0, 0, 0 });
-    
+
     for(int ii {0}; ii < Num_LD; ++ii)
       LDN_pt_xyz[ii] = Vector_3{ temp_ldn_xyz[3 * ii], temp_ldn_xyz[3 * ii + 1], temp_ldn_xyz[3 * ii + 2] };
   }
@@ -41,9 +41,9 @@ ALocal_RotatedBC::ALocal_RotatedBC(
   num_local_node = h5r->read_intScalar( gname.c_str(), "num_local_node" );
 
   // If this partitioned sub-domain contains moving surface element,
-  // load its geometrical info 
+  // load its geometrical info
   if(num_local_cell > 0)
-  {      
+  {
     local_cell_ien = h5r->read_intVector( gname.c_str(), "local_cell_ien" );
   }
   else
@@ -52,13 +52,13 @@ ALocal_RotatedBC::ALocal_RotatedBC(
   }
 
   if(num_local_node > 0)
-  {  
+  {
     const auto temp_xyz = h5r->read_doubleVector( gname.c_str(), "local_pt_xyz" );
 
     ASSERT( VEC_T::get_size(temp_xyz) == num_local_node*3, "Error: ALocal_RotatedBC local_pt_xyz format is wrong.\n");
 
     local_pt_xyz = std::vector<Vector_3> (num_local_node, Vector_3{ 0, 0, 0 });
-      
+
     for(int ii {0}; ii < num_local_node; ++ii)
       local_pt_xyz[ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
 
@@ -137,9 +137,9 @@ ALocal_RotatedBC::ALocal_RotatedBC( const HDF5_Reader * const &h5r )
   }
 }
 
-void ALocal_RotatedBC::get_ctrlPts_xyz( const int &eindex, 
-    double * const &ctrl_x, 
-    double * const &ctrl_y, 
+void ALocal_RotatedBC::get_ctrlPts_xyz( int eindex,
+    double * const &ctrl_x,
+    double * const &ctrl_y,
     double * const &ctrl_z ) const
 {
   for(int jj=0; jj<cell_nLocBas; ++jj)
@@ -151,7 +151,7 @@ void ALocal_RotatedBC::get_ctrlPts_xyz( const int &eindex,
   }
 }
 
-void ALocal_RotatedBC::get_SIEN( const int &eindex, int * const &sien ) const
+void ALocal_RotatedBC::get_SIEN( int eindex, int * const &sien ) const
 {
   for(int jj=0; jj<cell_nLocBas; ++jj)
   {
@@ -160,7 +160,7 @@ void ALocal_RotatedBC::get_SIEN( const int &eindex, int * const &sien ) const
   }
 }
 
-std::vector<int> ALocal_RotatedBC::get_SIEN( const int &eindex ) const
+std::vector<int> ALocal_RotatedBC::get_SIEN( int eindex ) const
 {
   std::vector<int> out( cell_nLocBas, 0 );
   for(int jj=0; jj<cell_nLocBas; ++jj)

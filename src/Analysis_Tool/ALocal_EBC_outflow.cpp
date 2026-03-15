@@ -1,7 +1,7 @@
 #include "ALocal_EBC_outflow.hpp"
 
 ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
-    const int &cpu_rank, const std::string &gname )
+    int cpu_rank, const std::string &gname )
 : ALocal_EBC( fileBaseName, cpu_rank, gname )
 {
   // Read in the integral of basis function, LID, and outward normal vector
