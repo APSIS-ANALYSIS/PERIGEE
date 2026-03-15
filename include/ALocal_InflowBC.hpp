@@ -54,7 +54,7 @@ class ALocal_InflowBC
     // ------------------------------------------------------------------------
     virtual double get_actarea( int nbc_id ) const
     {return act_area[nbc_id];}
-
+    
     // ------------------------------------------------------------------------
     // get the full area of the surface
     // ------------------------------------------------------------------------
@@ -64,7 +64,7 @@ class ALocal_InflowBC
     // ------------------------------------------------------------------------
     // determine whether a given index belongs to the LDN[nbc_id] vector
     // ------------------------------------------------------------------------
-    virtual bool is_inLDN( int nbc_id, int ii ) const
+    virtual bool is_inLDN( int nbc_id, int ii ) const 
     { return VEC_T::is_invec(LDN[nbc_id], ii); }
 
     // ------------------------------------------------------------------------
@@ -119,7 +119,7 @@ class ALocal_InflowBC
     // 0 <= ee < num_local_cell[nbc_id], 0 <= ii < cell_nLocBas[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien( int nbc_id, int ee,
+    virtual int get_local_cell_ien( int nbc_id, int ee, 
         int ii ) const
     { return local_cell_ien[nbc_id][ee * cell_nLocBas[nbc_id] + ii]; }
 
@@ -191,10 +191,10 @@ class ALocal_InflowBC
     // local_to_global array
     // num_nbc x num_local_node[ii]
     std::vector< std::vector<int> > local_node_pos;
-
-    // ------------------------------------------------------------------------
-    // Disallow default constructor
-    ALocal_InflowBC() = delete;
+  
+    // ------------------------------------------------------------------------ 
+    // Disallow default constructor 
+    ALocal_InflowBC() = delete; 
 };
 
 #endif

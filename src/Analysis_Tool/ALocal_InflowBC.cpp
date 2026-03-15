@@ -1,6 +1,6 @@
 #include "ALocal_InflowBC.hpp"
 
-ALocal_InflowBC::ALocal_InflowBC(
+ALocal_InflowBC::ALocal_InflowBC( 
     const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
@@ -12,21 +12,21 @@ ALocal_InflowBC::ALocal_InflowBC(
   const std::string gname("/inflow");
 
   num_nbc = h5r -> read_intScalar( gname.c_str(), "num_nbc" );
-
+    
   // Allocate the size of the member data
-  Num_LD.resize(num_nbc);
+  Num_LD.resize(num_nbc); 
   LDN.resize(num_nbc);
-  outnormal.resize(num_nbc);
-  act_area.resize(num_nbc);
-  ful_area.resize(num_nbc);
+  outnormal.resize(num_nbc); 
+  act_area.resize(num_nbc); 
+  ful_area.resize(num_nbc); 
   num_out_bc_pts.resize(num_nbc);
   outline_pts.resize(num_nbc);
-  centroid.resize(num_nbc);
-  num_local_node.resize(num_nbc);
-  num_local_cell.resize(num_nbc);
+  centroid.resize(num_nbc); 
+  num_local_node.resize(num_nbc); 
+  num_local_cell.resize(num_nbc); 
   cell_nLocBas.resize(num_nbc);
-  local_pt_xyz.resize(num_nbc);
-  local_cell_ien.resize(num_nbc);
+  local_pt_xyz.resize(num_nbc); 
+  local_cell_ien.resize(num_nbc); 
   local_node_pos.resize(num_nbc);
 
   for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
@@ -48,7 +48,7 @@ ALocal_InflowBC::ALocal_InflowBC(
       LDN[nbc_id].clear();
       outline_pts[nbc_id].clear();
     }
-
+    
     SYS_T::print_fatal_if( Num_LD[nbc_id] != static_cast<int>( LDN[nbc_id].size() ), "Error: the LDN vector size does not match with the value of Num_LD.\n" );
 
     // Basic geometrical quantities of the nbc_id-th inlet surface
@@ -63,7 +63,7 @@ ALocal_InflowBC::ALocal_InflowBC(
     num_local_node[nbc_id] = h5r->read_intScalar( sub_gname.c_str(), "num_local_node" );
 
     // If this partitioned sub-domain contains inlet surface element,
-    // load its geometrical info
+    // load its geometrical info 
     if(num_local_cell[nbc_id] > 0)
     {
       const auto temp_xyz = h5r->read_doubleVector( sub_gname.c_str(), "local_pt_xyz" );
@@ -71,10 +71,10 @@ ALocal_InflowBC::ALocal_InflowBC(
       ASSERT( VEC_T::get_size(temp_xyz) == num_local_node[nbc_id]*3, "Error: ALocal_InflowBC local_pt_xyz format is wrong.\n");
 
       local_pt_xyz[nbc_id] = std::vector<Vector_3> (num_local_node[nbc_id], Vector_3{ 0, 0, 0 });
-
+      
       for(int ii {0}; ii < num_local_node[nbc_id]; ++ii)
         local_pt_xyz[nbc_id][ii] = Vector_3{ temp_xyz[3 * ii], temp_xyz[3 * ii + 1], temp_xyz[3 * ii + 2] };
-
+      
       local_cell_ien[nbc_id] = h5r->read_intVector( sub_gname.c_str(), "local_cell_ien" );
       local_node_pos[nbc_id] = h5r->read_intVector( sub_gname.c_str(), "local_node_pos" );
     }
@@ -192,7 +192,7 @@ double ALocal_InflowBC::get_radius( int nbc_id,
 }
 
 void ALocal_InflowBC::get_ctrlPts_xyz( int nbc_id,
-    int eindex, double * const &ctrl_x, double * const &ctrl_y,
+    int eindex, double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_z ) const
 {
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)

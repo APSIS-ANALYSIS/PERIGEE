@@ -37,7 +37,7 @@ class ALocal_RotatedBC
     // ------------------------------------------------------------------------
     // determine whether a given index belongs to the LDN vector
     // ------------------------------------------------------------------------
-    virtual bool is_inLDN( int ii ) const
+    virtual bool is_inLDN( int ii ) const 
     { return VEC_T::is_invec(LDN, ii); }
 
     // ------------------------------------------------------------------------
@@ -89,8 +89,8 @@ class ALocal_RotatedBC
     // 0 <= ee < num_local_cell, 0 <= ii < cell_nLocBas
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien(
-        int ee,
+    virtual int get_local_cell_ien( 
+        int ee, 
         int ii ) const
     { return local_cell_ien[ee * cell_nLocBas + ii]; }
 
@@ -145,10 +145,10 @@ class ALocal_RotatedBC
     // local_to_global array
     // Length: num_local_node
     std::vector<int> local_node_pos;
-
-    // ------------------------------------------------------------------------
-    // Disallow default constructor
-    ALocal_RotatedBC() = delete;
+  
+    // ------------------------------------------------------------------------ 
+    // Disallow default constructor 
+    ALocal_RotatedBC() = delete; 
 
 };
 

@@ -15,12 +15,12 @@ class ALocal_EBC
 {
   public:
     // ------------------------------------------------------------------------
-    // ! Constructor.
-    //   Read from part file, and the EBC info is stored in the group /ebc by
+    // ! Constructor. 
+    //   Read from part file, and the EBC info is stored in the group /ebc by 
     //   default. User may specify a group name for gname if the data is written
     //   under a different groupname.
     // ------------------------------------------------------------------------
-    ALocal_EBC( const std::string &fileBaseName, int cpu_rank,
+    ALocal_EBC( const std::string &fileBaseName, int cpu_rank, 
         const std::string &gname="/ebc" );
 
     ALocal_EBC( const HDF5_Reader * const &h5r,
@@ -44,10 +44,10 @@ class ALocal_EBC
     // The following are functions that access the geometrical data of
     // the ii-th surface that is prescribed with the elemental BC
     // 0 <= ii < num_ebc
-    // ! get the number of all nodes associated with the surface cells within
+    // ! get the number of all nodes associated with the surface cells within 
     //   this partition.
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell_node(int ii) const
+    virtual int get_num_local_cell_node(int ii) const 
     {return num_local_cell_node[ii];}
 
     // ------------------------------------------------------------------------
@@ -110,10 +110,10 @@ class ALocal_EBC
     // Users are responsible for allocating & deleting the ctrl_xyz arrays.
     // ebc_id : 0 <= ii < num_ebc;
     // surface element id: 0 <= eindex < num_local_cell[ii];
-    // ctrl_x/y/z : output geometry array, length is
+    // ctrl_x/y/z : output geometry array, length is 
     //              cell_nLocBas[ii].
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz(int ii, int eindex,
+    virtual void get_ctrlPts_xyz(int ii, int eindex, 
         double * const &ctrl_x, double * const &ctrl_y, double * const &ctrl_z ) const;
 
     // ------------------------------------------------------------------------
@@ -134,7 +134,7 @@ class ALocal_EBC
     // eindex : 0 <= eindex < num_local_cell[ii];
     // coor_x/y/z : output interior point coordinates
     // ------------------------------------------------------------------------
-    virtual void get_intPts_xyz(int ii, int eindex,
+    virtual void get_intPts_xyz(int ii, int eindex, 
         double &coor_x, double &coor_y, double &coor_z ) const
     {
       SYS_T::print_fatal("Error: ALocal_EBC::get_intPts_xyz is not implemented. \n");
@@ -166,7 +166,7 @@ class ALocal_EBC
       SYS_T::print_fatal("Error: ALocal_EBC::get_intNA is not implemented. \n");
       return {};
     }
-
+    
     // ------------------------------------------------------------------------
     // get_LID : returns the LID for the nodes associated with intNA,
     //           if this partition owns any cell on this surface.
@@ -199,7 +199,7 @@ class ALocal_EBC
     // num_local_cell_node[ii] gives the ii-th ebc's local cell node number. These are
     //                    nodes associated with local cells.
     // num_local_cell[ii] gives the ii-th ebc's local cell number.
-    // cell_nLocBas[ii]   gives the cell's number of node. e.g.,
+    // cell_nLocBas[ii]   gives the cell's number of node. e.g., 
     //                    triangle surface is 3,
     //                    quadralaterial surface is 4,
     //                    quadratic triangle surface is 6.
@@ -210,7 +210,7 @@ class ALocal_EBC
     std::vector< std::vector<double> > local_cell_node_xyz;
 
     // local_cell_ien[ii] gives the local cell's IEN array
-    // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii])
+    // size: num_ebc x (cell_nLocBas[ii] x num_local_cell[ii]) 
     std::vector< std::vector<int> > local_cell_ien;
 
     // local cell nodes' global indices
@@ -224,8 +224,8 @@ class ALocal_EBC
     // local cell's corresponding volumetric element indices
     // size: num_ebc x num_local_cell[ii]
     std::vector< std::vector<int> > local_cell_vol_id;
-
-    ALocal_EBC() = delete;
+    
+    ALocal_EBC() = delete; 
 };
 
 #endif
