@@ -1,6 +1,6 @@
 #include "ALocal_Interface.hpp"
 
-ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank)
+ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_rank)
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
@@ -265,7 +265,7 @@ void ALocal_Interface::print_info() const
   SYS_T::commPrint("Interfaces: %d\n", num_itf);
 }
 
-void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &jj,
+void ALocal_Interface::get_fixed_ele_ctrlPts(int ii, int jj,
   double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const
 {
   for(int nn{0}; nn < nLocBas; ++nn)
@@ -278,7 +278,7 @@ void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &jj,
   }
 }
 
-void ALocal_Interface::get_rotated_ele_ctrlPts(const int &ii, const int &jj,
+void ALocal_Interface::get_rotated_ele_ctrlPts(int ii, int jj,
   double * const volctrl_x, double * const volctrl_y, double * const volctrl_z) const
 {
   for(int nn{0}; nn < nLocBas; ++nn)
