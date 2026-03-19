@@ -1,7 +1,5 @@
 <img src="./docs/PERIGEE-logo.png" width="36%" height="36%">
 
-# PERIGEE
-
 PERIGEE is a nonlinear dynamic finite element analysis code for multiphysics simulation. It is designed as an object-oriented framework for parallel implementations of fluid, solid, and fluid-structure interaction problems. Copyright and licensing information are available in [LICENSE](LICENSE).
 
 ## Table of Contents
