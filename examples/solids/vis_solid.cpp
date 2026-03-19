@@ -133,6 +133,8 @@ int main( int argc, char * argv[] )
       GMIptr->get_nLocBas(), element_part_file, std::move(matmodel) );
 
   std::ostringstream time_index;
+  const auto anode_mapping = VIS_T::readNodeMapping(anode_mapping_file, "old_2_new");
+  const auto pnode_mapping = VIS_T::readNodeMapping(pnode_mapping_file, "new_2_old");
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
@@ -156,8 +158,8 @@ int main( int argc, char * argv[] )
     sol_names.push_back(pres_name_to_read);
     sol_names.push_back(velo_name_to_read);
 
-    visprep->get_pointArray(sol_names, anode_mapping_file, pnode_mapping_file,
-        pNode.get(), GMIptr->get_nFunc(), solArrays);
+    visprep->get_pointArray(sol_names, anode_mapping, pnode_mapping,
+        pNode.get(), solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(), visprep.get(),
         element.get(), quad.get(), solArrays, rank, size,

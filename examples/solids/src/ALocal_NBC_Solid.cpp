@@ -1,4 +1,5 @@
 #include "ALocal_NBC_Solid.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_NBC_Solid::ALocal_NBC_Solid( const std::string &fileBaseName,
     const int &cpu_rank, const std::string &gname )
