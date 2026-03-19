@@ -9,10 +9,10 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "NodalBC_Solid.hpp"
 #include "Part_FEM.hpp"
-#include "NodalBC.hpp"
 #include "ElemBC_3D.hpp"
-#include "NBC_Partition.hpp"
+#include "NBC_Partition_Solid.hpp"
 #include "EBC_Partition.hpp"
 #include "yaml-cpp/yaml.h"
 
@@ -76,17 +76,6 @@ int main( int argc, char * argv[] )
   for(const auto &val : is_disp_driven_z)
     SYS_T::print_fatal_if( val != 0 && val != 1,
         "Error: is_disp_driven_z entry must be 0 or 1.\n" );
-
-  std::vector<std::string> sur_file_dir_x_disp, sur_file_dir_y_disp, sur_file_dir_z_disp;
-  for(size_t ii=0; ii<sur_file_dir_x.size(); ++ii)
-    if(is_disp_driven_x[ii] == 1) sur_file_dir_x_disp.push_back(sur_file_dir_x[ii]);
-  for(size_t ii=0; ii<sur_file_dir_y.size(); ++ii)
-    if(is_disp_driven_y[ii] == 1) sur_file_dir_y_disp.push_back(sur_file_dir_y[ii]);
-  for(size_t ii=0; ii<sur_file_dir_z.size(); ++ii)
-    if(is_disp_driven_z[ii] == 1) sur_file_dir_z_disp.push_back(sur_file_dir_z[ii]);
-
-  const bool has_disp_dir = !sur_file_dir_x_disp.empty() ||
-    !sur_file_dir_y_disp.empty() || !sur_file_dir_z_disp.empty();
 
   if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
@@ -178,23 +167,26 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
-  // Setup Nodal i.e. Dirichlet type Boundary Conditions
-  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  // Setup Nodal Boundary Conditions, grouped by direction.
+  std::vector<NodalBC_Solid *> solid_nbc_list_x {};
+  std::vector<NodalBC_Solid *> solid_nbc_list_y {};
+  std::vector<NodalBC_Solid *> solid_nbc_list_z {};
 
-  NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( sur_file_dir_x, nFunc );
-  NBC_list[2] = new NodalBC( sur_file_dir_y, nFunc );
-  NBC_list[3] = new NodalBC( sur_file_dir_z, nFunc );
+  solid_nbc_list_x.reserve( sur_file_dir_x.size() );
+  solid_nbc_list_y.reserve( sur_file_dir_y.size() );
+  solid_nbc_list_z.reserve( sur_file_dir_z.size() );
 
-  std::vector<INodalBC *> NBC_list_disp;
-  if( has_disp_dir )
-  {
-    NBC_list_disp.resize( dofMat, nullptr );
-    NBC_list_disp[0] = new NodalBC( nFunc );
-    NBC_list_disp[1] = new NodalBC( sur_file_dir_x_disp, nFunc );
-    NBC_list_disp[2] = new NodalBC( sur_file_dir_y_disp, nFunc );
-    NBC_list_disp[3] = new NodalBC( sur_file_dir_z_disp, nFunc );
-  }
+  for(size_t ii=0; ii<sur_file_dir_x.size(); ++ii)
+    solid_nbc_list_x.push_back(
+        new NodalBC_Solid( sur_file_dir_x[ii], nFunc, is_disp_driven_x[ii] ) );
+
+  for(size_t ii=0; ii<sur_file_dir_y.size(); ++ii)
+    solid_nbc_list_y.push_back(
+        new NodalBC_Solid( sur_file_dir_y[ii], nFunc, is_disp_driven_y[ii] ) );
+
+  for(size_t ii=0; ii<sur_file_dir_z.size(); ++ii)
+    solid_nbc_list_z.push_back(
+        new NodalBC_Solid( sur_file_dir_z[ii], nFunc, is_disp_driven_z[ii] ) );
 
   ElemBC * ebc = new ElemBC_3D( sur_file_neu, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
@@ -225,51 +217,11 @@ int main( int argc, char * argv[] )
     part -> write( part_file );
 
     // Partition Nodal BC and write to h5 file
-    auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex, NBC_list);
-
-    nbcpart -> write_hdf5( part_file );
-
-    if( has_disp_dir )
-    {
-      auto nbcpart_disp = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex, NBC_list_disp);
-
-      std::vector<int> LDN_is_disp;
-      LDN_is_disp.reserve( nbcpart->get_Num_LD(0) + nbcpart->get_Num_LD(1)
-          + nbcpart->get_Num_LD(2) + nbcpart->get_Num_LD(3) );
-
-      int offset = 0;
-      int offset_disp = 0;
-      for(int dof=0; dof<dofMat; ++dof)
-      {
-        const int num_ld = nbcpart->get_Num_LD(dof);
-        const int num_ld_disp = nbcpart_disp->get_Num_LD(dof);
-
-        for(int ii=0; ii<num_ld; ++ii)
-        {
-          const int node = nbcpart->get_LDN(offset + ii);
-          int flag = 0;
-          for(int jj=0; jj<num_ld_disp; ++jj)
-          {
-            if( node == nbcpart_disp->get_LDN(offset_disp + jj) )
-            {
-              flag = 1;
-              break;
-            }
-          }
-          LDN_is_disp.push_back( flag );
-        }
-
-        offset += num_ld;
-        offset_disp += num_ld_disp;
-      }
-
-      const std::string fName = SYS_T::gen_partfile_name( part_file, proc_rank );
-      hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT );
-      hid_t g_id = H5Gopen( file_id, "/nbc", H5P_DEFAULT );
-      HDF5_Writer h5w(file_id);
-      h5w.write_intVector( g_id, "LDN_is_disp_driven", LDN_is_disp );
-      H5Gclose(g_id); H5Fclose(file_id);
-    }
+    auto nbcpart = SYS_T::make_unique<NBC_Partition_Solid>(
+        part.get(), mnindex,
+        solid_nbc_list_x, solid_nbc_list_y, solid_nbc_list_z,
+        dofMat, nFunc );
+    nbcpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
     auto ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex, ebc);
@@ -301,8 +253,9 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto &it_nbc : NBC_list ) delete it_nbc;
-  for(auto &it_nbc : NBC_list_disp ) delete it_nbc;
+  for(auto &it_nbc : solid_nbc_list_x ) delete it_nbc;
+  for(auto &it_nbc : solid_nbc_list_y ) delete it_nbc;
+  for(auto &it_nbc : solid_nbc_list_z ) delete it_nbc;
 
   delete ebc; delete global_part; delete mnindex; delete IEN;
 

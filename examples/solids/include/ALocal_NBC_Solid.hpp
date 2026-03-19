@@ -21,10 +21,10 @@ class ALocal_NBC_Solid : public ALocal_NBC
     virtual ~ALocal_NBC_Solid() = default;
 
     virtual int get_LDN_is_disp_driven( const int &dof_index, const int &node ) const
-    { return LDN_is_disp.empty() ? 0 : LDN_is_disp[LD_offset[dof_index] + node]; }
+    { return LDN_is_disp_driven.empty() ? 0 : LDN_is_disp_driven[LD_offset[dof_index] + node]; }
 
   private:
-    std::vector<int> LDN_is_disp;
+    std::vector<int> LDN_is_disp_driven;
 
     void read_disp_flag( const HDF5_Reader * const &h5r,
         const std::string &gname );

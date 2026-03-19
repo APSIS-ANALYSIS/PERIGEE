@@ -47,6 +47,7 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
+  ${perigee_SOURCE_DIR}/src/NBC_Partition_Solid.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp

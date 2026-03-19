@@ -220,18 +220,33 @@ void PGAssem_Solid_FEM::Apply_Dirichlet_BC( const double &time,
     PDNSolution * const &disp,
     PDNSolution * const &velo ) const
 {
-  // Direction-dependent displacement loading (edit the arrays below).
-  const double ramp_time[3] = {1.0, 1.0, 1.0};
-  const double target_disp[3] = {0.0, 0.5, 1.0};
-
   for(int field=1; field<=3; ++field)
   {
-    const int dir = field - 1;
-    const double t = (time < ramp_time[dir]) ? time : ramp_time[dir];
+    double uval = 0.0;
+    double vval = 0.0;
+    double aval = 0.0;
 
-    const double uval = target_disp[dir] * t / ramp_time[dir];
-    const double vval = (time < ramp_time[dir]) ? (target_disp[dir] / ramp_time[dir]) : 0.0;
-    const double aval = 0.0;
+    if(field == 1)
+    {
+      // x-direction displacement loading
+      uval = time;
+      vval = 1.0;
+      aval = 0.0;
+    }
+    else if(field == 2)
+    {
+      // y-direction displacement loading
+      uval = time;
+      vval = 1.0;
+      aval = 0.0;
+    }
+    else
+    {
+      // z-direction displacement loading
+      uval = time;
+      vval = 1.0;
+      aval = 0.0;
+    }
 
     const int num_ld = nbc->get_Num_LD(field);
     for(int ii=0; ii<num_ld; ++ii)
