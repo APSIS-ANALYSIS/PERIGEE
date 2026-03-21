@@ -3,15 +3,15 @@
 NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const std::vector<INodalBC *> &nbc_list,
-    const std::vector< std::vector<int> > &grid2id ) 
+    const std::vector< std::vector<int> > &grid2id )
 : NBC_Partition(part, mnindex, nbc_list)
-{ 
+{
   const int dof = (int) nbc_list.size();
-  const int totnode = part->get_nlocghonode(); 
+  const int totnode = part->get_nlocghonode();
 
   SYS_T::print_fatal_if( VEC_T::get_size(grid2id) != dof, "Error: NBC_Partition_MF, the grid2id array size should math that of nbc list.\n" );
- 
-  // Generate an offset for accessing different dof's node 
+
+  // Generate an offset for accessing different dof's node
   std::vector<int> LD_offset {0}, LPS_offset {0}, LPM_offset {0};
 
   for(int ii=1; ii<dof; ++ii)
@@ -29,7 +29,7 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
   LID_MF.resize(LID.size());
 
   for(int ii=0; ii<dof; ++ii)
-  { 
+  {
     for(int jj=0; jj<Num_LD[ii]; ++jj)
     {
       const int loc = LD_offset[ii] + jj;
@@ -57,8 +57,8 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
       else LID_MF[loc] = -1;
     }
   } // end ii-loop over dof
-  
-  LDN_MF.shrink_to_fit(); 
+
+  LDN_MF.shrink_to_fit();
   LPSN_MF.shrink_to_fit();
   LPMN_MF.shrink_to_fit();
   LocalMaster_MF.shrink_to_fit();
@@ -68,13 +68,13 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
 
 NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const std::vector<INodalBC *> &nbc_list ) 
+    const std::vector<INodalBC *> &nbc_list )
 : NBC_Partition(part, mnindex, nbc_list)
-{ 
+{
   const int dof = (int) nbc_list.size();
-  const int totnode = part->get_nlocghonode(); 
+  const int totnode = part->get_nlocghonode();
 
-  // Generate an offset for accessing different dof's node 
+  // Generate an offset for accessing different dof's node
   std::vector<int> LD_offset {0}, LPS_offset {0}, LPM_offset {0};
 
   for(int ii=1; ii<dof; ++ii)
@@ -92,7 +92,7 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
   LID_MF.resize(LID.size());
 
   for(int ii=0; ii<dof; ++ii)
-  { 
+  {
     for(int jj=0; jj<Num_LD[ii]; ++jj)
     {
       const int loc = LD_offset[ii] + jj;
@@ -120,9 +120,9 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
       else LID_MF[loc] = -1;
     }
   } // end ii-loop over dof
-  
-  LDN_MF.shrink_to_fit(); 
-  LPSN_MF.shrink_to_fit(); 
+
+  LDN_MF.shrink_to_fit();
+  LPSN_MF.shrink_to_fit();
   LPMN_MF.shrink_to_fit();
   LocalMaster_MF.shrink_to_fit();
   LocalMasterSlave_MF.shrink_to_fit();
@@ -131,11 +131,11 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
 
 NBC_Partition_MF::~NBC_Partition_MF()
 {
-  VEC_T::clean( LDN_MF ); 
-  VEC_T::clean( LPSN_MF ); 
-  VEC_T::clean( LPMN_MF ); 
-  VEC_T::clean( LocalMaster_MF ); 
-  VEC_T::clean( LocalMasterSlave_MF ); 
+  VEC_T::clean( LDN_MF );
+  VEC_T::clean( LPSN_MF );
+  VEC_T::clean( LPMN_MF );
+  VEC_T::clean( LocalMaster_MF );
+  VEC_T::clean( LocalMasterSlave_MF );
   VEC_T::clean( LID_MF );
 }
 
@@ -146,12 +146,12 @@ void NBC_Partition_MF::write_hdf5( const std::string &FileName,
   // Call the base class writer to write the base class data
   NBC_Partition::write_hdf5( FileName, GroupName );
   // --------------------------------------------------------------------------
-  
+
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
+  auto h5writer = SYS_T::make_unique<HDF5_Writer>(file_id);
 
   hid_t g_nbc_id = H5Gopen(file_id, GroupName.c_str(), H5P_DEFAULT);
 
@@ -177,7 +177,7 @@ void NBC_Partition_MF::write_hdf5( const std::string &FileName,
   h5writer->write_intVector(g_id, "Num_LPS", Num_LPS);
   h5writer->write_intVector(g_id, "Num_LPM", Num_LPM);
 
-  delete h5writer;
+
   H5Gclose(g_id); H5Gclose(g_nbc_id); H5Fclose(file_id);
 }
 

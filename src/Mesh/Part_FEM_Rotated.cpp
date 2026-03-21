@@ -10,10 +10,10 @@ Part_FEM_Rotated::Part_FEM_Rotated( const int &in_nelem,
     const std::vector<int> &eletag,
     const std::vector<int> &node_f,
     const std::vector<int> &node_r,
-    const int &in_cpu_rank, 
+    const int &in_cpu_rank,
     const int &in_cpu_size,
     const FEType &in_elemType,
-    const Field_Property &fp ) 
+    const Field_Property &fp )
 : Part_FEM( in_nelem, in_nfunc, in_nlocbas, gpart, mnindex, IEN, ctrlPts, in_cpu_rank, in_cpu_size, in_elemType, fp )
 {
   // Generate the local array tagging the element's property.
@@ -46,7 +46,7 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
   // open group 1: local element
   hid_t group_id_1 = H5Gopen(file_id, "/Local_Elem", H5P_DEFAULT);
@@ -70,7 +70,7 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
   H5Gclose( group_id_2 );
 
   // Finish the writing of hdf5 file
-  delete h5w;
+
   H5Fclose(file_id);
 }
 

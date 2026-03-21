@@ -128,7 +128,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
   auto h5r = SYS_T::make_unique<HDF5_Reader>( file_id );
 
-  // local elements 
+  // local elements
   elem_loc = h5r->read_intVector( "Local_Elem", "elem_loc" );
   nlocalele = h5r->read_intScalar( "Local_Elem", "nlocalele" );
 
@@ -164,7 +164,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   dofNum   = h5r -> read_intScalar("Global_Mesh_Info", "dofNum");
   field_id = h5r -> read_intScalar("Global_Mesh_Info", "field_id");
   field_name = h5r -> read_string("Global_Mesh_Info", "field_name" );
-  
+
   const int temp = h5r -> read_intScalar("Global_Mesh_Info", "is_geo_field");
   if(temp == 1) is_geo_field = true;
   else is_geo_field = false;
@@ -233,7 +233,7 @@ void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
 
   // 2. Reorder node_loc
   PERIGEE_OMP_PARALLEL_FOR
-  for( int ii=0; ii<nlocalnode; ++ii ) 
+  for( int ii=0; ii<nlocalnode; ++ii )
     node_loc[ii] = mnindex->get_old2new( node_loc[ii] );
 
   // 3. Generate node_tot, which stores the nodes needed by the elements in the subdomain
@@ -247,7 +247,7 @@ void Part_FEM::Generate_Partition( const IGlobal_Part * const &gpart,
       node_tot.push_back( temp_node );
     }
   }
-  
+
   VEC_T::sort_unique_resize( node_tot );
 
   ntotalnode = VEC_T::get_size( node_tot );
@@ -334,7 +334,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
 
   // group 1: local element
   hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -381,7 +381,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
   H5Gclose( group_id_3 );
 
   // group 4: part info
-  hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
+  hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
 
   h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
   h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
@@ -416,7 +416,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
   }
 
   // Finish writing, clean up
-  delete h5w;
+
   H5Fclose(file_id);
 }
 
