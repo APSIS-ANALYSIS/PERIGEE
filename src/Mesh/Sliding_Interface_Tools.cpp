@@ -9,7 +9,7 @@ namespace SI_T
 
     hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-    HDF5_Reader * h5r = new HDF5_Reader( file_id );
+    auto h5r = SYS_T::make_unique<HDF5_Reader>( file_id );
 
     const std::string gname("/sliding");
 
@@ -60,7 +60,7 @@ namespace SI_T
       rotated_node_loc_pos[ii] = h5r -> read_intVector( subgroup_name.c_str(), "rotated_node_loc_pos" );
     }
 
-    delete h5r; H5Fclose( file_id );
+    H5Fclose( file_id );
   }
 
   void SI_solution::update_node_sol(const PDNSolution * const &sol)

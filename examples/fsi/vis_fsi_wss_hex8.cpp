@@ -59,24 +59,24 @@ int main( int argc, char * argv[] )
   // Read in the mesh file
   hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  auto cmd_h5r = SYS_T::make_unique<HDF5_Reader>( prepcmd_file );
 
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_f_file_wall");
   const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  H5Fclose(prepcmd_file);
   
   hid_t anacmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT );
   
-  HDF5_Reader * ana_h5r = new HDF5_Reader( anacmd_file );
+  auto ana_h5r = SYS_T::make_unique<HDF5_Reader>( anacmd_file );
   
   const std::string sol_bname = ana_h5r -> read_string("/", "sol_bName");
   
   const double fluid_mu = ana_h5r -> read_doubleScalar("/", "fl_mu");
 
-  delete ana_h5r; H5Fclose(anacmd_file);
+  H5Fclose(anacmd_file);
 
   // Enforce the element to be trilinear hex for now
   if( elemType != FEType::Hex8 ) SYS_T::print_fatal("Error: element type should be trilinear hex element.\n");

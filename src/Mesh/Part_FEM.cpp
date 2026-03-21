@@ -126,7 +126,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
   const std::string fName = SYS_T::gen_partfile_name( inputfileName, in_cpu_rank );
 
   hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>( file_id );
 
   // local elements 
   elem_loc = h5r->read_intVector( "Local_Elem", "elem_loc" );
@@ -193,7 +193,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
     ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
   }
 
-  delete h5r; H5Fclose( file_id );
+  H5Fclose( file_id );
 }
 
 Part_FEM::~Part_FEM()
