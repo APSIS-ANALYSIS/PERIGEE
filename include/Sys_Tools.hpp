@@ -560,7 +560,7 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  inline void InsertFileYAML( const std::string &filename, const bool &require )
+  inline void InsertFileYAML( const std::string &filename, bool require )
   {
 #if PETSC_VERSION_GE(3,15,0)
     if( require )

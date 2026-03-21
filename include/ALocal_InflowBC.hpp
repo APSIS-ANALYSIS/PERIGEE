@@ -15,7 +15,7 @@
 class ALocal_InflowBC
 {
   public:
-    ALocal_InflowBC( const std::string &fileBaseName, const int &cpu_rank );
+    ALocal_InflowBC( const std::string &fileBaseName, int cpu_rank );
 
     ALocal_InflowBC( const HDF5_Reader * const &h5r );
 
@@ -31,40 +31,40 @@ class ALocal_InflowBC
     // 0 <= node < Num_LD[nbc_id]
     // Note: make sure that Num_LD[nbc_id] > 0 before calling this get function
     // ------------------------------------------------------------------------
-    virtual int get_LDN( const int &nbc_id, const int &node ) const
+    virtual int get_LDN( int nbc_id, int node ) const
     {return LDN[nbc_id][node];}
 
     // ------------------------------------------------------------------------
     // Get the number of Dirichlet nodes in the local partition
     // ------------------------------------------------------------------------
-    virtual int get_Num_LD( const int &nbc_id ) const {return Num_LD[nbc_id];}
+    virtual int get_Num_LD( int nbc_id ) const {return Num_LD[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get the outward normal vector components.
     // ii=0 : x-component; ii=1 : y-component; ii=2 : z-component
     // ------------------------------------------------------------------------
-    virtual double get_outvec( const int &nbc_id, const int &ii ) const
+    virtual double get_outvec( int nbc_id, int ii ) const
     {return outnormal[nbc_id](ii);}
 
-    virtual Vector_3 get_outvec( const int &nbc_id ) const
+    virtual Vector_3 get_outvec( int nbc_id ) const
     {return outnormal[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get the active area of the surface
     // ------------------------------------------------------------------------
-    virtual double get_actarea( const int &nbc_id ) const
+    virtual double get_actarea( int nbc_id ) const
     {return act_area[nbc_id];}
     
     // ------------------------------------------------------------------------
     // get the full area of the surface
     // ------------------------------------------------------------------------
-    virtual double get_fularea( const int &nbc_id ) const
+    virtual double get_fularea( int nbc_id ) const
     {return ful_area[nbc_id];}
 
     // ------------------------------------------------------------------------
     // determine whether a given index belongs to the LDN[nbc_id] vector
     // ------------------------------------------------------------------------
-    virtual bool is_inLDN( const int &nbc_id, const int &ii ) const 
+    virtual bool is_inLDN( int nbc_id, int ii ) const 
     { return VEC_T::is_invec(LDN[nbc_id], ii); }
 
     // ------------------------------------------------------------------------
@@ -76,24 +76,24 @@ class ALocal_InflowBC
     //             If this partition does not contain any inflow bc
     //             nodes, this function will throw an error.
     // ------------------------------------------------------------------------
-    virtual double get_radius( const int &nbc_id, const Vector_3 &pt ) const;
+    virtual double get_radius( int nbc_id, const Vector_3 &pt ) const;
 
     // ------------------------------------------------------------------------
     // get number of nodes belonging to the local partition
     // ------------------------------------------------------------------------
-    virtual int get_num_local_node( const int &nbc_id ) const
+    virtual int get_num_local_node( int nbc_id ) const
     {return num_local_node[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get number of cells belonging to the local partition
     // ------------------------------------------------------------------------
-    virtual int get_num_local_cell( const int &nbc_id ) const
+    virtual int get_num_local_cell( int nbc_id ) const
     {return num_local_cell[nbc_id];}
 
     // ------------------------------------------------------------------------
     // get the number of nodes per element, or nLocBas[nbc_id]
     // ------------------------------------------------------------------------
-    virtual int get_cell_nLocBas( const int &nbc_id ) const
+    virtual int get_cell_nLocBas( int nbc_id ) const
     {return cell_nLocBas[nbc_id];}
 
     // ------------------------------------------------------------------------
@@ -102,7 +102,7 @@ class ALocal_InflowBC
     // 0 <= ii < num_local_node[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_local_pt_xyz( const int &nbc_id, const int &ii) const
+    virtual Vector_3 get_local_pt_xyz( int nbc_id, int ii) const
     {return local_pt_xyz[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
@@ -110,7 +110,7 @@ class ALocal_InflowBC
     // 0 <= ii < cell_nLocBas[nbc_id] x num_local_cell[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien( const int &nbc_id, const int &ii ) const
+    virtual int get_local_cell_ien( int nbc_id, int ii ) const
     {return local_cell_ien[nbc_id][ii];}
 
     // ------------------------------------------------------------------------
@@ -119,8 +119,8 @@ class ALocal_InflowBC
     // 0 <= ee < num_local_cell[nbc_id], 0 <= ii < cell_nLocBas[nbc_id]
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien( const int &nbc_id, const int &ee, 
-        const int &ii ) const
+    virtual int get_local_cell_ien( int nbc_id, int ee, 
+        int ii ) const
     { return local_cell_ien[nbc_id][ee * cell_nLocBas[nbc_id] + ii]; }
 
     // ------------------------------------------------------------------------
@@ -131,7 +131,7 @@ class ALocal_InflowBC
     // ctrl_x/y/z : output coordinate arrays, each of length cell_nLocBas[nbc_id].
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz( const int &nbc_id, const int &eindex,
+    virtual void get_ctrlPts_xyz( int nbc_id, int eindex,
         double * const &ctrl_x, double * const &ctrl_y,
         double * const &ctrl_z ) const;
 
@@ -142,10 +142,10 @@ class ALocal_InflowBC
     // sien : length cell_nLocBas[nbc_id].
     // Note: make sure num_local_cell[nbc_id] > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual void get_SIEN( const int &nbc_id, const int &eindex,
+    virtual void get_SIEN( int nbc_id, int eindex,
         int * const &sien ) const;
 
-    virtual std::vector<int> get_SIEN( const int &nbc_id, const int &eindex ) const;
+    virtual std::vector<int> get_SIEN( int nbc_id, int eindex ) const;
 
   private:
     int num_nbc;
