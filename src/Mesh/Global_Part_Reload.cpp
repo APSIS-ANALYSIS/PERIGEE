@@ -10,7 +10,7 @@ Global_Part_Reload::Global_Part_Reload( const int &cpu_size,
 
   hid_t efile_id = H5Fopen( efName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  HDF5_Reader * eh5r = new HDF5_Reader( efile_id );
+  auto eh5r = SYS_T::make_unique<HDF5_Reader>( efile_id );
   
   int temp = eh5r -> read_intScalar("/", "isMETIS");
   if( temp == 1 ) isMETIS = true;
@@ -30,20 +30,20 @@ Global_Part_Reload::Global_Part_Reload( const int &cpu_size,
 
   epart = eh5r -> read_intVector("/", "part");
 
-  delete eh5r; H5Fclose( efile_id );
+  H5Fclose( efile_id );
 
   // --------------------------------------------------------------------------
   const std::string nfName = node_part_name + ".h5";
 
   hid_t nfile_id = H5Fopen( nfName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  HDF5_Reader * nh5r = new HDF5_Reader( nfile_id );
+  auto nh5r = SYS_T::make_unique<HDF5_Reader>( nfile_id );
 
   npart = nh5r -> read_intVector("/", "part");
   
   field_offset = nh5r -> read_intVector("/", "field_offset");
 
-  delete nh5r; H5Fclose( nfile_id );
+  H5Fclose( nfile_id );
   // --------------------------------------------------------------------------
 
   SYS_T::print_fatal_if( cpu_size != cpusize, "Error: Global_Part_Reload cpu_size is incompatible with prior partition.\n" );

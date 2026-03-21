@@ -184,7 +184,7 @@ int main( int argc, char * argv[] )
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  auto cmdh5w = SYS_T::make_unique<HDF5_Writer>(cmd_file_id);
 
   cmdh5w->write_intScalar("num_inlet", num_inlet);
   cmdh5w->write_intScalar("num_outlet", num_outlet);
@@ -203,7 +203,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
   cmdh5w->write_string("part_file", part_file);
 
-  delete cmdh5w; H5Fclose(cmd_file_id);
+  H5Fclose(cmd_file_id);
 
   // Read the volumetric mesh file from the vtu file: fixed_geo_file
   int nFunc, nElem;
@@ -471,11 +471,11 @@ int main( int argc, char * argv[] )
     const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
     hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
     hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * h5w = new HDF5_Writer( file_id );
+    auto h5w = SYS_T::make_unique<HDF5_Writer>( file_id );
     h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
     h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
 
-    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+    H5Gclose( g_id ); H5Fclose( file_id );
 
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);
@@ -561,7 +561,7 @@ int main( int argc, char * argv[] )
 
     hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
-    HDF5_Writer * h5w = new HDF5_Writer( file_id );
+    auto h5w = SYS_T::make_unique<HDF5_Writer>( file_id );
 
     h5w -> write_intVector( g_id, "max_num_local_fixed_cell", max_fixed_nlocalele );
 
@@ -587,7 +587,7 @@ int main( int argc, char * argv[] )
       H5Gclose( group_id );
     }
 
-    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+    H5Gclose( g_id ); H5Fclose( file_id );
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;

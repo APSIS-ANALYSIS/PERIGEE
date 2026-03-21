@@ -14,11 +14,11 @@
 //
 // hid_t file_id = H5Fopen(name_of_h5_file, mode, H5P_DEFAULT)
 //
-// HDF5_Reader * h5r = new HDF5_Reader( file_id );
+// auto h5r = SYS_T::make_unique<HDF5_Reader>( file_id );
 //
 // call read functions
 //
-// delete h5r;
+// h5r is released automatically when it goes out of scope.
 // H5Fclose(file_id);
 //
 // There are two modes for H5Fopen

@@ -33,7 +33,7 @@ void EBC_Partition_WallModel::write_hdf5(const std::string &FileName) const
 
   hid_t g_id = H5Gcreate(file_id, "/weak", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( file_id );
 
   h5w -> write_intScalar( g_id, "wall_model_type", wall_model_type );
 
@@ -48,7 +48,7 @@ void EBC_Partition_WallModel::write_hdf5(const std::string &FileName) const
   else
     ;   // stop writing if wall_model_type = 0
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+  H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 // EOF
