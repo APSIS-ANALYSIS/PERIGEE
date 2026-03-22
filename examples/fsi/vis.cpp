@@ -15,10 +15,6 @@
 int main( int argc, char * argv[] )
 {
   const std::string element_part_file = "epart.h5";
-  const std::string an_v_mapping_file = "node_mapping_v.h5";
-  const std::string an_p_mapping_file = "node_mapping_p.h5";
-  const std::string pn_v_mapping_file = "post_node_mapping_v.h5";
-  const std::string pn_p_mapping_file = "post_node_mapping_p.h5";
   const std::string part_v_file="./ppart/postpart_v";
   const std::string part_p_file="./ppart/postpart_p";
 
@@ -132,12 +128,12 @@ int main( int argc, char * argv[] )
   std::ostringstream time_index;
 
   // Velocity and displacement node mappings
-  const auto an_v_mapping = VIS_T::readNodeMapping(an_v_mapping_file, "old_2_new");
-  const auto pn_v_mapping = VIS_T::readNodeMapping(pn_v_mapping_file, "new_2_old");
+  const auto an_v_mapping = HDF5_T::read_intVector("node_mapping_v.h5", "/", "old_2_new");
+  const auto pn_v_mapping = HDF5_T::read_intVector("post_node_mapping_v.h5", "/", "new_2_old");
 
   // Pressure node mappings
-  const auto an_p_mapping = VIS_T::readNodeMapping(an_p_mapping_file, "old_2_new");
-  const auto pn_p_mapping = VIS_T::readNodeMapping(pn_p_mapping_file, "new_2_old");
+  const auto an_p_mapping = HDF5_T::read_intVector("node_mapping_p.h5", "/", "old_2_new");
+  const auto pn_p_mapping = HDF5_T::read_intVector("post_node_mapping_p.h5", "/", "new_2_old");
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
