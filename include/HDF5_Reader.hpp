@@ -6,20 +6,16 @@
 // This is a set of tools that read in files in .h5 format. This will 
 // ease the input of data from the disk.
 //
-// To construct this class, one should first obtain a hid_t data by
-// calling H5Fopen. After the data are all read, one should call
-// H5Fclose.
+// Construct this class with a file name. The file is opened by the
+// constructor and closed automatically in the destructor.
 //
 // A typical way of using this class is:
 //
-// hid_t file_id = H5Fopen(name_of_h5_file, mode, H5P_DEFAULT)
-//
-// HDF5_Reader * h5r = new HDF5_Reader( file_id );
+// HDF5_Reader * h5r = new HDF5_Reader( name_of_h5_file );
 //
 // call read functions
 //
 // delete h5r;
-// H5Fclose(file_id);
 //
 // There are two modes for H5Fopen
 // H5F_ACC_RDONLY: the application will read only the file
@@ -42,16 +38,23 @@ class HDF5_Reader
   public:
     // --------------------------------------------------------------
     // ! HDF5_Reader
-    //   Constructor. Assuming the fild_id has been created. The 
-    //   constructor will pass the given fild_id in to make it its 
-    //   own variable.
+    //   Constructor. Open the hdf5 file with the specified mode.
     // --------------------------------------------------------------
-    HDF5_Reader( const hid_t &in_file_id ) : file_id(in_file_id) {}
+    HDF5_Reader( const std::string &in_file_name,
+        const unsigned in_mode = H5F_ACC_RDONLY )
+      : file_id(H5Fopen(in_file_name.c_str(), in_mode, H5P_DEFAULT))
+    {
+      if( file_id < 0 )
+        SYS_T::print_fatal("Error: HDF5_Reader cannot open file %s\n", in_file_name.c_str());
+    }
     
     // --------------------------------------------------------------
     // ! ~HDF5_Reader : Destructor.
     // --------------------------------------------------------------
-    virtual ~HDF5_Reader() = default;
+    virtual ~HDF5_Reader()
+    {
+      H5Fclose(file_id);
+    }
 
     // --------------------------------------------------------------
     // !check_data: return a bool value that determines if the data
@@ -60,6 +63,14 @@ class HDF5_Reader
     bool check_data( const char * const &name ) const
     {
       return H5Lexists(file_id, name, H5P_DEFAULT);
+    }
+
+    // --------------------------------------------------------------
+    // ! get_file_id: return the internal hdf5 file id.
+    // --------------------------------------------------------------
+    hid_t get_file_id() const
+    {
+      return file_id;
     }
     
     // --------------------------------------------------------------
