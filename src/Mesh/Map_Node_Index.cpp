@@ -35,13 +35,11 @@ Map_Node_Index::Map_Node_Index( const char * const &fileName )
   fName.append(".h5");
 
 
-  HDF5_Reader * h5r = new HDF5_Reader( fName );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   old_2_new = h5r -> read_intVector("/", "old_2_new");
   new_2_old = h5r -> read_intVector("/", "new_2_old");
 
-  delete h5r;
-  
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
   std::cout<<std::endl<<"=== Node index mapping loaded.\n";

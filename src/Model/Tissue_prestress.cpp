@@ -35,7 +35,7 @@ Tissue_prestress::Tissue_prestress(
       if( SYS_T::file_exist(ps_fName) )
       {
 
-        HDF5_Reader * ps_h5r = new HDF5_Reader( ps_fName );
+        auto ps_h5r = SYS_T::make_unique<HDF5_Reader>(ps_fName);
 
         const int ps_size = ps_h5r -> read_intScalar("/", "ps_array_size"); 
 
@@ -43,7 +43,6 @@ Tissue_prestress::Tissue_prestress(
 
         qua_ps_array = ps_h5r -> read_doubleVector("/", "prestress");
 
-        delete ps_h5r;
       }
       else
         SYS_T::print_fatal("Error: prestress file %s cannot be found.\n", ps_fName.c_str());
