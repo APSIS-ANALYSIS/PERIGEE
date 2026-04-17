@@ -98,7 +98,7 @@ void NBC_Partition_rotated::write_hdf5( const std::string &FileName ) const
   auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, "/rotated_nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group g_id = HDF5_Group::create(file_id, "/rotated_nbc");
 
   h5w->write_intScalar( g_id, "Num_LD", Num_LD );
   
@@ -130,8 +130,6 @@ void NBC_Partition_rotated::write_hdf5( const std::string &FileName ) const
 
     h5w->write_intVector( g_id, "local_global_cell", local_global_cell );   
   }
-
-  H5Gclose( g_id );
 }
 
 // EOF

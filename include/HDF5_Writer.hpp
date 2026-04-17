@@ -36,6 +36,7 @@
 #include <vector>
 #include <array>
 #include "Sys_Tools.hpp"
+#include "HDF5_Group.hpp"
 #include "hdf5.h"
 
 class HDF5_Writer

@@ -119,7 +119,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
   auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, "/inflow", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group g_id = HDF5_Group::create(file_id, "/inflow");
 
   h5w -> write_intScalar( g_id, "num_nbc", num_nbc );
 
@@ -128,8 +128,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
     std::string subgroup_name( "nbcid_" );
     subgroup_name.append( std::to_string(ii) );
 
-    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Group group_id = HDF5_Group::create(g_id, subgroup_name.c_str());
 
     h5w->write_intScalar( group_id, "Num_LD", Num_LD[ii] );
     
@@ -162,11 +161,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
     h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
 
     h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
-
-    H5Gclose( group_id );
   }
-
-  H5Gclose( g_id );
 }
 
 // EOF

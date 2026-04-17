@@ -5,7 +5,7 @@ void HDF5_Reader::read_intArray(const char * const &group_name,
     hid_t &data_rank, hsize_t * &data_dims, int * &data  ) const
 {
   // open group file and data file
-  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
+  HDF5_Group group_id = HDF5_Group::open(file_id, group_name);
   hid_t data_id = H5Dopen(group_id, data_name, H5P_DEFAULT);
 
   // retrive dataspace of the dataset
@@ -42,7 +42,6 @@ void HDF5_Reader::read_intArray(const char * const &group_name,
   H5Sclose( mem_space );
   H5Sclose( data_space );
   H5Dclose( data_id );
-  H5Gclose( group_id );
 }
 
 void HDF5_Reader::read_doubleArray(const char * const &group_name,
@@ -50,7 +49,7 @@ void HDF5_Reader::read_doubleArray(const char * const &group_name,
     hid_t &data_rank, hsize_t * &data_dims, double * &data  ) const
 {
   // open group file and data file
-  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
+  HDF5_Group group_id = HDF5_Group::open(file_id, group_name);
   hid_t data_id  = H5Dopen(group_id, data_name, H5P_DEFAULT);
 
   // retrive dataspace of the dataset
@@ -84,7 +83,6 @@ void HDF5_Reader::read_doubleArray(const char * const &group_name,
   H5Sclose( mem_space );
   H5Sclose( data_space );
   H5Dclose( data_id );
-  H5Gclose( group_id );
 }
 
 int HDF5_Reader::read_intScalar( const char * const &group_name,
@@ -284,7 +282,7 @@ std::string HDF5_Reader::read_string( const char * const &group_name,
     const char * const &data_name ) const
 {
   // open group file and data file
-  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
+  HDF5_Group group_id = HDF5_Group::open(file_id, group_name);
   hid_t data_id  = H5Dopen(group_id, data_name, H5P_DEFAULT);
 
   hid_t filetype = H5Dget_type( data_id );
@@ -317,8 +315,6 @@ std::string HDF5_Reader::read_string( const char * const &group_name,
   H5Tclose( filetype );
   H5Sclose( data_space );
   H5Dclose( data_id );
-  H5Gclose( group_id );
-
   return string_out;
 }
 

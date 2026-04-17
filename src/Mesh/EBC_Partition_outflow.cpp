@@ -61,7 +61,7 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
 
   auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
   const hid_t file_id = h5w->get_file_id();
-  hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
+  HDF5_Group g_id = HDF5_Group::open( file_id, GroupName.c_str() );
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -69,17 +69,13 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
     {
       std::string subgroup_name( "ebcid_" );
       subgroup_name.append( std::to_string(ii) );
-      hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
+      HDF5_Group subgroup_id = HDF5_Group::open(g_id, subgroup_name.c_str() );
 
       h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );
       h5w->write_intVector( subgroup_id, "LID_all_face_nodes", LID_all_face_nodes[ii] );
       h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii].to_std_array() );
-
-      H5Gclose( subgroup_id );
     }
   }
-
-  H5Gclose( g_id );
 }
 
 // EOF

@@ -173,7 +173,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
   auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
   const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, "/sliding", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group g_id = HDF5_Group::create(file_id, "/sliding");
 
   h5w -> write_intScalar( g_id, "num_interface", num_pair );
 
@@ -190,7 +190,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
     std::string subgroup_name(groupbase);
     subgroup_name.append( std::to_string(ii) );
 
-    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Group group_id = HDF5_Group::create(g_id, subgroup_name.c_str());
 
     h5w -> write_intScalar( group_id, "num_fixed_node", VEC_T::get_size(fixed_global_node[ii]) );
 
@@ -235,19 +235,13 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
       std::string subsubgroup_name(subgroupbase);
       subsubgroup_name.append( std::to_string(jj) );
 
-      hid_t subgroup_id = H5Gcreate(group_id, subsubgroup_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      HDF5_Group subgroup_id = HDF5_Group::create(group_id, subsubgroup_name.c_str());
 
       h5w -> write_intVector( subgroup_id, "tagged_fixed_cell", tagged_fixed_ele[ii][jj] );
 
       h5w -> write_intVector( subgroup_id, "tagged_rotated_cell", tagged_rotated_ele[ii][jj] );
-
-      H5Gclose( subgroup_id );
     }
-
-    H5Gclose( group_id );
   }
-
-  H5Gclose( g_id );
 }
 
 // EOF

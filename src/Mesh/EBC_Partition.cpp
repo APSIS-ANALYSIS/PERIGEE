@@ -99,7 +99,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
+  HDF5_Group g_id = HDF5_Group::create(file_id, GroupName.c_str()); 
 
   auto h5w = SYS_T::make_unique<HDF5_Writer>( file_id );
 
@@ -119,8 +119,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
     {
       const std::string sub_gname = groupbase + std::to_string(ii);
 
-      hid_t group_id = H5Gcreate(g_id, sub_gname.c_str(), 
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      HDF5_Group group_id = HDF5_Group::create(g_id, sub_gname.c_str());
 
       h5w->write_doubleVector( group_id, "local_cell_node_xyz", local_cell_node_xyz[ii] );
 
@@ -131,12 +130,8 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
       h5w->write_intVector( group_id, "local_cell_node_pos", local_cell_node_pos[ii] );
 
       h5w->write_intVector( group_id, "local_cell_vol_id", local_cell_vol_id[ii] );
-
-      H5Gclose( group_id );
     }
   }
-
-  H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 void EBC_Partition::print_info() const

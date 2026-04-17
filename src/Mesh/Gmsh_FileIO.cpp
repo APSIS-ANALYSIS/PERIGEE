@@ -912,8 +912,7 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
     // Record info
     std::string name_1d_domain(slash);
     name_1d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_1d_domain.c_str(), 
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    HDF5_Group g_id = HDF5_Group::create( file_id, name_1d_domain.c_str() );
 
     h5w->write_string(g_id, "name", phy_1d_name[ index_1d[ii] ] );
     h5w->write_intScalar(g_id, "phy_tag", index_1d[ii]);
@@ -926,8 +925,6 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
     h5w->write_intVector(g_id, "pt_idx", bcpt);
     h5w->write_intVector(g_id, "edge2elem", face2elem);
     h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
   }
 }
 
@@ -1079,8 +1076,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     // Record info
     std::string name_2d_domain(slash);
     name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    HDF5_Group g_id = HDF5_Group::create( file_id, name_2d_domain.c_str() );
 
     h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
     h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
@@ -1093,8 +1089,6 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     h5w->write_intVector(g_id, "pt_idx", bcpt);
     h5w->write_intVector(g_id, "face2elem", face2elem);
     h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
   } // End-loop-over-2d-face
 }
 
@@ -1249,8 +1243,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     // Record info
     std::string name_2d_domain(slash);
     name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    HDF5_Group g_id = HDF5_Group::create( file_id, name_2d_domain.c_str() );
 
     h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
     h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
@@ -1263,8 +1256,6 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     h5w->write_intVector(g_id, "pt_idx", bcpt);
     h5w->write_intVector(g_id, "face2elem", face2elem);
     h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
   } // End-loop-over-2d-face
 }
 

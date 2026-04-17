@@ -50,14 +50,11 @@ void Part_FEM_FSI::write( const std::string &inputFileName ) const
   const hid_t file_id = h5w->get_file_id();
 
   // open group 1: local element
-  hid_t group_id_1 = H5Gopen(file_id, "/Local_Elem", H5P_DEFAULT);
+  HDF5_Group group_id_1 = HDF5_Group::open(file_id, "/Local_Elem");
 
   h5w->write_intVector( group_id_1, "elem_phy_tag", elem_phy_tag );
-
-  H5Gclose( group_id_1 );
-
   // group 2: local node
-  hid_t group_id_2 = H5Gopen( file_id, "/Local_Node", H5P_DEFAULT );
+  HDF5_Group group_id_2 = HDF5_Group::open(file_id, "/Local_Node");
 
   h5w->write_intScalar( group_id_2, "nlocalnode_fluid", nlocalnode_fluid );
   h5w->write_intScalar( group_id_2, "nlocalnode_solid", nlocalnode_solid );
@@ -67,15 +64,10 @@ void Part_FEM_FSI::write( const std::string &inputFileName ) const
 
   if( nlocalnode_solid > 0 )
     h5w->write_intVector( group_id_2, "node_loc_solid", node_loc_solid );
-
-  H5Gclose( group_id_2 );
-
   // group 7: DOF mapper
-  hid_t group_id_7 = H5Gcreate(file_id, "/DOF_mapper", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group group_id_7 = HDF5_Group::create(file_id, "/DOF_mapper");
 
   h5w -> write_intScalar( group_id_7, "start_idx", start_idx );
-
-  H5Gclose( group_id_7 );
 }
 
 // EOF

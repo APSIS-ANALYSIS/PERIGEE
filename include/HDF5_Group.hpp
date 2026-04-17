@@ -73,6 +73,7 @@ class HDF5_Group
     }
 
     hid_t id() const noexcept { return group_id; }
+    operator hid_t() const noexcept { return group_id; }
 
     bool is_valid() const noexcept { return group_id >= 0; }
 
