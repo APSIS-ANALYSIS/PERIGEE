@@ -11,11 +11,10 @@
 //
 // A typical way of using this class is:
 //
-// HDF5_Reader * h5r = new HDF5_Reader( name_of_h5_file );
+// auto h5r = SYS_T::make_unique<HDF5_Reader>(name_of_h5_file);
 //
 // call read functions
-//
-// delete h5r;
+// (resource is released automatically when h5r goes out of scope)
 //
 // There are two modes for H5Fopen
 // H5F_ACC_RDONLY: the application will read only the file
