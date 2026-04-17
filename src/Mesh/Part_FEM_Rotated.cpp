@@ -44,9 +44,8 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
 
   const std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
+  const hid_t file_id = h5w->get_file_id();
 
   // open group 1: local element
   hid_t group_id_1 = H5Gopen(file_id, "/Local_Elem", H5P_DEFAULT);
@@ -68,10 +67,6 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
     h5w->write_intVector( group_id_2, "node_loc_rotated", node_loc_rotated );
 
   H5Gclose( group_id_2 );
-
-  // Finish the writing of hdf5 file
-  delete h5w;
-  H5Fclose(file_id);
 }
 
 // EOF

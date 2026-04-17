@@ -795,10 +795,8 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
     std::cout<<phy_1d_name[ index_1d[ii] ]<<'\t';
   std::cout<<std::endl;
 
-  hid_t file_id = H5Fcreate(h5_file_name.c_str(), 
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( h5_file_name );
+  const hid_t file_id = h5w->get_file_id();
 
   // Write 2D domain first
   const std::string slash("/");
@@ -931,10 +929,6 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
 
     H5Gclose(g_id);
   }
-
-  // Close the HDF5 file
-  delete h5w;
-  H5Fclose( file_id );
 }
 
 void Gmsh_FileIO::write_vol_h5( int index_3d,
@@ -962,10 +956,9 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     std::cout<<phy_2d_name[ index_2d[ii] ]<<'\t';
   std::cout<<std::endl;
 
-  hid_t file_id = H5Fcreate(h5_file_name.c_str(),
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( h5_file_name );
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  const hid_t file_id = h5w->get_file_id();
 
   // Write the 3D domain at the root
   const std::string slash("/");
@@ -1103,10 +1096,6 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
 
     H5Gclose(g_id);
   } // End-loop-over-2d-face
-
-  // Close the HDF5 file
-  delete h5w;
-  H5Fclose( file_id ); 
 }
 
 void Gmsh_FileIO::write_vol_h5( int index_3d,
@@ -1135,10 +1124,9 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     std::cout<<phy_2d_name[ index_2d[ii] ]<<'\t';
   std::cout<<std::endl;
 
-  hid_t file_id = H5Fcreate(h5_file_name.c_str(),
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( h5_file_name );
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  const hid_t file_id = h5w->get_file_id();
 
   // Write the 3D domain at the root
   const std::string slash("/");
@@ -1278,10 +1266,6 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
 
     H5Gclose(g_id);
   } // End-loop-over-2d-face
-
-  // Close the HDF5 file
-  delete h5w;
-  H5Fclose( file_id ); 
 }
 
 void Gmsh_FileIO::update_FSI_nodal_ordering()

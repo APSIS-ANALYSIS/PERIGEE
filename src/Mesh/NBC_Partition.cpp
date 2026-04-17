@@ -83,11 +83,10 @@ void NBC_Partition::write_hdf5( const std::string &FileName,
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  auto h5writer = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
+  const hid_t file_id = h5writer->get_file_id();
 
   hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
 
   h5writer->write_intVector( g_id, "LID", LID );
 
@@ -109,7 +108,7 @@ void NBC_Partition::write_hdf5( const std::string &FileName,
   h5writer->write_intVector(g_id, "Num_LPS", Num_LPS);
   h5writer->write_intVector(g_id, "Num_LPM", Num_LPM);
 
-  delete h5writer; H5Gclose(g_id); H5Fclose(file_id);
+  H5Gclose(g_id);
 }
 
 void NBC_Partition::print_info() const

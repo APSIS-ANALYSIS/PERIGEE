@@ -166,13 +166,12 @@ int main( int argc, char *argv[] )
   // ====== Record important parameters ======
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("wall_ps_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    HDF5_Writer * cmdh5w = new HDF5_Writer("wall_ps_cmd.h5");
     
     cmdh5w -> write_string(      "ps_file_name",       ps_file_name);
     cmdh5w -> write_doubleScalar("prestress_disp_tol", prestress_disp_tol );
 
-    delete cmdh5w; H5Fclose(cmd_file_id);
+    delete cmdh5w;
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);

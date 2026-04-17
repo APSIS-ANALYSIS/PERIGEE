@@ -161,8 +161,7 @@ int main( int argc, char * argv[] )
 
   // ----- Write the input argument into a HDF5 file
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  HDF5_Writer * cmdh5w = new HDF5_Writer("preprocessor_cmd.h5");
 
   cmdh5w->write_intScalar("num_outlet",       num_outlet);
   cmdh5w->write_intScalar("num_inlet",        num_inlet);
@@ -186,7 +185,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("date",                SYS_T::get_date() );
   cmdh5w->write_string("time",                SYS_T::get_time() );
 
-  delete cmdh5w; H5Fclose(cmd_file_id);
+  delete cmdh5w;
   // ----- Finish writing
 
   // Read the geometry file for the whole FSI domain for the velocity /
