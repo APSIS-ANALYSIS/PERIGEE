@@ -6,9 +6,7 @@ ALocal_NBC::ALocal_NBC( const std::string &fileBaseName,
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   nlocghonode = h5r->read_intScalar( "Local_Node", "nlocghonode" );
   LID = h5r->read_intVector( gname.c_str(), "LID" );
@@ -51,7 +49,6 @@ ALocal_NBC::ALocal_NBC( const std::string &fileBaseName,
   SYS_T::print_fatal_if( int(LocalMaster.size()) != VEC_T::sum( Num_LPM ), "Error: ALocal_NBC, LocalMaster length does not match Num_LPM. \n" );
   SYS_T::print_fatal_if( int(LocalMasterSlave.size()) != VEC_T::sum( Num_LPM ), "Error: ALocal_NBC, LocalMasterSlave length does not match Num_LPM. \n" );
 
-  H5Fclose( file_id );
 
   // Generate the offsets 
   LD_offset.clear(); LPS_offset.clear(); LPM_offset.clear();

@@ -19,13 +19,11 @@ namespace ANL_T
   {
     const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
 
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-    auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+    auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
     const int val = h5r->read_intScalar(partname.c_str(), dataname.c_str());
 
-    H5Fclose(file_id);
     return val;
   }
 
@@ -48,13 +46,11 @@ namespace ANL_T
   {
     const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
 
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-    auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+    auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
     auto elemType = FE_T::to_FEType(h5r->read_string("Global_Mesh_Info", "elemType"));
 
-    H5Fclose(file_id);
     return elemType;
   }
 
