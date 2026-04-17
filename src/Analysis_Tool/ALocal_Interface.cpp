@@ -4,7 +4,6 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_ran
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-
   auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("/sliding");
