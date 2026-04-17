@@ -556,11 +556,11 @@ int main( int argc, char * argv[] )
 
     const std::string GroupName = "/sliding";
 
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-
-    hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
-
     HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
+    
+    const hid_t file_id = h5w->get_file_id();
+    
+    hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
     h5w -> write_intVector( g_id, "max_num_local_fixed_cell", max_fixed_nlocalele );
 
@@ -586,7 +586,7 @@ int main( int argc, char * argv[] )
       H5Gclose( group_id );
     }
 
-    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+    delete h5w; H5Gclose( g_id );
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
