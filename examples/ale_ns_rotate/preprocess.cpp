@@ -468,13 +468,13 @@ int main( int argc, char * argv[] )
 
     // Writed the info of rotation axis into h5 file
     const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-    hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
+    const hid_t file_id = h5w->get_file_id();
+    hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
     h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
 
-    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+    delete h5w; H5Gclose( g_id );
 
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);
