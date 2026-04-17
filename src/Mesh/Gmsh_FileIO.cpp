@@ -929,8 +929,6 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
 
     H5Gclose(g_id);
   }
-
-  // Close the HDF5 fileH5Fclose( file_id );
 }
 
 void Gmsh_FileIO::write_vol_h5( int index_3d,
