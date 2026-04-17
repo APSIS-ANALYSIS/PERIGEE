@@ -58,24 +58,23 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if( SYS_T::get_MPI_size() != 1, "ERROR: vis_wss_tet10 is a serial program! \n");
 
   // Read the geometry file name from preprocessor hdf5 file
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
   const std::string geo_file  = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_file_wall");
   const std::string elemType_str = cmd_h5r -> read_string("/", "elemType");
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // Read the material property from the solver HDF5 file
   prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  cmd_h5r = new HDF5_Reader( prepcmd_file );
+  cmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
 
   const double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // Enforce the element to be quadratic tet for now
   if( elemType != FEType::Tet10 ) SYS_T::print_fatal("Error: element type should be quadratic tet element.\n");

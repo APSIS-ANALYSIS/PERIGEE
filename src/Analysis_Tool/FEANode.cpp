@@ -4,9 +4,8 @@ FEANode::FEANode( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   ctrlPts_x = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
   ctrlPts_y = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
@@ -18,7 +17,6 @@ FEANode::FEANode( const std::string &fileBaseName, int cpu_rank )
   else
     VEC_T::clean( ctrlPts_w );
 
-  H5Fclose( file_id );
 }
 
 FEANode::FEANode( const HDF5_Reader * const &h5r )
