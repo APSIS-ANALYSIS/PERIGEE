@@ -59,9 +59,7 @@ int main( int argc, char * argv[] )
   delete cmd_h5r;
 
   // Now read the material properties from the solver cmd h5 file
-  prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-  
-  cmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
+  cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );
   
   const double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
