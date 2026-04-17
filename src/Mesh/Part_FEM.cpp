@@ -416,6 +416,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   // Finish writing, clean up
   delete h5w;
+  H5Fclose(file_id);
 }
 
 void Part_FEM::print_part_ele() const
