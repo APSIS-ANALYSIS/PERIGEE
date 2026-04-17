@@ -5,7 +5,6 @@ APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, int rank )
 {
   std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-
   auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("Local_Node");
@@ -18,7 +17,6 @@ APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, int rank )
 
   if(nlocalnode_solid > 0)
     node_loc_solid = h5r -> read_intVector( gname.c_str(), "node_loc_solid" );
-
 }
 
 APart_Node_FSI::APart_Node_FSI(const HDF5_Reader * const &h5r)

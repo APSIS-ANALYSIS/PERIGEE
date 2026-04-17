@@ -5,7 +5,6 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, int cpu_rank)
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-
   auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   elem_loc = h5r->read_intVector( "/Local_Elem", "elem_loc" );
@@ -21,7 +20,6 @@ ALocal_Elem::ALocal_Elem(const std::string &fileBaseName, int cpu_rank)
   }
   else
     elem_tag.clear();
-    
 }
 
 ALocal_Elem::ALocal_Elem(const HDF5_Reader * const &h5r)
