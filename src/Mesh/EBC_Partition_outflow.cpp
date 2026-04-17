@@ -59,10 +59,9 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
 
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-  hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
-
   HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
+  const hid_t file_id = h5w->get_file_id();
+  hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -80,7 +79,7 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
     }
   }
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+  delete h5w; H5Gclose( g_id );
 }
 
 // EOF

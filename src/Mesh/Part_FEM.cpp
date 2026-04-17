@@ -330,9 +330,8 @@ void Part_FEM::write( const std::string &inputFileName ) const
 {
   const std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
-  hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
+  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_TRUNC);
+  const hid_t file_id = h5w->get_file_id();
 
   // group 1: local element
   hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -415,7 +414,6 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
   // Finish writing, clean up
   delete h5w;
-  H5Fclose(file_id);
 }
 
 void Part_FEM::print_part_ele() const
