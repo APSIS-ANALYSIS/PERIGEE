@@ -72,8 +72,7 @@ void Map_Node_Index::write_hdf5( const std::string &fileName ) const
   h5w -> write_intVector( "old_2_new", old_2_new );
   h5w -> write_intVector( "new_2_old", new_2_old );
 
-  delete h5w;
-  H5Fclose(file_id);
+  delete h5w; H5Fclose(file_id);
 }
 
 // EOF
