@@ -67,7 +67,6 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
     h5w->write_intVector( group_id_2, "node_loc_rotated", node_loc_rotated );
 
   H5Gclose( group_id_2 );
-
-  // Finish the writing of hdf5 file}
+}
 
 // EOF

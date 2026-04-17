@@ -76,7 +76,6 @@ void Part_FEM_FSI::write( const std::string &inputFileName ) const
   h5w -> write_intScalar( group_id_7, "start_idx", start_idx );
 
   H5Gclose( group_id_7 );
-
-  // Finish the writing of hdf5 file}
+}
 
 // EOF

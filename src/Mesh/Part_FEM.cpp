@@ -191,7 +191,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
     ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
     ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
   }
-
 }
 
 Part_FEM::~Part_FEM()
@@ -411,8 +410,7 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
     H5Gclose( group_id_6 );
   }
-
-  // Finish writing, clean up}
+}
 
 void Part_FEM::print_part_ele() const
 {
