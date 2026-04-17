@@ -145,7 +145,7 @@ int main( int argc, char * argv[] )
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
   // Read the node mappings
-  const auto analysis_new2old = VIS_T::readNodeMapping("node_mapping_v.h5", "new_2_old");
+  const auto analysis_new2old = HDF5_T::read_intVector("node_mapping_v.h5", "/", "new_2_old");
 
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 

@@ -453,12 +453,6 @@ std::vector<int> VIS_T::read_epart( const std::string &epart_file, int esize )
   return elem_part;
 }
 
-std::vector<int> VIS_T::readNodeMapping( const std::string &node_mapping_file,
-    const char * const &mapping_type )
-{
-  return HDF5_T::read_intVector( node_mapping_file.c_str(), "/", mapping_type );
-}
-
 std::vector<double> VIS_T::readPETSc_vec(const std::string &solution_file_name)
 {
   Vec sol_temp;

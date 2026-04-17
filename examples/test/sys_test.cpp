@@ -96,7 +96,7 @@ int main()
   if(VEC_T::is_equal(old2new_map_1, old2new_map_2, 0)) std::cout<<"good!\n";
   else std::cout<<"bad\n";
 
-  std::vector<int> old2new_map_3 = VIS_T::readNodeMapping( node_mapping_file, "old_2_new", nNode );
+  std::vector<int> old2new_map_3 = HDF5_T::read_intVector( node_mapping_file.c_str(), "/", "old_2_new" );
 
   if(VEC_T::is_equal(old2new_map_1, old2new_map_3, 0)) std::cout<<"good!\n";
   else std::cout<<"bad\n";

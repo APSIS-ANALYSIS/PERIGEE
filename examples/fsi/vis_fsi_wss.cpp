@@ -92,7 +92,7 @@ int main( int argc, char * argv[] )
   cout<<"Wall mesh contains "<<nElem<<" elements and "<<nFunc<<" vertices.\n";
 
   // Read the node mappings
-  const auto analysis_new2old = VIS_T::readNodeMapping( "node_mapping_v.h5", "new_2_old" );
+  const auto analysis_new2old = HDF5_T::read_intVector( "node_mapping_v.h5", "/", "new_2_old" );
 
   // Read solution files
   std::string disp_sol_name(sol_bname), velo_sol_name(sol_bname);
