@@ -5,9 +5,8 @@ ALocal_InflowBC::ALocal_InflowBC(
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("/inflow");
 
@@ -86,7 +85,6 @@ ALocal_InflowBC::ALocal_InflowBC(
     }
   } // end nbc_id-loop
 
-  H5Fclose( file_id );
 }
 
 ALocal_InflowBC::ALocal_InflowBC( const HDF5_Reader * const &h5r )

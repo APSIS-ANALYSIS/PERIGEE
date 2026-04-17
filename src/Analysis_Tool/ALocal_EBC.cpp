@@ -5,9 +5,8 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
 {
   std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   num_ebc = h5r -> read_intScalar(gname.c_str(), "num_ebc");
 
@@ -52,7 +51,6 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     }
   }
 
-  H5Fclose( file_id );
 }
 
 ALocal_EBC::ALocal_EBC( const HDF5_Reader * const &h5r,

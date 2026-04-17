@@ -34,14 +34,13 @@ Map_Node_Index::Map_Node_Index( const char * const &fileName )
   std::string fName( fileName );
   fName.append(".h5");
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  HDF5_Reader * h5r = new HDF5_Reader( fName );
 
   old_2_new = h5r -> read_intVector("/", "old_2_new");
   new_2_old = h5r -> read_intVector("/", "new_2_old");
 
-  delete h5r; H5Fclose( file_id );
+  delete h5r;
   
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
@@ -73,7 +72,7 @@ void Map_Node_Index::write_hdf5( const std::string &fileName ) const
   h5w -> write_intVector( "old_2_new", old_2_new );
   h5w -> write_intVector( "new_2_old", new_2_old );
 
-  delete h5w; H5Fclose(file_id);
+  delete h5w;
 }
 
 // EOF

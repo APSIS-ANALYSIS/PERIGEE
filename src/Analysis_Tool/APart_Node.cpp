@@ -5,9 +5,8 @@ APart_Node::APart_Node( const std::string &fbasename, int rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fbasename, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
 
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
   
   nlocalnode  = h5r->read_intScalar("Local_Node", "nlocalnode");
   nghostnode  = h5r->read_intScalar("Local_Node", "nghostnode");
@@ -26,7 +25,6 @@ APart_Node::APart_Node( const std::string &fbasename, int rank )
 
   dof = h5r->read_intScalar("Global_Mesh_Info", "dofNum");
 
-  H5Fclose( file_id );
 }
 
 APart_Node::APart_Node( const HDF5_Reader * const &h5r )
