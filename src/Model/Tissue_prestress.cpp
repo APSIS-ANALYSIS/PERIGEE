@@ -115,15 +115,13 @@ void Tissue_prestress::write_prestress_hdf5() const
   // Record to h5 file
   const std::string fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
 
-  HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_TRUNC );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName );
   const hid_t file_id = h5w->get_file_id();
 
   h5w -> write_intScalar( "ps_array_size", qua_prestress_array.size() );
 
   if( qua_prestress_array.size() > 0 )
     h5w -> write_doubleVector( file_id, "prestress", qua_prestress_array );
-
-  delete h5w;
 }
 
 // EOF

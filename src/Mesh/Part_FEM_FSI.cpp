@@ -46,7 +46,7 @@ void Part_FEM_FSI::write( const std::string &inputFileName ) const
 
   const std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
-  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5w->get_file_id();
 
   // open group 1: local element
@@ -77,8 +77,6 @@ void Part_FEM_FSI::write( const std::string &inputFileName ) const
 
   H5Gclose( group_id_7 );
 
-  // Finish the writing of hdf5 file
-  delete h5w;
-}
+  // Finish the writing of hdf5 file}
 
 // EOF

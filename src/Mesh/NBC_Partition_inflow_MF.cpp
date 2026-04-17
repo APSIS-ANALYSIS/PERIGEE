@@ -33,7 +33,7 @@ void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const
 
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5w->get_file_id();
 
   hid_t g_id = H5Gopen(file_id, "/inflow", H5P_DEFAULT);
@@ -48,7 +48,7 @@ void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const
     h5w->write_intVector( group_id, "LDN_MF", LDN_MF[ii] );
   }
 
-  delete h5w; H5Gclose( g_id );
+  H5Gclose( g_id );
 }
 
 // EOF
