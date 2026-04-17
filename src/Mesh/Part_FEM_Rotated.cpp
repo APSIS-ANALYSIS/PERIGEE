@@ -46,7 +46,7 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
 
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
 
   // open group 1: local element
   hid_t group_id_1 = H5Gopen(file_id, "/Local_Elem", H5P_DEFAULT);

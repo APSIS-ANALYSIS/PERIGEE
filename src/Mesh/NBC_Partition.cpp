@@ -87,7 +87,7 @@ void NBC_Partition::write_hdf5( const std::string &FileName,
 
   hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
+  HDF5_Writer * h5writer = new HDF5_Writer(fName, H5F_ACC_RDWR);
 
   h5writer->write_intVector( g_id, "LID", LID );
 

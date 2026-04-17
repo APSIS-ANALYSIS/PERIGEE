@@ -62,7 +62,7 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
   hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
   hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
 
   for(int ii=0; ii<num_ebc; ++ii)
   {

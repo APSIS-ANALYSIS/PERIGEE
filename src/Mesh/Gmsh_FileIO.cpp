@@ -798,7 +798,7 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
   hid_t file_id = H5Fcreate(h5_file_name.c_str(), 
       H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  HDF5_Writer * h5w = new HDF5_Writer( h5_file_name, H5F_ACC_RDWR );
 
   // Write 2D domain first
   const std::string slash("/");
@@ -965,7 +965,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
   hid_t file_id = H5Fcreate(h5_file_name.c_str(),
       H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  HDF5_Writer * h5w = new HDF5_Writer( h5_file_name, H5F_ACC_RDWR );
 
   // Write the 3D domain at the root
   const std::string slash("/");
@@ -1138,7 +1138,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
   hid_t file_id = H5Fcreate(h5_file_name.c_str(),
       H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  HDF5_Writer * h5w = new HDF5_Writer( h5_file_name, H5F_ACC_RDWR );
 
   // Write the 3D domain at the root
   const std::string slash("/");

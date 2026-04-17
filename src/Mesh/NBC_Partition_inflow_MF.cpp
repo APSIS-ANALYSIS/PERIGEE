@@ -37,7 +37,7 @@ void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const
 
   hid_t g_id = H5Gopen(file_id, "/inflow", H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
 
   for(int ii=0; ii<num_nbc; ++ii)
   {

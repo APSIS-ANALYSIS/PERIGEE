@@ -99,7 +99,7 @@ void NBC_Partition_rotated::write_hdf5( const std::string &FileName ) const
 
   hid_t g_id = H5Gcreate(file_id, "/rotated_nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
 
   h5w->write_intScalar( g_id, "Num_LD", Num_LD );
   
