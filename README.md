@@ -147,6 +147,7 @@ A fluid-structure interaction simulation of a pulmonary model is performed using
 - J. Liu and A.L. Marsden, [A unified continuum and variational multiscale formulation for fluids, solids, and fluid-structure interaction](https://doi.org/10.1016/j.cma.2018.03.045), *Computer Methods in Applied Mechanics and Engineering*, 337:549-597, 2018.
 - I.S. Lan, J. Liu, W. Yang, and A.L. Marsden, [A reduced unified continuum formulation for vascular fluid-structure interaction](https://doi.org/10.1016/j.cma.2022.114852), *Computer Methods in Applied Mechanics and Engineering*, 394:114852, 2022.
 - J. Liu, I.S. Lan, O.Z. Tikenogullari, and A.L. Marsden, [A note on the accuracy of the generalized-$\alpha$ scheme for the incompressible Navier-Stokes equations](https://doi.org/10.1002/nme.6550), *International Journal for Numerical Methods in Engineering*, 122:638-651, 2021.
+- Y. Sun, C. Ding, and J. Liu, [Half-explicit Runge-Kutta integrators for variational multiscale turbulence modeling: Toward higher-order accuracy in space and time](https://doi.org/10.1016/j.cma.2026.118930) *Computer Methods in Applied Mechanics and Engineering*, 456:118930, 2026.
 
 ### Solver Technology
 
