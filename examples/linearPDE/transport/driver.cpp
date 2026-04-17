@@ -140,15 +140,14 @@ int main(int argc, char *argv[])
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    HDF5_Writer * cmdh5w = new HDF5_Writer("solver_cmd.h5");
 
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
 
-    delete cmdh5w; H5Fclose(cmd_file_id);
+    delete cmdh5w;
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);

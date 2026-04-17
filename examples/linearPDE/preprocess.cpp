@@ -91,8 +91,7 @@ int main( int argc, char * argv[] )
   std::cout << "=========================================" << std::endl;
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  HDF5_Writer * cmdh5w = new HDF5_Writer("preprocessor_cmd.h5");
 
   cmdh5w->write_intScalar("cpu_size", cpu_size);
   cmdh5w->write_intScalar("in_ncommon", in_ncommon);
@@ -102,7 +101,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_intScalar("dof_num", dofNum);
   cmdh5w->write_intScalar("dof_mat", dofMat);
 
-  delete cmdh5w; H5Fclose(cmd_file_id);
+  delete cmdh5w;
   
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;

@@ -117,7 +117,7 @@ void Tissue_prestress::write_prestress_hdf5() const
 
   hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
 
   h5w -> write_intScalar( "ps_array_size", qua_prestress_array.size() );
 

@@ -65,7 +65,7 @@ void Map_Node_Index::write_hdf5( const std::string &fileName ) const
   // file creation
   hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  HDF5_Writer * h5w = new HDF5_Writer(fName, H5F_ACC_RDWR);
 
   h5w -> write_intVector( "old_2_new", old_2_new );
   h5w -> write_intVector( "new_2_old", new_2_old );
