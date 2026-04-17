@@ -4,19 +4,19 @@ FEANode::FEANode( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-
   auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   ctrlPts_x = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
   ctrlPts_y = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
   ctrlPts_z = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
 
+  const auto file_id = h5r -> get_file_id();
+
   // Detect if the weights is in the h5 file, and read if yes
   if( H5Lexists(file_id, "/ctrlPts_loc/ctrlPts_w_loc", H5P_DEFAULT) )
     ctrlPts_w = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_w_loc");
   else
     VEC_T::clean( ctrlPts_w );
-
 }
 
 FEANode::FEANode( const HDF5_Reader * const &h5r )
