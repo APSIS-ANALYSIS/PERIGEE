@@ -129,7 +129,7 @@ class PDNSolution
     // ------------------------------------------------------------------------
     virtual void WriteBinary(const std::string &file_name) const;
     
-    virtual void ReadBinary(const std::string &file_name) const;
+    virtual void ReadBinary(const std::string &file_name);
 
     // ------------------------------------------------------------------------
     // ! Get the number of local and ghost nodes for the parallel vector's 

@@ -242,7 +242,7 @@ void PDNSolution::WriteBinary(const std::string &file_name) const
   PetscViewerDestroy(&viewer);
 }
 
-void PDNSolution::ReadBinary(const std::string &file_name) const
+void PDNSolution::ReadBinary(const std::string &file_name)
 {
   PetscViewer viewer;
   PetscViewerBinaryOpen(PETSC_COMM_WORLD, file_name.c_str(),
