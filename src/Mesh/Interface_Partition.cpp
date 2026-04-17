@@ -170,11 +170,10 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
+  const hid_t file_id = h5w->get_file_id();
 
   hid_t g_id = H5Gcreate(file_id, "/sliding", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
 
   h5w -> write_intScalar( g_id, "num_interface", num_pair );
 
@@ -247,7 +246,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     H5Gclose( group_id );
   }
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+  delete h5w; H5Gclose( g_id );
 }
 
 // EOF
