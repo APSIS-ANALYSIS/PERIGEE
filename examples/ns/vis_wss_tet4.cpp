@@ -195,7 +195,7 @@ int main( int argc, char * argv[] )
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
   // Read the node mappings
-  const auto analysis_new2old = VIS_T::readNodeMapping("node_mapping.h5", "new_2_old" );
+  const auto analysis_new2old = HDF5_T::read_intVector("node_mapping.h5", "/", "new_2_old" );
 
   // Read solutions
   std::ostringstream time_index;
