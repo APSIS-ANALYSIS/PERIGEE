@@ -474,7 +474,8 @@ int main( int argc, char * argv[] )
     h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
     h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
 
-    delete h5w; H5Gclose( g_id );
+    H5Gclose( g_id );
+    delete h5w;
 
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);
@@ -586,7 +587,8 @@ int main( int argc, char * argv[] )
       H5Gclose( group_id );
     }
 
-    delete h5w; H5Gclose( g_id );
+    H5Gclose( g_id );
+    delete h5w;
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
