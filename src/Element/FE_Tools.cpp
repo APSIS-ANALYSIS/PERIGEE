@@ -99,7 +99,7 @@ Vector_3 FE_T::get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vect
 }
 
 void FE_T::get_tet_sphere_info(
-    const double &x0, const double &x1, const double &x2, const double &x3, 
+    const double &x0, const double &x1, const double &x2, const double &x3,
     const double &y0, const double &y1, const double &y2, const double &y3,
     const double &z0, const double &z1, const double &z2, const double &z3,
     double &xx, double &yy, double &zz, double &rr )
@@ -145,8 +145,8 @@ double FE_T::get_tet_sphere_radius (
 }
 
 Vector_3 FE_T::get_tet_sphere_info( const Vector_3 &pt0,
-    const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3, 
-    double &radius ) 
+    const Vector_3 &pt1, const Vector_3 &pt2, const Vector_3 &pt3,
+    double &radius )
 {
   FE_T::Matrix_double_3by3_Array AA(
       2.0 * (pt1.x()-pt0.x()), 2.0 * (pt1.y()-pt0.y()), 2.0 * (pt1.z()-pt0.z()),
@@ -210,7 +210,7 @@ bool FE_T::search_closest_point( const Vector_3 &target_xyz,
   const double init_dist = Vec3::dist(point_xyz, target_xyz);
 
   // SYS_T::commPrint("      init_dist: %e\n", init_dist);
-  if (init_dist < 1e-9) return true;  // lucky enouugh 
+  if (init_dist < 1e-9) return true;  // lucky enouugh
   if (init_dist > 8) return false;
 
   // initialize the nonlinear iteration
@@ -322,7 +322,7 @@ namespace FE_T
     pp[0] = 0; pp[1] = 1; pp[2] = 2;
   }
 
-  Matrix_double_3by3_Array::Matrix_double_3by3_Array( 
+  Matrix_double_3by3_Array::Matrix_double_3by3_Array(
       const double &a11, const double &a12, const double &a13,
       const double &a21, const double &a22, const double &a23,
       const double &a31, const double &a32, const double &a33 )
@@ -331,7 +331,7 @@ namespace FE_T
     mat[3] = a21;  mat[4] = a22;  mat[5] = a23;
     mat[6] = a31;  mat[7] = a32;  mat[8] = a33;
 
-    pp[0] = 0; pp[1] = 1; pp[2] = 2; 
+    pp[0] = 0; pp[1] = 1; pp[2] = 2;
   }
 
   Matrix_double_3by3_Array& Matrix_double_3by3_Array::operator= (
@@ -361,7 +361,7 @@ namespace FE_T
     std::random_device rd;
     std::mt19937_64 gen( rd() );
     std::uniform_real_distribution<double> dis(min, max);
-    for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen); 
+    for(int ii=0; ii<9; ++ii) mat[ii] = dis(gen);
 
     pp[0] = 0; pp[1] = 1; pp[2] = 2;
   }
@@ -509,7 +509,7 @@ namespace FE_T
   {
     double temp = mat[1]; mat[1] = mat[3]; mat[3] = temp;
     temp = mat[2]; mat[2] = mat[6]; mat[6] = temp;
-    temp = mat[5]; mat[5] = mat[7]; mat[7] = temp; 
+    temp = mat[5]; mat[5] = mat[7]; mat[7] = temp;
   }
 
   void Matrix_double_3by3_Array::inverse()
@@ -531,8 +531,8 @@ namespace FE_T
 
   double Matrix_double_3by3_Array::det() const
   {
-    return mat[0] * mat[4] * mat[8] + mat[1] * mat[5] * mat[6] 
-      + mat[2] * mat[3] * mat[7] - mat[2] * mat[4] * mat[6] 
+    return mat[0] * mat[4] * mat[8] + mat[1] * mat[5] * mat[6]
+      + mat[2] * mat[3] * mat[7] - mat[2] * mat[4] * mat[6]
       - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
   }
 
@@ -629,7 +629,7 @@ namespace FE_T
           Mat[6*kk+ii] = Mat[6*max_index+ii];
           Mat[6*max_index+ii] = temp;
         }
-      } 
+      }
 
       for(int ii=kk+1; ii<6; ++ii)
       {
@@ -675,7 +675,7 @@ namespace FE_T
     std::cout<<'\n'<<std::endl;
   }
 
-  QuadPts_on_face::QuadPts_on_face(const FEType &vol_elemType, const int &face_id, 
+  QuadPts_on_face::QuadPts_on_face(const FEType &vol_elemType, int face_id,
       const IQuadPts * const lower_quad_rule)
     : dim(lower_quad_rule->get_dim() + 1), num_pts( lower_quad_rule -> get_num_quadPts() )
   {
@@ -689,9 +689,9 @@ namespace FE_T
       //                   / |    `.
       //                  /  |       `.
       //                 /   |          `.
-      //                /    |             `.     
+      //                /    |             `.
       //               /     |                `.
-      //              /      |                   `.   
+      //              /      |                   `.
       //             /      ,0 - - - - - - - - - - -`2 - - -> s
       //            /     ,'  (u)               ,  "
       //           /    ,'                ,  "
@@ -707,18 +707,18 @@ namespace FE_T
         "Error: FE_T::QuadPts_on_face, wrong surface quadrature rule.\n" );
 
       qp.assign( 4 * lower_quad_rule->get_num_quadPts(), 0.0 );
-      
+
       switch(face_id)
       {
         case 0: // u = 0 : node1 = node0', node2 = node1', node3 = node2'       //      t                                     s'
           for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)        //      ^                                     ^
           {                                                                     //      3                                     2'
-            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 2);  // r = t'           //      |  `.                     map         |  `.  
+            qp[4*ii + 0] = lower_quad_rule->get_qp(ii, 2);  // r = t'           //      |  `.                     map         |  `.
             qp[4*ii + 1] = lower_quad_rule->get_qp(ii, 0);  // s = r'           //      |     `.                 <----        |     `.
             qp[4*ii + 2] = lower_quad_rule->get_qp(ii, 1);  // t = s'           //      | front  `.                           |        `.
           }                                                                     //      |           `.                        |           `.
           break;                                                                //  (r) 1 - - - - - - 2 - - -> s         (t') 0'- - - - - - 1'- - -> r'
-        
+
         case 1: // r = 0 : node0 = node0', node3 = node1', node2 = node2'       //      s                                     s'
           for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)        //      ^                                     ^
           {                                                                     //      2                                     2'
@@ -779,7 +779,7 @@ namespace FE_T
         "Error: FE_T::QuadPts_on_face, wrong surface quadrature rule.\n" );
 
       qp.assign( 3 * lower_quad_rule->get_num_quadPts(), 0.0 );
-      
+
       switch(face_id)
       {
         case 0: // t = 0 : node0 = node0', node3 = node1', node2 = node2', node1 = node3' //    r                          s'
@@ -799,7 +799,7 @@ namespace FE_T
             qp[3*ii + 2] = 1.0;                             // t = 1                      //    |   top    |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    4 -------- 5 - -> r        0'-------- 1'- -> r'
-        
+
         case 2: // s = 0 : node0 = node0', node1 = node1', node5 = node2', node4 = node3' //    t                          s'
           for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                  //    ^                          ^
           {                                                                               //    |                          |
@@ -826,7 +826,7 @@ namespace FE_T
             qp[3*ii + 2] = lower_quad_rule->get_qp(ii, 0);  // t = r'                     //    |   right  |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    3 -------- 7 - -> t        0'-------- 1'- -> r'
-        
+
         case 5: // r = 0 : node0 = node0', node4 = node1', node7 = node2', node3 = node3' //    s                          s'
           for(int ii {0}; ii < lower_quad_rule->get_num_quadPts(); ++ii)                  //    ^                          ^
           {                                                                               //    |                          |
@@ -835,7 +835,7 @@ namespace FE_T
             qp[3*ii + 2] = lower_quad_rule->get_qp(ii, 0);  // t = r'                     //    |   back   |       <----   |          |
           }                                                                               //    |          |               |          |
           break;                                                                          //    0 -------- 4 - -> t        0'-------- 1'- -> r'
-        
+
         default:
           SYS_T::print_fatal("Error: FE_T::QuadPts_on_face, wrong face id input.\n");
           break;
