@@ -1,4 +1,6 @@
 #include "VisDataPrep_NS.hpp"
+#include "PostVectSolution.hpp"
+
 
 VisDataPrep_NS::VisDataPrep_NS()
 {
