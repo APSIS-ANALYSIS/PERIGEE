@@ -30,32 +30,32 @@ class EBC_Partition
     virtual void write_hdf5( const std::string &FileName ) const
     { write_hdf5( FileName, "/ebc" ); }
 
-    virtual void print_info() const;
+    void print_info() const;
 
-    virtual int get_num_ebc() const {return num_ebc;}
+    int get_num_ebc() const {return num_ebc;}
 
-    virtual int get_num_local_cell_node(const int &ii) const
+    int get_num_local_cell_node(int ii) const
     {return num_local_cell_node[ii];}
 
-    virtual int get_num_local_cell(const int &ii) const
+    int get_num_local_cell(int ii) const
     {return num_local_cell[ii];}
 
-    virtual int get_cell_nLocBas(const int &ii) const
+    int get_cell_nLocBas(int ii) const
     {return cell_nLocBas[ii];}
 
-    virtual double get_local_cell_node_xyz(const int &ii, const int &jj) const
+    double get_local_cell_node_xyz(int ii, int jj) const
     {return local_cell_node_xyz[ii][jj];}
 
-    virtual int get_local_cell_ien(const int &ii, const int &jj) const
+    int get_local_cell_ien(int ii, int jj) const
     {return local_cell_ien[ii][jj];}
 
-    virtual int get_local_cell_node_vol_id(const int &ii, const int &jj) const
+    int get_local_cell_node_vol_id(int ii, int jj) const
     {return local_cell_node_vol_id[ii][jj];}
 
-    virtual int get_cell_local_node_pos(const int &ii, const int &jj) const
+    int get_cell_local_node_pos(int ii, int jj) const
     {return local_cell_node_pos[ii][jj];}
 
-    virtual int get_local_cell_vol_id(const int &ii, const int &jj) const
+    int get_local_cell_vol_id(int ii, int jj) const
     {return local_cell_vol_id[ii][jj];}
 
   protected:
