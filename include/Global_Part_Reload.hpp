@@ -17,20 +17,20 @@ class Global_Part_Reload : public IGlobal_Part
         const bool &isDualGraph, const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
-    virtual ~Global_Part_Reload();
+    ~Global_Part_Reload() override;
 
-    virtual idx_t get_epart( int ee ) const {return static_cast<idx_t>(epart[ee]);}
+    idx_t get_epart( int ee ) const override {return static_cast<idx_t>(epart[ee]);}
 
-    virtual idx_t get_npart( int nn, int field ) const
+    idx_t get_npart( int nn, int field ) const override
     {return static_cast<idx_t>(npart[nn + field_offset[field]]);}
 
-    virtual bool get_isMETIS() const {return isMETIS;};
+    bool get_isMETIS() const override {return isMETIS;};
 
-    virtual bool get_isDual() const {return isDual;};
+    bool get_isDual() const override {return isDual;};
 
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
+    int get_dual_edge_ncommon() const override {return dual_edge_ncommon;}
 
-    virtual bool is_serial() const {return isSerial;}
+    bool is_serial() const override {return isSerial;}
 
   private:
     bool isMETIS, isDual, isSerial;
