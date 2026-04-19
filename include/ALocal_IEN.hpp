@@ -14,6 +14,7 @@
 // Author: Ju Liu
 // Date: Nov. 10th 2013
 // ============================================================================
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -85,7 +86,7 @@ class ALocal_IEN
     virtual bool isNode_in_Elem(int elem, int node) const
     {
       const std::vector<int> eIEN = get_LIEN( elem );
-      std::vector<int>::const_iterator it = find(eIEN.begin(), eIEN.end(), node);
+      std::vector<int>::const_iterator it = std::find(eIEN.begin(), eIEN.end(), node);
       return (it != eIEN.end());
     }
 
