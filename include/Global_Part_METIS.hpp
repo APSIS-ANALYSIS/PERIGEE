@@ -49,25 +49,25 @@ class Global_Part_METIS : public IGlobal_Part
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
-    virtual ~Global_Part_METIS();
+    ~Global_Part_METIS() override;
 
-    virtual idx_t get_epart( int ee ) const {return epart[ee];}
+    idx_t get_epart( int ee ) const override {return epart[ee];}
 
     // ------------------------------------------------------------------------
     // For multifield partition, we allow the access of partition results by
     // specifiying the field index, and nn ranges in 
     // [ 0 , mesh[field]->get_nFunc )
     // ------------------------------------------------------------------------
-    virtual idx_t get_npart( int nn, int field = 0 ) const
+    idx_t get_npart( int nn, int field = 0 ) const override
     {return npart[nn + field_offset[field]];}
 
-    virtual bool get_isMETIS() const {return true;};
+    bool get_isMETIS() const override {return true;};
 
-    virtual bool get_isDual() const {return isDual;};
+    bool get_isDual() const override {return isDual;};
 
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
+    int get_dual_edge_ncommon() const override {return dual_edge_ncommon;}
 
-    virtual bool is_serial() const {return false;}
+    bool is_serial() const override {return false;}
 
   private:
     const bool isDual;
