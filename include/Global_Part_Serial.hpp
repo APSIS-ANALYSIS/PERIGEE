@@ -28,9 +28,9 @@ class Global_Part_Serial : public IGlobal_Part
 
     virtual ~Global_Part_Serial();
 
-    virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
+    virtual idx_t get_epart( int ee ) const {return epart[ee];}
 
-    virtual idx_t get_npart( const int &nn, const int &field = 0 ) const 
+    virtual idx_t get_npart( int nn, int field = 0 ) const
     {return npart[nn + field_offset[field]];}
 
     virtual bool get_isMETIS() const {return false;};

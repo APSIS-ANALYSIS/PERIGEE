@@ -19,9 +19,9 @@ class Global_Part_Reload : public IGlobal_Part
 
     virtual ~Global_Part_Reload();
 
-    virtual idx_t get_epart( const int &ee ) const {return static_cast<idx_t>(epart[ee]);}
+    virtual idx_t get_epart( int ee ) const {return static_cast<idx_t>(epart[ee]);}
 
-    virtual idx_t get_npart( const int &nn, const int &field ) const 
+    virtual idx_t get_npart( int nn, int field ) const
     {return static_cast<idx_t>(npart[nn + field_offset[field]]);}
 
     virtual bool get_isMETIS() const {return isMETIS;};
