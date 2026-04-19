@@ -19,7 +19,6 @@ namespace ANL_T
   {
     const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
 
-
     auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
     const int val = h5r->read_intScalar(partname.c_str(), dataname.c_str());
@@ -45,7 +44,6 @@ namespace ANL_T
   inline FEType get_elemType(const std::string &fbasename, const int &in_rank)
   {
     const std::string fName = SYS_T::gen_partfile_name(fbasename, in_rank);
-
 
     auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
