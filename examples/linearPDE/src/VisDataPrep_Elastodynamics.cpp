@@ -1,4 +1,6 @@
 #include "VisDataPrep_Elastodynamics.hpp"
+#include "PostVectSolution.hpp"
+
 
 VisDataPrep_Elastodynamics::VisDataPrep_Elastodynamics()
 {

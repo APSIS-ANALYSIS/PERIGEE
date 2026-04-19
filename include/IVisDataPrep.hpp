@@ -11,7 +11,10 @@
 //
 // Date: Dec. 17 2013
 // ==================================================================
-#include "PostVectSolution.hpp"
+#include <vector>
+#include "Sys_Tools.hpp"
+
+class APart_Node;
 
 class IVisDataPrep
 {

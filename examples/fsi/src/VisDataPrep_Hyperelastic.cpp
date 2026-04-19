@@ -1,4 +1,6 @@
 #include "VisDataPrep_Hyperelastic.hpp"
+#include "PostVectSolution.hpp"
+
 
 VisDataPrep_Hyperelastic::VisDataPrep_Hyperelastic( const bool &is_ref )
 {
