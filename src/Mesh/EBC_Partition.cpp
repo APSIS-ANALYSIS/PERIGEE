@@ -110,13 +110,11 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
 
   h5w -> write_intVector( root_group.id(), "cell_nLocBas", cell_nLocBas );
 
-  const std::string groupbase("ebcid_");
-
   for(int ii=0; ii<num_ebc; ++ii)
   {
     if( num_local_cell[ii] > 0 )
     {
-      const std::string sub_gname = groupbase + std::to_string(ii);
+      const std::string sub_gname = "ebcid_" + std::to_string(ii);
 
       auto sub_group = HDF5_Group::create( root_group.id(), sub_gname );
 
@@ -129,10 +127,8 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
       h5w->write_intVector( sub_group.id(), "local_cell_node_pos", local_cell_node_pos[ii] );
 
       h5w->write_intVector( sub_group.id(), "local_cell_vol_id", local_cell_vol_id[ii] );
-
     }
   }
-
 }
 
 void EBC_Partition::print_info() const
