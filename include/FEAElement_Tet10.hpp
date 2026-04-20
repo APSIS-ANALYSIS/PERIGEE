@@ -57,10 +57,10 @@ class FEAElement_Tet10 final : public FEAElement
 
     // Given the quadrature points and nodal coordinates, evaluate
     // the basis functions and their derivatives up to second order
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Return the element size.
     // Here we adopt the algorithm for Tet4 and use the four vertex
@@ -105,10 +105,10 @@ class FEAElement_Tet10 final : public FEAElement
     //   Tet-Face-1 : Node 0 3 2 7 9 6
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
-    void buildBasis( int face_id, const IQuadPts * const &quad_rule_s,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( int face_id, const IQuadPts * quad_rule_s,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Get the outwardnormal on faces
     Vector_3 get_2d_normal_out( int quaindex, double &area ) const override

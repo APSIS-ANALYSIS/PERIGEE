@@ -54,10 +54,10 @@ class FEAElement_Hex8 final : public FEAElement
 
     // Given the quadrature points and nodal coordinates, evaluate the basis 
     // functions and their derivatives up to second order
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
     
     double get_h( const double * ctrl_x, const double * ctrl_y,
         const double * ctrl_z ) const override;
@@ -104,10 +104,10 @@ class FEAElement_Hex8 final : public FEAElement
     //   Hex-Face-3 : Node 1 2 6 5
     //   Hex-Face-4 : Node 3 7 6 2
     //   Hex-Face-5 : Node 0 4 7 3
-    void buildBasis( int face_id, const IQuadPts * const &quad_rule_s,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( int face_id, const IQuadPts * quad_rule_s,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Get the outwardnormal on faces
     Vector_3 get_2d_normal_out( int quaindex, double &area ) const override

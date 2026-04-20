@@ -29,9 +29,9 @@ class FEAElement_Triangle6 final : public FEAElement
 
     void print_info() const override;
 
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y ) override;
 
     double get_h( const double * ctrl_x,
         const double * ctrl_y ) const override;

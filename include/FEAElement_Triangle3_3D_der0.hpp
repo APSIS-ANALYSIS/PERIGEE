@@ -38,10 +38,10 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
 
     void print_info() const override;
 
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     void get_R( int quaindex, double * const &basis ) const override;
 
