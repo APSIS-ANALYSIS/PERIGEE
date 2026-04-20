@@ -167,9 +167,9 @@ void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( int quaindex,
   }
 }
 
-double FEAElement_Tet4::get_h( const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z ) const
+double FEAElement_Tet4::get_h( const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z ) const
 {
   return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],

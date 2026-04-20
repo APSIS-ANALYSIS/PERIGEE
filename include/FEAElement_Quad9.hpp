@@ -32,8 +32,8 @@ class FEAElement_Quad9 final : public FEAElement
         const double * const &ctrl_x,
         const double * const &ctrl_y ) override;
 
-    double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y ) const override;
+    double get_h( const double * ctrl_x,
+        const double * ctrl_y ) const override;
 
     void get_R( int quaindex, double * const &basis ) const override;
 

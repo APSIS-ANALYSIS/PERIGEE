@@ -174,9 +174,9 @@ void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-double FEAElement_Hex8::get_h( const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z ) const
+double FEAElement_Hex8::get_h( const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z ) const
 {
   const double diag[4] { std::pow((ctrl_x[0] - ctrl_x[6]), 2.0)
       + std::pow((ctrl_y[0] - ctrl_y[6]), 2.0) + std::pow((ctrl_z[0] - ctrl_z[6]), 2.0),

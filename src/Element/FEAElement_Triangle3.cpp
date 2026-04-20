@@ -52,8 +52,8 @@ void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
   dR_dy[2] = Jac[7];
 }
 
-double FEAElement_Triangle3::get_h( const double * const &ctrl_x,
-    const double * const &ctrl_y ) const
+double FEAElement_Triangle3::get_h( const double * ctrl_x,
+    const double * ctrl_y ) const
 {
   const double a = 2.0 * ( ctrl_x[1] - ctrl_x[0] );
   const double b = 2.0 * ( ctrl_y[1] - ctrl_y[0] );
