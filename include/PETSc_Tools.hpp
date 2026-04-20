@@ -132,15 +132,15 @@ namespace PETSc_T
 
   // Get the |diag|^{-0.5}. If the entry value is small, correct the diag
   // value to be 1.0.
-  void MinusSqrtVec(Vec &diag, const double &tol = 1.0e-15);
+  void MinusSqrtVec(Vec &diag, double tol = 1.0e-15);
 
   // Get |diag|^{-1}. If the entry value is smaller than the tol value, 
   // assign the resulting value to be 1.0.
-  void InvAbsVec( Vec &diag, const double &tol = 1.0e-15 ); 
+  void InvAbsVec( Vec &diag, double tol = 1.0e-15 ); 
 
   // return the value of the vector at a location.
   // It can ONLY get the values in the local portion. Use with Caution!
-  double GetValue( const Vec &a, const int ii );
+  double GetValue( const Vec &a, int ii );
 
   // Return sqrt(a dot a)
   inline double Get2Norm( const Vec &a )
