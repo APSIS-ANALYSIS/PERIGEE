@@ -76,7 +76,7 @@ double FEAElement_Triangle3::get_h( const double * ctrl_x,
 }
 
 void FEAElement_Triangle3::get_R( int quaindex, 
-    double * const &basis ) const
+    double * basis ) const
 {
   const int offset = quaindex * nLocBas;
   basis[0] = R[offset];
@@ -115,10 +115,10 @@ void FEAElement_Triangle3::get_R_gradR( int quaindex,
 }
 
 void FEAElement_Triangle3::get_2D_R_dR_d2R( int quaindex,
-    double * const &basis,
-    double * const &basis_x, double * const &basis_y,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_xy ) const
+    double * basis,
+    double * basis_x, double * basis_y,
+    double * basis_xx, double * basis_yy,
+    double * basis_xy ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Triangle3::get_2D_R_dR_d2R function error.\n" );
   const int offset = quaindex * nLocBas;

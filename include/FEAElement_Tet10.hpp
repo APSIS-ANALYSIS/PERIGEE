@@ -82,17 +82,17 @@ class FEAElement_Tet10 final : public FEAElement
         double * basis_z ) const override;
 
     void get_3D_R_dR_d2R( int quaindex,
-        double * const &basis, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_zz, double * const &basis_xy,
-        double * const &basis_xz, double * const &basis_yz ) const override;
+        double * basis, double * basis_x,
+        double * basis_y, double * basis_z,
+        double * basis_xx, double * basis_yy,
+        double * basis_zz, double * basis_xy,
+        double * basis_xz, double * basis_yz ) const override;
 
     void get_3D_R_gradR_LaplacianR( int quaindex,
-        double * const &basis, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_zz ) const override;
+        double * basis, double * basis_x,
+        double * basis_y, double * basis_z,
+        double * basis_xx, double * basis_yy,
+        double * basis_zz ) const override;
 
     std::array<double,9> get_Jacobian( int quaindex ) const override;
 

@@ -63,9 +63,9 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
     // These functions are needed in the FE_T::search_closest_point function,
     // which is called inside the sliding interface formulation.
     Vector_3 get_dx_dr( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const override
     {
       return Vector_3( - ctrl_x[0] + ctrl_x[1],
                        - ctrl_y[0] + ctrl_y[1],
@@ -73,9 +73,9 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
     }
     
     Vector_3 get_dx_ds( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const override
     {
       return Vector_3( - ctrl_x[0] + ctrl_x[2],
                        - ctrl_y[0] + ctrl_y[2],
@@ -83,21 +83,21 @@ class FEAElement_Triangle3_3D_der0 final : public FEAElement
     }
 
     Vector_3 get_d2x_drr( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const override
     {return Vector_3(0.0, 0.0, 0.0);}
 
     Vector_3 get_d2x_dss( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const override
     {return Vector_3(0.0, 0.0, 0.0);}
 
     Vector_3 get_d2x_drs( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const override
     {return Vector_3(0.0, 0.0, 0.0);}
 
   private:

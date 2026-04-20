@@ -46,10 +46,10 @@ class FEAElement_Quad4 final : public FEAElement
         double * basis_x, double * basis_y ) const override;
 
     void get_2D_R_dR_d2R( int quaindex,
-        double * const &basis,
-        double * const &basis_x, double * const &basis_y,
-        double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_xy ) const override;
+        double * basis,
+        double * basis_x, double * basis_y,
+        double * basis_xx, double * basis_yy,
+        double * basis_xy ) const override;
 
     std::array<double,4> get_Jacobian_2D(int quaindex) const override;
 

@@ -55,17 +55,17 @@ class FEAElement_Tet4 final : public FEAElement
         double * basis_z ) const override;
 
     void get_3D_R_dR_d2R( int quaindex, 
-        double * const &basis, double * const &basis_x, 
-        double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_zz, double * const &basis_xy, 
-        double * const &basis_xz, double * const &basis_yz ) const override;
+        double * basis, double * basis_x, 
+        double * basis_y, double * basis_z,
+        double * basis_xx, double * basis_yy, 
+        double * basis_zz, double * basis_xy, 
+        double * basis_xz, double * basis_yz ) const override;
 
     void get_3D_R_gradR_LaplacianR( int quaindex,
-        double * const &basis, double * const &basis_x, 
-        double * const &basis_y, double * const &basis_z, 
-        double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_zz ) const override;
+        double * basis, double * basis_x, 
+        double * basis_y, double * basis_z, 
+        double * basis_xx, double * basis_yy, 
+        double * basis_zz ) const override;
 
     // Get the Jacobian matrix dx/dr
     std::array<double,9> get_Jacobian( int quaindex ) const override
@@ -104,9 +104,9 @@ class FEAElement_Tet4 final : public FEAElement
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
     std::array<std::vector<double>, 3> get_face_ctrlPts( int face_id,
-        const double * const &volctrl_x,
-        const double * const &volctrl_y,
-        const double * const &volctrl_z ) const override;
+        const double * volctrl_x,
+        const double * volctrl_y,
+        const double * volctrl_z ) const override;
 
   private:
     static constexpr int nLocBas = 4;

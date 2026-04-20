@@ -124,11 +124,11 @@ void FEAElement_Tet4::get_R_gradR( int quaindex, double * basis,
 }
 
 void FEAElement_Tet4::get_3D_R_dR_d2R( int quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz, double * const &basis_xy,
-    double * const &basis_xz, double * const &basis_yz ) const
+    double * basis, double * basis_x,
+    double * basis_y, double * basis_z,
+    double * basis_xx, double * basis_yy,
+    double * basis_zz, double * basis_xy,
+    double * basis_xz, double * basis_yz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_3D_R_dR_d2R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -148,10 +148,10 @@ void FEAElement_Tet4::get_3D_R_dR_d2R( int quaindex,
 }
 
 void FEAElement_Tet4::get_3D_R_gradR_LaplacianR( int quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz ) const
+    double * basis, double * basis_x,
+    double * basis_y, double * basis_z,
+    double * basis_xx, double * basis_yy,
+    double * basis_zz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_3D_R_gradR_LaplacianR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -194,9 +194,9 @@ void FEAElement_Tet4::buildBasis( int face_id, const IQuadPts * quad_s,
 }
 
 std::array<std::vector<double>, 3> FEAElement_Tet4::get_face_ctrlPts( int face_id,
-    const double * const &vol_ctrl_x,
-    const double * const &vol_ctrl_y,
-    const double * const &vol_ctrl_z ) const
+    const double * vol_ctrl_x,
+    const double * vol_ctrl_y,
+    const double * vol_ctrl_z ) const
 {
   std::array<std::vector<double>, 3> out;
 
