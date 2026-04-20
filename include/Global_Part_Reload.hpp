@@ -8,16 +8,15 @@
 // Date: Dec. 9 2021
 // ============================================================================
 #include "IGlobal_Part.hpp"
-#include "HDF5_Reader.hpp"
 
 class Global_Part_Reload : public IGlobal_Part
 {
   public:
-    Global_Part_Reload(  const int &cpu_size, const int &in_ncommon, 
-        const bool &isDualGraph, const std::string &element_part_name = "epart",
+    Global_Part_Reload( int cpu_size, int in_ncommon, 
+        bool isDualGraph, const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
-    ~Global_Part_Reload() override;
+    ~Global_Part_Reload() override = default;
 
     idx_t get_epart( int ee ) const override {return static_cast<idx_t>(epart[ee]);}
 
