@@ -1,6 +1,6 @@
 #include "FEAElement_Quad4.hpp"
 
-FEAElement_Quad4::FEAElement_Quad4( const int &in_nqua )
+FEAElement_Quad4::FEAElement_Quad4( int in_nqua )
 : numQuapts( in_nqua )
 {
   R.resize(nLocBas * numQuapts, 0.0);
@@ -131,7 +131,7 @@ double FEAElement_Quad4::get_h( const double * const &ctrl_x,
   return std::sqrt(d);
 }
 
-void FEAElement_Quad4::get_R( const int &quaindex, 
+void FEAElement_Quad4::get_R( int quaindex, 
     double * const &basis ) const
 {
   const int offset = quaindex * nLocBas;
@@ -139,13 +139,13 @@ void FEAElement_Quad4::get_R( const int &quaindex,
   basis[2] = R[offset+2]; basis[3] = R[offset+3];
 }
 
-std::vector<double> FEAElement_Quad4::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Quad4::get_R( int quaindex ) const
 {
   const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3] };
 }
 
-void FEAElement_Quad4::get_gradR( const int &quaindex, 
+void FEAElement_Quad4::get_gradR( int quaindex, 
     double * const &basis_x, double * const &basis_y ) const
 {
   const int offset = quaindex * nLocBas;
@@ -156,7 +156,7 @@ void FEAElement_Quad4::get_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Quad4::get_R_gradR( const int &quaindex, 
+void FEAElement_Quad4::get_R_gradR( int quaindex, 
     double * const &basis, double * const &basis_x, 
     double * const &basis_y ) const
 {
@@ -169,7 +169,7 @@ void FEAElement_Quad4::get_R_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Quad4::get_2D_R_dR_d2R( const int &quaindex,
+void FEAElement_Quad4::get_2D_R_dR_d2R( int quaindex,
     double * const &basis,
     double * const &basis_x, double * const &basis_y,
     double * const &basis_xx, double * const &basis_yy,
@@ -188,12 +188,12 @@ void FEAElement_Quad4::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-std::array<double,4> FEAElement_Quad4::get_Jacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Quad4::get_Jacobian_2D(int quaindex) const
 {
   return {{ Jac[4*quaindex], Jac[4*quaindex+1], Jac[4*quaindex+2], Jac[4*quaindex+3] }};
 }
 
-std::array<double,4> FEAElement_Quad4::get_invJacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Quad4::get_invJacobian_2D(int quaindex) const
 {
   const int offset = 4 * numQuapts + 4 * quaindex;
   return {{ Jac[offset], Jac[offset+1], Jac[offset+2], Jac[offset+3] }};
