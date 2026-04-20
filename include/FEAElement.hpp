@@ -251,8 +251,8 @@ class FEAElement
     // ------------------------------------------------------------------------
     // dx_ds in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_dx_ds( int quaindex,
-        const double * ctrl_x, const double * ctrl_y, const double * ctrl_z ) const 
+    virtual Vector_3 get_dx_ds( int quaindex, const double * ctrl_x,
+        const double * ctrl_y, const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_dx_ds is not implemented. \n");
       return Vector_3();
