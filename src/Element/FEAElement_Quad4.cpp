@@ -146,7 +146,7 @@ std::vector<double> FEAElement_Quad4::get_R( int quaindex ) const
 }
 
 void FEAElement_Quad4::get_gradR( int quaindex, 
-    double *basis_x, double *basis_y ) const
+    double * basis_x, double * basis_y ) const
 {
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii)
@@ -157,8 +157,8 @@ void FEAElement_Quad4::get_gradR( int quaindex,
 }
 
 void FEAElement_Quad4::get_R_gradR( int quaindex, 
-    double *basis, double *basis_x, 
-    double *basis_y ) const
+    double * basis, double * basis_x, 
+    double * basis_y ) const
 {
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii)
