@@ -65,9 +65,9 @@ class FEAElement_Tet10 final : public FEAElement
     // Return the element size.
     // Here we adopt the algorithm for Tet4 and use the four vertex
     // nodes to calculate the element size
-    double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override;
+    double get_h( const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const override;
 
     // get_xxx functions give access to function evaluations at the
     // quadrature point corresponding to quaindex
