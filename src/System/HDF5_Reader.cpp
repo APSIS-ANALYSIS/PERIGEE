@@ -1,18 +1,12 @@
 #include "HDF5_Reader.hpp"
 
-void HDF5_Reader::read_intArray(const char * const &group_name,
-    const char * const &data_name,
+void HDF5_Reader::read_intArray(const char * group_name,
+    const char * data_name,
     hid_t &data_rank, hsize_t * &data_dims, int * &data  ) const
 {
-  const HDF5_Group group_id = HDF5_Group::open( file_id, group_name );
-  read_intArray( group_id, data_name, data_rank, data_dims, data );
-}
-
-void HDF5_Reader::read_intArray( const HDF5_Group &group,
-    const char * const &data_name,
-    hid_t &data_rank, hsize_t * &data_dims, int * &data ) const
-{
-  hid_t data_id = H5Dopen(group.id(), data_name, H5P_DEFAULT);
+  // open group file and data file
+  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
+  hid_t data_id = H5Dopen(group_id, data_name, H5P_DEFAULT);
 
   // retrive dataspace of the dataset
   hid_t data_space = H5Dget_space( data_id );
@@ -48,21 +42,16 @@ void HDF5_Reader::read_intArray( const HDF5_Group &group,
   H5Sclose( mem_space );
   H5Sclose( data_space );
   H5Dclose( data_id );
+  H5Gclose( group_id );
 }
 
-void HDF5_Reader::read_doubleArray(const char * const &group_name,
-    const char * const &data_name,
+void HDF5_Reader::read_doubleArray(const char * group_name,
+    const char * data_name,
     hid_t &data_rank, hsize_t * &data_dims, double * &data  ) const
 {
-  const HDF5_Group group_id = HDF5_Group::open( file_id, group_name );
-  read_doubleArray( group_id, data_name, data_rank, data_dims, data );
-}
-
-void HDF5_Reader::read_doubleArray( const HDF5_Group &group,
-    const char * const &data_name,
-    hid_t &data_rank, hsize_t * &data_dims, double * &data ) const
-{
-  hid_t data_id  = H5Dopen(group.id(), data_name, H5P_DEFAULT);
+  // open group file and data file
+  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
+  hid_t data_id  = H5Dopen(group_id, data_name, H5P_DEFAULT);
 
   // retrive dataspace of the dataset
   hid_t data_space = H5Dget_space( data_id );
@@ -95,28 +84,22 @@ void HDF5_Reader::read_doubleArray( const HDF5_Group &group,
   H5Sclose( mem_space );
   H5Sclose( data_space );
   H5Dclose( data_id );
+  H5Gclose( group_id );
 }
 
-int HDF5_Reader::read_intScalar( const char * const &group_name,
-    const char * const &data_name ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_intScalar( group, data_name );
-}
-
-int HDF5_Reader::read_intScalar( const HDF5_Group &group,
-    const char * const &data_name ) const
+int HDF5_Reader::read_intScalar( const char * group_name,
+    const char * data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
   int * intdata;
 
-  read_intArray( group, data_name, drank, ddims, intdata );
+  read_intArray( group_name, data_name, drank, ddims, intdata );
 
   if( drank != 1 || ddims[0] != 1 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_intScalar read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_intScalar read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a scalar! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -127,26 +110,19 @@ int HDF5_Reader::read_intScalar( const HDF5_Group &group,
   return outdata;
 }
 
-double HDF5_Reader::read_doubleScalar( const char * const &group_name,
-    const char * const &data_name ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_doubleScalar( group, data_name );
-}
-
-double HDF5_Reader::read_doubleScalar( const HDF5_Group &group,
-    const char * const &data_name ) const
+double HDF5_Reader::read_doubleScalar( const char * group_name,
+    const char * data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
   double * ddata;
 
-  read_doubleArray( group, data_name, drank, ddims, ddata );
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
 
   if( drank != 1 || ddims[0] != 1 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_doubleScalar read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_doubleScalar read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a scalar! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -157,26 +133,19 @@ double HDF5_Reader::read_doubleScalar( const HDF5_Group &group,
   return outdata;
 }
 
-std::vector<int> HDF5_Reader::read_intVector( const char * const &group_name,
-    const char * const &data_name ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_intVector( group, data_name );
-}
-
-std::vector<int> HDF5_Reader::read_intVector( const HDF5_Group &group,
-    const char * const &data_name ) const
+std::vector<int> HDF5_Reader::read_intVector( const char * group_name,
+    const char * data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
   int * intdata;
 
-  read_intArray( group, data_name, drank, ddims, intdata );
+  read_intArray( group_name, data_name, drank, ddims, intdata );
 
   if( drank != 1 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_intVector read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_intVector read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a 1D vector! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -188,26 +157,19 @@ std::vector<int> HDF5_Reader::read_intVector( const HDF5_Group &group,
   return out;
 }
 
-std::vector<double> HDF5_Reader::read_doubleVector( const char * const &group_name,
-    const char * const &data_name ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_doubleVector( group, data_name );
-}
-
-std::vector<double> HDF5_Reader::read_doubleVector( const HDF5_Group &group,
-    const char * const &data_name ) const
+std::vector<double> HDF5_Reader::read_doubleVector( const char * group_name,
+    const char * data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
   double * ddata;
 
-  read_doubleArray( group, data_name, drank, ddims, ddata );
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
 
   if( drank != 1 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_doubleVector read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_doubleVector read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a 1D vector! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -218,26 +180,19 @@ std::vector<double> HDF5_Reader::read_doubleVector( const HDF5_Group &group,
   return out;
 }
 
-std::array<double, 3> HDF5_Reader::read_Vector_3( const char * const &group_name,
-    const char * const &data_name ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_Vector_3( group, data_name );
-}
-
-std::array<double, 3> HDF5_Reader::read_Vector_3( const HDF5_Group &group,
-    const char * const &data_name ) const
+std::array<double, 3> HDF5_Reader::read_Vector_3( const char * group_name,
+    const char * data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
   double * ddata;
 
-  read_doubleArray( group, data_name, drank, ddims, ddata );
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
 
   if( drank != 1 || ddims[0] != 3 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_Vector_3 read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_Vector_3 read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a 3-component vector! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -248,26 +203,19 @@ std::array<double, 3> HDF5_Reader::read_Vector_3( const HDF5_Group &group,
   return out;
 }
 
-std::array<double, 9> HDF5_Reader::read_Tensor2_3D( const char * const &group_name,
-    const char * const &data_name ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_Tensor2_3D( group, data_name );
-}
-
-std::array<double, 9> HDF5_Reader::read_Tensor2_3D( const HDF5_Group &group,
-    const char * const &data_name ) const
+std::array<double, 9> HDF5_Reader::read_Tensor2_3D( const char * group_name,
+    const char * data_name ) const
 {
   hid_t drank;
   hsize_t * ddims;
   double * ddata;
 
-  read_doubleArray( group, data_name, drank, ddims, ddata );
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
 
   if( drank != 1 || ddims[0] != 9 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_Tensor2_3D read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_Tensor2_3D read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a 3x3 matrix! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -278,26 +226,19 @@ std::array<double, 9> HDF5_Reader::read_Tensor2_3D( const HDF5_Group &group,
   return out;
 }
 
-std::vector<int> HDF5_Reader::read_intMatrix( const char * const &group_name,
-    const char * const &data_name, int &num_row, int &num_col ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_intMatrix( group, data_name, num_row, num_col );
-}
-
-std::vector<int> HDF5_Reader::read_intMatrix( const HDF5_Group &group,
-    const char * const &data_name, int &num_row, int &num_col ) const
+std::vector<int> HDF5_Reader::read_intMatrix( const char * group_name,
+    const char * data_name, int &num_row, int &num_col ) const
 {
   hid_t drank;
   hsize_t * ddims;
   int * intdata;
 
-  read_intArray( group, data_name, drank, ddims, intdata );
+  read_intArray( group_name, data_name, drank, ddims, intdata );
 
   if( drank != 2 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_intMatrix read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_intMatrix read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a 2D matrix! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -312,26 +253,19 @@ std::vector<int> HDF5_Reader::read_intMatrix( const HDF5_Group &group,
   return out;
 }
 
-std::vector<double> HDF5_Reader::read_doubleMatrix( const char * const &group_name,
-    const char * const &data_name, int &num_row, int &num_col ) const
-{
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_doubleMatrix( group, data_name, num_row, num_col );
-}
-
-std::vector<double> HDF5_Reader::read_doubleMatrix( const HDF5_Group &group,
-    const char * const &data_name, int &num_row, int &num_col ) const
+std::vector<double> HDF5_Reader::read_doubleMatrix( const char * group_name,
+    const char * data_name, int &num_row, int &num_col ) const
 {
   hid_t drank;
   hsize_t * ddims;
   double * ddata;
 
-  read_doubleArray( group, data_name, drank, ddims, ddata );
+  read_doubleArray( group_name, data_name, drank, ddims, ddata );
 
   if( drank != 2 )
   {
     std::ostringstream oss;
-    oss<<"Error: HDF5_Reader::read_doubleMatrix read data at "<<"<group>";
+    oss<<"Error: HDF5_Reader::read_doubleMatrix read data at "<<group_name;
     oss<<" with name "<<data_name<<" is not a 2D matrix! \n";
     SYS_T::print_fatal( oss.str().c_str() );
   }
@@ -346,17 +280,12 @@ std::vector<double> HDF5_Reader::read_doubleMatrix( const HDF5_Group &group,
   return out;
 }
 
-std::string HDF5_Reader::read_string( const char * const &group_name,
-    const char * const &data_name ) const
+std::string HDF5_Reader::read_string( const char * group_name,
+    const char * data_name ) const
 {
-  const HDF5_Group group = HDF5_Group::open( file_id, group_name );
-  return read_string( group, data_name );
-}
-
-std::string HDF5_Reader::read_string( const HDF5_Group &group,
-    const char * const &data_name ) const
-{
-  hid_t data_id  = H5Dopen(group.id(), data_name, H5P_DEFAULT);
+  // open group file and data file
+  hid_t group_id = H5Gopen(file_id, group_name, H5P_DEFAULT);
+  hid_t data_id  = H5Dopen(group_id, data_name, H5P_DEFAULT);
 
   hid_t filetype = H5Dget_type( data_id );
   size_t sdim = H5Tget_size( filetype );
@@ -388,6 +317,7 @@ std::string HDF5_Reader::read_string( const HDF5_Group &group,
   H5Tclose( filetype );
   H5Sclose( data_space );
   H5Dclose( data_id );
+  H5Gclose( group_id );
 
   return string_out;
 }

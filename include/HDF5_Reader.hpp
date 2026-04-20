@@ -11,10 +11,11 @@
 //
 // A typical way of using this class is:
 //
-// auto h5r = SYS_T::make_unique<HDF5_Reader>(name_of_h5_file);
+// HDF5_Reader * h5r = new HDF5_Reader( name_of_h5_file );
 //
 // call read functions
-// (resource is released automatically when h5r goes out of scope)
+//
+// delete h5r;
 //
 // There are two modes for H5Fopen
 // H5F_ACC_RDONLY: the application will read only the file
@@ -30,7 +31,6 @@
 #include <array>
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
-#include "HDF5_Group.hpp"
 #include "hdf5.h"
 
 class HDF5_Reader
@@ -60,7 +60,7 @@ class HDF5_Reader
     // !check_data: return a bool value that determines if the data
     //              with the specified name exists in the file.
     // --------------------------------------------------------------
-    bool check_data( const char * const &name ) const
+    bool check_data( const char * name ) const
     {
       return H5Lexists(file_id, name, H5P_DEFAULT);
     }
@@ -68,82 +68,63 @@ class HDF5_Reader
     // --------------------------------------------------------------
     // ! get_file_id: return the internal hdf5 file id.
     // --------------------------------------------------------------
-    hid_t get_file_id() const
-    {
-      return file_id;
-    }
+    hid_t get_file_id() const { return file_id; }
     
     // --------------------------------------------------------------
     // !read_intScalar: return the integer scalar data by specifing 
     //                  its group_name with data_name.
     // --------------------------------------------------------------
-    int read_intScalar( const char * const &group_name,
-        const char * const &data_name ) const;
-    int read_intScalar( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    int read_intScalar( const char * group_name,
+        const char * data_name ) const;
 
     // --------------------------------------------------------------
     // !read_doubleScalar: return the double scalar data by specifing 
     //                  its group_name with data_name.
     // --------------------------------------------------------------
-    double read_doubleScalar( const char * const &group_name,
-        const char * const &data_name ) const;
-    double read_doubleScalar( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    double read_doubleScalar( const char * group_name,
+        const char * data_name ) const;
 
     // --------------------------------------------------------------
     // ! read_intVector: output the 1D integer array data into 
     //                   vector<int>.
     // --------------------------------------------------------------
-    std::vector<int> read_intVector( const char * const &group_name,
-        const char * const &data_name ) const;
-    std::vector<int> read_intVector( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    std::vector<int> read_intVector( const char * group_name,
+        const char * data_name ) const;
     
     // --------------------------------------------------------------
     // ! read_doubleVector: output the 1D integer array data into 
     //                      vector<double>.
     // --------------------------------------------------------------
-    std::vector<double> read_doubleVector( const char * const &group_name,
-        const char * const &data_name ) const;
-    std::vector<double> read_doubleVector( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    std::vector<double> read_doubleVector( const char * group_name,
+        const char * data_name ) const;
 
     // --------------------------------------------------------------
     // ! read_Vector_3 : output the std::array<double, 3>.
     // --------------------------------------------------------------
-    std::array<double, 3> read_Vector_3( const char * const &group_name,
-        const char * const &data_name ) const;
-    std::array<double, 3> read_Vector_3( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    std::array<double, 3> read_Vector_3( const char * group_name,
+        const char * data_name ) const;
 
     // --------------------------------------------------------------
     // ! read_Tensor2_3D : output the std::array<double, 9>.
     // --------------------------------------------------------------
-    std::array<double, 9> read_Tensor2_3D( const char * const &group_name,
-        const char * const &data_name ) const;
-    std::array<double, 9> read_Tensor2_3D( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    std::array<double, 9> read_Tensor2_3D( const char * group_name,
+        const char * data_name ) const;
 
     // --------------------------------------------------------------
     // ! read_intMatrix : output a 2D integer Matrix into vector<int>,
     //                    with size num_row x num_col. The matrix is
     //                    stroed by rows.
     // --------------------------------------------------------------
-    std::vector<int> read_intMatrix( const char * const &group_name,
-        const char * const &data_name, int &num_row, int &num_col ) const;
-    std::vector<int> read_intMatrix( const HDF5_Group &group,
-        const char * const &data_name, int &num_row, int &num_col ) const;
+    std::vector<int> read_intMatrix( const char * group_name,
+        const char * data_name, int &num_row, int &num_col ) const;
 
     // --------------------------------------------------------------
     // ! read_doubleMatrix : output a 2D double Matrix into 
     //                       vector<double>, with size num_row x num_col. 
     //                       The matrix is stroed by rows.
     // --------------------------------------------------------------
-    std::vector<double> read_doubleMatrix( const char * const &group_name,
-        const char * const &data_name, int &num_row, int &num_col ) const;
-    std::vector<double> read_doubleMatrix( const HDF5_Group &group,
-        const char * const &data_name, int &num_row, int &num_col ) const;
+    std::vector<double> read_doubleMatrix( const char * group_name,
+        const char * data_name, int &num_row, int &num_col ) const;
 
     // --------------------------------------------------------------
     // ! read_intArray
@@ -165,12 +146,9 @@ class HDF5_Reader
     //    Note: The user is responsible for deleting/freeing the memory 
     //          space for data_dims and data. 
     // --------------------------------------------------------------
-    void read_intArray(const char * const &group_name, 
-        const char * const &data_name,
+    void read_intArray(const char * group_name, 
+        const char * data_name,
         hid_t &data_rank, hsize_t * &data_dims, int * &data  ) const;
-    void read_intArray( const HDF5_Group &group,
-        const char * const &data_name,
-        hid_t &data_rank, hsize_t * &data_dims, int * &data ) const;
 
     // --------------------------------------------------------------
     // ! read_doubleArray
@@ -192,12 +170,9 @@ class HDF5_Reader
     //    Note: The user is responsible for deleting/freeing the memory 
     //          space for data_dims and data. 
     // --------------------------------------------------------------
-    void read_doubleArray(const char * const &group_name, 
-        const char * const &data_name,
+    void read_doubleArray(const char * group_name, 
+        const char * data_name,
         hid_t &data_rank, hsize_t * &data_dims, double * &data  ) const;
-    void read_doubleArray( const HDF5_Group &group,
-        const char * const &data_name,
-        hid_t &data_rank, hsize_t * &data_dims, double * &data ) const;
 
     // --------------------------------------------------------------
     // ! read_string
@@ -206,15 +181,13 @@ class HDF5_Reader
     //   \para group_name : the name of the group
     //   \para data_name  : the name of the dataset in the group
     // --------------------------------------------------------------
-    std::string read_string( const char * const &group_name,
-        const char * const &data_name ) const;
-    std::string read_string( const HDF5_Group &group,
-        const char * const &data_name ) const;
+    std::string read_string( const char * group_name,
+        const char * data_name ) const;
 
   private:
     const hid_t file_id;
 
-    void check_error(const herr_t &status, const char * const &funname ) const
+    void check_error(const herr_t &status, const char * funname ) const
     {
       if( status < 0 )
       {
