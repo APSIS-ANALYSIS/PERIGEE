@@ -90,10 +90,10 @@ class FEAElement
     // Users are responsible for allocating proper memory for basis, and delete 
     // the pointer after use.
     // ------------------------------------------------------------------------
-    virtual void get_R( const int &quaindex, double * const &basis ) const
+    virtual void get_R( int quaindex, double * const &basis ) const
     {SYS_T::commPrint("Warning: get_R is not implemented. \n");} 
 
-    virtual std::vector<double> get_R( const int &quaindex ) const
+    virtual std::vector<double> get_R( int quaindex ) const
     {SYS_T::commPrint("Warning: get_R is not implemented. \n"); return {};} 
 
     // ------------------------------------------------------------------------    
@@ -103,35 +103,35 @@ class FEAElement
     // the pointer after use.
     // ------------------------------------------------------------------------    
     // 3D case
-    virtual void get_gradR( const int &quaindex, double * const &basis_x,
+    virtual void get_gradR( int quaindex, double * const &basis_x,
         double * const &basis_y, double * const &basis_z ) const 
     {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
 
     // 2D case
-    virtual void get_gradR( const int &quaindex, double * const &basis_x,
+    virtual void get_gradR( int quaindex, double * const &basis_x,
         double * const &basis_y ) const 
     {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
 
     // 2D case:
-    virtual void get_R_gradR( const int &quaindex, double * const &basis, 
+    virtual void get_R_gradR( int quaindex, double * const &basis, 
         double * const &basis_x, double * const &basis_y ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");} 
 
     // 3D case:
-    virtual void get_R_gradR( const int &quaindex, double * const &basis,
+    virtual void get_R_gradR( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y, double * const &basis_z ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
 
     // ------------------------------------------------------------------------    
     // R, gradR, and Laplacian R
     // ------------------------------------------------------------------------    
-    virtual void get_3D_R_gradR_LaplacianR( const int &quaindex,
+    virtual void get_3D_R_gradR_LaplacianR( int quaindex,
         double * const &basis, double * const &basis_x, double * const &basis_y,
         double * const &basis_z, double * const &basis_xx, double * const &basis_yy, 
         double * const &basis_zz ) const 
     {SYS_T::commPrint("Warning: get_3DLaplacianR is not implemented. \n");}
 
-    virtual void get_2D_R_gradR_LaplacianR( const int &quaindex,
+    virtual void get_2D_R_gradR_LaplacianR( int quaindex,
         double * const &basis, double * const &basis_x, double * const &basis_y,
         double * const &basis_xx, double * const &basis_yy ) const 
     {SYS_T::commPrint("Warning: get_2DLaplacianR is not implemented. \n");}
@@ -139,12 +139,12 @@ class FEAElement
     // ------------------------------------------------------------------------    
     // R, gradR, and grad gradR
     // ------------------------------------------------------------------------    
-    virtual void get_2D_R_dR_d2R( const int &quaindex, double * const &basis,
+    virtual void get_2D_R_dR_d2R( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y, double * const &basis_xx, 
         double * const &basis_yy, double * const &basis_xy ) const
     {SYS_T::commPrint("Warning: get_2D_R_dR_d2R is not implemented. \n");}
 
-    virtual void get_3D_R_dR_d2R( const int &quaindex, double * const &basis,
+    virtual void get_3D_R_dR_d2R( int quaindex, double * const &basis,
         double * const &basis_x, double * const &basis_y, double * const &basis_z,
         double * const &basis_xx, double * const &basis_yy, double * const &basis_zz,
         double * const &basis_xy, double * const &basis_xz, double * const &basis_yz ) 
@@ -153,7 +153,7 @@ class FEAElement
     // ------------------------------------------------------------------------    
     // Return the Jacobian determinant
     // ------------------------------------------------------------------------    
-    virtual double get_detJac(const int &quaindex) const
+    virtual double get_detJac(int quaindex) const
     {SYS_T::commPrint("Warning: get_detJac is not implemented.\n"); return 0.0;}
 
     // ------------------------------------------------------------------------    
@@ -161,13 +161,13 @@ class FEAElement
     // dy_dxi, ... dz_deta, dz_dzeta. The size of teh return vector is 9 for 3d,
     // and 4 for 2d, for exampel. 
     // ------------------------------------------------------------------------    
-    virtual std::array<double,9> get_Jacobian( const int &quaindex ) const
+    virtual std::array<double,9> get_Jacobian( int quaindex ) const
     {
       SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     }
 
-    virtual std::array<double,4> get_Jacobian_2D( const int &quaindex ) const
+    virtual std::array<double,4> get_Jacobian_2D( int quaindex ) const
     {
       SYS_T::commPrint("Warning: get_Jacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0}};
@@ -178,13 +178,13 @@ class FEAElement
     // given. The output array dxi_dx is a 9 or 4 component array for 3D / 2D
     // case.
     // ------------------------------------------------------------------------    
-    virtual std::array<double,9> get_invJacobian( const int &quaindex ) const
+    virtual std::array<double,9> get_invJacobian( int quaindex ) const
     {
       SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
     }
 
-    virtual std::array<double,4> get_invJacobian_2D( const int &quaindex ) const
+    virtual std::array<double,4> get_invJacobian_2D( int quaindex ) const
     {
       SYS_T::commPrint("Warning: get_invJacobian is not implemented. \n");
       return {{0.0, 0.0, 0.0, 0.0}};
@@ -203,7 +203,7 @@ class FEAElement
     // surface.
     // This function is called in FEAElement_Triangle3_3D_der0.
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const
+    virtual Vector_3 get_2d_normal_out( int quaindex, double &area ) const
     {
       SYS_T::commPrint("Warning: get_2d_normal_out is not implemented. \n");
       return Vector_3();
@@ -218,7 +218,7 @@ class FEAElement
     // calculate the "root" of the tangential vector.
     // This function is, for example, called in FEAElement_Line2_3D_der0.
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_normal_out( const int &quaindex,
+    virtual Vector_3 get_normal_out( int quaindex,
         const std::vector<Vector_3> &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
     {
@@ -226,7 +226,7 @@ class FEAElement
       return Vector_3();
     }
 
-    virtual Vector_3 get_normal_out( const int &quaindex,
+    virtual Vector_3 get_normal_out( int quaindex,
         const Vector_3 &sur_pt, const Vector_3 &int_pt, 
         double &length ) const
     {
@@ -237,7 +237,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // Build the volume element with a face id and the quad_rule on surface element.
     // ------------------------------------------------------------------------
-    virtual void buildBasis( const int &face_id,
+    virtual void buildBasis( int face_id,
         const IQuadPts * const &quad_rule_s,
         const double * const &ctrl_x, 
         const double * const &ctrl_y,
@@ -247,7 +247,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // dx_dr in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_dx_dr( const int &quaindex,
+    virtual Vector_3 get_dx_dr( int quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const 
@@ -259,7 +259,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // dx_ds in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_dx_ds( const int &quaindex,
+    virtual Vector_3 get_dx_ds( int quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const 
@@ -271,7 +271,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // d2x_drr in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_d2x_drr( const int &quaindex,
+    virtual Vector_3 get_d2x_drr( int quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const 
@@ -283,7 +283,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // d2x_dss in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_d2x_dss( const int &quaindex,
+    virtual Vector_3 get_d2x_dss( int quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const 
@@ -295,7 +295,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // d2x_drs in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_d2x_drs( const int &quaindex,
+    virtual Vector_3 get_d2x_drs( int quaindex,
         const double * const &ctrl_x,
         const double * const &ctrl_y,
         const double * const &ctrl_z ) const 
@@ -304,7 +304,7 @@ class FEAElement
       return Vector_3();
     }
 
-    virtual std::array<std::vector<double>, 3> get_face_ctrlPts( const int &face_id,
+    virtual std::array<std::vector<double>, 3> get_face_ctrlPts( int face_id,
         const double * const &volctrl_x,
         const double * const &volctrl_y,
         const double * const &volctrl_z ) const
