@@ -124,28 +124,28 @@ class FEAElement
     // R, gradR, and Laplacian R
     // ------------------------------------------------------------------------    
     virtual void get_3D_R_gradR_LaplacianR( int quaindex,
-        double * const &basis, double * const &basis_x, double * const &basis_y,
-        double * const &basis_z, double * const &basis_xx, double * const &basis_yy, 
-        double * const &basis_zz ) const 
+        double * basis, double * basis_x, double * basis_y,
+        double * basis_z, double * basis_xx, double * basis_yy, 
+        double * basis_zz ) const 
     {SYS_T::commPrint("Warning: get_3DLaplacianR is not implemented. \n");}
 
     virtual void get_2D_R_gradR_LaplacianR( int quaindex,
-        double * const &basis, double * const &basis_x, double * const &basis_y,
-        double * const &basis_xx, double * const &basis_yy ) const 
+        double * basis, double * basis_x, double * basis_y,
+        double * basis_xx, double * basis_yy ) const 
     {SYS_T::commPrint("Warning: get_2DLaplacianR is not implemented. \n");}
 
     // ------------------------------------------------------------------------    
     // R, gradR, and grad gradR
     // ------------------------------------------------------------------------    
-    virtual void get_2D_R_dR_d2R( int quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y, double * const &basis_xx, 
-        double * const &basis_yy, double * const &basis_xy ) const
+    virtual void get_2D_R_dR_d2R( int quaindex, double * basis,
+        double * basis_x, double * basis_y, double * basis_xx, 
+        double * basis_yy, double * basis_xy ) const
     {SYS_T::commPrint("Warning: get_2D_R_dR_d2R is not implemented. \n");}
 
-    virtual void get_3D_R_dR_d2R( int quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy, double * const &basis_zz,
-        double * const &basis_xy, double * const &basis_xz, double * const &basis_yz ) 
+    virtual void get_3D_R_dR_d2R( int quaindex, double * basis,
+        double * basis_x, double * basis_y, double * basis_z,
+        double * basis_xx, double * basis_yy, double * basis_zz,
+        double * basis_xy, double * basis_xz, double * basis_yz ) 
       const {SYS_T::commPrint("Warning: get_3D_R_dR_d2R is not implemented. \n");}
 
     // ------------------------------------------------------------------------    
@@ -246,9 +246,9 @@ class FEAElement
     // dx_dr in parent domain
     // ------------------------------------------------------------------------
     virtual Vector_3 get_dx_dr( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const 
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_dx_dr is not implemented. \n");
       return Vector_3();
@@ -258,9 +258,9 @@ class FEAElement
     // dx_ds in parent domain
     // ------------------------------------------------------------------------
     virtual Vector_3 get_dx_ds( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const 
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_dx_ds is not implemented. \n");
       return Vector_3();
@@ -270,9 +270,9 @@ class FEAElement
     // d2x_drr in parent domain
     // ------------------------------------------------------------------------
     virtual Vector_3 get_d2x_drr( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const 
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_d2x_drr is not implemented. \n");
       return Vector_3();
@@ -282,9 +282,9 @@ class FEAElement
     // d2x_dss in parent domain
     // ------------------------------------------------------------------------
     virtual Vector_3 get_d2x_dss( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const 
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_d2x_dss is not implemented. \n");
       return Vector_3();
@@ -294,18 +294,18 @@ class FEAElement
     // d2x_drs in parent domain
     // ------------------------------------------------------------------------
     virtual Vector_3 get_d2x_drs( int quaindex,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const 
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_d2x_drs is not implemented. \n");
       return Vector_3();
     }
 
     virtual std::array<std::vector<double>, 3> get_face_ctrlPts( int face_id,
-        const double * const &volctrl_x,
-        const double * const &volctrl_y,
-        const double * const &volctrl_z ) const
+        const double * volctrl_x,
+        const double * volctrl_y,
+        const double * volctrl_z ) const
     {
       SYS_T::commPrint("Warning: get_face_ctrlPts is not implemented. \n");
     

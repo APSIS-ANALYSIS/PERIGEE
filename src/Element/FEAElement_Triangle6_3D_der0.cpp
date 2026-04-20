@@ -60,7 +60,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * quad,
 }
 
 void FEAElement_Triangle6_3D_der0::get_R( 
-    int quaindex, double * const &basis ) const
+    int quaindex, double * basis ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
