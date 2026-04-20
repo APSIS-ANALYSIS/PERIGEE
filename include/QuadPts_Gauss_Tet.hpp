@@ -36,8 +36,7 @@ class QuadPts_Gauss_Tet final : public IQuadPts
     double get_qp(int ii, int comp) const override
     {return qp[4*ii+comp];}
 
-    double get_qw(int ii) const override
-    {return qw[ii];}
+    double get_qw(int ii) const override {return qw[ii];}
 
   private:
     const int num_pts;
@@ -56,8 +55,7 @@ class QuadPts_Gauss_Tet final : public IQuadPts
     //                    c a b c; c b a c;
     //                    c a c b; c b c a;
     //                    c c a b; c c b a;
-    std::vector<double> gen_permutations( double a,
-        double b, double c ) const;
+    std::vector<double> gen_permutations( double a, double b, double c ) const;
 };
 
 #endif

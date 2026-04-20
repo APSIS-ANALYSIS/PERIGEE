@@ -44,8 +44,7 @@ class QuadPts_Gauss_Hex final : public IQuadPts
     double get_qp(int ii, int comp) const override
     {return qp[3*ii+comp];}
 
-    double get_qw(int ii) const override
-    {return qw[ii];}
+    double get_qw(int ii) const override {return qw[ii];}
 
   private:
     const int num_pts, num_pts_x, num_pts_y, num_pts_z;
