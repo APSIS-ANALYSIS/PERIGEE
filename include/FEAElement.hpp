@@ -65,8 +65,7 @@ class FEAElement
     // ------------------------------------------------------------------------
     // Build 3D basis -- FEM
     virtual void buildBasis( const IQuadPts * quad_rule,
-        const double * ctrl_x, const double * ctrl_y,
-        const double * ctrl_z )
+        const double * ctrl_x, const double * ctrl_y, const double * ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
 
     virtual void buildBasis( const IQuadPts * quad_rule,

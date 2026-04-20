@@ -32,8 +32,7 @@ class FEAElement_Tet4 final : public FEAElement
     // Given the quadrature points and nodal coordinates, evaluate the basis 
     // functions and their derivatives up to second order
     void buildBasis( const IQuadPts * quad_rule,
-        const double * ctrl_x,
-        const double * ctrl_y,
+        const double * ctrl_x, const double * ctrl_y,
         const double * ctrl_z ) override;
 
     // Return the element size.
