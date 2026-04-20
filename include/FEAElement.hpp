@@ -88,7 +88,7 @@ class FEAElement
     // Users are responsible for allocating proper memory for basis, and delete 
     // the pointer after use.
     // ------------------------------------------------------------------------
-    virtual void get_R( int quaindex, double * const &basis ) const
+    virtual void get_R( int quaindex, double * basis ) const
     {SYS_T::commPrint("Warning: get_R is not implemented. \n");} 
 
     virtual std::vector<double> get_R( int quaindex ) const

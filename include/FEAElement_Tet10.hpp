@@ -70,7 +70,7 @@ class FEAElement_Tet10 final : public FEAElement
 
     // get_xxx functions give access to function evaluations at the
     // quadrature point corresponding to quaindex
-    void get_R( int quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * basis ) const override;
 
     std::vector<double> get_R( int quaindex ) const override;
 
