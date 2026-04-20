@@ -340,8 +340,8 @@ std::vector<double> FEAElement_Hex27::get_R( int quaindex ) const
   return vec;
 }
 
-void FEAElement_Hex27::get_gradR( int quaindex, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z ) const
+void FEAElement_Hex27::get_gradR( int quaindex, double * basis_x,
+    double * basis_y, double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -353,9 +353,9 @@ void FEAElement_Hex27::get_gradR( int quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Hex27::get_R_gradR( int quaindex, double * const &basis,
-    double * const &basis_x, double * const &basis_y,
-    double * const &basis_z ) const
+void FEAElement_Hex27::get_R_gradR( int quaindex, double * basis,
+    double * basis_x, double * basis_y,
+    double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R_gradR function error.\n" );
   const int offset = quaindex * nLocBas;

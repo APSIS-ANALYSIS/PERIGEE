@@ -101,23 +101,23 @@ class FEAElement
     // the pointer after use.
     // ------------------------------------------------------------------------    
     // 3D case
-    virtual void get_gradR( int quaindex, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z ) const 
+    virtual void get_gradR( int quaindex, double * basis_x,
+        double * basis_y, double * basis_z ) const 
     {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
 
     // 2D case
-    virtual void get_gradR( int quaindex, double * const &basis_x,
-        double * const &basis_y ) const 
+    virtual void get_gradR( int quaindex, double * basis_x,
+        double * basis_y ) const 
     {SYS_T::commPrint("Warning: get_gradR is not implemented. \n");} 
 
     // 2D case:
-    virtual void get_R_gradR( int quaindex, double * const &basis, 
-        double * const &basis_x, double * const &basis_y ) const 
+    virtual void get_R_gradR( int quaindex, double * basis, 
+        double * basis_x, double * basis_y ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");} 
 
     // 3D case:
-    virtual void get_R_gradR( int quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y, double * const &basis_z ) const 
+    virtual void get_R_gradR( int quaindex, double * basis,
+        double * basis_x, double * basis_y, double * basis_z ) const 
     {SYS_T::commPrint("Warning: get_R_gradR is not implemented. \n");}
 
     // ------------------------------------------------------------------------    

@@ -201,8 +201,8 @@ std::vector<double> FEAElement_Tet10::get_R( int quaindex ) const
     R[offset+4], R[offset+5], R[offset+6], R[offset+7], R[offset+8], R[offset+9] };
 }
 
-void FEAElement_Tet10::get_gradR( int quaindex, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z ) const
+void FEAElement_Tet10::get_gradR( int quaindex, double * basis_x,
+    double * basis_y, double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -214,9 +214,9 @@ void FEAElement_Tet10::get_gradR( int quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Tet10::get_R_gradR( int quaindex, double * const &basis,
-    double * const &basis_x, double * const &basis_y,
-    double * const &basis_z ) const
+void FEAElement_Tet10::get_R_gradR( int quaindex, double * basis,
+    double * basis_x, double * basis_y,
+    double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R_gradR function error.\n" );
   const int offset = quaindex * nLocBas;

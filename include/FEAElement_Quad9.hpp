@@ -39,11 +39,11 @@ class FEAElement_Quad9 final : public FEAElement
 
     std::vector<double> get_R( int quaindex ) const override;
 
-    void get_gradR( int quaindex, double * const &basis_x,
-        double * const &basis_y ) const override;
+    void get_gradR( int quaindex, double * basis_x,
+        double * basis_y ) const override;
 
-    void get_R_gradR( int quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y ) const override;
+    void get_R_gradR( int quaindex, double * basis,
+        double * basis_x, double * basis_y ) const override;
 
     void get_2D_R_dR_d2R( int quaindex,
         double * const &basis,
