@@ -1,4 +1,5 @@
 #include "NBC_Partition.hpp"
+#include "HDF5_Group.hpp"
 
 NBC_Partition::NBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
@@ -86,29 +87,27 @@ void NBC_Partition::write_hdf5( const std::string &FileName,
   auto h5writer = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5writer->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  auto nbc_group = HDF5_Group::create( file_id, GroupName );
 
-  h5writer->write_intVector( g_id, "LID", LID );
+  h5writer->write_intVector( nbc_group.id(), "LID", LID );
 
-  if( LDN.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN );
+  if( LDN.size() > 0 ) h5writer->write_intVector( nbc_group.id(), "LDN", LDN );
 
   if( LPSN.size() > 0 )
   {
-    h5writer->write_intVector( g_id, "LPSN", LPSN );
-    h5writer->write_intVector( g_id, "LPMN", LPMN );
+    h5writer->write_intVector( nbc_group.id(), "LPSN", LPSN );
+    h5writer->write_intVector( nbc_group.id(), "LPMN", LPMN );
   }
 
   if( LocalMaster.size() > 0 )
   {
-    h5writer->write_intVector( g_id, "LocalMaster",      LocalMaster );
-    h5writer->write_intVector( g_id, "LocalMasterSlave", LocalMasterSlave );
+    h5writer->write_intVector( nbc_group.id(), "LocalMaster",      LocalMaster );
+    h5writer->write_intVector( nbc_group.id(), "LocalMasterSlave", LocalMasterSlave );
   }
 
-  h5writer->write_intVector(g_id, "Num_LD",  Num_LD);
-  h5writer->write_intVector(g_id, "Num_LPS", Num_LPS);
-  h5writer->write_intVector(g_id, "Num_LPM", Num_LPM);
-
-  H5Gclose(g_id);
+  h5writer->write_intVector(nbc_group.id(), "Num_LD",  Num_LD);
+  h5writer->write_intVector(nbc_group.id(), "Num_LPS", Num_LPS);
+  h5writer->write_intVector(nbc_group.id(), "Num_LPM", Num_LPM);
 }
 
 void NBC_Partition::print_info() const

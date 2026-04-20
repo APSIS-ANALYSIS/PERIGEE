@@ -1,4 +1,5 @@
 #include "NBC_Partition_inflow.hpp"
+#include "HDF5_Group.hpp"
 
 NBC_Partition_inflow::NBC_Partition_inflow(
     const IPart * const &part,
@@ -119,54 +120,51 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
   auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, "/inflow", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  auto inflow_group = HDF5_Group::create( file_id, "/inflow" );
 
-  h5w -> write_intScalar( g_id, "num_nbc", num_nbc );
+  h5w -> write_intScalar( inflow_group.id(), "num_nbc", num_nbc );
 
   for(int ii=0; ii<num_nbc; ++ii)
   {
     std::string subgroup_name( "nbcid_" );
     subgroup_name.append( std::to_string(ii) );
 
-    hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    auto sub_group = HDF5_Group::create( inflow_group.id(), subgroup_name );
 
-    h5w->write_intScalar( group_id, "Num_LD", Num_LD[ii] );
+    h5w->write_intScalar( sub_group.id(), "Num_LD", Num_LD[ii] );
     
-    h5w->write_intVector( group_id, "LDN", LDN[ii] );
+    h5w->write_intVector( sub_group.id(), "LDN", LDN[ii] );
 
-    h5w->write_doubleScalar( group_id, "Inflow_active_area", actarea[ii] );
+    h5w->write_doubleScalar( sub_group.id(), "Inflow_active_area", actarea[ii] );
 
-    h5w->write_doubleScalar( group_id, "Inflow_full_area", facearea[ii] );
+    h5w->write_doubleScalar( sub_group.id(), "Inflow_full_area", facearea[ii] );
 
-    h5w->write_intScalar( group_id, "num_out_bc_pts", num_out_bc_pts[ii] );
+    h5w->write_intScalar( sub_group.id(), "num_out_bc_pts", num_out_bc_pts[ii] );
 
-    h5w->write_intScalar( group_id, "num_local_node", num_local_node[ii] );
+    h5w->write_intScalar( sub_group.id(), "num_local_node", num_local_node[ii] );
 
-    h5w->write_intScalar( group_id, "num_local_cell", num_local_cell[ii] );
+    h5w->write_intScalar( sub_group.id(), "num_local_cell", num_local_cell[ii] );
 
-    h5w->write_intScalar( group_id, "cell_nLocBas", cell_nLocBas[ii] );
+    h5w->write_intScalar( sub_group.id(), "cell_nLocBas", cell_nLocBas[ii] );
 
-    h5w->write_Vector_3( group_id, "Outward_normal_vector", outvec[ii].to_std_array() );
+    h5w->write_Vector_3( sub_group.id(), "Outward_normal_vector", outvec[ii].to_std_array() );
 
-    h5w->write_Vector_3( group_id, "centroid", centroid[ii].to_std_array() );
+    h5w->write_Vector_3( sub_group.id(), "centroid", centroid[ii].to_std_array() );
 
-    h5w->write_doubleVector( group_id, "outline_pts", outline_pts[ii] );
+    h5w->write_doubleVector( sub_group.id(), "outline_pts", outline_pts[ii] );
 
-    h5w->write_doubleVector( group_id, "local_pt_xyz", local_pt_xyz[ii] );
+    h5w->write_doubleVector( sub_group.id(), "local_pt_xyz", local_pt_xyz[ii] );
 
-    h5w->write_intVector( group_id, "local_cell_ien", local_cell_ien[ii] );
+    h5w->write_intVector( sub_group.id(), "local_cell_ien", local_cell_ien[ii] );
 
-    h5w->write_intVector( group_id, "local_global_node", local_global_node[ii] );
+    h5w->write_intVector( sub_group.id(), "local_global_node", local_global_node[ii] );
 
-    h5w->write_intVector( group_id, "local_node_pos", local_node_pos[ii] );
+    h5w->write_intVector( sub_group.id(), "local_node_pos", local_node_pos[ii] );
 
-    h5w->write_intVector( group_id, "local_global_cell", local_global_cell[ii] );
+    h5w->write_intVector( sub_group.id(), "local_global_cell", local_global_cell[ii] );
 
-    H5Gclose( group_id );
   }
 
-  H5Gclose( g_id );
 }
 
 // EOF

@@ -1,4 +1,5 @@
 #include "NBC_Partition_inflow_MF.hpp"
+#include "HDF5_Group.hpp"
 
 NBC_Partition_inflow_MF::NBC_Partition_inflow_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
@@ -36,19 +37,18 @@ void NBC_Partition_inflow_MF::write_hdf5( const std::string &FileName ) const
   auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
   const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gopen(file_id, "/inflow", H5P_DEFAULT);
+  auto inflow_group = HDF5_Group::open( file_id, "/inflow" );
 
   for(int ii=0; ii<num_nbc; ++ii)
   {
     std::string subgroup_name( "nbcid_" );
     subgroup_name.append( std::to_string(ii) );
 
-    hid_t group_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT);
+    auto sub_group = HDF5_Group::open( inflow_group.id(), subgroup_name );
 
-    h5w->write_intVector( group_id, "LDN_MF", LDN_MF[ii] );
+    h5w->write_intVector( sub_group.id(), "LDN_MF", LDN_MF[ii] );
   }
 
-  H5Gclose( g_id );
 }
 
 // EOF
