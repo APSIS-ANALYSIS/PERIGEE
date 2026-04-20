@@ -8,6 +8,7 @@
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
+#include "APart_Node.hpp"
 #include "QuadPtsFactory.hpp"
 #include "FEAElementFactory.hpp"
 #include "VisDataPrep_NS.hpp"

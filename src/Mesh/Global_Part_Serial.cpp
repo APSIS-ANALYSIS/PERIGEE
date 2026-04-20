@@ -82,10 +82,7 @@ void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
 {
   const std::string fName = fileName + ".h5";
 
-  // file creation
-  hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  auto h5w = SYS_T::make_unique<HDF5_Writer>(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(fName);
 
   h5w->write_intScalar("part_size", part_size);
   h5w->write_intScalar("cpu_size", 1);
@@ -97,8 +94,6 @@ void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
   h5w->write_intScalar("in_ncommon", get_dual_edge_ncommon() );
   
   h5w->write_intScalar("isSerial", ( is_serial() ? 1 : 0 ) );
-
-  H5Fclose(file_id);
 }
 
 // EOF
