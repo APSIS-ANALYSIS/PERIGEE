@@ -176,7 +176,7 @@ int main(int argc, char *argv[])
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    HDF5_Writer * cmdh5w = new HDF5_Writer("solver_cmd.h5");
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("solver_cmd.h5");
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
@@ -184,7 +184,6 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
-    delete cmdh5w;
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
