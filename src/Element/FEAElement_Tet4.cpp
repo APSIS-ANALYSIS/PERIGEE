@@ -13,10 +13,10 @@ void FEAElement_Tet4::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
-void FEAElement_Tet4::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Tet4::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   ASSERT( quad -> get_dim() == 4, "FEAElement_Tet4::buildBasis function error.\n" );
 
@@ -177,10 +177,10 @@ double FEAElement_Tet4::get_h( const double * ctrl_x,
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] );  
 }
 
-void FEAElement_Tet4::buildBasis( int face_id, const IQuadPts * const &quad_s,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Tet4::buildBasis( int face_id, const IQuadPts * quad_s,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );

@@ -64,21 +64,21 @@ class FEAElement
     // Build Basis function quadrature info
     // ------------------------------------------------------------------------
     // Build 3D basis -- FEM
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x, const double * const &ctrl_y,
-        const double * const &ctrl_z )
+    virtual void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x, const double * ctrl_y,
+        const double * ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
 
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
+    virtual void buildBasis( const IQuadPts * quad_rule,
         const std::array<std::vector<double>,3> &pts )
     {buildBasis(quad_rule, &pts[0][0], &pts[1][0], &pts[2][0]);}
 
     // Build 2D basis -- FEM
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x, const double * const &ctrl_y )
+    virtual void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x, const double * ctrl_y )
     {SYS_T::commPrint("Warning: buildBasis() is not implemented. \n");}
 
-    virtual void buildBasis( const IQuadPts * const &quad_rule,
+    virtual void buildBasis( const IQuadPts * quad_rule,
         const std::array<std::vector<double>,2> &pts )
     {buildBasis(quad_rule, &pts[0][0], &pts[1][0]);}
 
@@ -237,10 +237,10 @@ class FEAElement
     // Build the volume element with a face id and the quad_rule on surface element.
     // ------------------------------------------------------------------------
     virtual void buildBasis( int face_id,
-        const IQuadPts * const &quad_rule_s,
-        const double * const &ctrl_x, 
-        const double * const &ctrl_y,
-        const double * const &ctrl_z )
+        const IQuadPts * quad_rule_s,
+        const double * ctrl_x, 
+        const double * ctrl_y,
+        const double * ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis is not implemented. \n");}
 
     // ------------------------------------------------------------------------

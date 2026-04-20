@@ -31,10 +31,10 @@ class FEAElement_Tet4 final : public FEAElement
 
     // Given the quadrature points and nodal coordinates, evaluate the basis 
     // functions and their derivatives up to second order
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Return the element size.
     // For the linear tet element, we calculate the DIAMETER of the
@@ -90,10 +90,10 @@ class FEAElement_Tet4 final : public FEAElement
     //   Tet-Face-1 : Node 0 3 2
     //   Tet-Face-2 : Node 0 1 3
     //   Tet-Face-3 : Node 0 2 1
-    void buildBasis( int face_id, const IQuadPts * const &quad_rule_s,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( int face_id, const IQuadPts * quad_rule_s,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Get the outwardnormal on faces
     // This function requires the buildBasis with face_id provided, so that the

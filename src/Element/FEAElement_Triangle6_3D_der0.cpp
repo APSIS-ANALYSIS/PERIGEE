@@ -15,10 +15,10 @@ void FEAElement_Triangle6_3D_der0::print_info() const
   SYS_T::commPrint("Note: This element is designed for natural BC integrals.\n");
 }
 
-void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   ASSERT(quad->get_dim() == 3, "FEAElement_Triangle6_3D_der0::buildBasis function error.\n" );
 

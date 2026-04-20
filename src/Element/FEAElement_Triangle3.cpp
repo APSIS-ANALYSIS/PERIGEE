@@ -13,8 +13,8 @@ void FEAElement_Triangle3::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated. \n");
 }
 
-void FEAElement_Triangle3::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x, const double * const &ctrl_y )
+void FEAElement_Triangle3::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x, const double * ctrl_y )
 {
   ASSERT(quad -> get_dim() == 3, "FEAElement_Triangle3::buildBasis function error.\n" );
 

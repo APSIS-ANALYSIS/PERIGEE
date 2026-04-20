@@ -21,9 +21,9 @@ void FEAElement_Quad9::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
-void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y )
+void FEAElement_Quad9::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y )
 {
   ASSERT(quad->get_dim() == 2, "FEAElement_Quad9::buildBasis function error.\n" );
 

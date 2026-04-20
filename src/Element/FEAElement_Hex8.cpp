@@ -28,10 +28,10 @@ void FEAElement_Hex8::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
-void FEAElement_Hex8::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Hex8::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   ASSERT( quad -> get_dim() == 3, "FEAElement_Hex8::buildBasis function error.\n" );
 
@@ -299,10 +299,10 @@ std::array<double,9> FEAElement_Hex8::get_invJacobian(int quaindex) const
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Hex8::buildBasis( int face_id, const IQuadPts * const &quad_s, 
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Hex8::buildBasis( int face_id, const IQuadPts * quad_s, 
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
