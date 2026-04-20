@@ -126,8 +126,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
 
   for(int ii=0; ii<num_nbc; ++ii)
   {
-    std::string subgroup_name( "nbcid_" );
-    subgroup_name.append( std::to_string(ii) );
+    const std::string subgroup_name = std::string("nbcid_") + std::to_string(ii);
 
     auto sub_group = HDF5_Group::create( inflow_group.id(), subgroup_name );
 
@@ -162,9 +161,7 @@ void NBC_Partition_inflow::write_hdf5( const std::string &FileName ) const
     h5w->write_intVector( sub_group.id(), "local_node_pos", local_node_pos[ii] );
 
     h5w->write_intVector( sub_group.id(), "local_global_cell", local_global_cell[ii] );
-
   }
-
 }
 
 // EOF

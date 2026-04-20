@@ -68,8 +68,7 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
   {
     if( num_local_cell[ii] > 0 )
     {
-      std::string subgroup_name( "ebcid_" );
-      subgroup_name.append( std::to_string(ii) );
+      const std::string subgroup_name = std::string("ebcid_") + std::to_string(ii);
       auto sub_group = HDF5_Group::open( root_group.id(), subgroup_name );
 
       h5w->write_doubleVector( sub_group.id(), "intNA", face_int_NA[ii] );
@@ -78,7 +77,6 @@ void EBC_Partition_outflow::write_hdf5( const std::string &FileName,
 
     }
   }
-
 }
 
 // EOF
