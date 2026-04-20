@@ -25,7 +25,6 @@
 #include "Interface_Partition.hpp"
 #include "yaml-cpp/yaml.h"
 #include "HDF5_Group.hpp"
-#include <memory>
 
 int main( int argc, char * argv[] )
 {
