@@ -214,9 +214,9 @@ int main( int argc, char * argv[] )
     std::ostringstream time_index;
     time_index.str("");
     time_index << 900000000 + time;
-    const std::string time_label = time_index.str();
-    const std::string name_to_read = sol_bname + time_label;
-    const std::string name_to_write = out_bname + time_label;
+    const std::string time_suffix = time_index.str();
+    const std::string name_to_read = sol_bname + time_suffix;
+    const std::string name_to_write = out_bname + time_suffix;
 
     SYS_T::commPrint("Time %d: Read %s and Write %s \n", time, name_to_read.c_str(), name_to_write.c_str());
 

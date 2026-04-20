@@ -208,9 +208,9 @@ int main( int argc, char * argv[] )
     // Generate the file name
     time_index.str("");
     time_index << 900000000 + time;
-    const std::string time_label = time_index.str();
-    const std::string name_to_read = sol_bname + time_label;
-    const std::string name_to_write = out_bname + time_label;
+    const std::string time_suffix = time_index.str();
+    const std::string name_to_read = sol_bname + time_suffix;
+    const std::string name_to_write = out_bname + time_suffix;
 
     std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 
