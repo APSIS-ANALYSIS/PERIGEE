@@ -24,6 +24,7 @@
 #include "EBC_Partition_WallModel.hpp"
 #include "Interface_Partition.hpp"
 #include "yaml-cpp/yaml.h"
+#include "HDF5_Group.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -183,26 +184,26 @@ int main( int argc, char * argv[] )
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  HDF5_Writer * cmdh5w = new HDF5_Writer("preprocessor_cmd.h5");
+  {
+    auto cmdh5w = std::make_unique<HDF5_Writer>("preprocessor_cmd.h5");
 
-  cmdh5w->write_intScalar("num_inlet", num_inlet);
-  cmdh5w->write_intScalar("num_outlet", num_outlet);
-  cmdh5w->write_intScalar("cpu_size", cpu_size);
-  cmdh5w->write_intScalar("in_ncommon", in_ncommon);
-  cmdh5w->write_intScalar("dofNum", dofNum);
-  cmdh5w->write_intScalar("dofMat", dofMat);
-  cmdh5w->write_string("elemType", elemType_str);
-  cmdh5w->write_string("fixed_geo_file", fixed_geo_file);
-  cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
-  cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
-  cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
-  cmdh5w->write_string("sur_file_inner_wall", sur_file_inner_wall);
-  cmdh5w->write_string("sur_file_outer_wall", sur_file_outer_wall);
-  cmdh5w->write_string("fixed_interface_base", fixed_interface_base);
-  cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
-  cmdh5w->write_string("part_file", part_file);
-
-  delete cmdh5w;
+    cmdh5w->write_intScalar("num_inlet", num_inlet);
+    cmdh5w->write_intScalar("num_outlet", num_outlet);
+    cmdh5w->write_intScalar("cpu_size", cpu_size);
+    cmdh5w->write_intScalar("in_ncommon", in_ncommon);
+    cmdh5w->write_intScalar("dofNum", dofNum);
+    cmdh5w->write_intScalar("dofMat", dofMat);
+    cmdh5w->write_string("elemType", elemType_str);
+    cmdh5w->write_string("fixed_geo_file", fixed_geo_file);
+    cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
+    cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
+    cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
+    cmdh5w->write_string("sur_file_inner_wall", sur_file_inner_wall);
+    cmdh5w->write_string("sur_file_outer_wall", sur_file_outer_wall);
+    cmdh5w->write_string("fixed_interface_base", fixed_interface_base);
+    cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
+    cmdh5w->write_string("part_file", part_file);
+  }
 
   // Read the volumetric mesh file from the vtu file: fixed_geo_file
   int nFunc, nElem;
@@ -468,14 +469,13 @@ int main( int argc, char * argv[] )
 
     // Writed the info of rotation axis into h5 file
     const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
-    HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
-    const hid_t file_id = h5w->get_file_id();
-    hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
-    h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
-
-    H5Gclose( g_id );
-    delete h5w;
+    {
+      auto h5w = std::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+      const hid_t file_id = h5w->get_file_id();
+      auto rotation_group = HDF5_Group::create(file_id, "/rotation");
+      h5w -> write_Vector_3( rotation_group.id(), "point_rotated", point_rotated.to_std_array() );
+      h5w -> write_Vector_3( rotation_group.id(), "angular_direction", angular_direction.to_std_array() );
+    }
 
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);
@@ -557,15 +557,15 @@ int main( int argc, char * argv[] )
 
     const std::string GroupName = "/sliding";
 
-    HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
-    
+    auto h5w = std::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+
     const hid_t file_id = h5w->get_file_id();
-    
-    hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
 
-    h5w -> write_intVector( g_id, "max_num_local_fixed_cell", max_fixed_nlocalele );
+    auto sliding_group = HDF5_Group::open( file_id, GroupName );
 
-    h5w -> write_intVector( g_id, "max_num_local_rotated_cell", max_rotated_nlocalele );
+    h5w -> write_intVector( sliding_group.id(), "max_num_local_fixed_cell", max_fixed_nlocalele );
+
+    h5w -> write_intVector( sliding_group.id(), "max_num_local_rotated_cell", max_rotated_nlocalele );
 
     const std::string groupbase("interfaceid_");
 
@@ -574,21 +574,16 @@ int main( int argc, char * argv[] )
       std::string subgroup_name(groupbase);
       subgroup_name.append( std::to_string(ii) );
 
-      hid_t group_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT);
+      auto interface_group = HDF5_Group::open(sliding_group.id(), subgroup_name);
 
-      h5w -> write_intVector( group_id, "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
+      h5w -> write_intVector( interface_group.id(), "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
+      h5w -> write_intVector( interface_group.id(), "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
 
-      h5w -> write_intVector( group_id, "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
+      h5w -> write_intVector( interface_group.id(), "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
-
-      H5Gclose( group_id );
+      h5w -> write_intVector( interface_group.id(), "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
     }
-
-    H5Gclose( g_id );
-    delete h5w;
   }
 
   cout<<"\n===> Mesh Partition Quality: "<<endl;
