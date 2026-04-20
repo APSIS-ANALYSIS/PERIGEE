@@ -15,7 +15,7 @@ namespace FE_T
   // Generate outward normal vector from a tangential vector.
   // tan : the tangential vector
   // p0  : the starting point of the tangential vector
-  // p1  : the interior point 
+  // p1  : the interior point
   // return : the outward normal vector
   // Algorithm: p1->p0 gives the vector m,
   //            n = m - (m,t) t / (t,t).
@@ -23,21 +23,21 @@ namespace FE_T
   Vector_3 get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 );
 
   // --------------------------------------------------------------------------
-  // Calculate the circumscribing sphere's centre point and radius of four 
+  // Calculate the circumscribing sphere's centre point and radius of four
   // given points
   // --------------------------------------------------------------------------
   void get_tet_sphere_info(
-      const double &x0, const double &x1, const double &x2, const double &x3, 
+      const double &x0, const double &x1, const double &x2, const double &x3,
       const double &y0, const double &y1, const double &y2, const double &y3,
       const double &z0, const double &z1, const double &z2, const double &z3,
       double &xx, double &yy, double &zz, double &rr );
 
-  double get_tet_sphere_radius( 
-      const double &x0, const double &x1, const double &x2, const double &x3, 
+  double get_tet_sphere_radius(
+      const double &x0, const double &x1, const double &x2, const double &x3,
       const double &y0, const double &y1, const double &y2, const double &y3,
       const double &z0, const double &z1, const double &z2, const double &z3 );
 
-  Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
+  Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1,
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
 
   double get_circumradius( const std::array<Vector_3, 4> &pts );
@@ -67,7 +67,7 @@ namespace FE_T
   // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
   //                          = sum(f * gwts) / sum(gwts)
   // --------------------------------------------------------------------------
-  double L2Proj_DGP0( const double * const &f, 
+  double L2Proj_DGP0( const double * const &f,
       const double * const &gwts, const int &nqp );
 
   // --------------------------------------------------------------------------
@@ -112,7 +112,7 @@ namespace FE_T
   // This is a 3-by-3 matrix class that can calculate LU factorization of the
   // dense matrix. The components are stored in a 1-D array.
   //
-  // The array that stores the matrix is mat[9]. Logically, the matrix is 
+  // The array that stores the matrix is mat[9]. Logically, the matrix is
   //                     mat[0], mat[1], mat[2]
   //                     mat[3], mat[4], mat[5]
   //                     mat[6], mat[7], mat[8]
@@ -125,9 +125,9 @@ namespace FE_T
       Matrix_double_3by3_Array();
 
       // Explicitly define the matrix components
-      Matrix_double_3by3_Array( const double &a11, const double &a12, 
-          const double &a13, const double &a21, const double &a22, 
-          const double &a23, const double &a31, const double &a32, 
+      Matrix_double_3by3_Array( const double &a11, const double &a12,
+          const double &a13, const double &a21, const double &a22,
+          const double &a23, const double &a31, const double &a32,
           const double &a33 );
 
       // Destructor
@@ -169,7 +169,7 @@ namespace FE_T
       void LU_solve(const double &b1, const double &b2, const double &b3,
           double &x1, double &x2, double &x3) const;
 
-      // Transpose operation for the matrix 
+      // Transpose operation for the matrix
       void transpose();
 
       // Inverse of the matrix (based on cofactor). The pp is not
@@ -181,10 +181,10 @@ namespace FE_T
 
       // Vector multiplication y = Ax
       // make sure the x y vector has length 3.
-      void VecMult( const double * const &xx, double * const &yy ) const; 
+      void VecMult( const double * const &xx, double * const &yy ) const;
 
       // Matrix multiplication
-      void MatMult( const Matrix_double_3by3_Array &mleft, 
+      void MatMult( const Matrix_double_3by3_Array &mleft,
           const Matrix_double_3by3_Array &mright );
 
       // print mat in matrix format
@@ -207,8 +207,8 @@ namespace FE_T
   // derivatives of element basis functions. The components are stored
   // in a 1-D array.
   //
-  // The array that stores the matrix is mat[36]. Logically, the matrix is 
-  //                    
+  // The array that stores the matrix is mat[36]. Logically, the matrix is
+  //
   //    mat[0],  mat[1],  mat[2],  mat[3],  mat[4],  mat[5]
   //    mat[6],  mat[7],  mat[8],  mat[9],  mat[10], mat[11]
   //    mat[12], mat[13], mat[14], mat[15], mat[16], mat[17]
@@ -236,7 +236,7 @@ namespace FE_T
 
     private:
       double Mat[36];
-      
+
       int pp[6];
   };
 
@@ -250,7 +250,7 @@ namespace FE_T
       // Input: \para vol_eleType     : the element type of the volume element
       //        \para boundary_id     : the boundary index defined specifically
       //        \para lower_quad_rule : the quadrature rlue of the lower-dimensional element
-      QuadPts_on_face(const FEType &vol_elemType, const int &face_id, 
+      QuadPts_on_face(const FEType &vol_elemType, int face_id,
           const IQuadPts * const lower_quad_rule);
 
       ~QuadPts_on_face() override = default;
@@ -261,7 +261,7 @@ namespace FE_T
 
       int get_num_quadPts() const override {return num_pts;}
 
-      double get_qp(const int &ii, const int &comp) const override
+      double get_qp(int ii, int comp) const override
       {return qp[dim * ii + comp];}
 
     private:
@@ -272,7 +272,7 @@ namespace FE_T
       // disallow default constructor
       QuadPts_on_face() = delete;
   };
-      
+
 } // End of FE_T
 
 #endif
