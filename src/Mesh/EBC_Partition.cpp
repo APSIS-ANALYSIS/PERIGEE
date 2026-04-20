@@ -97,7 +97,7 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
   hid_t file_id = h5w->get_file_id();
   hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
 
