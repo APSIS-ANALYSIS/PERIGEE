@@ -51,8 +51,7 @@ class FEAElement
         const double * ctrl_z ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
-    virtual double get_h( const double * ctrl_x,
-        const double * ctrl_y ) const
+    virtual double get_h( const double * ctrl_x, const double * ctrl_y ) const
     {SYS_T::commPrint("Warning: get_h is not implemented. \n"); return 0.0;}
 
     virtual double get_h( const std::array<std::vector<double>,3> pts ) const

@@ -105,8 +105,7 @@ class FEAElement_Hex27 final : public FEAElement
         const double * const &ctrl_y,
         const double * const &ctrl_z ) override;
     
-    double get_h( const double * ctrl_x,
-        const double * ctrl_y,
+    double get_h( const double * ctrl_x, const double * ctrl_y,
         const double * ctrl_z ) const override;
     
     // Get functions give access to function evaluations at the quadrature point 
