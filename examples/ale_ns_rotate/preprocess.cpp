@@ -557,32 +557,34 @@ int main( int argc, char * argv[] )
 
     const std::string GroupName = "/sliding";
 
-    auto h5w = std::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
-
-    const hid_t file_id = h5w->get_file_id();
-
-    auto sliding_group = HDF5_Group::open( file_id, GroupName );
-
-    h5w -> write_intVector( sliding_group.id(), "max_num_local_fixed_cell", max_fixed_nlocalele );
-
-    h5w -> write_intVector( sliding_group.id(), "max_num_local_rotated_cell", max_rotated_nlocalele );
-
-    const std::string groupbase("interfaceid_");
-
-    for(int ii = 0; ii < VEC_T::get_size(interfaces); ++ii)
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( std::to_string(ii) );
+      auto h5w = std::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
 
-      auto interface_group = HDF5_Group::open(sliding_group.id(), subgroup_name);
+      const hid_t file_id = h5w->get_file_id();
 
-      h5w -> write_intVector( interface_group.id(), "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
+      auto sliding_group = HDF5_Group::open( file_id, GroupName );
 
-      h5w -> write_intVector( interface_group.id(), "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
+      h5w -> write_intVector( sliding_group.id(), "max_num_local_fixed_cell", max_fixed_nlocalele );
 
-      h5w -> write_intVector( interface_group.id(), "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
+      h5w -> write_intVector( sliding_group.id(), "max_num_local_rotated_cell", max_rotated_nlocalele );
 
-      h5w -> write_intVector( interface_group.id(), "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
+      const std::string groupbase("interfaceid_");
+
+      for(int ii = 0; ii < VEC_T::get_size(interfaces); ++ii)
+      {
+        std::string subgroup_name(groupbase);
+        subgroup_name.append( std::to_string(ii) );
+
+        auto interface_group = HDF5_Group::open(sliding_group.id(), subgroup_name);
+
+        h5w -> write_intVector( interface_group.id(), "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
+
+        h5w -> write_intVector( interface_group.id(), "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
+
+        h5w -> write_intVector( interface_group.id(), "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
+
+        h5w -> write_intVector( interface_group.id(), "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
+      }
     }
   }
 
