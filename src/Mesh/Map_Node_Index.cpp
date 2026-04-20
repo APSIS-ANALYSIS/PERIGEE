@@ -31,9 +31,7 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
 Map_Node_Index::Map_Node_Index( const char * const &fileName )
 {
   std::cout<<"-- loading old2new & new2old index mapping from disk. \n";
-  std::string fName( fileName );
-  fName.append(".h5");
-
+  const std::string fName = std::string(fileName) + ".h5";
 
   auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
