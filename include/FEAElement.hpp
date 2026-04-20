@@ -224,9 +224,8 @@ class FEAElement
       return Vector_3();
     }
 
-    virtual Vector_3 get_normal_out( int quaindex,
-        const Vector_3 &sur_pt, const Vector_3 &int_pt, 
-        double &length ) const
+    virtual Vector_3 get_normal_out( int quaindex, const Vector_3 &sur_pt,
+        const Vector_3 &int_pt, double &length ) const
     {
       SYS_T::commPrint("Warning: get_normal_out is not implemented. \n");
       return Vector_3();
@@ -235,20 +234,15 @@ class FEAElement
     // ------------------------------------------------------------------------
     // Build the volume element with a face id and the quad_rule on surface element.
     // ------------------------------------------------------------------------
-    virtual void buildBasis( int face_id,
-        const IQuadPts * quad_rule_s,
-        const double * ctrl_x, 
-        const double * ctrl_y,
-        const double * ctrl_z )
+    virtual void buildBasis( int face_id, const IQuadPts * quad_rule_s,
+        const double * ctrl_x, const double * ctrl_y, const double * ctrl_z )
     {SYS_T::commPrint("Warning: buildBasis is not implemented. \n");}
 
     // ------------------------------------------------------------------------
     // dx_dr in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_dx_dr( int quaindex,
-        const double * ctrl_x,
-        const double * ctrl_y,
-        const double * ctrl_z ) const 
+    virtual Vector_3 get_dx_dr( int quaindex, const double * ctrl_x, 
+        const double * ctrl_y, const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_dx_dr is not implemented. \n");
       return Vector_3();
@@ -258,9 +252,7 @@ class FEAElement
     // dx_ds in parent domain
     // ------------------------------------------------------------------------
     virtual Vector_3 get_dx_ds( int quaindex,
-        const double * ctrl_x,
-        const double * ctrl_y,
-        const double * ctrl_z ) const 
+        const double * ctrl_x, const double * ctrl_y, const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_dx_ds is not implemented. \n");
       return Vector_3();
@@ -269,10 +261,8 @@ class FEAElement
     // ------------------------------------------------------------------------
     // d2x_drr in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_d2x_drr( int quaindex,
-        const double * ctrl_x,
-        const double * ctrl_y,
-        const double * ctrl_z ) const 
+    virtual Vector_3 get_d2x_drr( int quaindex, const double * ctrl_x,
+        const double * ctrl_y, const double * ctrl_z ) const 
     {
       SYS_T::commPrint("Warning: get_d2x_drr is not implemented. \n");
       return Vector_3();
@@ -281,10 +271,8 @@ class FEAElement
     // ------------------------------------------------------------------------
     // d2x_dss in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_d2x_dss( int quaindex,
-        const double * ctrl_x,
-        const double * ctrl_y,
-        const double * ctrl_z ) const 
+    virtual Vector_3 get_d2x_dss( int quaindex, const double * ctrl_x,
+        const double * ctrl_y, const double * ctrl_z ) const
     {
       SYS_T::commPrint("Warning: get_d2x_dss is not implemented. \n");
       return Vector_3();
@@ -293,10 +281,8 @@ class FEAElement
     // ------------------------------------------------------------------------
     // d2x_drs in parent domain
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_d2x_drs( int quaindex,
-        const double * ctrl_x,
-        const double * ctrl_y,
-        const double * ctrl_z ) const 
+    virtual Vector_3 get_d2x_drs( int quaindex, const double * ctrl_x,
+        const double * ctrl_y, const double * ctrl_z ) const
     {
       SYS_T::commPrint("Warning: get_d2x_drs is not implemented. \n");
       return Vector_3();
