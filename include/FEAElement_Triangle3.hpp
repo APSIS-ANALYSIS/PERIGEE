@@ -35,7 +35,7 @@ class FEAElement_Triangle3 final : public FEAElement
     double get_h( const double * ctrl_x,
         const double * ctrl_y ) const override;
 
-    void get_R( int quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * basis ) const override;
     
     std::vector<double> get_R( int quaindex ) const override;
 

@@ -186,7 +186,7 @@ double FEAElement_Tet10::get_h( const double * ctrl_x,
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] ); 
 }
 
-void FEAElement_Tet10::get_R( int quaindex, double * const &basis ) const
+void FEAElement_Tet10::get_R( int quaindex, double * basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * nLocBas;

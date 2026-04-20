@@ -196,7 +196,7 @@ double FEAElement_Hex8::get_h( const double * ctrl_x,
   return std::sqrt(d);
 }
 
-void FEAElement_Hex8::get_R( int quaindex, double * const &basis ) const
+void FEAElement_Hex8::get_R( int quaindex, double * basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex8::get_R function error.\n" );
   const int offset = quaindex * nLocBas;

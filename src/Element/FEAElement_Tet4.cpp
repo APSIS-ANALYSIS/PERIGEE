@@ -79,7 +79,7 @@ void FEAElement_Tet4::buildBasis( const IQuadPts * quad,
   dR_dz[3] = Jac[17];
 }
 
-void FEAElement_Tet4::get_R( int quaindex, double * const &basis ) const
+void FEAElement_Tet4::get_R( int quaindex, double * basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet4::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
