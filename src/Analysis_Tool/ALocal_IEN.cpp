@@ -13,7 +13,6 @@ ALocal_IEN::ALocal_IEN( const std::string &fileBaseName, int cpu_rank )
 
   int num_row, num_col;
   LIEN = h5r -> read_intMatrix("LIEN", "LIEN", num_row, num_col);
-  
 
   SYS_T::print_fatal_if( num_row != nlocalele, "Error: ALocal_IEN::LIEN size does not match the number of element. \n");
 
