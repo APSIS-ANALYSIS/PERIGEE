@@ -59,10 +59,8 @@ void Map_Node_Index::print_info() const
 
 void Map_Node_Index::write_hdf5( const std::string &fileName ) const
 {
-  std::string fName(fileName);
-  fName.append(".h5");
+  const std::string fName = fileName + ".h5";
   
-  // file creation
   auto h5w = SYS_T::make_unique<HDF5_Writer>( fName );
 
   h5w -> write_intVector( "old_2_new", old_2_new );
