@@ -89,9 +89,7 @@ class ALocal_RotatedBC
     // 0 <= ee < num_local_cell, 0 <= ii < cell_nLocBas
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien( 
-        int ee, 
-        int ii ) const
+    virtual int get_local_cell_ien(  int ee, int ii ) const
     { return local_cell_ien[ee * cell_nLocBas + ii]; }
 
     // ------------------------------------------------------------------------
