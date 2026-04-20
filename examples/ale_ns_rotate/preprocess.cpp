@@ -470,11 +470,9 @@ int main( int argc, char * argv[] )
     const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
     HDF5_Writer * h5w = new HDF5_Writer( fName, H5F_ACC_RDWR );
     const hid_t file_id = h5w->get_file_id();
-    hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Group g_id = HDF5_Group::create(file_id, "/rotation");
     h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
     h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
-
-    H5Gclose( g_id );
     delete h5w;
 
     // Partition sliding interface and write to h5 file
@@ -561,7 +559,7 @@ int main( int argc, char * argv[] )
     
     const hid_t file_id = h5w->get_file_id();
     
-    hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
+    HDF5_Group g_id = HDF5_Group::open( file_id, GroupName.c_str() );
 
     h5w -> write_intVector( g_id, "max_num_local_fixed_cell", max_fixed_nlocalele );
 
@@ -574,7 +572,7 @@ int main( int argc, char * argv[] )
       std::string subgroup_name(groupbase);
       subgroup_name.append( std::to_string(ii) );
 
-      hid_t group_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT);
+      HDF5_Group group_id = HDF5_Group::open(g_id.id(), subgroup_name.c_str());
 
       h5w -> write_intVector( group_id, "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
 
@@ -583,11 +581,7 @@ int main( int argc, char * argv[] )
       h5w -> write_intVector( group_id, "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
 
       h5w -> write_intVector( group_id, "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
-
-      H5Gclose( group_id );
     }
-
-    H5Gclose( g_id );
     delete h5w;
   }
 

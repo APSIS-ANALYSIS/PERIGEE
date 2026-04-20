@@ -48,14 +48,11 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
   const hid_t file_id = h5w->get_file_id();
 
   // open group 1: local element
-  hid_t group_id_1 = H5Gopen(file_id, "/Local_Elem", H5P_DEFAULT);
+  HDF5_Group group_id_1 = HDF5_Group::open(file_id, "/Local_Elem");
 
   h5w->write_intVector( group_id_1, "elem_phy_tag", elem_tag );
-
-  H5Gclose( group_id_1 );
-
   // group 2: local node
-  hid_t group_id_2 = H5Gopen( file_id, "/Local_Node", H5P_DEFAULT );
+  HDF5_Group group_id_2 = HDF5_Group::open( file_id, "/Local_Node");
 
   h5w->write_intScalar( group_id_2, "nlocalnode_fixed", nlocalnode_fixed );
   h5w->write_intScalar( group_id_2, "nlocalnode_rotated", nlocalnode_rotated );
@@ -65,8 +62,6 @@ void Part_FEM_Rotated::write( const std::string &inputFileName ) const
 
   if( nlocalnode_rotated > 0 )
     h5w->write_intVector( group_id_2, "node_loc_rotated", node_loc_rotated );
-
-  H5Gclose( group_id_2 );
 }
 
 // EOF

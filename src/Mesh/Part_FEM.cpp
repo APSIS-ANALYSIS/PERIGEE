@@ -333,16 +333,13 @@ void Part_FEM::write( const std::string &inputFileName ) const
   const hid_t file_id = h5w->get_file_id();
 
   // group 1: local element
-  hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group group_id_1 = HDF5_Group::create(file_id, "/Local_Elem");
 
   h5w->write_intScalar( group_id_1, "nlocalele", nlocalele );
   h5w->write_intVector( group_id_1, "elem_loc", elem_loc );
   h5w->write_intVector( group_id_1, "elem_rotated_tag", elem_rotated_tag );
-
-  H5Gclose( group_id_1 );
-
   // group 2: local node
-  hid_t group_id_2 = H5Gcreate( file_id, "/Local_Node", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+  HDF5_Group group_id_2 = HDF5_Group::create( file_id, "/Local_Node");
 
   h5w->write_intScalar( group_id_2, "nlocalnode", nlocalnode );
   h5w->write_intScalar( group_id_2, "nghostnode", nghostnode );
@@ -355,11 +352,8 @@ void Part_FEM::write( const std::string &inputFileName ) const
   h5w->write_intVector( group_id_2, "local_to_global", local_to_global );
   if(nghostnode > 0)
     h5w->write_intVector( group_id_2, "node_ghost", node_ghost );
-
-  H5Gclose( group_id_2 );
-
   // group 3: global mesh info
-  hid_t group_id_3 = H5Gcreate(file_id, "/Global_Mesh_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group group_id_3 = HDF5_Group::create(file_id, "/Global_Mesh_Info");
 
   h5w->write_intScalar( group_id_3, "nElem", nElem );
   h5w->write_intScalar( group_id_3, "nFunc", nFunc );
@@ -373,19 +367,13 @@ void Part_FEM::write( const std::string &inputFileName ) const
   h5w->write_intScalar( group_id_3, "field_id", field_id );
   h5w->write_intScalar( group_id_3, "is_geo_field", (is_geo_field ? 1 : 0) );
   h5w->write_string( group_id_3, "field_name", field_name );
-
-  H5Gclose( group_id_3 );
-
   // group 4: part info
-  hid_t group_id_4 = H5Gcreate( file_id, "/Part_Info", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT ); 
+  HDF5_Group group_id_4 = HDF5_Group::create( file_id, "/Part_Info"); 
 
   h5w->write_intScalar( group_id_4, "cpu_rank", cpu_rank );
   h5w->write_intScalar( group_id_4, "cpu_size", cpu_size );
-
-  H5Gclose( group_id_4 );
-
   // group 5: LIEN
-  hid_t group_id_5 = H5Gcreate(file_id, "/LIEN", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  HDF5_Group group_id_5 = HDF5_Group::create(file_id, "/LIEN");
 
   std::vector<int> row_LIEN(nlocalele * nLocBas, -1);
 
@@ -396,19 +384,14 @@ void Part_FEM::write( const std::string &inputFileName ) const
   }
 
   h5w -> write_intMatrix( group_id_5, "LIEN", row_LIEN, nlocalele, nLocBas);
-
-  H5Gclose( group_id_5 );
-
   // group 6: control points
   if( is_geo_field == true )
   {
-    hid_t group_id_6 = H5Gcreate(file_id, "/ctrlPts_loc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Group group_id_6 = HDF5_Group::create(file_id, "/ctrlPts_loc");
 
     h5w -> write_doubleVector( group_id_6, "ctrlPts_x_loc", ctrlPts_x_loc );
     h5w -> write_doubleVector( group_id_6, "ctrlPts_y_loc", ctrlPts_y_loc );
     h5w -> write_doubleVector( group_id_6, "ctrlPts_z_loc", ctrlPts_z_loc );
-
-    H5Gclose( group_id_6 );
   }
 }
 
