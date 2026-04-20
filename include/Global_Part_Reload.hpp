@@ -7,6 +7,8 @@
 // Author: Ju Liu
 // Date: Dec. 9 2021
 // ============================================================================
+#include <string>
+#include <vector>
 #include "IGlobal_Part.hpp"
 
 class Global_Part_Reload : public IGlobal_Part

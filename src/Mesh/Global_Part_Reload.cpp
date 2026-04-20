@@ -1,8 +1,8 @@
 #include "Global_Part_Reload.hpp"
 #include "HDF5_Reader.hpp"
 
-Global_Part_Reload::Global_Part_Reload( int &cpu_size, 
-    int &in_ncommon, bool &isDualGraph,
+Global_Part_Reload::Global_Part_Reload( int cpu_size, 
+    int in_ncommon, bool isDualGraph,
     const std::string &element_part_name,
     const std::string &node_part_name )
 {

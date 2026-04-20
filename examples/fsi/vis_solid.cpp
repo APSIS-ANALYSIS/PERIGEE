@@ -8,6 +8,7 @@
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
 #include "QuadPtsFactory.hpp"
+#include "APart_Node.hpp"
 #include "FEAElementFactory.hpp"
 #include "VisDataPrep_Hyperelastic.hpp"  
 #include "VTK_Writer_FSI.hpp"   
