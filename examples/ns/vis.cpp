@@ -118,12 +118,9 @@ int main( int argc, char * argv[] )
 
   for(int time = time_start; time<=time_end; time+= time_step)
   {
-    std::string name_to_read(sol_bname);
-    std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index<< 900000000 + time;
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string suffix = std::to_string(900000000 + time);
+    const std::string name_to_read  = sol_bname + suffix;
+    const std::string name_to_write = out_bname + suffix;
 
     SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );

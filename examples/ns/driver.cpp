@@ -290,8 +290,7 @@ int main(int argc, char *argv[])
     sol->ReadBinary(restart_name);
 
     // generate the corresponding dot_sol file name
-    std::string restart_dot_name = "dot_";
-    restart_dot_name.append(restart_name);
+    const std::string restart_dot_name = "dot_" + restart_name;
 
     // Read dot_sol file
     SYS_T::file_check(restart_dot_name);
