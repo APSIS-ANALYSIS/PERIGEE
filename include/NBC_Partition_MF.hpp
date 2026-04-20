@@ -28,13 +28,13 @@ class NBC_Partition_MF : public NBC_Partition
         const Map_Node_Index * const &mnindex,
         const std::vector<INodalBC *> &nbc_list );
 
-    virtual ~NBC_Partition_MF();
+    ~NBC_Partition_MF() override;
 
-    virtual void write_hdf5( const std::string &FileName ) const
+    void write_hdf5( const std::string &FileName ) const override
     { write_hdf5(FileName, "/nbc"); }
 
-    virtual void write_hdf5( const std::string &FileName,
-        const std::string &GroupName ) const;
+    void write_hdf5( const std::string &FileName,
+        const std::string &GroupName ) const override;
 
   protected:
     // LID mapped to the MF value, which means the actual row/col index in the
