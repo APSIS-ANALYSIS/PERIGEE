@@ -1,4 +1,5 @@
 #include "APart_Node_FSI.hpp"
+#include "HDF5_Reader.hpp"
 
 APart_Node_FSI::APart_Node_FSI(const std::string &fileBaseName, int rank )
 : APart_Node(fileBaseName, rank)

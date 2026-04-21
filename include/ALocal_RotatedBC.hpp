@@ -8,7 +8,6 @@
 // Date Created: Sep 11 2024
 // Author: Yujie Sun
 // ============================================================================
-#include "Math_Tools.hpp"
 #include "Vector_3.hpp"
 #include "Vec_Tools.hpp"
 

@@ -1,5 +1,7 @@
 #include "NBC_Partition_inflow_MF.hpp"
 #include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
+#include "Vec_Tools.hpp"
 
 NBC_Partition_inflow_MF::NBC_Partition_inflow_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
