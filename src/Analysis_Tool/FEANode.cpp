@@ -1,4 +1,5 @@
 #include "FEANode.hpp"
+#include "HDF5_Reader.hpp"
 
 FEANode::FEANode( const std::string &fileBaseName, int cpu_rank )
 {

@@ -18,8 +18,13 @@
 // Date Created:  Nov.  5 2013
 // Date Modified: Jan. 20 2017 
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include <array>
+#include <string>
+#include <vector>
+
 #include "Vector_3.hpp"
+
+class HDF5_Reader;
 
 class FEANode
 {
@@ -37,22 +42,22 @@ class FEANode
     // ------------------------------------------------------------------------
     // ! Destructor
     // ------------------------------------------------------------------------
-    virtual ~FEANode() = default;
+    ~FEANode() = default;
 
     // ------------------------------------------------------------------------
     // ! Functions that give access to the coordinates (and weights).
     //   Input: index ranges in [ 0 , nlocghonode )
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_ctrlPts_xyz(int index) const
+    Vector_3 get_ctrlPts_xyz(int index) const
     { return Vector_3( ctrlPts_x[index], ctrlPts_y[index], ctrlPts_z[index] ); }
     
-    virtual double get_ctrlPts_x(int index) const {return ctrlPts_x[index];}
+    double get_ctrlPts_x(int index) const {return ctrlPts_x[index];}
     
-    virtual double get_ctrlPts_y(int index) const {return ctrlPts_y[index];}
+    double get_ctrlPts_y(int index) const {return ctrlPts_y[index];}
     
-    virtual double get_ctrlPts_z(int index) const {return ctrlPts_z[index];}
+    double get_ctrlPts_z(int index) const {return ctrlPts_z[index];}
     
-    virtual double get_ctrlPts_w(int index) const {return ctrlPts_w[index];}
+    double get_ctrlPts_w(int index) const {return ctrlPts_w[index];}
 
     // ------------------------------------------------------------------------
     // ! Get n control points' x-y-z in a batch
@@ -63,10 +68,10 @@ class FEANode
     //   Note: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/z).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz( int num, const int * const &index, 
+    void get_ctrlPts_xyz( int num, const int * const &index, 
         double * ctrl_x, double * ctrl_y, double * ctrl_z ) const;
 
-    virtual std::array<std::vector<double>, 3> get_ctrlPts_xyz( 
+    std::array<std::vector<double>, 3> get_ctrlPts_xyz( 
         const std::vector<int> &index ) const;
 
     // ------------------------------------------------------------------------
@@ -74,7 +79,7 @@ class FEANode
     //   Note: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/z/w).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyzw( int num, const int * const &index, 
+    void get_ctrlPts_xyzw( int num, const int * const &index, 
         double * ctrl_x, double * ctrl_y, 
         double * ctrl_z, double * ctrl_w ) const;
    
@@ -83,7 +88,7 @@ class FEANode
     //   NOTE: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/w).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyw( int num, const int * const &index,
+    void get_ctrlPts_xyw( int num, const int * const &index,
         double * ctrl_x, double * ctrl_y, double * ctrl_w ) const;
 
     // ------------------------------------------------------------------------
@@ -91,18 +96,18 @@ class FEANode
     //   NOTE: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y).
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xy( int num, const int * const &index,
+    void get_ctrlPts_xy( int num, const int * const &index,
         double * ctrl_x, double * ctrl_y ) const;
 
     // ------------------------------------------------------------------------
     // ! Print the info for this class.
     // ------------------------------------------------------------------------
-    virtual void print_info() const;
+    void print_info() const;
 
     // ------------------------------------------------------------------------
     // ! Returns the memory usage of the private data in Bytes
     // ------------------------------------------------------------------------
-    virtual double get_memory_usage() const;
+    double get_memory_usage() const;
 
   private:
     // The control points' coordinates and weights if used for NURBS
