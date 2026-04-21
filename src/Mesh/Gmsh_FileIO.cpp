@@ -909,8 +909,7 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
     std::cout<<"      face2elem mapping generated. \n"; 
 
     // Record info
-    const std::string name_1d_domain =
-      slash + std::to_string( static_cast<int>(ii) );
+    const std::string name_1d_domain = slash+std::to_string(static_cast<int>(ii));
     const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
         name_1d_domain.c_str() );
 
@@ -1072,8 +1071,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     std::cout<<"      face2elem mapping generated.\n";
 
     // Record info
-    const std::string name_2d_domain =
-      slash + std::to_string( static_cast<int>(ii) );
+    const std::string name_2d_domain = slash+std::to_string(static_cast<int>(ii));
     const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
         name_2d_domain.c_str() );
 
@@ -1238,8 +1236,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     }
 
     // Record info
-    const std::string name_2d_domain =
-      slash + std::to_string( static_cast<int>(ii) );
+    const std::string name_2d_domain = slash+std::to_string(static_cast<int>(ii));
     const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
         name_2d_domain.c_str() );
 
