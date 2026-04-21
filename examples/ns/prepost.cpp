@@ -12,7 +12,6 @@
 #include "Global_Part_Serial.hpp"
 #include "Part_FEM.hpp"
 #include "yaml-cpp/yaml.h"
-#include <memory>
 
 int main( int argc, char * argv[] )
 {
@@ -33,6 +32,8 @@ int main( int argc, char * argv[] )
   const int dofNum = cmd_h5r -> read_intScalar("/","dofNum");
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
   const FEType elemType = FE_T::to_FEType(elemType_str);
+
+  cmd_h5r.reset();
 
   // The user can specify the new mesh partition options from the yaml file
   const std::string yaml_file("ns_prepost.yml");
