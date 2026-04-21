@@ -8,6 +8,7 @@
 // Author: Ju Liu
 // Date: Jan. 16 2017
 // ============================================================================
+#include "Sys_Tools.hpp"
 #include "Vector_3.hpp"
 
 class HDF5_Reader;

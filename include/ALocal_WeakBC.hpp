@@ -8,6 +8,8 @@
 // Author: Xuanming Huang
 // Date Created: Oct. 18th 2023
 // ============================================================================
+#include <vector>
+#include "Sys_Tools.hpp"
 
 class HDF5_Reader;
 
