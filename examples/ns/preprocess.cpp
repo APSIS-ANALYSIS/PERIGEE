@@ -149,7 +149,7 @@ int main( int argc, char * argv[] )
   
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
-  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
+  auto IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
   
   const int nLocBas = FE_T::to_nLocBas(elemType);
@@ -157,16 +157,16 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas() );
 
   // Call METIS to partition the mesh 
-  IGlobal_Part * global_part = nullptr;
+  std::unique_ptr<IGlobal_Part> global_part = nullptr;
   if(cpu_size > 1)
-    global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, nElem, nFunc, nLocBas, IEN, "epart", "npart" );
+    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+        isDualGraph, nElem, nFunc, nLocBas, IEN.get(), "epart", "npart" );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( nElem, nFunc, "epart", "npart" );
+    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc, "epart", "npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
   // Generate the new nodal numbering
-  Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
+  auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
@@ -195,21 +195,21 @@ int main( int argc, char * argv[] )
   if(elemType == FEType::Tet4 || elemType == FEType::Tet10)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );    
+      inlet_outvec[ii] = TET_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN.get() );    
   }
   else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
   {
     for(unsigned int ii=0; ii<sur_file_in.size(); ++ii)
-      inlet_outvec[ii] = HEX_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN );  
+      inlet_outvec[ii] = HEX_T::get_out_normal( sur_file_in[ii], ctrlPts, IEN.get() );  
   }
   else
     SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the inflow boundary condition. \n");
 
-  INodalBC * InFBC = new NodalBC_3D_inflow( sur_file_in, sur_file_wall,
+  auto InFBC = SYS_T::make_unique<NodalBC_3D_inflow>( sur_file_in, sur_file_wall,
       nFunc, inlet_outvec, elemType );
   
   // reset IEN for outward normal calculations
-  InFBC -> resetSurIEN_outwardnormal( IEN );
+  InFBC -> resetSurIEN_outwardnormal( IEN.get() );
 
   // Setup Elemental Boundary Conditions
   // Obtain the outward normal vector
@@ -218,22 +218,22 @@ int main( int argc, char * argv[] )
   if(elemType == FEType::Tet4 || elemType == FEType::Tet10)
   {
     for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );  
+      outlet_outvec[ii] = TET_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN.get() );  
   }
   else if(elemType == FEType::Hex8 || elemType == FEType::Hex27)
   {
     for(unsigned int ii=0; ii<sur_file_out.size(); ++ii)
-      outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN );
+      outlet_outvec[ii] = HEX_T::get_out_normal( sur_file_out[ii], ctrlPts, IEN.get() );
   }
   else
     SYS_T::print_fatal("Error: unknown element type occurs when obtaining the outward normal vector for the elemental boundary conditions. \n");
 
-  ElemBC * ebc = new ElemBC_3D_outflow( sur_file_out, outlet_outvec, elemType );
+  auto ebc = SYS_T::make_unique<ElemBC_3D_outflow>( sur_file_out, outlet_outvec, elemType );
 
-  ebc -> resetSurIEN_outwardnormal( IEN ); // reset IEN for outward normal calculations
+  ebc -> resetSurIEN_outwardnormal( IEN.get() ); // reset IEN for outward normal calculations
 
   // Setup weakly enforced Dirichlet BC on wall if wall_model_type > 0
-  ElemBC * wbc = new ElemBC_3D_WallModel( weak_list, wall_model_type, IEN, elemType );
+  auto wbc = SYS_T::make_unique<ElemBC_3D_WallModel>( weak_list, wall_model_type, IEN.get(), elemType );
  
   // Start partition the mesh for each cpu_rank 
 
@@ -249,7 +249,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     auto part = SYS_T::make_unique<Part_FEM>( 
-        nElem, nFunc, nLocBas, global_part, mnindex, IEN,
+        nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
         ctrlPts, proc_rank, cpu_size, elemType, 
         Field_Property(0, dofNum, true, "NS") );
     mytimer->Stop();
@@ -261,22 +261,22 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
     
     // Partition Nodal BC and write to h5 file
-    auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex, NBC_list);
+    auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex.get(), NBC_list);
     
     nbcpart -> write_hdf5( part_file );
 
     // Partition Nodal Inflow BC and write to h5 file
-    auto infpart = SYS_T::make_unique<NBC_Partition_inflow>(part.get(), mnindex, InFBC);
+    auto infpart = SYS_T::make_unique<NBC_Partition_inflow>(part.get(), mnindex.get(), InFBC.get());
     
     infpart->write_hdf5( part_file );
     
     // Partition Elemental BC and write to h5 file
-    auto ebcpart = SYS_T::make_unique<EBC_Partition_outflow>(part.get(), mnindex, ebc, NBC_list);
+    auto ebcpart = SYS_T::make_unique<EBC_Partition_outflow>(part.get(), mnindex.get(), ebc.get(), NBC_list);
 
     ebcpart -> write_hdf5( part_file );
 
     // Partition Weak BC and write to h5 file
-    auto wbcpart = SYS_T::make_unique<EBC_Partition_WallModel>(part.get(), mnindex, wbc);
+    auto wbcpart = SYS_T::make_unique<EBC_Partition_WallModel>(part.get(), mnindex.get(), wbc.get());
 
     wbcpart -> write_hdf5( part_file );
 
@@ -306,9 +306,6 @@ int main( int argc, char * argv[] )
 
   // Finalize the code and exit
   for(auto &it_nbc : NBC_list) delete it_nbc;
-
-  delete InFBC; delete ebc; delete wbc;
-  delete mnindex; delete global_part; delete IEN;
 
   return EXIT_SUCCESS;
 }
