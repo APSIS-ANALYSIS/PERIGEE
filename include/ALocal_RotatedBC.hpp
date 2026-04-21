@@ -13,6 +13,8 @@
 
 class HDF5_Reader;
 
+class HDF5_Reader;
+
 class ALocal_RotatedBC
 {
   public:
