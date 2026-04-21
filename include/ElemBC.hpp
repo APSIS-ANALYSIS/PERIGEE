@@ -32,9 +32,9 @@
 //
 // Date: Jan. 10 2017
 // ==================================================================
-#include "Hex_Tools.hpp"
 #include "IIEN.hpp"
 #include "FEType.hpp"
+#include "Vector_3.hpp"
 
 class ElemBC
 {

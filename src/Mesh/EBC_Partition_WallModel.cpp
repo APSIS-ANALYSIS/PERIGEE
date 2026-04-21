@@ -1,4 +1,5 @@
 #include "EBC_Partition_WallModel.hpp"
+#include "Vec_Tools.hpp"
 #include "HDF5_Group.hpp"
 #include "HDF5_Writer.hpp"
 

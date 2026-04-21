@@ -1,4 +1,5 @@
 #include "ElemBC_3D_outflow.hpp"
+#include "Vec_Tools.hpp"
 
 ElemBC_3D_outflow::ElemBC_3D_outflow(
     const std::vector<std::string> &vtkfileList,
