@@ -1,4 +1,5 @@
 #include "ALocal_WeakBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, 
     int cpu_rank ) : wall_model_type {0}

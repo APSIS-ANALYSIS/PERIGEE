@@ -1,4 +1,5 @@
 #include "ALocal_RotatedBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_RotatedBC::ALocal_RotatedBC( 
     const std::string &fileBaseName, int cpu_rank )

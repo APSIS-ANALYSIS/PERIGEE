@@ -8,9 +8,10 @@
 // Date Created: Sep 11 2024
 // Author: Yujie Sun
 // ============================================================================
-#include "HDF5_Reader.hpp"
 #include "Math_Tools.hpp"
 #include "Vector_3.hpp"
+
+class HDF5_Reader;
 
 class ALocal_RotatedBC
 {

@@ -1,4 +1,5 @@
 #include "ALocal_InflowBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_InflowBC::ALocal_InflowBC( const std::string &fileBaseName, int cpu_rank )
 {
