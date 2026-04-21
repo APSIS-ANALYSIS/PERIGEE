@@ -16,7 +16,8 @@
 // Author: Ju Liu
 // Date: Nov. 26th 2013
 // ============================================================================
-#include "HDF5_Reader.hpp"
+
+class HDF5_Reader;
 
 class APart_Node
 {
