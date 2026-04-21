@@ -10,6 +10,7 @@
 // ============================================================================
 #include "Math_Tools.hpp"
 #include "Vector_3.hpp"
+#include "Vec_Tools.hpp"
 
 class HDF5_Reader;
 
