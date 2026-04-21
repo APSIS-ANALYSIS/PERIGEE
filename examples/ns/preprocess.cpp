@@ -20,7 +20,6 @@
 #include "EBC_Partition_outflow.hpp"
 #include "EBC_Partition_WallModel.hpp"
 #include "yaml-cpp/yaml.h"
-#include <memory>
 
 int main( int argc, char * argv[] )
 {
