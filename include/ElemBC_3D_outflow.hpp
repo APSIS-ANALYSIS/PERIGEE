@@ -33,10 +33,10 @@ class ElemBC_3D_outflow : public ElemBC_3D
 
     virtual void print_info() const;
 
-    virtual Vector_3 get_normal_vec( const int &ebc_id ) const
+    virtual Vector_3 get_normal_vec( int ebc_id ) const
     { return outNormal[ebc_id]; }
 
-    virtual std::vector<double> get_intNA( const int &ebc_id ) const
+    virtual std::vector<double> get_intNA( int ebc_id ) const
     { return intNA[ebc_id]; }
 
   private:
