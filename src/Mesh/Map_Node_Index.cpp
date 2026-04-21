@@ -1,4 +1,6 @@
 #include "Map_Node_Index.hpp"
+#include "HDF5_Writer.hpp"
+#include "HDF5_Reader.hpp"
 
 Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
     const int &cpu_size, const int &nFunc, const int &field )

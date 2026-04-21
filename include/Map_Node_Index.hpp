@@ -16,9 +16,9 @@
 // Author: Ju Liu
 // Date Created: Oct 3 2013
 // ==================================================================
+#include <string>
+#include <vector>
 #include "IGlobal_Part.hpp"
-#include "HDF5_Writer.hpp"
-#include "HDF5_Reader.hpp"
 
 class Map_Node_Index
 {

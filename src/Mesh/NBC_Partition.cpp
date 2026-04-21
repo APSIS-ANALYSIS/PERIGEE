@@ -1,4 +1,6 @@
 #include "NBC_Partition.hpp"
+#include "Vec_Tools.hpp"
+#include "HDF5_Writer.hpp"
 #include "HDF5_Group.hpp"
 
 NBC_Partition::NBC_Partition( const IPart * const &part,

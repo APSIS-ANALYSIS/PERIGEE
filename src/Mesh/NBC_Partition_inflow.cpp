@@ -1,4 +1,6 @@
 #include "NBC_Partition_inflow.hpp"
+#include "Vec_Tools.hpp"
+#include "HDF5_Writer.hpp"
 #include "HDF5_Group.hpp"
 
 NBC_Partition_inflow::NBC_Partition_inflow(
