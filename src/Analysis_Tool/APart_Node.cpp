@@ -1,4 +1,5 @@
 #include "APart_Node.hpp"
+#include "HDF5_Reader.hpp"
 
 APart_Node::APart_Node( const std::string &fbasename, int rank )
 : cpu_rank( rank )

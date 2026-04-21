@@ -8,6 +8,7 @@
 // ==================================================================
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
+#include "APart_Node.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "QuadPts_vis_tet10.hpp"
 #include "QuadPts_vis_hex8.hpp"

@@ -1,4 +1,5 @@
 #include "ALocal_EBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_EBC::ALocal_EBC( const std::string &fileBaseName, 
     int cpu_rank, const std::string &gname )

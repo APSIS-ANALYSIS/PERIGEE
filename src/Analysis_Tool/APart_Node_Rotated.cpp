@@ -1,4 +1,5 @@
 #include "APart_Node_Rotated.hpp"
+#include "HDF5_Reader.hpp"
 
 APart_Node_Rotated::APart_Node_Rotated(const std::string &fileBaseName, int rank )
 : APart_Node(fileBaseName, rank)

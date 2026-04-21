@@ -1,5 +1,7 @@
 #include "NBC_Partition_rotated.hpp"
+#include "HDF5_Writer.hpp"
 #include "HDF5_Group.hpp"
+#include "Vec_Tools.hpp"
 
 NBC_Partition_rotated::NBC_Partition_rotated(
     const IPart * const &part,

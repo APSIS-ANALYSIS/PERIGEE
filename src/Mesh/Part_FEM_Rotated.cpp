@@ -1,4 +1,5 @@
 #include "Part_FEM_Rotated.hpp"
+#include "HDF5_Writer.hpp"
 
 Part_FEM_Rotated::Part_FEM_Rotated( const int &in_nelem,
     const int &in_nfunc,

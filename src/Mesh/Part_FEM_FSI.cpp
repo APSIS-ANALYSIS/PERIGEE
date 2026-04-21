@@ -1,4 +1,5 @@
 #include "Part_FEM_FSI.hpp"
+#include "HDF5_Writer.hpp"
 
 Part_FEM_FSI::Part_FEM_FSI( const int &in_nelem,
     const int &in_nfunc,

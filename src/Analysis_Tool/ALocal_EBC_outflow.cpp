@@ -1,4 +1,5 @@
 #include "ALocal_EBC_outflow.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
     int cpu_rank, const std::string &gname )

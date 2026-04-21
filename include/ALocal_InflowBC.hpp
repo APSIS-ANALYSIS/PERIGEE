@@ -8,9 +8,10 @@
 // Date Created: July 8 2017
 // Author: Ju Liu
 // ============================================================================
-#include "HDF5_Reader.hpp"
-#include "Math_Tools.hpp"
+#include "Vec_Tools.hpp"
 #include "Vector_3.hpp"
+
+class HDF5_Reader;
 
 class ALocal_InflowBC
 {

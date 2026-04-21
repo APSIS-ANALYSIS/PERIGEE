@@ -8,7 +8,10 @@
 // Author: Xuanming Huang
 // Date Created: Oct. 18th 2023
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include <vector>
+#include "Sys_Tools.hpp"
+
+class HDF5_Reader;
 
 class ALocal_WeakBC
 {

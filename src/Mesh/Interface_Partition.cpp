@@ -1,4 +1,5 @@
 #include "Interface_Partition.hpp"
+#include "HDF5_Writer.hpp"
 
 Interface_Partition::Interface_Partition(const IPart * const &part,
   const Map_Node_Index * const &mnindex,
