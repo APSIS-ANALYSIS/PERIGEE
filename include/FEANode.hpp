@@ -64,8 +64,7 @@ class FEANode
     //         for index and ctrl_(x/y/z).
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyz( int num, const int * const &index, 
-        double * ctrl_x, double * ctrl_y, 
-        double * ctrl_z ) const;
+        double * ctrl_x, double * ctrl_y, double * ctrl_z ) const;
 
     virtual std::array<std::vector<double>, 3> get_ctrlPts_xyz( 
         const std::vector<int> &index ) const;
@@ -85,8 +84,7 @@ class FEANode
     //         for index and ctrl_(x/y/w).
     // ------------------------------------------------------------------------
     virtual void get_ctrlPts_xyw( int num, const int * const &index,
-        double * ctrl_x, double * ctrl_y,
-        double * ctrl_w ) const;
+        double * ctrl_x, double * ctrl_y, double * ctrl_w ) const;
 
     // ------------------------------------------------------------------------
     // ! Get n contrl points' x-y in a batch
