@@ -92,8 +92,10 @@ int main( int argc, char * argv[] )
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
   {
     mytimer->Reset(); mytimer->Start();
-    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
-        ctrlPts, proc_rank, proc_size, elemType, {0, dofNum, true, "NS"} );
+    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, 
+        global_part.get(), mnindex.get(), IEN.get(),
+        ctrlPts, proc_rank, proc_size, elemType, 
+        Field_Property(0, dofNum, true, "NS") );
     part->write(part_file.c_str());
     mytimer->Stop();
     cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
