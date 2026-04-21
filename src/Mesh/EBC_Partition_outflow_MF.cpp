@@ -1,5 +1,6 @@
 #include "EBC_Partition_outflow_MF.hpp"
 #include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
 
 EBC_Partition_outflow_MF::EBC_Partition_outflow_MF(
     const IPart * const &part,
