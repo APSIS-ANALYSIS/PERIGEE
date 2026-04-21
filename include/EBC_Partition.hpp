@@ -12,7 +12,6 @@
 #include "IPart.hpp"
 #include "Map_Node_Index.hpp"
 #include "ElemBC.hpp"
-#include "HDF5_Writer.hpp"
 
 class EBC_Partition
 {

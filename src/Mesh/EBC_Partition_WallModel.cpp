@@ -1,5 +1,6 @@
 #include "EBC_Partition_WallModel.hpp"
 #include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
 
 EBC_Partition_WallModel::EBC_Partition_WallModel(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)

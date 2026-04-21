@@ -1,5 +1,6 @@
 #include "EBC_Partition.hpp"
 #include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
 
 EBC_Partition::EBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc )
