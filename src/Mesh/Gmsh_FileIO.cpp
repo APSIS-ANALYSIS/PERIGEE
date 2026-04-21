@@ -1,4 +1,5 @@
 #include "Gmsh_FileIO.hpp"
+#include "HDF5_Group.hpp"
 
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 : filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
@@ -784,9 +785,7 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
         "Error: Gmsh_FileIO::write_sur_h5, edge index is wrong. \n");
 
   // Open an HDF5 file
-  std::string h5_file_name( "Gmsh_" );
-  h5_file_name.append( phy_2d_name[index_2d] );
-  h5_file_name.append(".h5");
+  const std::string h5_file_name = "Gmsh_" + phy_2d_name[index_2d] + ".h5";
 
   std::cout<<"=== Gmsh_FileIO::write_sur_h5 for "
     <<phy_2d_name[index_2d]<<" associated with ";
@@ -910,24 +909,22 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
     std::cout<<"      face2elem mapping generated. \n"; 
 
     // Record info
-    std::string name_1d_domain(slash);
-    name_1d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_1d_domain.c_str(), 
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    const std::string name_1d_domain =
+      slash + std::to_string( static_cast<int>(ii) );
+    const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
+        name_1d_domain.c_str() );
 
-    h5w->write_string(g_id, "name", phy_1d_name[ index_1d[ii] ] );
-    h5w->write_intScalar(g_id, "phy_tag", index_1d[ii]);
-    h5w->write_intScalar(g_id, "num_cell", num_1d_cell);
-    h5w->write_intScalar(g_id, "num_node", bcnumpt );
-    h5w->write_intScalar(g_id, "ele_type", ele_type[domain_1d_idx]);
-    h5w->write_intScalar(g_id, "nLocBas", nLocBas_1d);
-    h5w->write_intVector(g_id, "IEN_glo", edge_ien_global);
-    h5w->write_intVector(g_id, "IEN_loc", edge_ien_local);
-    h5w->write_intVector(g_id, "pt_idx", bcpt);
-    h5w->write_intVector(g_id, "edge2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
+    h5w->write_string(hdf5_group.id(), "name", phy_1d_name[ index_1d[ii] ] );
+    h5w->write_intScalar(hdf5_group.id(), "phy_tag", index_1d[ii]);
+    h5w->write_intScalar(hdf5_group.id(), "num_cell", num_1d_cell);
+    h5w->write_intScalar(hdf5_group.id(), "num_node", bcnumpt );
+    h5w->write_intScalar(hdf5_group.id(), "ele_type", ele_type[domain_1d_idx]);
+    h5w->write_intScalar(hdf5_group.id(), "nLocBas", nLocBas_1d);
+    h5w->write_intVector(hdf5_group.id(), "IEN_glo", edge_ien_global);
+    h5w->write_intVector(hdf5_group.id(), "IEN_loc", edge_ien_local);
+    h5w->write_intVector(hdf5_group.id(), "pt_idx", bcpt);
+    h5w->write_intVector(hdf5_group.id(), "edge2elem", face2elem);
+    h5w->write_doubleVector(hdf5_group.id(), "pt_coor", surpt);
   }
 }
 
@@ -945,9 +942,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
         "Error: Gmsh_FileIO::write_vol_h5, face index is wrong. \n");
 
   // Open an HDF5 file
-  std::string h5_file_name( "Gmsh_" );
-  h5_file_name.append( phy_3d_name[index_3d] );
-  h5_file_name.append(".h5");
+  const std::string h5_file_name = "Gmsh_" + phy_3d_name[index_3d] + ".h5";
 
   std::cout<<"=== Gmsh_FileIO::write_vol_h5 for "
     <<phy_3d_name[index_3d]<<" associated with ";
@@ -1077,24 +1072,22 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     std::cout<<"      face2elem mapping generated.\n";
 
     // Record info
-    std::string name_2d_domain(slash);
-    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    const std::string name_2d_domain =
+      slash + std::to_string( static_cast<int>(ii) );
+    const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
+        name_2d_domain.c_str() );
 
-    h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
-    h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
-    h5w->write_intScalar(g_id, "num_cell", num_2d_cell);
-    h5w->write_intScalar(g_id, "num_node", bcnumpt );
-    h5w->write_intScalar(g_id, "ele_type", ele_type[domain_2d_idx]);
-    h5w->write_intScalar(g_id, "nLocBas", nLocBas_2d);
-    h5w->write_intVector(g_id, "IEN_glo", face_ien_global);
-    h5w->write_intVector(g_id, "IEN_loc", face_ien_local);
-    h5w->write_intVector(g_id, "pt_idx", bcpt);
-    h5w->write_intVector(g_id, "face2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
+    h5w->write_string(hdf5_group.id(), "name", phy_2d_name[ index_2d[ii] ] );
+    h5w->write_intScalar(hdf5_group.id(), "phy_tag", index_2d[ii]);
+    h5w->write_intScalar(hdf5_group.id(), "num_cell", num_2d_cell);
+    h5w->write_intScalar(hdf5_group.id(), "num_node", bcnumpt );
+    h5w->write_intScalar(hdf5_group.id(), "ele_type", ele_type[domain_2d_idx]);
+    h5w->write_intScalar(hdf5_group.id(), "nLocBas", nLocBas_2d);
+    h5w->write_intVector(hdf5_group.id(), "IEN_glo", face_ien_global);
+    h5w->write_intVector(hdf5_group.id(), "IEN_loc", face_ien_local);
+    h5w->write_intVector(hdf5_group.id(), "pt_idx", bcpt);
+    h5w->write_intVector(hdf5_group.id(), "face2elem", face2elem);
+    h5w->write_doubleVector(hdf5_group.id(), "pt_coor", surpt);
   } // End-loop-over-2d-face
 }
 
@@ -1113,9 +1106,7 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
         "Error: Gmsh_FileIO::write_vol_h5, face index is wrong. \n");
 
   // Open an HDF5 file
-  std::string h5_file_name( "Gmsh_" );
-  h5_file_name.append( phy_3d_name[index_3d] );
-  h5_file_name.append(".h5");
+  const std::string h5_file_name = "Gmsh_" + phy_3d_name[index_3d] + ".h5";
 
   std::cout<<"=== Gmsh_FileIO::write_vol_h5 for "
     <<phy_3d_name[index_3d]<<" associated with ";
@@ -1247,24 +1238,22 @@ void Gmsh_FileIO::write_vol_h5( int index_3d,
     }
 
     // Record info
-    std::string name_2d_domain(slash);
-    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    const std::string name_2d_domain =
+      slash + std::to_string( static_cast<int>(ii) );
+    const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
+        name_2d_domain.c_str() );
 
-    h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
-    h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
-    h5w->write_intScalar(g_id, "num_cell", num_2d_cell);
-    h5w->write_intScalar(g_id, "num_node", bcnumpt );
-    h5w->write_intScalar(g_id, "ele_type", ele_type[domain_2d_idx]);
-    h5w->write_intScalar(g_id, "nLocBas", nLocBas_2d);
-    h5w->write_intVector(g_id, "IEN_glo", face_ien_global);
-    h5w->write_intVector(g_id, "IEN_loc", face_ien_local);
-    h5w->write_intVector(g_id, "pt_idx", bcpt);
-    h5w->write_intVector(g_id, "face2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
+    h5w->write_string(hdf5_group.id(), "name", phy_2d_name[ index_2d[ii] ] );
+    h5w->write_intScalar(hdf5_group.id(), "phy_tag", index_2d[ii]);
+    h5w->write_intScalar(hdf5_group.id(), "num_cell", num_2d_cell);
+    h5w->write_intScalar(hdf5_group.id(), "num_node", bcnumpt );
+    h5w->write_intScalar(hdf5_group.id(), "ele_type", ele_type[domain_2d_idx]);
+    h5w->write_intScalar(hdf5_group.id(), "nLocBas", nLocBas_2d);
+    h5w->write_intVector(hdf5_group.id(), "IEN_glo", face_ien_global);
+    h5w->write_intVector(hdf5_group.id(), "IEN_loc", face_ien_local);
+    h5w->write_intVector(hdf5_group.id(), "pt_idx", bcpt);
+    h5w->write_intVector(hdf5_group.id(), "face2elem", face2elem);
+    h5w->write_doubleVector(hdf5_group.id(), "pt_coor", surpt);
   } // End-loop-over-2d-face
 }
 
