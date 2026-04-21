@@ -18,35 +18,35 @@ class ElemBC_3D : public ElemBC
 
     ElemBC_3D( const std::vector<std::string> &vtkfileList, const FEType &in_elemtype );
 
-    virtual ~ElemBC_3D() = default;
+    ~ElemBC_3D() override = default;
 
-    virtual int get_num_ebc() const {return num_ebc;}
+    int get_num_ebc() const override {return num_ebc;}
 
-    virtual int get_num_node(int ebc_id) const {return num_node[ebc_id];}
+    int get_num_node(int ebc_id) const override {return num_node[ebc_id];}
 
-    virtual int get_num_cell(int ebc_id) const {return num_cell[ebc_id];}
+    int get_num_cell(int ebc_id) const override {return num_cell[ebc_id];}
 
-    virtual int get_cell_nLocBas(int ebc_id) const {return cell_nLocBas[ebc_id];}
+    int get_cell_nLocBas(int ebc_id) const override {return cell_nLocBas[ebc_id];}
 
-    virtual double get_pt_xyz(int ebc_id, int node, int dir) const
+    double get_pt_xyz(int ebc_id, int node, int dir) const override
     {return pt_xyz[ebc_id][3*node+dir];}
 
-    virtual int get_ien(int ebc_id, int cell, int lnode) const
+    int get_ien(int ebc_id, int cell, int lnode) const override
     {return sur_ien[ebc_id][ cell_nLocBas[ebc_id] * cell + lnode ];}
 
-    virtual int get_global_node(int ebc_id, int node_index) const
+    int get_global_node(int ebc_id, int node_index) const override
     {return global_node[ebc_id][node_index];}
 
-    virtual void get_global_node(int ebc_id, std::vector<int> &out) const
+    void get_global_node(int ebc_id, std::vector<int> &out) const override
     {out = global_node[ebc_id];}
 
-    virtual std::vector<int> get_global_node(int ebc_id) const
+    std::vector<int> get_global_node(int ebc_id) const override
     {return global_node[ebc_id];}
 
-    virtual int get_global_cell(int ebc_id, int cell_index) const
+    int get_global_cell(int ebc_id, int cell_index) const override
     {return global_cell[ebc_id][cell_index];}
 
-    virtual void print_info() const;
+    void print_info() const override;
 
     // For linear element (type Tet4), the face node numbering is
     //   Tet-Face-0 : Node 1 2 3
@@ -72,22 +72,22 @@ class ElemBC_3D : public ElemBC
     //   Hex-Face-3 : Node 1 2 6 5 9 18 13 17 21
     //   Hex-Face-4 : Node 2 3 7 6 10 19 14 18 23
     //   Hex-Face-5 : Node 0 4 7 3 16 15 19 11 20
-    virtual void resetSurIEN_outwardnormal( const IIEN * const &VIEN );
+    void resetSurIEN_outwardnormal( const IIEN * const &VIEN ) override;
 
     // Access the data in ElemBC_3D_outflow, outward normal vector
-    virtual Vector_3 get_normal_vec( int ebc_id ) const
+    Vector_3 get_normal_vec( int ebc_id ) const override
     {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n"); return Vector_3();}
 
     // Access the data in ElemBC_3D_outflow, basis surface integration
-    virtual std::vector<double> get_intNA( int ebc_id ) const
+    std::vector<double> get_intNA( int ebc_id ) const override
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 
     // Access the data in ElemBC_3D_wall_turbulence, wall model type
-    virtual int get_wall_model_type() const
+    int get_wall_model_type() const override
     {SYS_T::commPrint("Warning: get_wall_model_type is not implemented. \n"); return -1;}
 
     // Access the data in ElemBC_3D_wall_turbulence, face id of volume element
-    virtual int get_faceID( int cell_index ) const
+    int get_faceID( int cell_index ) const override
     {SYS_T::commPrint("Warning: get_faceID is not implemented. \n"); return {};}
 
   protected:

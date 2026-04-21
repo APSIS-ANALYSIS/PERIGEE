@@ -33,11 +33,11 @@ class ElemBC_3D_WallModel : public ElemBC_3D
         const IIEN * const &VIEN,
         const FEType &in_elemtype );
 
-    virtual ~ElemBC_3D_WallModel() = default;
+    ~ElemBC_3D_WallModel() override = default;
 
-    virtual int get_wall_model_type() const { return wall_model_type; };
+    int get_wall_model_type() const override { return wall_model_type; };
 
-    virtual int get_faceID( int cell_index ) const { return face_id[cell_index]; }
+    int get_faceID( int cell_index ) const override { return face_id[cell_index]; }
 
   private:
     // Wall model type
