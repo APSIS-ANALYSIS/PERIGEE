@@ -18,10 +18,7 @@
 // Date Created:  Nov.  5 2013
 // Date Modified: Jan. 20 2017 
 // ============================================================================
-#include <array>
 #include <string>
-#include <vector>
-
 #include "Vector_3.hpp"
 
 class HDF5_Reader;
