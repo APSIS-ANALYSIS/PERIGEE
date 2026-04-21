@@ -1,7 +1,6 @@
 #include "ALocal_InflowBC.hpp"
 
-ALocal_InflowBC::ALocal_InflowBC( 
-    const std::string &fileBaseName, int cpu_rank )
+ALocal_InflowBC::ALocal_InflowBC( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
