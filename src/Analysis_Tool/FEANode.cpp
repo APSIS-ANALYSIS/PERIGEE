@@ -45,8 +45,7 @@ void FEANode::print_info() const
   VEC_T::print(ctrlPts_w);
 }
 
-void FEANode::get_ctrlPts_xyz( 
-    int num, const int * const &index,
+void FEANode::get_ctrlPts_xyz( int num, const int * index,
     double * ctrl_x, double * ctrl_y, double * ctrl_z ) const
 {
   for(int ii=0; ii<num; ++ii)
@@ -75,8 +74,7 @@ std::array<std::vector<double>, 3> FEANode::get_ctrlPts_xyz(
   return out;
 }
 
-void FEANode::get_ctrlPts_xyzw( 
-    int num, const int * const &index,
+void FEANode::get_ctrlPts_xyzw( int num, const int * index,
     double * ctrl_x, double * ctrl_y, 
     double * ctrl_z, double * ctrl_w ) const
 {
@@ -89,8 +87,7 @@ void FEANode::get_ctrlPts_xyzw(
   }
 }
 
-void FEANode::get_ctrlPts_xyw( 
-    int num, const int * const &index,
+void FEANode::get_ctrlPts_xyw( int num, const int * index,
     double * ctrl_x, double * ctrl_y, 
     double * ctrl_w ) const
 {
@@ -102,8 +99,7 @@ void FEANode::get_ctrlPts_xyw(
   }
 }
 
-void FEANode::get_ctrlPts_xy( 
-    int num, const int * const &index,
+void FEANode::get_ctrlPts_xy( int num, const int * index,
     double * ctrl_x, double * ctrl_y ) const
 {
   for(int ii=0; ii<num; ++ii)

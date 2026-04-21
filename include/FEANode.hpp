@@ -65,7 +65,7 @@ class FEANode
     //   Note: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/z).
     // ------------------------------------------------------------------------
-    void get_ctrlPts_xyz( int num, const int * const &index, 
+    void get_ctrlPts_xyz( int num, const int * index, 
         double * ctrl_x, double * ctrl_y, double * ctrl_z ) const;
 
     std::array<std::vector<double>, 3> get_ctrlPts_xyz( 
@@ -76,7 +76,7 @@ class FEANode
     //   Note: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/z/w).
     // ------------------------------------------------------------------------
-    void get_ctrlPts_xyzw( int num, const int * const &index, 
+    void get_ctrlPts_xyzw( int num, const int * index, 
         double * ctrl_x, double * ctrl_y, 
         double * ctrl_z, double * ctrl_w ) const;
    
@@ -85,7 +85,7 @@ class FEANode
     //   NOTE: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y/w).
     // ------------------------------------------------------------------------
-    void get_ctrlPts_xyw( int num, const int * const &index,
+    void get_ctrlPts_xyw( int num, const int * index,
         double * ctrl_x, double * ctrl_y, double * ctrl_w ) const;
 
     // ------------------------------------------------------------------------
@@ -93,7 +93,7 @@ class FEANode
     //   NOTE: Users are responsible for allocating and deallocating memory
     //         for index and ctrl_(x/y).
     // ------------------------------------------------------------------------
-    void get_ctrlPts_xy( int num, const int * const &index,
+    void get_ctrlPts_xy( int num, const int * index,
         double * ctrl_x, double * ctrl_y ) const;
 
     // ------------------------------------------------------------------------
