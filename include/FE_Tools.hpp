@@ -6,7 +6,6 @@
 //
 // Date Created: Sep. 22 2023
 // ============================================================================
-#include "Math_Tools.hpp"
 #include "FEAElement.hpp"
 
 namespace FE_T

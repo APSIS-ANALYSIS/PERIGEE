@@ -1,4 +1,5 @@
 #include "FE_Tools.hpp"
+#include "Math_Tools.hpp"
 
 double FE_T::L2Proj_DGP0( const double * const &f,
     const double * const &gwts, const int &nqp )
