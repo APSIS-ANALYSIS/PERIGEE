@@ -62,8 +62,7 @@ class NBC_Partition
 
     int get_LocalMaster( int ii ) const {return LocalMaster[ii];}
 
-    int get_LocalMasterSlave( int ii ) const 
-    {return LocalMasterSlave[ii];}
+    int get_LocalMasterSlave( int ii ) const {return LocalMasterSlave[ii];}
 
     int get_Num_LD( int ii ) const {return Num_LD[ii];}
 
