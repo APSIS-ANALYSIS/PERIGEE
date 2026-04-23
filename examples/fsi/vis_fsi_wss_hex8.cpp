@@ -8,6 +8,7 @@
 #include "HDF5_Tools.hpp"
 #include "Hex_Tools.hpp"
 #include "Vis_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "QuadPts_vis_quad4.hpp"
 #include "QuadPts_Gauss_Quad.hpp"
 #include "QuadPts_vis_hex8.hpp"

@@ -1,4 +1,6 @@
 #include "NodalBC_3D_FSI.hpp"
+#include "Vec_Tools.hpp"
+#include "VTK_Tools.hpp"
 
 NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
     const std::string &solid_file,
