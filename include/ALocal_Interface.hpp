@@ -20,7 +20,8 @@
 // Date Created: Jun. 24  2024
 // ============================================================================
 #include <vector>
-#include "PDNSolution.hpp"
+
+class HDF5_Reader;
 
 class ALocal_Interface
 {
@@ -202,4 +203,5 @@ class ALocal_Interface
 
     ALocal_Interface() = delete;
 };
+
 #endif

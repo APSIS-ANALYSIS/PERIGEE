@@ -1,4 +1,5 @@
 #include "ALocal_Interface.hpp"
+#include "PDNSolution.hpp"
 #include "HDF5_Reader.hpp"
 
 ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_rank)
