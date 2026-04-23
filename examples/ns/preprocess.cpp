@@ -125,7 +125,7 @@ int main( int argc, char * argv[] )
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  HDF5_Writer * cmdh5w = new HDF5_Writer("preprocessor_cmd.h5");
+  auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("preprocessor_cmd.h5");
 
   cmdh5w->write_intScalar("num_inlet", num_inlet);
   cmdh5w->write_intScalar("num_outlet", num_outlet);
@@ -139,8 +139,6 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
   cmdh5w->write_string("sur_file_wall", sur_file_wall);
   cmdh5w->write_string("part_file", part_file);
-
-  delete cmdh5w;
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
