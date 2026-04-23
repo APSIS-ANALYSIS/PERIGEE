@@ -1,4 +1,5 @@
 #include "Hex_Tools.hpp"
+#include "Tet_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "VTK_Tools.hpp"
 

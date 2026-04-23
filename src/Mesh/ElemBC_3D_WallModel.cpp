@@ -1,4 +1,5 @@
 #include "ElemBC_3D_WallModel.hpp"
+#include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 #include "Vec_Tools.hpp"
 

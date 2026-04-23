@@ -1,4 +1,5 @@
 #include "Interface_pair.hpp"
+#include "Tet_Tools.hpp"
 #include "VTK_Tools.hpp"
 
 Interface_pair::Interface_pair(const std::string &fixed_vtkfile, 
