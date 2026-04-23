@@ -26,12 +26,7 @@ int main( int argc, char * argv[] )
   bool isXML = true, isRestart = false;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
-
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );
-
-  double dt = cmd_h5r -> read_doubleScalar("/","init_step");
-
-  delete cmd_h5r;
+  double dt = HDF5_T::read_doubleScalar("solver_cmd.h5", "/", "init_step"); 
 
   // ===== Initialize the MPI run =====
 #if PETSC_VERSION_LT(3,19,0)
