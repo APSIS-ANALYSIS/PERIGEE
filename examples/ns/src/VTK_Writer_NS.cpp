@@ -1,12 +1,5 @@
 #include "VTK_Writer_NS.hpp"
 
-VTK_Writer_NS::VTK_Writer_NS( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file )
-: nLocBas( in_nlocbas ), nElem( in_nelem ) 
-{
-  epart_map = VIS_T::read_epart( epart_file, nElem );
-}
-
 void VTK_Writer_NS::writeOutput(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -15,6 +8,8 @@ void VTK_Writer_NS::writeOutput(
     FEAElement * const &elemptr,
     const IQuadPts * const &quad,
     const double * const * const &pointArrays,
+    const std::vector<int> &epart_map,
+    const int &nLocBas,
     const int &rank, const int &size,
     const double &sol_time,
     const std::string &basename,
