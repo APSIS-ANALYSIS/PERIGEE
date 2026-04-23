@@ -111,8 +111,6 @@ int main( int argc, char * argv[] )
   auto vtk_w = SYS_T::make_unique<VTK_Writer_NS>( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
 
-  std::ostringstream time_index;
-
   const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
   const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
 
