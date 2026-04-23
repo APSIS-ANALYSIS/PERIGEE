@@ -11,6 +11,7 @@
 // ============================================================================
 #include "HDF5_Reader.hpp"
 #include "Tet_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "Vis_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"

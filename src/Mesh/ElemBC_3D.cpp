@@ -1,5 +1,7 @@
 #include "ElemBC_3D.hpp"
 #include "Hex_Tools.hpp"
+#include "Vec_Tools.hpp"
+#include "VTK_Tools.hpp"
 
 ElemBC_3D::ElemBC_3D( const FEType &in_elemtype )
 : elem_type( in_elemtype ), num_ebc( 0 )
