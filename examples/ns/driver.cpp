@@ -12,6 +12,7 @@
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
 #include "GenBCFactory.hpp"
+#include "InitHelpers.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
@@ -273,36 +274,11 @@ int main(int argc, char *argv[])
   std::unique_ptr<PDNSolution> base =
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 );
 
-  std::unique_ptr<PDNSolution> sol =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
-
-  std::unique_ptr<PDNSolution> dot_sol =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
-
-  if( is_restart )
-  {
-    initial_index = restart_index;
-    initial_time  = restart_time;
-    initial_step  = restart_step;
-
-    // Read sol file
-    SYS_T::file_check(restart_name);
-    sol->ReadBinary(restart_name);
-
-    // generate the corresponding dot_sol file name
-    const std::string restart_dot_name = "dot_" + restart_name;
-
-    // Read dot_sol file
-    SYS_T::file_check(restart_dot_name);
-    dot_sol->ReadBinary(restart_dot_name);
-
-    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
-    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
-    SYS_T::commPrint("     restart_time: %e \n", restart_time);
-    SYS_T::commPrint("     restart_index: %d \n", restart_index);
-    SYS_T::commPrint("     restart_step: %e \n", restart_step);
-  }
+  std::unique_ptr<PDNSolution> sol = nullptr;
+  std::unique_ptr<PDNSolution> dot_sol = nullptr;
+  NS_INIT::initialize_solution_state(pNode.get(), is_restart, restart_index, restart_time,
+      restart_step, restart_name, sol, dot_sol,
+      initial_index, initial_time, initial_step);
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
@@ -319,32 +295,7 @@ int main(int argc, char *argv[])
   gloAssem->Clear_KG();
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
-  if( is_restart == false )
-  {
-    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
-
-    KSPSetType(lsolver_acce->ksp, KSPGMRES);
-    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-        KSPGMRESModifiedGramSchmidtOrthogonalization);
-    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
-
-    PC preproc; lsolver_acce->GetPC(&preproc);
-    PCSetType( preproc, PCHYPRE );
-    PCHYPRESetType( preproc, "boomeramg" );
-
-    gloAssem->Assem_mass_residual( sol.get() );
-
-    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol.get() );
-
-    dot_sol -> ScaleValue(-1.0);
-
-    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-    lsolver_acce -> print_info();
-
-    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  }
+  NS_INIT::initialize_dot_solution(gloAssem.get(), sol.get(), dot_sol.get(), is_restart);
 
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
