@@ -183,12 +183,6 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
       void get_DC( double &dc_tau, const double * const &dxi_dx,
           const double &u, const double &v, const double &w ) const;
 
-      void get_f(const double &x, const double &y, const double &z,
-          const double &t, double &fx, double &fy, double &fz ) const
-      {
-        fx = 0.0; fy = 0.0; fz = 0.0;
-      }
-
       void get_H1(const double &x, const double &y, const double &z,
           const double &t, const double &nx, const double &ny,
           const double &nz, double &gx, double &gy, double &gz ) const

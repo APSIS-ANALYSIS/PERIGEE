@@ -1,4 +1,5 @@
 #include "PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha.hpp"
+#include "LoadData.hpp"
 
 PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha(
     const TimeMethod_GenAlpha * const &tm_gAlpha,
@@ -253,7 +254,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual(
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
     // Get the body force
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = LoadData::body_force( Vector_3(coor_x, coor_y, coor_z), curr );
+    fx = f_body.x(); fy = f_body.y(); fz = f_body.z();
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
@@ -425,7 +427,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua); 
 
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = LoadData::body_force( Vector_3(coor_x, coor_y, coor_z), curr );
+    fx = f_body.x(); fy = f_body.y(); fz = f_body.z();
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
@@ -749,7 +752,8 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
     const double gwts = element->get_detJac(qua) * quad->get_qw(qua);
 
-    get_f(coor_x, coor_y, coor_z, curr, fx, fy, fz);
+    const Vector_3 f_body = LoadData::body_force( Vector_3(coor_x, coor_y, coor_z), curr );
+    fx = f_body.x(); fy = f_body.y(); fz = f_body.z();
 
     for(int A=0; A<nLocBas; ++A)
     {

@@ -253,11 +253,6 @@ class PLocAssem_Block_VMS_NS_HERK
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_f(const Vector_3 &pt, const double &tt) const
-    {
-      return Vector_3( 0.0, 0.0, 0.0 );
-    }
-
     Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
         const Vector_3 &n_out ) const
     {
