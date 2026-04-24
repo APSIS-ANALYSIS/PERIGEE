@@ -50,15 +50,15 @@ int main( int argc, char * argv[] )
   const std::vector<std::string> sur_file_dir_x = paras["sur_file_dir_x"].as<std::vector<std::string>>();
   const std::vector<std::string> sur_file_dir_y = paras["sur_file_dir_y"].as<std::vector<std::string>>();
   const std::vector<std::string> sur_file_dir_z = paras["sur_file_dir_z"].as<std::vector<std::string>>();
-  const std::vector<int> is_disp_driven_x =
-    paras["is_disp_driven_x"] ? paras["is_disp_driven_x"].as<std::vector<int>>()
-                              : std::vector<int>(sur_file_dir_x.size(), 0);
-  const std::vector<int> is_disp_driven_y =
-    paras["is_disp_driven_y"] ? paras["is_disp_driven_y"].as<std::vector<int>>()
-                              : std::vector<int>(sur_file_dir_y.size(), 0);
-  const std::vector<int> is_disp_driven_z =
-    paras["is_disp_driven_z"] ? paras["is_disp_driven_z"].as<std::vector<int>>()
-                              : std::vector<int>(sur_file_dir_z.size(), 0);
+  const std::vector<bool> is_disp_driven_x =
+    paras["is_disp_driven_x"] ? paras["is_disp_driven_x"].as<std::vector<bool>>()
+                              : std::vector<bool>(sur_file_dir_x.size(), false);
+  const std::vector<bool> is_disp_driven_y =
+    paras["is_disp_driven_y"] ? paras["is_disp_driven_y"].as<std::vector<bool>>()
+                              : std::vector<bool>(sur_file_dir_y.size(), false);
+  const std::vector<bool> is_disp_driven_z =
+    paras["is_disp_driven_z"] ? paras["is_disp_driven_z"].as<std::vector<bool>>()
+                              : std::vector<bool>(sur_file_dir_z.size(), false);
 
   SYS_T::print_fatal_if( sur_file_dir_x.size() != is_disp_driven_x.size(),
       "Error: sur_file_dir_x and is_disp_driven_x size mismatch.\n" );
@@ -66,16 +66,6 @@ int main( int argc, char * argv[] )
       "Error: sur_file_dir_y and is_disp_driven_y size mismatch.\n" );
   SYS_T::print_fatal_if( sur_file_dir_z.size() != is_disp_driven_z.size(),
       "Error: sur_file_dir_z and is_disp_driven_z size mismatch.\n" );
-
-  for(const auto &val : is_disp_driven_x)
-    SYS_T::print_fatal_if( val != 0 && val != 1,
-        "Error: is_disp_driven_x entry must be 0 or 1.\n" );
-  for(const auto &val : is_disp_driven_y)
-    SYS_T::print_fatal_if( val != 0 && val != 1,
-        "Error: is_disp_driven_y entry must be 0 or 1.\n" );
-  for(const auto &val : is_disp_driven_z)
-    SYS_T::print_fatal_if( val != 0 && val != 1,
-        "Error: is_disp_driven_z entry must be 0 or 1.\n" );
 
   if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
@@ -87,19 +77,19 @@ int main( int argc, char * argv[] )
   for(const auto &fname : sur_file_dir_x) cout<<fname<<" ";
   cout<<endl;
   cout<<" -is_disp_driven_x: ";
-  for(const auto &flag : is_disp_driven_x) cout<<flag<<" ";
+  for(const auto &flag : is_disp_driven_x) cout<<(flag ? "true" : "false")<<" ";
   cout<<endl;
   cout<<" -sur_file_dir_y: ";
   for(const auto &fname : sur_file_dir_y) cout<<fname<<" ";
   cout<<endl;
   cout<<" -is_disp_driven_y: ";
-  for(const auto &flag : is_disp_driven_y) cout<<flag<<" ";
+  for(const auto &flag : is_disp_driven_y) cout<<(flag ? "true" : "false")<<" ";
   cout<<endl;
   cout<<" -sur_file_dir_z: ";
   for(const auto &fname : sur_file_dir_z) cout<<fname<<" ";
   cout<<endl;
   cout<<" -is_disp_driven_z: ";
-  for(const auto &flag : is_disp_driven_z) cout<<flag<<" ";
+  for(const auto &flag : is_disp_driven_z) cout<<(flag ? "true" : "false")<<" ";
   cout<<endl;
   cout<<" -sur_file_neu: ";
   for(const auto &fname : sur_file_neu) cout<<fname<<" ";

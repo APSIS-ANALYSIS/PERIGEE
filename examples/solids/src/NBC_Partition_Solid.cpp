@@ -37,7 +37,7 @@ NBC_Partition_Solid::NBC_Partition_Solid( const IPart * const &part,
         const unsigned int node = nbc->get_dir_nodes(ii);
         dir_nodes[field].push_back(node);
         dir_node_sets[field].insert(node);
-        if(nbc->get_is_disp_driven() == 1) disp_nodes[field].push_back(node);
+        if(nbc->get_is_disp_driven()) disp_nodes[field].push_back(node);
       }
     }
   }

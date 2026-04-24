@@ -253,7 +253,7 @@ void PGAssem_Solid_FEM::Apply_Dirichlet_BC( const double &time,
     {
       const PetscInt gid = nbc->get_LDN(field, ii);
       const PetscInt idx = gid * 3 + (field - 1);
-      if( nbc->get_LDN_is_disp_driven(field, ii) == 1 )
+      if( nbc->get_LDN_is_disp_driven(field, ii) )
       {
         VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
         VecSetValue(velo->solution, idx, vval, INSERT_VALUES);

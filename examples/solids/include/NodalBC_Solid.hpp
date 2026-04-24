@@ -14,17 +14,17 @@ class NodalBC_Solid : public NodalBC
   public:
     NodalBC_Solid( const std::string &vtkfile,
         const int &nFunc,
-        const int &in_is_disp_driven )
+        const bool &in_is_disp_driven )
     : NodalBC( std::vector<std::string>{vtkfile}, nFunc ),
       is_disp_driven( in_is_disp_driven )
     {}
 
     virtual ~NodalBC_Solid() = default;
 
-    int get_is_disp_driven() const { return is_disp_driven; }
+    bool get_is_disp_driven() const { return is_disp_driven; }
 
   private:
-    const int is_disp_driven;
+    const bool is_disp_driven;
 
     NodalBC_Solid() = delete;
 };

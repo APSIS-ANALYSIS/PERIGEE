@@ -36,13 +36,14 @@ void ALocal_NBC_Solid::read_disp_flag( const HDF5_Reader * const &h5r,
   const std::string data_path = gname + "/LDN_is_disp_driven";
   if( h5r->check_data( data_path.c_str() ) )
   {
-    LDN_is_disp_driven = h5r->read_intVector( gname.c_str(), "LDN_is_disp_driven" );
-    SYS_T::print_fatal_if( int(LDN_is_disp_driven.size()) != total_ld,
+    const auto raw_flag = h5r->read_intVector( gname.c_str(), "LDN_is_disp_driven" );
+    SYS_T::print_fatal_if( int(raw_flag.size()) != total_ld,
         "Error: ALocal_NBC_Solid, LDN_is_disp_driven length does not match Num_LD.\n" );
+    LDN_is_disp_driven.assign( raw_flag.begin(), raw_flag.end() );
   }
   else
   {
-    LDN_is_disp_driven.assign( total_ld, 0 );
+    LDN_is_disp_driven.assign( total_ld, false );
   }
 }
 
