@@ -16,6 +16,52 @@
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
+struct InitState
+{
+  std::unique_ptr<PDNSolution> sol;
+  std::unique_ptr<PDNSolution> dot_sol;
+  int initial_index;
+  double initial_time;
+  double initial_step;
+};
+
+InitState initialize_solution_state(const APart_Node * const pNode,
+    const bool is_restart, const int restart_index, const double restart_time,
+    const double restart_step, const std::string &restart_name,
+    const int initial_index, const double initial_time, const double initial_step)
+{
+  InitState state{
+    SYS_T::make_unique<PDNSolution_NS>(pNode, 0),
+    SYS_T::make_unique<PDNSolution_NS>(pNode, 0),
+    initial_index,
+    initial_time,
+    initial_step
+  };
+
+  if(is_restart)
+  {
+    state.initial_index = restart_index;
+    state.initial_time  = restart_time;
+    state.initial_step  = restart_step;
+
+    SYS_T::file_check(restart_name);
+    state.sol->ReadBinary(restart_name);
+
+    const std::string restart_dot_name = "dot_" + restart_name;
+    SYS_T::file_check(restart_dot_name);
+    state.dot_sol->ReadBinary(restart_dot_name);
+
+    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
+    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
+    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
+    SYS_T::commPrint("     restart_time: %e \n", restart_time);
+    SYS_T::commPrint("     restart_index: %d \n", restart_index);
+    SYS_T::commPrint("     restart_step: %e \n", restart_step);
+  }
+
+  return state;
+}
+
 int main(int argc, char *argv[])
 {
   // Coefficient for weak bc
@@ -273,36 +319,14 @@ int main(int argc, char *argv[])
   std::unique_ptr<PDNSolution> base =
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 );
 
-  std::unique_ptr<PDNSolution> sol =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
-
-  std::unique_ptr<PDNSolution> dot_sol =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
-
-  if( is_restart )
-  {
-    initial_index = restart_index;
-    initial_time  = restart_time;
-    initial_step  = restart_step;
-
-    // Read sol file
-    SYS_T::file_check(restart_name);
-    sol->ReadBinary(restart_name);
-
-    // generate the corresponding dot_sol file name
-    const std::string restart_dot_name = "dot_" + restart_name;
-
-    // Read dot_sol file
-    SYS_T::file_check(restart_dot_name);
-    dot_sol->ReadBinary(restart_dot_name);
-
-    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
-    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    SYS_T::commPrint("     restart_dot_name: %s \n", restart_dot_name.c_str());
-    SYS_T::commPrint("     restart_time: %e \n", restart_time);
-    SYS_T::commPrint("     restart_index: %d \n", restart_index);
-    SYS_T::commPrint("     restart_step: %e \n", restart_step);
-  }
+  auto init_state = initialize_solution_state(pNode.get(), is_restart,
+      restart_index, restart_time, restart_step, restart_name,
+      initial_index, initial_time, initial_step);
+  auto sol = std::move(init_state.sol);
+  auto dot_sol = std::move(init_state.dot_sol);
+  initial_index = init_state.initial_index;
+  initial_time = init_state.initial_time;
+  initial_step = init_state.initial_step;
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
