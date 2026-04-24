@@ -62,6 +62,35 @@ InitState initialize_solution_state(const APart_Node * const pNode,
   return state;
 }
 
+void initialize_dot_solution(IPGAssem * const gloAssem, PDNSolution * const sol,
+    PDNSolution * const dot_sol, const bool is_restart)
+{
+  if(is_restart) return;
+
+  SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
+  auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
+      1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
+
+  KSPSetType(lsolver_acce->ksp, KSPGMRES);
+  KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
+      KSPGMRESModifiedGramSchmidtOrthogonalization);
+  KSPGMRESSetRestart(lsolver_acce->ksp, 500);
+
+  PC preproc; lsolver_acce->GetPC(&preproc);
+  PCSetType( preproc, PCHYPRE );
+  PCHYPRESetType( preproc, "boomeramg" );
+
+  gloAssem->Assem_mass_residual( sol );
+
+  lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol );
+
+  dot_sol->ScaleValue(-1.0);
+
+  SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
+  lsolver_acce->print_info();
+  SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
+}
+
 int main(int argc, char *argv[])
 {
   // Coefficient for weak bc
@@ -343,32 +372,7 @@ int main(int argc, char *argv[])
   gloAssem->Clear_KG();
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
-  if( is_restart == false )
-  {
-    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
-
-    KSPSetType(lsolver_acce->ksp, KSPGMRES);
-    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-        KSPGMRESModifiedGramSchmidtOrthogonalization);
-    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
-
-    PC preproc; lsolver_acce->GetPC(&preproc);
-    PCSetType( preproc, PCHYPRE );
-    PCHYPRESetType( preproc, "boomeramg" );
-
-    gloAssem->Assem_mass_residual( sol.get() );
-
-    lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_sol.get() );
-
-    dot_sol -> ScaleValue(-1.0);
-
-    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-    lsolver_acce -> print_info();
-
-    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  }
+  initialize_dot_solution(gloAssem.get(), sol.get(), dot_sol.get(), is_restart);
 
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
