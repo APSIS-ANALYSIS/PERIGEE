@@ -9,6 +9,7 @@
 // Date: Sep. 7 2023
 // ============================================================================
 #include "ElemBC.hpp"
+#include "FEType.hpp"
 
 class ElemBC_3D : public ElemBC
 {

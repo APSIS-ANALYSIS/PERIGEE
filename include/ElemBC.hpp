@@ -32,9 +32,10 @@
 //
 // Date: Jan. 10 2017
 // ==================================================================
-#include "IIEN.hpp"
-#include "FEType.hpp"
+#include "Sys_Tools.hpp"
 #include "Vector_3.hpp"
+
+class IIEN;
 
 class ElemBC
 {

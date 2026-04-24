@@ -8,6 +8,7 @@
 // Date: Dec. 13 2021
 // ============================================================================
 #include "Math_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
