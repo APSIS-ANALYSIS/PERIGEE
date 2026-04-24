@@ -36,10 +36,6 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
 
   Zero_sur_Residual();
 
-  flist = nullptr;
-  flist = new locassem_vms_ns_funs[1];
-  flist[0] = &PLocAssem_Block_VMS_NS_HERK::get_H1;
-
   print_info();
 }
 
@@ -55,7 +51,6 @@ PLocAssem_Block_VMS_NS_HERK::~PLocAssem_Block_VMS_NS_HERK()
   delete [] Residual1; Residual1 = nullptr;
 
   delete [] sur_Residual1; sur_Residual1 = nullptr;
-  delete [] flist;
 }
 
 void PLocAssem_Block_VMS_NS_HERK::print_info() const
@@ -188,7 +183,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Sub(
 
     for(int jj=0; jj<subindex; ++jj)
     {
-      const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
+      const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor,
+          time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
       sum_h_x += tm_RK_ptr->get_RK_a(subindex, jj) * traction.x();
       sum_h_y += tm_RK_ptr->get_RK_a(subindex, jj) * traction.y();
       sum_h_z += tm_RK_ptr->get_RK_a(subindex, jj) * traction.z();
@@ -235,7 +231,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Final(
 
     for(int jj=0; jj<tm_RK_ptr->get_RK_step(); ++jj)
     {
-      const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
+      const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor,
+          time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
 
       sum_h_x += tm_RK_ptr->get_RK_b(jj) * traction.x();
       sum_h_y += tm_RK_ptr->get_RK_b(jj) * traction.y();
@@ -278,7 +275,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Pressure(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + dt, n_out );
+    const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor, time + dt, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {

@@ -183,27 +183,6 @@ class PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha : public IPLocAssem_2x2Block
       void get_DC( double &dc_tau, const double * const &dxi_dx,
           const double &u, const double &v, const double &w ) const;
 
-      void get_H1(const double &x, const double &y, const double &z,
-          const double &t, const double &nx, const double &ny,
-          const double &nz, double &gx, double &gy, double &gz ) const
-      {
-        const double p0 = 0.0;
-        gx = p0*nx; gy = p0*ny; gz = p0*nz;
-      }
-
-      typedef void ( PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::*locassem_tet_vms_ns_funs )( const double &x, const double &y, const double &z,
-          const double &t, const double &nx, const double &ny,
-          const double &nz, double &gx, double &gy, double &gz ) const;
-
-      locassem_tet_vms_ns_funs * flist;
-
-      void get_ebc_fun( const int &ebc_id,
-          const double &x, const double &y, const double &z,
-          const double &t, const double &nx, const double &ny,
-          const double &nz, double &gx, double &gy, double &gz ) const
-      {
-        return ((*this).*(flist[ebc_id]))(x,y,z,t,nx,ny,nz,gx,gy,gz);
-      }
 };
 
 #endif
