@@ -808,7 +808,7 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
 
   const double curr = time + alpha_f * dt;
 
-  double gx, gy, gz, nx, ny, nz, surface_area;
+  double nx, ny, nz, surface_area;
 
   Zero_Residual();
 
@@ -825,14 +825,14 @@ void PLocAssem_2x2Block_Tet_VMS_NS_GenAlpha::Assem_Residual_EBC(
       coor_z += eleCtrlPts_z[ii] * R[ii];
     }
 
-    get_ebc_fun( ebc_id, coor_x, coor_y, coor_z, curr, nx, ny, nz,
-        gx, gy, gz );
+    const Vector_3 traction = LoadData::ebc_traction( ebc_id,
+        Vector_3(coor_x, coor_y, coor_z), curr, Vector_3(nx, ny, nz) );
 
     for(int A=0; A<snLocBas; ++A)
     {
-      Residual1[3*A]   -= surface_area * quad -> get_qw(qua) * R[A] * gx;
-      Residual1[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * gy;
-      Residual1[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * gz;
+      Residual1[3*A]   -= surface_area * quad -> get_qw(qua) * R[A] * traction.x();
+      Residual1[3*A+1] -= surface_area * quad -> get_qw(qua) * R[A] * traction.y();
+      Residual1[3*A+2] -= surface_area * quad -> get_qw(qua) * R[A] * traction.z();
     }
   }
 }

@@ -253,23 +253,6 @@ class PLocAssem_Block_VMS_NS_HERK
     double get_DC( const std::array<double, 9> &dxi_dx,
         const double &u, const double &v, const double &w ) const;
 
-    Vector_3 get_H1(const Vector_3 &pt, const double &tt, 
-        const Vector_3 &n_out ) const
-    {
-      const double p0 = 0.0;  
-      return Vector_3( p0*n_out.x(), p0*n_out.y(), p0*n_out.z() );
-    }
-
-    typedef Vector_3 ( PLocAssem_Block_VMS_NS_HERK::*locassem_vms_ns_funs )( 
-        const Vector_3 &pt, const double &tt, const Vector_3 &n_out ) const;
-
-    locassem_vms_ns_funs * flist;
-
-    Vector_3 get_ebc_fun( const int &ebc_id, const Vector_3 &pt, 
-        const double &tt, const Vector_3 &n_out ) const
-    {
-      return ((*this).*(flist[ebc_id]))(pt, tt, n_out);
-    }
 };
 
 #endif

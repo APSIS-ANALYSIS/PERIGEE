@@ -769,7 +769,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
+    const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
