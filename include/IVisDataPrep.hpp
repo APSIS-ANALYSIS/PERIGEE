@@ -58,7 +58,6 @@ class IVisDataPrep
         const std::vector<int> &analysis_node_mapping,
         const std::vector<int> &post_node_mapping,
         const APart_Node * const &nNode_ptr,
-        const int &input_dof,
         double ** &pointArrays ) const
     {
       SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");

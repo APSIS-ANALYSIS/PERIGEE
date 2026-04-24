@@ -17,7 +17,6 @@ int main( int argc, char * argv[] )
 { 
   const std::string element_part_file = "epart.h5";
   const std::string part_file="./ppart/part";
-  constexpr int dof = 1;
 
   std::string sol_bname("SOL_temp_");
   std::string out_bname = sol_bname;
@@ -124,7 +123,7 @@ int main( int argc, char * argv[] )
         time, name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
-        pNode.get(), dof, solArrays);
+        pNode.get(), solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays,
