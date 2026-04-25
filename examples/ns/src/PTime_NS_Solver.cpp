@@ -9,24 +9,6 @@ PTime_NS_Solver::PTime_NS_Solver(
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name), nsolver(std::move(in_nsolver))
 {}
 
-std::string PTime_NS_Solver::Name_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  return pb_name + temp.str();
-}
-
-std::string PTime_NS_Solver::Name_dot_Generator(const int &counter) const
-{
-  std::ostringstream temp;
-  temp.str("");
-  temp<<900000000 + counter;
-
-  return std::string("dot_") + pb_name + temp.str();
-}
-
 void PTime_NS_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
@@ -78,7 +60,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     cur_dot_sol->WriteBinary(sol_dot_name);
   }
 
-  bool conv_flag, renew_flag;
+  bool renew_flag;
   int nl_counter = 0;
 
   bool rest_flag = restart_init_assembly_flag;
@@ -105,7 +87,7 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     nsolver->GenAlpha_Solve_NS( renew_flag, 
         time_info->get_time(), time_info->get_step(), pre_dot_sol.get(), 
         pre_sol.get(), cur_dot_sol.get(), cur_sol.get(), infnbc_part, 
-        gbc, gassem_ptr, conv_flag, nl_counter );
+        gbc, gassem_ptr, nl_counter );
 
     // Update the time step information
     time_info->TimeIncrement();

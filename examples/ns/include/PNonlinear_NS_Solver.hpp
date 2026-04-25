@@ -55,7 +55,7 @@ class PNonlinear_NS_Solver
         const ALocal_InflowBC * const &infnbc_part,
         const IGenBC * const &gbc,
         IPGAssem * const &gassem_ptr,
-        bool &conv_flag, int &nl_counter ) const;
+        int &nl_counter ) const;
 
   private:
     const double nr_tol, na_tol, nd_tol;

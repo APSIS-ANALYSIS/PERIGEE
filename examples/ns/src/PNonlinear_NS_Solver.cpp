@@ -53,7 +53,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const ALocal_InflowBC * const &infnbc_part,
     const IGenBC * const &gbc,
     IPGAssem * const &gassem_ptr,
-    bool &conv_flag, int &nl_counter ) const
+    int &nl_counter ) const
 {
   // Initialize the counter and error
   nl_counter = 0;
@@ -194,8 +194,6 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
-  if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
-  else conv_flag = false;
 }
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
