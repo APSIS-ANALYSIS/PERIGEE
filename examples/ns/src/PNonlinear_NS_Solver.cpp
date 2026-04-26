@@ -43,7 +43,7 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
+int PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
@@ -53,11 +53,10 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PDNSolution * const &sol,
     const ALocal_InflowBC * const &infnbc_part,
     const IGenBC * const &gbc,
-    IPGAssem * const &gassem_ptr,
-    int &nl_counter ) const
+    IPGAssem * const &gassem_ptr ) const
 {
   // Initialize the counter and error
-  nl_counter = 0;
+  int nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
   // Gen-alpha parameters
@@ -195,6 +194,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
+  return nl_counter;
 }
 
 // EOF

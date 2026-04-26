@@ -27,7 +27,7 @@ void PTime_NS_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,
     SYS_T::print_fatal("Error: PTimeSolver cannot open restart_file.txt");
 }
 
-void PTime_NS_Solver::TM_NS_GenAlpha( 
+void PTime_NS_Solver::TM_NS_GenAlpha(
     const bool &restart_init_assembly_flag,
     std::unique_ptr<PDNSolution> init_dot_sol,
     std::unique_ptr<PDNSolution> init_sol,
@@ -52,17 +52,17 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
 
   auto pre_velo_mesh   = SYS_T::make_unique<PDNSolution>(*init_mvelo);
   auto cur_velo_mesh   = SYS_T::make_unique<PDNSolution>(*init_mvelo);
-  auto alpha_velo_mesh = SYS_T::make_unique<PDNSolution>(*init_mvelo); 
+  auto alpha_velo_mesh = SYS_T::make_unique<PDNSolution>(*init_mvelo);
 
   // If this is a restart run, do not re-write the solution binaries
   if(restart_init_assembly_flag == false)
   {
     const auto sol_name = Name_Generator(time_info->get_index());
     cur_sol->WriteBinary(sol_name);
-    
+
     const auto sol_dot_name = Name_dot_Generator(time_info->get_index());
     cur_dot_sol->WriteBinary(sol_dot_name);
-  
+
     const auto sol_disp_name = Name_disp_Generator(time_info->get_index());
     cur_disp_mesh->WriteBinary(sol_disp_name);
 
@@ -94,41 +94,41 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     VecGhostGetLocalForm(cur_velo_mesh->solution, &lvelo_mesh);
     VecGhostGetLocalForm(cur_disp_mesh->solution, &ldisp_mesh);
     VecGhostGetLocalForm(alpha_velo_mesh->solution, &lvelo_alp_mesh);
-    VecGhostGetLocalForm(alpha_disp_mesh->solution, &ldisp_alp_mesh);    
+    VecGhostGetLocalForm(alpha_disp_mesh->solution, &ldisp_alp_mesh);
     VecGetArray(lvelo_mesh, &array_cur_velo_mesh);
     VecGetArray(ldisp_mesh, &array_cur_disp_mesh);
     VecGetArray(lvelo_alp_mesh, &array_alp_velo_mesh);
     VecGetArray(ldisp_alp_mesh, &array_alp_disp_mesh);
 
     for( int ii=0; ii<pNode_ptr->get_nlocalnode_rotated(); ++ii )
-    { 
+    {
       // Update the coordinates of the rotated nodes
       const Vector_3 init_pt_xyz = feanode_ptr->get_ctrlPts_xyz(pNode_ptr->get_node_loc_rotated(ii));
       const Vector_3 curr_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + time_info->get_step(), rot_info.get()); //get_currPts() may be writtern into Sl_tools
       const Vector_3 alpha_pt_xyz = get_currPts(init_pt_xyz, time_info->get_time() + alpha_f * time_info->get_step(), rot_info.get());
 
-      const Vector_3 radius_alpha = get_radius(alpha_pt_xyz, rot_info.get()); 
+      const Vector_3 radius_alpha = get_radius(alpha_pt_xyz, rot_info.get());
       const Vector_3 velo_mesh_alpha = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + alpha_f * time_info->get_step())*rot_info->get_direction_rotated(), radius_alpha);
 
-      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info.get()); //get_radius() may be writtern into Sl_tools  
+      const Vector_3 radius_curr = get_radius(curr_pt_xyz, rot_info.get()); //get_radius() may be writtern into Sl_tools
       const Vector_3 velo_mesh_curr = Vec3::cross_product(rot_info->get_angular_velo(time_info->get_time() + time_info->get_step())*rot_info->get_direction_rotated(), radius_curr);
 
-      const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;   
+      const int offset = pNode_ptr->get_node_loc_rotated(ii) * 3;
 
       for(int jj=0; jj<3; ++jj)
       {
         array_cur_velo_mesh[offset + jj] = velo_mesh_curr(jj);
-        array_cur_disp_mesh[offset + jj] = curr_pt_xyz(jj)-init_pt_xyz(jj);  
+        array_cur_disp_mesh[offset + jj] = curr_pt_xyz(jj)-init_pt_xyz(jj);
 
         array_alp_velo_mesh[offset + jj] = velo_mesh_alpha(jj);
-        array_alp_disp_mesh[offset + jj] = alpha_pt_xyz(jj)-init_pt_xyz(jj);  
+        array_alp_disp_mesh[offset + jj] = alpha_pt_xyz(jj)-init_pt_xyz(jj);
       }
     }
 
     VecRestoreArray(lvelo_mesh, &array_cur_velo_mesh);
     VecRestoreArray(ldisp_mesh, &array_cur_disp_mesh);
     VecRestoreArray(lvelo_alp_mesh, &array_alp_velo_mesh);
-    VecRestoreArray(ldisp_alp_mesh, &array_alp_disp_mesh);    
+    VecRestoreArray(ldisp_alp_mesh, &array_alp_disp_mesh);
     VecGhostRestoreLocalForm(cur_velo_mesh->solution, &lvelo_mesh);
     VecGhostRestoreLocalForm(cur_disp_mesh->solution, &ldisp_mesh);
     VecGhostRestoreLocalForm(alpha_velo_mesh->solution, &lvelo_alp_mesh);
@@ -151,13 +151,13 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     if( nl_counter == 1 ) renew_flag = false;
 
     // Call the nonlinear equation solver
-    nsolver->GenAlpha_Solve_NS( renew_flag, 
-        time_info->get_time(), time_info->get_step(), 
+    nl_counter = nsolver->GenAlpha_Solve_NS( renew_flag,
+        time_info->get_time(), time_info->get_step(),
         pre_dot_sol.get(), pre_sol.get(), pre_velo_mesh.get(), pre_disp_mesh.get(),
         infnbc_part.get(), rotnbc_part.get(), gbc.get(), gassem_ptr.get(),
         cur_dot_sol.get(), cur_sol.get(), cur_velo_mesh.get(), cur_disp_mesh.get(),
         alpha_velo_mesh.get(), alpha_disp_mesh.get(),
-        conv_flag, nl_counter, shell );
+        conv_flag, shell );
 
     // Update the time step information
     time_info->TimeIncrement();
@@ -186,15 +186,15 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     for(int face=0; face<gbc -> get_num_ebc(); ++face)
     {
       // Calculate the 3D dot flow rate on the outlet
-      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_dot_sol.get(), face); 
+      const double dot_face_flrate = gassem_ptr -> Assem_surface_flowrate(
+          cur_dot_sol.get(), face);
 
       // Calculate the 3D flow rate on the outlet
-      const double face_flrate = gassem_ptr -> Assem_surface_flowrate( 
-          cur_sol.get(), face); 
+      const double face_flrate = gassem_ptr -> Assem_surface_flowrate(
+          cur_sol.get(), face);
 
       // Calculate the 3D averaged pressure on the outlet
-      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure( 
+      const double face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_sol.get(), face);
 
       // Calculate the 0D pressure from LPN model
@@ -218,12 +218,12 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
       }
       MPI_Barrier(PETSC_COMM_WORLD);
     }
-   
+
     // Calcualte the inlet data
     for(int face=0; face<infnbc_part -> get_num_nbc(); ++face)
     {
       const double inlet_face_flrate = gassem_ptr -> Assem_surface_flowrate(
-          cur_sol.get(), infnbc_part.get(), face ); 
+          cur_sol.get(), infnbc_part.get(), face );
 
       const double inlet_face_avepre = gassem_ptr -> Assem_surface_ave_pressure(
           cur_sol.get(), infnbc_part.get(), face );
@@ -234,14 +234,14 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
         ofile.open( gen_flowfile_name("Inlet_", face).c_str(), std::ofstream::out | std::ofstream::app );
         ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'<<inlet_face_flrate<<'\t'<<inlet_face_avepre<<'\n';
         ofile.close();
-      } 
+      }
       MPI_Barrier(PETSC_COMM_WORLD);
     }
 
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
-    pre_disp_mesh->Copy(*cur_disp_mesh);    
+    pre_disp_mesh->Copy(*cur_disp_mesh);
     pre_velo_mesh->Copy(*cur_velo_mesh);
   }
 }
