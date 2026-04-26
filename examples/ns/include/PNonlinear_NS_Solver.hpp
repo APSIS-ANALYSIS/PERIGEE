@@ -80,9 +80,6 @@ class PNonlinear_NS_Solver
           count, rel_err, abs_err);
     }
 
-    void rescale_inflow_value( const double &stime,
-        const ALocal_InflowBC * const &infbc,
-        PDNSolution * const &sol ) const;
 };
 
 #endif
