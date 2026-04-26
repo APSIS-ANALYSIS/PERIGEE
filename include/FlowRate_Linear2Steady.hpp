@@ -9,7 +9,8 @@
 // Author: Ju Liu
 // Date Created: Oct. 1 2017
 // ============================================================================
-#include "Vec_Tools.hpp"
+#include <string>
+#include <vector>
 #include "IFlowRate.hpp"
 
 class FlowRate_Linear2Steady final : public IFlowRate

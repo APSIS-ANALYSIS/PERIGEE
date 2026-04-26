@@ -8,7 +8,8 @@
 //
 // Date Created: Nov. 17 2023
 // ============================================================================
-#include "Vec_Tools.hpp"
+#include <string>
+#include <vector>
 #include "IFlowRate.hpp"
 
 class FlowRate_Cosine2Steady final : public IFlowRate

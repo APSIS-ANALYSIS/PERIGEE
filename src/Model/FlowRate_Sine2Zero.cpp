@@ -1,4 +1,5 @@
 #include "FlowRate_Sine2Zero.hpp"
+#include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 
 FlowRate_Sine2Zero::FlowRate_Sine2Zero( const std::string &filename )

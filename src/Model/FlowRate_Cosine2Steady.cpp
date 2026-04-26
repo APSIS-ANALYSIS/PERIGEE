@@ -1,4 +1,5 @@
 #include "FlowRate_Cosine2Steady.hpp"
+#include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 
 FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )

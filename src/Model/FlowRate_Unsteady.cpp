@@ -1,4 +1,5 @@
 #include "FlowRate_Unsteady.hpp"
+#include "Vec_Tools.hpp"
 #include "Math_Tools.hpp"
 
 FlowRate_Unsteady::FlowRate_Unsteady( const std::string &filename )
