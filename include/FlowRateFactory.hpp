@@ -12,7 +12,6 @@
 #include "FlowRate_Unsteady.hpp"
 #include "FlowRate_Linear2Steady.hpp"
 #include "FlowRate_Cosine2Steady.hpp"
-#include "FlowRate_Sine2Zero.hpp"
 
 class FlowRateFactory
 {
@@ -32,8 +31,6 @@ class FlowRateFactory
           return SYS_T::make_unique<FlowRate_Linear2Steady>(inflow_filename);
         case 4:
           return SYS_T::make_unique<FlowRate_Cosine2Steady>(inflow_filename);
-        case 5:
-          return SYS_T::make_unique<FlowRate_Sine2Zero>(inflow_filename);
 
         default:
           SYS_T::print_fatal("Error: Inflow input file %s format cannot be recognized.\n", inflow_filename.c_str());
@@ -93,12 +90,6 @@ class FlowRateFactory
       {
         filetype = 4;
       }
-      else if( bc_type.compare("Sine") ==0
-          || bc_type.compare("sine") == 0
-          || bc_type.compare("SINE") == 0 )
-      {
-        filetype = 5;
-      }       
       else
       {
         filetype = 0;
