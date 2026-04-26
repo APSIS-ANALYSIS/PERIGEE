@@ -1,4 +1,6 @@
 #include "FlowRate_Sine2Zero.hpp"
+#include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 
 FlowRate_Sine2Zero::FlowRate_Sine2Zero( const std::string &filename )
 {
@@ -137,8 +139,8 @@ FlowRate_Sine2Zero::FlowRate_Sine2Zero( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRate_Sine2Zero::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Sine2Zero::get_flow_rate( int nbc_id,
+    double time ) const
 {
   double out_dot_rate = 0.0;
 

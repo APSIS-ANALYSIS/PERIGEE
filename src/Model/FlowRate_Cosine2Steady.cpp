@@ -1,4 +1,6 @@
 #include "FlowRate_Cosine2Steady.hpp"
+#include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 
 FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
 {
@@ -151,8 +153,8 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRate_Cosine2Steady::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Cosine2Steady::get_flow_rate( int nbc_id,
+    double time ) const
 {
   double out_rate = target_flow_rate[nbc_id];
 

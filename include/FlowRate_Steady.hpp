@@ -8,22 +8,22 @@
 // Author: Ju Liu
 // Date Created: May 1 2021
 // ============================================================================
-#include "Vec_Tools.hpp"
-#include "Math_Tools.hpp"
+#include <string>
+#include <vector>
 #include "IFlowRate.hpp"
 
-class FlowRate_Steady : public IFlowRate
+class FlowRate_Steady final : public IFlowRate
 {
   public:
     FlowRate_Steady( const std::string &filename );
 
-    virtual ~FlowRate_Steady() = default;
+    ~FlowRate_Steady() override = default;
 
-    virtual double get_flow_rate(const int &nbc_id, const double &time) const;
+    double get_flow_rate(int nbc_id, double time) const override;
 
-    virtual int get_num_nbc() const { return num_nbc; }
+    int get_num_nbc() const override { return num_nbc; }
 
-    virtual void print_info() const;
+    void print_info() const override;
 
   private:
     int num_nbc;

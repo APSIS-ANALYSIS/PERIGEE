@@ -8,11 +8,11 @@
 //
 // Date Created: Nov. 04 2024
 // ============================================================================
-#include "Vec_Tools.hpp"
-#include "Math_Tools.hpp"
+#include <string>
+#include <vector>
 #include "IFlowRate.hpp"
 
-class FlowRate_Sine2Zero : public IFlowRate
+class FlowRate_Sine2Zero final : public IFlowRate
 {
   public:
     // This constructor will set a uniform thred_time for all inlets, and the
@@ -22,7 +22,7 @@ class FlowRate_Sine2Zero : public IFlowRate
     // Same as FlowRate_Cosine2Steady.
     FlowRate_Sine2Zero( const std::string &filename );
 
-    virtual ~FlowRate_Sine2Zero() = default;
+    ~FlowRate_Sine2Zero() override = default;
 
     // From time 0 to in_thred_time,
     // flow_rate =  start_rate + 0.5 * (target_rate - start_rate) 
@@ -30,19 +30,19 @@ class FlowRate_Sine2Zero : public IFlowRate
     // dot_flow_rate = 0.5 * (target_rate - start_rate) 
     //                 * PI / in_thred_time * sin (PI * time / in_thred_time),
     // From in_thred_time to infty, flow_rate = target_rate, dot_flow_rate = 0.0.
-    virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
+    double get_flow_rate( int nbc_id, double time ) const override;
 
     // Get the turbulance intensity
-    virtual double get_flow_TI_std_dev( const int &nbc_id ) const 
+    double get_flow_TI_std_dev( int nbc_id ) const override 
     { return TI_std_dev[nbc_id]; }
 
     // Get the start rate if the users want to now it
-    virtual double get_flow_start_rate( const int &nbc_id ) const 
+    double get_flow_start_rate( int nbc_id ) const override 
     { return start_flow_rate[nbc_id]; }
 
-    virtual int get_num_nbc() const { return num_nbc; }
+    int get_num_nbc() const override { return num_nbc; }
 
-    virtual void print_info() const;
+    void print_info() const override;
 
   private:
     int num_nbc;
