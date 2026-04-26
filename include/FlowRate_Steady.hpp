@@ -8,7 +8,6 @@
 // Author: Ju Liu
 // Date Created: May 1 2021
 // ============================================================================
-#include <string>
 #include <vector>
 #include "IFlowRate.hpp"
 
