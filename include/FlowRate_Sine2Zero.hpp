@@ -30,6 +30,7 @@ class FlowRate_Sine2Zero final : public IFlowRate
     //                 * PI / in_thred_time * sin (PI * time / in_thred_time),
     // From in_thred_time to infty, flow_rate = target_rate, dot_flow_rate = 0.0.
     double get_flow_rate( int nbc_id, double time ) const override;
+    double get_dot_flow_rate( int nbc_id, double time ) const override;
 
     // Get the turbulance intensity
     double get_flow_TI_std_dev( int nbc_id ) const override 

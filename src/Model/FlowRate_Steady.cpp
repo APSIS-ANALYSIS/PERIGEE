@@ -139,6 +139,11 @@ double FlowRate_Steady::get_flow_rate(int nbc_id , double time) const
   return flowrate[nbc_id];
 }
 
+double FlowRate_Steady::get_dot_flow_rate( int nbc_id, double time ) const
+{
+  return 0.0;
+}
+
 void FlowRate_Steady::print_info() const
 {
   SYS_T::print_sep_line();

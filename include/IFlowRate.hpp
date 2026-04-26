@@ -23,6 +23,9 @@ class IFlowRate
     // Return the current flow rate
     virtual double get_flow_rate( int nbc_id, double time ) const = 0;
 
+    // Return the time derivative of flow rate
+    virtual double get_dot_flow_rate( int nbc_id, double time ) const { return 0.0; }
+
     // Return the flow turbulence intensity represented by the standard
     // deviation
     virtual double get_flow_TI_std_dev( int nbc_id ) const { return 0.0; }

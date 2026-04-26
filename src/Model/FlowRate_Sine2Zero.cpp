@@ -142,10 +142,24 @@ FlowRate_Sine2Zero::FlowRate_Sine2Zero( const std::string &filename )
 double FlowRate_Sine2Zero::get_flow_rate( int nbc_id,
     double time ) const
 {
-  double out_dot_rate = 0.0;
+  double out_rate = target_flow_rate[nbc_id];
 
   if( time < thred_time[nbc_id] && time >= 0.0 ) 
-    out_dot_rate = 0.5 * (target_flow_rate[nbc_id]- start_flow_rate[nbc_id]) * MATH_T::PI / thred_time[nbc_id] * std::sin(MATH_T::PI * time / thred_time[nbc_id]);
+    out_rate = start_flow_rate[nbc_id] + 0.5 * (target_flow_rate[nbc_id] - start_flow_rate[nbc_id])
+      * (1 - std::cos(MATH_T::PI * time / thred_time[nbc_id]));
+
+  return out_rate;
+}
+
+double FlowRate_Sine2Zero::get_dot_flow_rate( int nbc_id,
+    double time ) const
+{
+  double out_dot_rate = 0.0;
+
+  if( time < thred_time[nbc_id] && time >= 0.0 )
+    out_dot_rate = 0.5 * (target_flow_rate[nbc_id] - start_flow_rate[nbc_id])
+      * MATH_T::PI / thred_time[nbc_id]
+      * std::sin(MATH_T::PI * time / thred_time[nbc_id]);
 
   return out_dot_rate;
 }
