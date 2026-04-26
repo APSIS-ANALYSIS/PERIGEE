@@ -27,6 +27,7 @@ class FlowRate_Linear2Steady final : public IFlowRate
     // start_rate + (target_rate - start_rate) * time / in_thred_time
     // From in_thred_time to infty, flow_rate = target_rate
     double get_flow_rate( int nbc_id, double time ) const override;
+
     double get_dot_flow_rate( int nbc_id, double time ) const override;
 
     // Get the turbulance intensity

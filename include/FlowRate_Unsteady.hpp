@@ -30,6 +30,7 @@ class FlowRate_Unsteady final : public IFlowRate
     ~FlowRate_Unsteady() override = default;
 
     double get_flow_rate( int nbc_id, double time ) const override;
+
     double get_dot_flow_rate( int nbc_id, double time ) const override;
 
     int get_num_nbc() const override { return num_nbc; }
