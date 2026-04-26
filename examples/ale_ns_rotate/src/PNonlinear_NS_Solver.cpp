@@ -42,7 +42,7 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
+int PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
@@ -60,11 +60,11 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const PDNSolution * const &disp_mesh,
     const PDNSolution * const &mvelo_alpha,    
     const PDNSolution * const &mdisp_alpha,    
-    bool &conv_flag, int &nl_counter,
+    bool &conv_flag,
     Mat &shell ) const
 {
   // Initialize the counter and error
-  nl_counter = 0;
+  int nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
   // Gen-alpha parameters
@@ -224,6 +224,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
   else conv_flag = false;
+
+  return nl_counter;
 }
 
 void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,

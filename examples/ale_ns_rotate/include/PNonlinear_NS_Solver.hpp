@@ -48,7 +48,7 @@ class PNonlinear_NS_Solver
     // This solver solves the Navier-Stokes using 2nd-order Generalized
     // alpha method.
     // --------------------------------------------------------------
-    void GenAlpha_Solve_NS(
+    int GenAlpha_Solve_NS(
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
@@ -66,7 +66,7 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &disp_mesh,
         const PDNSolution * const &mvelo_alpha,    
         const PDNSolution * const &mdisp_alpha,  
-        bool &conv_flag, int &nl_counter,
+        bool &conv_flag,
         Mat &shell ) const;
 
   private:
