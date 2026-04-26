@@ -141,6 +141,22 @@ double FlowRate_Unsteady::get_flow_rate( int nbc_id,
   return sum;
 }
 
+double FlowRate_Unsteady::get_dot_flow_rate( int nbc_id,
+    double time ) const
+{
+  const int num_of_past_period = time / period[nbc_id];
+  const double local_time = time - num_of_past_period * period[nbc_id];
+
+  double sum = 0.0;
+  for( int ii = 1; ii <= num_of_mode[nbc_id]; ++ii )
+  {
+    sum += -coef_a[nbc_id][ii] * ii * w[nbc_id] * sin( ii*w[nbc_id]*local_time ) +
+      coef_b[nbc_id][ii] * ii * w[nbc_id] * cos( ii*w[nbc_id]*local_time );
+  }
+
+  return sum;
+}
+
 void FlowRate_Unsteady::print_info() const
 {
   SYS_T::print_sep_line();

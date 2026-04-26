@@ -165,6 +165,17 @@ double FlowRate_Linear2Steady::get_flow_rate( int nbc_id,
   return out_rate;
 }
 
+double FlowRate_Linear2Steady::get_dot_flow_rate( int nbc_id,
+    double time ) const
+{
+  double out_dot_rate = 0.0;
+
+  if( time < thred_time[nbc_id] && time >= 0.0 )
+    out_dot_rate = (target_flow_rate[nbc_id] - start_flow_rate[nbc_id]) / thred_time[nbc_id];
+
+  return out_dot_rate;
+}
+
 void FlowRate_Linear2Steady::print_info() const
 {
   SYS_T::print_sep_line();
