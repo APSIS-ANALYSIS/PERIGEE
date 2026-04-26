@@ -1,4 +1,5 @@
 #include "FlowRate_Unsteady.hpp"
+#include "Math_Tools.hpp"
 
 FlowRate_Unsteady::FlowRate_Unsteady( const std::string &filename )
 {
@@ -123,8 +124,8 @@ FlowRate_Unsteady::FlowRate_Unsteady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRate_Unsteady::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Unsteady::get_flow_rate( int nbc_id,
+    double time ) const
 {
   const int num_of_past_period = time / period[nbc_id];
   const double local_time = time - num_of_past_period * period[nbc_id];

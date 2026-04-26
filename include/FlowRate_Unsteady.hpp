@@ -20,21 +20,20 @@
 // Date Created: Sept. 23 2017
 // ==================================================================
 #include "Vec_Tools.hpp"
-#include "Math_Tools.hpp"
 #include "IFlowRate.hpp"
 
-class FlowRate_Unsteady : public IFlowRate
+class FlowRate_Unsteady final : public IFlowRate
 {
   public:
     FlowRate_Unsteady( const std::string &filename );
 
-    virtual ~FlowRate_Unsteady() = default;
+    ~FlowRate_Unsteady() override = default;
 
-    virtual double get_flow_rate( const int &nbc_id, const double &time ) const;
+    double get_flow_rate( int nbc_id, double time ) const override;
 
-    virtual int get_num_nbc() const { return num_nbc; }
+    int get_num_nbc() const override { return num_nbc; }
 
-    virtual void print_info() const;
+    void print_info() const override;
 
   private:
     int num_nbc;
