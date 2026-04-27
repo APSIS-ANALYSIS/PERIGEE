@@ -36,6 +36,7 @@ int main( int argc, char * argv[] )
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
   const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
 
+  cmd_h5r.reset();
 
   // ===== PETSc Initialization =====
 #if PETSC_VERSION_LT(3,19,0)

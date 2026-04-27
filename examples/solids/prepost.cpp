@@ -37,6 +37,7 @@ int main( int argc, char * argv[] )
   const int dofNum = cmd_h5r -> read_intScalar("/","dof_num");
   const int dofMat = cmd_h5r -> read_intScalar("/","dof_mat");
 
+  cmd_h5r.reset();
 
   // The user can specify the new mesh partition options from the yaml file
   const std::string yaml_file("preprocess.yml");
