@@ -120,7 +120,6 @@ int main( int argc, char * argv[] )
 
     VTK_Writer_NS::writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays, epart_map,
-        GMIptr->get_nLocBas(),
         rank, size, time * dt, sol_bname, out_bname, name_to_write, isXML );
   }
 

@@ -9,7 +9,6 @@ void VTK_Writer_NS::writeOutput(
     const IQuadPts * const &quad,
     const double * const * const &pointArrays,
     const std::vector<int> &epart_map,
-    const int &nLocBas,
     const int &rank, const int &size,
     const double &sol_time,
     const std::string &basename,
@@ -17,6 +16,8 @@ void VTK_Writer_NS::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
+  const int nLocBas = elemptr -> get_nLocBas();
+
   // Allocate VTK gridData object
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 

@@ -29,7 +29,6 @@ namespace VTK_Writer_NS
       const IQuadPts * const &quad,
       const double * const * const &pointArrays,
       const std::vector<int> &epart_map,
-      const int &nLocBas,
       const int &rank, const int &size,
       const double &sol_time,
       const std::string &basename,
