@@ -85,6 +85,12 @@ int PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   LoadData::rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flrate.get(), sol_base.get(), &sol_alpha);
   // ------------------------------------------------- 
 
+  // ------------------------------------------------- 
+  // Update the dot_inflow boundary values
+  LoadData::rescale_dot_inflow_value(curr_time+dt, infnbc_part, flrate.get(), sol_base.get(), dot_sol);
+  LoadData::rescale_dot_inflow_value(curr_time+alpha_m*dt, infnbc_part, flrate.get(), sol_base.get(), &dot_sol_alpha);
+  // ------------------------------------------------- 
+
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
