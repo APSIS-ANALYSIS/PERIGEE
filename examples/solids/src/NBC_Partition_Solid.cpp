@@ -9,11 +9,11 @@ NBC_Partition_Solid::NBC_Partition_Solid( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
     const std::vector<NodalBC_Solid *> &solid_nbc_list_x,
     const std::vector<NodalBC_Solid *> &solid_nbc_list_y,
-    const std::vector<NodalBC_Solid *> &solid_nbc_list_z,
-    const int &dof,
-    const int &nFunc )
+    const std::vector<NodalBC_Solid *> &solid_nbc_list_z )
 : cpu_rank( part->get_cpu_rank() )
 {
+  constexpr int dof = 4;
+
   std::vector<std::vector<unsigned int>> dir_nodes(dof);
   std::vector<std::vector<unsigned int>> disp_nodes(dof);
   std::vector<std::unordered_set<unsigned int>> dir_node_sets(dof);
@@ -25,9 +25,6 @@ NBC_Partition_Solid::NBC_Partition_Solid( const IPart * const &part,
     solid_nbc_list_y,
     solid_nbc_list_z
   };
-
-  SYS_T::print_fatal_if( dof != 4,
-      "Error: NBC_Partition_Solid assumes dof = 4, but received %d.\n", dof );
 
   for(int field=1; field<dof; ++field)
   {
