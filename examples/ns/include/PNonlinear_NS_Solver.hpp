@@ -78,7 +78,7 @@ class PNonlinear_NS_Solver
       SYS_T::commPrint("  === NR ite: %d, r_error: %e, a_error: %e \n",
           count, rel_err, abs_err);
     }
-    
+
 };
 
 #endif
