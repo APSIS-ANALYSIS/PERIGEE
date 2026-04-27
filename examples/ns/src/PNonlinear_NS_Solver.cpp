@@ -1,4 +1,5 @@
 #include "PNonlinear_NS_Solver.hpp"
+#include "LoadData.hpp"
 
 PNonlinear_NS_Solver::PNonlinear_NS_Solver(
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
@@ -19,7 +20,15 @@ PNonlinear_NS_Solver::PNonlinear_NS_Solver(
   tmga(std::move(in_tmga)),
   flrate(std::move(in_flrate)),
   sol_base(std::move(in_sol_base))
-{}
+{
+#ifdef PETSC_USE_LOG
+  PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
+  PetscLogEventRegister("assembly mat 0", classid_assembly, &mat_assem_0_event);
+  PetscLogEventRegister("assembly mat 1", classid_assembly, &mat_assem_1_event);
+  PetscLogEventRegister("assembly vec 0", classid_assembly, &vec_assem_0_event);
+  PetscLogEventRegister("assembly vec 1", classid_assembly, &vec_assem_1_event);
+#endif
+}
 
 void PNonlinear_NS_Solver::print_info() const
 {
@@ -34,8 +43,7 @@ void PNonlinear_NS_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-
-void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
+int PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
@@ -45,24 +53,10 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
     PDNSolution * const &sol,
     const ALocal_InflowBC * const &infnbc_part,
     const IGenBC * const &gbc,
-    IPGAssem * const &gassem_ptr,
-    bool &conv_flag, int &nl_counter ) const
+    IPGAssem * const &gassem_ptr ) const
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent mat_assem_0_event, mat_assem_1_event;
-  PetscLogEvent vec_assem_0_event, vec_assem_1_event;
-  PetscLogEvent lin_solve_event;
-  PetscClassId classid_assembly;
-  PetscClassIdRegister("mat_vec_assembly", &classid_assembly);
-  PetscLogEventRegister("assembly mat 0", classid_assembly, &mat_assem_0_event);
-  PetscLogEventRegister("assembly mat 1", classid_assembly, &mat_assem_1_event);
-  PetscLogEventRegister("assembly vec 0", classid_assembly, &vec_assem_0_event);
-  PetscLogEventRegister("assembly vec 1", classid_assembly, &vec_assem_1_event);
-  PetscLogEventRegister("lin_solve", classid_assembly, &lin_solve_event);
-#endif
-
   // Initialize the counter and error
-  nl_counter = 0;
+  int nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;
 
   // Gen-alpha parameters
@@ -87,8 +81,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   // ------------------------------------------------- 
   // Update the inflow boundary values
-  rescale_inflow_value(curr_time+dt, infnbc_part, sol);
-  rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, &sol_alpha);
+  LoadData::rescale_inflow_value(curr_time+dt, infnbc_part, flrate.get(), sol_base.get(), sol);
+  LoadData::rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flrate.get(), sol_base.get(), &sol_alpha);
   // ------------------------------------------------- 
 
   // If new_tangent_flag == TRUE, update the tangent matrix;
@@ -138,16 +132,8 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   // Now do consistent Newton-Raphson iteration
   do
   {
-#ifdef PETSC_USE_LOG
-    PetscLogEventBegin(lin_solve_event, 0,0,0,0);
-#endif
-    
     // solve the equation K dot_step = G
     lsolver->Solve( gassem_ptr->G, dot_step.get() );
-
-#ifdef PETSC_USE_LOG
-    PetscLogEventEnd(lin_solve_event,0,0,0,0);
-#endif
 
     bc_mat->MatMultSol( dot_step.get() );
 
@@ -208,46 +194,7 @@ void PNonlinear_NS_Solver::GenAlpha_Solve_NS(
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
-  if(relative_error <= nr_tol || residual_norm <= na_tol) conv_flag = true;
-  else conv_flag = false;
-}
-
-void PNonlinear_NS_Solver::rescale_inflow_value( const double &stime,
-    const ALocal_InflowBC * const &infbc,
-    PDNSolution * const &sol ) const
-{
-  const int num_nbc = infbc -> get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    const int numnode = infbc -> get_Num_LD( nbc_id );
-
-    const double factor  = flrate -> get_flow_rate( nbc_id, stime );
-    const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
-
-    for(int ii=0; ii<numnode; ++ii)
-    {
-      const int node_index = infbc -> get_LDN( nbc_id, ii );
-      
-      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
-
-      double base_vals[3];
-
-      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
-
-      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
-
-      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
-        base_vals[1] * factor * (1.0 + perturb_y),
-        base_vals[2] * factor * (1.0 + perturb_z) };
-
-      VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
-    }
-  }
-
-  sol->Assembly_GhostUpdate();
+  return nl_counter;
 }
 
 void PNonlinear_NS_Solver::rescale_dot_inflow_value( const double &stime,

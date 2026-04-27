@@ -232,6 +232,8 @@ void PLocAssem_Transport_GenAlpha::Assem_Residual_EBC(
     double surface_area;
     const Vector_3 n_out = elements->get_2d_normal_out(qua, surface_area);
 
+    UNUSED(n_out);
+
     Vector_3 coor(0.0, 0.0, 0.0);
 
     for(int ii=0; ii<snLocBas; ++ii)

@@ -10,12 +10,16 @@
 // or 8-node quadrilateral, as the quadratic
 // elements at present.
 // ============================================================================
-#include "Tet_Tools.hpp"
+#include "DataVecStr.hpp"
+#include "IIEN.hpp"
+#include "Vector_3.hpp"
 
-#include <vtkQuad.h>
-#include <vtkBiQuadraticQuad.h>
-#include <vtkHexahedron.h>
-#include <vtkTriQuadraticHexahedron.h>
+#include "vtkQuad.h"
+#include "vtkBiQuadraticQuad.h"
+#include "vtkHexahedron.h"
+#include "vtkTriQuadraticHexahedron.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkPolyData.h"
 
 namespace HEX_T
 {

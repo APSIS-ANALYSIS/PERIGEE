@@ -1,6 +1,6 @@
 #include "FEAElement_Quad9.hpp"
 
-FEAElement_Quad9::FEAElement_Quad9( const int &in_nqua ) : numQuapts( in_nqua )
+FEAElement_Quad9::FEAElement_Quad9( int in_nqua ) : numQuapts( in_nqua )
 {
   R.resize(nLocBas * numQuapts, 0.0);
 
@@ -21,9 +21,9 @@ void FEAElement_Quad9::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
-void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y )
+void FEAElement_Quad9::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y )
 {
   ASSERT(quad->get_dim() == 2, "FEAElement_Quad9::buildBasis function error.\n" );
 
@@ -158,8 +158,8 @@ void FEAElement_Quad9::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-double FEAElement_Quad9::get_h( const double * const &ctrl_x,
-    const double * const &ctrl_y ) const
+double FEAElement_Quad9::get_h( const double * ctrl_x,
+    const double * ctrl_y ) const
 {
   const double diag[2] { std::pow((ctrl_x[0] - ctrl_x[2]), 2.0) 
       + std::pow((ctrl_y[0] - ctrl_y[2]), 2.0),
@@ -171,22 +171,22 @@ double FEAElement_Quad9::get_h( const double * const &ctrl_x,
   return std::sqrt(d);
 }
 
-void FEAElement_Quad9::get_R( const int &quaindex, 
-    double * const &basis ) const
+void FEAElement_Quad9::get_R( int quaindex, 
+    double * basis ) const
 {
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
-std::vector<double> FEAElement_Quad9::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Quad9::get_R( int quaindex ) const
 {
   const int offset = quaindex * nLocBas;
   std::vector<double> vec(R.begin() + offset, R.begin() + offset + 9);
   return vec;
 }
 
-void FEAElement_Quad9::get_gradR( const int &quaindex, 
-    double * const &basis_x, double * const &basis_y ) const
+void FEAElement_Quad9::get_gradR( int quaindex, 
+    double * basis_x, double * basis_y ) const
 {
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii)
@@ -196,9 +196,9 @@ void FEAElement_Quad9::get_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Quad9::get_R_gradR( const int &quaindex, 
-    double * const &basis, double * const &basis_x, 
-    double * const &basis_y ) const
+void FEAElement_Quad9::get_R_gradR( int quaindex, 
+    double * basis, double * basis_x, 
+    double * basis_y ) const
 {
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii)
@@ -209,11 +209,11 @@ void FEAElement_Quad9::get_R_gradR( const int &quaindex,
   }
 }
 
-void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
-    double * const &basis,
-    double * const &basis_x, double * const &basis_y,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_xy ) const
+void FEAElement_Quad9::get_2D_R_dR_d2R( int quaindex,
+    double * basis,
+    double * basis_x, double * basis_y,
+    double * basis_xx, double * basis_yy,
+    double * basis_xy ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Quad9::get_2D_R_dR_d2R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -228,13 +228,13 @@ void FEAElement_Quad9::get_2D_R_dR_d2R( const int &quaindex,
   }
 }
 
-std::array<double,4> FEAElement_Quad9::get_Jacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Quad9::get_Jacobian_2D(int quaindex) const
 {
   return {{ Jac[4*quaindex], Jac[4*quaindex+1],
     Jac[4*quaindex+2], Jac[4*quaindex+3] }};
 }
 
-std::array<double,4> FEAElement_Quad9::get_invJacobian_2D(const int &quaindex) const
+std::array<double,4> FEAElement_Quad9::get_invJacobian_2D(int quaindex) const
 {
   const int offset = 4 * numQuapts + 4 * quaindex;
   return {{ Jac[offset], Jac[offset+1], Jac[offset+2], Jac[offset+3] }};

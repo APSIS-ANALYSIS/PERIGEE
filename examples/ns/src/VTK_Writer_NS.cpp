@@ -1,12 +1,5 @@
 #include "VTK_Writer_NS.hpp"
 
-VTK_Writer_NS::VTK_Writer_NS( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file )
-: nLocBas( in_nlocbas ), nElem( in_nelem ) 
-{
-  epart_map = VIS_T::read_epart( epart_file, nElem );
-}
-
 void VTK_Writer_NS::writeOutput(
     const FEANode * const &fnode_ptr,
     const ALocal_IEN * const &lien_ptr,
@@ -15,6 +8,7 @@ void VTK_Writer_NS::writeOutput(
     FEAElement * const &elemptr,
     const IQuadPts * const &quad,
     const double * const * const &pointArrays,
+    const std::vector<int> &epart_map,
     const int &rank, const int &size,
     const double &sol_time,
     const std::string &basename,
@@ -22,7 +16,7 @@ void VTK_Writer_NS::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
-  Interpolater intep( nLocBas );
+  const int nLocBas = elemptr -> get_nLocBas();
 
   // Allocate VTK gridData object
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
@@ -49,7 +43,7 @@ void VTK_Writer_NS::writeOutput(
 
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
+    const auto IEN_e = lien_ptr -> get_LIEN( ee );
 
     std::vector<double> ectrl_x ( nLocBas, 0.0 );
     std::vector<double> ectrl_y ( nLocBas, 0.0 );
@@ -60,7 +54,7 @@ void VTK_Writer_NS::writeOutput(
     elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
     
     // Interpolate nodal coordinates
-    intep.interpolateVTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
+    Interp::VTKPts(&IEN_e[0], &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
         elemptr, points );
   
     std::vector<double> inputInfo; inputInfo.clear();
@@ -75,7 +69,7 @@ void VTK_Writer_NS::writeOutput(
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk] );
     }
  
-    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+    Interp::VTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[0] ); 
 
     // Interpolate velocity vector
@@ -87,7 +81,7 @@ void VTK_Writer_NS::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, &IEN_e[0], &inputInfo[0],
+    Interp::VTKData( asize, &IEN_e[0], &inputInfo[0],
         elemptr, dataVecs[1] );
 
     // Set mesh connectivity

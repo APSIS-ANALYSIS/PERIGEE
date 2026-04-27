@@ -8,7 +8,10 @@
 // Author: Ju Liu
 // Date: Nov. 10 2013
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include "Sys_Tools.hpp"
+#include "Vec_Tools.hpp"
+
+class HDF5_Reader;
 
 class ALocal_Elem
 {
@@ -16,7 +19,7 @@ class ALocal_Elem
     // ------------------------------------------------------------------------
     // Constructor : read the h5 file of the given base name and rank
     // ------------------------------------------------------------------------
-    ALocal_Elem(const std::string &fbasename, const int &cpu_rank);
+    ALocal_Elem(const std::string &fbasename, int cpu_rank);
 
     ALocal_Elem(const HDF5_Reader * const &h5r);
 
@@ -29,7 +32,7 @@ class ALocal_Elem
     // Return the element index based on the local element index.
     // 0 <= index < nlocalele
     // ------------------------------------------------------------------------
-    virtual int get_elem_loc(const int &index) const {return elem_loc[index];}
+    virtual int get_elem_loc(int index) const {return elem_loc[index];}
    
     // ------------------------------------------------------------------------
     // Return the number of elements in this sub-domain owned by this CPU. 
@@ -40,13 +43,13 @@ class ALocal_Elem
     // Return the number of elements with tag value being the input tag_val.
     // This function can only be called when isTagged = true.
     // ------------------------------------------------------------------------
-    virtual int get_nlocalele( const int &tag_val ) const;
+    virtual int get_nlocalele( int tag_val ) const;
 
     // ------------------------------------------------------------------------
     // Given the global element index, return its location in the vector
     // elem_loc. If it does not belong to this sub-domain, it will return -1
     // ------------------------------------------------------------------------
-    virtual int get_pos(const int &global_e_index) const 
+    virtual int get_pos( int global_e_index ) const 
     {return VEC_T::get_pos(elem_loc, global_e_index);}
 
     virtual void print_info() const;
@@ -57,7 +60,7 @@ class ALocal_Elem
     // such as fluid/fixed vs. solid/rotated subdomains. For a single domain problem,
     // this function is NOT needed, and returns a default value of 0.
     // ------------------------------------------------------------------------
-    virtual int get_elem_tag(const int &ee) const
+    virtual int get_elem_tag( int ee ) const
     {
       ASSERT(isTagged, "Error: get_elem_tag function 'isTagged' is false.\n");
       return elem_tag[ee];

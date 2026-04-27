@@ -45,19 +45,7 @@ PLinear_Solver_PETSc::~PLinear_Solver_PETSc()
 
 void PLinear_Solver_PETSc::Solve( const Vec &G, Vec &out_sol, const bool &isPrint )
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent solver_gmres;
-  PetscClassId classid_ls;
-  PetscClassIdRegister("petsc_ls", &classid_ls);
-  PetscLogEventRegister("petsc solver", classid_ls, &solver_gmres);
-  PetscLogEventBegin(solver_gmres,0,0,0,0);
-#endif
-
   KSPSolve(ksp, G, out_sol);
-
-#ifdef PETSC_USE_LOG
-  PetscLogEventEnd(solver_gmres,0,0,0,0);
-#endif
 
   if( isPrint )
   {
@@ -72,20 +60,8 @@ void PLinear_Solver_PETSc::Solve( const Vec &G, Vec &out_sol, const bool &isPrin
 void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, Vec &out_sol,
    const bool &isPrint )
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent solver_gmres;
-  PetscClassId classid_ls;
-  PetscClassIdRegister("petsc_ls", &classid_ls);
-  PetscLogEventRegister("petsc solver", classid_ls, &solver_gmres);
-  PetscLogEventBegin(solver_gmres,0,0,0,0);
-#endif
-
   KSPSetOperators(ksp, K, K);
   KSPSolve(ksp, G, out_sol);
-
-#ifdef PETSC_USE_LOG
-  PetscLogEventEnd(solver_gmres,0,0,0,0);
-#endif
 
   if( isPrint )
   {
@@ -100,20 +76,8 @@ void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, Vec &out_sol,
 void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G, 
     PDNSolution * const &out_sol, const bool &isPrint )
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent solver_gmres;
-  PetscClassId classid_ls;
-  PetscClassIdRegister("petsc_ls", &classid_ls);
-  PetscLogEventRegister("petsc solver", classid_ls, &solver_gmres);
-  PetscLogEventBegin(solver_gmres,0,0,0,0);
-#endif
-
   KSPSetOperators(ksp, K, K);
   KSPSolve(ksp, G, out_sol->solution);
-
-#ifdef PETSC_USE_LOG
-  PetscLogEventEnd(solver_gmres,0,0,0,0);
-#endif
 
   if( isPrint )
   {
@@ -131,19 +95,7 @@ void PLinear_Solver_PETSc::Solve( const Mat &K, const Vec &G,
 void PLinear_Solver_PETSc::Solve( const Vec &G, PDNSolution * const &out_sol,
     const bool &isPrint )
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent solver_gmres;
-  PetscClassId classid_ls;
-  PetscClassIdRegister("petsc_ls", &classid_ls);
-  PetscLogEventRegister("petsc solver", classid_ls, &solver_gmres);
-  PetscLogEventBegin(solver_gmres,0,0,0,0);
-#endif
-
   KSPSolve(ksp, G, out_sol->solution);
-
-#ifdef PETSC_USE_LOG
-  PetscLogEventEnd(solver_gmres,0,0,0,0);
-#endif
 
   if( isPrint )
   {

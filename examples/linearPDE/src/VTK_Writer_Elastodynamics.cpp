@@ -25,8 +25,6 @@ void VTK_Writer_Elastodynamics::writeOutput(
     const std::string &outputName,
     const bool &isXML )
 {
-  Interpolater intep( nLocBas );
-
   // Allocate VTK gridData object
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 
@@ -53,7 +51,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
   int ptOffset = 0;
   for(int ee=0; ee<lelem_ptr->get_nlocalele(); ++ee)
   {
-    const std::vector<int> IEN_e = lien_ptr -> get_LIEN( ee );
+    const auto IEN_e = lien_ptr -> get_LIEN( ee );
 
     std::vector<double> ectrl_x ( nLocBas, 0.0 );
     std::vector<double> ectrl_y ( nLocBas, 0.0 );
@@ -64,7 +62,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
     elemptr->buildBasis( quad, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0] );
     
     // Interpolate nodal coordinates
-    intep.interpolateVTKPts(ptOffset, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
+    Interp::VTKPts(ptOffset, &ectrl_x[0], &ectrl_y[0], &ectrl_z[0],
         elemptr, points );
   
     std::vector<double> inputInfo; inputInfo.clear();
@@ -77,7 +75,7 @@ void VTK_Writer_Elastodynamics::writeOutput(
       for(int kk=0; kk<asize; ++kk)
         inputInfo.push_back( pointArrays[0][pt_index * asize + kk ] );
     }
-    intep.interpolateVTKData( asize, ptOffset, &inputInfo[0],
+    Interp::VTKData( asize, ptOffset, &inputInfo[0],
         elemptr, dataVecs[0] );
 
     interpolateCauchy( ptOffset, &inputInfo[0], elemptr, dataVecs[1] );
@@ -138,8 +136,6 @@ void VTK_Writer_Elastodynamics::interpolateCauchy( const int &ptOffset,
     const double * const &inputData, FEAElement * const &elem,
     vtkDoubleArray * const &vtkData)
 {
-  Interpolater intep( nLocBas );
-
   const double l2mu = lambda + 2.0 * mu;
 
   const int nqp = elem->get_numQuapts();
@@ -157,9 +153,9 @@ void VTK_Writer_Elastodynamics::interpolateCauchy( const int &ptOffset,
     uz[ii] = inputData[ii*3+2];
   }
 
-  intep.interpolateFE_Grad(ux, elem, ux_x, ux_y, ux_z);
-  intep.interpolateFE_Grad(uy, elem, uy_x, uy_y, uy_z);
-  intep.interpolateFE_Grad(uz, elem, uz_x, uz_y, uz_z);
+  Interp::FE_Grad(ux, elem, ux_x, ux_y, ux_z);
+  Interp::FE_Grad(uy, elem, uy_x, uy_y, uy_z);
+  Interp::FE_Grad(uz, elem, uz_x, uz_y, uz_z);
 
   double sigma_xx = 0.0, sigma_yy = 0.0, sigma_zz = 0.0;
   double sigma_xy = 0.0, sigma_xz = 0.0, sigma_yz = 0.0;

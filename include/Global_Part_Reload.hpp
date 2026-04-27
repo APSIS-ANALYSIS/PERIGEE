@@ -7,30 +7,31 @@
 // Author: Ju Liu
 // Date: Dec. 9 2021
 // ============================================================================
+#include <string>
+#include <vector>
 #include "IGlobal_Part.hpp"
-#include "HDF5_Reader.hpp"
 
 class Global_Part_Reload : public IGlobal_Part
 {
   public:
-    Global_Part_Reload(  const int &cpu_size, const int &in_ncommon, 
-        const bool &isDualGraph, const std::string &element_part_name = "epart",
+    Global_Part_Reload( int cpu_size, int in_ncommon, 
+        bool isDualGraph, const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
-    virtual ~Global_Part_Reload();
+    ~Global_Part_Reload() override = default;
 
-    virtual idx_t get_epart( const int &ee ) const {return static_cast<idx_t>(epart[ee]);}
+    idx_t get_epart( int ee ) const override {return static_cast<idx_t>(epart[ee]);}
 
-    virtual idx_t get_npart( const int &nn, const int &field ) const 
+    idx_t get_npart( int nn, int field ) const override
     {return static_cast<idx_t>(npart[nn + field_offset[field]]);}
 
-    virtual bool get_isMETIS() const {return isMETIS;};
+    bool get_isMETIS() const override {return isMETIS;};
 
-    virtual bool get_isDual() const {return isDual;};
+    bool get_isDual() const override {return isDual;};
 
-    virtual int get_dual_edge_ncommon() const {return dual_edge_ncommon;}
+    int get_dual_edge_ncommon() const override {return dual_edge_ncommon;}
 
-    virtual bool is_serial() const {return isSerial;}
+    bool is_serial() const override {return isSerial;}
 
   private:
     bool isMETIS, isDual, isSerial;

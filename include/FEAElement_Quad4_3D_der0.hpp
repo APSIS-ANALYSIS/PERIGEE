@@ -35,7 +35,7 @@
 class FEAElement_Quad4_3D_der0 final : public FEAElement
 {
   public:
-    FEAElement_Quad4_3D_der0( const int &in_nqua );
+    FEAElement_Quad4_3D_der0( int in_nqua );
 
     ~FEAElement_Quad4_3D_der0() override = default;
 
@@ -49,25 +49,25 @@ class FEAElement_Quad4_3D_der0 final : public FEAElement
 
     void print_info() const override;
 
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
     // Assuming the quad nodes are arranged such that the outward
     // direction is given by dx_dr x dx_ds
-    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override;
+    Vector_3 get_2d_normal_out( int quaindex, double &area ) const override;
     
     // If the quad nodes are NOT arranged in any particular order,
     // use an interior node to define the outward direction. 
-    Vector_3 get_normal_out( const int &quaindex, const Vector_3 &sur_pt,
+    Vector_3 get_normal_out( int quaindex, const Vector_3 &sur_pt,
         const Vector_3 &int_pt, double &len ) const override;
 
-    double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
+    double get_detJac(int quaindex) const override {return detJac[quaindex];}
 
   private:
     static constexpr int nLocBas = 4;

@@ -50,26 +50,25 @@ class NBC_Partition
     virtual void write_hdf5( const std::string &FileName, 
         const std::string &GroupName ) const;
 
-    virtual void print_info() const;
+    void print_info() const;
 
-    virtual int get_LID( const int &ii ) const {return LID[ii];}
+    int get_LID( int ii ) const {return LID[ii];}
 
-    virtual int get_LDN( const int &ii ) const {return LDN[ii];}
+    int get_LDN( int ii ) const {return LDN[ii];}
 
-    virtual int get_LPSN( const int &ii ) const {return LPSN[ii];}
+    int get_LPSN( int ii ) const {return LPSN[ii];}
 
-    virtual int get_LPMN( const int &ii ) const {return LPMN[ii];}
+    int get_LPMN( int ii ) const {return LPMN[ii];}
 
-    virtual int get_LocalMaster( const int &ii ) const {return LocalMaster[ii];}
+    int get_LocalMaster( int ii ) const {return LocalMaster[ii];}
 
-    virtual int get_LocalMasterSlave( const int &ii ) const 
-    {return LocalMasterSlave[ii];}
+    int get_LocalMasterSlave( int ii ) const {return LocalMasterSlave[ii];}
 
-    virtual int get_Num_LD( const int &ii ) const {return Num_LD[ii];}
+    int get_Num_LD( int ii ) const {return Num_LD[ii];}
 
-    virtual int get_Num_LPS( const int &ii ) const {return Num_LPS[ii];}
+    int get_Num_LPS( int ii ) const {return Num_LPS[ii];}
 
-    virtual int get_Num_LPM( const int &ii ) const {return Num_LPM[ii];}
+    int get_Num_LPM( int ii ) const {return Num_LPM[ii];}
 
   protected:
     const int cpu_rank;

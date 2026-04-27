@@ -32,9 +32,10 @@
 //
 // Date: Jan. 10 2017
 // ==================================================================
-#include "Hex_Tools.hpp"
-#include "IIEN.hpp"
-#include "FEType.hpp"
+#include "Sys_Tools.hpp"
+#include "Vector_3.hpp"
+
+class IIEN;
 
 class ElemBC
 {
@@ -50,19 +51,19 @@ class ElemBC
     
     // This returns the number of nodes on the surface with ebc_id, wherein
     // 0 <= ebc_id < get_num_ebc() 
-    virtual int get_num_node(const int &ebc_id) const
+    virtual int get_num_node(int ebc_id) const
     {SYS_T::commPrint("Warning: get_num_node is not implemented. \n"); return 0;}
     
     // This returns the number of cells on the surface with ebc_id, wherein
     // 0 <= ebc_id < get_num_ebc()
-    virtual int get_num_cell(const int &ebc_id) const
+    virtual int get_num_cell(int ebc_id) const
     {SYS_T::commPrint("Warning: get_num_cell is not implemented. \n"); return 0;}
 
     // This returns the number of local nodes in the boundary cell. For example,
     // linear triangles return 3;
     // bilinear quad returns 4;
     // quadratic triangles return 6.
-    virtual int get_cell_nLocBas(const int &ebc_id) const
+    virtual int get_cell_nLocBas(int ebc_id) const
     {SYS_T::commPrint("Warning: get_cell_nLocBas is not implemented. \n"); return 0;}
     
     // This returns the coordinates of the nodal points, wherein
@@ -72,8 +73,8 @@ class ElemBC
     // dir = 0 => x direction
     // dir = 1 => y direction
     // dir = 2 => z direction
-    virtual double get_pt_xyz(const int &ebc_id, const int &node, 
-        const int &dir) const
+    virtual double get_pt_xyz(int ebc_id, int node, 
+        int dir) const
     {SYS_T::commPrint("Warning: get_pt_xyz is not implemented. \n"); return 0.0;}
 
     // This returns the connectivity for the surface cell with the node list
@@ -81,37 +82,37 @@ class ElemBC
     // 0 <= ebc_id < get_num_ebc();
     // 0 <= cell   < get_num_cell();
     // 0 <= lnode  < get_cell_nLocBas().
-    virtual int get_ien(const int &ebc_id, const int &cell, const int &lnode) const
+    virtual int get_ien(int ebc_id, int cell, int lnode) const
     {SYS_T::commPrint("Warning: get_ien is not implemented. \n"); return 0;}
 
     // This returns the global node index (i.e., the node indices in the
     // volumetric mesh) for nodes.
     // 0 <= ebc_id < get_num_ebc();
     // 0 <= node   < get_num_node(ebc_id);
-    virtual int get_global_node(const int &ebc_id, const int &node_index) const
+    virtual int get_global_node(int ebc_id, int node_index) const
     {SYS_T::commPrint("Warning: get_global_node is not implemented. \n"); return 0;}
 
-    virtual void get_global_node(const int &ebc_id,std::vector<int> &out) const
+    virtual void get_global_node(int ebc_id,std::vector<int> &out) const
     {SYS_T::commPrint("Warning: get_global_node is not implemented. \n");}
 
-    virtual std::vector<int> get_global_node(const int &ebc_id) const
+    virtual std::vector<int> get_global_node(int ebc_id) const
     {SYS_T::commPrint("Warning: get_global_node is not implemented. \n"); return {};}
 
     // This returns the global volumetric element index for the surface cells.
-    virtual int get_global_cell(const int &ebc_id, const int &cell_index) const
+    virtual int get_global_cell(int ebc_id, int cell_index) const
     {SYS_T::commPrint("Warning: get_global_cell is not implemented. \n"); return 0;}
 
     // This returns the cell's interior point's xyz coordinates.
-    virtual double get_intpt_xyz(const int &ebc_id, const int &cell_index,
-        const int &dir) const
+    virtual double get_intpt_xyz(int ebc_id, int cell_index,
+        int dir) const
     {SYS_T::commPrint("Warning: get_intpt_xyz is not implemented. \n"); return 0.0;}
 
     // This function returns the outward normal vector for faces
-    virtual Vector_3 get_normal_vec( const int &ebc_id ) const
+    virtual Vector_3 get_normal_vec( int ebc_id ) const
     {SYS_T::commPrint("Warning: get_normal_vec is not implemented. \n"); return Vector_3();}
 
     // This function returns the integral of basis NA on the faces
-    virtual std::vector<double> get_intNA( const int &ebc_id ) const
+    virtual std::vector<double> get_intNA( int ebc_id ) const
     {SYS_T::commPrint("Warning: get_intNA is not implemented.\n"); return {};}
 
     // Access the data in ElemBC_3D_wall_turbulence, wall model type
@@ -119,7 +120,7 @@ class ElemBC
     {SYS_T::commPrint("Warning: get_wall_model_type is not implemented. \n"); return -1;}
 
     // Access the data in ElemBC_3D_wall_turbulence, face id of volume element
-    virtual int get_faceID( const int &cell_index ) const
+    virtual int get_faceID( int cell_index ) const
     {SYS_T::commPrint("Warning: get_faceID is not implemented. \n"); return {};}
  
     // print the information of the ebc object on screen.    

@@ -1,7 +1,7 @@
 #include "QuadPts_Gauss_1D.hpp"
 
-QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min, 
-    const double &max ) : num_pts(in_num_pts)
+QuadPts_Gauss_1D::QuadPts_Gauss_1D( int in_num_pts, double min,
+    double max ) : num_pts(in_num_pts)
 {
   // Make sure that min < max
   SYS_T::print_fatal_if( min >= max, "Error: QuadPts_Gauss_1D, the given range of quadrature domain is incorrect.\n");
@@ -122,12 +122,12 @@ QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min,
       qw.push_back(0.090324080347429);
       qw.push_back(0.040637194180787);
       break;
-   
+
     case 10:
       qp.push_back(0.986953264258586);
       qp.push_back(0.932531683344492);
       qp.push_back(0.839704784149512);
-      qp.push_back(0.716697697064624); 
+      qp.push_back(0.716697697064624);
       qp.push_back(0.574437169490816);
       qp.push_back(0.425562830509184);
       qp.push_back(0.283302302935376);
@@ -157,7 +157,7 @@ QuadPts_Gauss_1D::QuadPts_Gauss_1D( const int &in_num_pts, const double &min,
   // Reverse the points and weights to make them in ascending order
   std::reverse(qp.begin(), qp.end());
   std::reverse(qw.begin(), qw.end());
-  
+
   // Now map the rule to the [min, max] domain via a linear change of interval
   // x = (max-min) xi + min
   // see en.wikipedia.org/wiki/Gaussian_quadrature

@@ -1,6 +1,7 @@
 #include "TimeMethod_GenAlpha.hpp"
+#include "Sys_Tools.hpp"
 
-TimeMethod_GenAlpha::TimeMethod_GenAlpha(const double &input_spectral )
+TimeMethod_GenAlpha::TimeMethod_GenAlpha(double input_spectral )
 : rho_infty( input_spectral ), 
   alpha_m( 0.5 * (3.0 - input_spectral) / (1.0 + input_spectral) ),
   alpha_f( 1.0/(1.0 + input_spectral) ),
@@ -10,8 +11,8 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha(const double &input_spectral )
 {
 }
 
-TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &in_alpha_m,
-    const double &in_alpha_f, const double &in_gamma )
+TimeMethod_GenAlpha::TimeMethod_GenAlpha( double in_alpha_m,
+    double in_alpha_f, double in_gamma )
 : rho_infty(0.0), alpha_m(in_alpha_m), 
   alpha_f(in_alpha_f), gamma(in_gamma), 
   beta( 0.25 * (1.0 - alpha_f + alpha_m) * (1.0 - alpha_f + alpha_m) ), 
@@ -19,8 +20,8 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &in_alpha_m,
 {
 }
 
-TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
-    const bool &input_is2ndorder )
+TimeMethod_GenAlpha::TimeMethod_GenAlpha( double input_spectral,
+    bool input_is2ndorder )
 : rho_infty(input_spectral), is2nd( input_is2ndorder ), is_rho_set(true)
 {
   if(is2nd)
@@ -40,7 +41,7 @@ TimeMethod_GenAlpha::TimeMethod_GenAlpha( const double &input_spectral,
 
 void TimeMethod_GenAlpha::print_info() const
 {
-  SYS_T::print_sep_line();
+  SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("Generalized-alpha method ");
   if(is2nd) SYS_T::commPrint("for 2nd-order system: \n");
   else SYS_T::commPrint("for 1st-order system: \n");
@@ -49,9 +50,8 @@ void TimeMethod_GenAlpha::print_info() const
   SYS_T::commPrint("  --- Alpha_f: %e \n", alpha_f);
   SYS_T::commPrint("  --- Alpha_m: %e \n", alpha_m);
   SYS_T::commPrint("  --- Gamma  : %e \n", gamma);
-  if(is2nd) SYS_T::commPrint("  --- Beta   : %e \n", beta);
-  else SYS_T::commPrint("  --- Beta   : %e (unused) \n", beta);
-  SYS_T::print_sep_line();
+  SYS_T::commPrint("  --- Beta   : %e \n", beta);
+  SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
 // EOF

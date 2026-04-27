@@ -7,11 +7,10 @@
 // ============================================================================
 #include "HDF5_Tools.hpp"
 #include "Tet_Tools.hpp"
+#include "VTK_Tools.hpp"
+#include "Vis_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
-
-std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap, const int &vec_size, const int &in_dof );
 
 void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
@@ -44,24 +43,22 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(SYS_T::get_MPI_size() != 1, "ERROR: preprocessor needs to be run in serial.\n");
   
   // Read in the mesh file
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
 
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string wall_file = cmd_h5r -> read_string("/", "sur_f_file_wall");
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
   
-  hid_t anacmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT );
   
-  HDF5_Reader * ana_h5r = new HDF5_Reader( anacmd_file );
+  HDF5_Reader * ana_h5r = new HDF5_Reader( "solver_cmd.h5" );
   
   const std::string sol_bname = ana_h5r -> read_string("/", "sol_bName");
   
   const double fluid_mu = ana_h5r -> read_doubleScalar("/", "fl_mu");
 
-  delete ana_h5r; H5Fclose(anacmd_file);
+  delete ana_h5r;
 
   SYS_T::GetOptionInt("-time_start", time_start);
   SYS_T::GetOptionInt("-time_step", time_step);
@@ -149,8 +146,7 @@ int main( int argc, char * argv[] )
   FEAElement * element = new FEAElement_Tet4( quad-> get_num_quadPts() );
 
   // Read the node mappings
-  const std::vector<int> analysis_new2old = HDF5_T::read_intVector( "node_mapping_v.h5",
-      "/", "new_2_old" );
+  const auto analysis_new2old = HDF5_T::read_intVector("node_mapping_v.h5", "/", "new_2_old");
 
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
@@ -177,8 +173,8 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
         velo_sol_name.c_str(), name_to_write.c_str() );
 
-    const std::vector<double> disp_sol = ReadPETSc_Vec( disp_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );
-    const std::vector<double> velo_sol = ReadPETSc_Vec( velo_sol_name, analysis_new2old, v_nFunc*dof_v, dof_v );  
+    const auto disp_sol = VIS_T::readPETSc_vec( disp_sol_name, analysis_new2old, dof_v );
+    const auto velo_sol = VIS_T::readPETSc_vec( velo_sol_name, analysis_new2old, dof_v );  
 
     // Ensure that the coordinates of the control points remain in the undeformed state
     v_ctrlPts = v_ctrlPts_origin;
@@ -351,49 +347,6 @@ int main( int argc, char * argv[] )
   delete quad; delete element;
   PetscFinalize();
   return EXIT_SUCCESS;
-}
-
-std::vector<double> ReadPETSc_Vec( const std::string &solution_file_name,
-    const std::vector<int> &nodemap, const int &vec_size, const int &in_dof )
-{
-  Vec sol_temp;
-  VecCreate(PETSC_COMM_SELF, &sol_temp);
-  VecSetType(sol_temp, VECSEQ);
-
-  PetscViewer viewer;
-  PetscViewerBinaryOpen(PETSC_COMM_SELF, solution_file_name.c_str(), 
-      FILE_MODE_READ, &viewer);
-  VecLoad(sol_temp, viewer);
-  PetscViewerDestroy(&viewer);
-
-  // Check the solution length
-  PetscInt get_sol_temp_size;
-  VecGetSize(sol_temp, &get_sol_temp_size);
-  SYS_T::print_fatal_if( get_sol_temp_size != vec_size, "The solution size %d is not compatible with the size %d given by partition file! \n", get_sol_temp_size, vec_size);
-
-  std::vector<double> veccopy( vec_size, 0.0 );
-  
-  double * array_temp;
-  VecGetArray(sol_temp, &array_temp);
-
-  for(int ii=0; ii<vec_size; ++ii) veccopy[ii] = array_temp[ii];
-
-  VecRestoreArray(sol_temp, &array_temp);
-  VecDestroy(&sol_temp);
-
-  // copy the solution varibles to the correct location
-  std::vector<double> sol( vec_size, 0.0 );
-
-  // check the nodemap size
-  SYS_T::print_fatal_if( VEC_T::get_size(nodemap) * in_dof != vec_size, "Error: node map size is incompatible with the solution length. \n");
-
-  for(int ii=0; ii<VEC_T::get_size(nodemap); ++ii)
-  {
-    for(int jj=0; jj<in_dof; ++jj)
-      sol[in_dof*nodemap[ii]+jj] = veccopy[in_dof*ii+jj];
-  }
-
-  return sol;
 }
 
 void write_triangle_grid_wss( const std::string &filename,

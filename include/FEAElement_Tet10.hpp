@@ -41,7 +41,7 @@
 class FEAElement_Tet10 final : public FEAElement
 {
   public:
-    FEAElement_Tet10( const int &in_nqua );
+    FEAElement_Tet10( int in_nqua );
 
     ~FEAElement_Tet10() override = default;
 
@@ -57,62 +57,61 @@ class FEAElement_Tet10 final : public FEAElement
 
     // Given the quadrature points and nodal coordinates, evaluate
     // the basis functions and their derivatives up to second order
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Return the element size.
     // Here we adopt the algorithm for Tet4 and use the four vertex
     // nodes to calculate the element size
-    double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) const override;
+    double get_h( const double * ctrl_x, const double * ctrl_y,
+        const double * ctrl_z ) const override;
 
     // get_xxx functions give access to function evaluations at the
     // quadrature point corresponding to quaindex
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
-    void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z ) const override;
+    void get_gradR( int quaindex, double * basis_x,
+        double * basis_y, double * basis_z ) const override;
 
-    void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y,
-        double * const &basis_z ) const override;
+    void get_R_gradR( int quaindex, double * basis,
+        double * basis_x, double * basis_y,
+        double * basis_z ) const override;
 
-    void get_3D_R_dR_d2R( const int &quaindex,
-        double * const &basis, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_zz, double * const &basis_xy,
-        double * const &basis_xz, double * const &basis_yz ) const override;
+    void get_3D_R_dR_d2R( int quaindex,
+        double * basis, double * basis_x,
+        double * basis_y, double * basis_z,
+        double * basis_xx, double * basis_yy,
+        double * basis_zz, double * basis_xy,
+        double * basis_xz, double * basis_yz ) const override;
 
-    void get_3D_R_gradR_LaplacianR( const int &quaindex,
-        double * const &basis, double * const &basis_x,
-        double * const &basis_y, double * const &basis_z,
-        double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_zz ) const override;
+    void get_3D_R_gradR_LaplacianR( int quaindex,
+        double * basis, double * basis_x,
+        double * basis_y, double * basis_z,
+        double * basis_xx, double * basis_yy,
+        double * basis_zz ) const override;
 
-    std::array<double,9> get_Jacobian( const int &quaindex ) const override;
+    std::array<double,9> get_Jacobian( int quaindex ) const override;
 
-    std::array<double,9> get_invJacobian( const int &quaindex ) const override;
+    std::array<double,9> get_invJacobian( int quaindex ) const override;
 
-    double get_detJac(const int &quaindex) const override {return detJac[quaindex];}
+    double get_detJac(int quaindex) const override {return detJac[quaindex];}
 
     // Build basis and build the boundary element
     //   Tet-Face-0 : Node 1 2 3 5 9 8
     //   Tet-Face-1 : Node 0 3 2 7 9 6
     //   Tet-Face-2 : Node 0 1 3 4 8 7
     //   Tet-Face-3 : Node 0 2 1 6 5 4
-    void buildBasis( const int &face_id, const IQuadPts * const &quad_rule_s,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y,
-        const double * const &ctrl_z ) override;
+    void buildBasis( int face_id, const IQuadPts * quad_rule_s,
+        const double * ctrl_x,
+        const double * ctrl_y,
+        const double * ctrl_z ) override;
 
     // Get the outwardnormal on faces
-    Vector_3 get_2d_normal_out( const int &quaindex, double &area ) const override
+    Vector_3 get_2d_normal_out( int quaindex, double &area ) const override
     {return triangle_face->get_2d_normal_out( quaindex, area );}
 
   private:

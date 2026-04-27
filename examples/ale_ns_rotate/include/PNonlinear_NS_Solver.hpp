@@ -48,7 +48,7 @@ class PNonlinear_NS_Solver
     // This solver solves the Navier-Stokes using 2nd-order Generalized
     // alpha method.
     // --------------------------------------------------------------
-    void GenAlpha_Solve_NS(
+    int GenAlpha_Solve_NS(
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
@@ -66,7 +66,7 @@ class PNonlinear_NS_Solver
         const PDNSolution * const &disp_mesh,
         const PDNSolution * const &mvelo_alpha,    
         const PDNSolution * const &mdisp_alpha,  
-        bool &conv_flag, int &nl_counter,
+        bool &conv_flag,
         Mat &shell ) const;
 
   private:
@@ -78,6 +78,12 @@ class PNonlinear_NS_Solver
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<IFlowRate> flrate;
     const std::unique_ptr<PDNSolution> sol_base;
+
+#ifdef PETSC_USE_LOG
+    PetscLogEvent mat_assem_0_event, mat_assem_1_event;
+    PetscLogEvent vec_assem_0_event, vec_assem_1_event;
+    PetscClassId classid_assembly;
+#endif
 
     void Print_convergence_info( int count, double rel_err, double abs_err ) const
     {

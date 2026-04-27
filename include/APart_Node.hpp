@@ -16,7 +16,10 @@
 // Author: Ju Liu
 // Date: Nov. 26th 2013
 // ============================================================================
-#include "HDF5_Reader.hpp"
+#include <vector>
+#include "Sys_Tools.hpp"
+
+class HDF5_Reader;
 
 class APart_Node
 {
@@ -26,7 +29,7 @@ class APart_Node
     //              fbasename : the base name of the h5 file
     //              rank      : the cpu rank
     // ------------------------------------------------------------------------
-    APart_Node( const std::string &fbasename, const int &rank );
+    APart_Node( const std::string &fbasename, int rank );
 
     APart_Node( const HDF5_Reader * const &h5r );
 
@@ -41,17 +44,17 @@ class APart_Node
     // problem's degrees-of-freedom, which is typically obtained by
     // ALocal_NBC->get_dof_LID();
     // ------------------------------------------------------------------------
-    virtual int get_dof() const {return dof;}
+    int get_dof() const noexcept {return dof;}
 
-    virtual int get_nlocalnode() const {return nlocalnode;}
+    int get_nlocalnode() const noexcept {return nlocalnode;}
     
-    virtual int get_nghostnode() const {return nghostnode;}
+    int get_nghostnode() const noexcept {return nghostnode;}
     
-    virtual int get_nbadnode() const {return nbadnode;}
+    int get_nbadnode() const noexcept {return nbadnode;}
     
-    virtual int get_nlocghonode() const {return nlocghonode;}
+    int get_nlocghonode() const noexcept {return nlocghonode;}
     
-    virtual int get_ntotalnode() const {return ntotalnode;}
+    int get_ntotalnode() const noexcept {return ntotalnode;}
 
     // ------------------------------------------------------------------------
     // local_to_global is a mapping that maps from the local node index
@@ -59,26 +62,26 @@ class APart_Node
     // Input: local nodal index with ranges 
     //        0 <= ii < nlocghonode == nlocalnode + nghostnode
     // ------------------------------------------------------------------------
-    virtual int get_local_to_global(const int &ii) const 
+    int get_local_to_global(int ii) const noexcept
     {return local_to_global[ii];}
 
     // ------------------------------------------------------------------------
     // node_ghost maps from [0, nghostnode) to their global/volume mesh index
     // 0 <= ii < nghostnode
     // ------------------------------------------------------------------------
-    virtual int get_node_ghost(const int &ii) const {return node_ghost[ii];}
+    int get_node_ghost(int ii) const noexcept {return node_ghost[ii];}
 
     // ------------------------------------------------------------------------
     // node_loc maps from [0, nlocalnode) to their global/volume mesh index
     // 0 <= index < nlocalnode
     // ------------------------------------------------------------------------
-    virtual int get_node_loc(const int &ii) const {return node_loc[ii];}
+    int get_node_loc(int ii) const noexcept {return node_loc[ii];}
 
     // ------------------------------------------------------------------------
     // Determine if a global mesh node with index belongs to this subdomain.
     // Input: ii is a global/volumetric mesh nodal index. 
     // ------------------------------------------------------------------------
-    virtual bool is_node_local(const int &ii) const
+    virtual bool is_node_local(int ii) const
     {
       return ( find(node_loc.begin(), node_loc.end(), ii) != node_loc.end() );
     }
@@ -86,7 +89,7 @@ class APart_Node
     // ------------------------------------------------------------------------
     // Return this subdomain rank
     // ------------------------------------------------------------------------
-    virtual int get_rank() const {return cpu_rank;}
+    int get_rank() const noexcept {return cpu_rank;}
 
     virtual void print_info() const;
 
@@ -99,7 +102,7 @@ class APart_Node
       return -1;
     }
 
-    virtual int get_node_loc_solid(const int &index) const
+    virtual int get_node_loc_solid(int index) const
     {
       SYS_T::print_fatal("Error: APart_Node::get_node_loc_solid is not implemented.\n");
       return -1;
@@ -111,7 +114,7 @@ class APart_Node
       return -1;
     }
 
-    virtual int get_node_loc_fluid(const int &index) const
+    virtual int get_node_loc_fluid(int index) const
     {
       SYS_T::print_fatal("Error: APart_Node::get_node_loc_fluid is not implemented.\n");
       return -1;
@@ -126,7 +129,7 @@ class APart_Node
       return -1;
     }
 
-    virtual int get_node_loc_rotated(const int &index) const
+    virtual int get_node_loc_rotated(int index) const
     {
       SYS_T::print_fatal("Error: APart_Node::get_node_loc_rotated is not implemented.\n");
       return -1;
@@ -138,7 +141,7 @@ class APart_Node
       return -1;
     }
 
-    virtual int get_node_loc_fixed(const int &index) const
+    virtual int get_node_loc_fixed(int index) const
     {
       SYS_T::print_fatal("Error: APart_Node::get_node_loc_fixed is not implemented.\n");
       return -1;

@@ -1,4 +1,7 @@
 #include "NBC_Partition_MF.hpp"
+#include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
+#include "Vec_Tools.hpp"
 
 NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
@@ -149,36 +152,32 @@ void NBC_Partition_MF::write_hdf5( const std::string &FileName,
   
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  auto h5writer = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
+  const hid_t file_id = h5writer->get_file_id();
 
-  HDF5_Writer * h5writer = new HDF5_Writer(file_id);
+  auto nbc_group = HDF5_Group::open( file_id, GroupName );
 
-  hid_t g_nbc_id = H5Gopen(file_id, GroupName.c_str(), H5P_DEFAULT);
+  auto mf_group = HDF5_Group::create( nbc_group.id(), "MF" );
 
-  hid_t g_id = H5Gcreate(g_nbc_id, "MF", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  h5writer->write_intVector( mf_group.id(), "LID", LID_MF );
 
-  h5writer->write_intVector( g_id, "LID", LID_MF );
-
-  if( LDN_MF.size() > 0 ) h5writer->write_intVector( g_id, "LDN", LDN_MF );
+  if( LDN_MF.size() > 0 ) h5writer->write_intVector( mf_group.id(), "LDN", LDN_MF );
 
   if( LPSN_MF.size() > 0 )
   {
-    h5writer->write_intVector( g_id, "LPSN", LPSN_MF );
-    h5writer->write_intVector( g_id, "LPMN", LPMN_MF );
+    h5writer->write_intVector( mf_group.id(), "LPSN", LPSN_MF );
+    h5writer->write_intVector( mf_group.id(), "LPMN", LPMN_MF );
   }
 
   if( LocalMaster_MF.size() > 0 )
   {
-    h5writer->write_intVector( g_id, "LocalMaster",      LocalMaster_MF );
-    h5writer->write_intVector( g_id, "LocalMasterSlave", LocalMasterSlave_MF );
+    h5writer->write_intVector( mf_group.id(), "LocalMaster",      LocalMaster_MF );
+    h5writer->write_intVector( mf_group.id(), "LocalMasterSlave", LocalMasterSlave_MF );
   }
 
-  h5writer->write_intVector(g_id, "Num_LD",  Num_LD);
-  h5writer->write_intVector(g_id, "Num_LPS", Num_LPS);
-  h5writer->write_intVector(g_id, "Num_LPM", Num_LPM);
-
-  delete h5writer;
-  H5Gclose(g_id); H5Gclose(g_nbc_id); H5Fclose(file_id);
+  h5writer->write_intVector(mf_group.id(), "Num_LD",  Num_LD);
+  h5writer->write_intVector(mf_group.id(), "Num_LPS", Num_LPS);
+  h5writer->write_intVector(mf_group.id(), "Num_LPM", Num_LPM);
 }
 
 // EOF

@@ -20,12 +20,13 @@
 // Date Created: Jun. 24  2024
 // ============================================================================
 #include <vector>
-#include "PDNSolution.hpp"
+
+class HDF5_Reader;
 
 class ALocal_Interface
 {
   public:
-    ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank);
+    ALocal_Interface( const std::string &fileBaseName, int cpu_rank);
 
     ALocal_Interface( const HDF5_Reader * const &h5r );
 
@@ -37,66 +38,66 @@ class ALocal_Interface
 
     int get_nLocBas() const {return nLocBas;}
 
-    int get_num_tag(const int &ii) const {return num_tag[ii];}
+    int get_num_tag(int ii) const {return num_tag[ii];}
 
-    virtual int get_num_fixed_ele(const int &ii) const
+    virtual int get_num_fixed_ele(int ii) const
     {return num_local_fixed_ele[ii];}
 
-    virtual int get_max_num_fixed_ele(const int &ii) const
+    virtual int get_max_num_fixed_ele(int ii) const
     {return max_num_local_fixed_ele[ii];}
 
-    virtual int get_fixed_ele(const int &ii, const int &ee) const
+    virtual int get_fixed_ele(int ii, int ee) const
     {return local_fixed_ele[ii][ee];} // return "jj" for other functions
 
-    int get_fixed_face_id(const int &ii, const int &jj) const
+    int get_fixed_face_id(int ii, int jj) const
     {return fixed_ele_face_id[ii][jj];}
 
-    int get_fixed_ele_tag(const int &ii, const int &jj) const
+    int get_fixed_ele_tag(int ii, int jj) const
     {return fixed_ele_tag[ii][jj];}
 
-    virtual int get_num_tagged_fixed_ele(const int &ii, const int &tag) const
+    virtual int get_num_tagged_fixed_ele(int ii, int tag) const
     {return num_tagged_fixed_ele[ii][tag];}
 
-    virtual int get_tagged_fixed_ele(const int &ii, const int &tag, const int &ee) const
+    virtual int get_tagged_fixed_ele(int ii, int tag, int ee) const
     {return tagged_fixed_ele[ii][tag][ee];} // return "jj" for other functions
 
-    virtual int get_fixed_lien(const int &ii, const int &kk) const
+    virtual int get_fixed_lien(int ii, int kk) const
     {return fixed_lien[ii][kk];}
 
-    int get_fixed_LID(const int &ii, const int &dof_index, const int &node) const
+    int get_fixed_LID(int ii, int dof_index, int node) const
     {return fixed_LID[ii][dof_index * num_fixed_node[ii] + node];}
 
-    virtual void get_fixed_ele_ctrlPts(const int &ii, const int &jj,
+    virtual void get_fixed_ele_ctrlPts(int ii, int jj,
       double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
-    virtual int get_max_num_rotated_ele(const int &ii) const
+    virtual int get_max_num_rotated_ele(int ii) const
     {return max_num_local_rotated_ele[ii];}
 
-    virtual int get_num_rotated_ele(const int &ii) const
+    virtual int get_num_rotated_ele(int ii) const
     {return num_local_rotated_ele[ii];}
 
-    virtual int get_rotated_ele(const int &ii, const int &ee) const
+    virtual int get_rotated_ele(int ii, int ee) const
     {return local_rotated_ele[ii][ee];} // return "jj" for other functions
 
-    virtual int get_rotated_face_id(const int &ii, const int &jj) const
+    virtual int get_rotated_face_id(int ii, int jj) const
     {return rotated_ele_face_id[ii][jj];}
 
-    virtual int get_rotated_ele_tag(const int &ii, const int &jj) const
+    virtual int get_rotated_ele_tag(int ii, int jj) const
     {return rotated_ele_tag[ii][jj];}
 
-    virtual int get_num_tagged_rotated_ele(const int &ii, const int &tag) const
+    virtual int get_num_tagged_rotated_ele(int ii, int tag) const
     {return num_tagged_rotated_ele[ii][tag];}
 
-    virtual int get_tagged_rotated_ele(const int &ii, const int &tag, const int &ee) const
+    virtual int get_tagged_rotated_ele(int ii, int tag, int ee) const
     {return tagged_rotated_ele[ii][tag][ee];} // return "jj" for other functions
 
-    virtual int get_rotated_lien(const int &ii, const int &kk) const
+    virtual int get_rotated_lien(int ii, int kk) const
     {return rotated_lien[ii][kk];}
 
-    int get_rotated_LID(const int &ii, const int &dof_index, const int &node) const
+    int get_rotated_LID(int ii, int dof_index, int node) const
     {return rotated_LID[ii][dof_index * num_rotated_node[ii] + node];}
 
-    virtual void get_rotated_ele_ctrlPts(const int &ii, const int &jj,
+    virtual void get_rotated_ele_ctrlPts(int ii, int jj,
         double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const;
 
   protected:
@@ -202,4 +203,5 @@ class ALocal_Interface
 
     ALocal_Interface() = delete;
 };
+
 #endif

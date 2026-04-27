@@ -44,7 +44,7 @@ class PNonlinear_NS_Solver
     // This solver solves the Navier-Stokes using 2nd-order Generalized
     // alpha method.
     // --------------------------------------------------------------
-    void GenAlpha_Solve_NS(
+    int GenAlpha_Solve_NS(
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
@@ -54,8 +54,7 @@ class PNonlinear_NS_Solver
         PDNSolution * const &sol,
         const ALocal_InflowBC * const &infnbc_part,
         const IGenBC * const &gbc,
-        IPGAssem * const &gassem_ptr,
-        bool &conv_flag, int &nl_counter ) const;
+        IPGAssem * const &gassem_ptr ) const;
 
   private:
     const double nr_tol, na_tol, nd_tol;
@@ -67,17 +66,18 @@ class PNonlinear_NS_Solver
     const std::unique_ptr<IFlowRate> flrate;
     const std::unique_ptr<PDNSolution> sol_base;
 
+#ifdef PETSC_USE_LOG
+    PetscLogEvent mat_assem_0_event, mat_assem_1_event;
+    PetscLogEvent vec_assem_0_event, vec_assem_1_event;
+    PetscClassId classid_assembly;
+#endif
+
     void Print_convergence_info( const int &count, const double rel_err,
         const double abs_err ) const
     {
       SYS_T::commPrint("  === NR ite: %d, r_error: %e, a_error: %e \n",
           count, rel_err, abs_err);
     }
-
-    // Rescale the inflow rate prescribed at the inlet boundary.
-    void rescale_inflow_value( const double &stime,
-        const ALocal_InflowBC * const &infbc,
-        PDNSolution * const &sol ) const;
 
     // Rescale the time derivative of the inflow rate prescribed at the inlet boundary.
     void rescale_dot_inflow_value( const double &stime,

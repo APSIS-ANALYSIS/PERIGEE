@@ -1,4 +1,6 @@
 #include "NodalBC.hpp"
+#include "Vec_Tools.hpp"
+#include "VTK_Tools.hpp"
 
 NodalBC::NodalBC( const int &nFunc )
 {

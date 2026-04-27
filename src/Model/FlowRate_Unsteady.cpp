@@ -1,4 +1,6 @@
 #include "FlowRate_Unsteady.hpp"
+#include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 
 FlowRate_Unsteady::FlowRate_Unsteady( const std::string &filename )
 {
@@ -123,8 +125,8 @@ FlowRate_Unsteady::FlowRate_Unsteady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRate_Unsteady::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Unsteady::get_flow_rate( int nbc_id,
+    double time ) const
 {
   const int num_of_past_period = time / period[nbc_id];
   const double local_time = time - num_of_past_period * period[nbc_id];
@@ -134,6 +136,22 @@ double FlowRate_Unsteady::get_flow_rate( const int &nbc_id,
   {
     sum += coef_a[nbc_id][ii] * cos( ii*w[nbc_id]*local_time ) +
       coef_b[nbc_id][ii] * sin( ii*w[nbc_id]*local_time );
+  }
+
+  return sum;
+}
+
+double FlowRate_Unsteady::get_dot_flow_rate( int nbc_id,
+    double time ) const
+{
+  const int num_of_past_period = time / period[nbc_id];
+  const double local_time = time - num_of_past_period * period[nbc_id];
+
+  double sum = 0.0;
+  for( int ii = 1; ii <= num_of_mode[nbc_id]; ++ii )
+  {
+    sum += -coef_a[nbc_id][ii] * ii * w[nbc_id] * sin( ii*w[nbc_id]*local_time ) +
+      coef_b[nbc_id][ii] * ii * w[nbc_id] * cos( ii*w[nbc_id]*local_time );
   }
 
   return sum;

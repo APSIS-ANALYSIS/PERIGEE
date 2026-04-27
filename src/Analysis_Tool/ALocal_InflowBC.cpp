@@ -1,13 +1,12 @@
 #include "ALocal_InflowBC.hpp"
+#include "HDF5_Reader.hpp"
+#include "Math_Tools.hpp"
 
-ALocal_InflowBC::ALocal_InflowBC( 
-    const std::string &fileBaseName, const int &cpu_rank )
+ALocal_InflowBC::ALocal_InflowBC( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("/inflow");
 
@@ -86,7 +85,6 @@ ALocal_InflowBC::ALocal_InflowBC(
     }
   } // end nbc_id-loop
 
-  H5Fclose( file_id );
 }
 
 ALocal_InflowBC::ALocal_InflowBC( const HDF5_Reader * const &h5r )
@@ -169,7 +167,7 @@ ALocal_InflowBC::ALocal_InflowBC( const HDF5_Reader * const &h5r )
   } // end nbc_id-loop
 }
 
-double ALocal_InflowBC::get_radius( const int &nbc_id,
+double ALocal_InflowBC::get_radius( int nbc_id,
     const Vector_3 &pt ) const
 {
   // num_out_bc_pts is set to be zero for parition that does not contain
@@ -191,8 +189,8 @@ double ALocal_InflowBC::get_radius( const int &nbc_id,
   return rc / (rb + rc);
 }
 
-void ALocal_InflowBC::get_ctrlPts_xyz( const int &nbc_id,
-    const int &eindex, double * const &ctrl_x, double * const &ctrl_y, 
+void ALocal_InflowBC::get_ctrlPts_xyz( int nbc_id,
+    int eindex, double * const &ctrl_x, double * const &ctrl_y, 
     double * const &ctrl_z ) const
 {
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
@@ -204,8 +202,8 @@ void ALocal_InflowBC::get_ctrlPts_xyz( const int &nbc_id,
   }
 }
 
-void ALocal_InflowBC::get_SIEN( const int &nbc_id,
-    const int &eindex, int * const &sien ) const
+void ALocal_InflowBC::get_SIEN( int nbc_id,
+    int eindex, int * const &sien ) const
 {
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)
   {
@@ -214,8 +212,8 @@ void ALocal_InflowBC::get_SIEN( const int &nbc_id,
   }
 }
 
-std::vector<int> ALocal_InflowBC::get_SIEN( const int &nbc_id,
-    const int &eindex ) const
+std::vector<int> ALocal_InflowBC::get_SIEN( int nbc_id,
+    int eindex ) const
 {
   std::vector<int> out( cell_nLocBas[nbc_id], 0 );
   for(int jj=0; jj<cell_nLocBas[nbc_id]; ++jj)

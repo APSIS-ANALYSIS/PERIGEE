@@ -6,9 +6,9 @@
 // This is a class that stores the visualization sampling points in
 // a reference tetrahedron.
 //
-// We use [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1], 
-// [0.5, 0, 0], [0.5, 0.5, 0], [0, 0.5, 0], [0, 0, 0.5], 
-// [0.5, 0, 0.5], [0, 0.5, 0.5]. 
+// We use [0, 0, 0], [1, 0, 0], [0, 1, 0], [0, 0, 1],
+// [0.5, 0, 0], [0.5, 0.5, 0], [0, 0.5, 0], [0, 0, 0.5],
+// [0.5, 0, 0.5], [0, 0.5, 0.5].
 // They are the vertex points for the quadratic tetrahedron.
 //
 // Note: We store them in area-coordinates, like what we did in the
@@ -26,7 +26,7 @@ class QuadPts_vis_tet10 final : public IQuadPts
 
     ~QuadPts_vis_tet10() override = default;
 
-    void print_info() const override 
+    void print_info() const override
     {
       SYS_T::commPrint("\n===== Visualization Points for Tet10 ===== \n");
       IQuadPts::print_info();
@@ -37,10 +37,10 @@ class QuadPts_vis_tet10 final : public IQuadPts
 
     int get_num_quadPts() const override {return 10;}
 
-    double get_qp(const int &ii, const int &comp) const override
+    double get_qp(int ii, int comp) const override
     {return qp[4*ii+comp];}
 
-    double get_qw(const int &ii) const override {return 0.1/6.0;}
+    double get_qw(int ii) const override {return 0.1/6.0;}
 
   private:
     const double qp[40] { 0.0, 0.0, 0.0, 1.0,

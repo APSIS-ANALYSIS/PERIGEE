@@ -15,7 +15,7 @@ class QuadPts_debug final : public IQuadPts
 {
   public:
     QuadPts_debug( const std::vector<double> &in_qp,
-        const std::vector<double> &in_qw, const int &in_dim = 1 );
+        const std::vector<double> &in_qw, int in_dim = 1 );
 
     ~QuadPts_debug() override = default;
 
@@ -25,12 +25,12 @@ class QuadPts_debug final : public IQuadPts
 
     int get_num_quadPts() const override {return num_pts;}
 
-    double get_qp(const int &ii) const override {return qp[ii];}
+    double get_qp(int ii) const override {return qp[ii];}
 
-    double get_qp(const int &ii, const int &comp) const override
+    double get_qp(int ii, int comp) const override
     {return qp[dim*ii + comp];}
 
-    double get_qw(const int &ii) const override {return qw[ii];}
+    double get_qw(int ii) const override {return qw[ii];}
 
   private:
     const int num_pts, dim;

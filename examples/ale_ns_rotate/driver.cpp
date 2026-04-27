@@ -207,9 +207,7 @@ int main(int argc, char *argv[])
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
-        H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("solver_cmd.h5");
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
@@ -219,7 +217,6 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("angular_velo", angular_velo);
     cmdh5w->write_string("inflow_file", inflow_file);
     
-    delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -227,12 +224,11 @@ int main(int argc, char *argv[])
   // ===== Data from Files =====
   // Read the info of rotation axis from h5file
   const std::string fName = SYS_T::gen_partfile_name( part_file, rank );
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  HDF5_Reader * h5r = new HDF5_Reader( fName );
   const std::string gname("/rotation");
   const Vector_3 point_rotated( h5r -> read_Vector_3( gname.c_str(), "point_rotated" ) );
   const Vector_3 angular_direction( h5r -> read_Vector_3( gname.c_str(), "angular_direction" ) );
-  delete h5r; H5Fclose( file_id );
+  delete h5r;
 
   // Control points' xyz coordinates
   auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);

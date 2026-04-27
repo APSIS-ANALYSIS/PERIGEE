@@ -26,20 +26,20 @@ class Global_Part_Serial : public IGlobal_Part
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
-    virtual ~Global_Part_Serial();
+    ~Global_Part_Serial() override;
 
-    virtual idx_t get_epart( const int &ee ) const {return epart[ee];}
+    idx_t get_epart( int ee ) const override {return epart[ee];}
 
-    virtual idx_t get_npart( const int &nn, const int &field = 0 ) const 
+    idx_t get_npart( int nn, int field = 0 ) const override
     {return npart[nn + field_offset[field]];}
 
-    virtual bool get_isMETIS() const {return false;};
+    bool get_isMETIS() const override {return false;};
 
-    virtual bool get_isDual() const {return false;};
+    bool get_isDual() const override {return false;};
 
-    virtual int get_dual_edge_ncommon() const {return 0;}
+    int get_dual_edge_ncommon() const override {return 0;}
 
-    virtual bool is_serial() const {return true;}
+    bool is_serial() const override {return true;}
 
   private:
     idx_t * epart, * npart;

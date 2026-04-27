@@ -1,6 +1,6 @@
 #include "FEAElement_Tet10.hpp"
 
-FEAElement_Tet10::FEAElement_Tet10( const int &in_nqua ) : numQuapts( in_nqua ) ,
+FEAElement_Tet10::FEAElement_Tet10( int in_nqua ) : numQuapts( in_nqua ) ,
   triangle_face( SYS_T::make_unique<FEAElement_Triangle6_3D_der0>(numQuapts) )
 {
   R.resize(nLocBas * numQuapts, 0.0);
@@ -29,10 +29,10 @@ void FEAElement_Tet10::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
-void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Tet10::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   ASSERT( quad -> get_dim() == 4, "FEAElement_Tet10::buildBasis function error.\n" );
 
@@ -176,9 +176,9 @@ void FEAElement_Tet10::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-double FEAElement_Tet10::get_h( const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z ) const
+double FEAElement_Tet10::get_h( const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z ) const
 {
   return 2.0 * FE_T::get_tet_sphere_radius(
       ctrl_x[0], ctrl_x[1], ctrl_x[2], ctrl_x[3],
@@ -186,14 +186,14 @@ double FEAElement_Tet10::get_h( const double * const &ctrl_x,
       ctrl_z[0], ctrl_z[1], ctrl_z[2], ctrl_z[3] ); 
 }
 
-void FEAElement_Tet10::get_R( const int &quaindex, double * const &basis ) const
+void FEAElement_Tet10::get_R( int quaindex, double * basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
-std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Tet10::get_R( int quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -201,8 +201,8 @@ std::vector<double> FEAElement_Tet10::get_R( const int &quaindex ) const
     R[offset+4], R[offset+5], R[offset+6], R[offset+7], R[offset+8], R[offset+9] };
 }
 
-void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z ) const
+void FEAElement_Tet10::get_gradR( int quaindex, double * basis_x,
+    double * basis_y, double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -214,9 +214,9 @@ void FEAElement_Tet10::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
-    double * const &basis_x, double * const &basis_y,
-    double * const &basis_z ) const
+void FEAElement_Tet10::get_R_gradR( int quaindex, double * basis,
+    double * basis_x, double * basis_y,
+    double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_R_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -229,12 +229,12 @@ void FEAElement_Tet10::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz, double * const &basis_xy,
-    double * const &basis_xz, double * const &basis_yz ) const
+void FEAElement_Tet10::get_3D_R_dR_d2R( int quaindex,
+    double * basis, double * basis_x,
+    double * basis_y, double * basis_z,
+    double * basis_xx, double * basis_yy,
+    double * basis_zz, double * basis_xy,
+    double * basis_xz, double * basis_yz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_3D_R_dR_d2R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -253,11 +253,11 @@ void FEAElement_Tet10::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz ) const
+void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( int quaindex,
+    double * basis, double * basis_x,
+    double * basis_y, double * basis_z,
+    double * basis_xx, double * basis_yy,
+    double * basis_zz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_3D_R_gradR_LaplacianR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -273,7 +273,7 @@ void FEAElement_Tet10::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Tet10::get_Jacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_Jacobian function error.\n" );
   return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2],
@@ -281,7 +281,7 @@ std::array<double,9> FEAElement_Tet10::get_Jacobian(const int &quaindex) const
     dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
 }
 
-std::array<double,9> FEAElement_Tet10::get_invJacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Tet10::get_invJacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Tet10::get_invJacobian function error.\n" );
   return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2],
@@ -289,10 +289,10 @@ std::array<double,9> FEAElement_Tet10::get_invJacobian(const int &quaindex) cons
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Tet10::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Tet10::buildBasis( int face_id, const IQuadPts * quad_s,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );

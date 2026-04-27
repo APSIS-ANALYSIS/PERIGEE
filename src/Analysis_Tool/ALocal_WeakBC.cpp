@@ -1,13 +1,12 @@
 #include "ALocal_WeakBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName, 
-    const int &cpu_rank ) : wall_model_type {0}
+    int cpu_rank ) : wall_model_type {0}
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("/weak");
 
@@ -31,7 +30,6 @@ ALocal_WeakBC::ALocal_WeakBC( const std::string &fileBaseName,
     ele_face_id = {};
   }
 
-  H5Fclose( file_id );
 }
 
 ALocal_WeakBC::ALocal_WeakBC( const HDF5_Reader * const &h5r )

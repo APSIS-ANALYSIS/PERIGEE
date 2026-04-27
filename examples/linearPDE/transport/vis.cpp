@@ -7,6 +7,7 @@
 // ============================================================================
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
+#include "APart_Node.hpp"
 #include "QuadPtsFactory.hpp"
 #include "FEAElementFactory.hpp"
 #include "VisDataPrep_Transport.hpp"
@@ -15,10 +16,7 @@
 int main( int argc, char * argv[] ) 
 { 
   const std::string element_part_file = "epart.h5";
-  const std::string anode_mapping_file = "node_mapping.h5";
-  const std::string pnode_mapping_file = "post_node_mapping.h5";
   const std::string part_file="./ppart/part";
-  constexpr int dof = 1;
 
   std::string sol_bname("SOL_temp_");
   std::string out_bname = sol_bname;
@@ -26,13 +24,12 @@ int main( int argc, char * argv[] )
   bool isXML = true, isRestart = false;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // ===== Initialize the MPI run =====
 #if PETSC_VERSION_LT(3,19,0)
@@ -110,6 +107,9 @@ int main( int argc, char * argv[] )
   
   std::ostringstream time_index;
 
+  const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
+  const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
+
   for(int time = time_start; time<=time_end; time+= time_step)
   {
     std::string name_to_read(sol_bname);
@@ -122,8 +122,8 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );
 
-    visprep->get_pointArray(name_to_read, anode_mapping_file, pnode_mapping_file,
-        pNode.get(), GMIptr->get_nFunc(), dof, solArrays);
+    visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
+        pNode.get(), solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays,

@@ -1,4 +1,6 @@
 #include "FlowRate_Linear2Steady.hpp"
+#include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 
 FlowRate_Linear2Steady::FlowRate_Linear2Steady( const std::string &filename )
 {
@@ -152,8 +154,8 @@ FlowRate_Linear2Steady::FlowRate_Linear2Steady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRate_Linear2Steady::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Linear2Steady::get_flow_rate( int nbc_id,
+    double time ) const
 {
   double out_rate = target_flow_rate[nbc_id];
 
@@ -161,6 +163,17 @@ double FlowRate_Linear2Steady::get_flow_rate( const int &nbc_id,
     out_rate = start_flow_rate[nbc_id] + (target_flow_rate[nbc_id] - start_flow_rate[nbc_id]) * time / thred_time[nbc_id];
 
   return out_rate;
+}
+
+double FlowRate_Linear2Steady::get_dot_flow_rate( int nbc_id,
+    double time ) const
+{
+  double out_dot_rate = 0.0;
+
+  if( time < thred_time[nbc_id] && time >= 0.0 )
+    out_dot_rate = (target_flow_rate[nbc_id] - start_flow_rate[nbc_id]) / thred_time[nbc_id];
+
+  return out_dot_rate;
 }
 
 void FlowRate_Linear2Steady::print_info() const

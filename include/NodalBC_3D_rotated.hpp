@@ -11,8 +11,8 @@
 // Author: Yujie Sun
 // Date: Sep. 10 2024
 // ============================================================================
-
 #include "INodalBC.hpp"
+#include "FEType.hpp"
 #include "Tet_Tools.hpp"
 #include "Hex_Tools.hpp"
 

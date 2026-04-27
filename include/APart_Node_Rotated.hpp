@@ -29,26 +29,26 @@
 class APart_Node_Rotated : public APart_Node
 {
   public:
-    APart_Node_Rotated(const std::string &fileBaseName, const int &rank );
+    APart_Node_Rotated(const std::string &fileBaseName, int rank );
 
     APart_Node_Rotated(const HDF5_Reader * const &h5r);
 
-    virtual ~APart_Node_Rotated() = default;
+    ~APart_Node_Rotated() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
     // Get the solid local node number and indices
-    virtual int get_nlocalnode_rotated() const 
+    int get_nlocalnode_rotated() const override
     {return nlocalnode_rotated;}
 
-    virtual int get_node_loc_rotated(const int &index) const
+    int get_node_loc_rotated(int index) const override
     {return node_loc_rotated[index];}
 
     // Get the fluid local node number and indices
-    virtual int get_nlocalnode_fixed() const 
+    int get_nlocalnode_fixed() const override
     {return nlocalnode_fixed;}
 
-    virtual int get_node_loc_fixed(const int &index) const
+    int get_node_loc_fixed(int index) const override
     {return node_loc_fixed[index];}
 
   private:

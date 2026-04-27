@@ -12,6 +12,8 @@
 #include "PETSc_Tools.hpp"
 #include "FEAElementFactory.hpp"
 #include "QuadPtsFactory.hpp"
+#include "Vec_Tools.hpp"
+#include "PDNSolution.hpp"
 
 namespace SI_T
 {

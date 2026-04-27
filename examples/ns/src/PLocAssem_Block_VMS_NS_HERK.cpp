@@ -1,4 +1,5 @@
 #include "PLocAssem_Block_VMS_NS_HERK.hpp"
+#include "LoadData.hpp"
 
 PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
@@ -35,10 +36,6 @@ PLocAssem_Block_VMS_NS_HERK::PLocAssem_Block_VMS_NS_HERK(
 
   Zero_sur_Residual();
 
-  flist = nullptr;
-  flist = new locassem_vms_ns_funs[1];
-  flist[0] = &PLocAssem_Block_VMS_NS_HERK::get_H1;
-
   print_info();
 }
 
@@ -54,7 +51,6 @@ PLocAssem_Block_VMS_NS_HERK::~PLocAssem_Block_VMS_NS_HERK()
   delete [] Residual1; Residual1 = nullptr;
 
   delete [] sur_Residual1; sur_Residual1 = nullptr;
-  delete [] flist;
 }
 
 void PLocAssem_Block_VMS_NS_HERK::print_info() const
@@ -187,7 +183,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Sub(
 
     for(int jj=0; jj<subindex; ++jj)
     {
-      const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
+      const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor,
+          time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
       sum_h_x += tm_RK_ptr->get_RK_a(subindex, jj) * traction.x();
       sum_h_y += tm_RK_ptr->get_RK_a(subindex, jj) * traction.y();
       sum_h_z += tm_RK_ptr->get_RK_a(subindex, jj) * traction.z();
@@ -234,7 +231,8 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Final(
 
     for(int jj=0; jj<tm_RK_ptr->get_RK_step(); ++jj)
     {
-      const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
+      const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor,
+          time + tm_RK_ptr->get_RK_c(jj) * dt, n_out );
 
       sum_h_x += tm_RK_ptr->get_RK_b(jj) * traction.x();
       sum_h_y += tm_RK_ptr->get_RK_b(jj) * traction.y();
@@ -277,7 +275,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_EBC_HERK_Pressure(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor, time + dt, n_out );
+    const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor, time + dt, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -590,19 +588,19 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
                                                v[jj] * u_y[jj] + w[jj] * u_z[jj] );
         sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj]
                                          + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
+        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
         sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj]
                                              + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
         sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj]
                                          + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
-        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
         sum_w_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * w_x[jj]
                                              + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
         sum_w_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xz[jj] + v_yz[jj]
                                          + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
-        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
+        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
       }
 
       for(int jj=0; jj<index-1; ++jj)
@@ -639,7 +637,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
       sum_u_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xx[jj] + v_pre_xy[jj]
                                                    + w_pre_xz[jj] + u_pre_xx[jj]
                                                    + u_pre_yy[jj] + u_pre_zz[jj] );
-      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
 
       sum_v_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * v_pre_x[jj]
                                                    + v_pre[jj] * v_pre_y[jj]
@@ -647,7 +645,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
       sum_v_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xy[jj] + v_pre_yy[jj]
                                                    + w_pre_yz[jj] + v_pre_xx[jj]
                                                    + v_pre_yy[jj] + v_pre_zz[jj] );
-      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * w_pre_x[jj]
                                                    + v_pre[jj] * w_pre_y[jj]
@@ -655,7 +653,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
       sum_w_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xz[jj] + v_pre_yz[jj]
                                                    + w_pre_zz[jj] + w_pre_xx[jj]
                                                    + w_pre_yy[jj] + w_pre_zz[jj] );
-      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -1006,19 +1004,19 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
                                              + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
         sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj]
                                          + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
+        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
         sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj]
                                              + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
         sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj]
                                          + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
-        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
         sum_w_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * w_x[jj]
                                              + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
         sum_w_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xz[jj] + v_yz[jj]
                                          + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
-        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
+        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
       }
 
       for(int jj=0; jj<index-1; ++jj)
@@ -1057,7 +1055,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       sum_u_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xx[jj] + v_pre_xy[jj]
                                                    + w_pre_xz[jj] + u_pre_xx[jj]
                                                    + u_pre_yy[jj] + u_pre_zz[jj] );
-      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
 
       sum_v_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * v_pre_x[jj]
                                                    + v_pre[jj] * v_pre_y[jj]
@@ -1065,7 +1063,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       sum_v_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xy[jj] + v_pre_yy[jj]
                                                    + w_pre_yz[jj] + v_pre_xx[jj]
                                                    + v_pre_yy[jj] + v_pre_zz[jj] );
-      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * w_pre_x[jj]
                                                    + v_pre[jj] * w_pre_y[jj]
@@ -1073,7 +1071,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       sum_w_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xz[jj] + v_pre_yz[jj]
                                                    + w_pre_zz[jj] + w_pre_xx[jj]
                                                    + w_pre_yy[jj] + w_pre_zz[jj] );
-      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -1098,19 +1096,19 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
                                                    + w[jj] * u_z[jj] );
       sum_u_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj]
                                                    + u_yy[jj] + u_zz[jj] );
-      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
 
       sum_v_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj]
                                                    + w[jj] * v_z[jj] );
       sum_v_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj]
                                                    + v_yy[jj] + v_zz[jj] );
-      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj]
                                                    + w[jj] * w_z[jj] );
       sum_w_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj]
                                                    + w_yy[jj] + w_zz[jj] );
-      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -1451,19 +1449,19 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
                                                    + w[jj] * u_z[jj] );
       sum_u_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj]
                                                    + u_yy[jj] + u_zz[jj] );
-      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
 
       sum_v_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj]
                                                    + w[jj] * v_z[jj] );
       sum_v_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj]
                                                    + v_yy[jj] + v_zz[jj] );
-      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj]
                                                    + w[jj] * w_z[jj] );
       sum_w_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj]
                                                    + w_yy[jj] + w_zz[jj] );
-      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -1496,11 +1494,11 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
     const double w_np1_diffu = u_np1_xz + v_np1_yz + w_np1_zz + w_np1_xx + w_np1_yy + w_np1_zz;
 
     const double dot_u_np1_prime = -1.0 * tau_m * ( rho0 * dot_u_np1 +  p_np1_x + rho0 * u_np1_adevc
-                                        - vis_mu * u_np1_diffu - rho0 * get_f( coor, time + dt ).x() );
+                                        - vis_mu * u_np1_diffu - rho0 * LoadData::body_force( coor, time + dt ).x() );
     const double dot_v_np1_prime = -1.0 * tau_m * ( rho0 * dot_v_np1 +  p_np1_y + rho0 * v_np1_adevc
-                                        - vis_mu * v_np1_diffu - rho0 * get_f( coor, time + dt ).y() );
+                                        - vis_mu * v_np1_diffu - rho0 * LoadData::body_force( coor, time + dt ).y() );
     const double dot_w_np1_prime = -1.0 * tau_m * ( rho0 * dot_w_np1 +  p_np1_z + rho0 * w_np1_adevc
-                                        - vis_mu * w_np1_diffu - rho0 * get_f( coor, time + dt ).z() );    
+                                        - vis_mu * w_np1_diffu - rho0 * LoadData::body_force( coor, time + dt ).z() );    
 
     const double div_dot_vel_np1 = dot_u_np1_x + dot_v_np1_y + dot_w_np1_z;
     const double p_np1_prime = -1.0 * tau_c * div_dot_vel_np1;
@@ -1559,7 +1557,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
                                    - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime 
-                                   - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
+                                   - NA_x * p_np1_prime - NA * rho0 * LoadData::body_force( coor, time + dt ).x() 
                                    + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu *  u_diffu1_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
@@ -1567,7 +1565,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
                                    - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
 
       Residual1[3*A + 1] += gwts * ( NA * rho0 * dot_v_np1 - NA_y * p_np1 + NA * rho0 * dot_v_np1_prime
-                                   - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).y() 
+                                   - NA_y * p_np1_prime - NA * rho0 * LoadData::body_force( coor, time + dt ).y() 
                                    + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
                                    - NA_xy * vis_mu * u_diffu2_1 - NA_yy * vis_mu * v_diffu2_2 - NA_yz * vis_mu * w_diffu2_3
                                    - NA_xx * vis_mu * v_diffu2_2 - NA_yy * vis_mu * v_diffu2_2 - NA_zz * vis_mu * v_diffu2_2
@@ -1575,7 +1573,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Pressure(
                                    - NA_x * rho0 * v_stab2_1 - NA_y * rho0 * v_stab2_2 - NA_z * rho0 * v_stab2_3 );
 
       Residual1[3*A + 2] += gwts * ( NA * rho0 * dot_w_np1 - NA_z * p_np1+ NA * rho0 * dot_w_np1_prime 
-                                   - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).z()
+                                   - NA_z * p_np1_prime - NA * rho0 * LoadData::body_force( coor, time + dt ).z()
                                    + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
                                    - NA_xz * vis_mu * u_diffu2_1 - NA_yz * vis_mu * v_diffu2_2 - NA_zz * vis_mu * w_diffu2_3
                                    - NA_xx * vis_mu * w_diffu2_3 - NA_yy * vis_mu * w_diffu2_3 - NA_zz * vis_mu * w_diffu2_3
@@ -1811,15 +1809,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
       {
         sum_u_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
         sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
+        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
         sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
         sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
-        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
         sum_w_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
         sum_w_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
-        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
+        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
       }
 
       for(int jj=0; jj<index-1; ++jj)
@@ -1846,15 +1844,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Sub(
     {
       sum_u_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * u_pre_x[jj] + v_pre[jj] * u_pre_y[jj] + w_pre[jj] * u_pre_z[jj] );
       sum_u_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xx[jj] + v_pre_xy[jj] + w_pre_xz[jj] + u_pre_xx[jj] + u_pre_yy[jj] + u_pre_zz[jj] );
-      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
   
       sum_v_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * v_pre_x[jj] + v_pre[jj] * v_pre_y[jj] + w_pre[jj] * v_pre_z[jj] );
       sum_v_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xy[jj] + v_pre_yy[jj] + w_pre_yz[jj] + v_pre_xx[jj] + v_pre_yy[jj] + v_pre_zz[jj] );
-      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * w_pre_x[jj] + v_pre[jj] * w_pre_y[jj] + w_pre[jj] * w_pre_z[jj] );
       sum_w_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xz[jj] + v_pre_yz[jj] + w_pre_zz[jj] + w_pre_xx[jj] + w_pre_yy[jj] + w_pre_zz[jj] );
-      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -2270,15 +2268,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
       {
         sum_u_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
         sum_u_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
+        sum_a_fx[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x();
 
         sum_v_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
         sum_v_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
-        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+        sum_a_fy[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
         sum_w_advec[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
         sum_w_diffu[index] += tm_RK_ptr->get_RK_a(index, jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
-        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
+        sum_a_fz[index] += tm_RK_ptr->get_RK_a(index, jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z();     
       }
 
       for(int jj=0; jj<index-1; ++jj)
@@ -2307,15 +2305,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
     {
       sum_u_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * u_pre_x[jj] + v_pre[jj] * u_pre_y[jj] + w_pre[jj] * u_pre_z[jj] );
       sum_u_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xx[jj] + v_pre_xy[jj] + w_pre_xz[jj] + u_pre_xx[jj] + u_pre_yy[jj] + u_pre_zz[jj] );
-      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
   
       sum_v_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * v_pre_x[jj] + v_pre[jj] * v_pre_y[jj] + w_pre[jj] * v_pre_z[jj] );
       sum_v_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xy[jj] + v_pre_yy[jj] + w_pre_yz[jj] + v_pre_xx[jj] + v_pre_yy[jj] + v_pre_zz[jj] );
-      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_pre_advec += tm_RK_ptr->get_RK_b(jj) * ( u_pre[jj] * w_pre_x[jj] + v_pre[jj] * w_pre_y[jj] + w_pre[jj] * w_pre_z[jj] );
       sum_w_pre_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_pre_xz[jj] + v_pre_yz[jj] + w_pre_zz[jj] + w_pre_xx[jj] + w_pre_yy[jj] + w_pre_zz[jj] );
-      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_pre += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time - dt + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -2344,15 +2342,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Final(
     {
       sum_u_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
       sum_u_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
   
       sum_v_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
       sum_v_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
-      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
       sum_w_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
-      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -2740,15 +2738,15 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
     {
       sum_u_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * u_x[jj] + v[jj] * u_y[jj] + w[jj] * u_z[jj] );
       sum_u_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xx[jj] + v_xy[jj] + w_xz[jj] + u_xx[jj] + u_yy[jj] + u_zz[jj] );
-      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
+      sum_a_fx_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).x(); 
   
       sum_v_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * v_x[jj] + v[jj] * v_y[jj] + w[jj] * v_z[jj] );
       sum_v_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xy[jj] + v_yy[jj] + w_yz[jj] + v_xx[jj] + v_yy[jj] + v_zz[jj] );
-      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
+      sum_a_fy_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).y();
 
       sum_w_cur_advec += tm_RK_ptr->get_RK_b(jj) * ( u[jj] * w_x[jj] + v[jj] * w_y[jj] + w[jj] * w_z[jj] );
       sum_w_cur_diffu += tm_RK_ptr->get_RK_b(jj) * ( u_xz[jj] + v_yz[jj] + w_zz[jj] + w_xx[jj] + w_yy[jj] + w_zz[jj] );
-      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * get_f( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
+      sum_a_fz_cur += tm_RK_ptr->get_RK_b(jj) * LoadData::body_force( coor, time + tm_RK_ptr->get_RK_c(jj) * dt ).z(); 
     }
 
     for(int jj=0; jj<num_steps-1; ++jj)
@@ -2775,11 +2773,11 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
     const double w_np1_diffu = u_np1_xz + v_np1_yz + w_np1_zz + w_np1_xx + w_np1_yy + w_np1_zz;
 
     const double dot_u_np1_prime = -1.0 * tau_m * ( rho0 * dot_u_np1 +  p_np1_x + rho0 * u_np1_adevc 
-                                        - vis_mu * u_np1_diffu - rho0 * get_f( coor, time + dt ).x() );
+                                        - vis_mu * u_np1_diffu - rho0 * LoadData::body_force( coor, time + dt ).x() );
     const double dot_v_np1_prime = -1.0 * tau_m * ( rho0 * dot_v_np1 +  p_np1_y + rho0 * v_np1_adevc
-                                        - vis_mu * v_np1_diffu - rho0 * get_f( coor, time + dt ).y() );
+                                        - vis_mu * v_np1_diffu - rho0 * LoadData::body_force( coor, time + dt ).y() );
     const double dot_w_np1_prime = -1.0 * tau_m * ( rho0 * dot_w_np1 +  p_np1_z + rho0 * w_np1_adevc
-                                        - vis_mu * w_np1_diffu - rho0 * get_f( coor, time + dt ).z() );    
+                                        - vis_mu * w_np1_diffu - rho0 * LoadData::body_force( coor, time + dt ).z() );    
 
     const double div_dot_vel_np1 = dot_u_np1_x + dot_v_np1_y + dot_w_np1_z;
     const double p_np1_prime = -1.0 * tau_c * div_dot_vel_np1;
@@ -2837,7 +2835,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
       Residual0[ A     ] += gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime 
-                                   - NA_x * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).x() 
+                                   - NA_x * p_np1_prime - NA * rho0 * LoadData::body_force( coor, time + dt ).x() 
                                    + NA_x * vis_mu * u_diffu1_1 + NA_y * vis_mu * u_diffu1_2 + NA_z * vis_mu *  u_diffu1_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_xy * vis_mu * v_diffu2_2 - NA_xz * vis_mu * w_diffu2_3 
                                    - NA_xx * vis_mu * u_diffu2_1 - NA_yy * vis_mu * u_diffu2_1 - NA_zz * vis_mu * u_diffu2_1
@@ -2845,7 +2843,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
                                    - NA_x * rho0 * u_stab2_1 - NA_y * rho0 * u_stab2_2 - NA_z * rho0 * u_stab2_3 );
 
       Residual1[3*A + 1] += gwts * ( NA * rho0 * dot_v_np1 - NA_y * p_np1 + NA * rho0 * dot_v_np1_prime 
-                                   - NA_y * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).y() 
+                                   - NA_y * p_np1_prime - NA * rho0 * LoadData::body_force( coor, time + dt ).y() 
                                    + NA_x * vis_mu * v_diffu1_1 + NA_y * vis_mu * v_diffu1_2 + NA_z * vis_mu * v_diffu1_3
                                    - NA_xy * vis_mu * u_diffu2_1 - NA_yy * vis_mu * v_diffu2_2 - NA_yz * vis_mu * w_diffu2_3
                                    - NA_xx * vis_mu * v_diffu2_2 - NA_yy * vis_mu * v_diffu2_2 - NA_zz * vis_mu * v_diffu2_2
@@ -2853,7 +2851,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Tangent_Residual_Pressure(
                                    - NA_x * rho0 * v_stab2_1 - NA_y * rho0 * v_stab2_2 - NA_z * rho0 * v_stab2_3 );
 
       Residual1[3*A + 2] += gwts * ( NA * rho0 * dot_w_np1 - NA_z * p_np1+ NA * rho0 * dot_w_np1_prime
-                                   - NA_z * p_np1_prime - NA * rho0 * get_f( coor, time + dt ).z()
+                                   - NA_z * p_np1_prime - NA * rho0 * LoadData::body_force( coor, time + dt ).z()
                                    + NA_x * vis_mu * w_diffu1_1 + NA_y * vis_mu * w_diffu1_2 + NA_z * vis_mu * w_diffu1_3
                                    - NA_xz * vis_mu * u_diffu2_1 - NA_yz * vis_mu * v_diffu2_2 - NA_zz * vis_mu * w_diffu2_3
                                    - NA_xx * vis_mu * w_diffu2_3 - NA_yy * vis_mu * w_diffu2_3 - NA_zz * vis_mu * w_diffu2_3

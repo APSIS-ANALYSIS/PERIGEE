@@ -17,7 +17,13 @@ PTime_NS_HERK_Solver_AccurateA::PTime_NS_HERK_Solver_AccurateA(
   tmRK(std::move(in_tmRK)), flrate(std::move(in_flrate)), 
   dot_flrate(std::move(in_dot_flrate)), sol_base(std::move(in_sol_base)),
   infnbc(std::move(in_infnbc))
-{}
+{
+#ifdef PETSC_USE_LOG
+  PetscClassIdRegister("matsolve", &classid_solve);
+  PetscLogEventRegister("K_solve", classid_solve, &K_solve);
+  PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
+#endif
+}
 
 std::string PTime_NS_HERK_Solver_AccurateA::Name_Generator(const int &counter) const
 {
@@ -173,14 +179,6 @@ void PTime_NS_HERK_Solver_AccurateA::HERK_Solve_NS(
     PDNSolution * const &pre_velo_before,
     PDNSolution * const &cur_sol ) const
 {
-  #ifdef PETSC_USE_LOG
-    PetscLogEvent K_solve, update_dotstep;
-    PetscClassId classid_solve;
-    PetscClassIdRegister("matsolve", &classid_solve);
-    PetscLogEventRegister("K_solve", classid_solve, &K_solve);
-    PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
-  #endif
-
   auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
 
   // HERK's number of steps

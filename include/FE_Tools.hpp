@@ -6,7 +6,6 @@
 //
 // Date Created: Sep. 22 2023
 // ============================================================================
-#include "Math_Tools.hpp"
 #include "FEAElement.hpp"
 
 namespace FE_T
@@ -15,7 +14,7 @@ namespace FE_T
   // Generate outward normal vector from a tangential vector.
   // tan : the tangential vector
   // p0  : the starting point of the tangential vector
-  // p1  : the interior point 
+  // p1  : the interior point
   // return : the outward normal vector
   // Algorithm: p1->p0 gives the vector m,
   //            n = m - (m,t) t / (t,t).
@@ -23,21 +22,21 @@ namespace FE_T
   Vector_3 get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vector_3 &p1 );
 
   // --------------------------------------------------------------------------
-  // Calculate the circumscribing sphere's centre point and radius of four 
+  // Calculate the circumscribing sphere's centre point and radius of four
   // given points
   // --------------------------------------------------------------------------
   void get_tet_sphere_info(
-      const double &x0, const double &x1, const double &x2, const double &x3, 
-      const double &y0, const double &y1, const double &y2, const double &y3,
-      const double &z0, const double &z1, const double &z2, const double &z3,
+      double x0, double x1, double x2, double x3,
+      double y0, double y1, double y2, double y3,
+      double z0, double z1, double z2, double z3,
       double &xx, double &yy, double &zz, double &rr );
 
-  double get_tet_sphere_radius( 
-      const double &x0, const double &x1, const double &x2, const double &x3, 
-      const double &y0, const double &y1, const double &y2, const double &y3,
-      const double &z0, const double &z1, const double &z2, const double &z3 );
+  double get_tet_sphere_radius(
+      double x0, double x1, double x2, double x3,
+      double y0, double y1, double y2, double y3,
+      double z0, double z1, double z2, double z3 );
 
-  Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1, 
+  Vector_3 get_tet_sphere_info( const Vector_3 &pt0, const Vector_3 &pt1,
       const Vector_3 &pt2, const Vector_3 &pt3, double &radius );
 
   double get_circumradius( const std::array<Vector_3, 4> &pts );
@@ -51,9 +50,9 @@ namespace FE_T
   // --------------------------------------------------------------------------
   bool search_closest_point( const Vector_3 &target_xyz,
       FEAElement * const &elements,
-      const double * const &electrl_x,
-      const double * const &electrl_y,
-      const double * const &electrl_z,
+      const double * electrl_x,
+      const double * electrl_y,
+      const double * electrl_z,
       IQuadPts * const &closest_point );
 
   // --------------------------------------------------------------------------
@@ -67,8 +66,8 @@ namespace FE_T
   // return a scalar Prof(f) := int_omega f dx / int_omega 1 dx
   //                          = sum(f * gwts) / sum(gwts)
   // --------------------------------------------------------------------------
-  double L2Proj_DGP0( const double * const &f, 
-      const double * const &gwts, const int &nqp );
+  double L2Proj_DGP0( const double * f,
+      const double * gwts, int nqp );
 
   // --------------------------------------------------------------------------
   // L2-projection of a function to a piecewise linear (DGP1 space) in 2D.
@@ -81,11 +80,11 @@ namespace FE_T
   // The projected polynomial is
   //         coeff_0 + coeff_x x + coeff_y y.
   // --------------------------------------------------------------------------
-  void L2Proj_DGP1_2D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const int &nqp,
+  void L2Proj_DGP1_2D( const double * f,
+      const double * gwts,
+      const double * qp_x,
+      const double * qp_y,
+      int nqp,
       double &coeff_0, double &coeff_x, double &coeff_y );
 
   // --------------------------------------------------------------------------
@@ -100,19 +99,19 @@ namespace FE_T
   // The projected polynomial is
   //         coeff_0 + coeff_x x + coeff_y y + coeff_z z.
   // --------------------------------------------------------------------------
-  void L2Proj_DGP1_3D( const double * const &f,
-      const double * const &gwts,
-      const double * const &qp_x,
-      const double * const &qp_y,
-      const double * const &qp_z,
-      const int &nqp,
+  void L2Proj_DGP1_3D( const double * f,
+      const double * gwts,
+      const double * qp_x,
+      const double * qp_y,
+      const double * qp_z,
+      int nqp,
       double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z );
 
   // ============================================================================
   // This is a 3-by-3 matrix class that can calculate LU factorization of the
   // dense matrix. The components are stored in a 1-D array.
   //
-  // The array that stores the matrix is mat[9]. Logically, the matrix is 
+  // The array that stores the matrix is mat[9]. Logically, the matrix is
   //                     mat[0], mat[1], mat[2]
   //                     mat[3], mat[4], mat[5]
   //                     mat[6], mat[7], mat[8]
@@ -125,10 +124,10 @@ namespace FE_T
       Matrix_double_3by3_Array();
 
       // Explicitly define the matrix components
-      Matrix_double_3by3_Array( const double &a11, const double &a12, 
-          const double &a13, const double &a21, const double &a22, 
-          const double &a23, const double &a31, const double &a32, 
-          const double &a33 );
+      Matrix_double_3by3_Array( double a11, double a12,
+          double a13, double a21, double a22,
+          double a23, double a31, double a32,
+          double a33 );
 
       // Destructor
       ~Matrix_double_3by3_Array() = default;
@@ -138,16 +137,16 @@ namespace FE_T
 
       // Parenthesis operator. It allows both access matrix entries as well as
       // assigning values to the entry.
-      double& operator()(const int &index) {return mat[index];}
+      double& operator()(int index) {return mat[index];}
 
-      const double& operator()(const int &index) const {return mat[index];}
+      const double& operator()(int index) const {return mat[index];}
 
       // Generate an identity matrix. Erase all previous values and reset pp to default values.
       void gen_id();
 
       // Generate a matrix with random entries
       // All previous values are erased and pp is reset to default.
-      void gen_rand(const double &min = -1.0, const double &max = 1.0);
+      void gen_rand(double min = -1.0, double max = 1.0);
 
       // Generate a Hilbert matrix
       // all previous values are earsed and pp is reset to default.
@@ -166,10 +165,10 @@ namespace FE_T
 
       // Perofrm LU solve for the 3 mat x = b equations
       // LU_fac() has to be called first.
-      void LU_solve(const double &b1, const double &b2, const double &b3,
+      void LU_solve(double b1, double b2, double b3,
           double &x1, double &x2, double &x3) const;
 
-      // Transpose operation for the matrix 
+      // Transpose operation for the matrix
       void transpose();
 
       // Inverse of the matrix (based on cofactor). The pp is not
@@ -181,10 +180,10 @@ namespace FE_T
 
       // Vector multiplication y = Ax
       // make sure the x y vector has length 3.
-      void VecMult( const double * const &xx, double * const &yy ) const; 
+      void VecMult( const double * xx, double * yy ) const;
 
       // Matrix multiplication
-      void MatMult( const Matrix_double_3by3_Array &mleft, 
+      void MatMult( const Matrix_double_3by3_Array &mleft,
           const Matrix_double_3by3_Array &mright );
 
       // print mat in matrix format
@@ -207,8 +206,8 @@ namespace FE_T
   // derivatives of element basis functions. The components are stored
   // in a 1-D array.
   //
-  // The array that stores the matrix is mat[36]. Logically, the matrix is 
-  //                    
+  // The array that stores the matrix is mat[36]. Logically, the matrix is
+  //
   //    mat[0],  mat[1],  mat[2],  mat[3],  mat[4],  mat[5]
   //    mat[6],  mat[7],  mat[8],  mat[9],  mat[10], mat[11]
   //    mat[12], mat[13], mat[14], mat[15], mat[16], mat[17]
@@ -221,10 +220,10 @@ namespace FE_T
     public:
       // This constructor is designed for the special structure when
       // solving for 2nd order derivatives.
-      Matrix_double_6by6_Array(const double &aa, const double &bb,
-          const double &cc, const double &dd, const double &ee,
-          const double &ff, const double &gg, const double &hh,
-          const double &ii);
+      Matrix_double_6by6_Array(double aa, double bb,
+          double cc, double dd, double ee,
+          double ff, double gg, double hh,
+          double ii);
 
       ~Matrix_double_6by6_Array() = default;
 
@@ -236,7 +235,7 @@ namespace FE_T
 
     private:
       double Mat[36];
-      
+
       int pp[6];
   };
 
@@ -250,7 +249,7 @@ namespace FE_T
       // Input: \para vol_eleType     : the element type of the volume element
       //        \para boundary_id     : the boundary index defined specifically
       //        \para lower_quad_rule : the quadrature rlue of the lower-dimensional element
-      QuadPts_on_face(const FEType &vol_elemType, const int &face_id, 
+      QuadPts_on_face(const FEType &vol_elemType, int face_id,
           const IQuadPts * const lower_quad_rule);
 
       ~QuadPts_on_face() override = default;
@@ -261,7 +260,7 @@ namespace FE_T
 
       int get_num_quadPts() const override {return num_pts;}
 
-      double get_qp(const int &ii, const int &comp) const override
+      double get_qp(int ii, int comp) const override
       {return qp[dim * ii + comp];}
 
     private:
@@ -272,7 +271,7 @@ namespace FE_T
       // disallow default constructor
       QuadPts_on_face() = delete;
   };
-      
+
 } // End of FE_T
 
 #endif

@@ -1,4 +1,5 @@
 #include "Gmsh_FileIO.hpp"
+#include "HDF5_Group.hpp"
 
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 : filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
@@ -96,9 +97,6 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   }
 }
 
-Gmsh_FileIO::~Gmsh_FileIO()
-{}
-
 void Gmsh_FileIO::print_info() const
 {
   std::cout<<"File name : "<<filename<<std::endl;
@@ -156,7 +154,7 @@ void Gmsh_FileIO::print_info() const
 }
 
 void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename, 
-  const int &index_sur,const int &index_vol1, const int &index_vol2 ) const
+  int index_sur, int index_vol1, int index_vol2 ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -367,8 +365,8 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   delete mytimer;
 }
 
-void Gmsh_FileIO::write_interior_vtp( const int &index_sur, 
-    const int &index_vol1, const int &index_vol2 ) const
+void Gmsh_FileIO::write_interior_vtp( int index_sur, 
+    int index_vol1, int index_vol2 ) const
 {
   std::string vtp_file_name(phy_2d_name[index_sur]);
   vtp_file_name += "_";
@@ -380,7 +378,7 @@ void Gmsh_FileIO::write_interior_vtp( const int &index_sur,
 }
 
 void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
-  const int &index_sur, const int &index_vol, const bool &isf2e, const bool &is_slave ) const
+  int index_sur, int index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -773,7 +771,7 @@ void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
   SYS_T::print_fatal_if( name1.compare(phy2), "Error: Gmsh_FileIO FSI mesh 3d subdomain index 1 should be solid domain.\n" );
 }
 
-void Gmsh_FileIO::write_sur_h5( const int &index_2d, 
+void Gmsh_FileIO::write_sur_h5( int index_2d, 
     const std::vector<int> &index_1d ) const
 {
   // Perform basic logical checks
@@ -787,9 +785,7 @@ void Gmsh_FileIO::write_sur_h5( const int &index_2d,
         "Error: Gmsh_FileIO::write_sur_h5, edge index is wrong. \n");
 
   // Open an HDF5 file
-  std::string h5_file_name( "Gmsh_" );
-  h5_file_name.append( phy_2d_name[index_2d] );
-  h5_file_name.append(".h5");
+  const std::string h5_file_name = "Gmsh_" + phy_2d_name[index_2d] + ".h5";
 
   std::cout<<"=== Gmsh_FileIO::write_sur_h5 for "
     <<phy_2d_name[index_2d]<<" associated with ";
@@ -798,10 +794,8 @@ void Gmsh_FileIO::write_sur_h5( const int &index_2d,
     std::cout<<phy_1d_name[ index_1d[ii] ]<<'\t';
   std::cout<<std::endl;
 
-  hid_t file_id = H5Fcreate(h5_file_name.c_str(), 
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( h5_file_name );
+  const hid_t file_id = h5w->get_file_id();
 
   // Write 2D domain first
   const std::string slash("/");
@@ -915,32 +909,25 @@ void Gmsh_FileIO::write_sur_h5( const int &index_2d,
     std::cout<<"      face2elem mapping generated. \n"; 
 
     // Record info
-    std::string name_1d_domain(slash);
-    name_1d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_1d_domain.c_str(), 
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    const std::string name_1d_domain = slash+std::to_string(static_cast<int>(ii));
+    const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
+        name_1d_domain.c_str() );
 
-    h5w->write_string(g_id, "name", phy_1d_name[ index_1d[ii] ] );
-    h5w->write_intScalar(g_id, "phy_tag", index_1d[ii]);
-    h5w->write_intScalar(g_id, "num_cell", num_1d_cell);
-    h5w->write_intScalar(g_id, "num_node", bcnumpt );
-    h5w->write_intScalar(g_id, "ele_type", ele_type[domain_1d_idx]);
-    h5w->write_intScalar(g_id, "nLocBas", nLocBas_1d);
-    h5w->write_intVector(g_id, "IEN_glo", edge_ien_global);
-    h5w->write_intVector(g_id, "IEN_loc", edge_ien_local);
-    h5w->write_intVector(g_id, "pt_idx", bcpt);
-    h5w->write_intVector(g_id, "edge2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
+    h5w->write_string(hdf5_group.id(), "name", phy_1d_name[ index_1d[ii] ] );
+    h5w->write_intScalar(hdf5_group.id(), "phy_tag", index_1d[ii]);
+    h5w->write_intScalar(hdf5_group.id(), "num_cell", num_1d_cell);
+    h5w->write_intScalar(hdf5_group.id(), "num_node", bcnumpt );
+    h5w->write_intScalar(hdf5_group.id(), "ele_type", ele_type[domain_1d_idx]);
+    h5w->write_intScalar(hdf5_group.id(), "nLocBas", nLocBas_1d);
+    h5w->write_intVector(hdf5_group.id(), "IEN_glo", edge_ien_global);
+    h5w->write_intVector(hdf5_group.id(), "IEN_loc", edge_ien_local);
+    h5w->write_intVector(hdf5_group.id(), "pt_idx", bcpt);
+    h5w->write_intVector(hdf5_group.id(), "edge2elem", face2elem);
+    h5w->write_doubleVector(hdf5_group.id(), "pt_coor", surpt);
   }
-
-  // Close the HDF5 file
-  delete h5w;
-  H5Fclose( file_id );
 }
 
-void Gmsh_FileIO::write_vol_h5( const int &index_3d,
+void Gmsh_FileIO::write_vol_h5( int index_3d,
     const std::vector<int> &index_2d ) const
 {
   // Perform basic index boundary check
@@ -954,9 +941,7 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
         "Error: Gmsh_FileIO::write_vol_h5, face index is wrong. \n");
 
   // Open an HDF5 file
-  std::string h5_file_name( "Gmsh_" );
-  h5_file_name.append( phy_3d_name[index_3d] );
-  h5_file_name.append(".h5");
+  const std::string h5_file_name = "Gmsh_" + phy_3d_name[index_3d] + ".h5";
 
   std::cout<<"=== Gmsh_FileIO::write_vol_h5 for "
     <<phy_3d_name[index_3d]<<" associated with ";
@@ -965,10 +950,9 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     std::cout<<phy_2d_name[ index_2d[ii] ]<<'\t';
   std::cout<<std::endl;
 
-  hid_t file_id = H5Fcreate(h5_file_name.c_str(),
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( h5_file_name );
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  const hid_t file_id = h5w->get_file_id();
 
   // Write the 3D domain at the root
   const std::string slash("/");
@@ -1087,32 +1071,25 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     std::cout<<"      face2elem mapping generated.\n";
 
     // Record info
-    std::string name_2d_domain(slash);
-    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    const std::string name_2d_domain = slash+std::to_string(static_cast<int>(ii));
+    const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
+        name_2d_domain.c_str() );
 
-    h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
-    h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
-    h5w->write_intScalar(g_id, "num_cell", num_2d_cell);
-    h5w->write_intScalar(g_id, "num_node", bcnumpt );
-    h5w->write_intScalar(g_id, "ele_type", ele_type[domain_2d_idx]);
-    h5w->write_intScalar(g_id, "nLocBas", nLocBas_2d);
-    h5w->write_intVector(g_id, "IEN_glo", face_ien_global);
-    h5w->write_intVector(g_id, "IEN_loc", face_ien_local);
-    h5w->write_intVector(g_id, "pt_idx", bcpt);
-    h5w->write_intVector(g_id, "face2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
+    h5w->write_string(hdf5_group.id(), "name", phy_2d_name[ index_2d[ii] ] );
+    h5w->write_intScalar(hdf5_group.id(), "phy_tag", index_2d[ii]);
+    h5w->write_intScalar(hdf5_group.id(), "num_cell", num_2d_cell);
+    h5w->write_intScalar(hdf5_group.id(), "num_node", bcnumpt );
+    h5w->write_intScalar(hdf5_group.id(), "ele_type", ele_type[domain_2d_idx]);
+    h5w->write_intScalar(hdf5_group.id(), "nLocBas", nLocBas_2d);
+    h5w->write_intVector(hdf5_group.id(), "IEN_glo", face_ien_global);
+    h5w->write_intVector(hdf5_group.id(), "IEN_loc", face_ien_local);
+    h5w->write_intVector(hdf5_group.id(), "pt_idx", bcpt);
+    h5w->write_intVector(hdf5_group.id(), "face2elem", face2elem);
+    h5w->write_doubleVector(hdf5_group.id(), "pt_coor", surpt);
   } // End-loop-over-2d-face
-
-  // Close the HDF5 file
-  delete h5w;
-  H5Fclose( file_id ); 
 }
 
-void Gmsh_FileIO::write_vol_h5( const int &index_3d,
+void Gmsh_FileIO::write_vol_h5( int index_3d,
     const std::vector<int> &index_2d,
     const std::vector<int> &index_2d_need_facemap ) const
 {
@@ -1127,9 +1104,7 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
         "Error: Gmsh_FileIO::write_vol_h5, face index is wrong. \n");
 
   // Open an HDF5 file
-  std::string h5_file_name( "Gmsh_" );
-  h5_file_name.append( phy_3d_name[index_3d] );
-  h5_file_name.append(".h5");
+  const std::string h5_file_name = "Gmsh_" + phy_3d_name[index_3d] + ".h5";
 
   std::cout<<"=== Gmsh_FileIO::write_vol_h5 for "
     <<phy_3d_name[index_3d]<<" associated with ";
@@ -1138,10 +1113,9 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     std::cout<<phy_2d_name[ index_2d[ii] ]<<'\t';
   std::cout<<std::endl;
 
-  hid_t file_id = H5Fcreate(h5_file_name.c_str(),
-      H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( h5_file_name );
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  const hid_t file_id = h5w->get_file_id();
 
   // Write the 3D domain at the root
   const std::string slash("/");
@@ -1262,29 +1236,22 @@ void Gmsh_FileIO::write_vol_h5( const int &index_3d,
     }
 
     // Record info
-    std::string name_2d_domain(slash);
-    name_2d_domain.append( std::to_string( static_cast<int>(ii) ) );
-    hid_t g_id = H5Gcreate( file_id, name_2d_domain.c_str(),
-        H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    const std::string name_2d_domain = slash+std::to_string(static_cast<int>(ii));
+    const HDF5_Group hdf5_group = HDF5_Group::create( file_id,
+        name_2d_domain.c_str() );
 
-    h5w->write_string(g_id, "name", phy_2d_name[ index_2d[ii] ] );
-    h5w->write_intScalar(g_id, "phy_tag", index_2d[ii]);
-    h5w->write_intScalar(g_id, "num_cell", num_2d_cell);
-    h5w->write_intScalar(g_id, "num_node", bcnumpt );
-    h5w->write_intScalar(g_id, "ele_type", ele_type[domain_2d_idx]);
-    h5w->write_intScalar(g_id, "nLocBas", nLocBas_2d);
-    h5w->write_intVector(g_id, "IEN_glo", face_ien_global);
-    h5w->write_intVector(g_id, "IEN_loc", face_ien_local);
-    h5w->write_intVector(g_id, "pt_idx", bcpt);
-    h5w->write_intVector(g_id, "face2elem", face2elem);
-    h5w->write_doubleVector(g_id, "pt_coor", surpt);
-
-    H5Gclose(g_id);
+    h5w->write_string(hdf5_group.id(), "name", phy_2d_name[ index_2d[ii] ] );
+    h5w->write_intScalar(hdf5_group.id(), "phy_tag", index_2d[ii]);
+    h5w->write_intScalar(hdf5_group.id(), "num_cell", num_2d_cell);
+    h5w->write_intScalar(hdf5_group.id(), "num_node", bcnumpt );
+    h5w->write_intScalar(hdf5_group.id(), "ele_type", ele_type[domain_2d_idx]);
+    h5w->write_intScalar(hdf5_group.id(), "nLocBas", nLocBas_2d);
+    h5w->write_intVector(hdf5_group.id(), "IEN_glo", face_ien_global);
+    h5w->write_intVector(hdf5_group.id(), "IEN_loc", face_ien_local);
+    h5w->write_intVector(hdf5_group.id(), "pt_idx", bcpt);
+    h5w->write_intVector(hdf5_group.id(), "face2elem", face2elem);
+    h5w->write_doubleVector(hdf5_group.id(), "pt_coor", surpt);
   } // End-loop-over-2d-face
-
-  // Close the HDF5 file
-  delete h5w;
-  H5Fclose( file_id ); 
 }
 
 void Gmsh_FileIO::update_FSI_nodal_ordering()
@@ -1342,7 +1309,7 @@ void Gmsh_FileIO::update_FSI_nodal_ordering()
   }
 }
 
-void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
+void Gmsh_FileIO::update_quadratic_tet_IEN( int index_3d )
 {
   SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
@@ -1367,7 +1334,7 @@ void Gmsh_FileIO::update_quadratic_tet_IEN( const int &index_3d )
   }
 }
 
-void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
+void Gmsh_FileIO::update_quadratic_hex_IEN( int index_3d )
 {
   SYS_T::print_fatal_if(index_3d < 0 || index_3d >= num_phy_domain_3d,
       "Error: input index_3d is out of range.\n");
@@ -1427,7 +1394,7 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( const int &index_3d )
 }
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
-    const int &index_sur, const int &index_vol, const bool &isf2e, const bool &is_slave ) const
+    int index_sur, int index_vol, const bool &isf2e, const bool &is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, surface index is wrong. \n");

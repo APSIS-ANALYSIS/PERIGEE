@@ -34,9 +34,8 @@ Tissue_prestress::Tissue_prestress(
       const std::string ps_fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
       if( SYS_T::file_exist(ps_fName) )
       {
-        hid_t ps_file_id = H5Fopen(ps_fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT);
 
-        HDF5_Reader * ps_h5r = new HDF5_Reader( ps_file_id );
+        auto ps_h5r = SYS_T::make_unique<HDF5_Reader>(ps_fName);
 
         const int ps_size = ps_h5r -> read_intScalar("/", "ps_array_size"); 
 
@@ -44,7 +43,6 @@ Tissue_prestress::Tissue_prestress(
 
         qua_ps_array = ps_h5r -> read_doubleVector("/", "prestress");
 
-        delete ps_h5r; H5Fclose(ps_file_id);
       }
       else
         SYS_T::print_fatal("Error: prestress file %s cannot be found.\n", ps_fName.c_str());
@@ -117,16 +115,13 @@ void Tissue_prestress::write_prestress_hdf5() const
   // Record to h5 file
   const std::string fName = SYS_T::gen_partfile_name( ps_fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName );
+  const hid_t file_id = h5w->get_file_id();
 
   h5w -> write_intScalar( "ps_array_size", qua_prestress_array.size() );
 
   if( qua_prestress_array.size() > 0 )
     h5w -> write_doubleVector( file_id, "prestress", qua_prestress_array );
-
-  delete h5w; H5Fclose( file_id );
 }
 
 // EOF

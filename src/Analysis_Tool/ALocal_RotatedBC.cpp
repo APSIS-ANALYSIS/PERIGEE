@@ -1,13 +1,13 @@
 #include "ALocal_RotatedBC.hpp"
+#include "HDF5_Reader.hpp"
+#include "Math_Tools.hpp"
 
 ALocal_RotatedBC::ALocal_RotatedBC( 
-    const std::string &fileBaseName, const int &cpu_rank )
+    const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("/rotated_nbc"); 
 
@@ -70,7 +70,6 @@ ALocal_RotatedBC::ALocal_RotatedBC(
     local_node_pos.clear();
   }
 
-  H5Fclose( file_id );
 }
 
 ALocal_RotatedBC::ALocal_RotatedBC( const HDF5_Reader * const &h5r )
@@ -137,7 +136,7 @@ ALocal_RotatedBC::ALocal_RotatedBC( const HDF5_Reader * const &h5r )
   }
 }
 
-void ALocal_RotatedBC::get_ctrlPts_xyz( const int &eindex, 
+void ALocal_RotatedBC::get_ctrlPts_xyz( int eindex, 
     double * const &ctrl_x, 
     double * const &ctrl_y, 
     double * const &ctrl_z ) const
@@ -151,7 +150,7 @@ void ALocal_RotatedBC::get_ctrlPts_xyz( const int &eindex,
   }
 }
 
-void ALocal_RotatedBC::get_SIEN( const int &eindex, int * const &sien ) const
+void ALocal_RotatedBC::get_SIEN( int eindex, int * const &sien ) const
 {
   for(int jj=0; jj<cell_nLocBas; ++jj)
   {
@@ -160,7 +159,7 @@ void ALocal_RotatedBC::get_SIEN( const int &eindex, int * const &sien ) const
   }
 }
 
-std::vector<int> ALocal_RotatedBC::get_SIEN( const int &eindex ) const
+std::vector<int> ALocal_RotatedBC::get_SIEN( int eindex ) const
 {
   std::vector<int> out( cell_nLocBas, 0 );
   for(int jj=0; jj<cell_nLocBas; ++jj)

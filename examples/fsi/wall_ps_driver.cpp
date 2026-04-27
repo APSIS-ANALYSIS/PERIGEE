@@ -60,17 +60,15 @@ int main( int argc, char *argv[] )
 
   // We assume that a 3D solver has been called (to generate the wall traction)
   // and a suite of command line arguments has been saved to disk
-  hid_t solver_cmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( solver_cmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );
 
   const int nqp_vol     = cmd_h5r -> read_intScalar(    "/", "nqp_vol");
   const int nqp_sur     = cmd_h5r -> read_intScalar(    "/", "nqp_sur");
 
-  delete cmd_h5r; H5Fclose(solver_cmd_file);
+  delete cmd_h5r;
 
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-  HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * pcmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
 
   const std::string part_v_file = pcmd_h5r -> read_string(    "/", "part_file_v" );
   const std::string part_p_file = pcmd_h5r -> read_string(    "/", "part_file_p" );
@@ -78,7 +76,7 @@ int main( int argc, char *argv[] )
   const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
-  delete pcmd_h5r; H5Fclose(prepcmd_file);
+  delete pcmd_h5r;
 
   // Initialize PETSc
 #if PETSC_VERSION_LT(3,19,0)
@@ -168,13 +166,12 @@ int main( int argc, char *argv[] )
   // ====== Record important parameters ======
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("wall_ps_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    HDF5_Writer * cmdh5w = new HDF5_Writer("wall_ps_cmd.h5");
     
     cmdh5w -> write_string(      "ps_file_name",       ps_file_name);
     cmdh5w -> write_doubleScalar("prestress_disp_tol", prestress_disp_tol );
 
-    delete cmdh5w; H5Fclose(cmd_file_id);
+    delete cmdh5w;
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);

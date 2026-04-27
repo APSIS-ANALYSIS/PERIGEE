@@ -1,4 +1,5 @@
 #include "PLocAssem_VMS_NS_GenAlpha.hpp"
+#include "LoadData.hpp"
 
 PLocAssem_VMS_NS_GenAlpha::PLocAssem_VMS_NS_GenAlpha(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
@@ -207,7 +208,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual(
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
     // Get the body force
-    const Vector_3 f_body = get_f( coor, curr );
+    const Vector_3 f_body = LoadData::body_force( coor, curr );
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
@@ -377,7 +378,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Tangent_Residual(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua); 
 
-    const Vector_3 f_body = get_f( coor, curr );
+    const Vector_3 f_body = LoadData::body_force( coor, curr );
 
     const double u_lap = u_xx + u_yy + u_zz;
     const double v_lap = v_xx + v_yy + v_zz;
@@ -701,7 +702,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Mass_Residual(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
-    const Vector_3 f_body = get_f( coor, curr );
+    const Vector_3 f_body = LoadData::body_force( coor, curr );
 
     for(int A=0; A<nLocBas; ++A)
     {
@@ -768,7 +769,7 @@ void PLocAssem_VMS_NS_GenAlpha::Assem_Residual_EBC(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 traction = get_ebc_fun( ebc_id, coor, curr, n_out );
+    const Vector_3 traction = LoadData::ebc_traction( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {

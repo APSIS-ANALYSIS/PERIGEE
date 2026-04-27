@@ -1,4 +1,6 @@
 #include "FlowRate_Cosine2Steady.hpp"
+#include "Vec_Tools.hpp"
+#include "Math_Tools.hpp"
 
 FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
 {
@@ -151,8 +153,8 @@ FlowRate_Cosine2Steady::FlowRate_Cosine2Steady( const std::string &filename )
   MPI_Barrier(PETSC_COMM_WORLD);
 }
 
-double FlowRate_Cosine2Steady::get_flow_rate( const int &nbc_id,
-    const double &time ) const
+double FlowRate_Cosine2Steady::get_flow_rate( int nbc_id,
+    double time ) const
 {
   double out_rate = target_flow_rate[nbc_id];
 
@@ -160,6 +162,19 @@ double FlowRate_Cosine2Steady::get_flow_rate( const int &nbc_id,
     out_rate = start_flow_rate[nbc_id] + 0.5 * (target_flow_rate[nbc_id] - start_flow_rate[nbc_id]) * (1 -  std::cos(MATH_T::PI * time / thred_time[nbc_id]));
 
   return out_rate;
+}
+
+double FlowRate_Cosine2Steady::get_dot_flow_rate( int nbc_id,
+    double time ) const
+{
+  double out_dot_rate = 0.0;
+
+  if( time < thred_time[nbc_id] && time >= 0.0 )
+    out_dot_rate = 0.5 * (target_flow_rate[nbc_id] - start_flow_rate[nbc_id])
+      * MATH_T::PI / thred_time[nbc_id]
+      * std::sin(MATH_T::PI * time / thred_time[nbc_id]);
+
+  return out_dot_rate;
 }
 
 void FlowRate_Cosine2Steady::print_info() const

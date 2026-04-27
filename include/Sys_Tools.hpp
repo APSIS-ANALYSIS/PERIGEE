@@ -48,6 +48,9 @@
   #define ASSERT(cond, ...) ((void)0)
 #endif
 
+// UNUSED makes a var x as intentionally unused to suppress compiler warnings.
+#define UNUSED(x) (void)(x)
+
 namespace SYS_T
 {
   // Implementation of make_unique for C++11
@@ -557,7 +560,7 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  inline void InsertFileYAML( const std::string &filename, const bool &require )
+  inline void InsertFileYAML( const std::string &filename, bool require )
   {
 #if PETSC_VERSION_GE(3,15,0)
     if( require )

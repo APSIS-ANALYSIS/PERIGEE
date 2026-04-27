@@ -16,9 +16,9 @@
 // Author: Ju Liu
 // Date Created: Oct 3 2013
 // ==================================================================
+#include <string>
+#include <vector>
 #include "IGlobal_Part.hpp"
-#include "HDF5_Writer.hpp"
-#include "HDF5_Reader.hpp"
 
 class Map_Node_Index
 {
@@ -30,19 +30,19 @@ class Map_Node_Index
     // Load the index mapping from file on disk
     Map_Node_Index( const char * const &fileName );
 
-    virtual ~Map_Node_Index() = default;
+    ~Map_Node_Index() = default;
 
     // Map the natural node numbering to the new numbering based on
     // mesh partition
-    virtual int get_old2new(const int &ii) const {return old_2_new[ii];}
+    int get_old2new(const int &ii) const {return old_2_new[ii];}
     
     // Map the new numbering back to the old, natural numbering for nodes
-    virtual int get_new2old(const int &ii) const {return new_2_old[ii];}
+    int get_new2old(const int &ii) const {return new_2_old[ii];}
     
-    virtual void print_info() const;
+    void print_info() const;
 
     // write the old_2_new and new_2_old mappings into an hdf5 file
-    virtual void write_hdf5( const std::string &fileName ) const;
+    void write_hdf5( const std::string &fileName ) const;
 
   private:
     std::vector<int> old_2_new, new_2_old;

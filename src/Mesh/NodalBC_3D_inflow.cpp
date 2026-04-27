@@ -1,4 +1,6 @@
 #include "NodalBC_3D_inflow.hpp"
+#include "VTK_Tools.hpp"
+#include "Vec_Tools.hpp"
 
 NodalBC_3D_inflow::NodalBC_3D_inflow( const std::vector<std::string> &inffileList,
     const std::string &wallfile,

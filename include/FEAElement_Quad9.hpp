@@ -14,7 +14,7 @@
 class FEAElement_Quad9 final : public FEAElement
 {
   public:
-    FEAElement_Quad9( const int &in_nqua );
+    FEAElement_Quad9( int in_nqua );
 
     ~FEAElement_Quad9() override = default;
 
@@ -28,34 +28,34 @@ class FEAElement_Quad9 final : public FEAElement
 
     void print_info() const override;
 
-    void buildBasis( const IQuadPts * const &quad_rule,
-        const double * const &ctrl_x,
-        const double * const &ctrl_y ) override;
+    void buildBasis( const IQuadPts * quad_rule,
+        const double * ctrl_x,
+        const double * ctrl_y ) override;
 
-    double get_h( const double * const &ctrl_x,
-        const double * const &ctrl_y ) const override;
+    double get_h( const double * ctrl_x,
+        const double * ctrl_y ) const override;
 
-    void get_R( const int &quaindex, double * const &basis ) const override;
+    void get_R( int quaindex, double * basis ) const override;
 
-    std::vector<double> get_R( const int &quaindex ) const override;
+    std::vector<double> get_R( int quaindex ) const override;
 
-    void get_gradR( const int &quaindex, double * const &basis_x,
-        double * const &basis_y ) const override;
+    void get_gradR( int quaindex, double * basis_x,
+        double * basis_y ) const override;
 
-    void get_R_gradR( const int &quaindex, double * const &basis,
-        double * const &basis_x, double * const &basis_y ) const override;
+    void get_R_gradR( int quaindex, double * basis,
+        double * basis_x, double * basis_y ) const override;
 
-    void get_2D_R_dR_d2R( const int &quaindex,
-        double * const &basis,
-        double * const &basis_x, double * const &basis_y,
-        double * const &basis_xx, double * const &basis_yy,
-        double * const &basis_xy ) const override;
+    void get_2D_R_dR_d2R( int quaindex,
+        double * basis,
+        double * basis_x, double * basis_y,
+        double * basis_xx, double * basis_yy,
+        double * basis_xy ) const override;
 
-    std::array<double,4> get_Jacobian_2D(const int &quaindex) const override;
+    std::array<double,4> get_Jacobian_2D(int quaindex) const override;
 
-    std::array<double,4> get_invJacobian_2D(const int &quaindex) const override;
+    std::array<double,4> get_invJacobian_2D(int quaindex) const override;
 
-    double get_detJac(const int &quaindex) const override
+    double get_detJac(int quaindex) const override
     {return Jac[8*numQuapts + quaindex];}
 
   private:

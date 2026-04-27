@@ -21,14 +21,17 @@ class IFlowRate
     virtual ~IFlowRate() = default;
 
     // Return the current flow rate
-    virtual double get_flow_rate( const int &nbc_id, const double &time ) const = 0;
+    virtual double get_flow_rate( int nbc_id, double time ) const = 0;
+
+    // Return the time derivative of flow rate
+    virtual double get_dot_flow_rate( int nbc_id, double time ) const { return 0.0; }
 
     // Return the flow turbulence intensity represented by the standard
     // deviation
-    virtual double get_flow_TI_std_dev( const int &nbc_id ) const { return 0.0; }
+    virtual double get_flow_TI_std_dev( int nbc_id ) const { return 0.0; }
 
     // Return the start rate for Linear2Steady and Cosine2Steady
-    virtual double get_flow_start_rate( const int &nbc_id ) const { return 0.0; }
+    virtual double get_flow_start_rate( int nbc_id ) const { return 0.0; }
 
     virtual int get_num_nbc() const = 0;
 
@@ -38,7 +41,7 @@ class IFlowRate
     // ------------------------------------------------------------------------
     // Generate a filename for inlet face nbc_id as Inlet_xxx_flowrate.txt
     // ------------------------------------------------------------------------
-    virtual std::string gen_flowfile_name(const int &nbc_id) const
+    virtual std::string gen_flowfile_name(int nbc_id) const
     {
       std::ostringstream ss;
       ss << "Inlet_";

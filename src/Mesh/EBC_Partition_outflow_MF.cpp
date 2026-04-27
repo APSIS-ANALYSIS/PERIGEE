@@ -1,4 +1,6 @@
 #include "EBC_Partition_outflow_MF.hpp"
+#include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
 
 EBC_Partition_outflow_MF::EBC_Partition_outflow_MF(
     const IPart * const &part,
@@ -76,10 +78,9 @@ void EBC_Partition_outflow_MF::write_hdf5( const std::string &FileName,
 
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-  hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
-
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+  const hid_t file_id = h5w->get_file_id();
+  auto root_group = HDF5_Group::open( file_id, GroupName );
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
@@ -87,17 +88,15 @@ void EBC_Partition_outflow_MF::write_hdf5( const std::string &FileName,
     {
       std::string subgroup_name( "ebcid_" );
       subgroup_name.append( std::to_string(ii) );
-      hid_t subgroup_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT );
+      auto sub_group = HDF5_Group::open( root_group.id(), subgroup_name );
 
-      h5w->write_doubleVector( subgroup_id, "intNA", face_int_NA[ii] );
-      h5w->write_intVector( subgroup_id, "LID_all_face_nodes", LID_all_face_nodes[ii] );
-      h5w->write_Vector_3( subgroup_id, "out_normal", outvec[ii].to_std_array() );
+      h5w->write_doubleVector( sub_group.id(), "intNA", face_int_NA[ii] );
+      h5w->write_intVector( sub_group.id(), "LID_all_face_nodes", LID_all_face_nodes[ii] );
+      h5w->write_Vector_3( sub_group.id(), "out_normal", outvec[ii].to_std_array() );
 
-      H5Gclose( subgroup_id );
     }
   }
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 // EOF

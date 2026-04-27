@@ -89,7 +89,7 @@ void PETSc_T::Get_dnz_onz( const Mat &K,
   }
 }
 
-void PETSc_T::MinusSqrtVec(Vec &v, const double &tol)
+void PETSc_T::MinusSqrtVec(Vec &v, double tol)
 {
   PetscInt nn,ii;
   PetscScalar *v1;
@@ -106,7 +106,7 @@ void PETSc_T::MinusSqrtVec(Vec &v, const double &tol)
   VecRestoreArray(v, &v1);
 }
 
-void PETSc_T::InvAbsVec(Vec &v, const double &tol)
+void PETSc_T::InvAbsVec(Vec &v, double tol)
 {
   PetscInt nn,ii;
   PetscScalar *v1;
@@ -140,7 +140,7 @@ void PETSc_T::MatCreateId( Mat &K, const PetscInt &lrow )
   MatAssemblyEnd(K, MAT_FINAL_ASSEMBLY);
 }
 
-double PETSc_T::GetValue( const Vec &a, const int ii )
+double PETSc_T::GetValue( const Vec &a, int ii )
 {
   double val;
   VecGetValues( a, 1, &ii, &val );

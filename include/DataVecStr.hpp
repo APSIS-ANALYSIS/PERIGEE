@@ -27,11 +27,11 @@ template <typename T>
 class DataVecStr
 {
   public:
-    DataVecStr( const std::vector<T> &input_data, const std::string &input_name, const AssociateObject &input_type ) : data(input_data), name(input_name), object(input_type) {};
+    DataVecStr( const std::vector<T> &input_data, const std::string &input_name, const AssociateObject &input_type ) : data(input_data), name(input_name), object(input_type) {}
  
     DataVecStr() { data = {}; name = "undefined"; object = AssociateObject::Node; }
 
-    virtual ~DataVecStr() = default;
+    ~DataVecStr() = default;
 
     DataVecStr<T>& operator= ( const DataVecStr<T> &input )
     {
@@ -68,7 +68,7 @@ class DataVecStr
   private:
     // ------------------------------------------------------------------------
     // data is the container that holds the values
-    // name is the name to be writen or read from the file
+    // name is the name to be written or read from the file
     // object = AssociateObject::Node or AssociateObject::Cell.
     // ------------------------------------------------------------------------
     std::vector<T> data;

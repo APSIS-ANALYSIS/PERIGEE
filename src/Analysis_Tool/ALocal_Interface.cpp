@@ -1,12 +1,12 @@
 #include "ALocal_Interface.hpp"
+#include "PDNSolution.hpp"
+#include "HDF5_Reader.hpp"
 
-ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &cpu_rank)
+ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_rank)
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   const std::string gname("/sliding");
 
@@ -131,7 +131,6 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, const int &
     }
   }
 
-  H5Fclose( file_id );
 }
 
 ALocal_Interface::ALocal_Interface( const HDF5_Reader * const &h5r )
@@ -265,7 +264,7 @@ void ALocal_Interface::print_info() const
   SYS_T::commPrint("Interfaces: %d\n", num_itf);
 }
 
-void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &jj,
+void ALocal_Interface::get_fixed_ele_ctrlPts(int ii, int jj,
   double * const volctrl_x,  double * const volctrl_y,  double * const volctrl_z) const
 {
   for(int nn{0}; nn < nLocBas; ++nn)
@@ -278,7 +277,7 @@ void ALocal_Interface::get_fixed_ele_ctrlPts(const int &ii, const int &jj,
   }
 }
 
-void ALocal_Interface::get_rotated_ele_ctrlPts(const int &ii, const int &jj,
+void ALocal_Interface::get_rotated_ele_ctrlPts(int ii, int jj,
   double * const volctrl_x, double * const volctrl_y, double * const volctrl_z) const
 {
   for(int nn{0}; nn < nLocBas; ++nn)

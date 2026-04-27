@@ -1,4 +1,7 @@
 #include "EBC_Partition.hpp"
+#include "Vec_Tools.hpp"
+#include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
 
 EBC_Partition::EBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc )
@@ -97,46 +100,37 @@ void EBC_Partition::write_hdf5( const std::string &FileName,
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+  hid_t file_id = h5w->get_file_id();
+  auto root_group = HDF5_Group::create( file_id, GroupName );
 
-  hid_t g_id = H5Gcreate(file_id, GroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT); 
+  h5w -> write_intScalar( root_group.id(), "num_ebc", num_ebc );
 
-  auto h5w = SYS_T::make_unique<HDF5_Writer>( file_id );
+  h5w -> write_intVector( root_group.id(), "num_local_cell_node", num_local_cell_node );
 
-  h5w -> write_intScalar( g_id, "num_ebc", num_ebc );
+  h5w -> write_intVector( root_group.id(), "num_local_cell", num_local_cell );
 
-  h5w -> write_intVector( g_id, "num_local_cell_node", num_local_cell_node );
-
-  h5w -> write_intVector( g_id, "num_local_cell", num_local_cell );
-
-  h5w -> write_intVector( g_id, "cell_nLocBas", cell_nLocBas );
-
-  const std::string groupbase("ebcid_");
+  h5w -> write_intVector( root_group.id(), "cell_nLocBas", cell_nLocBas );
 
   for(int ii=0; ii<num_ebc; ++ii)
   {
     if( num_local_cell[ii] > 0 )
     {
-      const std::string sub_gname = groupbase + std::to_string(ii);
+      const std::string sub_gname = "ebcid_" + std::to_string(ii);
 
-      hid_t group_id = H5Gcreate(g_id, sub_gname.c_str(), 
-          H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+      auto sub_group = HDF5_Group::create( root_group.id(), sub_gname );
 
-      h5w->write_doubleVector( group_id, "local_cell_node_xyz", local_cell_node_xyz[ii] );
+      h5w->write_doubleVector( sub_group.id(), "local_cell_node_xyz", local_cell_node_xyz[ii] );
 
-      h5w->write_intVector( group_id, "local_cell_ien", local_cell_ien[ii] );
+      h5w->write_intVector( sub_group.id(), "local_cell_ien", local_cell_ien[ii] );
 
-      h5w->write_intVector( group_id, "local_cell_node_vol_id", local_cell_node_vol_id[ii] );
+      h5w->write_intVector( sub_group.id(), "local_cell_node_vol_id", local_cell_node_vol_id[ii] );
 
-      h5w->write_intVector( group_id, "local_cell_node_pos", local_cell_node_pos[ii] );
+      h5w->write_intVector( sub_group.id(), "local_cell_node_pos", local_cell_node_pos[ii] );
 
-      h5w->write_intVector( group_id, "local_cell_vol_id", local_cell_vol_id[ii] );
-
-      H5Gclose( group_id );
+      h5w->write_intVector( sub_group.id(), "local_cell_vol_id", local_cell_vol_id[ii] );
     }
   }
-
-  H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 void EBC_Partition::print_info() const

@@ -1,4 +1,6 @@
 #include "VisDataPrep_Stress_Recovery.hpp"
+#include "PostVectSolution.hpp"
+
 
 VisDataPrep_Stress_Recovery::VisDataPrep_Stress_Recovery()
 {

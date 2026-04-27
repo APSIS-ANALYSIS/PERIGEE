@@ -7,15 +7,14 @@
 // basic mesh quality evaluation.
 // ==================================================================
 #include "DataVecStr.hpp"
-#include "Vec_Tools.hpp"
-#include "VTK_Tools.hpp"
-#include "FE_Tools.hpp"
 #include "IIEN.hpp"
+#include "Vector_3.hpp"
 
 #include "vtkTriangle.h"
 #include "vtkQuadraticTriangle.h"
 #include "vtkTetra.h"
 #include "vtkQuadraticTetra.h"
+#include "vtkPolyData.h"
 
 #include "tetgen.h"
 

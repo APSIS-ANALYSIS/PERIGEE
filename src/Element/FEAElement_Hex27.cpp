@@ -1,6 +1,6 @@
 #include "FEAElement_Hex27.hpp"
 
-FEAElement_Hex27::FEAElement_Hex27( const int &in_nqua ) : numQuapts( in_nqua ) ,
+FEAElement_Hex27::FEAElement_Hex27( int in_nqua ) : numQuapts( in_nqua ) ,
   quadrilateral_face( SYS_T::make_unique<FEAElement_Quad9_3D_der0>(numQuapts) )
 {
   R.resize(nLocBas * numQuapts, 0.0);
@@ -28,10 +28,10 @@ void FEAElement_Hex27::print_info() const
   SYS_T::commPrint("Note: Jacobian and inverse Jacobian are evaluated.\n");
 }
 
-void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Hex27::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   ASSERT( quad -> get_dim() == 3, "FEAElement_Hex27::buildBasis function error.\n" );
 
@@ -303,9 +303,9 @@ void FEAElement_Hex27::buildBasis( const IQuadPts * const &quad,
   }
 }
 
-double FEAElement_Hex27::get_h( const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z ) const
+double FEAElement_Hex27::get_h( const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z ) const
 {
   const double diag[4] { std::pow((ctrl_x[0] - ctrl_x[6]), 2.0)
       + std::pow((ctrl_y[0] - ctrl_y[6]), 2.0) + std::pow((ctrl_z[0] - ctrl_z[6]), 2.0),
@@ -325,14 +325,14 @@ double FEAElement_Hex27::get_h( const double * const &ctrl_x,
   return std::sqrt(d);
 }
 
-void FEAElement_Hex27::get_R( const int &quaindex, double * const &basis ) const
+void FEAElement_Hex27::get_R( int quaindex, double * basis ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   for(int ii=0; ii<nLocBas; ++ii) basis[ii] = R[offset+ii];
 }
 
-std::vector<double> FEAElement_Hex27::get_R( const int &quaindex ) const
+std::vector<double> FEAElement_Hex27::get_R( int quaindex ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -340,8 +340,8 @@ std::vector<double> FEAElement_Hex27::get_R( const int &quaindex ) const
   return vec;
 }
 
-void FEAElement_Hex27::get_gradR( const int &quaindex, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z ) const
+void FEAElement_Hex27::get_gradR( int quaindex, double * basis_x,
+    double * basis_y, double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -353,9 +353,9 @@ void FEAElement_Hex27::get_gradR( const int &quaindex, double * const &basis_x,
   }
 }
 
-void FEAElement_Hex27::get_R_gradR( const int &quaindex, double * const &basis,
-    double * const &basis_x, double * const &basis_y,
-    double * const &basis_z ) const
+void FEAElement_Hex27::get_R_gradR( int quaindex, double * basis,
+    double * basis_x, double * basis_y,
+    double * basis_z ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_R_gradR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -368,12 +368,12 @@ void FEAElement_Hex27::get_R_gradR( const int &quaindex, double * const &basis,
   }
 }
 
-void FEAElement_Hex27::get_3D_R_dR_d2R( const int &quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz, double * const &basis_xy,
-    double * const &basis_xz, double * const &basis_yz ) const
+void FEAElement_Hex27::get_3D_R_dR_d2R( int quaindex,
+    double * basis, double * basis_x,
+    double * basis_y, double * basis_z,
+    double * basis_xx, double * basis_yy,
+    double * basis_zz, double * basis_xy,
+    double * basis_xz, double * basis_yz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_3D_R_dR_d2R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -392,11 +392,11 @@ void FEAElement_Hex27::get_3D_R_dR_d2R( const int &quaindex,
   }
 }
 
-void FEAElement_Hex27::get_3D_R_gradR_LaplacianR( const int &quaindex,
-    double * const &basis, double * const &basis_x,
-    double * const &basis_y, double * const &basis_z,
-    double * const &basis_xx, double * const &basis_yy,
-    double * const &basis_zz ) const
+void FEAElement_Hex27::get_3D_R_gradR_LaplacianR( int quaindex,
+    double * basis, double * basis_x,
+    double * basis_y, double * basis_z,
+    double * basis_xx, double * basis_yy,
+    double * basis_zz ) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_3D_R_gradR_LaplacianR function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -412,7 +412,7 @@ void FEAElement_Hex27::get_3D_R_gradR_LaplacianR( const int &quaindex,
   }
 }
 
-std::array<double,9> FEAElement_Hex27::get_Jacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Hex27::get_Jacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_Jacobian function error.\n" );
   return {{ dx_dr[9*quaindex], dx_dr[9*quaindex+1], dx_dr[9*quaindex+2],
@@ -420,7 +420,7 @@ std::array<double,9> FEAElement_Hex27::get_Jacobian(const int &quaindex) const
     dx_dr[9*quaindex+6], dx_dr[9*quaindex+7], dx_dr[9*quaindex+8] }};
 }
 
-std::array<double,9> FEAElement_Hex27::get_invJacobian(const int &quaindex) const
+std::array<double,9> FEAElement_Hex27::get_invJacobian(int quaindex) const
 {
   ASSERT( quaindex >= 0 && quaindex < numQuapts, "FEAElement_Hex27::get_invJacobian function error.\n" );
   return {{ dr_dx[9*quaindex], dr_dx[9*quaindex+1], dr_dx[9*quaindex+2],
@@ -428,10 +428,10 @@ std::array<double,9> FEAElement_Hex27::get_invJacobian(const int &quaindex) cons
     dr_dx[9*quaindex+6], dr_dx[9*quaindex+7], dr_dx[9*quaindex+8] }};
 }
 
-void FEAElement_Hex27::buildBasis( const int &face_id, const IQuadPts * const &quad_s,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Hex27::buildBasis( int face_id, const IQuadPts * quad_s,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   // Build the volume element
   const auto quad_v = FE_T::QuadPts_on_face( this->get_Type(), face_id, quad_s );
