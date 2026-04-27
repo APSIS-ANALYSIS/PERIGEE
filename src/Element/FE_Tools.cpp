@@ -1,8 +1,8 @@
 #include "FE_Tools.hpp"
 #include "Math_Tools.hpp"
 
-double FE_T::L2Proj_DGP0( const double * const &f,
-    const double * const &gwts, const int &nqp )
+double FE_T::L2Proj_DGP0( const double * f,
+    const double * gwts, int nqp )
 {
   double sum_top = 0.0, sum_bot = 0.0;
   for(int ii=0; ii<nqp; ++ii)
@@ -13,11 +13,11 @@ double FE_T::L2Proj_DGP0( const double * const &f,
   return sum_top / sum_bot;
 }
 
-void FE_T::L2Proj_DGP1_2D( const double * const &f,
-    const double * const &gwts,
-    const double * const &qp_x,
-    const double * const &qp_y,
-    const int &nqp,
+void FE_T::L2Proj_DGP1_2D( const double * f,
+    const double * gwts,
+    const double * qp_x,
+    const double * qp_y,
+    int nqp,
     double &coeff_0, double &coeff_x, double &coeff_y )
 {
   double a [9] = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
@@ -46,12 +46,12 @@ void FE_T::L2Proj_DGP1_2D( const double * const &f,
   AA.LU_solve(b[0], b[1], b[2], coeff_0, coeff_x, coeff_y);
 }
 
-void FE_T::L2Proj_DGP1_3D( const double * const &f,
-    const double * const &gwts,
-    const double * const &qp_x,
-    const double * const &qp_y,
-    const double * const &qp_z,
-    const int &nqp,
+void FE_T::L2Proj_DGP1_3D( const double * f,
+    const double * gwts,
+    const double * qp_x,
+    const double * qp_y,
+    const double * qp_z,
+    int nqp,
     double &coeff_0, double &coeff_x, double &coeff_y, double &coeff_z )
 {
   std::array<double,16> a {{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0}};
@@ -100,9 +100,9 @@ Vector_3 FE_T::get_n_from_t( const Vector_3 &tan, const Vector_3 &p0, const Vect
 }
 
 void FE_T::get_tet_sphere_info(
-    const double &x0, const double &x1, const double &x2, const double &x3,
-    const double &y0, const double &y1, const double &y2, const double &y3,
-    const double &z0, const double &z1, const double &z2, const double &z3,
+    double x0, double x1, double x2, double x3,
+    double y0, double y1, double y2, double y3,
+    double z0, double z1, double z2, double z3,
     double &xx, double &yy, double &zz, double &rr )
 {
   FE_T::Matrix_double_3by3_Array AA(
@@ -123,9 +123,9 @@ void FE_T::get_tet_sphere_info(
 }
 
 double FE_T::get_tet_sphere_radius (
-    const double &x0, const double &x1, const double &x2, const double &x3,
-    const double &y0, const double &y1, const double &y2, const double &y3,
-    const double &z0, const double &z1, const double &z2, const double &z3 )
+    double x0, double x1, double x2, double x3,
+    double y0, double y1, double y2, double y3,
+    double z0, double z1, double z2, double z3 )
 {
   FE_T::Matrix_double_3by3_Array AA(
       2.0 * (x1-x0), 2.0 * (y1-y0), 2.0 * (z1-z0),
@@ -185,9 +185,9 @@ double FE_T::get_circumradius( const std::array<Vector_3, 4> &pts )
 
 bool FE_T::search_closest_point( const Vector_3 &target_xyz,
     FEAElement * const &elements,
-    const double * const &electrl_x,
-    const double * const &electrl_y,
-    const double * const &electrl_z,
+    const double * electrl_x,
+    const double * electrl_y,
+    const double * electrl_z,
     IQuadPts * const &closest_point )
 {
   // initial value
@@ -324,9 +324,9 @@ namespace FE_T
   }
 
   Matrix_double_3by3_Array::Matrix_double_3by3_Array(
-      const double &a11, const double &a12, const double &a13,
-      const double &a21, const double &a22, const double &a23,
-      const double &a31, const double &a32, const double &a33 )
+      double a11, double a12, double a13,
+      double a21, double a22, double a23,
+      double a31, double a32, double a33 )
   {
     mat[0] = a11;  mat[1] = a12;  mat[2] = a13;
     mat[3] = a21;  mat[4] = a22;  mat[5] = a23;
@@ -357,7 +357,7 @@ namespace FE_T
     pp[0] = 0; pp[1] = 1; pp[2] = 2;
   }
 
-  void Matrix_double_3by3_Array::gen_rand(const double &min, const double &max)
+  void Matrix_double_3by3_Array::gen_rand(double min, double max)
   {
     std::random_device rd;
     std::mt19937_64 gen( rd() );
@@ -489,7 +489,7 @@ namespace FE_T
     return xx;
   }
 
-  void Matrix_double_3by3_Array::LU_solve(const double &b1, const double &b2, const double &b3,
+  void Matrix_double_3by3_Array::LU_solve(double b1, double b2, double b3,
       double &x1, double &x2, double &x3) const
   {
     const double bb[3] = {b1, b2, b3};
@@ -537,7 +537,7 @@ namespace FE_T
       - mat[0] * mat[5] * mat[7] - mat[1] * mat[3] * mat[8];
   }
 
-  void Matrix_double_3by3_Array::VecMult(const double * const &xx, double * const &yy) const
+  void Matrix_double_3by3_Array::VecMult(const double * xx, double * yy) const
   {
     yy[0] = mat[0] * xx[0] + mat[1] * xx[1] + mat[2] * xx[2];
     yy[1] = mat[3] * xx[0] + mat[4] * xx[1] + mat[5] * xx[2];
@@ -575,9 +575,9 @@ namespace FE_T
     std::cout<<std::setprecision(9)<<pp[0]<<'\t'<<pp[1]<<'\t'<<pp[2]<<'\n';
   }
 
-  Matrix_double_6by6_Array::Matrix_double_6by6_Array(const double &aa, const double &bb,
-      const double &cc, const double &dd, const double &ee, const double &ff,
-      const double &gg, const double &hh, const double &ii)
+  Matrix_double_6by6_Array::Matrix_double_6by6_Array(double aa, double bb,
+      double cc, double dd, double ee, double ff,
+      double gg, double hh, double ii)
   {
     Mat[0] = aa*aa;     Mat[1] = dd*dd;     Mat[2] = gg*gg;
     Mat[3] = 2.0*aa*dd; Mat[4] = 2.0*aa*gg; Mat[5] = 2.0*dd*gg;
