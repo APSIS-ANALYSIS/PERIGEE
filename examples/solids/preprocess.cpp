@@ -208,8 +208,7 @@ int main( int argc, char * argv[] )
     // Partition Nodal BC and write to h5 file
     auto nbcpart = SYS_T::make_unique<NBC_Partition_Solid>(
         part.get(), mnindex.get(),
-        solid_nbc_list_x, solid_nbc_list_y, solid_nbc_list_z,
-        dofMat, nFunc );
+        solid_nbc_list_x, solid_nbc_list_y, solid_nbc_list_z );
     nbcpart->write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file

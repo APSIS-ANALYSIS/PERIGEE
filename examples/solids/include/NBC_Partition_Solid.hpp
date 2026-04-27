@@ -18,9 +18,7 @@ class NBC_Partition_Solid
         const Map_Node_Index * const &mnindex,
         const std::vector<NodalBC_Solid *> &solid_nbc_list_x,
         const std::vector<NodalBC_Solid *> &solid_nbc_list_y,
-        const std::vector<NodalBC_Solid *> &solid_nbc_list_z,
-        const int &dof,
-        const int &nFunc );
+        const std::vector<NodalBC_Solid *> &solid_nbc_list_z );
 
     virtual ~NBC_Partition_Solid() = default;
 
