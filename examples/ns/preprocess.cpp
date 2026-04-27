@@ -92,8 +92,7 @@ int main( int argc, char * argv[] )
   SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
 
   // Generate the inlet file names and check existance
-  std::vector< std::string > sur_file_in;
-  sur_file_in.resize( num_inlet );
+  std::vector< std::string > sur_file_in( num_inlet );
 
   for(int ii=0; ii<num_inlet; ++ii)
   {  
@@ -109,8 +108,7 @@ int main( int argc, char * argv[] )
   }
 
   // Generate the outlet file names and check existance
-  std::vector< std::string > sur_file_out;
-  sur_file_out.resize( num_outlet );
+  std::vector< std::string > sur_file_out( num_outlet );
 
   for(int ii=0; ii<num_outlet; ++ii)
   {
