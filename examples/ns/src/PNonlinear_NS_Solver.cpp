@@ -85,6 +85,12 @@ int PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   LoadData::rescale_inflow_value(curr_time+alpha_f*dt, infnbc_part, flrate.get(), sol_base.get(), &sol_alpha);
   // ------------------------------------------------- 
 
+  // ------------------------------------------------- 
+  // Update the dot_inflow boundary values
+  LoadData::rescale_dot_inflow_value(curr_time+dt, infnbc_part, flrate.get(), sol_base.get(), dot_sol);
+  LoadData::rescale_dot_inflow_value(curr_time+alpha_m*dt, infnbc_part, flrate.get(), sol_base.get(), &dot_sol_alpha);
+  // ------------------------------------------------- 
+
   // If new_tangent_flag == TRUE, update the tangent matrix;
   // otherwise, use the matrix from the previous time step
   if( new_tangent_flag )
@@ -195,44 +201,6 @@ int PNonlinear_NS_Solver::GenAlpha_Solve_NS(
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
   return nl_counter;
-}
-
-void PNonlinear_NS_Solver::rescale_dot_inflow_value( const double &stime,
-    const ALocal_InflowBC * const &infbc,
-    PDNSolution * const &sol ) const
-{
-  const int num_nbc = infbc -> get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    const int numnode = infbc -> get_Num_LD( nbc_id );
-
-    const double factor  = flrate -> get_flow_rate( nbc_id, stime );
-    const double std_dev = flrate -> get_flow_TI_std_dev( nbc_id );
-
-    for(int ii=0; ii<numnode; ++ii)
-    {
-      const int node_index = infbc -> get_LDN( nbc_id, ii );
-      
-      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
-
-      double base_vals[3];
-
-      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
-
-      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
-
-      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
-        base_vals[1] * factor * (1.0 + perturb_y),
-        base_vals[2] * factor * (1.0 + perturb_z) };
-
-      VecSetValues(sol->solution, 3, base_idx, vals, INSERT_VALUES);
-    }
-  }
-
-  sol->Assembly_GhostUpdate();
 }
 
 // EOF
