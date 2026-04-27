@@ -78,11 +78,7 @@ class PNonlinear_NS_Solver
       SYS_T::commPrint("  === NR ite: %d, r_error: %e, a_error: %e \n",
           count, rel_err, abs_err);
     }
-
-    // Rescale the time derivative of the inflow rate prescribed at the inlet boundary.
-    void rescale_dot_inflow_value( const double &stime,
-        const ALocal_InflowBC * const &infbc,
-        PDNSolution * const &sol ) const;        
+    
 };
 
 #endif
