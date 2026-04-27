@@ -70,39 +70,39 @@ int main( int argc, char * argv[] )
   if(elemType!=FEType::Tet4 && elemType!=FEType::Tet10 && elemType!=FEType::Hex8 && elemType!=FEType::Hex27) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   // Print the command line arguments
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType_str<<endl;
-  cout<<" -geo_file: "<<geo_file<<endl;
-  cout<<" -sur_file_dir_x: ";
-  for(const auto &fname : sur_file_dir_x) cout<<fname<<" ";
-  cout<<endl;
-  cout<<" -is_disp_driven_x: ";
-  for(const auto &flag : is_disp_driven_x) cout<<(flag ? "true" : "false")<<" ";
-  cout<<endl;
-  cout<<" -sur_file_dir_y: ";
-  for(const auto &fname : sur_file_dir_y) cout<<fname<<" ";
-  cout<<endl;
-  cout<<" -is_disp_driven_y: ";
-  for(const auto &flag : is_disp_driven_y) cout<<(flag ? "true" : "false")<<" ";
-  cout<<endl;
-  cout<<" -sur_file_dir_z: ";
-  for(const auto &fname : sur_file_dir_z) cout<<fname<<" ";
-  cout<<endl;
-  cout<<" -is_disp_driven_z: ";
-  for(const auto &flag : is_disp_driven_z) cout<<(flag ? "true" : "false")<<" ";
-  cout<<endl;
-  cout<<" -sur_file_neu: ";
-  for(const auto &fname : sur_file_neu) cout<<fname<<" ";
-  cout<<endl;
-  cout<<" -part_file: "<<part_file<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -isDualGraph: true \n";
-  else cout<<" -isDualGraph: false \n";
-  cout<<"---- Problem definition ----\n";
-  cout<<" dofNum: "<<dofNum<<endl;
-  cout<<" dofMat: "<<dofMat<<endl;
-  cout<<"====  Command Line Arguments/ ===="<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -elem_type: "<<elemType_str<<std::endl;
+  std::cout<<" -geo_file: "<<geo_file<<std::endl;
+  std::cout<<" -sur_file_dir_x: ";
+  for(const auto &fname : sur_file_dir_x) std::cout<<fname<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -is_disp_driven_x: ";
+  for(const auto &flag : is_disp_driven_x) std::cout<<(flag ? "true" : "false")<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -sur_file_dir_y: ";
+  for(const auto &fname : sur_file_dir_y) std::cout<<fname<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -is_disp_driven_y: ";
+  for(const auto &flag : is_disp_driven_y) std::cout<<(flag ? "true" : "false")<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -sur_file_dir_z: ";
+  for(const auto &fname : sur_file_dir_z) std::cout<<fname<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -is_disp_driven_z: ";
+  for(const auto &flag : is_disp_driven_z) std::cout<<(flag ? "true" : "false")<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -sur_file_neu: ";
+  for(const auto &fname : sur_file_neu) std::cout<<fname<<" ";
+  std::cout<<std::endl;
+  std::cout<<" -part_file: "<<part_file<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -isDualGraph: true \n";
+  else std::cout<<" -isDualGraph: false \n";
+  std::cout<<"---- Problem definition ----\n";
+  std::cout<<" dofNum: "<<dofNum<<std::endl;
+  std::cout<<" dofMat: "<<dofMat<<std::endl;
+  std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
 
   // Check if the vtu geometry files exist on disk
   SYS_T::file_check(geo_file);
@@ -166,15 +166,15 @@ int main( int argc, char * argv[] )
   solid_nbc_list_y.reserve( sur_file_dir_y.size() );
   solid_nbc_list_z.reserve( sur_file_dir_z.size() );
 
-  for(size_t ii=0; ii<sur_file_dir_x.size(); ++ii)
+  for(std::size_t ii=0; ii<sur_file_dir_x.size(); ++ii)
     solid_nbc_list_x.push_back(
         new NodalBC_Solid( sur_file_dir_x[ii], nFunc, is_disp_driven_x[ii] ) );
 
-  for(size_t ii=0; ii<sur_file_dir_y.size(); ++ii)
+  for(std::size_t ii=0; ii<sur_file_dir_y.size(); ++ii)
     solid_nbc_list_y.push_back(
         new NodalBC_Solid( sur_file_dir_y[ii], nFunc, is_disp_driven_y[ii] ) );
 
-  for(size_t ii=0; ii<sur_file_dir_z.size(); ++ii)
+  for(std::size_t ii=0; ii<sur_file_dir_z.size(); ++ii)
     solid_nbc_list_z.push_back(
         new NodalBC_Solid( sur_file_dir_z[ii], nFunc, is_disp_driven_z[ii] ) );
 
@@ -201,7 +201,7 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
     
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part hdf5 file
     part -> write( part_file );
@@ -228,19 +228,19 @@ int main( int argc, char * argv[] )
     sum_nghostnode += part->get_nghostnode();
   }
 
-  cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
-  cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-  cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<endl;
+  std::cout<<"\n===> Mesh Partition Quality: "<<std::endl;
+  std::cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<std::endl;
+  std::cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<std::endl;
+  std::cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<std::endl;
+  std::cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<std::endl;
 
   const int maxpart_nlocalnode = VEC_T::max(list_nlocalnode);
   const int minpart_nlocalnode = VEC_T::min(list_nlocalnode);
 
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  std::cout<<"The maximum and minimum local node numbers are ";
+  std::cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<std::endl;
+  std::cout<<"The maximum / minimum of local node is: ";
+  std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
   // Finalize the code and exit
   for(auto &it_nbc : solid_nbc_list_x ) delete it_nbc;
