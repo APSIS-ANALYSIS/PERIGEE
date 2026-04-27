@@ -29,15 +29,14 @@ int main( int argc, char * argv[] )
   bool isClean = true;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  auto cmd_h5r = SYS_T::make_unique<HDF5_Reader>("solver_cmd.h5");
 
   const int init_index = cmd_h5r -> read_intScalar("/","init_index");
   const int final_index = cmd_h5r -> read_intScalar("/","final_index");
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
   const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  cmd_h5r.reset();
 
   // ===== PETSc Initialization =====
 #if PETSC_VERSION_LT(3,19,0)
