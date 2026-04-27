@@ -7,6 +7,7 @@
 // Date Created: Jan 04 2026
 // ============================================================================
 #include "IEN_FEM.hpp"
+#include "VTK_Tools.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "NodalBC_Solid.hpp"
@@ -117,19 +118,17 @@ int main( int argc, char * argv[] )
   { SYS_T::file_check( fname ); std::cout << fname << " found. \n"; }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
-
-  cmdh5w->write_intScalar("cpu_size", cpu_size);
-  cmdh5w->write_intScalar("in_ncommon", in_ncommon);
-  cmdh5w->write_string("elemType", elemType_str);
-  cmdh5w->write_string("geo_file", geo_file);
-  cmdh5w->write_string("part_file", part_file);
-  cmdh5w->write_intScalar("dof_num", dofNum);
-  cmdh5w->write_intScalar("dof_mat", dofMat);
-
-  delete cmdh5w; H5Fclose(cmd_file_id);
-
+  {
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("preprocessor_cmd.h5");
+    cmdh5w->write_intScalar("cpu_size", cpu_size);
+    cmdh5w->write_intScalar("in_ncommon", in_ncommon);
+    cmdh5w->write_string("elemType", elemType_str);
+    cmdh5w->write_string("geo_file", geo_file);
+    cmdh5w->write_string("part_file", part_file);
+    cmdh5w->write_intScalar("dof_num", dofNum);
+    cmdh5w->write_intScalar("dof_mat", dofMat);
+  }
+  
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
   std::vector<int> vecIEN;

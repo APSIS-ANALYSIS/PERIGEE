@@ -1,5 +1,6 @@
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
+#include "APart_Node.hpp"
 #include "FEAElementFactory.hpp"
 #include "HDF5_Reader.hpp"
 #include "MaterialModel_ich_NeoHookean.hpp"
@@ -12,8 +13,6 @@
 int main( int argc, char * argv[] )
 {
   const std::string element_part_file = "epart.h5";
-  const std::string anode_mapping_file = "node_mapping.h5";
-  const std::string pnode_mapping_file = "post_node_mapping.h5";
   const std::string part_file = "./ppart/part";
 
   std::string disp_sol_bname("SOL_disp_");
@@ -132,8 +131,8 @@ int main( int argc, char * argv[] )
       GMIptr->get_nLocBas(), element_part_file, std::move(matmodel) );
 
   std::ostringstream time_index;
-  const auto anode_mapping = VIS_T::readNodeMapping(anode_mapping_file, "old_2_new");
-  const auto pnode_mapping = VIS_T::readNodeMapping(pnode_mapping_file, "new_2_old");
+  const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
+  const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
