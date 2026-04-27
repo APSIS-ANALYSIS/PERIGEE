@@ -1,4 +1,5 @@
 #include "NBC_Partition_Solid.hpp"
+#include "HDF5_Group.hpp"
 #include "HDF5_Writer.hpp"
 
 #include <algorithm>
@@ -108,20 +109,17 @@ void NBC_Partition_Solid::write_hdf5( const std::string &FileName,
     const std::string &GroupName ) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-  hid_t g_id = H5Gcreate(file_id, GroupName.c_str(),
-      H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  auto h5writer = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
+  const hid_t file_id = h5writer->get_file_id();
 
-  HDF5_Writer h5w(file_id);
-  h5w.write_intVector( g_id, "LID", LID );
-  if( LDN.size() > 0 ) h5w.write_intVector( g_id, "LDN", LDN );
-  h5w.write_intVector( g_id, "Num_LD", Num_LD );
-  h5w.write_intVector( g_id, "Num_LPS", Num_LPS );
-  h5w.write_intVector( g_id, "Num_LPM", Num_LPM );
-  h5w.write_intVector( g_id, "LDN_is_disp_driven", LDN_is_disp_driven );
+  auto nbc_group = HDF5_Group::create( file_id, GroupName );
 
-  H5Gclose(g_id);
-  H5Fclose(file_id);
+  h5writer->write_intVector( nbc_group.id(), "LID", LID );
+  if( LDN.size() > 0 ) h5writer->write_intVector( nbc_group.id(), "LDN", LDN );
+  h5writer->write_intVector( nbc_group.id(), "Num_LD", Num_LD );
+  h5writer->write_intVector( nbc_group.id(), "Num_LPS", Num_LPS );
+  h5writer->write_intVector( nbc_group.id(), "Num_LPM", Num_LPM );
+  h5writer->write_intVector( nbc_group.id(), "LDN_is_disp_driven", LDN_is_disp_driven );
 }
 
 // EOF
