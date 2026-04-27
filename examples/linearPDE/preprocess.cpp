@@ -121,9 +121,9 @@ int main( int argc, char * argv[] )
   IGlobal_Part * global_part = nullptr;
   if(cpu_size > 1)
     global_part = new Global_Part_METIS( cpu_size, in_ncommon,
-        isDualGraph, nElem, nFunc, nLocBas, IEN, "epart", "npart" );
+        isDualGraph, nElem, nFunc, nLocBas, IEN );
   else if(cpu_size == 1)
-    global_part = new Global_Part_Serial( nElem, nFunc, "epart", "npart" );
+    global_part = new Global_Part_Serial( nElem, nFunc );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
   
   // Generate the new nodal numbering
