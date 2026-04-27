@@ -13,7 +13,6 @@
 #include <ctime>
 #include <memory>
 #include <sys/stat.h>
-#include <algorithm>
 #include "petsc.h"
 #ifdef USE_OPENMP
 #include "omp.h"
