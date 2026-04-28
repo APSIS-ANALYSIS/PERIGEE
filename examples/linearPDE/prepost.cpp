@@ -101,13 +101,12 @@ int main( int argc, char * argv[] )
     mytimer -> Reset();
     mytimer -> Start();
 
-    IPart * part = new Part_FEM( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
+    std::unique_ptr<IPart> part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
         ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "linearPDE"} );
 
     part -> write(part_file.c_str());
     mytimer -> Stop();
     cout << "-- proc " << proc_rank << " Time taken: " << mytimer -> get_sec() << " sec. \n";
-    delete part;
   }
 
   return EXIT_SUCCESS;

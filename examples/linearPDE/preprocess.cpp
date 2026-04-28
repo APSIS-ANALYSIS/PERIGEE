@@ -152,7 +152,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     
-    IPart * part = new Part_FEM( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
+    std::unique_ptr<IPart> part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
         ctrlPts, proc_rank, cpu_size, elemType, {0, dofMat, true, "linearPDE"} );
 
     part -> print_part_loadbalance_edgecut();
@@ -164,12 +164,12 @@ int main( int argc, char * argv[] )
     part -> write( part_file );
 
     // Partition Nodal BC and write to h5 file
-    NBC_Partition * nbcpart = new NBC_Partition(part, mnindex.get(), NBC_list);
+    std::unique_ptr<NBC_Partition> nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex.get(), NBC_list);
 
     nbcpart -> write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
-    EBC_Partition * ebcpart = new EBC_Partition(part, mnindex.get(), ebc.get());
+    std::unique_ptr<EBC_Partition> ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex.get(), ebc.get());
 
     ebcpart -> write_hdf5( part_file );
 
@@ -182,7 +182,6 @@ int main( int argc, char * argv[] )
 
     sum_nghostnode += part->get_nghostnode();
 
-    delete part; delete ebcpart; delete nbcpart;
   }
   
   cout<<"\n===> Mesh Partition Quality: "<<endl;
