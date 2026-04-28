@@ -118,16 +118,13 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas());
 
   // Call METIS to partition the mesh 
-  auto global_part = [&]() -> std::unique_ptr<IGlobal_Part>
-  {
-    if(cpu_size > 1)
-      return SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
-          isDualGraph, nElem, nFunc, nLocBas, IEN.get() );
-    else if(cpu_size == 1)
-      return SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc );
-    else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
-    return nullptr;
-  }();
+  std::unique_ptr<IGlobal_Part> global_part = nullptr;
+  if(cpu_size > 1)
+    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+        isDualGraph, nElem, nFunc, nLocBas, IEN.get() );
+  else if(cpu_size == 1)
+    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc );
+  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
   
   // Generate the new nodal numbering
   auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
