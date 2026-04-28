@@ -13,7 +13,6 @@
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution.hpp"
 #include "APart_Node.hpp"
-#include "ALocal_NBC_Solid.hpp"
 
 class PNonlinear_Solid_Solver
 {
