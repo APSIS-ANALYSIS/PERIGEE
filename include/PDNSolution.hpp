@@ -28,6 +28,13 @@ class PDNSolution
     Vec solution; 
     
     // ------------------------------------------------------------------------
+    // ! Construct a solution vec compatible with the analysis node partition,
+    //   with the solution vector's dof value being equal to the APart_Node
+    //   class's dof value.
+    // ------------------------------------------------------------------------
+    PDNSolution( const APart_Node * const &pNode );
+
+    // ------------------------------------------------------------------------
     // ! Construct a solution vec compatible with the analysis node partition, 
     //   but with a different dof_num from pNode->dof. 
     //   The users specify a dof number for the solution class.
@@ -114,6 +121,16 @@ class PDNSolution
     void GetLocalArray( double * const &local_array ) const;
     
     std::vector<double> GetLocalArray() const;
+
+    // ------------------------------------------------------------------------
+    // ! Assembly the vector and update its ghost values. It is just a routine
+    //   calling the following things.
+    //          VecAssemblyBegin(solution);
+    //          VecAssemblyEnd(solution);
+    //          GhostUpdate();
+    //   This is called after VecSetValues to finish the assembly of vector.
+    // ------------------------------------------------------------------------
+    void Assembly_GhostUpdate();
 
     // ------------------------------------------------------------------------
     // ! Print the vec solution on screen with or without the ghost part

@@ -1,6 +1,10 @@
 #include "PDNSolution.hpp"
 #include <random>
 
+PDNSolution::PDNSolution( const APart_Node * const &pNode )
+: PDNSolution( pNode, pNode->get_dof() )
+{}
+
 PDNSolution::PDNSolution( const APart_Node * const &pNode, int input_dof_num )
 : dof_num( input_dof_num ),
   nlocalnode( pNode->get_nlocalnode() ),
@@ -233,6 +237,14 @@ std::vector<double> PDNSolution::GetLocalArray() const
   VecGhostRestoreLocalForm(solution, &lsol);
 
   return local_array;
+}
+
+void PDNSolution::Assembly_GhostUpdate()
+{
+  VecAssemblyBegin(solution);
+  VecAssemblyEnd(solution);
+  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
+  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 void PDNSolution::PrintWithGhost() const
