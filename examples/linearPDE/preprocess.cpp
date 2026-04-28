@@ -110,7 +110,7 @@ int main( int argc, char * argv[] )
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
-  std::unique_ptr<IIEN> IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
+  auto IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
@@ -118,16 +118,19 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas());
 
   // Call METIS to partition the mesh 
-  std::unique_ptr<IGlobal_Part> global_part = nullptr;
-  if(cpu_size > 1)
-    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
-        isDualGraph, nElem, nFunc, nLocBas, IEN.get() );
-  else if(cpu_size == 1)
-    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc );
-  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+  auto global_part = [&]() -> std::unique_ptr<IGlobal_Part>
+  {
+    if(cpu_size > 1)
+      return SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+          isDualGraph, nElem, nFunc, nLocBas, IEN.get() );
+    else if(cpu_size == 1)
+      return SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc );
+    else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+    return nullptr;
+  }();
   
   // Generate the new nodal numbering
-  std::unique_ptr<Map_Node_Index> mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
+  auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
@@ -136,11 +139,11 @@ int main( int argc, char * argv[] )
     NBC_list[ii] = new NodalBC( dir_list[ii], nFunc );
   
   // Setup Elemental (Neumann type) boundary condition(s)
-  std::unique_ptr<ElemBC> ebc = SYS_T::make_unique<ElemBC_3D>( neu_list, elemType );
+  auto ebc = SYS_T::make_unique<ElemBC_3D>( neu_list, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN.get() ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
-  std::unique_ptr<SYS_T::Timer> mytimer = SYS_T::make_unique<SYS_T::Timer>();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
@@ -152,7 +155,7 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     
-    std::unique_ptr<IPart> part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
+    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
         ctrlPts, proc_rank, cpu_size, elemType, {0, dofMat, true, "linearPDE"} );
 
     part -> print_part_loadbalance_edgecut();
@@ -164,12 +167,12 @@ int main( int argc, char * argv[] )
     part -> write( part_file );
 
     // Partition Nodal BC and write to h5 file
-    std::unique_ptr<NBC_Partition> nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex.get(), NBC_list);
+    auto nbcpart = SYS_T::make_unique<NBC_Partition>(part.get(), mnindex.get(), NBC_list);
 
     nbcpart -> write_hdf5( part_file );
 
     // Partition Elemental BC and write to h5 file
-    std::unique_ptr<EBC_Partition> ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex.get(), ebc.get());
+    auto ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex.get(), ebc.get());
 
     ebcpart -> write_hdf5( part_file );
 

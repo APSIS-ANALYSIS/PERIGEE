@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
 
-  std::unique_ptr<IIEN> IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
+  auto IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
@@ -81,27 +81,30 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas()); 
 
   // Call METIS to partition the mesh
-  std::unique_ptr<IGlobal_Part> global_part = nullptr;
-  if(cpu_size > 1)
-    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
-        isDualGraph, nElem, nFunc, nLocBas, IEN.get(), "post_epart", "post_npart" );
-  else if(cpu_size == 1)
-    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc, "post_epart", "post_npart" );
-  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+  auto global_part = [&]() -> std::unique_ptr<IGlobal_Part>
+  {
+    if(cpu_size > 1)
+      return SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+          isDualGraph, nElem, nFunc, nLocBas, IEN.get(), "post_epart", "post_npart" );
+    else if(cpu_size == 1)
+      return SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc, "post_epart", "post_npart" );
+    else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+    return nullptr;
+  }();
 
-  std::unique_ptr<Map_Node_Index> mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
+  auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("post_node_mapping");
 
   cout<<"=== Start Partition ... \n";
 
-  std::unique_ptr<SYS_T::Timer> mytimer = SYS_T::make_unique<SYS_T::Timer>();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
     mytimer -> Reset();
     mytimer -> Start();
 
-    std::unique_ptr<IPart> part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
+    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
         ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "linearPDE"} );
 
     part -> write(part_file.c_str());
