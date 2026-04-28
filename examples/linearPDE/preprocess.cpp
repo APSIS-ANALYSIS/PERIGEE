@@ -110,7 +110,7 @@ int main( int argc, char * argv[] )
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
-  std::unique_ptr<IIEN> IEN = std::make_unique<IEN_FEM>(nElem, vecIEN);
+  std::unique_ptr<IIEN> IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
@@ -120,14 +120,14 @@ int main( int argc, char * argv[] )
   // Call METIS to partition the mesh 
   std::unique_ptr<IGlobal_Part> global_part = nullptr;
   if(cpu_size > 1)
-    global_part = std::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
         isDualGraph, nElem, nFunc, nLocBas, IEN.get() );
   else if(cpu_size == 1)
-    global_part = std::make_unique<Global_Part_Serial>( nElem, nFunc );
+    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
   
   // Generate the new nodal numbering
-  std::unique_ptr<Map_Node_Index> mnindex = std::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
+  std::unique_ptr<Map_Node_Index> mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
@@ -136,11 +136,11 @@ int main( int argc, char * argv[] )
     NBC_list[ii] = new NodalBC( dir_list[ii], nFunc );
   
   // Setup Elemental (Neumann type) boundary condition(s)
-  std::unique_ptr<ElemBC> ebc = std::make_unique<ElemBC_3D>( neu_list, elemType );
+  std::unique_ptr<ElemBC> ebc = SYS_T::make_unique<ElemBC_3D>( neu_list, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN.get() ); // reset IEN for outward normal calculations
   
   // Start partition the mesh for each cpu_rank
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  std::unique_ptr<SYS_T::Timer> mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
@@ -184,8 +184,6 @@ int main( int argc, char * argv[] )
 
     delete part; delete ebcpart; delete nbcpart;
   }
-  
-  delete mytimer;
   
   cout<<"\n===> Mesh Partition Quality: "<<endl;
   cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;

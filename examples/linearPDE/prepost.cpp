@@ -73,7 +73,7 @@ int main( int argc, char * argv[] )
 
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
 
-  std::unique_ptr<IIEN> IEN = std::make_unique<IEN_FEM>(nElem, vecIEN);
+  std::unique_ptr<IIEN> IEN = SYS_T::make_unique<IEN_FEM>(nElem, vecIEN);
   VEC_T::clean( vecIEN ); // clean the vector
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
@@ -83,18 +83,18 @@ int main( int argc, char * argv[] )
   // Call METIS to partition the mesh
   std::unique_ptr<IGlobal_Part> global_part = nullptr;
   if(cpu_size > 1)
-    global_part = std::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
         isDualGraph, nElem, nFunc, nLocBas, IEN.get(), "post_epart", "post_npart" );
   else if(cpu_size == 1)
-    global_part = std::make_unique<Global_Part_Serial>( nElem, nFunc, "post_epart", "post_npart" );
+    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc, "post_epart", "post_npart" );
   else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
 
-  std::unique_ptr<Map_Node_Index> mnindex = std::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
+  std::unique_ptr<Map_Node_Index> mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("post_node_mapping");
 
   cout<<"=== Start Partition ... \n";
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  std::unique_ptr<SYS_T::Timer> mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
   {
@@ -110,7 +110,6 @@ int main( int argc, char * argv[] )
     delete part;
   }
 
-  delete mytimer;
   return EXIT_SUCCESS;
 }
 
