@@ -19,7 +19,7 @@
 // Author: Ju Liu
 // Date: Nov. 23th 2013
 // ============================================================================
-#include "Math_Tools.hpp"
+#include "Sys_Tools.hpp"
 #include "APart_Node.hpp"
 
 class PDNSolution
@@ -28,73 +28,88 @@ class PDNSolution
     Vec solution; 
     
     // ------------------------------------------------------------------------
-    // ! Construct a solution vec compatible with the analysis node partition, 
-    //   with the solution vector's dof value being equal to the APart_Node 
+    // ! Construct a solution vec compatible with the analysis node partition,
+    //   with the solution vector's dof value being equal to the APart_Node
     //   class's dof value.
     // ------------------------------------------------------------------------
     PDNSolution( const APart_Node * const &pNode );
-    
+
     // ------------------------------------------------------------------------
     // ! Construct a solution vec compatible with the analysis node partition, 
     //   but with a different dof_num from pNode->dof. 
     //   The users specify a dof number for the solution class.
     // ------------------------------------------------------------------------
-    PDNSolution( const APart_Node * const &pNode, const int &input_dof_num );
+    PDNSolution( const APart_Node * const &pNode, int input_dof_num );
     
     // ------------------------------------------------------------------------
     // ! Copy constructors
     // ------------------------------------------------------------------------
     PDNSolution( const PDNSolution &INPUT );
 
-    PDNSolution( const PDNSolution * const &INPUT_ptr );
+    PDNSolution &operator=( const PDNSolution &INPUT ) noexcept;
 
-    virtual ~PDNSolution();
+    PDNSolution( PDNSolution && ) = delete;
+
+    PDNSolution &operator=( PDNSolution && ) = delete;
+
+    PDNSolution( const PDNSolution * INPUT_ptr );
+
+    virtual ~PDNSolution() noexcept;
 
     // ------------------------------------------------------------------------
     // ! Generate a random solution vector.
     // ------------------------------------------------------------------------
-    virtual void Gen_random();
+    void Gen_random();
 
     // ------------------------------------------------------------------------
     // ! Copy the INPUT's Vec, nlocal, nghost to the current vector.
     //   (similar to the copy constructor)
     // ------------------------------------------------------------------------
-    virtual void Copy(const PDNSolution &INPUT);
+    void Copy(const PDNSolution &INPUT);
     
-    virtual void Copy(const PDNSolution * const &INPUT_ptr);
+    void Copy(const PDNSolution * INPUT_ptr);
+
+    void CopyScale(const PDNSolution &src, double a);
+
+    void CopyScale(const PDNSolution * src_ptr, double a);
     
     // ------------------------------------------------------------------------
     // ! Update the solution entries associated with the ghost nodes
     // ------------------------------------------------------------------------
-    virtual void GhostUpdate();
+    void GhostUpdate();
 
     // ------------------------------------------------------------------------
     // ! Compute 1-, 2-, and infinity- Norms of the solution vector 
     // ------------------------------------------------------------------------
-    virtual double Norm_1() const;
+    double Norm_1() const;
+
+    double Norm_2() const;
 		
-    virtual double Norm_2() const;
-		
-    virtual double Norm_inf() const;
+    double Norm_inf() const;
 
     // ------------------------------------------------------------------------
     // ! Perform solution = solution + a * x 
     // ------------------------------------------------------------------------
-    virtual void PlusAX(const PDNSolution &x, const double &a);
+    void PlusAX(const PDNSolution &x, double a);
     
-    virtual void PlusAX(const PDNSolution * const &x_ptr, const double &a);
+    void PlusAX(const PDNSolution * x_ptr, double a);
 
     // ------------------------------------------------------------------------
     // ! Perform solution = solution + a * x
     //   here x is a plain PETSc Vec object. The user is responsible for making
     //   sure that the parallel layout is compatible between x and solution. 
     // ------------------------------------------------------------------------
-    virtual void PlusAX(const Vec &x, const double &a);
+    void PlusAX(const Vec &x, double a);
 
     // ------------------------------------------------------------------------
     // ! Perform uniform scaling operation : solution = a * solution
     // ------------------------------------------------------------------------
-    virtual void ScaleValue( const double &a );
+    void ScaleValue( double a );
+
+    // ------------------------------------------------------------------------
+    // ! Perform solution = a * x + b * y
+    // ------------------------------------------------------------------------
+    void LinearCombination(double a, const PDNSolution &x, double b, const PDNSolution &y);
     
     // ------------------------------------------------------------------------
     // ! Get the part of the solution vector that belongs to the local 
@@ -103,61 +118,61 @@ class PDNSolution
     //   size nlocal + nghost, and one is also responsible for freeing
     //   the memory allocation of the local_array pointer.
     // ------------------------------------------------------------------------
-    virtual void GetLocalArray( double * const &local_array ) const;
+    void GetLocalArray( double * const &local_array ) const;
     
-    virtual std::vector<double> GetLocalArray() const;
+    std::vector<double> GetLocalArray() const;
 
     // ------------------------------------------------------------------------
-    // ! Assembly the vector and update its ghost values. It is just a routine 
-    //   calling the following things. 
+    // ! Assembly the vector and update its ghost values. It is just a routine
+    //   calling the following things.
     //          VecAssemblyBegin(solution);
-    //          VecAssenblyEnd(solution);
+    //          VecAssemblyEnd(solution);
     //          GhostUpdate();
     //   This is called after VecSetValues to finish the assembly of vector.
     // ------------------------------------------------------------------------
-    virtual void Assembly_GhostUpdate();
+    void Assembly_GhostUpdate();
 
     // ------------------------------------------------------------------------
     // ! Print the vec solution on screen with or without the ghost part
     // ------------------------------------------------------------------------
-    virtual void PrintWithGhost() const;
+    void PrintWithGhost() const;
     
-    virtual void PrintNoGhost() const;
+    void PrintNoGhost() const;
 
     // ------------------------------------------------------------------------
     // ! Write and Read the solution vector in PETSc binary format
     // ------------------------------------------------------------------------
-    virtual void WriteBinary(const std::string &file_name) const;
+    void WriteBinary(const std::string &file_name) const;
     
-    virtual void ReadBinary(const std::string &file_name);
+    void ReadBinary(const std::string &file_name);
 
     // ------------------------------------------------------------------------
     // ! Get the number of local and ghost nodes for the parallel vector's 
     //   local portion.
     // ------------------------------------------------------------------------
-    virtual int get_nlocalnode() const {return nlocalnode;}
+    int get_nlocalnode() const noexcept {return nlocalnode;}
 
-    virtual int get_nghostnode() const {return nghostnode;}
+    int get_nghostnode() const noexcept {return nghostnode;}
 
     // ------------------------------------------------------------------------
     // ! Get the number of local and ghost entries in the parallel vector's 
     //   local portion.
     // ------------------------------------------------------------------------
-    virtual int get_nlocal() const {return nlocal;}
+    int get_nlocal() const noexcept {return nlocal;}
     
-    virtual int get_nghost() const {return nghost;}
+    int get_nghost() const noexcept {return nghost;}
 
     // ------------------------------------------------------------------------
     // ! Get the number of local plus ghost entries in the parallel vector's 
     //   local portion. This can be used for allocating the array size for 
     //   GetLocalArray.
     // ------------------------------------------------------------------------
-    virtual int get_nlgn() const {return nlocal + nghost;}
+    int get_nlgn() const noexcept {return nlocal + nghost;}
 
     // ------------------------------------------------------------------------
     // ! Get the number of degrees of freedom of this solution vector
     // ------------------------------------------------------------------------
-    virtual int get_dof_num() const {return dof_num;}
+    int get_dof_num() const noexcept {return dof_num;}
 
     // ------------------------------------------------------------------------
     // ! Compare the layout of the solution vector, that is,
@@ -165,7 +180,7 @@ class PDNSolution
     //   Return true if the nlocalnode and nghostnode for the two inputs
     //   are the same; return false otherwise. 
     // ------------------------------------------------------------------------
-    friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right );
+    friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right ) noexcept;
 
   protected:
     // ------------------------------------------------------------------------
