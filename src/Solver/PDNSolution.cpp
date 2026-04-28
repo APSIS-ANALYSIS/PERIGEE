@@ -1,28 +1,7 @@
 #include "PDNSolution.hpp"
+#include <random>
 
-PDNSolution::PDNSolution( const APart_Node * const &pNode )
-: dof_num( pNode->get_dof() ),
-  nlocalnode( pNode->get_nlocalnode() ),
-  nghostnode( pNode->get_nghostnode() ),
-  nlocal( pNode->get_nlocalnode() * dof_num ),
-  nghost( pNode->get_nghostnode() * dof_num )
-{
-  PetscInt * ifrom = new PetscInt [nghost];
-
-  for(int ii=0; ii<pNode->get_nghostnode(); ++ii)
-  {
-    for(int jj=0; jj<dof_num; ++jj)
-      ifrom[ii*dof_num + jj] = pNode->get_node_ghost(ii) * dof_num + jj;
-  }
-
-  VecCreateGhost(PETSC_COMM_WORLD, nlocal, PETSC_DECIDE, nghost, ifrom,
-      &solution);
-   
-  delete [] ifrom; ifrom = nullptr;
-}
-
-PDNSolution::PDNSolution( const APart_Node * const &pNode,
-   const int &input_dof_num )
+PDNSolution::PDNSolution( const APart_Node * const &pNode, int input_dof_num )
 : dof_num( input_dof_num ),
   nlocalnode( pNode->get_nlocalnode() ),
   nghostnode( pNode->get_nghostnode() ),
@@ -57,7 +36,26 @@ PDNSolution::PDNSolution( const PDNSolution &INPUT )
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-PDNSolution::PDNSolution( const PDNSolution * const &INPUT_ptr )
+PDNSolution &PDNSolution::operator=( const PDNSolution &INPUT ) noexcept
+{
+  if( this == &INPUT ) return *this;
+
+  SYS_T::print_fatal_if( dof_num != INPUT.get_dof_num(),
+      "Error: PDNSolution::operator=, dof_num does not match.\n" );
+  SYS_T::print_fatal_if( nlocal != INPUT.get_nlocal(),
+      "Error: PDNSolution::operator=, nlocal does not match.\n" );
+  SYS_T::print_fatal_if( nghost != INPUT.get_nghost(),
+      "Error: PDNSolution::operator=, nghost does not match.\n" );
+
+  VecCopy(INPUT.solution, solution);
+
+  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
+  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
+
+  return *this;
+}
+
+PDNSolution::PDNSolution( const PDNSolution * INPUT_ptr )
 : dof_num( INPUT_ptr->get_dof_num() ),
   nlocalnode( INPUT_ptr->get_nlocalnode() ),
   nghostnode( INPUT_ptr->get_nghostnode() ),
@@ -71,19 +69,22 @@ PDNSolution::PDNSolution( const PDNSolution * const &INPUT_ptr )
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-PDNSolution::~PDNSolution()
+PDNSolution::~PDNSolution() noexcept
 {
   VecDestroy(&solution);
 }
 
 void PDNSolution::Gen_random()
 {
+  thread_local std::mt19937_64 gen( std::random_device{}() );
+  std::uniform_real_distribution<double> dis(-1.0, 1.0);
+
   PetscScalar * val = new PetscScalar[nlocal];
   PetscInt * idx = new PetscInt[nlocal];
   
   for(int ii=0; ii<nlocal; ++ii) 
   {
-    val[ii] = MATH_T::gen_double_rand(-1.0, 1.0);
+    val[ii] = dis(gen);
     idx[ii] = ii;
   }
 
@@ -109,7 +110,7 @@ void PDNSolution::Copy(const PDNSolution &INPUT)
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-void PDNSolution::Copy(const PDNSolution * const &INPUT_ptr)
+void PDNSolution::Copy(const PDNSolution * INPUT_ptr)
 {
   SYS_T::print_fatal_if( dof_num != INPUT_ptr->get_dof_num(), "Error: PDNSolution::Copy, dof_num does not match.\n");
   SYS_T::print_fatal_if( nlocal != INPUT_ptr->get_nlocal(), "Error: PDNSolution::Copy, nlocal does not match.\n");
@@ -119,6 +120,23 @@ void PDNSolution::Copy(const PDNSolution * const &INPUT_ptr)
 
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
+}
+
+void PDNSolution::CopyScale(const PDNSolution &src, double a)
+{
+  SYS_T::print_fatal_if( !is_layout_equal(*this, src), "Error: PDNSolution::CopyScale, vector layout does not match.\n" );
+  SYS_T::print_fatal_if( dof_num != src.get_dof_num(), "Error: PDNSolution::CopyScale, dof_num does not match.\n" );
+
+  VecCopy(src.solution, solution);
+  VecScale(solution, a);
+
+  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
+  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
+}
+
+void PDNSolution::CopyScale(const PDNSolution * src_ptr, double a)
+{
+  CopyScale(*src_ptr, a);
 }
 
 void PDNSolution::GhostUpdate()
@@ -148,30 +166,44 @@ double PDNSolution::Norm_inf() const
   return norm;
 }
 
-void PDNSolution::PlusAX(const PDNSolution &x, const double &a)
+void PDNSolution::PlusAX(const PDNSolution &x, double a)
 {
   VecAXPY(solution, a, x.solution);
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-void PDNSolution::PlusAX(const PDNSolution * const &x_ptr, const double &a)
+void PDNSolution::PlusAX(const PDNSolution * x_ptr, double a)
 {
   VecAXPY(solution, a, x_ptr->solution);
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-void PDNSolution::PlusAX(const Vec &x, const double &a)
+void PDNSolution::PlusAX(const Vec &x, double a)
 {
   VecAXPY(solution, a, x);
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
-void PDNSolution::ScaleValue(const double &val)
+void PDNSolution::ScaleValue(double val)
 {
   VecScale(solution, val);
+  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
+  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
+}
+
+void PDNSolution::LinearCombination(double a, const PDNSolution &x, double b, const PDNSolution &y)
+{
+  SYS_T::print_fatal_if( !is_layout_equal(*this, x), "Error: PDNSolution::LinearCombination, vector layout does not match between this and x.\n" );
+  SYS_T::print_fatal_if( !is_layout_equal(*this, y), "Error: PDNSolution::LinearCombination, vector layout does not match between this and y.\n" );
+  SYS_T::print_fatal_if( !(dof_num == x.get_dof_num() && dof_num == y.get_dof_num()), "Error: PDNSolution::LinearCombination, dof_num does not match.\n" );
+
+  VecCopy(x.solution, solution);
+  VecScale(solution, a);
+  VecAXPY(solution, b, y.solution);
+
   VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
   VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
@@ -201,14 +233,6 @@ std::vector<double> PDNSolution::GetLocalArray() const
   VecGhostRestoreLocalForm(solution, &lsol);
 
   return local_array;
-}
-
-void PDNSolution::Assembly_GhostUpdate()
-{
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
-  VecGhostUpdateBegin(solution, INSERT_VALUES, SCATTER_FORWARD);
-  VecGhostUpdateEnd(solution, INSERT_VALUES, SCATTER_FORWARD);
 }
 
 void PDNSolution::PrintWithGhost() const
@@ -253,7 +277,7 @@ void PDNSolution::ReadBinary(const std::string &file_name)
   PetscViewerDestroy(&viewer);
 }
 
-bool is_layout_equal( const PDNSolution &left, const PDNSolution &right )
+bool is_layout_equal( const PDNSolution &left, const PDNSolution &right ) noexcept
 {
   return ( left.nlocalnode == right.nlocalnode && left.nghostnode == right.nghostnode );
 }
