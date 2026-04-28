@@ -10,10 +10,10 @@
 #include "VTK_Tools.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
-#include "NodalBC_Solid.hpp"
+#include "NodalBC.hpp"
 #include "Part_FEM.hpp"
 #include "ElemBC_3D.hpp"
-#include "NBC_Partition_Solid.hpp"
+#include "NBC_Partition.hpp"
 #include "EBC_Partition.hpp"
 #include "yaml-cpp/yaml.h"
 
@@ -156,26 +156,41 @@ int main( int argc, char * argv[] )
   auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("node_mapping");
 
-  // Setup Nodal Boundary Conditions, grouped by direction.
-  std::vector<NodalBC_Solid *> solid_nbc_list_x {};
-  std::vector<NodalBC_Solid *> solid_nbc_list_y {};
-  std::vector<NodalBC_Solid *> solid_nbc_list_z {};
+  // Setup Nodal Boundary Conditions, grouped by matrix dof.
+  std::vector<INodalBC *> nbc_list {};
+  nbc_list.reserve( dofMat );
+  nbc_list.push_back( new NodalBC( nFunc ) );
+  nbc_list.push_back( new NodalBC( sur_file_dir_x, nFunc ) );
+  nbc_list.push_back( new NodalBC( sur_file_dir_y, nFunc ) );
+  nbc_list.push_back( new NodalBC( sur_file_dir_z, nFunc ) );
 
-  solid_nbc_list_x.reserve( sur_file_dir_x.size() );
-  solid_nbc_list_y.reserve( sur_file_dir_y.size() );
-  solid_nbc_list_z.reserve( sur_file_dir_z.size() );
+  std::vector<INodalBC *> nbc_disp_list {};
+  nbc_disp_list.reserve( dofMat );
+  nbc_disp_list.push_back( new NodalBC( nFunc ) );
 
+  std::vector<std::string> nbc_disp_file {};
+  nbc_disp_file.reserve( sur_file_dir_x.size() );
   for(std::size_t ii=0; ii<sur_file_dir_x.size(); ++ii)
-    solid_nbc_list_x.push_back(
-        new NodalBC_Solid( sur_file_dir_x[ii], nFunc, is_disp_driven_x[ii] ) );
+  {
+    if( is_disp_driven_x[ii] ) nbc_disp_file.push_back( sur_file_dir_x[ii] );
+  }
+  nbc_disp_list.push_back( new NodalBC( nbc_disp_file, nFunc ) );
 
+  nbc_disp_file.clear();
+  nbc_disp_file.reserve( sur_file_dir_y.size() );
   for(std::size_t ii=0; ii<sur_file_dir_y.size(); ++ii)
-    solid_nbc_list_y.push_back(
-        new NodalBC_Solid( sur_file_dir_y[ii], nFunc, is_disp_driven_y[ii] ) );
+  {
+    if( is_disp_driven_y[ii] ) nbc_disp_file.push_back( sur_file_dir_y[ii] );
+  }
+  nbc_disp_list.push_back( new NodalBC( nbc_disp_file, nFunc ) );
 
+  nbc_disp_file.clear();
+  nbc_disp_file.reserve( sur_file_dir_z.size() );
   for(std::size_t ii=0; ii<sur_file_dir_z.size(); ++ii)
-    solid_nbc_list_z.push_back(
-        new NodalBC_Solid( sur_file_dir_z[ii], nFunc, is_disp_driven_z[ii] ) );
+  {
+    if( is_disp_driven_z[ii] ) nbc_disp_file.push_back( sur_file_dir_z[ii] );
+  }
+  nbc_disp_list.push_back( new NodalBC( nbc_disp_file, nFunc ) );
 
   auto ebc = SYS_T::make_unique<ElemBC_3D>( sur_file_neu, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN.get() ); // reset IEN for outward normal calculations
@@ -206,10 +221,14 @@ int main( int argc, char * argv[] )
     part -> write( part_file );
 
     // Partition Nodal BC and write to h5 file
-    auto nbcpart = SYS_T::make_unique<NBC_Partition_Solid>(
-        part.get(), mnindex.get(),
-        solid_nbc_list_x, solid_nbc_list_y, solid_nbc_list_z );
+    auto nbcpart = SYS_T::make_unique<NBC_Partition>(
+        part.get(), mnindex.get(), nbc_list );
     nbcpart->write_hdf5( part_file );
+
+    // Partition displacement-driven nodes into a separate nbc group.
+    auto nbc_disp_part = SYS_T::make_unique<NBC_Partition>(
+        part.get(), mnindex.get(), nbc_disp_list );
+    nbc_disp_part->write_hdf5( part_file, "/nbc_disp_driven" );
 
     // Partition Elemental BC and write to h5 file
     auto ebcpart = SYS_T::make_unique<EBC_Partition>(part.get(), mnindex.get(), ebc.get());
@@ -240,10 +259,8 @@ int main( int argc, char * argv[] )
   std::cout<<"The maximum / minimum of local node is: ";
   std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
-  // Finalize the code and exit
-  for(auto &it_nbc : solid_nbc_list_x ) delete it_nbc;
-  for(auto &it_nbc : solid_nbc_list_y ) delete it_nbc;
-  for(auto &it_nbc : solid_nbc_list_z ) delete it_nbc;
+  for(auto &it_nbc : nbc_list ) delete it_nbc;
+  for(auto &it_nbc : nbc_disp_list ) delete it_nbc;
 
   return EXIT_SUCCESS;
 }
