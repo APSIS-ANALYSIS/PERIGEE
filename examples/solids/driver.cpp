@@ -12,7 +12,7 @@
 #include "MaterialModel_Mixed_Elasticity.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "PDNSolution_Solid.hpp"
-#include "ALocal_NBC_Solid.hpp"
+#include "ALocal_NBC.hpp"
 #include "PGAssem_Solid_FEM.hpp"
 #include "PNonlinear_Solid_Solver.hpp"
 #include "PTime_Solid_Solver.hpp"
@@ -178,7 +178,9 @@ int main(int argc, char *argv[])
   auto locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
-  auto locnbc = SYS_T::make_unique<ALocal_NBC_Solid>(part_file, rank);
+  auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+  auto locnbc_disp =
+    SYS_T::make_unique<ALocal_NBC>(part_file, rank, "/nbc_disp_driven");
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
@@ -233,8 +235,8 @@ int main(int argc, char *argv[])
   std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
         std::move(locIEN), std::move(locElem), std::move(fNode),
-        std::move(pNode_gassem), std::move(locnbc), std::move(locebc),
-        std::move(locAssem_ptr), nz_estimate);
+        std::move(pNode_gassem), std::move(locnbc), std::move(locnbc_disp),
+        std::move(locebc), std::move(locAssem_ptr), nz_estimate);
 
   // ===== Initial condition =====
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
