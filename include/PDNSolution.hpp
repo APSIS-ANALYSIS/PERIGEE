@@ -48,9 +48,9 @@ class PDNSolution
 
     PDNSolution &operator=( const PDNSolution &INPUT ) noexcept;
 
-    PDNSolution( PDNSolution && ) = delete;
+    PDNSolution( PDNSolution &&INPUT ) noexcept;
 
-    PDNSolution &operator=( PDNSolution && ) = delete;
+    PDNSolution &operator=( PDNSolution &&INPUT ) noexcept;
 
     PDNSolution( const PDNSolution * INPUT_ptr );
 
