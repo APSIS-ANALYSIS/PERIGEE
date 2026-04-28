@@ -60,12 +60,12 @@ PDNSolution &PDNSolution::operator=( const PDNSolution &INPUT ) noexcept
 }
 
 PDNSolution::PDNSolution( PDNSolution &&INPUT ) noexcept
-: dof_num( INPUT.get_dof_num() ),
+: solution( INPUT.solution ),
+  dof_num( INPUT.get_dof_num() ),
   nlocalnode( INPUT.get_nlocalnode() ),
   nghostnode( INPUT.get_nghostnode() ),
   nlocal( INPUT.get_nlocal() ),
-  nghost( INPUT.get_nghost() ),
-  solution( INPUT.solution )
+  nghost( INPUT.get_nghost() )
 {
   INPUT.solution = nullptr;
 }
