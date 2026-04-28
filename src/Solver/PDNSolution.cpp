@@ -78,28 +78,34 @@ PDNSolution::~PDNSolution() noexcept
   VecDestroy(&solution);
 }
 
-void PDNSolution::Gen_random()
+PDNSolution PDNSolution::Gen_random( const APart_Node * const &pNode,
+    int input_dof_num )
 {
+  PDNSolution sol( pNode,
+      input_dof_num > 0 ? input_dof_num : pNode->get_dof() );
+
   thread_local std::mt19937_64 gen( std::random_device{}() );
   std::uniform_real_distribution<double> dis(-1.0, 1.0);
 
-  PetscScalar * val = new PetscScalar[nlocal];
-  PetscInt * idx = new PetscInt[nlocal];
+  PetscScalar * val = new PetscScalar[sol.nlocal];
+  PetscInt * idx = new PetscInt[sol.nlocal];
   
-  for(int ii=0; ii<nlocal; ++ii) 
+  for(int ii=0; ii<sol.nlocal; ++ii)
   {
     val[ii] = dis(gen);
     idx[ii] = ii;
   }
 
-  VecSetValuesLocal(solution, nlocal, idx, val, INSERT_VALUES);
+  VecSetValuesLocal(sol.solution, sol.nlocal, idx, val, INSERT_VALUES);
 
-  VecAssemblyBegin(solution);
-  VecAssemblyEnd(solution);
+  VecAssemblyBegin(sol.solution);
+  VecAssemblyEnd(sol.solution);
 
-  GhostUpdate();
+  sol.GhostUpdate();
 
   delete [] val; val = nullptr; delete [] idx; idx = nullptr;
+
+  return sol;
 }
 
 void PDNSolution::Copy(const PDNSolution &INPUT)

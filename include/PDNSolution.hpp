@@ -57,9 +57,11 @@ class PDNSolution
     virtual ~PDNSolution() noexcept;
 
     // ------------------------------------------------------------------------
-    // ! Generate a random solution vector.
+    // ! Construct and return a random solution vector.
+    // ! If input_dof_num <= 0, use pNode->get_dof().
     // ------------------------------------------------------------------------
-    void Gen_random();
+    static PDNSolution Gen_random( const APart_Node * const &pNode,
+        int input_dof_num = -1 );
 
     // ------------------------------------------------------------------------
     // ! Copy the INPUT's Vec, nlocal, nghost to the current vector.
