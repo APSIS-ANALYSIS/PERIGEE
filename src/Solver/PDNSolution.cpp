@@ -108,6 +108,22 @@ PDNSolution PDNSolution::Gen_random( const APart_Node * const &pNode,
   return sol;
 }
 
+PDNSolution PDNSolution::Gen_zero( const APart_Node * const &pNode,
+    int input_dof_num )
+{
+  PDNSolution sol( pNode,
+      input_dof_num > 0 ? input_dof_num : pNode->get_dof() );
+
+  VecSet(sol.solution, 0.0);
+
+  VecAssemblyBegin(sol.solution);
+  VecAssemblyEnd(sol.solution);
+
+  sol.GhostUpdate();
+
+  return sol;
+}
+
 void PDNSolution::Copy(const PDNSolution &INPUT)
 {
   SYS_T::print_fatal_if( dof_num != INPUT.get_dof_num(), "Error: PDNSolution::Copy, dof_num does not match.\n");
