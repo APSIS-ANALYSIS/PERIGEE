@@ -48,9 +48,9 @@ class PDNSolution
 
     PDNSolution &operator=( const PDNSolution &INPUT ) noexcept;
 
-    PDNSolution( PDNSolution && ) = delete;
+    PDNSolution( PDNSolution &&INPUT ) noexcept;
 
-    PDNSolution &operator=( PDNSolution && ) = delete;
+    PDNSolution &operator=( PDNSolution &&INPUT ) noexcept;
 
     PDNSolution( const PDNSolution * INPUT_ptr );
 
@@ -187,7 +187,8 @@ class PDNSolution
     //   Return true if the nlocalnode and nghostnode for the two inputs
     //   are the same; return false otherwise. 
     // ------------------------------------------------------------------------
-    friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right ) noexcept;
+    friend bool is_layout_equal( const PDNSolution &left, 
+        const PDNSolution &right ) noexcept;
 
   protected:
     // ------------------------------------------------------------------------

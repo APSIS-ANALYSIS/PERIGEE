@@ -59,6 +59,35 @@ PDNSolution &PDNSolution::operator=( const PDNSolution &INPUT ) noexcept
   return *this;
 }
 
+PDNSolution::PDNSolution( PDNSolution &&INPUT ) noexcept
+: solution( INPUT.solution ),
+  dof_num( INPUT.get_dof_num() ),
+  nlocalnode( INPUT.get_nlocalnode() ),
+  nghostnode( INPUT.get_nghostnode() ),
+  nlocal( INPUT.get_nlocal() ),
+  nghost( INPUT.get_nghost() )
+{
+  INPUT.solution = nullptr;
+}
+
+PDNSolution &PDNSolution::operator=( PDNSolution &&INPUT ) noexcept
+{
+  if( this == &INPUT ) return *this;
+
+  SYS_T::print_fatal_if( dof_num != INPUT.get_dof_num(),
+      "Error: PDNSolution::operator=(move), dof_num does not match.\n" );
+  SYS_T::print_fatal_if( nlocal != INPUT.get_nlocal(),
+      "Error: PDNSolution::operator=(move), nlocal does not match.\n" );
+  SYS_T::print_fatal_if( nghost != INPUT.get_nghost(),
+      "Error: PDNSolution::operator=(move), nghost does not match.\n" );
+
+  VecDestroy(&solution);
+  solution = INPUT.solution;
+  INPUT.solution = nullptr;
+
+  return *this;
+}
+
 PDNSolution::PDNSolution( const PDNSolution * INPUT_ptr )
 : dof_num( INPUT_ptr->get_dof_num() ),
   nlocalnode( INPUT_ptr->get_nlocalnode() ),
