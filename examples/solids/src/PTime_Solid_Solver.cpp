@@ -112,7 +112,6 @@ void PTime_Solver::TM_Solid_GenAlpha(
 
     nsolver->GenAlpha_Seg_solve_Solid( renew_flag,
         time_info->get_time(), time_info->get_step(),
-        is_v, is_p,
         nbc_disp,
         pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(),
         pre_disp.get(), pre_velo.get(), pre_pres.get(),

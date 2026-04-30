@@ -75,6 +75,25 @@ PGAssem_Solid_FEM::~PGAssem_Solid_FEM()
   MatDestroy(&K);
 }
 
+void PGAssem_Solid_FEM::GetSubVecIndex_vp(
+    std::vector<PetscInt> &idx_v,
+    std::vector<PetscInt> &idx_p ) const
+{
+  const int nlocal = pnode->get_nlocalnode();
+
+  idx_v.resize(3 * nlocal);
+  idx_p.resize(nlocal);
+
+  for(int ii=0; ii<nlocal; ++ii)
+  {
+    const PetscInt gid = pnode->get_node_loc(ii);
+    idx_p[ii] = 4 * gid;
+    idx_v[3*ii  ] = 4 * gid + 1;
+    idx_v[3*ii+1] = 4 * gid + 2;
+    idx_v[3*ii+2] = 4 * gid + 3;
+  }
+}
+
 void PGAssem_Solid_FEM::EssBC_KG( const int &field )
 {
   const int local_dir = nbc->get_Num_LD(field);
