@@ -1,7 +1,7 @@
 #ifndef PNONLINEAR_SOLID_SOLVER_HPP
 #define PNONLINEAR_SOLID_SOLVER_HPP
 // ============================================================================
-// PNonlinear_Solid_Solver.hpp
+// PNonlinear_Solver.hpp
 //
 // Nonlinear solver for hyperelastic solid with mixed u-p formulation.
 //
@@ -14,10 +14,10 @@
 #include "PDNSolution.hpp"
 #include "ALocal_NBC.hpp"
 
-class PNonlinear_Solid_Solver
+class PNonlinear_Solver
 {
   public:
-    PNonlinear_Solid_Solver(
+    PNonlinear_Solver(
         std::unique_ptr<PGAssem_Solid_FEM> in_gassem,
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
@@ -26,7 +26,7 @@ class PNonlinear_Solid_Solver
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq, const int &input_renew_threshold );
 
-    ~PNonlinear_Solid_Solver() = default;
+    ~PNonlinear_Solver() = default;
 
     int get_non_max_its() const {return nmaxits;}
 
@@ -81,7 +81,7 @@ class PNonlinear_Solid_Solver
         PDNSolution * const &disp,
         PDNSolution * const &velo ) const;
 
-    PNonlinear_Solid_Solver() = delete;
+    PNonlinear_Solver() = delete;
 };
 
 #endif

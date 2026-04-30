@@ -1,7 +1,7 @@
 #include "PTime_Solid_Solver.hpp"
 
-PTime_Solid_Solver::PTime_Solid_Solver(
-    std::unique_ptr<PNonlinear_Solid_Solver> in_nsolver,
+PTime_Solver::PTime_Solver(
+    std::unique_ptr<PNonlinear_Solver> in_nsolver,
     const std::string &input_name,
     const int &input_record_freq,
     const int &input_renew_tang_freq,
@@ -11,7 +11,7 @@ PTime_Solid_Solver::PTime_Solid_Solver(
   nsolver(std::move(in_nsolver))
 {}
 
-void PTime_Solid_Solver::print_info() const
+void PTime_Solver::print_info() const
 {
   SYS_T::commPrint("----------------------------------------------------------- \n");
   SYS_T::commPrint("Time stepping solver setted up:\n");
@@ -22,7 +22,7 @@ void PTime_Solid_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-std::string PTime_Solid_Solver::Name_Generator( const std::string &middle_name,
+std::string PTime_Solver::Name_Generator( const std::string &middle_name,
     const int &counter ) const
 {
   std::ostringstream temp;
@@ -31,7 +31,7 @@ std::string PTime_Solid_Solver::Name_Generator( const std::string &middle_name,
   return pb_name + middle_name + temp.str();
 }
 
-std::string PTime_Solid_Solver::Name_dot_Generator( const std::string &middle_name,
+std::string PTime_Solver::Name_dot_Generator( const std::string &middle_name,
     const int &counter ) const
 {
   std::ostringstream temp;
@@ -40,7 +40,7 @@ std::string PTime_Solid_Solver::Name_dot_Generator( const std::string &middle_na
   return std::string("dot_") + pb_name + middle_name + temp.str();
 }
 
-void PTime_Solid_Solver::TM_Solid_GenAlpha(
+void PTime_Solver::TM_Solid_GenAlpha(
     const bool &restart_init_assembly_flag,
     const IS &is_v,
     const IS &is_p,

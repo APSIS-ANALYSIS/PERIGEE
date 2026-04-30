@@ -1,7 +1,7 @@
 #include "PNonlinear_Solid_Solver.hpp"
 #include "LoadData.hpp"
 
-PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
+PNonlinear_Solver::PNonlinear_Solver(
     std::unique_ptr<PGAssem_Solid_FEM> in_gassem,
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
@@ -18,7 +18,7 @@ PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
   tmga(std::move(in_tmga))
 {}
 
-void PNonlinear_Solid_Solver::print_info() const
+void PNonlinear_Solver::print_info() const
 {
   SYS_T::print_sep_line();
   SYS_T::commPrint("relative tolerance: %e \n", nr_tol);
@@ -30,7 +30,7 @@ void PNonlinear_Solid_Solver::print_info() const
   SYS_T::print_sep_line();
 }
 
-void PNonlinear_Solid_Solver::update_solid_kinematics( const double &val,
+void PNonlinear_Solver::update_solid_kinematics( const double &val,
     const Vec &input,
     PDNSolution * const &output ) const
 {
@@ -58,7 +58,7 @@ void PNonlinear_Solid_Solver::update_solid_kinematics( const double &val,
   output->GhostUpdate();
 }
 
-void PNonlinear_Solid_Solver::apply_disp_loading(
+void PNonlinear_Solver::apply_disp_loading(
     const ALocal_NBC * const &nbc_disp,
     const double &time,
     PDNSolution * const &dot_disp,
@@ -93,7 +93,7 @@ void PNonlinear_Solid_Solver::apply_disp_loading(
   dot_velo->Assembly_GhostUpdate();
 }
 
-void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
+void PNonlinear_Solver::GenAlpha_Seg_solve_Solid(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,

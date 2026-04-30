@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
   // ===== Linear and nonlinear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
-  auto nsolver = SYS_T::make_unique<PNonlinear_Solid_Solver>(
+  auto nsolver = SYS_T::make_unique<PNonlinear_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
       std::move(tm_galpha),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== Temporal solver context =====
-  auto tsolver = SYS_T::make_unique<PTime_Solid_Solver>(
+  auto tsolver = SYS_T::make_unique<PTime_Solver>(
       std::move(nsolver), sol_bName, sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();

@@ -1,7 +1,7 @@
 #ifndef PTIME_SOLID_SOLVER_HPP
 #define PTIME_SOLID_SOLVER_HPP
 // ============================================================================
-// PTime_Solid_Solver.hpp
+// PTime_Solver.hpp
 //
 // Parallel time solver for hyperelastic solid problems.
 //
@@ -10,17 +10,17 @@
 #include "PDNTimeStep.hpp"
 #include "PNonlinear_Solid_Solver.hpp"
 
-class PTime_Solid_Solver
+class PTime_Solver
 {
   public:
-    PTime_Solid_Solver(
-        std::unique_ptr<PNonlinear_Solid_Solver> in_nsolver,
+    PTime_Solver(
+        std::unique_ptr<PNonlinear_Solver> in_nsolver,
         const std::string &input_name,
         const int &input_record_freq,
         const int &input_renew_tang_freq,
         const double &input_final_time );
 
-    ~PTime_Solid_Solver() = default;
+    ~PTime_Solver() = default;
 
     void print_info() const;
 
@@ -45,7 +45,7 @@ class PTime_Solid_Solver
     const int renew_tang_freq;
     const std::string pb_name;
 
-    const std::unique_ptr<PNonlinear_Solid_Solver> nsolver;
+    const std::unique_ptr<PNonlinear_Solver> nsolver;
 
     std::string Name_Generator( const std::string &middle_name,
         const int &counter ) const;
@@ -53,7 +53,7 @@ class PTime_Solid_Solver
     std::string Name_dot_Generator( const std::string &middle_name,
         const int &counter ) const;
 
-    PTime_Solid_Solver() = delete;
+    PTime_Solver() = delete;
 };
 
 #endif
