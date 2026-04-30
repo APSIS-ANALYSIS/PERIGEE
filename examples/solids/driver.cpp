@@ -182,9 +182,9 @@ int main(int argc, char *argv[])
   auto locnbc_disp =
     SYS_T::make_unique<ALocal_NBC>(part_file, rank, "/nbc_disp_driven");
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
+  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
