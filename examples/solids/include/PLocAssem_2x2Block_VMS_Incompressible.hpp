@@ -20,7 +20,8 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
   public:
     PLocAssem_2x2Block_VMS_Incompressible(
         const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
-        const TimeMethod_GenAlpha * const &tm_gAlpha );
+        const TimeMethod_GenAlpha * const &tm_gAlpha,
+        std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel );
 
     virtual ~PLocAssem_2x2Block_VMS_Incompressible();
 
