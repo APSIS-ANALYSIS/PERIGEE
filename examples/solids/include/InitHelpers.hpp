@@ -71,7 +71,6 @@ namespace SOLID_INIT
   }
 
   inline void initialize_dot_solution( PGAssem_Solid_FEM * const gloAssem,
-      const IS &is_velo, const IS &is_pres,
       PDNSolution * const &dot_disp,
       PDNSolution * const &dot_velo,
       PDNSolution * const &dot_pres,
@@ -103,6 +102,13 @@ namespace SOLID_INIT
     lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_vp );
     VecScale(dot_vp, -1.0);
 
+    std::vector<PetscInt> idx_v, idx_p;
+    gloAssem->GetSubVecIndex_vp(idx_v, idx_p);
+
+    IS is_velo, is_pres;
+    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()), idx_v.data(), PETSC_COPY_VALUES, &is_velo);
+    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()), idx_p.data(), PETSC_COPY_VALUES, &is_pres);
+
     Vec sol_v, sol_p;
     VecGetSubVector(dot_vp, is_velo, &sol_v);
     VecGetSubVector(dot_vp, is_pres, &sol_p);
@@ -115,6 +121,8 @@ namespace SOLID_INIT
 
     VecRestoreSubVector(dot_vp, is_velo, &sol_v);
     VecRestoreSubVector(dot_vp, is_pres, &sol_p);
+    ISDestroy(&is_velo);
+    ISDestroy(&is_pres);
     VecDestroy(&dot_vp);
 
     dot_disp->Copy( velo );
