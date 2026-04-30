@@ -188,23 +188,6 @@ int main(int argc, char *argv[])
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
-  const int dof_mat = locnbc->get_dof_LID();
-  const int nlocal = pNode->get_nlocalnode();
-
-  std::vector<PetscInt> idx_v(3 * nlocal);
-  std::vector<PetscInt> idx_p(nlocal);
-  for(int ii=0; ii<nlocal; ++ii)
-  {
-    const PetscInt gid = pNode->get_node_loc(ii);
-    idx_p[ii] = dof_mat * gid;
-    idx_v[3*ii  ] = dof_mat * gid + 1;
-    idx_v[3*ii+1] = dof_mat * gid + 2;
-    idx_v[3*ii+2] = dof_mat * gid + 3;
-  }
-
-  IS is_velo, is_pres;
-  ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()), idx_v.data(), PETSC_COPY_VALUES, &is_velo);
-  ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()), idx_p.data(), PETSC_COPY_VALUES, &is_pres);
 
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
@@ -257,7 +240,7 @@ int main(int argc, char *argv[])
       initial_index, initial_time, initial_step );
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
-  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
+  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(),
       dot_disp.get(), dot_velo.get(), dot_pres.get(),
       disp.get(), velo.get(), pres.get(), is_restart );
 
@@ -282,14 +265,12 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_Solid_GenAlpha( is_restart, is_velo, is_pres,
+  tsolver->TM_Solid_GenAlpha( is_restart,
       locnbc_disp.get(),
       std::move(dot_disp), std::move(dot_velo), std::move(dot_pres),
       std::move(disp), std::move(velo), std::move(pres),
       std::move(timeinfo) );
 
-  ISDestroy(&is_velo);
-  ISDestroy(&is_pres);
 
   // Ensure PETSc objects are destroyed before PetscFinalize
   tsolver.reset();

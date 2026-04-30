@@ -55,6 +55,10 @@ class PGAssem_Solid_FEM : public IPGAssem
         const PDNSolution * const &velo,
         const PDNSolution * const &pres ) override;
 
+    void GetSubVecIndex_vp(
+        std::vector<PetscInt> &idx_v,
+        std::vector<PetscInt> &idx_p ) const;
+
   private:
     const std::unique_ptr<const ALocal_IEN> locien;
     const std::unique_ptr<const ALocal_Elem> locelem;
