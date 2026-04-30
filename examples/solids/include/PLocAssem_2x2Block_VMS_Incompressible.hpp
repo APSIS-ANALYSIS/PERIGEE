@@ -14,6 +14,7 @@
 #include "TimeMethod_GenAlpha.hpp"
 #include "FEAElementFactory.hpp"
 #include "QuadPtsFactory.hpp"
+#include "LoadData.hpp"
 
 class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
 {
@@ -118,7 +119,7 @@ class PLocAssem_2x2Block_VMS_Incompressible : public IPLocAssem_2x2Block
 
     Vector_3 get_f(const Vector_3 &pt, const double &tt ) const
     {
-      return Vector_3( 0.0, 0.0, 0.0 );
+      return LoadData::body_force( pt, tt );
     }
 
     Vector_3 get_traction( const int &ebc_id,

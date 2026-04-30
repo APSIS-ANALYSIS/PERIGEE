@@ -1,4 +1,5 @@
 #include "PGAssem_Solid_FEM.hpp"
+#include "LoadData.hpp"
 
 PGAssem_Solid_FEM::PGAssem_Solid_FEM(
     std::unique_ptr<ALocal_IEN> in_locien,
@@ -230,27 +231,7 @@ void PGAssem_Solid_FEM::Apply_Dirichlet_BC( const double &time,
     double vval = 0.0;
     double aval = 0.0;
 
-    if(field == 1)
-    {
-      // x-direction displacement loading
-      uval = time;
-      vval = 1.0;
-      aval = 0.0;
-    }
-    else if(field == 2)
-    {
-      // y-direction displacement loading
-      uval = time;
-      vval = 1.0;
-      aval = 0.0;
-    }
-    else
-    {
-      // z-direction displacement loading
-      uval = time;
-      vval = 1.0;
-      aval = 0.0;
-    }
+    LoadData::disp_loading( field, time, uval, vval, aval );
 
     const int num_ld = nbc->get_Num_LD(field);
     for(int ii=0; ii<num_ld; ++ii)

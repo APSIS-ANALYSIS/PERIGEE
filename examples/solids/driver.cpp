@@ -11,7 +11,7 @@
 #include "MaterialModel_vol_Incompressible.hpp"
 #include "MaterialModel_Mixed_Elasticity.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
-#include "PDNSolution_Solid.hpp"
+#include "InitHelpers.hpp"
 #include "ALocal_NBC.hpp"
 #include "PGAssem_Solid_FEM.hpp"
 #include "PNonlinear_Solid_Solver.hpp"
@@ -241,76 +241,19 @@ int main(int argc, char *argv[])
   // ===== Initial condition =====
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
 
-  std::unique_ptr<PDNSolution> disp =
-    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "disp" );
+  std::unique_ptr<PDNSolution> disp, velo, pres;
+  std::unique_ptr<PDNSolution> dot_disp, dot_velo, dot_pres;
 
-  std::unique_ptr<PDNSolution> velo =
-    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "velo" );
+  SOLID_INIT::initialize_solution_state( pNode_sol.get(), is_restart,
+      restart_index, restart_time, restart_step,
+      restart_u_name, restart_v_name, restart_p_name,
+      disp, velo, pres, dot_disp, dot_velo, dot_pres,
+      initial_index, initial_time, initial_step );
 
-  std::unique_ptr<PDNSolution> pres =
-    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 1, 0, false, "pres" );
-
-  std::unique_ptr<PDNSolution> dot_disp =
-    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "dot_disp" );
-
-  std::unique_ptr<PDNSolution> dot_velo =
-    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 3, 0, false, "dot_velo" );
-
-  std::unique_ptr<PDNSolution> dot_pres =
-    SYS_T::make_unique<PDNSolution_Solid>( pNode_sol.get(), 1, 0, false, "dot_pres" );
-
-  auto init_zero = []( PDNSolution * const &sol )
-  {
-    VecSet(sol->solution, 0.0);
-    sol->Assembly_GhostUpdate();
-  };
-
-  // ===== Restart options =====
   if( is_restart )
   {
-    initial_index = restart_index;
-    initial_time  = restart_time;
-    initial_step  = restart_step;
-
-    // Read sol file
-    SYS_T::file_check(restart_u_name);
-    SYS_T::file_check(restart_v_name);
-    SYS_T::file_check(restart_p_name);
-
-    disp->ReadBinary(restart_u_name);
-    velo->ReadBinary(restart_v_name);
-    pres->ReadBinary(restart_p_name);
-
-    // generate the corresponding dot_sol file name
-    std::string restart_dot_u_name = "dot_";
-    std::string restart_dot_v_name = "dot_";
-    std::string restart_dot_p_name = "dot_";
-    restart_dot_u_name.append(restart_u_name);
-    restart_dot_v_name.append(restart_v_name);
-    restart_dot_p_name.append(restart_p_name);
-
-    // Read dot_sol file
-    SYS_T::file_check(restart_dot_u_name);
-    SYS_T::file_check(restart_dot_v_name);
-    SYS_T::file_check(restart_dot_p_name);
-
-    dot_disp->ReadBinary(restart_dot_u_name);
-    dot_velo->ReadBinary(restart_dot_v_name);
-    dot_pres->ReadBinary(restart_dot_p_name);
-
-    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
-    SYS_T::commPrint("     restart_u_name: %s \n", restart_u_name.c_str());
-    SYS_T::commPrint("     restart_v_name: %s \n", restart_v_name.c_str());
-    SYS_T::commPrint("     restart_p_name: %s \n", restart_p_name.c_str());
-    SYS_T::commPrint("     restart_dot_u_name: %s \n", restart_dot_u_name.c_str());
-    SYS_T::commPrint("     restart_dot_v_name: %s \n", restart_dot_v_name.c_str());
-    SYS_T::commPrint("     restart_dot_p_name: %s \n", restart_dot_p_name.c_str());
-    SYS_T::commPrint("     restart_time: %e \n", restart_time);
-    SYS_T::commPrint("     restart_index: %d \n", restart_index);
-    SYS_T::commPrint("     restart_step: %e \n", restart_step);
-
-    gloAssem_ptr->Apply_Dirichlet_BC( restart_time, dot_disp.get(), dot_velo.get(),
-        disp.get(), velo.get() );
+    SOLID_INIT::apply_initial_dirichlet_bc( gloAssem_ptr.get(), restart_time,
+        dot_disp.get(), dot_velo.get(), disp.get(), velo.get() );
   }
 
 
@@ -319,53 +262,9 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
-  if( is_restart == false )
-  {
-    gloAssem_ptr->Apply_Dirichlet_BC( initial_time, dot_disp.get(), dot_velo.get(),
-        disp.get(), velo.get() );
-
-    SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
-
-    auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
-        1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );
-
-    KSPSetType(lsolver_acce->ksp, KSPGMRES);
-    KSPGMRESSetOrthogonalization(lsolver_acce->ksp,
-        KSPGMRESModifiedGramSchmidtOrthogonalization);
-    KSPGMRESSetRestart(lsolver_acce->ksp, 500);
-
-    PC preproc; lsolver_acce->GetPC(&preproc);
-    PCSetType( preproc, PCHYPRE );
-    PCHYPRESetType( preproc, "boomeramg" );
-
-    gloAssem_ptr->Assem_mass_residual( disp.get(), velo.get(), pres.get() );
-
-    Vec dot_vp;
-    VecDuplicate(gloAssem_ptr->G, &dot_vp);
-
-    lsolver_acce->Solve( gloAssem_ptr->K, gloAssem_ptr->G, dot_vp );
-
-    VecScale(dot_vp, -1.0);
-
-    Vec sol_v, sol_p;
-    VecGetSubVector(dot_vp, is_velo, &sol_v);
-    VecGetSubVector(dot_vp, is_pres, &sol_p);
-
-    init_zero( dot_velo.get() );
-    init_zero( dot_pres.get() );
-    dot_velo->PlusAX( sol_v, 1.0 );
-    dot_pres->PlusAX( sol_p, 1.0 );
-
-    VecRestoreSubVector(dot_vp, is_velo, &sol_v);
-    VecRestoreSubVector(dot_vp, is_pres, &sol_p);
-    VecDestroy(&dot_vp);
-
-    dot_disp->Copy( velo.get() );
-
-    SYS_T::commPrint("\n===> Consistent initial acceleration is obtained. \n");
-    lsolver_acce->print_info();
-    SYS_T::commPrint(" The mass matrix lsolver is destroyed.\n");
-  }
+  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
+      dot_disp.get(), dot_velo.get(), dot_pres.get(),
+      disp.get(), velo.get(), pres.get(), initial_time, is_restart );
 
   // ===== Linear and nonlinear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
