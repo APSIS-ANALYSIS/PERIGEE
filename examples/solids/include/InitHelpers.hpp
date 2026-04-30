@@ -71,7 +71,6 @@ namespace SOLID_INIT
   }
 
   inline void initialize_dot_solution( PGAssem_Solid_FEM * const gloAssem,
-      const IS &is_velo, const IS &is_pres,
       PDNSolution * const &dot_disp,
       PDNSolution * const &dot_velo,
       PDNSolution * const &dot_pres,
@@ -103,6 +102,24 @@ namespace SOLID_INIT
     lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_vp );
     VecScale(dot_vp, -1.0);
 
+    PetscInt rstart, rend;
+    VecGetOwnershipRange(dot_vp, &rstart, &rend);
+
+    const PetscInt nlocalnode = static_cast<PetscInt>(dot_pres->get_nlocalnode());
+    std::vector<PetscInt> idx_v(3 * nlocalnode), idx_p(nlocalnode);
+    for(PetscInt ii=0; ii<nlocalnode; ++ii)
+    {
+      const PetscInt base = rstart + 4 * ii;
+      idx_p[ii] = base;
+      idx_v[3*ii  ] = base + 1;
+      idx_v[3*ii+1] = base + 2;
+      idx_v[3*ii+2] = base + 3;
+    }
+
+    IS is_velo, is_pres;
+    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()), idx_v.data(), PETSC_COPY_VALUES, &is_velo);
+    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()), idx_p.data(), PETSC_COPY_VALUES, &is_pres);
+
     Vec sol_v, sol_p;
     VecGetSubVector(dot_vp, is_velo, &sol_v);
     VecGetSubVector(dot_vp, is_pres, &sol_p);
@@ -115,6 +132,8 @@ namespace SOLID_INIT
 
     VecRestoreSubVector(dot_vp, is_velo, &sol_v);
     VecRestoreSubVector(dot_vp, is_pres, &sol_p);
+    ISDestroy(&is_velo);
+    ISDestroy(&is_pres);
     VecDestroy(&dot_vp);
 
     dot_disp->Copy( velo );
