@@ -8,6 +8,7 @@
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
+#include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
 #include "InitHelpers.hpp"
 #include "ALocal_NBC.hpp"
 #include "PGAssem_Solid_FEM.hpp"
@@ -193,8 +194,15 @@ int main(int argc, char *argv[])
 
   // ===== Local Assembly Routine =====
   auto matmodel = MaterialModelData::create_mixed_model();
-  std::unique_ptr<IPLocAssem_2x2Block> locAssem_ptr =
-    SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
+  const bool is_incompressible = matmodel->get_vol_model_name() == "Incompressible";
+
+  std::unique_ptr<IPLocAssem_2x2Block> locAssem_ptr;
+  if( is_incompressible )
+    locAssem_ptr = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
+        elemType, nqp_vol, nqp_sur,
+        tm_galpha.get(), std::move(matmodel));
+  else
+    locAssem_ptr = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
         elemType, nqp_vol, nqp_sur,
         tm_galpha.get(), std::move(matmodel));
 
