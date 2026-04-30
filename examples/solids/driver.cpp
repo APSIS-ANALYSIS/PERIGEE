@@ -7,9 +7,6 @@
 // ==========================================================================
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
-#include "MaterialModel_ich_NeoHookean.hpp"
-#include "MaterialModel_vol_Incompressible.hpp"
-#include "MaterialModel_Mixed_Elasticity.hpp"
 #include "PLocAssem_2x2Block_VMS_Incompressible.hpp"
 #include "InitHelpers.hpp"
 #include "ALocal_NBC.hpp"
@@ -48,10 +45,6 @@ int main(int argc, char *argv[])
   std::string sol_bName("SOL_"); // base name of the solution file
   int ttan_renew_freq = 1;   // frequency of tangent matrix renewal
   int sol_record_freq = 1;   // frequency of recording the solution
-
-  // solid material parameters
-  const double solid_density = 1.0e3;
-  const double solid_mu = 6.666666666e4;
 
   // displacement-driven BC parameters (edit here)
 
@@ -198,19 +191,10 @@ int main(int argc, char *argv[])
   tm_galpha->print_info();
 
   // ===== Local Assembly Routine =====
-  std::unique_ptr<IMaterialModel_ich> imodel =
-    SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
-
-  std::unique_ptr<IMaterialModel_vol> vmodel =
-    SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_density);
-
-  std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel =
-    SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(std::move(vmodel), std::move(imodel));
-
   std::unique_ptr<IPLocAssem_2x2Block> locAssem_ptr =
     SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
         elemType, nqp_vol, nqp_sur,
-        tm_galpha.get(), std::move(matmodel));
+        tm_galpha.get());
 
   // ===== Initial condition =====
   auto disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
