@@ -66,6 +66,12 @@ class PDNSolution
     static PDNSolution Gen_zero( const APart_Node * const &pNode,
         int input_dof_num = -1 );
 
+    static std::unique_ptr<PDNSolution> Gen_random_ptr(
+        const APart_Node * const &pNode, int input_dof_num = -1 );
+
+    static std::unique_ptr<PDNSolution> Gen_zero_ptr(
+        const APart_Node * const &pNode, int input_dof_num = -1 );
+
     // ------------------------------------------------------------------------
     // ! Copy the INPUT's Vec, nlocal, nghost to the current vector.
     //   (similar to the copy constructor)

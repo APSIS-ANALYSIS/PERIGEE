@@ -25,19 +25,13 @@ namespace SOLID_INIT
       std::unique_ptr<PDNSolution> &dot_pres,
       int &initial_index, double &initial_time, double &initial_step )
   {
-    disp = SYS_T::make_unique<PDNSolution>(
-        PDNSolution::Gen_zero( pNode, 3 ) );
-    velo = SYS_T::make_unique<PDNSolution>(
-        PDNSolution::Gen_zero( pNode, 3 ) );
-    pres = SYS_T::make_unique<PDNSolution>(
-        PDNSolution::Gen_zero( pNode, 1 ) );
+    disp = PDNSolution::Gen_zero_ptr( pNode, 3 );
+    velo = PDNSolution::Gen_zero_ptr( pNode, 3 );
+    pres = PDNSolution::Gen_zero_ptr( pNode, 1 );
 
-    dot_disp = SYS_T::make_unique<PDNSolution>(
-        PDNSolution::Gen_zero( pNode, 3 ) );
-    dot_velo = SYS_T::make_unique<PDNSolution>(
-        PDNSolution::Gen_zero( pNode, 3 ) );
-    dot_pres = SYS_T::make_unique<PDNSolution>(
-        PDNSolution::Gen_zero( pNode, 1 ) );
+    dot_disp = PDNSolution::Gen_zero_ptr( pNode, 3 );
+    dot_velo = PDNSolution::Gen_zero_ptr( pNode, 3 );
+    dot_pres = PDNSolution::Gen_zero_ptr( pNode, 1 );
 
     if(is_restart)
     {
