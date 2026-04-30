@@ -107,7 +107,6 @@ PDNSolution::~PDNSolution() noexcept
   VecDestroy(&solution);
 }
 
-/*
 PDNSolution PDNSolution::Gen_random( const APart_Node * const &pNode,
     int input_dof_num )
 {
@@ -153,7 +152,6 @@ PDNSolution PDNSolution::Gen_zero( const APart_Node * const &pNode,
 
   return sol;
 }
-*/
 
 void PDNSolution::Copy(const PDNSolution &INPUT)
 {
