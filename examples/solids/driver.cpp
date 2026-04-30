@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
 
   auto nsolver = SYS_T::make_unique<PNonlinear_Solid_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(pNode_bc),
+      std::move(tm_galpha),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();

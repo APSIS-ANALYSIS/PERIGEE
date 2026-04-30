@@ -6,7 +6,6 @@ PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
-    std::unique_ptr<APart_Node> in_pnode,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
     const int &input_renew_freq, const int &input_renew_threshold )
@@ -16,8 +15,7 @@ PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
   gassem(std::move(in_gassem)),
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
-  tmga(std::move(in_tmga)),
-  pnode(std::move(in_pnode))
+  tmga(std::move(in_tmga))
 {}
 
 void PNonlinear_Solid_Solver::print_info() const
@@ -36,7 +34,7 @@ void PNonlinear_Solid_Solver::update_solid_kinematics( const double &val,
     const Vec &input,
     PDNSolution * const &output ) const
 {
-  const int nlocal = pnode->get_nlocalnode();
+  const int nlocal = output->get_nlocalnode();
 
   Vec local_output;
   VecGhostGetLocalForm(output->solution, &local_output);
