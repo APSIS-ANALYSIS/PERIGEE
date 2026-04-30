@@ -11,19 +11,6 @@
 
 namespace SOLID_INIT
 {
-  inline void zero_solution( PDNSolution * const &sol )
-  {
-    VecSet(sol->solution, 0.0);
-    sol->Assembly_GhostUpdate();
-  }
-
-  inline void read_binary_checked( PDNSolution * const &sol,
-      const std::string &name )
-  {
-    SYS_T::file_check(name);
-    sol->ReadBinary(name);
-  }
-
   inline void initialize_solution_state( const APart_Node * const pNode,
       const bool is_restart, const int restart_index,
       const double restart_time, const double restart_step,
@@ -58,17 +45,25 @@ namespace SOLID_INIT
       initial_time  = restart_time;
       initial_step  = restart_step;
 
-      read_binary_checked( disp.get(), restart_disp_name );
-      read_binary_checked( velo.get(), restart_velo_name );
-      read_binary_checked( pres.get(), restart_pres_name );
+      SYS_T::file_check(restart_disp_name);
+      SYS_T::file_check(restart_velo_name);
+      SYS_T::file_check(restart_pres_name);
+
+      disp->ReadBinary(restart_disp_name);
+      velo->ReadBinary(restart_velo_name);
+      pres->ReadBinary(restart_pres_name);
 
       const std::string restart_dot_disp_name = "dot_" + restart_disp_name;
       const std::string restart_dot_velo_name = "dot_" + restart_velo_name;
       const std::string restart_dot_pres_name = "dot_" + restart_pres_name;
 
-      read_binary_checked( dot_disp.get(), restart_dot_disp_name );
-      read_binary_checked( dot_velo.get(), restart_dot_velo_name );
-      read_binary_checked( dot_pres.get(), restart_dot_pres_name );
+      SYS_T::file_check(restart_dot_disp_name);
+      SYS_T::file_check(restart_dot_velo_name);
+      SYS_T::file_check(restart_dot_pres_name);
+
+      dot_disp->ReadBinary(restart_dot_disp_name);
+      dot_velo->ReadBinary(restart_dot_velo_name);
+      dot_pres->ReadBinary(restart_dot_pres_name);
 
       SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
       SYS_T::commPrint("     restart_disp_name: %s \n",
@@ -126,8 +121,11 @@ namespace SOLID_INIT
     VecGetSubVector(dot_vp, is_velo, &sol_v);
     VecGetSubVector(dot_vp, is_pres, &sol_p);
 
-    zero_solution( dot_velo );
-    zero_solution( dot_pres );
+    VecSet(dot_velo->solution, 0.0);
+    VecSet(dot_pres->solution, 0.0);
+    dot_velo->Assembly_GhostUpdate();
+    dot_pres->Assembly_GhostUpdate();
+
     dot_velo->PlusAX( sol_v, 1.0 );
     dot_pres->PlusAX( sol_p, 1.0 );
 
