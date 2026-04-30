@@ -118,31 +118,23 @@ int main( int argc, char * argv[] )
   auto vtk_w = SYS_T::make_unique<VTK_Writer_Solid>( GMIptr->get_nElem(),
       GMIptr->get_nLocBas(), element_part_file, std::move(matmodel) );
 
-  std::ostringstream time_index;
   const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
   const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
-    std::string disp_name_to_read(disp_sol_bname);
-    std::string velo_name_to_read(velo_sol_bname);
-    std::string pres_name_to_read(pres_sol_bname);
-    std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index << 900000000 + time;
-    disp_name_to_read.append(time_index.str());
-    velo_name_to_read.append(time_index.str());
-    pres_name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string suffix = std::to_string(900000000 + time);
+    const std::string disp_name_to_read = disp_sol_bname + suffix;
+    const std::string velo_name_to_read = velo_sol_bname + suffix;
+    const std::string pres_name_to_read = pres_sol_bname + suffix;
+    const std::string name_to_write = out_bname + suffix;
 
     SYS_T::commPrint("Time %d: Read %s %s %s and Write %s \n",
         time, disp_name_to_read.c_str(), pres_name_to_read.c_str(),
         velo_name_to_read.c_str(), name_to_write.c_str() );
 
-    std::vector<std::string> sol_names;
-    sol_names.push_back(disp_name_to_read);
-    sol_names.push_back(pres_name_to_read);
-    sol_names.push_back(velo_name_to_read);
+    std::vector<std::string> sol_names { disp_name_to_read, 
+      pres_name_to_read, velo_name_to_read };
 
     visprep->get_pointArray(sol_names, anode_mapping, pnode_mapping,
         pNode.get(), solArrays);
