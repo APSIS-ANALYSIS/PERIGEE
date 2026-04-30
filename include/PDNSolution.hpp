@@ -189,7 +189,8 @@ class PDNSolution
     //   Return true if the nlocalnode and nghostnode for the two inputs
     //   are the same; return false otherwise. 
     // ------------------------------------------------------------------------
-    friend bool is_layout_equal( const PDNSolution &left, const PDNSolution &right ) noexcept;
+    friend bool is_layout_equal( const PDNSolution &left, 
+        const PDNSolution &right ) noexcept;
 
   protected:
     // ------------------------------------------------------------------------
