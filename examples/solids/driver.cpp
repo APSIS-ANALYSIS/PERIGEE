@@ -184,18 +184,18 @@ int main(int argc, char *argv[])
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
 
   // ===== Generate a sparse matrix for the enforcement of essential BCs
-  auto pNode_bc = SYS_T::make_unique<APart_Node>(part_file, rank);
-  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode_bc.get(), locnbc.get());
-  pmat->gen_perm_bc(pNode_bc.get(), locnbc.get());
+  auto pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
+  auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
+  pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
   const int dof_mat = locnbc->get_dof_LID();
-  const int nlocal = pNode_bc->get_nlocalnode();
+  const int nlocal = pNode->get_nlocalnode();
 
   std::vector<PetscInt> idx_v(3 * nlocal);
   std::vector<PetscInt> idx_p(nlocal);
   for(int ii=0; ii<nlocal; ++ii)
   {
-    const PetscInt gid = pNode_bc->get_node_loc(ii);
+    const PetscInt gid = pNode->get_node_loc(ii);
     idx_p[ii] = dof_mat * gid;
     idx_v[3*ii  ] = dof_mat * gid + 1;
     idx_v[3*ii+1] = dof_mat * gid + 2;
@@ -231,11 +231,10 @@ int main(int argc, char *argv[])
         tm_galpha.get(), std::move(matmodel));
 
   // ===== Global Assembly Routine =====
-  auto pNode_gassem = SYS_T::make_unique<APart_Node>(part_file, rank);
   std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
         std::move(locIEN), std::move(locElem), std::move(fNode),
-        std::move(pNode_gassem), std::move(locnbc), std::move(locebc),
+        pNode.get(), std::move(locnbc), std::move(locebc),
         std::move(locAssem_ptr), nz_estimate);
 
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
@@ -243,15 +242,13 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Clear_KG();
 
   // ===== Initial condition =====
-  auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
+  auto disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
+  auto velo = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
+  auto pres = PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
 
-  auto disp = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
-  auto velo = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
-  auto pres = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 1 );
-
-  auto dot_disp = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
-  auto dot_velo = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
-  auto dot_pres = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 1 );
+  auto dot_disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
+  auto dot_velo = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
+  auto dot_pres = PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
 
   SOLID_INIT::initialize_solution_state( is_restart,
       restart_index, restart_time, restart_step,

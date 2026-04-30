@@ -20,7 +20,7 @@ class PGAssem_Solid_FEM : public IPGAssem
         std::unique_ptr<ALocal_IEN> in_locien,
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
-        std::unique_ptr<APart_Node> in_pnode,
+        const APart_Node * const in_pnode,
         std::unique_ptr<ALocal_NBC> in_nbc,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<IPLocAssem_2x2Block> in_locassem,
@@ -59,7 +59,7 @@ class PGAssem_Solid_FEM : public IPGAssem
     const std::unique_ptr<const ALocal_IEN> locien;
     const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const FEANode> fnode;
-    const std::unique_ptr<const APart_Node> pnode;
+    const APart_Node * const pnode;
     const std::unique_ptr<const ALocal_NBC> nbc;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<IPLocAssem_2x2Block> locassem;
