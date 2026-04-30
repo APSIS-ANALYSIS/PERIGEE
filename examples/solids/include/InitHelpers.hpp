@@ -5,7 +5,7 @@
 //
 // Initial-condition and restart helpers for mixed solid dynamics.
 // ============================================================================
-#include "PDNSolution_Solid.hpp"
+#include "PDNSolution.hpp"
 #include "PGAssem_Solid_FEM.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 
@@ -38,19 +38,19 @@ namespace SOLID_INIT
       std::unique_ptr<PDNSolution> &dot_pres,
       int &initial_index, double &initial_time, double &initial_step )
   {
-    disp = SYS_T::make_unique<PDNSolution_Solid>(
-        pNode, 3, 0, false, "disp" );
-    velo = SYS_T::make_unique<PDNSolution_Solid>(
-        pNode, 3, 0, false, "velo" );
-    pres = SYS_T::make_unique<PDNSolution_Solid>(
-        pNode, 1, 0, false, "pres" );
+    disp = SYS_T::make_unique<PDNSolution>(
+        PDNSolution::Gen_zero( pNode, 3 ) );
+    velo = SYS_T::make_unique<PDNSolution>(
+        PDNSolution::Gen_zero( pNode, 3 ) );
+    pres = SYS_T::make_unique<PDNSolution>(
+        PDNSolution::Gen_zero( pNode, 1 ) );
 
-    dot_disp = SYS_T::make_unique<PDNSolution_Solid>(
-        pNode, 3, 0, false, "dot_disp" );
-    dot_velo = SYS_T::make_unique<PDNSolution_Solid>(
-        pNode, 3, 0, false, "dot_velo" );
-    dot_pres = SYS_T::make_unique<PDNSolution_Solid>(
-        pNode, 1, 0, false, "dot_pres" );
+    dot_disp = SYS_T::make_unique<PDNSolution>(
+        PDNSolution::Gen_zero( pNode, 3 ) );
+    dot_velo = SYS_T::make_unique<PDNSolution>(
+        PDNSolution::Gen_zero( pNode, 3 ) );
+    dot_pres = SYS_T::make_unique<PDNSolution>(
+        PDNSolution::Gen_zero( pNode, 1 ) );
 
     if(is_restart)
     {
@@ -96,8 +96,11 @@ namespace SOLID_INIT
       PDNSolution * const &dot_pres,
       PDNSolution * const &disp,
       PDNSolution * const &velo,
-      PDNSolution * const &pres )
+      PDNSolution * const &pres,
+      const bool is_restart )
   {
+    if(is_restart) return;
+
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");
     auto lsolver_acce = SYS_T::make_unique<PLinear_Solver_PETSc>(
         1.0e-14, 1.0e-85, 1.0e30, 1000, "mass_", "mass_" );

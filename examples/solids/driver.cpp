@@ -255,12 +255,9 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
-  if( is_restart == false )
-  {
-    SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
-        dot_disp.get(), dot_velo.get(), dot_pres.get(),
-        disp.get(), velo.get(), pres.get() );
-  }
+  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
+      dot_disp.get(), dot_velo.get(), dot_pres.get(),
+      disp.get(), velo.get(), pres.get(), is_restart );
 
   // ===== Linear and nonlinear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
