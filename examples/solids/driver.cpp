@@ -13,6 +13,7 @@
 #include "PGAssem_Solid_FEM.hpp"
 #include "PNonlinear_Solver.hpp"
 #include "PTime_Solver.hpp"
+#include "MaterialModelData.hpp"
 
 int main(int argc, char *argv[])
 {
@@ -191,10 +192,11 @@ int main(int argc, char *argv[])
   tm_galpha->print_info();
 
   // ===== Local Assembly Routine =====
+  auto matmodel = MaterialModelData::create_mixed_model();
   std::unique_ptr<IPLocAssem_2x2Block> locAssem_ptr =
     SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
         elemType, nqp_vol, nqp_sur,
-        tm_galpha.get());
+        tm_galpha.get(), std::move(matmodel));
 
   // ===== Initial condition =====
   auto disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
