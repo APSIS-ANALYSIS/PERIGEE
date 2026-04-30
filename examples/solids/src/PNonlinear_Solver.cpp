@@ -82,8 +82,6 @@ void PNonlinear_Solver::apply_disp_loading(
     PDNSolution * const &disp,
     PDNSolution * const &velo ) const
 {
-  const ALocal_NBC &disp_nbc = *nbc_disp;
-
   for(int field=1; field<=3; ++field)
   {
     double uval = 0.0;
@@ -92,10 +90,10 @@ void PNonlinear_Solver::apply_disp_loading(
 
     LoadData::disp_loading( field, time, uval, vval, aval );
 
-    const int num_disp_ld = disp_nbc.get_Num_LD(field);
+    const int num_disp_ld = nbc_disp->get_Num_LD(field);
     for(int ii=0; ii<num_disp_ld; ++ii)
     {
-      const PetscInt gid = disp_nbc.get_LDN(field, ii);
+      const PetscInt gid = nbc_disp->get_LDN(field, ii);
       const PetscInt idx = gid * 3 + (field - 1);
 
       VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
