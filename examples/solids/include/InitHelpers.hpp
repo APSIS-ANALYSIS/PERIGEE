@@ -11,8 +11,8 @@
 
 namespace SOLID_INIT
 {
-  inline void initialize_solution_state( const APart_Node * const pNode,
-      const bool is_restart, const int restart_index,
+  inline void initialize_solution_state( const bool is_restart,
+      const int restart_index,
       const double restart_time, const double restart_step,
       const std::string &restart_disp_name,
       const std::string &restart_velo_name,
@@ -25,14 +25,6 @@ namespace SOLID_INIT
       std::unique_ptr<PDNSolution> &dot_pres,
       int &initial_index, double &initial_time, double &initial_step )
   {
-    disp = PDNSolution::Gen_zero_ptr( pNode, 3 );
-    velo = PDNSolution::Gen_zero_ptr( pNode, 3 );
-    pres = PDNSolution::Gen_zero_ptr( pNode, 1 );
-
-    dot_disp = PDNSolution::Gen_zero_ptr( pNode, 3 );
-    dot_velo = PDNSolution::Gen_zero_ptr( pNode, 3 );
-    dot_pres = PDNSolution::Gen_zero_ptr( pNode, 1 );
-
     if(is_restart)
     {
       initial_index = restart_index;

@@ -245,10 +245,15 @@ int main(int argc, char *argv[])
   // ===== Initial condition =====
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
 
-  std::unique_ptr<PDNSolution> disp, velo, pres;
-  std::unique_ptr<PDNSolution> dot_disp, dot_velo, dot_pres;
+  auto disp = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto velo = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto pres = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 1 );
 
-  SOLID_INIT::initialize_solution_state( pNode_sol.get(), is_restart,
+  auto dot_disp = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto dot_velo = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto dot_pres = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 1 );
+
+  SOLID_INIT::initialize_solution_state( is_restart,
       restart_index, restart_time, restart_step,
       restart_u_name, restart_v_name, restart_p_name,
       disp, velo, pres, dot_disp, dot_velo, dot_pres,
@@ -264,7 +269,7 @@ int main(int argc, char *argv[])
 
   auto nsolver = SYS_T::make_unique<PNonlinear_Solid_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(pNode_bc),
+      std::move(tm_galpha),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
