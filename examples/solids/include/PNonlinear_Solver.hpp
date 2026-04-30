@@ -22,6 +22,7 @@ class PNonlinear_Solver
         std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+        std::unique_ptr<ALocal_NBC> in_nbc_disp,
         const double &input_nrtol, const double &input_natol,
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq, const int &input_renew_threshold );
@@ -38,7 +39,6 @@ class PNonlinear_Solver
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
-        const ALocal_NBC * const &nbc_disp,
         const PDNSolution * const &pre_dot_disp,
         const PDNSolution * const &pre_dot_velo,
         const PDNSolution * const &pre_dot_pres,
@@ -61,6 +61,7 @@ class PNonlinear_Solver
     const std::unique_ptr<PLinear_Solver_PETSc> lsolver;
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
+    const std::unique_ptr<ALocal_NBC> nbc_disp;
     IS is_velo, is_pres;
 
     void Print_convergence_info( const int &count,
@@ -73,8 +74,7 @@ class PNonlinear_Solver
         const Vec &input,
         PDNSolution * const &output ) const;
 
-    void apply_disp_loading( const ALocal_NBC * const &nbc_disp,
-        const double &time,
+    void apply_disp_loading( const double &time,
         PDNSolution * const &dot_disp,
         PDNSolution * const &dot_velo,
         PDNSolution * const &disp,

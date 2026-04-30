@@ -6,6 +6,7 @@ PNonlinear_Solver::PNonlinear_Solver(
     std::unique_ptr<PLinear_Solver_PETSc> in_lsolver,
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
+    std::unique_ptr<ALocal_NBC> in_nbc_disp,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
     const int &input_renew_freq, const int &input_renew_threshold )
@@ -16,6 +17,7 @@ PNonlinear_Solver::PNonlinear_Solver(
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
+  nbc_disp(std::move(in_nbc_disp)),
   is_velo(nullptr), is_pres(nullptr)
 {
   std::vector<PetscInt> idx_v, idx_p;
@@ -74,13 +76,14 @@ void PNonlinear_Solver::update_solid_kinematics( const double &val,
 }
 
 void PNonlinear_Solver::apply_disp_loading(
-    const ALocal_NBC * const &nbc_disp,
     const double &time,
     PDNSolution * const &dot_disp,
     PDNSolution * const &dot_velo,
     PDNSolution * const &disp,
     PDNSolution * const &velo ) const
 {
+  const ALocal_NBC &disp_nbc = *nbc_disp;
+
   for(int field=1; field<=3; ++field)
   {
     double uval = 0.0;
@@ -89,10 +92,10 @@ void PNonlinear_Solver::apply_disp_loading(
 
     LoadData::disp_loading( field, time, uval, vval, aval );
 
-    const int num_disp_ld = nbc_disp->get_Num_LD(field);
+    const int num_disp_ld = disp_nbc.get_Num_LD(field);
     for(int ii=0; ii<num_disp_ld; ++ii)
     {
-      const PetscInt gid = nbc_disp->get_LDN(field, ii);
+      const PetscInt gid = disp_nbc.get_LDN(field, ii);
       const PetscInt idx = gid * 3 + (field - 1);
 
       VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
@@ -112,7 +115,6 @@ void PNonlinear_Solver::GenAlpha_Seg_solve_Solid(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
-    const ALocal_NBC * const &nbc_disp,
     const PDNSolution * const &pre_dot_disp,
     const PDNSolution * const &pre_dot_velo,
     const PDNSolution * const &pre_dot_pres,
@@ -146,7 +148,7 @@ void PNonlinear_Solver::GenAlpha_Seg_solve_Solid(
   velo -> Copy( pre_velo );
   pres -> Copy( pre_pres );
 
-  apply_disp_loading( nbc_disp, curr_time + dt,
+  apply_disp_loading( curr_time + dt,
       dot_disp, dot_velo, disp, velo );
 
   // Define intermediate solutions
