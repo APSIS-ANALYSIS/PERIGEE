@@ -30,6 +30,7 @@ class PTime_Solid_Solver
         const bool &restart_init_assembly_flag,
         const IS &is_v,
         const IS &is_p,
+        const ALocal_NBC * const &nbc_disp,
         std::unique_ptr<PDNSolution> init_dot_disp,
         std::unique_ptr<PDNSolution> init_dot_velo,
         std::unique_ptr<PDNSolution> init_dot_pres,

@@ -179,7 +179,6 @@ int main(int argc, char *argv[])
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
-  auto locnbc_dir = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
   auto locnbc_disp =
     SYS_T::make_unique<ALocal_NBC>(part_file, rank, "/nbc_disp_driven");
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
@@ -251,31 +250,24 @@ int main(int argc, char *argv[])
       disp, velo, pres, dot_disp, dot_velo, dot_pres,
       initial_index, initial_time, initial_step );
 
-  if( is_restart )
-  {
-    SOLID_INIT::apply_initial_dirichlet_bc( locnbc_dir.get(),
-        locnbc_disp.get(), restart_time,
-        dot_disp.get(), dot_velo.get(), disp.get(), velo.get() );
-  }
-
-
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
-  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), locnbc_dir.get(),
-      locnbc_disp.get(), is_velo, is_pres,
-      dot_disp.get(), dot_velo.get(), dot_pres.get(),
-      disp.get(), velo.get(), pres.get(), initial_time, is_restart );
+  if( is_restart == false )
+  {
+    SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
+        dot_disp.get(), dot_velo.get(), dot_pres.get(),
+        disp.get(), velo.get(), pres.get() );
+  }
 
   // ===== Linear and nonlinear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
   auto nsolver = SYS_T::make_unique<PNonlinear_Solid_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(pNode_bc), std::move(locnbc_dir),
-      std::move(locnbc_disp),
+      std::move(tm_galpha), std::move(pNode_bc),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -292,6 +284,7 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_Solid_GenAlpha( is_restart, is_velo, is_pres,
+      locnbc_disp.get(),
       std::move(dot_disp), std::move(dot_velo), std::move(dot_pres),
       std::move(disp), std::move(velo), std::move(pres),
       std::move(timeinfo) );
