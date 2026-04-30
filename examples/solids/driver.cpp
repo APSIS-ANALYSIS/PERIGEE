@@ -14,8 +14,8 @@
 #include "InitHelpers.hpp"
 #include "ALocal_NBC.hpp"
 #include "PGAssem_Solid_FEM.hpp"
-#include "PNonlinear_Solid_Solver.hpp"
-#include "PTime_Solid_Solver.hpp"
+#include "PNonlinear_Solver.hpp"
+#include "PTime_Solver.hpp"
 
 int main(int argc, char *argv[])
 {
