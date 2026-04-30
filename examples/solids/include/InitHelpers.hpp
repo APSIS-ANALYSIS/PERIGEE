@@ -102,19 +102,8 @@ namespace SOLID_INIT
     lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_vp );
     VecScale(dot_vp, -1.0);
 
-    PetscInt rstart, rend;
-    VecGetOwnershipRange(dot_vp, &rstart, &rend);
-
-    const PetscInt nlocalnode = static_cast<PetscInt>(dot_pres->get_nlocalnode());
-    std::vector<PetscInt> idx_v(3 * nlocalnode), idx_p(nlocalnode);
-    for(PetscInt ii=0; ii<nlocalnode; ++ii)
-    {
-      const PetscInt base = rstart + 4 * ii;
-      idx_p[ii] = base;
-      idx_v[3*ii  ] = base + 1;
-      idx_v[3*ii+1] = base + 2;
-      idx_v[3*ii+2] = base + 3;
-    }
+    std::vector<PetscInt> idx_v, idx_p;
+    gloAssem->GetSubVecIndex_vp(idx_v, idx_p);
 
     IS is_velo, is_pres;
     ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()), idx_v.data(), PETSC_COPY_VALUES, &is_velo);
