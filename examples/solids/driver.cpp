@@ -230,17 +230,6 @@ int main(int argc, char *argv[])
         elemType, nqp_vol, nqp_sur,
         tm_galpha.get(), std::move(matmodel));
 
-  // ===== Global Assembly Routine =====
-  std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
-    SYS_T::make_unique<PGAssem_Solid_FEM>(
-        std::move(locIEN), std::move(locElem), std::move(fNode),
-        pNode.get(), std::move(locnbc), std::move(locebc),
-        std::move(locAssem_ptr), nz_estimate);
-
-  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  gloAssem_ptr->Fix_nonzero_err_str();
-  gloAssem_ptr->Clear_KG();
-
   // ===== Initial condition =====
   auto disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
   auto velo = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
@@ -249,6 +238,17 @@ int main(int argc, char *argv[])
   auto dot_disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
   auto dot_velo = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
   auto dot_pres = PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
+
+  // ===== Global Assembly Routine =====
+  std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
+    SYS_T::make_unique<PGAssem_Solid_FEM>(
+        std::move(locIEN), std::move(locElem), std::move(fNode),
+        std::move(pNode), std::move(locnbc), std::move(locebc),
+        std::move(locAssem_ptr), nz_estimate);
+
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
 
   SOLID_INIT::initialize_solution_state( is_restart,
       restart_index, restart_time, restart_step,
