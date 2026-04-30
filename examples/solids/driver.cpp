@@ -245,10 +245,15 @@ int main(int argc, char *argv[])
   // ===== Initial condition =====
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
 
-  std::unique_ptr<PDNSolution> disp, velo, pres;
-  std::unique_ptr<PDNSolution> dot_disp, dot_velo, dot_pres;
+  auto disp = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto velo = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto pres = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 1 );
 
-  SOLID_INIT::initialize_solution_state( pNode_sol.get(), is_restart,
+  auto dot_disp = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto dot_velo = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 3 );
+  auto dot_pres = PDNSolution::Gen_zero_ptr( pNode_sol.get(), 1 );
+
+  SOLID_INIT::initialize_solution_state( is_restart,
       restart_index, restart_time, restart_step,
       restart_u_name, restart_v_name, restart_p_name,
       disp, velo, pres, dot_disp, dot_velo, dot_pres,
