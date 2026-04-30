@@ -47,7 +47,6 @@ SET( perigee_preprocess_lib_src
   ${perigee_source}/Mesh/QuadPts_Gauss_1D.cpp
   ${perigee_source}/Mesh/QuadPts_Gauss_Quad.cpp
   ${perigee_source}/Mesh/NBC_Partition.cpp
-  ${perigee_SOURCE_DIR}/src/NBC_Partition_Solid.cpp
   ${perigee_source}/Mesh/NBC_Partition_inflow.cpp
   ${perigee_source}/Mesh/EBC_Partition.cpp
   ${perigee_source}/Mesh/EBC_Partition_outflow.cpp
@@ -97,7 +96,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
   ${perigee_source}/Solver/PLinear_Solver_PETSc.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_Solid.cpp
-  ${perigee_SOURCE_DIR}/src/ALocal_NBC_Solid.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_Solid_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_2x2Block_VMS_Hyperelasticity.cpp

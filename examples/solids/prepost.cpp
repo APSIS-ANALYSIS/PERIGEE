@@ -97,7 +97,7 @@ int main( int argc, char * argv[] )
     mytimer->Start();
     
     auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
-        ctrlPts, proc_rank, cpu_size, elemType, {0, dofNum, true, "linearPDE"} );
+        ctrlPts, proc_rank, cpu_size, elemType, Field_Property(0, dofNum, true, "linearPDE") );
     part->write(part_file.c_str());
     
     mytimer->Stop();

@@ -63,10 +63,6 @@ class PDNSolution
     static PDNSolution Gen_random( const APart_Node * const &pNode,
         int input_dof_num = -1 );
 
-    // ------------------------------------------------------------------------
-    // ! Construct and return a zero solution vector.
-    // ! If input_dof_num <= 0, use pNode->get_dof().
-    // ------------------------------------------------------------------------
     static PDNSolution Gen_zero( const APart_Node * const &pNode,
         int input_dof_num = -1 );
 

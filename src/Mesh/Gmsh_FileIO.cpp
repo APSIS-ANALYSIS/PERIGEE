@@ -1,4 +1,6 @@
 #include "Gmsh_FileIO.hpp"
+#include "Vec_Tools.hpp"
+#include "Tet_Tools.hpp"
 #include "HDF5_Group.hpp"
 
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )

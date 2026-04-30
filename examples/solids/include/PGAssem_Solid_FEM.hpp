@@ -9,7 +9,7 @@
 // ==========================================================================
 #include "IPGAssem.hpp"
 #include "ALocal_Elem.hpp"
-#include "ALocal_NBC_Solid.hpp"
+#include "ALocal_NBC.hpp"
 #include "ALocal_EBC.hpp"
 #include "PETSc_Tools.hpp"
 
@@ -21,7 +21,8 @@ class PGAssem_Solid_FEM : public IPGAssem
         std::unique_ptr<ALocal_Elem> in_locelem,
         std::unique_ptr<FEANode> in_fnode,
         std::unique_ptr<APart_Node> in_pnode,
-        std::unique_ptr<ALocal_NBC_Solid> in_nbc,
+        std::unique_ptr<ALocal_NBC> in_nbc,
+        std::unique_ptr<ALocal_NBC> in_nbc_disp,
         std::unique_ptr<ALocal_EBC> in_ebc,
         std::unique_ptr<IPLocAssem_2x2Block> in_locassem,
         const int &in_nz_estimate = 60 );
@@ -62,14 +63,13 @@ class PGAssem_Solid_FEM : public IPGAssem
         PDNSolution * const &disp,
         PDNSolution * const &velo ) const;
 
-    const ALocal_NBC_Solid * get_nbc() const { return nbc.get(); }
-
   private:
     const std::unique_ptr<const ALocal_IEN> locien;
     const std::unique_ptr<const ALocal_Elem> locelem;
     const std::unique_ptr<const FEANode> fnode;
     const std::unique_ptr<const APart_Node> pnode;
-    const std::unique_ptr<const ALocal_NBC_Solid> nbc;
+    const std::unique_ptr<const ALocal_NBC> nbc;
+    const std::unique_ptr<const ALocal_NBC> nbc_disp;
     const std::unique_ptr<const ALocal_EBC> ebc;
     const std::unique_ptr<IPLocAssem_2x2Block> locassem;
 
