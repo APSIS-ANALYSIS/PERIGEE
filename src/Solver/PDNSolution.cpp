@@ -118,7 +118,7 @@ PDNSolution PDNSolution::Gen_random( const APart_Node * const &pNode,
 
   PetscScalar * val = new PetscScalar[sol.nlocal];
   PetscInt * idx = new PetscInt[sol.nlocal];
-  
+
   for(int ii=0; ii<sol.nlocal; ++ii)
   {
     val[ii] = dis(gen);
@@ -126,7 +126,6 @@ PDNSolution PDNSolution::Gen_random( const APart_Node * const &pNode,
   }
 
   VecSetValuesLocal(sol.solution, sol.nlocal, idx, val, INSERT_VALUES);
-
   VecAssemblyBegin(sol.solution);
   VecAssemblyEnd(sol.solution);
 
@@ -149,6 +148,51 @@ PDNSolution PDNSolution::Gen_zero( const APart_Node * const &pNode,
   VecAssemblyEnd(sol.solution);
 
   sol.GhostUpdate();
+
+  return sol;
+}
+
+std::unique_ptr<PDNSolution> PDNSolution::Gen_random_ptr(
+    const APart_Node * const &pNode, int input_dof_num )
+{
+  auto sol = SYS_T::make_unique<PDNSolution>(
+      pNode, input_dof_num > 0 ? input_dof_num : pNode->get_dof() );
+
+  thread_local std::mt19937_64 gen( std::random_device{}() );
+  std::uniform_real_distribution<double> dis(-1.0, 1.0);
+
+  PetscScalar * val = new PetscScalar[sol->nlocal];
+  PetscInt * idx = new PetscInt[sol->nlocal];
+
+  for(int ii=0; ii<sol->nlocal; ++ii)
+  {
+    val[ii] = dis(gen);
+    idx[ii] = ii;
+  }
+
+  VecSetValuesLocal(sol->solution, sol->nlocal, idx, val, INSERT_VALUES);
+  VecAssemblyBegin(sol->solution);
+  VecAssemblyEnd(sol->solution);
+
+  sol->GhostUpdate();
+
+  delete [] val; val = nullptr; delete [] idx; idx = nullptr;
+
+  return sol;
+}
+
+std::unique_ptr<PDNSolution> PDNSolution::Gen_zero_ptr(
+    const APart_Node * const &pNode, int input_dof_num )
+{
+  auto sol = SYS_T::make_unique<PDNSolution>(
+      pNode, input_dof_num > 0 ? input_dof_num : pNode->get_dof() );
+
+  VecSet(sol->solution, 0.0);
+
+  VecAssemblyBegin(sol->solution);
+  VecAssemblyEnd(sol->solution);
+
+  sol->GhostUpdate();
 
   return sol;
 }
