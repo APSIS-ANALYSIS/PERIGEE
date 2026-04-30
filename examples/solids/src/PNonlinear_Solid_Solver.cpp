@@ -261,9 +261,6 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
 
   }while( nl_counter < nmaxits && relative_error > nr_tol && residual_norm > na_tol );
 
-  apply_disp_loading( nbc_disp, curr_time + dt,
-      dot_disp, dot_velo, disp, velo );
-
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 
   if( relative_error <= nr_tol || residual_norm <= na_tol ) conv_flag = true;
