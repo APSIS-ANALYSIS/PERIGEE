@@ -77,6 +77,13 @@ class PNonlinear_Solid_Solver
         const Vec &input,
         PDNSolution * const &output ) const;
 
+    void apply_disp_loading( const ALocal_NBC * const &nbc_disp,
+        const double &time,
+        PDNSolution * const &dot_disp,
+        PDNSolution * const &dot_velo,
+        PDNSolution * const &disp,
+        PDNSolution * const &velo ) const;
+
     PNonlinear_Solid_Solver() = delete;
 };
 

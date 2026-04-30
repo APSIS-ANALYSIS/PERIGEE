@@ -60,41 +60,39 @@ void PNonlinear_Solid_Solver::update_solid_kinematics( const double &val,
   output->GhostUpdate();
 }
 
-namespace
+void PNonlinear_Solid_Solver::apply_disp_loading(
+    const ALocal_NBC * const &nbc_disp,
+    const double &time,
+    PDNSolution * const &dot_disp,
+    PDNSolution * const &dot_velo,
+    PDNSolution * const &disp,
+    PDNSolution * const &velo ) const
 {
-  void apply_disp_loading( const ALocal_NBC * const &nbc_disp,
-      const double &time,
-      PDNSolution * const &dot_disp,
-      PDNSolution * const &dot_velo,
-      PDNSolution * const &disp,
-      PDNSolution * const &velo )
+  for(int field=1; field<=3; ++field)
   {
-    for(int field=1; field<=3; ++field)
+    double uval = 0.0;
+    double vval = 0.0;
+    double aval = 0.0;
+
+    LoadData::disp_loading( field, time, uval, vval, aval );
+
+    const int num_disp_ld = nbc_disp->get_Num_LD(field);
+    for(int ii=0; ii<num_disp_ld; ++ii)
     {
-      double uval = 0.0;
-      double vval = 0.0;
-      double aval = 0.0;
+      const PetscInt gid = nbc_disp->get_LDN(field, ii);
+      const PetscInt idx = gid * 3 + (field - 1);
 
-      LoadData::disp_loading( field, time, uval, vval, aval );
-
-      const int num_disp_ld = nbc_disp->get_Num_LD(field);
-      for(int ii=0; ii<num_disp_ld; ++ii)
-      {
-        const PetscInt gid = nbc_disp->get_LDN(field, ii);
-        const PetscInt idx = gid * 3 + (field - 1);
-
-        VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
-        VecSetValue(velo->solution, idx, vval, INSERT_VALUES);
-        VecSetValue(dot_disp->solution, idx, vval, INSERT_VALUES);
-        VecSetValue(dot_velo->solution, idx, aval, INSERT_VALUES);
-      }
+      VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
+      VecSetValue(velo->solution, idx, vval, INSERT_VALUES);
+      VecSetValue(dot_disp->solution, idx, vval, INSERT_VALUES);
+      VecSetValue(dot_velo->solution, idx, aval, INSERT_VALUES);
     }
-
-    disp->Assembly_GhostUpdate();
-    velo->Assembly_GhostUpdate();
-    dot_disp->Assembly_GhostUpdate();
-    dot_velo->Assembly_GhostUpdate();
   }
+
+  disp->Assembly_GhostUpdate();
+  velo->Assembly_GhostUpdate();
+  dot_disp->Assembly_GhostUpdate();
+  dot_velo->Assembly_GhostUpdate();
 }
 
 void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
