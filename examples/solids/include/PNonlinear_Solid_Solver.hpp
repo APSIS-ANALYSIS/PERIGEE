@@ -13,6 +13,7 @@
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution.hpp"
 #include "APart_Node.hpp"
+#include "ALocal_NBC.hpp"
 
 class PNonlinear_Solid_Solver
 {
@@ -41,6 +42,7 @@ class PNonlinear_Solid_Solver
         const double &dt,
         const IS &is_v,
         const IS &is_p,
+        const ALocal_NBC * const &nbc_disp,
         const PDNSolution * const &pre_dot_disp,
         const PDNSolution * const &pre_dot_velo,
         const PDNSolution * const &pre_dot_pres,
@@ -64,6 +66,7 @@ class PNonlinear_Solid_Solver
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<const APart_Node> pnode;
+
     void Print_convergence_info( const int &count,
         const double &rel_err, const double &abs_err ) const
     {
@@ -73,6 +76,13 @@ class PNonlinear_Solid_Solver
     void update_solid_kinematics( const double &val,
         const Vec &input,
         PDNSolution * const &output ) const;
+
+    void apply_disp_loading( const ALocal_NBC * const &nbc_disp,
+        const double &time,
+        PDNSolution * const &dot_disp,
+        PDNSolution * const &dot_velo,
+        PDNSolution * const &disp,
+        PDNSolution * const &velo ) const;
 
     PNonlinear_Solid_Solver() = delete;
 };

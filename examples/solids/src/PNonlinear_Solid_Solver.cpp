@@ -1,4 +1,5 @@
 #include "PNonlinear_Solid_Solver.hpp"
+#include "LoadData.hpp"
 
 PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
     std::unique_ptr<PGAssem_Solid_FEM> in_gassem,
@@ -59,12 +60,48 @@ void PNonlinear_Solid_Solver::update_solid_kinematics( const double &val,
   output->GhostUpdate();
 }
 
+void PNonlinear_Solid_Solver::apply_disp_loading(
+    const ALocal_NBC * const &nbc_disp,
+    const double &time,
+    PDNSolution * const &dot_disp,
+    PDNSolution * const &dot_velo,
+    PDNSolution * const &disp,
+    PDNSolution * const &velo ) const
+{
+  for(int field=1; field<=3; ++field)
+  {
+    double uval = 0.0;
+    double vval = 0.0;
+    double aval = 0.0;
+
+    LoadData::disp_loading( field, time, uval, vval, aval );
+
+    const int num_disp_ld = nbc_disp->get_Num_LD(field);
+    for(int ii=0; ii<num_disp_ld; ++ii)
+    {
+      const PetscInt gid = nbc_disp->get_LDN(field, ii);
+      const PetscInt idx = gid * 3 + (field - 1);
+
+      VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
+      VecSetValue(velo->solution, idx, vval, INSERT_VALUES);
+      VecSetValue(dot_disp->solution, idx, vval, INSERT_VALUES);
+      VecSetValue(dot_velo->solution, idx, aval, INSERT_VALUES);
+    }
+  }
+
+  disp->Assembly_GhostUpdate();
+  velo->Assembly_GhostUpdate();
+  dot_disp->Assembly_GhostUpdate();
+  dot_velo->Assembly_GhostUpdate();
+}
+
 void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
     const IS &is_v,
     const IS &is_p,
+    const ALocal_NBC * const &nbc_disp,
     const PDNSolution * const &pre_dot_disp,
     const PDNSolution * const &pre_dot_velo,
     const PDNSolution * const &pre_dot_pres,
@@ -98,7 +135,8 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
   velo -> Copy( pre_velo );
   pres -> Copy( pre_pres );
 
-  gassem->Apply_Dirichlet_BC( curr_time + dt, dot_disp, dot_velo, disp, velo );
+  apply_disp_loading( nbc_disp, curr_time + dt,
+      dot_disp, dot_velo, disp, velo );
 
   // Define intermediate solutions
   auto dot_disp_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_disp);
@@ -222,8 +260,6 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
     }
 
   }while( nl_counter < nmaxits && relative_error > nr_tol && residual_norm > na_tol );
-
-  gassem->Apply_Dirichlet_BC( curr_time + dt, dot_disp, dot_velo, disp, velo );
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 

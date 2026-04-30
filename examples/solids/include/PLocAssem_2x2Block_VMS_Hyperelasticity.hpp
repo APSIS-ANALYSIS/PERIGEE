@@ -114,13 +114,6 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
 
     std::array<double, 2> get_tau( const double &dt, const double &Jin, const double &dx ) const;
 
-    Vector_3 get_f(const Vector_3 &pt, const double &tt ) const
-    {
-      return Vector_3( 0.0, 0.0, 0.0 );
-    }
-
-    Vector_3 get_traction( const int &ebc_id,
-        const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const;
 };
 
 #endif
