@@ -146,8 +146,7 @@ void PNonlinear_Solver::GenAlpha_Seg_solve_Solid(
   velo -> Copy( pre_velo );
   pres -> Copy( pre_pres );
 
-  apply_disp_loading( curr_time + dt,
-      dot_disp, dot_velo, disp, velo );
+  apply_disp_loading( curr_time + dt, dot_disp, dot_velo, disp, velo );
 
   // Define intermediate solutions
   auto dot_disp_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_disp);
