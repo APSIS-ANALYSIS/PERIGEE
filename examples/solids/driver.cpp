@@ -199,12 +199,10 @@ int main(int argc, char *argv[])
   std::unique_ptr<IPLocAssem_2x2Block> locAssem_ptr;
   if( is_incompressible )
     locAssem_ptr = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Incompressible>(
-        elemType, nqp_vol, nqp_sur,
-        tm_galpha.get(), std::move(matmodel));
+        elemType, nqp_vol, nqp_sur, tm_galpha.get(), std::move(matmodel));
   else
     locAssem_ptr = SYS_T::make_unique<PLocAssem_2x2Block_VMS_Hyperelasticity>(
-        elemType, nqp_vol, nqp_sur,
-        tm_galpha.get(), std::move(matmodel));
+        elemType, nqp_vol, nqp_sur, tm_galpha.get(), std::move(matmodel));
 
   // ===== Initial condition =====
   auto disp = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
@@ -251,8 +249,8 @@ int main(int argc, char *argv[])
   auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
 
   // ===== Temporal solver context =====
-  auto tsolver = SYS_T::make_unique<PTime_Solver>(
-      std::move(nsolver), sol_bName, sol_record_freq, ttan_renew_freq, final_time );
+  auto tsolver = SYS_T::make_unique<PTime_Solver>( std::move(nsolver), 
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
 
   tsolver->print_info();
 

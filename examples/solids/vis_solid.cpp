@@ -3,9 +3,7 @@
 #include "APart_Node.hpp"
 #include "FEAElementFactory.hpp"
 #include "HDF5_Reader.hpp"
-#include "MaterialModel_ich_NeoHookean.hpp"
-#include "MaterialModel_vol_Incompressible.hpp"
-#include "MaterialModel_Mixed_Elasticity.hpp"
+#include "MaterialModelData.hpp"
 #include "QuadPtsFactory.hpp"
 #include "VisDataPrep_Solid.hpp"
 #include "VTK_Writer_Solid.hpp"
@@ -108,17 +106,7 @@ int main( int argc, char * argv[] )
   quad -> print_info();
 
   // Material model for Cauchy stress
-  const double solid_mu = 6.666666666e4;
-  const double solid_rho0 = 1.0;
-
-  std::unique_ptr<IMaterialModel_ich> imodel =
-    SYS_T::make_unique<MaterialModel_ich_NeoHookean>(solid_mu);
-
-  std::unique_ptr<IMaterialModel_vol> vmodel =
-    SYS_T::make_unique<MaterialModel_vol_Incompressible>(solid_rho0);
-
-  auto matmodel = SYS_T::make_unique<MaterialModel_Mixed_Elasticity>(
-      std::move(vmodel), std::move(imodel));
+  auto matmodel = MaterialModelData::create_mixed_model(); 
 
   std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_Solid>();
   visprep->print_info();
