@@ -15,7 +15,6 @@
 #include "Matrix_PETSc.hpp"
 #include "PDNTimeStep.hpp"
 #include "PDNSolution_NS.hpp"
-#include "PDNSolution.hpp"
 #include "ALocal_InflowBC.hpp"
 
 class PTime_NS_HERK_Solver
