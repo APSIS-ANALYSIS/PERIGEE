@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
   auto nsolver = SYS_T::make_unique<PNonlinear_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha),
+      std::move(tm_galpha), std::move(locnbc_disp),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();
@@ -251,7 +251,6 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
   tsolver->TM_Solid_GenAlpha( is_restart,
-      locnbc_disp.get(),
       std::move(dot_disp), std::move(dot_velo), std::move(dot_pres),
       std::move(disp), std::move(velo), std::move(pres),
       std::move(timeinfo) );
