@@ -1,4 +1,5 @@
 #include "PLocAssem_2x2Block_VMS_Hyperelasticity.hpp"
+#include "LoadData.hpp"
 
 PLocAssem_2x2Block_VMS_Hyperelasticity::PLocAssem_2x2Block_VMS_Hyperelasticity(
     const FEType &in_type, const int &in_nqp_v, const int &in_nqp_s,
@@ -176,7 +177,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor, curr);
+    const Vector_3 f_body = LoadData::body_force(coor, curr);
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -329,7 +330,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor, curr);
+    const Vector_3 f_body = LoadData::body_force(coor, curr);
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -617,7 +618,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
 
     const double gwts = elementv->get_detJac(qua) * quadv->get_qw(qua);
 
-    const Vector_3 f_body = get_f(coor, curr);
+    const Vector_3 f_body = LoadData::body_force(coor, curr);
 
     const Tensor2_3D F( ux_x + 1.0, ux_y, ux_z, uy_x, uy_y + 1.0, uy_z, uz_x, uz_y, uz_z + 1.0 );
 
@@ -706,7 +707,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_EBC(
       coor.z() += eleCtrlPts_z[ii] * R[ii];
     }
 
-    const Vector_3 gg = get_traction( ebc_id, coor, curr, n_out );
+    const Vector_3 gg = LoadData::surface_traction( ebc_id, coor, curr, n_out );
 
     for(int A=0; A<snLocBas; ++A)
     {
@@ -715,13 +716,6 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual_EBC(
       sur_Residual0[3*A+2] -= surface_area * quads -> get_qw(qua) * R[A] * gg.z();
     }
   }
-}
-
-Vector_3 PLocAssem_2x2Block_VMS_Hyperelasticity::get_traction(
-    const int &ebc_id,
-    const Vector_3 &pt, const double &tt, const Vector_3 &n_out) const
-{
-  return LoadData::surface_traction( ebc_id, pt, tt, n_out );
 }
 
 // EOF
