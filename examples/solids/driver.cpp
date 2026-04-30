@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
   auto locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
   auto fNode = SYS_T::make_unique<FEANode>(part_file, rank);
   auto locnbc = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
+  auto locnbc_dir = SYS_T::make_unique<ALocal_NBC>(part_file, rank);
   auto locnbc_disp =
     SYS_T::make_unique<ALocal_NBC>(part_file, rank, "/nbc_disp_driven");
   auto locebc = SYS_T::make_unique<ALocal_EBC>(part_file, rank);
@@ -235,8 +236,8 @@ int main(int argc, char *argv[])
   std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
         std::move(locIEN), std::move(locElem), std::move(fNode),
-        std::move(pNode_gassem), std::move(locnbc), std::move(locnbc_disp),
-        std::move(locebc), std::move(locAssem_ptr), nz_estimate);
+        std::move(pNode_gassem), std::move(locnbc), std::move(locebc),
+        std::move(locAssem_ptr), nz_estimate);
 
   // ===== Initial condition =====
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
@@ -252,7 +253,8 @@ int main(int argc, char *argv[])
 
   if( is_restart )
   {
-    SOLID_INIT::apply_initial_dirichlet_bc( gloAssem_ptr.get(), restart_time,
+    SOLID_INIT::apply_initial_dirichlet_bc( locnbc_dir.get(),
+        locnbc_disp.get(), restart_time,
         dot_disp.get(), dot_velo.get(), disp.get(), velo.get() );
   }
 
@@ -262,7 +264,8 @@ int main(int argc, char *argv[])
   gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
-  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
+  SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), locnbc_dir.get(),
+      locnbc_disp.get(), is_velo, is_pres,
       dot_disp.get(), dot_velo.get(), dot_pres.get(),
       disp.get(), velo.get(), pres.get(), initial_time, is_restart );
 
@@ -271,7 +274,8 @@ int main(int argc, char *argv[])
 
   auto nsolver = SYS_T::make_unique<PNonlinear_Solid_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(pNode_bc),
+      std::move(tm_galpha), std::move(pNode_bc), std::move(locnbc_dir),
+      std::move(locnbc_disp),
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
 
   nsolver->print_info();

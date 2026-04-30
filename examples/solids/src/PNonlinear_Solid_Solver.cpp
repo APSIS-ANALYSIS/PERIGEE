@@ -6,6 +6,8 @@ PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
     std::unique_ptr<APart_Node> in_pnode,
+    std::unique_ptr<ALocal_NBC> in_nbc_dir,
+    std::unique_ptr<ALocal_NBC> in_nbc_disp,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
     const int &input_renew_freq, const int &input_renew_threshold )
@@ -16,8 +18,15 @@ PNonlinear_Solid_Solver::PNonlinear_Solid_Solver(
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
-  pnode(std::move(in_pnode))
-{}
+  pnode(std::move(in_pnode)),
+  nbc_dir(std::move(in_nbc_dir)),
+  nbc_disp(std::move(in_nbc_disp))
+{
+  SYS_T::print_fatal_if( nbc_dir->get_dof_LID() != 4,
+      "Error: PNonlinear_Solid_Solver, nbc_dir dof should be 4.\n" );
+  SYS_T::print_fatal_if( nbc_disp->get_dof_LID() != 4,
+      "Error: PNonlinear_Solid_Solver, nbc_disp dof should be 4.\n" );
+}
 
 void PNonlinear_Solid_Solver::print_info() const
 {
@@ -59,6 +68,54 @@ void PNonlinear_Solid_Solver::update_solid_kinematics( const double &val,
   output->GhostUpdate();
 }
 
+void PNonlinear_Solid_Solver::Apply_Dirichlet_BC(
+    const ALocal_NBC * const &nbc_dir,
+    const ALocal_NBC * const &nbc_disp,
+    const double &time,
+    PDNSolution * const &dot_disp,
+    PDNSolution * const &dot_velo,
+    PDNSolution * const &disp,
+    PDNSolution * const &velo )
+{
+  for(int field=1; field<=3; ++field)
+  {
+    double uval = 0.0;
+    double vval = 0.0;
+    double aval = 0.0;
+
+    LoadData::disp_loading( field, time, uval, vval, aval );
+
+    const int num_ld = nbc_dir->get_Num_LD(field);
+    for(int ii=0; ii<num_ld; ++ii)
+    {
+      const PetscInt gid = nbc_dir->get_LDN(field, ii);
+      const PetscInt idx = gid * 3 + (field - 1);
+
+      VecSetValue(disp->solution, idx, 0.0, INSERT_VALUES);
+      VecSetValue(velo->solution, idx, 0.0, INSERT_VALUES);
+      VecSetValue(dot_disp->solution, idx, 0.0, INSERT_VALUES);
+      VecSetValue(dot_velo->solution, idx, 0.0, INSERT_VALUES);
+    }
+
+    const int num_disp_ld = nbc_disp->get_Num_LD(field);
+    for(int ii=0; ii<num_disp_ld; ++ii)
+    {
+      const PetscInt gid = nbc_disp->get_LDN(field, ii);
+      const PetscInt idx = gid * 3 + (field - 1);
+
+      VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
+      VecSetValue(velo->solution, idx, vval, INSERT_VALUES);
+      VecSetValue(dot_disp->solution, idx, vval, INSERT_VALUES);
+      VecSetValue(dot_velo->solution, idx, aval, INSERT_VALUES);
+    }
+  }
+
+  disp->Assembly_GhostUpdate();
+  velo->Assembly_GhostUpdate();
+  dot_disp->Assembly_GhostUpdate();
+  dot_velo->Assembly_GhostUpdate();
+}
+
 void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
     const bool &new_tangent_flag,
     const double &curr_time,
@@ -98,7 +155,8 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
   velo -> Copy( pre_velo );
   pres -> Copy( pre_pres );
 
-  gassem->Apply_Dirichlet_BC( curr_time + dt, dot_disp, dot_velo, disp, velo );
+  Apply_Dirichlet_BC( nbc_dir.get(), nbc_disp.get(), curr_time + dt,
+      dot_disp, dot_velo, disp, velo );
 
   // Define intermediate solutions
   auto dot_disp_alpha = SYS_T::make_unique<PDNSolution>(pre_dot_disp);
@@ -223,7 +281,8 @@ void PNonlinear_Solid_Solver::GenAlpha_Seg_solve_Solid(
 
   }while( nl_counter < nmaxits && relative_error > nr_tol && residual_norm > na_tol );
 
-  gassem->Apply_Dirichlet_BC( curr_time + dt, dot_disp, dot_velo, disp, velo );
+  Apply_Dirichlet_BC( nbc_dir.get(), nbc_disp.get(), curr_time + dt,
+      dot_disp, dot_velo, disp, velo );
 
   Print_convergence_info(nl_counter, relative_error, residual_norm);
 

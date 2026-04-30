@@ -7,6 +7,7 @@
 // ============================================================================
 #include "PDNSolution_Solid.hpp"
 #include "PGAssem_Solid_FEM.hpp"
+#include "PNonlinear_Solid_Solver.hpp"
 #include "PLinear_Solver_PETSc.hpp"
 
 namespace SOLID_INIT
@@ -89,17 +90,21 @@ namespace SOLID_INIT
     }
   }
 
-  inline void apply_initial_dirichlet_bc( PGAssem_Solid_FEM * const gloAssem,
+  inline void apply_initial_dirichlet_bc( const ALocal_NBC * const &nbc_dir,
+      const ALocal_NBC * const &nbc_disp,
       const double &time,
       PDNSolution * const &dot_disp,
       PDNSolution * const &dot_velo,
       PDNSolution * const &disp,
       PDNSolution * const &velo )
   {
-    gloAssem->Apply_Dirichlet_BC( time, dot_disp, dot_velo, disp, velo );
+    PNonlinear_Solid_Solver::Apply_Dirichlet_BC( nbc_dir, nbc_disp, time,
+        dot_disp, dot_velo, disp, velo );
   }
 
   inline void initialize_dot_solution( PGAssem_Solid_FEM * const gloAssem,
+      const ALocal_NBC * const &nbc_dir,
+      const ALocal_NBC * const &nbc_disp,
       const IS &is_velo, const IS &is_pres,
       PDNSolution * const &dot_disp,
       PDNSolution * const &dot_velo,
@@ -112,7 +117,7 @@ namespace SOLID_INIT
   {
     if(is_restart) return;
 
-    apply_initial_dirichlet_bc( gloAssem, initial_time,
+    apply_initial_dirichlet_bc( nbc_dir, nbc_disp, initial_time,
         dot_disp, dot_velo, disp, velo );
 
     SYS_T::commPrint("===> Assembly mass matrix and residual vector.\n");

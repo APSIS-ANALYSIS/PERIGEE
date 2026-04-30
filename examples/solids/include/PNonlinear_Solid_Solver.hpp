@@ -13,6 +13,8 @@
 #include "Matrix_PETSc.hpp"
 #include "PDNSolution.hpp"
 #include "APart_Node.hpp"
+#include "ALocal_NBC.hpp"
+#include "LoadData.hpp"
 
 class PNonlinear_Solid_Solver
 {
@@ -23,6 +25,8 @@ class PNonlinear_Solid_Solver
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
         std::unique_ptr<APart_Node> in_pnode,
+        std::unique_ptr<ALocal_NBC> in_nbc_dir,
+        std::unique_ptr<ALocal_NBC> in_nbc_disp,
         const double &input_nrtol, const double &input_natol,
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq, const int &input_renew_threshold );
@@ -34,6 +38,15 @@ class PNonlinear_Solid_Solver
     void print_info() const;
 
     void print_lsolver_info() const {lsolver->print_info();}
+
+    static void Apply_Dirichlet_BC(
+        const ALocal_NBC * const &nbc_dir,
+        const ALocal_NBC * const &nbc_disp,
+        const double &time,
+        PDNSolution * const &dot_disp,
+        PDNSolution * const &dot_velo,
+        PDNSolution * const &disp,
+        PDNSolution * const &velo );
 
     void GenAlpha_Seg_solve_Solid(
         const bool &new_tangent_flag,
@@ -64,6 +77,9 @@ class PNonlinear_Solid_Solver
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<const APart_Node> pnode;
+    const std::unique_ptr<const ALocal_NBC> nbc_dir;
+    const std::unique_ptr<const ALocal_NBC> nbc_disp;
+
     void Print_convergence_info( const int &count,
         const double &rel_err, const double &abs_err ) const
     {
