@@ -188,7 +188,6 @@ int main(int argc, char *argv[])
   auto pmat = SYS_T::make_unique<Matrix_PETSc>(pNode.get(), locnbc.get());
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
-
   // ===== Generalized-alpha =====
   SYS_T::commPrint("===> Setup the Generalized-alpha time scheme.\n");
 
@@ -222,6 +221,12 @@ int main(int argc, char *argv[])
   auto dot_velo = PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
   auto dot_pres = PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
 
+  SOLID_INIT::initialize_solution_state( is_restart,
+      restart_index, restart_time, restart_step,
+      restart_u_name, restart_v_name, restart_p_name,
+      disp, velo, pres, dot_disp, dot_velo, dot_pres,
+      initial_index, initial_time, initial_step );
+
   // ===== Global Assembly Routine =====
   std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
@@ -232,12 +237,6 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem_ptr->Fix_nonzero_err_str();
   gloAssem_ptr->Clear_KG();
-
-  SOLID_INIT::initialize_solution_state( is_restart,
-      restart_index, restart_time, restart_step,
-      restart_u_name, restart_v_name, restart_p_name,
-      disp, velo, pres, dot_disp, dot_velo, dot_pres,
-      initial_index, initial_time, initial_step );
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
   SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(),
@@ -270,7 +269,6 @@ int main(int argc, char *argv[])
       std::move(dot_disp), std::move(dot_velo), std::move(dot_pres),
       std::move(disp), std::move(velo), std::move(pres),
       std::move(timeinfo) );
-
 
   // Ensure PETSc objects are destroyed before PetscFinalize
   tsolver.reset();
