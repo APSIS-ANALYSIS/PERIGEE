@@ -15,8 +15,7 @@
 #include "Matrix_PETSc.hpp"
 #include "PDNTimeStep.hpp"
 #include "PDNSolution_NS.hpp"
-#include "PDNSolution_V.hpp"
-#include "PDNSolution_P.hpp"
+#include "PDNSolution.hpp"
 #include "ALocal_InflowBC.hpp"
 #include "Matrix_Free_Tools_AccurateA.hpp"
 
