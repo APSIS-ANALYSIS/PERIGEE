@@ -121,10 +121,8 @@ namespace SOLID_INIT
     VecGetSubVector(dot_vp, is_velo, &sol_v);
     VecGetSubVector(dot_vp, is_pres, &sol_p);
 
-    VecSet(dot_velo->solution, 0.0);
-    VecSet(dot_pres->solution, 0.0);
-    dot_velo->Assembly_GhostUpdate();
-    dot_pres->Assembly_GhostUpdate();
+    dot_velo->ScaleValue(0.0);
+    dot_pres->ScaleValue(0.0);
 
     dot_velo->PlusAX( sol_v, 1.0 );
     dot_pres->PlusAX( sol_p, 1.0 );
