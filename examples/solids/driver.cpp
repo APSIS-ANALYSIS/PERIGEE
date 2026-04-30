@@ -238,6 +238,10 @@ int main(int argc, char *argv[])
         std::move(pNode_gassem), std::move(locnbc), std::move(locebc),
         std::move(locAssem_ptr), nz_estimate);
 
+  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
+  gloAssem_ptr->Fix_nonzero_err_str();
+  gloAssem_ptr->Clear_KG();
+
   // ===== Initial condition =====
   auto pNode_sol = SYS_T::make_unique<APart_Node>(part_file, rank);
 
@@ -249,10 +253,6 @@ int main(int argc, char *argv[])
       restart_u_name, restart_v_name, restart_p_name,
       disp, velo, pres, dot_disp, dot_velo, dot_pres,
       initial_index, initial_time, initial_step );
-
-  SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
-  gloAssem_ptr->Fix_nonzero_err_str();
-  gloAssem_ptr->Clear_KG();
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
   SOLID_INIT::initialize_dot_solution( gloAssem_ptr.get(), is_velo, is_pres,
