@@ -47,42 +47,16 @@ namespace LoadData
   // --------------------------------------------------------------------------
   // disp_loading
   //   Prescribed displacement-driven loading for Dirichlet nodes.
-  //   field = 1, 2, 3 denotes x-, y-, z-direction displacement, respectively.
-  //   disp is the imposed displacement value; velo and acce are its first and
-  //   second time derivatives used to set dot_disp and dot_velo consistently.
+  //   disp, velo, and acce are returned for x-, y-, and z-directions together.
+  //   Their first and second time derivatives are used to set dot_disp and
+  //   dot_velo consistently.
   // --------------------------------------------------------------------------
-  inline void disp_loading( const int &field, const double &tt,
-      double &disp, double &velo, double &acce )
+  inline void disp_loading( const double &tt,
+      Vector_3 &disp, Vector_3 &velo, Vector_3 &acce )
   {
-    switch(field)
-    {
-      // x direction
-      case 1:
-        disp = 0.0;
-        velo = 0.0;
-        acce = 0.0;
-        break;
-
-      // y direction
-      case 2:
-        disp = 0.0;
-        velo = 0.0;
-        acce = 0.0;
-        break;
-
-      // z direction
-      case 3:
-        disp = tt;
-        velo = 1.0;
-        acce = 0.0;
-        break;
-
-      default:
-        disp = 0.0;
-        velo = 0.0;
-        acce = 0.0;
-        break;
-    }
+    disp = Vector_3(0.0, 0.0, tt);
+    velo = Vector_3(0.0, 0.0, 1.0);
+    acce = Vector_3(0.0, 0.0, 0.0);
   }
 }
 
