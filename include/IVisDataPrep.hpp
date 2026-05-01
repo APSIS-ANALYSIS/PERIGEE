@@ -79,6 +79,24 @@ class IVisDataPrep
       SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");
     }
 
+
+    // -------------------------------------------------------------------
+    // ! input gives three solution names for displacement, pressure,
+    //   and velocity. This is used when these solutions are stored as
+    //   separate petsc binary vectors on disk.
+    // -------------------------------------------------------------------
+    virtual void get_pointArray(
+        const std::string &disp_solution_file_name,
+        const std::string &pres_solution_file_name,
+        const std::string &velo_solution_file_name,
+        const std::vector<int> &analysis_node_mapping,
+        const std::vector<int> &post_node_mapping,
+        const APart_Node * const &nNode_ptr,
+        double ** &pointArrays ) const
+    {
+      SYS_T::print_fatal("Warning: get_pointArray is not implemented.\n");
+    }
+
     // ------------------------------------------------------------------------
     // ! input gives three solution names for the disp, pres, and velo
     // respectively. The kinematic variables (i.e. disp and velo) were

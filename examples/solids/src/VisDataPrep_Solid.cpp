@@ -23,22 +23,21 @@ VisDataPrep_Solid::VisDataPrep_Solid()
 }
 
 void VisDataPrep_Solid::get_pointArray(
-    const std::vector<std::string> solution_file_names,
+    const std::string &disp_solution_file_name,
+    const std::string &pres_solution_file_name,
+    const std::string &velo_solution_file_name,
     const std::vector<int> &analysis_node_mapping,
     const std::vector<int> &post_node_mapping,
     const APart_Node * const &nNode_ptr,
     double ** &pointArrays ) const
 {
-  SYS_T::print_fatal_if(solution_file_names.size() != 3,
-      "Error: VisDataPrep_Solid expects three solution files (disp, pres, velo).\n");
-
-  PostVectSolution pvsolu_disp(solution_file_names[0],
+  PostVectSolution pvsolu_disp(disp_solution_file_name,
       analysis_node_mapping, post_node_mapping, nNode_ptr, 3);
 
-  PostVectSolution pvsolu_pres(solution_file_names[1],
+  PostVectSolution pvsolu_pres(pres_solution_file_name,
       analysis_node_mapping, post_node_mapping, nNode_ptr, 1);
 
-  PostVectSolution pvsolu_velo(solution_file_names[2],
+  PostVectSolution pvsolu_velo(velo_solution_file_name,
       analysis_node_mapping, post_node_mapping, nNode_ptr, 3);
 
   const int ntotal = nNode_ptr->get_nlocghonode();

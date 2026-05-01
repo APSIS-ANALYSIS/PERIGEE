@@ -22,7 +22,9 @@ class VisDataPrep_Solid : public IVisDataPrep
     { return pt_array_len[ii]; }
 
     virtual void get_pointArray(
-        const std::vector<std::string> solution_file_names,
+        const std::string &disp_solution_file_name,
+        const std::string &pres_solution_file_name,
+        const std::string &velo_solution_file_name,
         const std::vector<int> &analysis_node_mapping,
         const std::vector<int> &post_node_mapping,
         const APart_Node * const &nNode_ptr,

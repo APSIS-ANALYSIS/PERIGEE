@@ -134,11 +134,8 @@ int main( int argc, char * argv[] )
         time, disp_name_to_read.c_str(), pres_name_to_read.c_str(),
         velo_name_to_read.c_str(), name_to_write.c_str() );
 
-    std::vector<std::string> sol_names { disp_name_to_read, 
-      pres_name_to_read, velo_name_to_read };
-
-    visprep->get_pointArray(sol_names, anode_mapping, pnode_mapping,
-        pNode.get(), solArrays);
+    visprep->get_pointArray(disp_name_to_read, pres_name_to_read,
+        velo_name_to_read, anode_mapping, pnode_mapping, pNode.get(), solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(), visprep.get(),
         element.get(), quad.get(), solArrays, epart_map, rank, size,
