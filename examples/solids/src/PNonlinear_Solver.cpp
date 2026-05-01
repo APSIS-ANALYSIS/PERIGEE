@@ -82,25 +82,45 @@ void PNonlinear_Solver::apply_disp_loading(
     PDNSolution * const &disp,
     PDNSolution * const &velo ) const
 {
-  for(int field=1; field<=3; ++field)
+  Vector_3 uval;
+  Vector_3 vval;
+  Vector_3 aval;
+  LoadData::disp_loading( time, uval, vval, aval );
+
+  const int num_disp_ld_x = nbc_disp->get_Num_LD(1);
+  for(int ii=0; ii<num_disp_ld_x; ++ii)
   {
-    double uval = 0.0;
-    double vval = 0.0;
-    double aval = 0.0;
+    const PetscInt gid = nbc_disp->get_LDN(1, ii);
+    const PetscInt idx = gid * 3;
 
-    LoadData::disp_loading( field, time, uval, vval, aval );
+    VecSetValue(disp->solution, idx, uval.x(), INSERT_VALUES);
+    VecSetValue(velo->solution, idx, vval.x(), INSERT_VALUES);
+    VecSetValue(dot_disp->solution, idx, vval.x(), INSERT_VALUES);
+    VecSetValue(dot_velo->solution, idx, aval.x(), INSERT_VALUES);
+  }
 
-    const int num_disp_ld = nbc_disp->get_Num_LD(field);
-    for(int ii=0; ii<num_disp_ld; ++ii)
-    {
-      const PetscInt gid = nbc_disp->get_LDN(field, ii);
-      const PetscInt idx = gid * 3 + (field - 1);
+  const int num_disp_ld_y = nbc_disp->get_Num_LD(2);
+  for(int ii=0; ii<num_disp_ld_y; ++ii)
+  {
+    const PetscInt gid = nbc_disp->get_LDN(2, ii);
+    const PetscInt idx = gid * 3 + 1;
 
-      VecSetValue(disp->solution, idx, uval, INSERT_VALUES);
-      VecSetValue(velo->solution, idx, vval, INSERT_VALUES);
-      VecSetValue(dot_disp->solution, idx, vval, INSERT_VALUES);
-      VecSetValue(dot_velo->solution, idx, aval, INSERT_VALUES);
-    }
+    VecSetValue(disp->solution, idx, uval.y(), INSERT_VALUES);
+    VecSetValue(velo->solution, idx, vval.y(), INSERT_VALUES);
+    VecSetValue(dot_disp->solution, idx, vval.y(), INSERT_VALUES);
+    VecSetValue(dot_velo->solution, idx, aval.y(), INSERT_VALUES);
+  }
+
+  const int num_disp_ld_z = nbc_disp->get_Num_LD(3);
+  for(int ii=0; ii<num_disp_ld_z; ++ii)
+  {
+    const PetscInt gid = nbc_disp->get_LDN(3, ii);
+    const PetscInt idx = gid * 3 + 2;
+
+    VecSetValue(disp->solution, idx, uval.z(), INSERT_VALUES);
+    VecSetValue(velo->solution, idx, vval.z(), INSERT_VALUES);
+    VecSetValue(dot_disp->solution, idx, vval.z(), INSERT_VALUES);
+    VecSetValue(dot_velo->solution, idx, aval.z(), INSERT_VALUES);
   }
 
   disp->Assembly_GhostUpdate();
