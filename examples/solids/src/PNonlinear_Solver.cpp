@@ -82,9 +82,7 @@ void PNonlinear_Solver::apply_disp_loading(
     PDNSolution * const &disp,
     PDNSolution * const &velo ) const
 {
-  Vector_3 uval;
-  Vector_3 vval;
-  Vector_3 aval;
+  Vector_3 uval, vval, aval;
   LoadData::disp_loading( time, uval, vval, aval );
 
   const int num_disp_ld_x = nbc_disp->get_Num_LD(1);
