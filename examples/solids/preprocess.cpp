@@ -219,13 +219,11 @@ int main( int argc, char * argv[] )
     part -> write( part_file );
 
     // Partition Nodal BC and write to h5 file
-    auto nbcpart = SYS_T::make_unique<NBC_Partition>(
-        part.get(), mnindex.get(), nbc_list );
+    auto nbcpart = SYS_T::make_unique<NBC_Partition>( part.get(), mnindex.get(), nbc_list );
     nbcpart->write_hdf5( part_file );
 
     // Partition displacement-driven nodes into a separate nbc group.
-    auto nbc_disp_part = SYS_T::make_unique<NBC_Partition>(
-        part.get(), mnindex.get(), nbc_disp_list );
+    auto nbc_disp_part = SYS_T::make_unique<NBC_Partition>( part.get(), mnindex.get(), nbc_disp_list );
     nbc_disp_part->write_hdf5( part_file, "/nbc_disp_driven" );
 
     // Partition Elemental BC and write to h5 file
