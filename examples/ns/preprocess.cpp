@@ -303,8 +303,6 @@ int main( int argc, char * argv[] )
   cout<<"The maximum / minimum of local node is: ";
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
-  // Finalize the code and exit
-
   return EXIT_SUCCESS;
 }
 
