@@ -24,7 +24,7 @@ class EBC_Partition_outflow : public EBC_Partition
     EBC_Partition_outflow( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc,
-        const std::vector<INodalBC *> &nbc_list );
+        const std::vector<std::unique_ptr<INodalBC>> &nbc_list );
 
     ~EBC_Partition_outflow() override = default;
 

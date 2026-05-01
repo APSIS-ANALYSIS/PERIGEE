@@ -18,7 +18,7 @@ class NBC_Partition_MF : public NBC_Partition
   public:
     NBC_Partition_MF( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
-        const std::vector<INodalBC *> &nbc_list,
+        const std::vector<std::unique_ptr<INodalBC>> &nbc_list,
         const std::vector< std::vector<int> > &grid2id );
 
     // If the grid2id mapper is not provided for the constructor, we assume that
@@ -26,7 +26,7 @@ class NBC_Partition_MF : public NBC_Partition
     // for 0 <= mm < dof
     NBC_Partition_MF( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
-        const std::vector<INodalBC *> &nbc_list );
+        const std::vector<std::unique_ptr<INodalBC>> &nbc_list );
 
     ~NBC_Partition_MF() override;
 

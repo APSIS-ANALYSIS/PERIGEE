@@ -427,29 +427,29 @@ int main( int argc, char * argv[] )
   // Physical NodalBC
   std::cout<<"===== Boundary Conditions =====\n";
   std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
-  std::vector<INodalBC *> NBC_list_p( 1, nullptr );
-  std::vector<INodalBC *> NBC_list_v( 3, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list_p( 1 );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list_v( 3 );
 
   // Here we assumed that the pressure mesh fluid nodal indices are identical to
   // that in the velocity mesh.
-  NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
+  NBC_list_p[0] = SYS_T::make_unique<NodalBC_3D_FSI>( geo_f_file, nFunc_p, fsiBC_type );
 
   for( int ii=0; ii<3; ++ii )
-    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+    NBC_list_v[ii] = SYS_T::make_unique<NodalBC_3D_FSI>( geo_f_file, geo_s_file, sur_f_file_wall, 
         sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
         nFunc_v, ii, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
-  std::vector<INodalBC *> meshBC_list( 3, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> meshBC_list( 3 );
 
   std::vector<std::string> meshdir_file_list { geo_s_file };
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
-  meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
-  meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
-  meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[0] = SYS_T::make_unique<NodalBC>( meshdir_file_list, nFunc_v );
+  meshBC_list[1] = SYS_T::make_unique<NodalBC>( meshdir_file_list, nFunc_v );
+  meshBC_list[2] = SYS_T::make_unique<NodalBC>( meshdir_file_list, nFunc_v );
 
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
@@ -571,12 +571,6 @@ int main( int argc, char * argv[] )
   }
 
   // Clean up the memory
-  for(auto &it_nbc : NBC_list_v) delete it_nbc;
-  
-  for(auto &it_nbc : NBC_list_p) delete it_nbc;
-
-  for(auto &it_nbc : meshBC_list) delete it_nbc;
-
   delete ebc; delete InFBC; delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v;
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 

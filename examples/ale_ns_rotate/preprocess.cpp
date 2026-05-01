@@ -315,7 +315,7 @@ int main( int argc, char * argv[] )
   }
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
-  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list( dofMat );
 
   std::vector<std::string> dir_list {};
   std::vector<std::string> weak_list {};
@@ -334,10 +334,10 @@ int main( int argc, char * argv[] )
   else
     SYS_T::print_fatal("Unknown wall model type.");
 
-  NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[0] = SYS_T::make_unique<NodalBC>( nFunc );
+  NBC_list[1] = SYS_T::make_unique<NodalBC>( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[2] = SYS_T::make_unique<NodalBC>( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[3] = SYS_T::make_unique<NodalBC>( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
 
   // Rotated BC info
   INodalBC * RotBC = new NodalBC_3D_rotated( rotated_sur_file, fixed_geo_file,
@@ -602,8 +602,6 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto &it_nbc : NBC_list) delete it_nbc;
-
   delete InFBC; delete RotBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete IEN;
 

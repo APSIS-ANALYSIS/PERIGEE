@@ -25,7 +25,7 @@ class NBC_Partition
     // ------------------------------------------------------------------------
     NBC_Partition( const IPart * const &part,
        const Map_Node_Index * const &mnindex,
-       const std::vector<INodalBC *> &nbc_list );
+       const std::vector<std::unique_ptr<INodalBC>> &nbc_list );
 
     virtual ~NBC_Partition() = default;
 
