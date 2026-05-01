@@ -271,14 +271,14 @@ int main(int argc, char *argv[])
   else SYS_T::print_fatal("Error: Unknown wall model type.\n");
 
   // ===== Initial condition =====
-  std::unique_ptr<PDNSolution> base =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 );
+  std::unique_ptr<PDNSolution> base = SYS_T::make_unique<PDNSolution_NS>( 
+      pNode.get(), fNode.get(), locinfnbc.get(), 1 );
 
   std::unique_ptr<PDNSolution> sol = nullptr;
   std::unique_ptr<PDNSolution> dot_sol = nullptr;
-  NS_INIT::initialize_solution_state(pNode.get(), is_restart, restart_index, restart_time,
-      restart_step, restart_name, sol, dot_sol,
-      initial_index, initial_time, initial_step);
+  NS_INIT::initialize_solution_state(pNode.get(), is_restart, 
+      restart_index, restart_time, restart_step, restart_name, 
+      sol, dot_sol, initial_index, initial_time, initial_step);
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
