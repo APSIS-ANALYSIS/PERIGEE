@@ -6,6 +6,7 @@
 // Author: Xinhai Yue
 // ============================================================================
 #include "IEN_FEM.hpp"
+#include "VTK_Tools.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "NodalBC.hpp"
@@ -152,8 +153,9 @@ int main( int argc, char * argv[] )
     mytimer->Reset();
     mytimer->Start();
     
-    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
-        ctrlPts, proc_rank, cpu_size, elemType, {0, dofMat, true, "linearPDE"} );
+    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), 
+        mnindex.get(), IEN.get(), ctrlPts, proc_rank, cpu_size, elemType, 
+        Field_Property(0, dofMat, true, "linearPDE") );
 
     part -> print_part_loadbalance_edgecut();
 

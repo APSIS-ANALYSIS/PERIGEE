@@ -2,6 +2,7 @@
 #define SI_ROTATION_INFO_HPP
 
 #include "Vector_3.hpp"
+#include "Math_Tools.hpp"
 
 class SI_rotation_info
 {
