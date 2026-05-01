@@ -245,12 +245,10 @@ int main(int argc, char *argv[])
 
   nsolver->print_info();
 
-  // ===== Time step info =====
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step);
-
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_Solver>( std::move(nsolver), 
-      sol_bName, sol_record_freq, ttan_renew_freq, final_time );
+      sol_bName, sol_record_freq, ttan_renew_freq, final_time,
+      initial_index, initial_time, initial_step );
 
   tsolver->print_info();
 
@@ -258,8 +256,7 @@ int main(int argc, char *argv[])
 
   tsolver->TM_Solid_GenAlpha( is_restart,
       std::move(dot_disp), std::move(dot_velo), std::move(dot_pres),
-      std::move(disp), std::move(velo), std::move(pres),
-      std::move(timeinfo) );
+      std::move(disp), std::move(velo), std::move(pres) );
 
   // Ensure PETSc objects are destroyed before PetscFinalize
   tsolver.reset();
