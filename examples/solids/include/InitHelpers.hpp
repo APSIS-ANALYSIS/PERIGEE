@@ -11,9 +11,8 @@
 
 namespace SOLID_INIT
 {
-  inline void initialize_solution_state( const bool is_restart,
-      const int restart_index,
-      const double restart_time, const double restart_step,
+  inline void initialize_solution_state( bool is_restart,
+      int restart_index, double restart_time, double restart_step,
       const std::string &restart_disp_name,
       const std::string &restart_velo_name,
       const std::string &restart_pres_name,
@@ -70,14 +69,14 @@ namespace SOLID_INIT
     }
   }
 
-  inline void initialize_dot_solution( PGAssem_Solid_FEM * const gloAssem,
+  inline void initialize_dot_solution( bool is_restart, 
+      PGAssem_Solid_FEM * const gloAssem,
       PDNSolution * const &dot_disp,
       PDNSolution * const &dot_velo,
       PDNSolution * const &dot_pres,
       PDNSolution * const &disp,
       PDNSolution * const &velo,
-      PDNSolution * const &pres,
-      const bool is_restart )
+      PDNSolution * const &pres )
   {
     if(is_restart) return;
 

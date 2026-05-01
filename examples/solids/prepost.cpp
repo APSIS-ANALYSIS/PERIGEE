@@ -88,7 +88,6 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("post_node_mapping");
 
   cout<<"=== Start Partition ... \n";
-
   auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
