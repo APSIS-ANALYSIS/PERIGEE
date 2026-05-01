@@ -12,7 +12,6 @@
 #include "IPart.hpp"
 #include "INodalBC.hpp"
 #include "Map_Node_Index.hpp"
-#include <memory>
 
 class NBC_Partition
 {

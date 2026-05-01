@@ -15,7 +15,6 @@
 // Date: Mar. 18 2019
 // ==================================================================
 #include "EBC_Partition.hpp"
-#include <memory>
 #include "INodalBC.hpp"
 
 class EBC_Partition_outflow : public EBC_Partition

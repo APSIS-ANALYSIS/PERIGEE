@@ -13,7 +13,6 @@
 // Date: Dec. 19 2021
 // ============================================================================
 #include "EBC_Partition.hpp"
-#include <memory>
 #include "INodalBC.hpp"
 
 class EBC_Partition_outflow_MF : public EBC_Partition
