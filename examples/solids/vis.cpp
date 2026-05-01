@@ -115,8 +115,9 @@ int main( int argc, char * argv[] )
   for(int ii=0; ii<visprep->get_ptarray_size(); ++ii)
     solArrays[ii] = new double [pNode->get_nlocghonode() * visprep->get_ptarray_comp_length(ii)];
 
-  auto vtk_w = SYS_T::make_unique<VTK_Writer_Solid>( GMIptr->get_nElem(),
-      GMIptr->get_nLocBas(), element_part_file, std::move(matmodel) );
+  auto vtk_w = SYS_T::make_unique<VTK_Writer_Solid>( std::move(matmodel) );
+
+  const auto epart_map = VIS_T::read_epart( element_part_file, GMIptr->get_nElem() );
 
   const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
   const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
@@ -140,7 +141,7 @@ int main( int argc, char * argv[] )
         pNode.get(), solArrays);
 
     vtk_w->writeOutput( fNode.get(), locIEN.get(), locElem.get(), visprep.get(),
-        element.get(), quad.get(), solArrays, rank, size,
+        element.get(), quad.get(), solArrays, epart_map, rank, size,
         time * dt, out_bname, name_to_write, isXML, isRef );
   }
 

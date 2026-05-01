@@ -1,13 +1,10 @@
 #include "VTK_Writer_Solid.hpp"
 #include "Sys_Tools.hpp"
 
-VTK_Writer_Solid::VTK_Writer_Solid( const int &in_nelem,
-    const int &in_nlocbas, const std::string &epart_file,
+VTK_Writer_Solid::VTK_Writer_Solid(
     std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel )
-: nLocBas( in_nlocbas ), nElem( in_nelem ),
-  matmodel(std::move(in_matmodel))
+: matmodel(std::move(in_matmodel))
 {
-  epart_map = VIS_T::read_epart( epart_file, nElem );
 }
 
 void VTK_Writer_Solid::interpolateJ_Cauchy( const int * const &ptid,
@@ -17,6 +14,7 @@ void VTK_Writer_Solid::interpolateJ_Cauchy( const int * const &ptid,
     vtkDoubleArray * const &detFData,
     vtkDoubleArray * const &cauchyData ) const
 {
+  const int nLocBas = elem -> get_nLocBas();
   const int nqp = elem->get_numQuapts();
 
   std::vector<double> ux(nLocBas, 0.0), uy(nLocBas, 0.0), uz(nLocBas, 0.0);
@@ -70,6 +68,7 @@ void VTK_Writer_Solid::writeOutput(
     FEAElement * const &elemptr,
     const IQuadPts * const &quad,
     const double * const * const &pointArrays,
+    const std::vector<int> &epart_map,
     const int &rank, const int &size,
     const double &sol_time,
     const std::string &outputBName,
@@ -77,6 +76,8 @@ void VTK_Writer_Solid::writeOutput(
     const bool &isXML,
     const bool &is_ref )
 {
+  const int nLocBas = elemptr -> get_nLocBas();
+  
   // Allocate VTK gridData object
   vtkUnstructuredGrid * gridData = vtkUnstructuredGrid::New();
 

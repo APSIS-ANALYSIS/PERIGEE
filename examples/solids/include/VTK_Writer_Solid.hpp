@@ -22,8 +22,7 @@
 class VTK_Writer_Solid
 {
   public:
-    VTK_Writer_Solid( const int &in_nelem,
-        const int &in_nlocbas, const std::string &epart_file,
+    VTK_Writer_Solid( 
         std::unique_ptr<MaterialModel_Mixed_Elasticity> in_matmodel );
 
     ~VTK_Writer_Solid() = default;
@@ -36,6 +35,7 @@ class VTK_Writer_Solid
         FEAElement * const &elemptr,
         const IQuadPts * const &quad,
         const double * const * const &pointArrays,
+        const std::vector<int> &epart_map,
         const int &rank, const int &size,
         const double &sol_time,
         const std::string &outputBName,
@@ -44,10 +44,7 @@ class VTK_Writer_Solid
         const bool &is_ref );
 
   private:
-    const int nLocBas, nElem;
     std::unique_ptr<MaterialModel_Mixed_Elasticity> matmodel;
-
-    std::vector<int> epart_map;
 
     void interpolateJ_Cauchy( const int * const &ptid,
         const double * const &dispData,
