@@ -18,7 +18,10 @@ class PTime_Solver
         const std::string &input_name,
         const int &input_record_freq,
         const int &input_renew_tang_freq,
-        const double &input_final_time );
+        const double &input_final_time,
+        const int &initial_index,
+        const double &initial_time,
+        const double &initial_step );
 
     ~PTime_Solver() = default;
 
@@ -33,8 +36,7 @@ class PTime_Solver
         std::unique_ptr<PDNSolution> init_dot_pres,
         std::unique_ptr<PDNSolution> init_disp,
         std::unique_ptr<PDNSolution> init_velo,
-        std::unique_ptr<PDNSolution> init_pres,
-        std::unique_ptr<PDNTimeStep> time_info ) const;
+        std::unique_ptr<PDNSolution> init_pres );
 
   private:
     const double final_time;
@@ -43,6 +45,7 @@ class PTime_Solver
     const std::string pb_name;
 
     const std::unique_ptr<PNonlinear_Solver> nsolver;
+    std::unique_ptr<PDNTimeStep> time_info;
 
     std::string Name_Generator( const std::string &middle_name,
         const int &counter ) const;

@@ -5,10 +5,14 @@ PTime_Solver::PTime_Solver(
     const std::string &input_name,
     const int &input_record_freq,
     const int &input_renew_tang_freq,
-    const double &input_final_time )
+    const double &input_final_time,
+    const int &initial_index,
+    const double &initial_time,
+    const double &initial_step )
 : final_time(input_final_time), sol_record_freq(input_record_freq),
   renew_tang_freq(input_renew_tang_freq), pb_name(input_name),
-  nsolver(std::move(in_nsolver))
+  nsolver(std::move(in_nsolver)),
+  time_info(SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, initial_step))
 {}
 
 void PTime_Solver::print_info() const
@@ -47,8 +51,7 @@ void PTime_Solver::TM_Solid_GenAlpha(
     std::unique_ptr<PDNSolution> init_dot_pres,
     std::unique_ptr<PDNSolution> init_disp,
     std::unique_ptr<PDNSolution> init_velo,
-    std::unique_ptr<PDNSolution> init_pres,
-    std::unique_ptr<PDNTimeStep> time_info ) const
+    std::unique_ptr<PDNSolution> init_pres )
 {
   auto pre_dot_disp = SYS_T::make_unique<PDNSolution>(*init_dot_disp);
   auto pre_dot_velo = SYS_T::make_unique<PDNSolution>(*init_dot_velo);
