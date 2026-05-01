@@ -157,16 +157,16 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal Boundary Conditions, grouped by matrix dof.
-  std::vector<INodalBC *> nbc_list {};
+  std::vector<std::unique_ptr<INodalBC>> nbc_list {};
   nbc_list.reserve( dofMat );
-  nbc_list.push_back( new NodalBC( nFunc ) );
-  nbc_list.push_back( new NodalBC( sur_file_dir_x, nFunc ) );
-  nbc_list.push_back( new NodalBC( sur_file_dir_y, nFunc ) );
-  nbc_list.push_back( new NodalBC( sur_file_dir_z, nFunc ) );
+  nbc_list.push_back( SYS_T::make_unique<NodalBC>( nFunc ) );
+  nbc_list.push_back( SYS_T::make_unique<NodalBC>( sur_file_dir_x, nFunc ) );
+  nbc_list.push_back( SYS_T::make_unique<NodalBC>( sur_file_dir_y, nFunc ) );
+  nbc_list.push_back( SYS_T::make_unique<NodalBC>( sur_file_dir_z, nFunc ) );
 
-  std::vector<INodalBC *> nbc_disp_list {};
+  std::vector<std::unique_ptr<INodalBC>> nbc_disp_list {};
   nbc_disp_list.reserve( dofMat );
-  nbc_disp_list.push_back( new NodalBC( nFunc ) );
+  nbc_disp_list.push_back( SYS_T::make_unique<NodalBC>( nFunc ) );
 
   std::vector<std::string> nbc_disp_file {};
   nbc_disp_file.reserve( sur_file_dir_x.size() );
@@ -174,7 +174,7 @@ int main( int argc, char * argv[] )
   {
     if( is_disp_driven_x[ii] ) nbc_disp_file.push_back( sur_file_dir_x[ii] );
   }
-  nbc_disp_list.push_back( new NodalBC( nbc_disp_file, nFunc ) );
+  nbc_disp_list.push_back( SYS_T::make_unique<NodalBC>( nbc_disp_file, nFunc ) );
 
   nbc_disp_file.clear();
   nbc_disp_file.reserve( sur_file_dir_y.size() );
@@ -182,7 +182,7 @@ int main( int argc, char * argv[] )
   {
     if( is_disp_driven_y[ii] ) nbc_disp_file.push_back( sur_file_dir_y[ii] );
   }
-  nbc_disp_list.push_back( new NodalBC( nbc_disp_file, nFunc ) );
+  nbc_disp_list.push_back( SYS_T::make_unique<NodalBC>( nbc_disp_file, nFunc ) );
 
   nbc_disp_file.clear();
   nbc_disp_file.reserve( sur_file_dir_z.size() );
@@ -190,7 +190,7 @@ int main( int argc, char * argv[] )
   {
     if( is_disp_driven_z[ii] ) nbc_disp_file.push_back( sur_file_dir_z[ii] );
   }
-  nbc_disp_list.push_back( new NodalBC( nbc_disp_file, nFunc ) );
+  nbc_disp_list.push_back( SYS_T::make_unique<NodalBC>( nbc_disp_file, nFunc ) );
 
   auto ebc = SYS_T::make_unique<ElemBC_3D>( sur_file_neu, elemType );
   ebc -> resetSurIEN_outwardnormal( IEN.get() ); // reset IEN for outward normal calculations
@@ -259,8 +259,6 @@ int main( int argc, char * argv[] )
   std::cout<<"The maximum / minimum of local node is: ";
   std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
-  for(auto &it_nbc : nbc_list ) delete it_nbc;
-  for(auto &it_nbc : nbc_disp_list ) delete it_nbc;
 
   return EXIT_SUCCESS;
 }

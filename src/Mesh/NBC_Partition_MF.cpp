@@ -5,7 +5,7 @@
 
 NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const std::vector<INodalBC *> &nbc_list,
+    const std::vector<std::unique_ptr<INodalBC>> &nbc_list,
     const std::vector< std::vector<int> > &grid2id ) 
 : NBC_Partition(part, mnindex, nbc_list)
 { 
@@ -71,7 +71,7 @@ NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
 
 NBC_Partition_MF::NBC_Partition_MF( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const std::vector<INodalBC *> &nbc_list ) 
+    const std::vector<std::unique_ptr<INodalBC>> &nbc_list ) 
 : NBC_Partition(part, mnindex, nbc_list)
 { 
   const int dof = (int) nbc_list.size();

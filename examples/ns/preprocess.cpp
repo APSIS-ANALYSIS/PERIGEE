@@ -169,7 +169,7 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
-  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list( dofMat );
 
   std::vector<std::string> dir_list {};
   std::vector<std::string> weak_list {};
@@ -183,10 +183,10 @@ int main( int argc, char * argv[] )
   else
     SYS_T::print_fatal("Unknown wall model type.");
 
-  NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, nFunc );
+  NBC_list[0] = SYS_T::make_unique<NodalBC>( nFunc );
+  NBC_list[1] = SYS_T::make_unique<NodalBC>( dir_list, nFunc );
+  NBC_list[2] = SYS_T::make_unique<NodalBC>( dir_list, nFunc );
+  NBC_list[3] = SYS_T::make_unique<NodalBC>( dir_list, nFunc );
 
   // Inflow BC info
   std::vector< Vector_3 > inlet_outvec( sur_file_in.size() );
@@ -304,7 +304,6 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto &it_nbc : NBC_list) delete it_nbc;
 
   return EXIT_SUCCESS;
 }

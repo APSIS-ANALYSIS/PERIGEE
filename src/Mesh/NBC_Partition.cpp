@@ -5,7 +5,7 @@
 
 NBC_Partition::NBC_Partition( const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const std::vector<INodalBC *> &nbc_list ) : cpu_rank(part->get_cpu_rank())
+    const std::vector<std::unique_ptr<INodalBC>> &nbc_list ) : cpu_rank(part->get_cpu_rank())
 {
   const int dof = (int) nbc_list.size();
 

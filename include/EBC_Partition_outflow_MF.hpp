@@ -13,6 +13,7 @@
 // Date: Dec. 19 2021
 // ============================================================================
 #include "EBC_Partition.hpp"
+#include <memory>
 #include "INodalBC.hpp"
 
 class EBC_Partition_outflow_MF : public EBC_Partition
@@ -22,7 +23,7 @@ class EBC_Partition_outflow_MF : public EBC_Partition
     EBC_Partition_outflow_MF( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc,
-        const std::vector<INodalBC *> &nbc_list,
+        const std::vector<std::unique_ptr<INodalBC>> &nbc_list,
         const std::vector< std::vector<int> > &grid2id );
 
     ~EBC_Partition_outflow_MF() override = default;

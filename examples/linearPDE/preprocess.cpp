@@ -131,9 +131,9 @@ int main( int argc, char * argv[] )
   mnindex->write_hdf5("node_mapping");
 
   // Setup Nodal (Dirichlet type) boundary condition(s)
-  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list( dofMat );
   for(int ii = 0; ii < dofMat; ++ii)
-    NBC_list[ii] = new NodalBC( dir_list[ii], nFunc );
+    NBC_list[ii] = SYS_T::make_unique<NodalBC>( dir_list[ii], nFunc );
   
   // Setup Elemental (Neumann type) boundary condition(s)
   auto ebc = SYS_T::make_unique<ElemBC_3D>( neu_list, elemType );
@@ -199,7 +199,6 @@ int main( int argc, char * argv[] )
   cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
 
   // Finalize the code and exit
-  for(auto &it_nbc : NBC_list ) delete it_nbc;
 
   return EXIT_SUCCESS;
 }
