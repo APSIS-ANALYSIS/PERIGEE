@@ -380,7 +380,7 @@ void Gmsh_FileIO::write_interior_vtp( int index_sur,
 }
 
 void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
-  int index_sur, int index_vol, const bool &isf2e, const bool &is_slave ) const
+  int index_sur, int index_vol, bool isf2e, bool is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_vtp, surface index is wrong. \n");
@@ -576,7 +576,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
 void Gmsh_FileIO::write_vtp(const std::string &vtp_filename,
   const std::string &phy_name_sur, const std::string &phy_name_vol,
-  const bool &isf2e, const bool &is_slave) const
+  bool isf2e, bool is_slave) const
 {
   const int index_sur = VEC_T::get_pos(phy_2d_name, phy_name_sur);
   SYS_T::print_fatal_if(index_sur == -1,
@@ -690,7 +690,7 @@ void Gmsh_FileIO::write_each_vtu() const
 }
 
 void Gmsh_FileIO::write_vtu( const std::string &in_fname, 
-    const bool &isXML ) const
+    bool isXML ) const
 {
   std::cout<<"=== Gmsh_FileIO::write_vtu. \n";
   std::cout<<"    There are "<<num_phy_domain_3d
@@ -1396,7 +1396,7 @@ void Gmsh_FileIO::update_quadratic_hex_IEN( int index_3d )
 }
 
 void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
-    int index_sur, int index_vol, const bool &isf2e, const bool &is_slave ) const
+    int index_sur, int index_vol, bool isf2e, bool is_slave ) const
 {
   SYS_T::print_fatal_if( index_sur >= num_phy_domain_2d || index_sur < 0,
       "Error: Gmsh_FileIO::write_quadratic_sur_vtu, surface index is wrong. \n");
@@ -1590,7 +1590,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 
 void Gmsh_FileIO::write_quadratic_sur_vtu(const std::string &vtu_filename,
   const std::string &phy_name_sur, const std::string &phy_name_vol,
-  const bool &isf2e, const bool &is_slave) const
+  bool isf2e, bool is_slave) const
 {
   const int index_sur = VEC_T::get_pos(phy_2d_name, phy_name_sur);
   SYS_T::print_fatal_if(index_sur == -1,
