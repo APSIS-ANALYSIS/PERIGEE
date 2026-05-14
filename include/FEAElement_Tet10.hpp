@@ -35,8 +35,8 @@
 //
 // Date created: Nov. 3 2019
 // ==================================================================
+#include "FEAElement.hpp"
 #include "FEAElement_Triangle6_3D_der0.hpp"
-#include "FE_Tools.hpp"
 
 class FEAElement_Tet10 final : public FEAElement
 {

@@ -1,4 +1,5 @@
 #include "FEAElement_Hex27.hpp"
+#include "FE_Tools.hpp"
 
 FEAElement_Hex27::FEAElement_Hex27( int in_nqua ) : numQuapts( in_nqua ) ,
   quadrilateral_face( SYS_T::make_unique<FEAElement_Quad9_3D_der0>(numQuapts) )
