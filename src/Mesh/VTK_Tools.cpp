@@ -430,7 +430,7 @@ int VTK_T::read_num_cl( const std::string &filename )
   return numcels;
 }
 
-void VTK_T::add_int_PointData( vtkPointSet * const &grid_w,
+void VTK_T::add_int_PointData( vtkPointSet *grid_w,
     const std::vector<int> &ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_int_PointData data size does not match with the number of points.\n" );
@@ -447,7 +447,7 @@ void VTK_T::add_int_PointData( vtkPointSet * const &grid_w,
 }
 
 
-void VTK_T::add_double_PointData( vtkPointSet * const &grid_w,
+void VTK_T::add_double_PointData( vtkPointSet *grid_w,
     const std::vector<double> &ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_double_PointData data size does not match with the number of points.\n" );
@@ -464,7 +464,7 @@ void VTK_T::add_double_PointData( vtkPointSet * const &grid_w,
 }
 
 
-void VTK_T::add_Vector3_PointData( vtkPointSet * const &grid_w,
+void VTK_T::add_Vector3_PointData( vtkPointSet *grid_w,
     const std::vector<Vector_3> &ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_Vector3_PointData data size does not match with the number of points.\n" );
@@ -485,7 +485,7 @@ void VTK_T::add_Vector3_PointData( vtkPointSet * const &grid_w,
 }
 
 
-void VTK_T::add_int_CellData( vtkPointSet * const &grid_w,
+void VTK_T::add_int_CellData( vtkPointSet *grid_w,
     const std::vector<int> &cldata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_int_CellData data size does not match with the number of cells.\n" );
@@ -502,7 +502,7 @@ void VTK_T::add_int_CellData( vtkPointSet * const &grid_w,
 }
 
 
-void VTK_T::add_double_CellData( vtkPointSet * const &grid_w,
+void VTK_T::add_double_CellData( vtkPointSet *grid_w,
     const std::vector<double> &cldata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_double_CellData data size does not match with the number of cells.\n" );
@@ -520,7 +520,7 @@ void VTK_T::add_double_CellData( vtkPointSet * const &grid_w,
 
 
 void VTK_T::write_vtkPointSet( const std::string &filename,
-    vtkPointSet * const &grid_w, const bool &isXML )
+    vtkPointSet *grid_w, const bool &isXML )
 {
   if( grid_w -> GetDataObjectType() == VTK_UNSTRUCTURED_GRID )
   {
