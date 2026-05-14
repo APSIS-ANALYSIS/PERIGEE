@@ -10,13 +10,12 @@
 #include "IIEN.hpp"
 #include "Vector_3.hpp"
 
-#include "vtkTriangle.h"
-#include "vtkQuadraticTriangle.h"
-#include "vtkTetra.h"
-#include "vtkQuadraticTetra.h"
-#include "vtkPolyData.h"
+#include <array>
+#include <string>
+#include <vector>
 
-#include "tetgen.h"
+class vtkPolyData;
+class vtkUnstructuredGrid;
 
 namespace TET_T
 {
@@ -156,33 +155,7 @@ namespace TET_T
       const IIEN * const &vol_ien );
   
   // ================================================================
-  // 3. TetGen interface
-  // ----------------------------------------------------------------
-  // This set of tools convert the tetgenio object to vtu grid and vtp
-  // surface files with markers for the preprocess code to read.
-  // ================================================================
-  // Input: \para meshout: tetgenio object containing the mesh points 
-  //                      and cell connectivity.
-  //        \para fName: fName.vtu will be write on disk as the volumetric
-  //                     grid.
-  // ----------------------------------------------------------------
-  void tetgenio2vtu( const tetgenio &meshout, const std::string &fName );
-
-  // ----------------------------------------------------------------  
-  // Input: \para meshout: tetgenio object containing the mesh points 
-  //                      and cell connectivity.
-  //        \para fName: fName.vtp will be write on disk as the surface 
-  //                     grid.
-  //        \para bcmarker: the marker input in the tetgen input file
-  //                        specifying the boundary domain.
-  // Output: fName.bcmarker.vtp will be write on disk for the boundary
-  //         with marker bcmarker.
-  // ----------------------------------------------------------------
-  void tetgenio2vtp( const tetgenio &meshout, const std::string &fName,
-      const int &bcmarker );
-
-  // ================================================================
-  // 4. Tet4 class defines a four node linear tetrahedron object with 
+  // 3. Tet4 class defines a four node linear tetrahedron object with 
   // basic manipulations including checking the size, the aspect ratio,
   // and check the face index for given three nodal indices.
   // The object is defined by 12 double data: 
@@ -248,7 +221,7 @@ namespace TET_T
   };
 
   // ================================================================
-  // 5. Tetrahedral mesh checker. 
+  // 4. Tetrahedral mesh checker. 
   //    This routine will read in the mesh information: control points
   //    and IEN array, and check each element's quality and print
   //    necessary information.
