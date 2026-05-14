@@ -160,7 +160,7 @@ int main( int argc, char * argv[] )
     part -> print_part_loadbalance_edgecut();
 
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part hdf5 file
     part -> write( part_file );
@@ -186,19 +186,19 @@ int main( int argc, char * argv[] )
 
   }
   
-  cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
-  cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-  cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<endl;
+  std::cout<<"\n===> Mesh Partition Quality: "<<std::endl;
+  std::cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<std::endl;
+  std::cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<std::endl;
+  std::cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<std::endl;
+  std::cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<std::endl;
 
   const int maxpart_nlocalnode = VEC_T::max(list_nlocalnode);
   const int minpart_nlocalnode = VEC_T::min(list_nlocalnode);
 
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  std::cout<<"The maximum and minimum local node numbers are ";
+  std::cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<std::endl;
+  std::cout<<"The maximum / minimum of local node is: ";
+  std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
   return EXIT_SUCCESS;
 }
