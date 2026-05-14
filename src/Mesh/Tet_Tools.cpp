@@ -5,6 +5,13 @@
 #include "vtkUnstructuredGrid.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
+#include "vtkTriangle.h"
+#include "vtkQuadraticTriangle.h"
+#include "vtkTetra.h"
+#include "vtkQuadraticTetra.h"
+#include "vtkPolyData.h"
+
+#include "tetgen.h"
 
 void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,

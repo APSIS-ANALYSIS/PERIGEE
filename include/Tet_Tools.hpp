@@ -10,13 +10,13 @@
 #include "IIEN.hpp"
 #include "Vector_3.hpp"
 
-#include "vtkTriangle.h"
-#include "vtkQuadraticTriangle.h"
-#include "vtkTetra.h"
-#include "vtkQuadraticTetra.h"
-#include "vtkPolyData.h"
+#include <array>
+#include <string>
+#include <vector>
 
-#include "tetgen.h"
+class vtkPolyData;
+class vtkUnstructuredGrid;
+class tetgenio;
 
 namespace TET_T
 {
