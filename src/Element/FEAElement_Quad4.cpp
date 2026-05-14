@@ -1,4 +1,5 @@
 #include "FEAElement_Quad4.hpp"
+#include "FE_Tools.hpp"
 
 FEAElement_Quad4::FEAElement_Quad4( int in_nqua )
 : numQuapts( in_nqua )

@@ -1,4 +1,5 @@
 #include "FEAElement_Triangle6.hpp"
+#include "FE_Tools.hpp"
 
 FEAElement_Triangle6::FEAElement_Triangle6( int in_nqua )
 : numQuapts( in_nqua )

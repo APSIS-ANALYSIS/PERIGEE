@@ -1,4 +1,5 @@
 #include "FEAElement_Tet4.hpp"
+#include "FE_Tools.hpp"
 
 FEAElement_Tet4::FEAElement_Tet4( int in_nqua ) : numQuapts( in_nqua ),
   triangle_face( SYS_T::make_unique<FEAElement_Triangle3_3D_der0>(numQuapts) )

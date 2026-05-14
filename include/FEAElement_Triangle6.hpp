@@ -10,7 +10,6 @@
 // Date created: Nov. 28 2017
 // ==================================================================
 #include "FEAElement.hpp"
-#include "FE_Tools.hpp"
 
 class FEAElement_Triangle6 final : public FEAElement
 {
