@@ -154,11 +154,11 @@ int main( int argc, char * argv[] )
   // If we can still detect additional files on disk, throw an warning
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) ||
       SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_inlet, ".vtp")) )
-    cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
+    std::cout<<std::endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
 
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
       SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base, num_outlet, ".vtp")) )
-    cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+    std::cout<<std::endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
 
   // ----- Write the input argument into a HDF5 file
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
@@ -472,7 +472,7 @@ int main( int argc, char * argv[] )
   InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
-  cout<<"4. Elem boundary for the implicit solver: \n";
+  std::cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
   if(elemType == FEType::Tet4)
@@ -500,7 +500,7 @@ int main( int argc, char * argv[] )
   ebc -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
 
   // Mesh solver ElemBC
-  cout<<"5. Elem boundary for the mesh solver: \n";
+  std::cout<<"5. Elem boundary for the mesh solver: \n";
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
   ElemBC * mesh_ebc = new ElemBC_3D( mesh_ebclist, elemType );
@@ -531,7 +531,7 @@ int main( int argc, char * argv[] )
     part_v -> write( part_file_v );
 
     mytimer -> Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     NBC_Partition * nbcpart_p = new NBC_Partition_MF(part_p, mnindex_p, NBC_list_p, mapper_p);
     nbcpart_p -> write_hdf5( part_file_p );
@@ -575,7 +575,7 @@ int main( int argc, char * argv[] )
   delete mnindex_p; delete mnindex_v;
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
 
-  cout<<"===> Preprocessing completes successfully!\n";
+  std::cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
 }
 

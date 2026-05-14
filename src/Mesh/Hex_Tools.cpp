@@ -3,6 +3,12 @@
 #include "Tet_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "VTK_Tools.hpp"
+#include "vtkQuad.h"
+#include "vtkBiQuadraticQuad.h"
+#include "vtkHexahedron.h"
+#include "vtkTriQuadraticHexahedron.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkPolyData.h"
 #include "vtkDoubleArray.h"
 #include "vtkCellData.h"
 

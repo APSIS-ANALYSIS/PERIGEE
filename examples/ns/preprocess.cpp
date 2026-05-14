@@ -68,28 +68,28 @@ int main( int argc, char * argv[] )
     SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   // Print the command line arguments
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType_str<<endl;
-  cout<<" -wall_model_type: "<<wall_model_type<<endl;
-  cout<<" -num_outlet: "<<num_outlet<<endl;
-  cout<<" -geo_file: "<<geo_file<<endl;
-  cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
-  cout<<" -sur_file_wall: "<<sur_file_wall<<endl;
-  cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
-  cout<<" -part_file: "<<part_file<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -isDualGraph: true \n";
-  else cout<<" -isDualGraph: false \n";
-  cout<<"---- Problem definition ----\n";
-  cout<<" dofNum: "<<dofNum<<endl;
-  cout<<" dofMat: "<<dofMat<<endl;
-  cout<<"====  Command Line Arguments/ ===="<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -elem_type: "<<elemType_str<<std::endl;
+  std::cout<<" -wall_model_type: "<<wall_model_type<<std::endl;
+  std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
+  std::cout<<" -geo_file: "<<geo_file<<std::endl;
+  std::cout<<" -sur_file_in_base: "<<sur_file_in_base<<std::endl;
+  std::cout<<" -sur_file_wall: "<<sur_file_wall<<std::endl;
+  std::cout<<" -sur_file_out_base: "<<sur_file_out_base<<std::endl;
+  std::cout<<" -part_file: "<<part_file<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -isDualGraph: true \n";
+  else std::cout<<" -isDualGraph: false \n";
+  std::cout<<"---- Problem definition ----\n";
+  std::cout<<" dofNum: "<<dofNum<<std::endl;
+  std::cout<<" dofMat: "<<dofMat<<std::endl;
+  std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
 
   // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(geo_file); cout<<geo_file<<" found. \n";
+  SYS_T::file_check(geo_file); std::cout<<geo_file<<" found. \n";
 
-  SYS_T::file_check(sur_file_wall); cout<<sur_file_wall<<" found. \n";
+  SYS_T::file_check(sur_file_wall); std::cout<<sur_file_wall<<" found. \n";
 
   // Generate the inlet file names and check existance
   std::vector< std::string > sur_file_in( num_inlet );
@@ -104,7 +104,7 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
   
     SYS_T::file_check(sur_file_in[ii]);
-    cout<<sur_file_in[ii]<<" found. \n";
+    std::cout<<sur_file_in[ii]<<" found. \n";
   }
 
   // Generate the outlet file names and check existance
@@ -120,7 +120,7 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
 
     SYS_T::file_check(sur_file_out[ii]);
-    cout<<sur_file_out[ii]<<" found. \n";
+    std::cout<<sur_file_out[ii]<<" found. \n";
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
@@ -252,7 +252,7 @@ int main( int argc, char * argv[] )
         ctrlPts, proc_rank, cpu_size, elemType, 
         Field_Property(0, dofNum, true, "NS") );
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part hdf5 file
     part -> write( part_file );
@@ -289,19 +289,19 @@ int main( int argc, char * argv[] )
     sum_nghostnode += part->get_nghostnode();
   }
 
-  cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
-  cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-  cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<endl;
+  std::cout<<"\n===> Mesh Partition Quality: "<<std::endl;
+  std::cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<std::endl;
+  std::cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<std::endl;
+  std::cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<std::endl;
+  std::cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<std::endl;
 
   const int maxpart_nlocalnode = VEC_T::max(list_nlocalnode); 
   const int minpart_nlocalnode = VEC_T::min(list_nlocalnode);
 
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  std::cout<<"The maximum and minimum local node numbers are ";
+  std::cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<std::endl;
+  std::cout<<"The maximum / minimum of local node is: ";
+  std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
   return EXIT_SUCCESS;
 }

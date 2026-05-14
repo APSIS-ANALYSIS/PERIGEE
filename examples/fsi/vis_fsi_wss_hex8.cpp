@@ -14,6 +14,7 @@
 #include "QuadPts_vis_hex8.hpp"
 #include "FEAElement_Hex8.hpp"
 #include "FEAElement_Quad4_3D_der0.hpp"
+#include "vtkPolyData.h"
 
 std::vector<int> range_generator( const int &ii, const int &jj, const int &kk, const int &ll );
 

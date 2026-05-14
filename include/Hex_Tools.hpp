@@ -14,12 +14,9 @@
 #include "IIEN.hpp"
 #include "Vector_3.hpp"
 
-#include "vtkQuad.h"
-#include "vtkBiQuadraticQuad.h"
-#include "vtkHexahedron.h"
-#include "vtkTriQuadraticHexahedron.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkPolyData.h"
+class vtkPolyData;
+class vtkUnstructuredGrid;
+
 
 namespace HEX_T
 {
