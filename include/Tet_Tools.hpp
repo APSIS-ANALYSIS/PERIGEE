@@ -10,10 +10,6 @@
 #include "IIEN.hpp"
 #include "Vector_3.hpp"
 
-#include <array>
-#include <string>
-#include <vector>
-
 class vtkPolyData;
 class vtkUnstructuredGrid;
 

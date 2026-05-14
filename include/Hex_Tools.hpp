@@ -17,7 +17,6 @@
 class vtkPolyData;
 class vtkUnstructuredGrid;
 
-
 namespace HEX_T
 {
   // ==========================================================================
