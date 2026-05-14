@@ -95,36 +95,36 @@ int main( int argc, char * argv[] )
   if( elemType != FEType::Tet4 && elemType != FEType::Tet10 && elemType != FEType::Hex8 && elemType != FEType::Hex27 ) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   // Print the command line arguments
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType_str<<endl;
-  cout<<" -wall_model_type: "<<wall_model_type<<endl;
-  cout<<" -num_outlet: "<<num_outlet<<endl;
-  cout<<" -fixed_geo_file: "<<fixed_geo_file<<endl;
-  cout<<" -rotated_geo_file: "<<fixed_geo_file<<endl;
-  cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
-  cout<<" -sur_file_inner_wall: "<<sur_file_inner_wall<<endl;
-  cout<<" -sur_file_outer_wall: "<<sur_file_outer_wall<<endl;
-  cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
-  cout<<" -fixed_interface_base: "<<fixed_interface_base<<endl;
-  cout<<" -rotated_interface_base: "<<rotated_interface_base<<endl;
-  cout<<" -part_file: "<<part_file<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -isDualGraph: true \n";
-  else cout<<" -isDualGraph: false \n";
-  cout<<"---- Problem definition ----\n";
-  cout<<" dofNum: "<<dofNum<<endl;
-  cout<<" dofMat: "<<dofMat<<endl;
-  cout<<"====  Command Line Arguments/ ===="<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -elem_type: "<<elemType_str<<std::endl;
+  std::cout<<" -wall_model_type: "<<wall_model_type<<std::endl;
+  std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
+  std::cout<<" -fixed_geo_file: "<<fixed_geo_file<<std::endl;
+  std::cout<<" -rotated_geo_file: "<<fixed_geo_file<<std::endl;
+  std::cout<<" -sur_file_in_base: "<<sur_file_in_base<<std::endl;
+  std::cout<<" -sur_file_inner_wall: "<<sur_file_inner_wall<<std::endl;
+  std::cout<<" -sur_file_outer_wall: "<<sur_file_outer_wall<<std::endl;
+  std::cout<<" -sur_file_out_base: "<<sur_file_out_base<<std::endl;
+  std::cout<<" -fixed_interface_base: "<<fixed_interface_base<<std::endl;
+  std::cout<<" -rotated_interface_base: "<<rotated_interface_base<<std::endl;
+  std::cout<<" -part_file: "<<part_file<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -isDualGraph: true \n";
+  else std::cout<<" -isDualGraph: false \n";
+  std::cout<<"---- Problem definition ----\n";
+  std::cout<<" dofNum: "<<dofNum<<std::endl;
+  std::cout<<" dofMat: "<<dofMat<<std::endl;
+  std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
 
   // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(fixed_geo_file); cout<<fixed_geo_file<<" found. \n";
+  SYS_T::file_check(fixed_geo_file); std::cout<<fixed_geo_file<<" found. \n";
 
-  SYS_T::file_check(rotated_geo_file); cout<<rotated_geo_file<<" found. \n";
+  SYS_T::file_check(rotated_geo_file); std::cout<<rotated_geo_file<<" found. \n";
 
-  SYS_T::file_check(sur_file_inner_wall); cout<<sur_file_outer_wall<<" found. \n";
+  SYS_T::file_check(sur_file_inner_wall); std::cout<<sur_file_outer_wall<<" found. \n";
 
-  SYS_T::file_check(sur_file_outer_wall); cout<<sur_file_inner_wall<<" found. \n";
+  SYS_T::file_check(sur_file_outer_wall); std::cout<<sur_file_inner_wall<<" found. \n";
 
   // Generate the inlet file names and check existance
   std::vector< std::string > sur_file_in;
@@ -140,7 +140,7 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
   
     SYS_T::file_check(sur_file_in[ii]);
-    cout<<sur_file_in[ii]<<" found. \n";
+    std::cout<<sur_file_in[ii]<<" found. \n";
   }
 
   // Generate the outlet file names and check existance
@@ -157,7 +157,7 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
 
     SYS_T::file_check(sur_file_out[ii]);
-    cout<<sur_file_out[ii]<<" found. \n";
+    std::cout<<sur_file_out[ii]<<" found. \n";
   }
 
   std::vector< std::string > fixed_interface_file(num_interface_pair);
@@ -178,10 +178,10 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
 
     SYS_T::file_check(fixed_interface_file[ii]);
-    cout<<fixed_interface_file[ii]<<" found. \n";
+    std::cout<<fixed_interface_file[ii]<<" found. \n";
 
     SYS_T::file_check(rotated_interface_file[ii]);
-    cout<<rotated_interface_file[ii]<<" found. \n";
+    std::cout<<rotated_interface_file[ii]<<" found. \n";
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
@@ -436,7 +436,7 @@ int main( int argc, char * argv[] )
         {0, dofNum, true, "ROTATED_NS"} );
     
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part h5 file
     part -> write( part_file );
@@ -587,19 +587,19 @@ int main( int argc, char * argv[] )
     }
   }
 
-  cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
-  cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-  cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<endl;
+  std::cout<<"\n===> Mesh Partition Quality: "<<std::endl;
+  std::cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<std::endl;
+  std::cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<std::endl;
+  std::cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<std::endl;
+  std::cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<std::endl;
 
   const int maxpart_nlocalnode = VEC_T::max(list_nlocalnode); 
   const int minpart_nlocalnode = VEC_T::min(list_nlocalnode);
 
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  std::cout<<"The maximum and minimum local node numbers are ";
+  std::cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<std::endl;
+  std::cout<<"The maximum / minimum of local node is: ";
+  std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
   // Finalize the code and exit
   delete InFBC; delete RotBC; delete ebc; delete wbc; delete mytimer;
