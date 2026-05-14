@@ -1,4 +1,19 @@
 #include "VTK_Tools.hpp"
+#include "Sys_Tools.hpp"
+
+#include "vtkIntArray.h"
+#include "vtkDoubleArray.h"
+#include "vtkPolyData.h"
+#include "vtkCellData.h"
+#include "vtkCellArray.h"
+#include "vtkPointData.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkUnstructuredGridWriter.h"
+#include "vtkXMLUnstructuredGridWriter.h"
+#include "vtkXMLUnstructuredGridReader.h"
+#include "vtkXMLPolyDataWriter.h"
+#include "vtkXMLPolyDataReader.h"
+#include "vtkXMLGenericDataObjectReader.h"
 #include <vtkSmartPointer.h>
 
 void VTK_T::read_vtu_grid( const std::string &filename,
@@ -130,7 +145,6 @@ void VTK_T::read_vtu_grid( const std::string &filename,
     }
     else SYS_T::print_fatal("Error: VTK_T::read_vtu_grid read a mesh with VTK cell type %d is not supported.\n", cell-> GetCellType() ); 
   }
-
 }
 
 void VTK_T::read_vtp_grid( const std::string &filename,
@@ -186,7 +200,6 @@ void VTK_T::read_vtp_grid( const std::string &filename,
     }
     else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with VTK cell type 5 or 9. \n");
   }
-
 }
 
 int VTK_T::read_grid( const std::string &filename,
@@ -221,7 +234,6 @@ int VTK_T::read_grid( const std::string &filename,
   }
   else
     SYS_T::print_fatal("VTK_T::read_grid unknown vtk object type.\n");
-
 
   return file_type;
 }
@@ -258,7 +270,6 @@ std::vector<int> VTK_T::read_int_CellData( const std::string &filename,
   for(int ii=0; ii<numcels; ++ii)
     data[ii] = static_cast<int>( cd->GetComponent(ii, 0) );
 
-
   return data;
 }
 
@@ -294,7 +305,6 @@ std::vector<double> VTK_T::read_double_CellData( const std::string &filename,
   for(int ii=0; ii<numcels; ++ii)
     data[ii] = static_cast<double>( cd->GetComponent(ii, 0) );
 
-
   return data;
 }
 
@@ -329,7 +339,6 @@ std::vector<int> VTK_T::read_int_PointData( const std::string &filename,
   std::vector<int> data( numpts );
   for(int ii=0; ii<numpts; ++ii)
     data[ii] = static_cast<int>( pd->GetComponent(ii, 0) );
-
 
   return data;
 }
@@ -392,7 +401,6 @@ int VTK_T::read_num_pt( const std::string &filename )
   else
     SYS_T::print_fatal("VTK_T::read_num_pt unknown vtk object type.\n");
 
-
   return numpts;
 }
 
@@ -417,7 +425,6 @@ int VTK_T::read_num_cl( const std::string &filename )
   }
   else
     SYS_T::print_fatal("VTK_T::read_num_cl unknown vtk object type.\n");
-
 
   return numcels;
 }
@@ -473,7 +480,6 @@ void VTK_T::add_Vector3_PointData( vtkPointSet *grid_w,
   grid_w -> GetPointData() -> AddArray( data );
 }
 
-
 void VTK_T::add_int_CellData( vtkPointSet *grid_w,
     const std::vector<int> &cldata, const std::string &dataname )
 {
@@ -489,7 +495,6 @@ void VTK_T::add_int_CellData( vtkPointSet *grid_w,
   grid_w -> GetCellData() -> AddArray( data );
 }
 
-
 void VTK_T::add_double_CellData( vtkPointSet *grid_w,
     const std::vector<double> &cldata, const std::string &dataname )
 {
@@ -504,7 +509,6 @@ void VTK_T::add_double_CellData( vtkPointSet *grid_w,
 
   grid_w -> GetCellData() -> AddArray( data );
 }
-
 
 void VTK_T::write_vtkPointSet( const std::string &filename,
     vtkPointSet *grid_w, const bool &isXML )

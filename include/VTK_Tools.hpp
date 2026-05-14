@@ -8,22 +8,11 @@
 // 
 // Date Created: Aug. 12 2023
 // ============================================================================
-#include "Sys_Tools.hpp"
+#include <string>
+#include <vector>
 #include "Vector_3.hpp"
 
-#include "vtkIntArray.h"
-#include "vtkDoubleArray.h"
-#include "vtkPolyData.h"
-#include "vtkCellData.h"
-#include "vtkCellArray.h"
-#include "vtkPointData.h"
-#include "vtkUnstructuredGrid.h"
-#include "vtkUnstructuredGridWriter.h"
-#include "vtkXMLUnstructuredGridWriter.h"
-#include "vtkXMLUnstructuredGridReader.h"
-#include "vtkXMLPolyDataWriter.h"
-#include "vtkXMLPolyDataReader.h"
-#include "vtkXMLGenericDataObjectReader.h"
+class vtkPointSet;
 
 namespace VTK_T
 {

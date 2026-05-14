@@ -1,7 +1,10 @@
 #include "Hex_Tools.hpp"
+#include "Sys_Tools.hpp"
 #include "Tet_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "VTK_Tools.hpp"
+#include "vtkDoubleArray.h"
+#include "vtkCellData.h"
 
 void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,

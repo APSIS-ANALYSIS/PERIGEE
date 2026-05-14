@@ -2,6 +2,9 @@
 #include "Vec_Tools.hpp" 
 #include "VTK_Tools.hpp"
 #include "FE_Tools.hpp"
+#include "vtkUnstructuredGrid.h"
+#include "vtkDoubleArray.h"
+#include "vtkCellData.h"
 
 void TET_T::gen_tet_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,
