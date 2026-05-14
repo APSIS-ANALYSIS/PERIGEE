@@ -11,6 +11,7 @@
 #include "Vis_Tools.hpp"
 #include "QuadPts_vis_tet4.hpp"
 #include "FEAElement_Tet4.hpp"
+#include "vtkPolyData.h"
 
 void write_triangle_grid_wss( const std::string &filename,
     const int &numpts, const int &numcels,
