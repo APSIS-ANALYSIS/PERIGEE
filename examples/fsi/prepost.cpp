@@ -55,18 +55,18 @@ int main( int argc, char * argv[] )
   const std::string part_file_v = paras["part_file_v"].as<std::string>();
   const std::string part_file_p = paras["part_file_p"].as<std::string>();
 
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -part_file_v: "<<part_file_v<<endl;
-  cout<<" -part_file_p: "<<part_file_p<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -is_dualgraph: true \n";
-  else cout<<" -is_dualgraph: false \n";
-  cout<<"----------------------------------\n";
-  cout<<"geo_file: "<<geo_file<<endl;
-  cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<endl;
-  cout<<"elemType: "<<elemType_str<<endl;
-  cout<<"==== Command Line Arguments ===="<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -part_file_v: "<<part_file_v<<std::endl;
+  std::cout<<" -part_file_p: "<<part_file_p<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -is_dualgraph: true \n";
+  else std::cout<<" -is_dualgraph: false \n";
+  std::cout<<"----------------------------------\n";
+  std::cout<<"geo_file: "<<geo_file<<std::endl;
+  std::cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<std::endl;
+  std::cout<<"elemType: "<<elemType_str<<std::endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
 
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
@@ -301,7 +301,7 @@ int main( int argc, char * argv[] )
     delete part_v;
 
     mytimer -> Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
   }
 
   // Clean up Memory

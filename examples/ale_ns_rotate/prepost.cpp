@@ -49,17 +49,17 @@ int main( int argc, char * argv[] )
   const bool isDualGraph = paras["is_dualgraph"].as<bool>();  
   const std::string part_file = paras["part_file"].as<std::string>();
 
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
-  else cout<<" -METIS_isDualGraph: false \n";
-  cout<<"----------------------------------\n";
-  cout<<"part_file: "<<part_file<<endl;
-  cout<<"fixed_geo_file: "<<fixed_geo_file<<endl;
-  cout<<"rotated_geo_file: "<<rotated_geo_file<<endl;
-  cout<<"elemType: "<<elemType_str<<endl;
-  cout<<"dof_num: "<<dofNum<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -METIS_isDualGraph: true \n";
+  else std::cout<<" -METIS_isDualGraph: false \n";
+  std::cout<<"----------------------------------\n";
+  std::cout<<"part_file: "<<part_file<<std::endl;
+  std::cout<<"fixed_geo_file: "<<fixed_geo_file<<std::endl;
+  std::cout<<"rotated_geo_file: "<<rotated_geo_file<<std::endl;
+  std::cout<<"elemType: "<<elemType_str<<std::endl;
+  std::cout<<"dof_num: "<<dofNum<<std::endl;
 
   // Read the fixed_geo_file
   int nFunc, nElem;
@@ -105,7 +105,7 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
   mnindex->write_hdf5("post_node_mapping");
 
-  cout<<"=== Start Partition ... \n";
+  std::cout<<"=== Start Partition ... \n";
   int proc_size = cpu_size;
   SYS_T::Timer * mytimer = new SYS_T::Timer();
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
@@ -115,12 +115,12 @@ int main( int argc, char * argv[] )
         ctrlPts, proc_rank, proc_size, elemType, {0, dofNum, true, "NS"} );
     part->write(part_file.c_str());
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
     delete part;
   }
 
   // Clean memory
-  cout<<"=== Clean memory. \n";
+  std::cout<<"=== Clean memory. \n";
   delete mnindex; delete global_part; delete IEN; delete mytimer;
   return EXIT_SUCCESS;
 }
