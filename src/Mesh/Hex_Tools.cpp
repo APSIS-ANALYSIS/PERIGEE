@@ -3,8 +3,14 @@
 #include "Tet_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "VTK_Tools.hpp"
-#include "vtkDoubleArray.h"
+#include "vtkBiQuadraticQuad.h"
+#include "vtkCell.h"
 #include "vtkCellData.h"
+#include "vtkDoubleArray.h"
+#include "vtkHexahedron.h"
+#include "vtkPoints.h"
+#include "vtkQuad.h"
+#include "vtkTriQuadraticHexahedron.h"
 
 void HEX_T::gen_hex_grid( vtkUnstructuredGrid * const &grid_w,
     const int &numpts, const int &numcels,
