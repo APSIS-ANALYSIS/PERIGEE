@@ -54,17 +54,17 @@ int main( int argc, char * argv[] )
   in_ncommon   = paras["in_ncommon"].as<int>();
   isDualGraph  = paras["is_dualgraph"].as<bool>();
 
-  cout << "==== Command Line Arguments ====" << endl;
-  cout << " -cpu_size: "   << cpu_size   << endl;
-  cout << " -in_ncommon: " << in_ncommon << endl;
-  if(isDualGraph) cout << " -METIS_isDualGraph: true \n";
-  else cout << " -METIS_isDualGraph: false \n";
-  cout << "----------------------------------\n";
-  cout << "-part_file: " << part_file << endl;
-  cout << "-geo_file: "  << geo_file  << endl;
-  cout << "-elemType: "  << elemType_str  << endl;
-  cout << "-dof_num: "   << dofNum    << endl;
-  cout << "-dof_mat: "   << dofMat    << endl; 
+  std::cout << "==== Command Line Arguments ====" << std::endl;
+  std::cout << " -cpu_size: "   << cpu_size   << std::endl;
+  std::cout << " -in_ncommon: " << in_ncommon << std::endl;
+  if(isDualGraph) std::cout << " -METIS_isDualGraph: true \n";
+  else std::cout << " -METIS_isDualGraph: false \n";
+  std::cout << "----------------------------------\n";
+  std::cout << "-part_file: " << part_file << std::endl;
+  std::cout << "-geo_file: "  << geo_file  << std::endl;
+  std::cout << "-elemType: "  << elemType_str  << std::endl;
+  std::cout << "-dof_num: "   << dofNum    << std::endl;
+  std::cout << "-dof_mat: "   << dofMat    << std::endl; 
 
   // Read the volumetric mesh file from the vtu file: geo_file
   int nFunc, nElem;
@@ -92,7 +92,7 @@ int main( int argc, char * argv[] )
   auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
   mnindex->write_hdf5("post_node_mapping");
 
-  cout<<"=== Start Partition ... \n";
+  std::cout<<"=== Start Partition ... \n";
 
   auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
@@ -108,7 +108,7 @@ int main( int argc, char * argv[] )
 
     part -> write(part_file.c_str());
     mytimer -> Stop();
-    cout << "-- proc " << proc_rank << " Time taken: " << mytimer -> get_sec() << " sec. \n";
+    std::cout << "-- proc " << proc_rank << " Time taken: " << mytimer -> get_sec() << " sec. \n";
   }
 
   return EXIT_SUCCESS;
