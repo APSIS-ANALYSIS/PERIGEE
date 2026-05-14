@@ -129,13 +129,13 @@ namespace VTK_T
   //                         points.
   //          \para dataname : the name of the data to be written.
   // ----------------------------------------------------------------
-  void add_int_PointData( vtkPointSet * const &grid_w,
+  void add_int_PointData( vtkPointSet *grid_w,
       const std::vector<int> &ptdata, const std::string &dataname );
 
-  void add_double_PointData( vtkPointSet * const &grid_w,
+  void add_double_PointData( vtkPointSet *grid_w,
       const std::vector<double> &ptdata, const std::string &dataname );
 
-  void add_Vector3_PointData( vtkPointSet * const &grid_w,
+  void add_Vector3_PointData( vtkPointSet *grid_w,
       const std::vector<Vector_3> &ptdata, const std::string &dataname );
 
   // ----------------------------------------------------------------
@@ -148,10 +148,10 @@ namespace VTK_T
   //                         points.
   //          \para dataname : the name of the data to be written.
   // ----------------------------------------------------------------
-  void add_int_CellData( vtkPointSet * const &grid_w, 
+  void add_int_CellData( vtkPointSet *grid_w, 
       const std::vector<int> &cldata, const std::string &dataname );
 
-  void add_double_CellData( vtkPointSet * const &grid_w, 
+  void add_double_CellData( vtkPointSet *grid_w, 
       const std::vector<double> &cldata, const std::string &dataname );
 
   // ----------------------------------------------------------------
@@ -163,7 +163,7 @@ namespace VTK_T
   //          \para isXML    : flag for vtu (true) or vtk (false).
   // ----------------------------------------------------------------
   void write_vtkPointSet( const std::string &filename, 
-      vtkPointSet * const &grid_w, const bool &isXML = true );
+      vtkPointSet *grid_w, const bool &isXML = true );
 }
 
 #endif

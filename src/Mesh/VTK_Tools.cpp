@@ -1,10 +1,11 @@
 #include "VTK_Tools.hpp"
+#include <vtkSmartPointer.h>
 
 void VTK_T::read_vtu_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array )
 {
-  vtkXMLUnstructuredGridReader * reader = vtkXMLUnstructuredGridReader::New();
+  vtkSmartPointer<vtkXMLUnstructuredGridReader> reader = vtkSmartPointer<vtkXMLUnstructuredGridReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   reader -> GlobalWarningDisplayOff();
@@ -130,14 +131,13 @@ void VTK_T::read_vtu_grid( const std::string &filename,
     else SYS_T::print_fatal("Error: VTK_T::read_vtu_grid read a mesh with VTK cell type %d is not supported.\n", cell-> GetCellType() ); 
   }
 
-  reader->Delete();
 }
 
 void VTK_T::read_vtp_grid( const std::string &filename,
     int &numpts, int &numcels,
     std::vector<double> &pt, std::vector<int> &ien_array )
 {
-  vtkXMLPolyDataReader * reader = vtkXMLPolyDataReader::New();
+  vtkSmartPointer<vtkXMLPolyDataReader> reader = vtkSmartPointer<vtkXMLPolyDataReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   vtkPolyData * polydata = reader -> GetOutput();
@@ -187,7 +187,6 @@ void VTK_T::read_vtp_grid( const std::string &filename,
     else SYS_T::print_fatal("Error: read_vtp_grid read a mesh with VTK cell type 5 or 9. \n");
   }
 
-  reader->Delete();
 }
 
 int VTK_T::read_grid( const std::string &filename,
@@ -196,7 +195,7 @@ int VTK_T::read_grid( const std::string &filename,
 {
   int file_type = 0;
 
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
 
@@ -231,7 +230,7 @@ int VTK_T::read_grid( const std::string &filename,
 std::vector<int> VTK_T::read_int_CellData( const std::string &filename,
     const std::string &dataname )
 {
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   
@@ -268,7 +267,7 @@ std::vector<int> VTK_T::read_int_CellData( const std::string &filename,
 std::vector<double> VTK_T::read_double_CellData( const std::string &filename,
     const std::string &dataname )
 {
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   
@@ -305,7 +304,7 @@ std::vector<double> VTK_T::read_double_CellData( const std::string &filename,
 std::vector<int> VTK_T::read_int_PointData( const std::string &filename,
     const std::string &dataname )
 {
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   
@@ -342,7 +341,7 @@ std::vector<int> VTK_T::read_int_PointData( const std::string &filename,
 std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
     const std::string &dataname )
 {
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   
@@ -378,7 +377,7 @@ std::vector<double> VTK_T::read_double_PointData( const std::string &filename,
 
 int VTK_T::read_num_pt( const std::string &filename )
 {
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   
@@ -405,7 +404,7 @@ int VTK_T::read_num_pt( const std::string &filename )
 
 int VTK_T::read_num_cl( const std::string &filename )
 {
-  vtkXMLGenericDataObjectReader * reader = vtkXMLGenericDataObjectReader::New();
+  vtkSmartPointer<vtkXMLGenericDataObjectReader> reader = vtkSmartPointer<vtkXMLGenericDataObjectReader>::New();
   reader -> SetFileName( filename.c_str() );
   reader -> Update();
   
@@ -430,12 +429,12 @@ int VTK_T::read_num_cl( const std::string &filename )
   return numcels;
 }
 
-void VTK_T::add_int_PointData( vtkPointSet * const &grid_w,
+void VTK_T::add_int_PointData( vtkPointSet *grid_w,
     const std::vector<int> &ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_int_PointData data size does not match with the number of points.\n" );
 
-  vtkIntArray * data = vtkIntArray::New();
+  vtkSmartPointer<vtkIntArray> data = vtkSmartPointer<vtkIntArray>::New();
   data -> SetNumberOfComponents(1);
   data -> SetName(dataname.c_str());
 
@@ -443,16 +442,15 @@ void VTK_T::add_int_PointData( vtkPointSet * const &grid_w,
     data -> InsertComponent(ii, 0, ptdata[ii]);
 
   grid_w -> GetPointData() -> AddArray( data );
-  data -> Delete();
 }
 
 
-void VTK_T::add_double_PointData( vtkPointSet * const &grid_w,
+void VTK_T::add_double_PointData( vtkPointSet *grid_w,
     const std::vector<double> &ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_double_PointData data size does not match with the number of points.\n" );
 
-  vtkDoubleArray * data = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
   data -> SetNumberOfComponents(1);
   data -> SetName(dataname.c_str());
 
@@ -460,16 +458,15 @@ void VTK_T::add_double_PointData( vtkPointSet * const &grid_w,
     data -> InsertComponent(ii, 0, ptdata[ii]);
 
   grid_w -> GetPointData() -> AddArray( data );
-  data -> Delete();
 }
 
 
-void VTK_T::add_Vector3_PointData( vtkPointSet * const &grid_w,
+void VTK_T::add_Vector3_PointData( vtkPointSet *grid_w,
     const std::vector<Vector_3> &ptdata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( ptdata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfPoints() ), "Error: add_Vector3_PointData data size does not match with the number of points.\n" );
 
-  vtkDoubleArray * data = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
   data -> SetNumberOfComponents(3);
   data -> SetName(dataname.c_str());
 
@@ -481,16 +478,15 @@ void VTK_T::add_Vector3_PointData( vtkPointSet * const &grid_w,
   }
 
   grid_w -> GetPointData() -> AddArray( data );
-  data -> Delete();
 }
 
 
-void VTK_T::add_int_CellData( vtkPointSet * const &grid_w,
+void VTK_T::add_int_CellData( vtkPointSet *grid_w,
     const std::vector<int> &cldata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_int_CellData data size does not match with the number of cells.\n" );
 
-  vtkIntArray * data = vtkIntArray::New();
+  vtkSmartPointer<vtkIntArray> data = vtkSmartPointer<vtkIntArray>::New();
   data -> SetNumberOfComponents(1);
   data -> SetName(dataname.c_str());
 
@@ -498,16 +494,15 @@ void VTK_T::add_int_CellData( vtkPointSet * const &grid_w,
     data -> InsertComponent(ii, 0, cldata[ii]);
 
   grid_w -> GetCellData() -> AddArray( data );
-  data -> Delete();
 }
 
 
-void VTK_T::add_double_CellData( vtkPointSet * const &grid_w,
+void VTK_T::add_double_CellData( vtkPointSet *grid_w,
     const std::vector<double> &cldata, const std::string &dataname )
 {
   SYS_T::print_fatal_if( cldata.size() != static_cast<unsigned int>( grid_w -> GetNumberOfCells() ), "Error: add_double_CellData data size does not match with the number of cells.\n" );
 
-  vtkDoubleArray * data = vtkDoubleArray::New();
+  vtkSmartPointer<vtkDoubleArray> data = vtkSmartPointer<vtkDoubleArray>::New();
   data -> SetNumberOfComponents(1);
   data -> SetName(dataname.c_str());
 
@@ -515,47 +510,43 @@ void VTK_T::add_double_CellData( vtkPointSet * const &grid_w,
     data -> InsertComponent(ii, 0, cldata[ii]);
 
   grid_w -> GetCellData() -> AddArray( data );
-  data -> Delete();
 }
 
 
 void VTK_T::write_vtkPointSet( const std::string &filename,
-    vtkPointSet * const &grid_w, const bool &isXML )
+    vtkPointSet *grid_w, const bool &isXML )
 {
   if( grid_w -> GetDataObjectType() == VTK_UNSTRUCTURED_GRID )
   {
     if ( isXML )
     {
-      vtkXMLUnstructuredGridWriter * writer = vtkXMLUnstructuredGridWriter::New();
+      vtkSmartPointer<vtkXMLUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLUnstructuredGridWriter>::New();
       std::string name_to_write(filename);
       name_to_write.append(".vtu");
       writer -> SetFileName( name_to_write.c_str() );
 
       writer->SetInputData(grid_w);
       writer->Write();
-      writer->Delete();
     }
     else
     {
-      vtkUnstructuredGridWriter * writer = vtkUnstructuredGridWriter::New();
+      vtkSmartPointer<vtkUnstructuredGridWriter> writer = vtkSmartPointer<vtkUnstructuredGridWriter>::New();
       std::string name_to_write(filename);
       name_to_write.append(".vtk");
       writer -> SetFileName( name_to_write.c_str() );
 
       writer->SetInputData(grid_w);
       writer->Write();
-      writer->Delete();
     }
   }
   else if( grid_w -> GetDataObjectType() == VTK_POLY_DATA )
   {
-    vtkXMLPolyDataWriter * writer = vtkXMLPolyDataWriter::New();
+    vtkSmartPointer<vtkXMLPolyDataWriter> writer = vtkSmartPointer<vtkXMLPolyDataWriter>::New();
     std::string name_to_write(filename);
     name_to_write.append(".vtp");
     writer -> SetFileName( name_to_write.c_str() );
     writer->SetInputData(grid_w);
     writer->Write();
-    writer->Delete();
   }
   else
     SYS_T::print_fatal("Error: VTK_T::write_vtkPointSet unknown vtkPointSet data. \n");
