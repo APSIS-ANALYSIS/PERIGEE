@@ -13,6 +13,7 @@
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
+#include "HDF5_Writer.hpp"
 #include "Part_FEM_FSI.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_FSI.hpp"

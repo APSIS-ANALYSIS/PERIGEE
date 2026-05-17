@@ -9,6 +9,7 @@
 #include "VTK_Tools.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "HDF5_Writer.hpp"
 #include "NodalBC.hpp"
 #include "ElemBC_3D.hpp"
 #include "Part_FEM.hpp"

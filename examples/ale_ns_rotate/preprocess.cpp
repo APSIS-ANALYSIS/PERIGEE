@@ -11,6 +11,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "HDF5_Writer.hpp"
 #include "Part_FEM_Rotated.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
@@ -186,7 +187,7 @@ int main( int argc, char * argv[] )
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
   {
-    auto cmdh5w = std::make_unique<HDF5_Writer>("preprocessor_cmd.h5");
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("preprocessor_cmd.h5");
 
     cmdh5w->write_intScalar("num_inlet", num_inlet);
     cmdh5w->write_intScalar("num_outlet", num_outlet);
@@ -471,7 +472,7 @@ int main( int argc, char * argv[] )
     // Writed the info of rotation axis into h5 file
     const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
     {
-      auto h5w = std::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+      auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
       const hid_t file_id = h5w->get_file_id();
       auto rotation_group = HDF5_Group::create(file_id, "/rotation");
       h5w -> write_Vector_3( rotation_group.id(), "point_rotated", point_rotated.to_std_array() );
@@ -558,7 +559,7 @@ int main( int argc, char * argv[] )
 
     const std::string GroupName = "/sliding";
 
-    auto h5w = std::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+    auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
 
     const hid_t file_id = h5w->get_file_id();
 
