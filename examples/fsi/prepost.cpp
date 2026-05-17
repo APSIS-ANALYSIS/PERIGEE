@@ -78,8 +78,13 @@ int main( int argc, char * argv[] )
   
   const std::vector<int> phy_tag = VTK_T::read_int_CellData( geo_file, "Physics_tag" );
 
+  // We will generate a new IEN array for the pressure variable by updating the
+  // IEN for the solid element. If the solid element has node on the fluid-solid
+  // interface, it will be mapped to the new index, that is nFunc + ii.
+  std::vector<int> vecIEN_p ( vecIEN );
+
   // Generate IEN
-  IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );
+  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
 
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
@@ -90,11 +95,6 @@ int main( int argc, char * argv[] )
 
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
   const int nFunc_p = nFunc_v + nFunc_interface;
-
-  // We will generate a new IEN array for the pressure variable by updating the
-  // IEN for the solid element. If the solid element has node on the fluid-solid
-  // interface, it will be mapped to the new index, that is nFunc + ii.
-  std::vector<int> vecIEN_p ( vecIEN );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -123,9 +123,8 @@ int main( int argc, char * argv[] )
     }
   }
 
-  IIEN * IEN_p = new IEN_FEM( nElem, vecIEN_p );
-
-  VEC_T::clean( vecIEN ); VEC_T::clean( vecIEN_p );
+  IIEN * IEN_p = new IEN_FEM( nElem, std::move(vecIEN_p) );
+ 
   // --------------------------------------------------------------------------
 
   // Generate the list of nodes for fluid and solid
