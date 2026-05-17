@@ -235,8 +235,7 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(vecIEN, rotated_vecIEN);
   VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
 
-  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
-  VEC_T::clean( vecIEN );
+  IIEN * IEN = new IEN_FEM(nElem, std::move(vecIEN));
   VEC_T::clean( rotated_vecIEN );
   VEC_T::clean( rotated_ctrlPts );
 
@@ -277,11 +276,9 @@ int main( int argc, char * argv[] )
     VTK_T::read_grid(fixed_interface_file[ii], sur_fixed_nFunc, sur_fixed_nElem, sur_fixed_ctrlPts, sur_fixed_vecIEN);
     VTK_T::read_grid(rotated_interface_file[ii], sur_rotated_nFunc, sur_rotated_nElem, sur_rotated_ctrlPts, sur_rotated_vecIEN);
 
-    IIEN * sur_fixed_IEN = new IEN_FEM(sur_fixed_nElem, sur_fixed_vecIEN);
-    VEC_T::clean(sur_fixed_vecIEN);
+    IIEN * sur_fixed_IEN = new IEN_FEM(sur_fixed_nElem, std::move(sur_fixed_vecIEN));
 
-    IIEN * sur_rotated_IEN = new IEN_FEM(sur_rotated_nElem, sur_rotated_vecIEN);
-    VEC_T::clean(sur_rotated_vecIEN);
+    IIEN * sur_rotated_IEN = new IEN_FEM(sur_rotated_nElem, std::move(sur_rotated_vecIEN));
 
     // Assume sur_fixed_nLocBas = sur_rotated_nLocBas
     const int sur_nLocBas = sur_fixed_IEN->get_nLocBas();

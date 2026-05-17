@@ -87,8 +87,7 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(vecIEN, rotated_vecIEN);
   VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
 
-  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
-  VEC_T::clean( vecIEN ); // clean the vector
+  IIEN * IEN = new IEN_FEM(nElem, std::move(vecIEN));
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
 

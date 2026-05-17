@@ -205,7 +205,7 @@ int main( int argc, char * argv[] )
   }
 
   // Generate IEN
-  IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );
+  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
 
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
@@ -249,9 +249,8 @@ int main( int argc, char * argv[] )
     }
   }
 
-  IIEN * IEN_p = new IEN_FEM( nElem, vecIEN_p );
-
-  VEC_T::clean( vecIEN ); VEC_T::clean( vecIEN_p );
+  IIEN * IEN_p = new IEN_FEM( nElem, std::move(vecIEN_p) );
+ 
   // --------------------------------------------------------------------------
 
   // Generate the list of nodes for fluid and solid
