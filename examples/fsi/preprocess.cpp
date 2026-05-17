@@ -204,9 +204,6 @@ int main( int argc, char * argv[] )
     if(phy_tag[ii] != 0 && phy_tag[ii] != 1) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 (fluid domain) or 1 (solid domain).\n");
   }
 
-  // Generate IEN
-  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
-
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
   // mapped to a new value by the following rule. The ii-th node in the
@@ -221,6 +218,9 @@ int main( int argc, char * argv[] )
   // IEN for the solid element. If the solid element has node on the fluid-solid
   // interface, it will be mapped to the new index, that is nFunc + ii.
   std::vector<int> vecIEN_p ( vecIEN );
+
+  // Generate IEN
+  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
   PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nElem; ++ee)
   {

@@ -78,9 +78,6 @@ int main( int argc, char * argv[] )
   
   const std::vector<int> phy_tag = VTK_T::read_int_CellData( geo_file, "Physics_tag" );
 
-  // Generate IEN
-  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
-
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
   // mapped to a new value by the following rule. The ii-th node in the
@@ -95,6 +92,9 @@ int main( int argc, char * argv[] )
   // IEN for the solid element. If the solid element has node on the fluid-solid
   // interface, it will be mapped to the new index, that is nFunc + ii.
   std::vector<int> vecIEN_p ( vecIEN );
+
+  // Generate IEN
+  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
 
   for(int ee=0; ee<nElem; ++ee)
   {
