@@ -8,7 +8,6 @@
 // Date:   Nov. 19, 2024
 // ============================================================================
 #include <unordered_map>
-#include "Sys_Tools.hpp" 
 
 enum class FEType
 {
@@ -110,9 +109,7 @@ namespace FE_T
       case FEType::Tet10: return 6;
       case FEType::Hex8: return 4;
       case FEType::Hex27: return 9;
-      default:
-          SYS_T::print_fatal("Error: FEType::to_snLocBas the input element type is invalid.\n"); 
-          return 0;
+      default: return 0;
     }
   }
 }
