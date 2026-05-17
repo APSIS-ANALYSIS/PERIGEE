@@ -1,4 +1,5 @@
 #include "PTime_NS_HERK_Solver.hpp"
+#include "Math_Tools.hpp"
 
 PTime_NS_HERK_Solver::PTime_NS_HERK_Solver(
     std::unique_ptr<PGAssem_Block_NS_FEM_HERK> in_gassem,

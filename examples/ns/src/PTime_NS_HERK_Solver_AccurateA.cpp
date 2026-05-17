@@ -1,4 +1,5 @@
 #include "PTime_NS_HERK_Solver_AccurateA.hpp"
+#include "Math_Tools.hpp"
 
 PTime_NS_HERK_Solver_AccurateA::PTime_NS_HERK_Solver_AccurateA(
     std::unique_ptr<MF_TA::SolverContext> in_solver_ctx,

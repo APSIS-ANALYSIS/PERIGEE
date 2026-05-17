@@ -1,4 +1,8 @@
+#include <limits>
+#include <iomanip>
+#include <algorithm>
 #include "QuadPts_Gauss_1D.hpp"
+#include "Math_Tools.hpp"
 
 QuadPts_Gauss_1D::QuadPts_Gauss_1D( int in_num_pts, double min,
     double max ) : num_pts(in_num_pts)
