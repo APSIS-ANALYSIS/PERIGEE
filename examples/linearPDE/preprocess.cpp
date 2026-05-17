@@ -113,7 +113,6 @@ int main( int argc, char * argv[] )
   
   auto IEN = SYS_T::make_unique<IEN_FEM>(nElem, std::move(vecIEN));
   
-
   const int nLocBas = FE_T::to_nLocBas(elemType);
 
   SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the Mesh %d and the IEN %d classes do not match. \n", nLocBas, IEN->get_nLocBas());

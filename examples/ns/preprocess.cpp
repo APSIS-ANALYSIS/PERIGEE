@@ -234,7 +234,6 @@ int main( int argc, char * argv[] )
   auto wbc = SYS_T::make_unique<ElemBC_3D_WallModel>( weak_list, wall_model_type, IEN.get(), elemType );
  
   // Start partition the mesh for each cpu_rank 
-
   std::vector<int> list_nlocalnode, list_nghostnode, list_ntotalnode, list_nbadnode;
   std::vector<double> list_ratio_g2l;
 

@@ -69,7 +69,6 @@ int main( int argc, char * argv[] )
   VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
   
   auto IEN = SYS_T::make_unique<IEN_FEM>(nElem, std::move(vecIEN));
-  
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
   
