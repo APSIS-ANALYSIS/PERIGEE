@@ -1,4 +1,6 @@
 #include "Global_Part_Serial.hpp"
+#include "Sys_Tools.hpp"
+#include "HDF5_Writer.hpp"
 
 Global_Part_Serial::Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
    const std::string &element_part_name, const std::string &node_part_name )

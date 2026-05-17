@@ -11,6 +11,7 @@
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "HDF5_Writer.hpp"
 #include "Part_FEM.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"

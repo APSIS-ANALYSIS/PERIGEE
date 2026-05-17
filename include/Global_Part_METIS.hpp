@@ -10,10 +10,10 @@
 // Author: Ju Liu
 // Date Created: Oct 2nd 2013
 // ============================================================================
-#include "Sys_Tools.hpp"
-#include "IIEN.hpp"
 #include "IGlobal_Part.hpp"
-#include "HDF5_Writer.hpp"
+#include "IIEN.hpp"
+#include <vector>
+#include <string>
 
 class Global_Part_METIS : public IGlobal_Part
 {

@@ -1,4 +1,6 @@
 #include "Global_Part_METIS.hpp"
+#include "Sys_Tools.hpp"
+#include "HDF5_Writer.hpp"
 
 Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
     const int &in_ncommon, const bool &isDualGraph,
