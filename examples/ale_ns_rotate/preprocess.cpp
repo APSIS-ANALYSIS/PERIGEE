@@ -6,6 +6,7 @@
 //
 // Date Created: Jan 01 2020
 // ==================================================================
+#include "Timer.hpp"
 #include "Math_Tools.hpp"
 #include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"

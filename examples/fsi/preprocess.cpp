@@ -7,6 +7,7 @@
 // Author: Ju Liu
 // Date: Dec. 13 2021
 // ============================================================================
+#include "Timer.hpp"
 #include "Math_Tools.hpp"
 #include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"

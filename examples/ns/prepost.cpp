@@ -5,6 +5,7 @@
 //
 // Date: Jan. 24 2017
 // ============================================================================
+#include "Timer.hpp"
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"

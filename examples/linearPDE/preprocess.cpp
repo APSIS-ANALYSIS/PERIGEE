@@ -5,6 +5,7 @@
 //
 // Author: Xinhai Yue
 // ============================================================================
+#include "Timer.hpp"
 #include "IEN_FEM.hpp"
 #include "VTK_Tools.hpp"
 #include "Global_Part_METIS.hpp"
