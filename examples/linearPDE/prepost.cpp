@@ -6,6 +6,7 @@
 // Author: Chi Ding
 // Email:  am-dight@outlook.com 
 // ============================================================================
+#include "Timer.hpp"
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"
