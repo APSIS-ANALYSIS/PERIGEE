@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <ctime>
@@ -108,13 +109,7 @@ namespace SYS_T
       int index, const std::string &filename )
   {
     std::ostringstream ss;
-    ss<<baseName;
-
-    if( index/10 == 0 ) ss<<"00";
-    else if( index/100 == 0 ) ss<<"0";
-
-    ss<<index<<filename;
-
+    ss << baseName << std::setfill('0') << std::setw(3) << index << filename;
     return ss.str();
   }
 
