@@ -26,20 +26,13 @@ void PTime_FSI_Solver::print_info() const
 std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
     const int &counter ) const
 {
-  std::string out_name(pb_name);
-  out_name.append(middle_name);
-  out_name.append(SYS_T::fixed_length_index(counter));
-  return out_name;
+  return pb_name + middle_name + SYS_T::fixed_length_index(counter);
 }
 
 std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name,
     const int &counter ) const
 {
-  std::string out_name("dot_");
-  out_name.append(pb_name);
-  out_name.append(middle_name);
-  out_name.append(SYS_T::fixed_length_index(counter));
-  return out_name;
+  return "dot_" + pb_name + middle_name + SYS_T::fixed_length_index(counter);
 }
 
 void PTime_FSI_Solver::Write_restart_file(const PDNTimeStep * const &timeinfo,

@@ -188,8 +188,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
   for(int ii=0; ii<num_pair; ++ii)
   {
-    std::string subgroup_name(groupbase);
-    subgroup_name.append( std::to_string(ii) );
+    const std::string subgroup_name = groupbase + std::to_string(ii);
 
     hid_t group_id = H5Gcreate(g_id, subgroup_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 
@@ -233,8 +232,7 @@ void Interface_Partition::write_hdf5(const std::string &FileName) const
 
     for(int jj=0; jj<num_tag[ii]; ++jj)
     {
-      std::string subsubgroup_name(subgroupbase);
-      subsubgroup_name.append( std::to_string(jj) );
+      const std::string subsubgroup_name = subgroupbase + std::to_string(jj);
 
       hid_t subgroup_id = H5Gcreate(group_id, subsubgroup_name.c_str(), H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
 

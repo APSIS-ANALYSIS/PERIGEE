@@ -19,8 +19,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_ran
   max_num_local_rotated_ele = h5r -> read_intVector( gname.c_str(), "max_num_local_rotated_cell" );
   num_tag = h5r -> read_intVector( gname.c_str(), "num_tag" );
 
-  std::string groupbase(gname);
-  groupbase.append("/interfaceid_");
+  const std::string groupbase = gname + "/interfaceid_";
 
   num_fixed_node.assign(num_itf, 0);
   num_rotated_node.assign(num_itf, 0);
@@ -50,8 +49,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_ran
 
   for(int ii=0; ii<num_itf; ++ii)
   {
-    std::string subgroup_name(groupbase);
-    subgroup_name.append( std::to_string(ii) );
+    const std::string subgroup_name = groupbase + std::to_string(ii);
 
     // total info
     fixed_ele_face_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_face_id" );
@@ -82,8 +80,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_ran
 
     rotated_LID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "rotated_LID" );
 
-    std::string subsubgroupbase(subgroup_name);
-    subsubgroupbase.append("/tag_");
+    const std::string subsubgroupbase = subgroup_name + "/tag_";
     
     // access for element search
     if(num_local_fixed_ele[ii] > 0)
@@ -94,8 +91,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_ran
 
       for(int jj=0; jj<num_tag[ii]; ++jj)
       {
-        std::string subsubgroup_name(subsubgroupbase);
-        subsubgroup_name.append( std::to_string(jj) );
+        const std::string subsubgroup_name = subsubgroupbase + std::to_string(jj);
         if(num_tagged_rotated_ele[ii][jj] > 0)
           tagged_rotated_ele[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "tagged_rotated_cell" );
         else
@@ -116,8 +112,7 @@ ALocal_Interface::ALocal_Interface( const std::string &fileBaseName, int cpu_ran
 
       for(int jj=0; jj<num_tag[ii]; ++jj)
       {
-        std::string subsubgroup_name(subsubgroupbase);
-        subsubgroup_name.append( std::to_string(jj) );
+        const std::string subsubgroup_name = subsubgroupbase + std::to_string(jj);
         if(num_tagged_fixed_ele[ii][jj] > 0)
           tagged_fixed_ele[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "tagged_fixed_cell" );
         else
@@ -146,8 +141,7 @@ ALocal_Interface::ALocal_Interface( const HDF5_Reader * const &h5r )
   max_num_local_rotated_ele = h5r -> read_intVector( gname.c_str(), "max_num_local_rotated_cell" );
   num_tag = h5r -> read_intVector( gname.c_str(), "num_tag" );
 
-  std::string groupbase(gname);
-  groupbase.append("/interfaceid_");
+  const std::string groupbase = gname + "/interfaceid_";
 
   num_fixed_node.assign(num_itf, 0);
   num_rotated_node.assign(num_itf, 0);
@@ -177,8 +171,7 @@ ALocal_Interface::ALocal_Interface( const HDF5_Reader * const &h5r )
 
   for(int ii=0; ii<num_itf; ++ii)
   {
-    std::string subgroup_name(groupbase);
-    subgroup_name.append( std::to_string(ii) );
+    const std::string subgroup_name = groupbase + std::to_string(ii);
 
     // total info
     fixed_ele_face_id[ii] = h5r -> read_intVector( subgroup_name.c_str(), "fixed_cell_face_id" );
@@ -209,8 +202,7 @@ ALocal_Interface::ALocal_Interface( const HDF5_Reader * const &h5r )
 
     rotated_LID[ii] = h5r -> read_intVector(  subgroup_name.c_str(), "rotated_LID" );
 
-    std::string subsubgroupbase(subgroup_name);
-    subsubgroupbase.append("/tag_");
+    const std::string subsubgroupbase = subgroup_name + "/tag_";
 
     // access for element search
     if(num_local_fixed_ele[ii] > 0)
@@ -221,8 +213,7 @@ ALocal_Interface::ALocal_Interface( const HDF5_Reader * const &h5r )
 
       for(int jj=0; jj<num_tag[ii]; ++jj)
       {
-        std::string subsubgroup_name(subsubgroupbase);
-        subsubgroup_name.append( std::to_string(jj) );
+        const std::string subsubgroup_name = subsubgroupbase + std::to_string(jj);
         if(num_tagged_rotated_ele[ii][jj] > 0)
           tagged_rotated_ele[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "tagged_rotated_cell" );
         else
@@ -243,8 +234,7 @@ ALocal_Interface::ALocal_Interface( const HDF5_Reader * const &h5r )
 
       for(int jj=0; jj<num_tag[ii]; ++jj)
       {
-        std::string subsubgroup_name(subsubgroupbase);
-        subsubgroup_name.append( std::to_string(jj) );
+        const std::string subsubgroup_name = subsubgroupbase + std::to_string(jj);
         if(num_tagged_fixed_ele[ii][jj] > 0)
           tagged_fixed_ele[ii][jj] = h5r -> read_intVector( subsubgroup_name.c_str(), "tagged_fixed_cell" );
         else
