@@ -160,7 +160,7 @@ int main( int argc, char * argv[] )
     std::string pres_name_to_read(pres_sol_bname);
     std::string name_to_write(out_bname);
     time_index.str("");
-    time_index<< 900000000 + time;
+    time_index << SYS_T::index_to_string(time, 9);
     disp_name_to_read.append(time_index.str());
     velo_name_to_read.append(time_index.str());
     pres_name_to_read.append(time_index.str());

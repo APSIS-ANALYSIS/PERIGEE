@@ -28,8 +28,8 @@ int main( int argc, char * argv[] )
 {
   std::string old_nmap("old_node_mapping.h5");
   std::string new_nmap("new_node_mapping.h5");
-  std::string sol_name("SOL_900000000");
-  std::string out_name("NEW_900000000");
+  std::string sol_name("SOL_" + SYS_T::index_to_string(0, 9));
+  std::string out_name("NEW_" + SYS_T::index_to_string(0, 9));
   
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);

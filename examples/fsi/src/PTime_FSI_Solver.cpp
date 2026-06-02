@@ -26,27 +26,19 @@ void PTime_FSI_Solver::print_info() const
 std::string PTime_FSI_Solver::Name_Generator( const std::string &middle_name,
     const int &counter ) const
 {
-  const int aux = 900000000 + counter;
-  std::ostringstream temp;
-  temp<<aux;
-
   std::string out_name(pb_name);
   out_name.append(middle_name);
-  out_name.append(temp.str());
+  out_name.append(SYS_T::index_to_string(counter, 9));
   return out_name;
 }
 
 std::string PTime_FSI_Solver::Name_dot_Generator( const std::string &middle_name,
     const int &counter ) const
 {
-  const int aux = 900000000 + counter;
-  std::ostringstream temp;
-  temp<<aux;
-
   std::string out_name("dot_");
   out_name.append(pb_name);
   out_name.append(middle_name);
-  out_name.append(temp.str());
+  out_name.append(SYS_T::index_to_string(counter, 9));
   return out_name;
 }
 

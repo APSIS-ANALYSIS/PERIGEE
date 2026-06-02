@@ -336,11 +336,11 @@ int main(int argc, char *argv[])
 
     // generate the corresponding mdisp file name
     std::string restart_mdisp_name = "DISP_";
-    restart_mdisp_name.append(std::to_string(900000000 + initial_index));
+    restart_mdisp_name.append(SYS_T::index_to_string(initial_index, 9));
 
     // generate the corresponding mvelo file name
     std::string restart_mvelo_name = "MVELO_";
-    restart_mvelo_name.append(std::to_string(900000000 + initial_index));
+    restart_mvelo_name.append(SYS_T::index_to_string(initial_index, 9));
 
     // Read dot_sol file
     SYS_T::file_check(restart_dot_name);

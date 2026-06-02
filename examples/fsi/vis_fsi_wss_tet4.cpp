@@ -165,7 +165,7 @@ int main( int argc, char * argv[] )
     std::string name_to_write(out_bname);
 
     std::ostringstream time_idx;
-    time_idx << 900000000 + time;
+    time_idx << SYS_T::index_to_string(time, 9);
     
     disp_sol_name.append(time_idx.str());
     velo_sol_name.append(time_idx.str());

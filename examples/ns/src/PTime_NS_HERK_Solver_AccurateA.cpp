@@ -28,7 +28,7 @@ PTime_NS_HERK_Solver_AccurateA::PTime_NS_HERK_Solver_AccurateA(
 
 std::string PTime_NS_HERK_Solver_AccurateA::Name_Generator(const int &counter) const
 {
-  return pb_name + std::to_string(900000000 + counter);
+  return pb_name + SYS_T::index_to_string(counter, 9);
 }
 
 void PTime_NS_HERK_Solver_AccurateA::print_info() const
