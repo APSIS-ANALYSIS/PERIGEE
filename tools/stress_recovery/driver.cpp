@@ -181,7 +181,7 @@ int main(int argc, char *argv[])
   for(int time = time_start; time<=time_end; time+=time_step)
   {
     std::string name_to_read(isol_bname);
-    const std::string time_suffix = SYS_T::fixed_length_index(time, 9);
+    const std::string time_suffix = SYS_T::fixed_length_index(time);
     name_to_read.append(time_suffix);
 
     std::string name_to_write(osol_bname);

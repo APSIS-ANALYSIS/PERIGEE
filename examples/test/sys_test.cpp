@@ -66,7 +66,7 @@ std::vector<int> ReadNodeMapping_2( const char * const &node_mapping_file,
 
 int main()
 {
-  assert(SYS_T::fixed_length_index(12) == "00000012");
+  assert(SYS_T::fixed_length_index(12) == "000000012");
   assert(SYS_T::fixed_length_index(12, 3) == "012");
   assert(SYS_T::fixed_length_index(0, 8) == "00000000");
   assert(SYS_T::fixed_length_index(123, 3) == "123");

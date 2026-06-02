@@ -207,7 +207,7 @@ int main( int argc, char * argv[] )
   for(int time = time_start; time <= time_end; time += time_step)
   {
     // Generate the file name
-    const std::string time_suffix = SYS_T::fixed_length_index(time, 9);
+    const std::string time_suffix = SYS_T::fixed_length_index(time);
     const std::string name_to_read = sol_bname + time_suffix;
     const std::string name_to_write = out_bname + time_suffix;
 

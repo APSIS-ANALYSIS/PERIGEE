@@ -211,7 +211,7 @@ int main( int argc, char * argv[] )
     velo_sol_name.append("velo_");
     std::string name_to_write(out_bname);
 
-    const std::string time_suffix = SYS_T::fixed_length_index(time, 9);
+    const std::string time_suffix = SYS_T::fixed_length_index(time);
     
     disp_sol_name.append(time_suffix);
     velo_sol_name.append(time_suffix);

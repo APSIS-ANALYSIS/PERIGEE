@@ -93,7 +93,7 @@ namespace SYS_T
   // ! fixed_length_index( index, length )
   //   Format an index as a fixed minimum-length string with leading zeros.
   // --------------------------------------------------------------------------
-  inline std::string fixed_length_index( const int index, const int length = 8 )
+  inline std::string fixed_length_index( const int index, const int length = 9 )
   {
     std::ostringstream ss;
     ss << std::setfill('0') << std::setw(length) << index;

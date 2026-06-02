@@ -29,14 +29,14 @@ void PTime_Solver::print_info() const
 std::string PTime_Solver::Name_Generator( const std::string &middle_name,
     const int &counter ) const
 {
-  return pb_name + middle_name + SYS_T::fixed_length_index(counter, 9);
+  return pb_name + middle_name + SYS_T::fixed_length_index(counter);
 }
 
 std::string PTime_Solver::Name_dot_Generator( const std::string &middle_name,
     const int &counter ) const
 {
   return std::string("dot_") + pb_name + middle_name
-      + SYS_T::fixed_length_index(counter, 9);
+      + SYS_T::fixed_length_index(counter);
 }
 
 void PTime_Solver::TM_Solid_GenAlpha(

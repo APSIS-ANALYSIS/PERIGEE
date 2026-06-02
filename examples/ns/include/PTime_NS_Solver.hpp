@@ -82,12 +82,12 @@ class PTime_NS_Solver
 
     std::string Name_Generator(const int &counter) const
     {
-      return pb_name + SYS_T::fixed_length_index(counter, 9);
+      return pb_name + SYS_T::fixed_length_index(counter);
     }
 
     std::string Name_dot_Generator(const int &counter) const
     {
-      return "dot_" + pb_name + SYS_T::fixed_length_index(counter, 9);
+      return "dot_" + pb_name + SYS_T::fixed_length_index(counter);
     }
 
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
