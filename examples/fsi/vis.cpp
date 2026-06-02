@@ -125,7 +125,6 @@ int main( int argc, char * argv[] )
   auto vtk_w = SYS_T::make_unique<VTK_Writer_FSI>( GMIptr_v->get_nElem(),
       element->get_nLocBas(), element_part_file );
 
-
   // Velocity and displacement node mappings
   const auto an_v_mapping = HDF5_T::read_intVector("node_mapping_v.h5", "/", "old_2_new");
   const auto pn_v_mapping = HDF5_T::read_intVector("post_node_mapping_v.h5", "/", "new_2_old");
