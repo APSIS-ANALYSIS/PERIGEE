@@ -111,7 +111,6 @@ int main( int argc, char * argv[] )
   auto vtk_w = SYS_T::make_unique<VTK_Writer_Elastodynamics>( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file, module_E, nu );
   
-  std::ostringstream time_index;
 
   const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
   const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
@@ -120,10 +119,9 @@ int main( int argc, char * argv[] )
   {
     std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index << SYS_T::fixed_length_index(time, 9);
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string time_suffix = SYS_T::fixed_length_index(time, 9);
+    name_to_read.append(time_suffix);
+    name_to_write.append(time_suffix);
 
     SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );

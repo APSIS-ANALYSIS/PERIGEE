@@ -143,7 +143,6 @@ int main( int argc, char * argv[] )
   VTK_Writer_NS * vtk_w = new VTK_Writer_NS( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
 
-  std::ostringstream time_index;
 
   const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
   const auto pnode_mapping = HDF5_T::read_intVector("post_node_mapping.h5", "/", "new_2_old");
@@ -154,12 +153,11 @@ int main( int argc, char * argv[] )
     std::string name_to_write(out_bname);
     std::string name_to_read_disp(disp_bname);
     std::string name_to_read_mvelo(mvelo_bname);    
-    time_index.str("");
-    time_index << SYS_T::fixed_length_index(time, 9);
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
-    name_to_read_disp.append(time_index.str());
-    name_to_read_mvelo.append(time_index.str());
+    const std::string time_suffix = SYS_T::fixed_length_index(time, 9);
+    name_to_read.append(time_suffix);
+    name_to_write.append(time_suffix);
+    name_to_read_disp.append(time_suffix);
+    name_to_read_mvelo.append(time_suffix);
 
     const std::vector<std::string> name_to_read_list {name_to_read, name_to_read_disp, name_to_read_mvelo};
 

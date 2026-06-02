@@ -197,7 +197,6 @@ int main( int argc, char * argv[] )
   const auto analysis_new2old = HDF5_T::read_intVector("node_mapping.h5", "/", "new_2_old");
 
   // Read solutions
-  std::ostringstream time_index;
 
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
@@ -211,10 +210,9 @@ int main( int argc, char * argv[] )
     // Generate the file name
     std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index << SYS_T::fixed_length_index(time, 9);
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string time_suffix = SYS_T::fixed_length_index(time, 9);
+    name_to_read.append(time_suffix);
+    name_to_write.append(time_suffix);
 
     std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 

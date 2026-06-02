@@ -102,12 +102,11 @@ int main( int argc, char * argv[] )
   velo_sol_name.append("velo_");
   std::string name_to_write(out_bname);
 
-  std::ostringstream time_idx;
-  time_idx << SYS_T::fixed_length_index(time_index, 9);
+  const std::string time_suffix = SYS_T::fixed_length_index(time_index, 9);
   
-  disp_sol_name.append(time_idx.str());
-  velo_sol_name.append(time_idx.str());
-  name_to_write.append(time_idx.str());
+  disp_sol_name.append(time_suffix);
+  velo_sol_name.append(time_suffix);
+  name_to_write.append(time_suffix);
   
   SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
       velo_sol_name.c_str(), name_to_write.c_str() );
