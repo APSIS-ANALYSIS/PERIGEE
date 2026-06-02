@@ -197,7 +197,6 @@ int main( int argc, char * argv[] )
   const auto analysis_new2old = HDF5_T::read_intVector("node_mapping.h5", "/", "new_2_old");
 
   // Read solutions
-
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
   std::vector<double> osi( nFunc, 0.0 ); 
