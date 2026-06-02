@@ -148,15 +148,11 @@ int main( int argc, char * argv[] )
 
   for(int time = time_start; time<=time_end; time+= time_step)
   {
-    std::string name_to_read(sol_bname);
-    std::string name_to_write(out_bname);
-    std::string name_to_read_disp(disp_bname);
-    std::string name_to_read_mvelo(mvelo_bname);    
     const std::string time_suffix = SYS_T::fixed_length_index(time);
-    name_to_read.append(time_suffix);
-    name_to_write.append(time_suffix);
-    name_to_read_disp.append(time_suffix);
-    name_to_read_mvelo.append(time_suffix);
+    const std::string name_to_read = sol_bname + time_suffix;
+    const std::string name_to_write = out_bname + time_suffix;
+    const std::string name_to_read_disp = disp_bname + time_suffix;
+    const std::string name_to_read_mvelo = mvelo_bname + time_suffix;
 
     const std::vector<std::string> name_to_read_list {name_to_read, name_to_read_disp, name_to_read_mvelo};
 

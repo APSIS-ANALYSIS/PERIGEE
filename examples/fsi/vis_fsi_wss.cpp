@@ -53,8 +53,7 @@ int main( int argc, char * argv[] )
 
   SYS_T::GetOptionInt("-time_index", time_index);
 
-  std::string out_bname = sol_bname;
-  out_bname.append("WSS_");
+  const std::string out_bname = sol_bname + "WSS_";
 
   cout<<"==== Command Line Arguments ===="<<endl;
   cout<<" -time_index: "<<time_index<<endl;
@@ -97,16 +96,10 @@ int main( int argc, char * argv[] )
   const auto analysis_new2old = HDF5_T::read_intVector( "node_mapping_v.h5", "/", "new_2_old" );
 
   // Read solution files
-  std::string disp_sol_name(sol_bname), velo_sol_name(sol_bname);
-  disp_sol_name.append("disp_");
-  velo_sol_name.append("velo_");
-  std::string name_to_write(out_bname);
-
   const std::string time_suffix = SYS_T::fixed_length_index(time_index);
-  
-  disp_sol_name.append(time_suffix);
-  velo_sol_name.append(time_suffix);
-  name_to_write.append(time_suffix);
+  const std::string disp_sol_name = sol_bname + "disp_" + time_suffix;
+  const std::string velo_sol_name = sol_bname + "velo_" + time_suffix;
+  const std::string name_to_write = out_bname + time_suffix;
   
   SYS_T::commPrint("Read %s and %s, and write %s. \n", disp_sol_name.c_str(),
       velo_sol_name.c_str(), name_to_write.c_str() );

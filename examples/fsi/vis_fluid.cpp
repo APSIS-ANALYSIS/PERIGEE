@@ -154,15 +154,11 @@ int main( int argc, char * argv[] )
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
-    std::string disp_name_to_read(disp_sol_bname);
-    std::string velo_name_to_read(velo_sol_bname);
-    std::string pres_name_to_read(pres_sol_bname);
-    std::string name_to_write(out_bname);
     const std::string time_suffix = SYS_T::fixed_length_index(time);
-    disp_name_to_read.append(time_suffix);
-    velo_name_to_read.append(time_suffix);
-    pres_name_to_read.append(time_suffix);
-    name_to_write.append(time_suffix);
+    const std::string disp_name_to_read = disp_sol_bname + time_suffix;
+    const std::string velo_name_to_read = velo_sol_bname + time_suffix;
+    const std::string pres_name_to_read = pres_sol_bname + time_suffix;
+    const std::string name_to_write = out_bname + time_suffix;
 
     SYS_T::commPrint("Time %d: Read %s %s %s and Write %s \n",
         time, disp_name_to_read.c_str(), pres_name_to_read.c_str(),
