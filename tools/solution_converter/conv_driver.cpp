@@ -12,11 +12,11 @@
 // Example:
 // ./sol_converter -old_nmap ../build_ns/node_mapping.h5 
 //                 -new_nmap ../build_ns2/node_mapping.h5 
-//                 -sol_name SOL_900000001 
-//                 -out_name NEW_900000001
+//                 -sol_name SOL_000000001 
+//                 -out_name NEW_000000001
 //
-//  SOL_900000001 is compatible with old nmap nodes;
-//  NEW_900000001 is compatible with new nmap nodes.
+//  SOL_000000001 is compatible with old nmap nodes;
+//  NEW_000000001 is compatible with new nmap nodes.
 //
 // Author: Ju Liu
 // Date: Mar. 13 2019
