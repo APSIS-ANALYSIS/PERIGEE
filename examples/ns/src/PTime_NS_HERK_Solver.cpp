@@ -28,7 +28,7 @@ PTime_NS_HERK_Solver::PTime_NS_HERK_Solver(
 
 std::string PTime_NS_HERK_Solver::Name_Generator(const int &counter) const
 {
-  return pb_name + SYS_T::index_to_string(counter, 9);
+  return pb_name + SYS_T::fixed_length_index(counter, 9);
 }
 
 void PTime_NS_HERK_Solver::print_info() const

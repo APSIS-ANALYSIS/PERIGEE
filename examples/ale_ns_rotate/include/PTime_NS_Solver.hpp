@@ -68,7 +68,7 @@ class PTime_NS_Solver
     const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
 
     std::string generateNumericSuffix(const int &counter) const 
-    { return SYS_T::index_to_string(counter, 9); }
+    { return SYS_T::fixed_length_index(counter, 9); }
 
     std::string Name_Generator( const int &counter ) const
     { return pb_name + generateNumericSuffix(counter); }

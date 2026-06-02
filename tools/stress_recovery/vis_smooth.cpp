@@ -145,7 +145,7 @@ int main( int argc, char * argv[] )
     std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
     time_index.str("");
-    time_index << SYS_T::index_to_string(time, 9);
+    time_index << SYS_T::fixed_length_index(time, 9);
     name_to_read.append(time_index.str());
     name_to_write.append(time_index.str());
 

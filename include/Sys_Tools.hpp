@@ -90,10 +90,10 @@ namespace SYS_T
   }
 
   // --------------------------------------------------------------------------
-  // ! index_to_string( index, length )
+  // ! fixed_length_index( index, length )
   //   Format an index as a fixed minimum-length string with leading zeros.
   // --------------------------------------------------------------------------
-  inline std::string index_to_string( const int &index, const int &length = 8 )
+  inline std::string fixed_length_index( const int index, const int length = 8 )
   {
     std::ostringstream ss;
     ss << std::setfill('0') << std::setw(length) << index;
@@ -107,7 +107,7 @@ namespace SYS_T
   inline std::string gen_partfile_name( const std::string &baseName, 
       int rank )
   {
-    return baseName + "_p" + index_to_string(rank, 5) + ".h5";
+    return baseName + "_p" + fixed_length_index(rank, 5) + ".h5";
   }
 
   // --------------------------------------------------------------------------
@@ -117,7 +117,7 @@ namespace SYS_T
   inline std::string gen_capfile_name( const std::string &baseName,
       int index, const std::string &filename )
   {
-    return baseName + index_to_string(index, 3) + filename;
+    return baseName + fixed_length_index(index, 3) + filename;
   }
 
   // --------------------------------------------------------------------------
