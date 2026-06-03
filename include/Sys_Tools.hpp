@@ -93,7 +93,7 @@ namespace SYS_T
   // ! fixed_length_index( index, length )
   //   Format an index as a fixed minimum-length string with leading zeros.
   // --------------------------------------------------------------------------
-  inline std::string fixed_length_index( const int index, const int length = 9 )
+  inline std::string fixed_length_index( int index, int length = 9 )
   {
     std::ostringstream ss;
     ss << std::setfill('0') << std::setw(length) << index;
@@ -184,11 +184,11 @@ namespace SYS_T
   // 2. Print the data name and its value on screen using PetscPrintf
   //    and PETSC_COMM_WORLD. This is particularly designed to print
   //    command line arguments.
-  inline void cmdPrint(const char * const &dataname, int datavalue)
+  inline void cmdPrint(const char * dataname, int datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
-  inline void cmdPrint(const char * const &dataname, double datavalue)
+  inline void cmdPrint(const char * dataname, double datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
-  inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
+  inline void cmdPrint(const char * dataname, const std::string &datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
 
   // 3. Print fatal error message and terminate the MPI process
@@ -458,7 +458,7 @@ namespace SYS_T
   // --------------------------------------------------------------------------
   // Execute a system call
   // --------------------------------------------------------------------------
-  inline void execute( const char * const &command )
+  inline void execute( const char * command )
   {
     int sysret = system( command );
     print_fatal_if(sysret != 0, "Error: system call %s failed. \n", command);
@@ -469,7 +469,7 @@ namespace SYS_T
   // argument. They are really wrappers of the PetscOptionsGetXXXXX
   // functions.
   // ================================================================
-  inline void GetOptionReal( const char * const &name, double &outdata )
+  inline void GetOptionReal( const char * name, double &outdata )
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetReal(PETSC_NULL, name, &outdata, PETSC_NULL);
@@ -480,7 +480,7 @@ namespace SYS_T
 #endif
   }
 
-  inline void GetOptionInt( const char * const &name, int &outdata )
+  inline void GetOptionInt( const char * name, int &outdata )
   {
 #if PETSC_VERSION_LT(3,7,0)
     PetscOptionsGetInt(PETSC_NULL, name, &outdata, PETSC_NULL);
@@ -491,7 +491,7 @@ namespace SYS_T
 #endif
   }
 
-  inline void GetOptionBool( const char * const &name, bool &outdata )
+  inline void GetOptionBool( const char * name, bool &outdata )
   {
     PetscBool pdata = PETSC_FALSE;
     PetscBool flg;
@@ -511,7 +511,7 @@ namespace SYS_T
     }
   }
 
-  inline void GetOptionString( const char * const &name, std::string &outdata )
+  inline void GetOptionString( const char * name, std::string &outdata )
   {
     PetscBool flg;
     char char_outdata[PETSC_MAX_PATH_LEN];
