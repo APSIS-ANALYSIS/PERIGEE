@@ -7,7 +7,6 @@ PTime_NS_HERK_Solver::PTime_NS_HERK_Solver(
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<ITimeMethod_RungeKutta> in_tmRK,
     std::unique_ptr<IFlowRate> in_flrate,
-    std::unique_ptr<IFlowRate> in_dot_flrate,
     std::unique_ptr<PDNSolution> in_sol_base,
     std::unique_ptr<ALocal_InflowBC> in_infnbc, 
     const std::string &input_name, const int &in_nlocalnode,
@@ -16,8 +15,7 @@ PTime_NS_HERK_Solver::PTime_NS_HERK_Solver(
   pb_name(input_name), nlocalnode(in_nlocalnode), gassem(std::move(in_gassem)), 
   lsolver(std::move(in_lsolver)), bc_mat(std::move(in_bc_mat)), 
   tmRK(std::move(in_tmRK)), flrate(std::move(in_flrate)), 
-  dot_flrate(std::move(in_dot_flrate)), sol_base(std::move(in_sol_base)),
-  infnbc(std::move(in_infnbc))
+  sol_base(std::move(in_sol_base)), infnbc(std::move(in_infnbc))
 {
 #ifdef PETSC_USE_LOG
   PetscClassIdRegister("matsolve", &classid_solve);
@@ -203,7 +201,7 @@ void PTime_NS_HERK_Solver::Cal_NS_pres(
   SYS_T::commPrint(" ==> Start calculating the pressure: \n");
 
   // Make the dot_velo meet the Dirchlet boundary
-  rescale_inflow_velo(time_index*dt, dot_flrate.get(), cur_dot_velo);
+  rescale_dot_inflow_velo(time_index*dt, flrate.get(), cur_dot_velo);
 
   gassem->Clear_G();
 
@@ -391,6 +389,45 @@ void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
   }
 
   velo->Assembly_GhostUpdate();
+}
+
+void PTime_NS_HERK_Solver::rescale_dot_inflow_velo( const double &stime,
+    const IFlowRate * const &flowrate, PDNSolution * const &dot_velo ) const
+{
+  const int num_nbc = infnbc -> get_num_nbc();
+
+  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
+  {
+    const int numnode = infnbc -> get_Num_LD( nbc_id );
+
+    const double factor  = flowrate -> get_dot_flow_rate( nbc_id, stime );
+    const double std_dev = flowrate -> get_flow_TI_std_dev( nbc_id );
+
+    for(int ii=0; ii<numnode; ++ii)
+    {
+      const int node_index = infnbc -> get_LDN( nbc_id, ii );
+
+      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
+
+      double base_vals[3];
+
+      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
+
+      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
+      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
+      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
+
+      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
+        base_vals[1] * factor * (1.0 + perturb_y),
+        base_vals[2] * factor * (1.0 + perturb_z) };
+
+      const int dot_velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
+
+      VecSetValues(dot_velo->solution, 3, dot_velo_idx, vals, INSERT_VALUES);
+    }
+  }
+
+  dot_velo->Assembly_GhostUpdate();
 }
 
 // Please make sure the Vec vp is VecNest before using the function

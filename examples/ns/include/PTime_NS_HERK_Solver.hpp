@@ -26,7 +26,6 @@ class PTime_NS_HERK_Solver
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<ITimeMethod_RungeKutta> in_tmRK,
         std::unique_ptr<IFlowRate> in_flrate,
-        std::unique_ptr<IFlowRate> in_dot_flrate,
         std::unique_ptr<PDNSolution> in_sol_base,
         std::unique_ptr<ALocal_InflowBC> in_infnbc,
         const std::string &input_name, const int &in_nlocalnode, 
@@ -64,7 +63,6 @@ class PTime_NS_HERK_Solver
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<ITimeMethod_RungeKutta> tmRK;
     const std::unique_ptr<IFlowRate> flrate;
-    const std::unique_ptr<IFlowRate> dot_flrate;
     const std::unique_ptr<PDNSolution> sol_base;
     const std::unique_ptr<const ALocal_InflowBC> infnbc;
 
@@ -95,6 +93,10 @@ class PTime_NS_HERK_Solver
       void rescale_inflow_velo( const double &stime,
           const IFlowRate * const &flrate, 
           PDNSolution * const &velo ) const;
+
+      void rescale_dot_inflow_velo( const double &stime,
+          const IFlowRate * const &flrate, 
+          PDNSolution * const &dot_velo ) const;
 
       void Update_dot_step(const Vec &vp, 
           PDNSolution * const &step) const;

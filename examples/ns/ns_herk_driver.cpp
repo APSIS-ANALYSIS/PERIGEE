@@ -330,8 +330,8 @@ int main(int argc, char *argv[])
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
-      std::move(inflow_rate), nullptr, std::move(base),
-      std::move(locinfnbc), sol_bName, nlocalnode, sol_record_freq, final_time );
+      std::move(inflow_rate), std::move(base), std::move(locinfnbc),
+      sol_bName, nlocalnode, sol_record_freq, final_time );
 
   tsolver->print_info();
 

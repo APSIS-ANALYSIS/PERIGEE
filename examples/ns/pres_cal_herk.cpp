@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
   // Read analysis code parameter if the solver_cmd.h5 exists
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
  
-  auto cmd_h5r = SYS_T::make_unique<HDF5_Reader>("solver_cmd.h5");
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );  
   
   double initial_step = cmd_h5r -> read_doubleScalar("/","init_step");
   int nqp_vol         = cmd_h5r -> read_intScalar("/", "nqp_vol");
@@ -43,11 +43,15 @@ int main(int argc, char *argv[])
   double fluid_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
   double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
-  auto pcmd_h5r = SYS_T::make_unique<HDF5_Reader>("preprocessor_cmd.h5");
+  delete cmd_h5r;
 
+  HDF5_Reader * pcmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );  
+  
   std::string part_file = pcmd_h5r -> read_string("/", "part_file" );
   const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
   
+  delete pcmd_h5r;
+
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
 
@@ -56,8 +60,8 @@ int main(int argc, char *argv[])
   double cu = 2.0;
   double cp = 0.0;
 
-  // dot_inflow_file
-  std::string dot_inflow_file("dot_inflow_fourier_series.txt");
+  // inflow_file
+  std::string inflow_file("inflow_fourier_series.txt");
 
   // Yaml options
   bool is_loadYaml = true;
@@ -91,7 +95,7 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-L0", L0);
   SYS_T::GetOptionReal("-cu", cu);
   SYS_T::GetOptionReal("-cp", cp);
-  SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
+  SYS_T::GetOptionString("-inflow_file", inflow_file);
   //   SYS_T::GetOptionString("-lpn_file", lpn_file);
   SYS_T::GetOptionReal("-dt", initial_step);
   SYS_T::GetOptionString("-read_sol_name", read_sol_bname);
@@ -116,7 +120,7 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-L0:", L0);
   SYS_T::cmdPrint("-cu:", cu);
   SYS_T::cmdPrint("-cp:", cp);
-  SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
+  SYS_T::cmdPrint("-inflow_file:", inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
   SYS_T::cmdPrint("-read_sol_name:", read_sol_bname);
   SYS_T::cmdPrint("-sol_name:", sol_bname);
@@ -137,7 +141,7 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
-    cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
+    cmdh5w->write_string("inflow_file", inflow_file);
     cmdh5w->write_string("sol_bName", sol_bname);
   }
 
@@ -171,10 +175,10 @@ int main(int argc, char *argv[])
   local_row_size = 4 * nlocalnode;
   local_col_size = local_row_size;
 
-  // dot_inflow rate
-  auto dot_inflow_rate = FlowRateFactory::createFlowRate(dot_inflow_file);
+  // inflow rate
+  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
   
-  dot_inflow_rate->print_info();
+  inflow_rate->print_info();
   
   // ===== LPN models =====
 //   auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
@@ -277,8 +281,8 @@ int main(int argc, char *argv[])
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
       std::move(gloAssem), std::move(lsolver), std::move(pmat), nullptr,
-      nullptr, std::move(dot_inflow_rate), std::move(base),
-      std::move(locinfnbc), sol_bname, nlocalnode, 1, final_time );
+      std::move(inflow_rate), std::move(base), std::move(locinfnbc),
+      sol_bname, nlocalnode, 1, final_time );
 
   tsolver->print_info();
 
