@@ -173,7 +173,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
     <<" associated with "<<phy_3d_name[index_vol1]
     <<" and "<<phy_3d_name[index_vol2]<<std::endl;
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   std::cout<<"-----> write "<<vtp_filename<<".vtp \n";
   mytimer->Reset();
@@ -365,7 +365,6 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
-  delete mytimer;
 }
 
 void Gmsh_FileIO::write_interior_vtp( int index_sur, 
@@ -398,7 +397,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   else
     std::cout<<" without face-to-volume element index. \n";
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   std::cout<<"-----> write "<<vtp_filename<<".vtp \n";
 
@@ -572,7 +571,6 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
-  delete mytimer;
 }
 
 void Gmsh_FileIO::write_vtp(const std::string &vtp_filename,
@@ -598,7 +596,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
   SYS_T::print_fatal_if(VEC_T::get_size(name_list) != num_phy_domain_3d,
     "Error: Gmsh_FileIO::write_each_vtu, the number of files should match the number of 3d domains");
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   for(int ii=0; ii<num_phy_domain_3d; ++ii)
   {
@@ -682,7 +680,6 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
     std::cout<<mytimer->get_sec()<<" sec. \n";
   }
 
-  delete mytimer;
 }
 
 void Gmsh_FileIO::write_each_vtu() const
@@ -697,7 +694,7 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
   std::cout<<"    There are "<<num_phy_domain_3d
     <<" 3D physical domains, with indices: \n";
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
   mytimer->Reset();
   mytimer->Start();
 
@@ -759,7 +756,6 @@ void Gmsh_FileIO::write_vtu( const std::string &in_fname,
 
   mytimer->Stop();
   std::cout<<"    Time taken "<<mytimer->get_sec()<<" sec. \n";
-  delete mytimer;
 }
 
 void Gmsh_FileIO::check_FSI_ordering( const std::string &phy1,
@@ -1414,7 +1410,7 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
   else
     std::cout<<" without face-to-volume element index. \n";
 
-  SYS_T::Timer * mytimer = new SYS_T::Timer();
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
 
   std::cout<<"-----> write "<<vtu_filename<<".vtu \n";
 
@@ -1586,7 +1582,6 @@ void Gmsh_FileIO::write_quadratic_sur_vtu( const std::string &vtu_filename,
 
   mytimer->Stop();
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
-  delete mytimer;
 }
 
 void Gmsh_FileIO::write_quadratic_sur_vtu(const std::string &vtu_filename,
