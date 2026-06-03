@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
   double fluid_mu = 3.5e-2;
   
   // Stabilization para for Darcy problem
-  double L0 = 0.1;
+  double L0 = 1.0;
   double cu = 2.0;
   double cp = 0.0;
 
