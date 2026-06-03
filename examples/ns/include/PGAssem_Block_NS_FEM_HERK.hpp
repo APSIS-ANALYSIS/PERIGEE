@@ -123,7 +123,7 @@ class PGAssem_Block_NS_FEM_HERK
     
     // Assembly the tangent block matrix for the HERK
     void Assem_tangent_matrix(
-        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
+        // const ITimeMethod_RungeKutta * const &tm_RK_ptr,
         const double &dt );
 
     // Assembly the residual vector for the sub-step of HERK        
@@ -164,43 +164,11 @@ class PGAssem_Block_NS_FEM_HERK
         const double &curr_time,
         const double &dt );
 
-    // Assembly the residual vector and tangent matrix for the sub-step of HERK
-    void Assem_tangent_residual_substep(
-        const int &substep_index,
-        PDNSolution ** const &cur_velo_sols,
-        PDNSolution ** const &cur_pres_sols,
-        PDNSolution ** const &pre_velo_sols,
-        PDNSolution * const &pre_velo,
-        PDNSolution ** const &pre_pres_sols,
-        PDNSolution * const &pre_velo_before,
-        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
-        const double &curr_time,
-        const double &dt );
-
-    // Assembly the residual vector and tangent matrix for the final step of HERK
-    void Assem_tangent_residual_finalstep(
-        PDNSolution ** const &cur_velo_sols,
-        PDNSolution * const &cur_velo,
-        PDNSolution ** const &cur_pres_sols,
-        PDNSolution ** const &pre_velo_sols,
-        PDNSolution * const &pre_velo,
-        PDNSolution ** const &pre_pres_sols,
-        PDNSolution * const &pre_velo_before,    
-        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
-        const double &curr_time,
-        const double &dt );
-
-    // Assembly the residual vector and tangent matrix for the pres stage of HERK 
-    void Assem_tangent_residual_presstage(
+    void Assem_residual_calpres(
         PDNSolution * const &cur_dot_velo,
-        PDNSolution ** const &cur_velo_sols,
         PDNSolution * const &cur_velo,
-        PDNSolution ** const &cur_pres_sols,
-        PDNSolution * const &pre_velo,
         PDNSolution * const &cur_pres,    
-        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
-        const double &curr_time,
-        const double &dt );
+        const double &curr_time );
 
     void Update_tangent_alpha_RK( const double &aa )
     {tangent_alpha_RK = aa;}

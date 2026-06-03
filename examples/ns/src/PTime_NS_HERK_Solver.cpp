@@ -166,6 +166,87 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
   delete pre_velo; delete pre_pres; delete pre_velo_before;
 }
 
+void PTime_NS_HERK_Solver::Cal_NS_pres(
+    const PDNSolution * const &init_sol,
+    const PDNSolution * const &init_dot_velo,
+    const PDNSolution * const &init_pres,
+    const PDNSolution * const &init_dot_sol,
+    const int &time_index, const double &dt ) const
+{  
+  // The dot_velo solution at the (n+1)-th time step
+  PDNSolution * cur_dot_velo = new PDNSolution(*init_dot_velo);
+
+  // The pres solution at the (n+1)-th time step
+  PDNSolution * cur_pres = new PDNSolution(*init_pres);
+
+  // The solution at the (n+1)-th time step
+  PDNSolution * cur_sol = new PDNSolution(*init_sol);
+
+  // The dot_solution at the (n+1)-th time step (dot_sol stores dot_velocity and pressure)
+  PDNSolution * cur_dot_sol = new PDNSolution(*init_dot_sol);
+
+  // The velo solution at the (n+1)-th time step
+  PDNSolution * cur_velo = new PDNSolution(*init_dot_velo);
+
+  Update_velocity_from_sol(cur_velo, cur_sol);
+
+  #ifdef PETSC_USE_LOG
+    PetscLogEvent K_solve, update_dotstep;
+    PetscClassId classid_solve;
+    PetscClassIdRegister("matsolve", &classid_solve);
+    PetscLogEventRegister("K_solve", classid_solve, &K_solve);
+    PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
+  #endif
+
+  auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
+
+  SYS_T::commPrint(" ==> Start calculating the pressure: \n");
+
+  // Make the dot_velo meet the Dirchlet boundary
+  rescale_inflow_velo(time_index*dt, dot_flrate.get(), cur_dot_velo);
+
+  gassem->Clear_G();
+
+  gassem->Assem_residual_calpres( cur_dot_velo, cur_velo, cur_pres, time_index*dt );
+
+  gassem->Update_tangent_alpha_RK( 1.0 );
+
+  Vec dot_sol_vp;
+  VecDuplicate( gassem->G, &dot_sol_vp );
+#ifdef PETSC_USE_LOG
+  PetscLogEventBegin(K_solve, 0,0,0,0);
+#endif 
+  lsolver->Solve( gassem->G, dot_sol_vp ); 
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(K_solve,0,0,0,0);
+#endif
+
+#ifdef PETSC_USE_LOG
+PetscLogEventBegin(update_dotstep, 0,0,0,0);
+#endif 
+  Update_dot_step( dot_sol_vp, dot_step.get() );
+#ifdef PETSC_USE_LOG
+  PetscLogEventEnd(update_dotstep, 0,0,0,0);
+#endif
+  
+  VecDestroy( &dot_sol_vp );
+
+  bc_mat->MatMultSol( dot_step.get() );
+
+  SYS_T::commPrint(" \n  --- pressure calculation is finished. \n");
+
+  Update_pressure_velocity(cur_dot_velo, cur_pres, dot_step.get());
+  
+  // Assemble dot_velo and pres at the (n+1)-th time step into a dot_solution vector
+  Update_solutions(cur_dot_velo, cur_pres, cur_dot_sol);
+
+  // Record solution
+  const auto sol_name = Name_Generator( time_index );
+  cur_dot_sol->WriteBinary(sol_name);
+
+  delete cur_velo; delete cur_dot_velo; delete cur_pres; delete cur_sol; delete cur_dot_sol;
+}
+
 void PTime_NS_HERK_Solver::HERK_Solve_NS(
     const double &curr_time, const double &dt,
     PDNSolution ** const &cur_velo_sols,
@@ -288,7 +369,7 @@ void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
     for(int ii=0; ii<numnode; ++ii)
     {
       const int node_index = infnbc -> get_LDN( nbc_id, ii );
-      
+
       const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
 
       double base_vals[3];
@@ -414,6 +495,35 @@ void PTime_NS_HERK_Solver::Update_init_pressure_velocity(
 
   velo->GhostUpdate();
   pres->GhostUpdate();  
+}
+
+void PTime_NS_HERK_Solver::Update_velocity_from_sol(     
+    PDNSolution * const &velo,
+    const PDNSolution * const &sol) const
+{
+  Vec lvelo, lsol;
+  double * array_velo, * array_sol;
+
+  VecGhostGetLocalForm(velo->solution, &lvelo);        
+  VecGhostGetLocalForm(sol->solution, &lsol);
+
+  VecGetArray(lvelo, &array_velo);
+  VecGetArray(lsol, &array_sol);
+
+  for(int ii=0; ii<nlocalnode; ++ii)
+  {
+    array_velo[ii*3 + 0 ] = array_sol[ii*4 + 1];
+    array_velo[ii*3 + 1 ] = array_sol[ii*4 + 2];
+    array_velo[ii*3 + 2 ] = array_sol[ii*4 + 3];
+  }
+
+  VecRestoreArray(lvelo, &array_velo);    
+  VecRestoreArray(lsol, &array_sol);
+  
+  VecGhostRestoreLocalForm(velo->solution, &lvelo);
+  VecGhostRestoreLocalForm(sol->solution, &lsol);
+
+  velo->GhostUpdate();
 }
 
 void PTime_NS_HERK_Solver::Update_solutions(     

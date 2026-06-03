@@ -13,11 +13,18 @@
 #include "FlowRateFactory.hpp"
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver_AccurateA.hpp"
-#include "ExplicitRK_SSPRK3p3s.hpp"
+#include "ExplicitRK_FERK1p2s.hpp"
 #include "ExplicitRK_EMRK2p2s.hpp"
 #include "ExplicitRK_HeunRK2p2s.hpp"
 #include "ExplicitRK_RalstonRK2p2s.hpp"
+#include "ExplicitRK_WrayRK3p3s.hpp"
+#include "ExplicitRK_SSPRK3p3s.hpp"
+#include "ExplicitRK_SSPRK3p4s.hpp"
+#include "ExplicitRK_RalstonRK3p3s.hpp"
 #include "ExplicitRK_PseudoSymplecticRK3p5q4s.hpp"
+#include "ExplicitRK_38RuleRK4p4s.hpp"
+#include "ExplicitRK_ClassicRK4p4s.hpp"
+#include "ExplicitRK_RalstonRK4p4s.hpp"
 #include "Matrix_Free_Tools.hpp"
 #include "Matrix_Free_Tools_AccurateA.hpp"
 
@@ -35,8 +42,6 @@ int main(int argc, char *argv[])
   // fluid properties
   double fluid_density = 1.065;
   double fluid_mu = 3.5e-2;
-  double c_tauc = 1.0; // scaling factor for tau_c, take 0.0, 0.125, or 1.0
-  double c_ct = 4.0;   // C_T parameter for defining tau_M
   
   // Stabilization para for Darcy problem
   double L0 = 0.1;
@@ -97,8 +102,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
   SYS_T::GetOptionReal("-fl_density", fluid_density);
   SYS_T::GetOptionReal("-fl_mu", fluid_mu);
-  SYS_T::GetOptionReal("-c_tauc", c_tauc);
-  SYS_T::GetOptionReal("-c_ct", c_ct);
   SYS_T::GetOptionReal("-L0", L0);
   SYS_T::GetOptionReal("-cu", cu);
   SYS_T::GetOptionReal("-cp", cp);
@@ -124,8 +127,6 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
-  SYS_T::cmdPrint("-c_tauc:", c_tauc);
-  SYS_T::cmdPrint("-c_ct:", c_ct);
   SYS_T::cmdPrint("-L0", L0);
   SYS_T::cmdPrint("-cu", cu);
   SYS_T::cmdPrint("-cp", cp);
@@ -158,6 +159,8 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
+    cmdh5w->write_intScalar("nqp_vol", nqp_vol);
+    cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
     cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
@@ -236,7 +239,7 @@ int main(int argc, char *argv[])
     // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
         ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_RK.get(),
-        fluid_density, fluid_mu, L0, c_ct, c_tauc, cu, cp );
+        fluid_density, fluid_mu, L0, cu, cp );
 
   // ===== Initial condition =====
   std::unique_ptr<PDNSolution> base =
@@ -285,7 +288,7 @@ int main(int argc, char *argv[])
   gloAssem->Fix_nonzero_err_str();
   gloAssem->Clear_subKG();
 
-  gloAssem->Assem_tangent_matrix(tm_RK.get(), initial_step);
+  gloAssem->Assem_tangent_matrix(initial_step);
   
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;

@@ -1,79 +1,28 @@
 // ==================================================================
-// ns code driver.cpp
+// pressure calculation.cpp
 //
-// Finite element code for 3D Navier-Stokes equations using the 
-// Variational Multiscale Formulation and Half-explicit RK time 
-// stepping.
+// Finite element code to calculate the pressure for the 3D Navier-Stokes equations 
+// program using the Variational Multiscale Formulation and Half-explicit RK time stepping.
 //
 // Author: Yujie Sun
-// Date: Apr. 4 2025
+// Date: June. 25 2025
 // ==================================================================
+
 #include "HDF5_Writer.hpp"
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
 #include "PGAssem_Block_NS_FEM_HERK.hpp"
 #include "PTime_NS_HERK_Solver.hpp"
-#include "ExplicitRK_FERK1p2s.hpp"
-#include "ExplicitRK_EMRK2p2s.hpp"
-#include "ExplicitRK_HeunRK2p2s.hpp"
-#include "ExplicitRK_RalstonRK2p2s.hpp"
-#include "ExplicitRK_WrayRK3p3s.hpp"
-#include "ExplicitRK_SSPRK3p3s.hpp"
-#include "ExplicitRK_SSPRK3p4s.hpp"
-#include "ExplicitRK_RalstonRK3p3s.hpp"
-#include "ExplicitRK_PseudoSymplecticRK3p5q4s.hpp"
-#include "ExplicitRK_38RuleRK4p4s.hpp"
-#include "ExplicitRK_ClassicRK4p4s.hpp"
-#include "ExplicitRK_RalstonRK4p4s.hpp"
 #include "Matrix_Free_Tools.hpp"
 
 int main(int argc, char *argv[])
 {
-  // Number of quadrature points for tets and triangles
-  // Suggested values: 5 / 4 for linear, 17 / 13 for quadratic
-  // Number of quadrature points for hexs and quadrangles
-  // Suggested values: 8 / 4 for linear, 64 / 16 for quadratic
-  int nqp_vol = 5, nqp_sur = 4;
+  // solution file name to be loaded for calculating the pressure
+  std::string read_sol_bname("SOL_");
+  int time_start = 0, time_step = 1, time_end = 1;
 
-  // Estimate of the nonzero per row for the sparse matrix
-  int nz_estimate = 300;
-
-  // fluid properties
-  double fluid_density = 1.065;
-  double fluid_mu = 3.5e-2;
-  
-  // Stabilization para for Darcy problem
-  double L0 = 0.1;
-  double cu = 2.0;
-  double cp = 2.0;
-
-  // inflow file
-  std::string inflow_file("inflow_fourier_series.txt");
-
-  // LPN file
-//   std::string lpn_file("lpn_rcr_input.txt");
-
-  // part file location
-  std::string part_file("part");
-
-  // time stepping parameters
-  double initial_time = 0.0; // time of the initial condition
-  double initial_step = 0.1; // time step size
-  int initial_index = 0;     // indiex of the initial condition
-  double final_time = 1.0;   // final time
-  std::string sol_bName("SOL_"); // base name of the solution file
-  int sol_record_freq = 1;   // frequency of recording the solution
-
-  // Restart options
-  bool is_restart = false;
-  int restart_index = 0;             // restart solution time index
-  double restart_time = 0.0;         // restart time
-  double restart_step = 1.0e-3;      // restart simulation time step size
-  std::string restart_name = "SOL_"; // restart solution base name
-
-  // Yaml options
-  bool is_loadYaml = true;
-  std::string yaml_file("./runscript.yml");
+  // base name of the dot_solution file
+  std::string sol_bname("dot_SOL_");
 
 #if PETSC_VERSION_LT(3,19,0)
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);
@@ -81,10 +30,53 @@ int main(int argc, char *argv[])
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULLPTR);
 #endif
 
+  SYS_T::print_perigee_art();
+
+  // Read analysis code parameter if the solver_cmd.h5 exists
+  SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
+ 
+  hid_t solcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( solcmd_file );
+
+  double initial_step = cmd_h5r -> read_doubleScalar("/","init_step");
+  int nqp_vol         = cmd_h5r -> read_intScalar("/", "nqp_vol");
+  int nqp_sur         = cmd_h5r -> read_intScalar("/", "nqp_sur");
+  double fluid_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
+  double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
+
+  delete cmd_h5r; H5Fclose(solcmd_file);
+
+  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
+  HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
+
+  std::string part_file = pcmd_h5r -> read_string("/", "part_file" );
+  const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
+  
+  delete pcmd_h5r; H5Fclose(prepcmd_file);
+
+  // Estimate of the nonzero per row for the sparse matrix
+  int nz_estimate = 300;
+
+  // Stabilization para for Darcy problem
+  double L0 = 0.1;
+  double cu = 2.0;
+  double cp = 2.0;
+
+  // dot_inflow_file
+  std::string dot_inflow_file("dot_inflow_fourier_series.txt");
+
+  // Yaml options
+  bool is_loadYaml = true;
+  std::string yaml_file("./runscript.yml");
+
   const PetscMPIInt rank = SYS_T::get_MPI_rank();
   const PetscMPIInt size = SYS_T::get_MPI_size();
 
-  SYS_T::print_perigee_art();
+  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
+
+  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
+      "Error: Assigned CPU number does not match the partition. \n");
 
   // ===== Yaml Arguments =====
   SYS_T::GetOptionBool("-is_loadYaml", is_loadYaml);
@@ -95,6 +87,9 @@ int main(int argc, char *argv[])
   // ===== Read Command Line Arguments =====
   SYS_T::commPrint("===> Reading arguments from Command line ... \n");
 
+  SYS_T::GetOptionInt("-time_start", time_start);
+  SYS_T::GetOptionInt("-time_step", time_step);
+  SYS_T::GetOptionInt("-time_end", time_end);
   SYS_T::GetOptionInt("-nqp_vol", nqp_vol);
   SYS_T::GetOptionInt("-nqp_sur", nqp_sur);
   SYS_T::GetOptionInt("-nz_estimate", nz_estimate);
@@ -103,63 +98,57 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionReal("-L0", L0);
   SYS_T::GetOptionReal("-cu", cu);
   SYS_T::GetOptionReal("-cp", cp);
-  SYS_T::GetOptionString("-inflow_file", inflow_file);
-//   SYS_T::GetOptionString("-lpn_file", lpn_file);
+  SYS_T::GetOptionString("-dot_inflow_file", dot_inflow_file);
+  //   SYS_T::GetOptionString("-lpn_file", lpn_file);
+  SYS_T::GetOptionReal("-dt", initial_step);
+  SYS_T::GetOptionString("-read_sol_name", read_sol_bname);
+  SYS_T::GetOptionString("-sol_name", sol_bname);
   SYS_T::GetOptionString("-part_file", part_file);
-  SYS_T::GetOptionReal("-init_time", initial_time);
-  SYS_T::GetOptionReal("-fina_time", final_time);
-  SYS_T::GetOptionReal("-init_step", initial_step);
-  SYS_T::GetOptionInt("-init_index", initial_index);
-  SYS_T::GetOptionInt("-sol_rec_freq", sol_record_freq);
-  SYS_T::GetOptionString("-sol_name", sol_bName);
-  SYS_T::GetOptionBool("-is_restart", is_restart);
-  SYS_T::GetOptionInt("-restart_index", restart_index);
-  SYS_T::GetOptionReal("-restart_time", restart_time);
-  SYS_T::GetOptionReal("-restart_step", restart_step);
-  SYS_T::GetOptionString("-restart_name", restart_name);
+
+  // time stepping parameters
+  // Assuming SOL_900000000 corresponds to a time of 0.0s
+  double initial_time = time_start * initial_step;
+  int initial_index = time_start;
+  double final_time = initial_time + time_end * initial_step;
 
   // ===== Print Command Line Arguments =====
+  SYS_T::cmdPrint("-time_start:", time_start);
+  SYS_T::cmdPrint("-time_step:", time_step);
+  SYS_T::cmdPrint("-time_end:", time_end);
   SYS_T::cmdPrint("-nqp_vol:", nqp_vol);
   SYS_T::cmdPrint("-nqp_sur:", nqp_sur);
   SYS_T::cmdPrint("-nz_estimate:", nz_estimate);
   SYS_T::cmdPrint("-fl_density:", fluid_density);
   SYS_T::cmdPrint("-fl_mu:", fluid_mu);
-  SYS_T::cmdPrint("-L0", L0);
-  SYS_T::cmdPrint("-cu", cu);
-  SYS_T::cmdPrint("-cp", cp);
-  SYS_T::cmdPrint("-inflow_file:", inflow_file);
+  SYS_T::cmdPrint("-L0:", L0);
+  SYS_T::cmdPrint("-cu:", cu);
+  SYS_T::cmdPrint("-cp:", cp);
+  SYS_T::cmdPrint("-dot_inflow_file:", dot_inflow_file);
 //   SYS_T::cmdPrint("-lpn_file:", lpn_file);
-  SYS_T::cmdPrint("-part_file:", part_file);;
+  SYS_T::cmdPrint("-read_sol_name:", read_sol_bname);
+  SYS_T::cmdPrint("-sol_name:", sol_bname);
+  SYS_T::cmdPrint("-part_file:", part_file);
   SYS_T::cmdPrint("-init_time:", initial_time);
-  SYS_T::cmdPrint("-init_step:", initial_step);
+  SYS_T::cmdPrint("-dt:", initial_step);
   SYS_T::cmdPrint("-init_index:", initial_index);
   SYS_T::cmdPrint("-fina_time:", final_time);
-  SYS_T::cmdPrint("-sol_rec_freq:", sol_record_freq);
-  SYS_T::cmdPrint("-sol_name:", sol_bName);
-  if(is_restart)
-  {
-    SYS_T::commPrint("-is_restart: true \n");
-    SYS_T::cmdPrint("-restart_index:", restart_index);
-    SYS_T::cmdPrint("-restart_time:", restart_time);
-    SYS_T::cmdPrint("-restart_step:", restart_step);
-    SYS_T::cmdPrint("-restart_name:", restart_name);
-  }
-  else SYS_T::commPrint("-is_restart: false \n");
 
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("solver_cmd.h5");
+    hid_t cmd_file_id = H5Fcreate("solver_pres_cmd.h5",
+        H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
+    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
-    cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
     cmdh5w->write_intScalar("nqp_vol", nqp_vol);
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
-    cmdh5w->write_string("inflow_file", inflow_file);
-    cmdh5w->write_string("c", dot_inflow_file);
+    cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
+    cmdh5w->write_string("sol_bName", sol_bname);
+    delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -192,20 +181,11 @@ int main(int argc, char *argv[])
   local_row_size = 4 * nlocalnode;
   local_col_size = local_row_size;
 
-  SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
-
-  SYS_T::print_fatal_if( size!= ANL_T::get_cpu_size(part_file, rank),
-      "Error: Assigned CPU number does not match the partition. \n");
-
-  SYS_T::commPrint("===> %d processor(s) are assigned for FEM analysis. \n", size);
-
-  // ===== Inflow flow rate =====
-  SYS_T::commPrint("===> Setup inflow flow rate. \n");
-
-  auto inflow_rate = FlowRateFactory::createFlowRate(inflow_file);
-
-  inflow_rate->print_info();
-
+  // dot_inflow rate
+  auto dot_inflow_rate = FlowRateFactory::createFlowRate(dot_inflow_file);
+  
+  dot_inflow_rate->print_info();
+  
   // ===== LPN models =====
 //   auto gbc = GenBCFactory::createGenBC(lpn_file, initial_time, initial_step, 
 //       initial_index, 1000);
@@ -221,50 +201,31 @@ int main(int argc, char *argv[])
 
   pmat->gen_perm_bc(pNode.get(), locnbc.get());
 
-  // ===== Half Explicit Runge Kutta scheme =====
-  SYS_T::commPrint("===> Setup the Runge Kutta time scheme.\n");
-
-  std::unique_ptr<ITimeMethod_RungeKutta> tm_RK = SYS_T::make_unique<ExplicitRK_SSPRK3p3s>();
-
-  tm_RK->print_coefficients();
- 
-    // ===== HERK Local Assembly routine =====
+  // ===== HERK Local Assembly routine =====
   auto locAssem = SYS_T::make_unique<PLocAssem_Block_VMS_NS_HERK>(
-        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, tm_RK.get(),
+        ANL_T::get_elemType(part_file, rank), nqp_vol, nqp_sur, nullptr,
         fluid_density, fluid_mu, L0, cu, cp );
 
   // ===== Initial condition =====
-  std::unique_ptr<PDNSolution> base =
-    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 );    
-
+  // dot_sol stores boundary base of dot_velocity
+   std::unique_ptr<PDNSolution> base =
+    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), fNode.get(), locinfnbc.get(), 1 ); 
+ 
+  // sol stores velocity and pressure (pressure equals to 0)
   std::unique_ptr<PDNSolution> sol =
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
 
-  std::unique_ptr<PDNSolution> velo =
-    PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
-
+  // dot_sol stores dot_velocity and pressure
+  std::unique_ptr<PDNSolution> dot_sol =
+    SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
+  
+  // pres sol stores pressure
   std::unique_ptr<PDNSolution> pres =
-    PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
-
+    SYS_T::make_unique<PDNSolution_P>( pNode.get(), 0, true, "pres" );
+  
+  // dot_velo stores dot velocity
   std::unique_ptr<PDNSolution> dot_velo =
-    PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
-
-  if( is_restart )
-  {
-    initial_index = restart_index;
-    initial_time  = restart_time;
-    initial_step  = restart_step;
-
-    // Read sol file
-    SYS_T::file_check(restart_name);
-    sol->ReadBinary(restart_name);
-
-    SYS_T::commPrint("===> Read sol from disk as a restart run... \n");
-    SYS_T::commPrint("     restart_name: %s \n", restart_name.c_str());
-    SYS_T::commPrint("     restart_time: %e \n", restart_time);
-    SYS_T::commPrint("     restart_index: %d \n", restart_index);
-    SYS_T::commPrint("     restart_step: %e \n", restart_step);
-  }
+    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "dot_velo" );
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
@@ -280,8 +241,7 @@ int main(int argc, char *argv[])
   gloAssem->Fix_nonzero_err_str();
   gloAssem->Clear_subKG();
 
-  // gloAssem->Assem_tangent_matrix(tm_RK.get(), initial_step);
-  gloAssem->Assem_tangent_matrix(initial_step);
+  gloAssem->Assem_tangent_matrix(1.0);
 
   // ===== Initialize the shell tangent matrix =====
   Mat K_shell;
@@ -323,16 +283,12 @@ int main(int argc, char *argv[])
   KSPSetPC( lsolver->ksp, pc_shell ); 
   
   lsolver->SetOperator(K_shell); 
-
-  // ===== Time step info ===== 
-  auto timeinfo = SYS_T::make_unique<PDNTimeStep>(initial_index, initial_time, 
-      initial_step);
  
   // ===== Temporal solver context =====
   auto tsolver = SYS_T::make_unique<PTime_NS_HERK_Solver>(
-      std::move(gloAssem), std::move(lsolver), std::move(pmat), std::move(tm_RK),
-      std::move(inflow_rate), nullptr, std::move(base),
-      std::move(locinfnbc), sol_bName, nlocalnode, sol_record_freq, final_time );
+      std::move(gloAssem), std::move(lsolver), std::move(pmat), nullptr,
+      nullptr, std::move(dot_inflow_rate), std::move(base),
+      std::move(locinfnbc), sol_bname, nlocalnode, 1, final_time );
 
   tsolver->print_info();
 
@@ -340,8 +296,26 @@ int main(int argc, char *argv[])
 
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  tsolver->TM_NS_HERK(is_restart, std::move(sol), std::move(velo), std::move(dot_velo), 
-      std::move(pres), std::move(timeinfo));
+  
+  // Read the sol
+  std::ostringstream time_index;
+  for (int time = time_start; time<=time_end; time += time_step)
+  {
+    std::string name_to_read(read_sol_bname);
+    std::string name_to_write(sol_bname);
+    time_index.str("");
+    time_index<< 900000000 + time;
+    name_to_read.append(time_index.str());
+    name_to_write.append(time_index.str());
+
+    SYS_T::commPrint("Time %f: Read %s, Write %s.\n", 
+      time*initial_step, name_to_read.c_str(), name_to_write.c_str() );
+    
+    SYS_T::file_check(name_to_read);
+      sol->ReadBinary(name_to_read);
+
+    tsolver->Cal_NS_pres(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), time, initial_step);
+  }
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();
@@ -353,9 +327,11 @@ int main(int argc, char *argv[])
   PCDestroy(&pc_shell);
   tsolver.reset();
   solverCtx.reset();
+  sol.reset(); dot_velo.reset(); 
+  pres.reset(); dot_sol.reset();
 
   PetscFinalize();
-  return EXIT_SUCCESS;
+  return EXIT_SUCCESS;  
 }
 
 // EOF
