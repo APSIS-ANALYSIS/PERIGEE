@@ -153,17 +153,6 @@ class PGAssem_Block_NS_FEM_HERK
         const double &dt );
 
     // Assembly the residual vector for the pres stage of HERK 
-    void Assem_residual_presstage(
-        PDNSolution * const &cur_dot_velo,
-        PDNSolution ** const &cur_velo_sols,
-        PDNSolution * const &cur_velo,
-        PDNSolution ** const &cur_pres_sols,
-        PDNSolution * const &pre_velo,
-        PDNSolution * const &cur_pres,    
-        const ITimeMethod_RungeKutta * const &tm_RK_ptr,
-        const double &curr_time,
-        const double &dt );
-
     void Assem_residual_calpres(
         PDNSolution * const &cur_dot_velo,
         PDNSolution * const &cur_velo,
