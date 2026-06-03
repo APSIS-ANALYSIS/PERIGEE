@@ -24,15 +24,15 @@ class Field_Property
   public:
     Field_Property() : id(0), dofNum(1), is_geo_field(true), name("unspecified") {};
 
-    Field_Property( const int &input_id, const int &input_dof, const bool &input_geo_flag, const std::string &input_name ) : id( input_id ), dofNum( input_dof ), is_geo_field( input_geo_flag ), name( input_name ) {};
+    Field_Property( int input_id, int input_dof, bool input_geo_flag, const std::string &input_name ) : id( input_id ), dofNum( input_dof ), is_geo_field( input_geo_flag ), name( input_name ) {};
 
-    virtual ~Field_Property() = default;
+    ~Field_Property() noexcept = default;
 
-    int get_id() const {return id;}
+    int get_id() const noexcept {return id;}
 
-    int get_dofNum() const {return dofNum;}
+    int get_dofNum() const noexcept {return dofNum;}
 
-    bool get_is_geo_field() const {return is_geo_field;}
+    bool get_is_geo_field() const noexcept {return is_geo_field;}
 
     std::string get_name() const {return name;}
 

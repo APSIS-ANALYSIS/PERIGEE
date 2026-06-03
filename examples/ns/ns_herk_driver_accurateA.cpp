@@ -153,9 +153,7 @@ int main(int argc, char *argv[])
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("solver_cmd.h5",
-        H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("solver_cmd.h5");
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
@@ -166,8 +164,6 @@ int main(int argc, char *argv[])
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
     cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
-    cmdh5w->write_string("sol_bName", sol_bName);
-    delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -253,13 +249,13 @@ int main(int argc, char *argv[])
     SYS_T::make_unique<PDNSolution_NS>( pNode.get(), 0 );
 
   std::unique_ptr<PDNSolution> velo =
-    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "velo" );
+    PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
 
   std::unique_ptr<PDNSolution> pres =
-    SYS_T::make_unique<PDNSolution_P>( pNode.get(), 0, true, "pres" );
+    PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
 
   std::unique_ptr<PDNSolution> dot_velo =
-    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "dot_velo" );
+    PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
 
   if( is_restart )
   {

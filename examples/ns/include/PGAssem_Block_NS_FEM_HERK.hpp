@@ -16,8 +16,6 @@
 // ==================================================================
 #include "PETSc_Tools.hpp"
 #include "PDNSolution_NS.hpp"
-#include "PDNSolution_V.hpp"
-#include "PDNSolution_P.hpp"
 #include "PLocAssem_Block_VMS_NS_HERK.hpp"
 #include "APart_Node.hpp"
 #include "ALocal_Elem.hpp"

@@ -1,6 +1,6 @@
 #include "FEAElement_Triangle6_3D_der0.hpp"
 
-FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( const int &in_nqua )
+FEAElement_Triangle6_3D_der0::FEAElement_Triangle6_3D_der0( int in_nqua )
 : numQuapts( in_nqua )
 {
   R.resize(nLocBas * numQuapts, 0.0);
@@ -15,10 +15,10 @@ void FEAElement_Triangle6_3D_der0::print_info() const
   SYS_T::commPrint("Note: This element is designed for natural BC integrals.\n");
 }
 
-void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
-    const double * const &ctrl_x,
-    const double * const &ctrl_y,
-    const double * const &ctrl_z )
+void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * quad,
+    const double * ctrl_x,
+    const double * ctrl_y,
+    const double * ctrl_z )
 {
   ASSERT(quad->get_dim() == 3, "FEAElement_Triangle6_3D_der0::buildBasis function error.\n" );
 
@@ -60,7 +60,7 @@ void FEAElement_Triangle6_3D_der0::buildBasis( const IQuadPts * const &quad,
 }
 
 void FEAElement_Triangle6_3D_der0::get_R( 
-    const int &quaindex, double * const &basis ) const
+    int quaindex, double * basis ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
@@ -73,14 +73,14 @@ void FEAElement_Triangle6_3D_der0::get_R(
 }
 
 std::vector<double> FEAElement_Triangle6_3D_der0::get_R( 
-    const int &quaindex ) const
+    int quaindex ) const
 {
   ASSERT(quaindex>=0 && quaindex < numQuapts, "FEAElement_Triangle6_3D_der0::get_R function error.\n" );
   const int offset = quaindex * nLocBas;
   return { R[offset], R[offset+1], R[offset+2], R[offset+3], R[offset+4], R[offset+5] };
 }
 
-Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
+Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( int qua,
     double &area ) const
 {
   ASSERT(qua >= 0 && qua < numQuapts, "FEAElement_Triangle6_3D_der0::get_2d_normal_out function error.\n" );
@@ -88,7 +88,7 @@ Vector_3 FEAElement_Triangle6_3D_der0::get_2d_normal_out( const int &qua,
   return un[qua];
 }
 
-Vector_3 FEAElement_Triangle6_3D_der0::get_normal_out( const int &qua,
+Vector_3 FEAElement_Triangle6_3D_der0::get_normal_out( int qua,
     const Vector_3 &sur_pt, const Vector_3 &int_pt, double &len ) const
 {
   // Construct a vector starting from the interior point to the triangle

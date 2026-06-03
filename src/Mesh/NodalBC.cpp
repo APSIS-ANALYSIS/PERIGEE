@@ -1,4 +1,6 @@
 #include "NodalBC.hpp"
+#include "Vec_Tools.hpp"
+#include "VTK_Tools.hpp"
 
 NodalBC::NodalBC( const int &nFunc )
 {
@@ -237,8 +239,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
     const int &nFunc, const int &type )
 {
-  clock_t log_time = clock();
- 
   // Clean allocation first 
   dir_nodes.clear();
   per_slave_nodes.clear();
@@ -265,9 +265,7 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 
   Create_ID( nFunc );
 
-  log_time = clock() - log_time;
-  std::cout<<"===> NodalBC, type = "<<type<<" is generated. ";
-  std::cout<<"Time taken: "<<((float) log_time)/CLOCKS_PER_SEC<<" seconds."<<std::endl; 
+  std::cout<<"===> NodalBC, type = "<<type<<" is generated.\n";
 }
 
 void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,

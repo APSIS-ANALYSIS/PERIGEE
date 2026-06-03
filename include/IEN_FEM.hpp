@@ -14,14 +14,15 @@
 #include "Sys_Tools.hpp"
 #include "Vec_Tools.hpp"
 #include "IIEN.hpp"
+#include <utility>
 
 class IEN_FEM final : public IIEN
 {
   public:
-    IEN_FEM( const int &in_nelem, const std::vector<int> &in_ien ) 
+    IEN_FEM( const int &in_nelem, std::vector<int> &&in_ien ) 
       : nElem( in_nelem ),
         nLocBas( VEC_T::get_size( in_ien )/nElem ),
-        IEN( in_ien )
+        IEN( std::move(in_ien) )
     {
       SYS_T::print_fatal_if( VEC_T::get_size( in_ien ) % nElem != 0,
           "Error: IEN_FEM input IEN vector size cannot do a perfect division by input number of elements. This suggests the mesh main contain different types of elements. \n" );

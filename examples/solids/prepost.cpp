@@ -1,0 +1,111 @@
+// ============================================================================
+// prepost.cpp
+// 
+// This is a prepost driver for handling solid mechanics problems using the
+// stabilized mixed formulation.
+//
+// Date Created: Jan 06 2026
+// ============================================================================
+ #include "Timer.hpp"
+ #include "HDF5_Reader.hpp"
+ #include "VTK_Tools.hpp"
+ #include "IEN_FEM.hpp"
+ #include "Global_Part_METIS.hpp"
+ #include "Global_Part_Serial.hpp"
+ #include "Part_FEM.hpp"
+ #include "yaml-cpp/yaml.h"
+
+int main( int argc, char * argv[] )
+{
+  // Set number of threads and print info of OpenMP
+  SYS_T::print_omp_info();
+  SYS_T::set_omp_num_threads();
+
+  // Clean the existing part hdf5 files of prepost
+  SYS_T::execute("rm -rf ppart");
+  SYS_T::execute("mkdir ppart");
+
+  // Define the partition file name
+  const std::string part_file("./ppart/part");
+
+  // Read the problem setting recorded in the .h5 file
+  auto cmd_h5r = SYS_T::make_unique<HDF5_Reader>("preprocessor_cmd.h5");
+
+  const std::string geo_file     = cmd_h5r -> read_string("/", "geo_file");
+  const std::string elemType_str = cmd_h5r -> read_string("/","elemType");
+  const FEType elemType          = FE_T::to_FEType(elemType_str);
+
+  const int dofNum = cmd_h5r -> read_intScalar("/","dof_num");
+  const int dofMat = cmd_h5r -> read_intScalar("/","dof_mat");
+
+  cmd_h5r.reset();
+
+  // The user can specify the new mesh partition options from the yaml file
+  const std::string yaml_file("preprocess.yml");
+  SYS_T::file_check(yaml_file); 
+  std::cout << yaml_file << " found. \n";
+
+  YAML::Node paras = YAML::LoadFile( yaml_file );
+
+  const int cpu_size    = paras["cpu_size"].as<int>();
+  const int in_ncommon  = paras["in_ncommon"].as<int>();
+  const bool isDualGraph = paras["is_dualgraph"].as<bool>();
+
+  std::cout << "==== Command Line Arguments ====" << std::endl;
+  std::cout << " -cpu_size: "   << cpu_size   << std::endl;
+  std::cout << " -in_ncommon: " << in_ncommon << std::endl;
+  if(isDualGraph) std::cout << " -METIS_isDualGraph: true \n";
+  else std::cout << " -METIS_isDualGraph: false \n";
+  std::cout << "----------------------------------\n";
+  std::cout << "-part_file: " << part_file    << std::endl;
+  std::cout << "-geo_file: "  << geo_file     << std::endl;
+  std::cout << "-elemType: "  << elemType_str << std::endl;
+  std::cout << "-dof_num: "   << dofNum       << std::endl;
+  std::cout << "-dof_mat: "   << dofMat       << std::endl;
+
+  // Read the volumetric mesh file from the vtu file: geo_file
+  int nFunc, nElem;
+  std::vector<int> vecIEN;
+  std::vector<double> ctrlPts;
+
+  VTK_T::read_vtu_grid(geo_file, nFunc, nElem, ctrlPts, vecIEN);
+
+  auto IEN = SYS_T::make_unique<IEN_FEM>(nElem, std::move(vecIEN));
+  
+
+  const int nLocBas = FE_T::to_nLocBas(elemType);
+
+  SYS_T::print_fatal_if( IEN->get_nLocBas() != nLocBas, "Error: the nLocBas from the given element type is %d and the mesh file is %d, which do not match. \n", nLocBas, IEN->get_nLocBas());
+
+  // Call METIS to partition the mesh
+  std::unique_ptr<IGlobal_Part> global_part = nullptr;
+  if(cpu_size > 1)
+    global_part = SYS_T::make_unique<Global_Part_METIS>( cpu_size, in_ncommon,
+        isDualGraph, nElem, nFunc, nLocBas, IEN.get(), "post_epart", "post_npart" );
+  else if(cpu_size == 1)
+    global_part = SYS_T::make_unique<Global_Part_Serial>( nElem, nFunc, "post_epart", "post_npart" );
+  else SYS_T::print_fatal("ERROR: wrong cpu_size: %d \n", cpu_size);
+
+  auto mnindex = SYS_T::make_unique<Map_Node_Index>(global_part.get(), cpu_size, nFunc);
+  mnindex->write_hdf5("post_node_mapping");
+
+  std::cout<<"=== Start Partition ... \n";
+  auto mytimer = SYS_T::make_unique<SYS_T::Timer>();
+
+  for(int proc_rank = 0; proc_rank < cpu_size; ++proc_rank)
+  {
+    mytimer->Reset();
+    mytimer->Start();
+    
+    auto part = SYS_T::make_unique<Part_FEM>( nElem, nFunc, nLocBas, global_part.get(), mnindex.get(), IEN.get(),
+        ctrlPts, proc_rank, cpu_size, elemType, Field_Property(0, dofNum, true, "linearPDE") );
+    part->write(part_file.c_str());
+    
+    mytimer->Stop();
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+  }
+  
+  return EXIT_SUCCESS;
+}
+
+// EOF

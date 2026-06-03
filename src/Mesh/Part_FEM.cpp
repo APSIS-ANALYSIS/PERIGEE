@@ -1,4 +1,6 @@
 #include "Part_FEM.hpp"
+#include "HDF5_Reader.hpp"
+#include "HDF5_Writer.hpp"
 
 Part_FEM::Part_FEM(
     const int &in_nelem, const int &in_nfunc, const int &in_nlocbas,
@@ -125,8 +127,7 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( inputfileName, in_cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   // local elements 
   elem_loc = h5r->read_intVector( "Local_Elem", "elem_loc" );
@@ -192,8 +193,6 @@ Part_FEM::Part_FEM( const std::string &inputfileName, const int &in_cpu_rank )
     ctrlPts_y_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
     ctrlPts_z_loc = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
   }
-
-  delete h5r; H5Fclose( file_id );
 }
 
 Part_FEM::~Part_FEM()
@@ -332,9 +331,8 @@ void Part_FEM::write( const std::string &inputFileName ) const
 {
   const std::string fName = SYS_T::gen_partfile_name( inputFileName, cpu_rank );
 
-  hid_t file_id = H5Fcreate(fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName );
+  const hid_t file_id = h5w->get_file_id();
 
   // group 1: local element
   hid_t group_id_1 = H5Gcreate(file_id, "/Local_Elem", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
@@ -414,10 +412,6 @@ void Part_FEM::write( const std::string &inputFileName ) const
 
     H5Gclose( group_id_6 );
   }
-
-  // Finish writing, clean up
-  delete h5w;
-  H5Fclose(file_id);
 }
 
 void Part_FEM::print_part_ele() const

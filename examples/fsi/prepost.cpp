@@ -5,6 +5,7 @@
 //
 // Date: Jan 16 2022
 // ==================================================================
+#include "Timer.hpp"
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"
@@ -31,9 +32,8 @@ int main( int argc, char * argv[] )
   const int num_fields = 2; // Two fields : pressure + velocity/displacement
   const std::vector<int> dof_fields {1, 3}; // pressure 1 ; velocity/displacement 3
 
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
 
   const std::string geo_file = cmd_h5r -> read_string("/", "geo_file");
   const std::string sur_s_file_interior_wall = cmd_h5r -> read_string("/", "sur_s_file_interior_wall");
@@ -41,7 +41,7 @@ int main( int argc, char * argv[] )
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // The user can specify the new mesh partition options from the yaml file
   const std::string yaml_file("fsi_prepost.yml");
@@ -56,18 +56,18 @@ int main( int argc, char * argv[] )
   const std::string part_file_v = paras["part_file_v"].as<std::string>();
   const std::string part_file_p = paras["part_file_p"].as<std::string>();
 
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -part_file_v: "<<part_file_v<<endl;
-  cout<<" -part_file_p: "<<part_file_p<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -is_dualgraph: true \n";
-  else cout<<" -is_dualgraph: false \n";
-  cout<<"----------------------------------\n";
-  cout<<"geo_file: "<<geo_file<<endl;
-  cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<endl;
-  cout<<"elemType: "<<elemType_str<<endl;
-  cout<<"==== Command Line Arguments ===="<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -part_file_v: "<<part_file_v<<std::endl;
+  std::cout<<" -part_file_p: "<<part_file_p<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -is_dualgraph: true \n";
+  else std::cout<<" -is_dualgraph: false \n";
+  std::cout<<"----------------------------------\n";
+  std::cout<<"geo_file: "<<geo_file<<std::endl;
+  std::cout<<"sur_s_file_interior_wall: "<<sur_s_file_interior_wall<<std::endl;
+  std::cout<<"elemType: "<<elemType_str<<std::endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
 
   // Read the geometry file for the whole FSI domain for the velocity /
   // displacement field
@@ -79,8 +79,13 @@ int main( int argc, char * argv[] )
   
   const std::vector<int> phy_tag = VTK_T::read_int_CellData( geo_file, "Physics_tag" );
 
+  // We will generate a new IEN array for the pressure variable by updating the
+  // IEN for the solid element. If the solid element has node on the fluid-solid
+  // interface, it will be mapped to the new index, that is nFunc + ii.
+  std::vector<int> vecIEN_p ( vecIEN );
+
   // Generate IEN
-  IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );
+  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
 
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
@@ -91,11 +96,6 @@ int main( int argc, char * argv[] )
 
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
   const int nFunc_p = nFunc_v + nFunc_interface;
-
-  // We will generate a new IEN array for the pressure variable by updating the
-  // IEN for the solid element. If the solid element has node on the fluid-solid
-  // interface, it will be mapped to the new index, that is nFunc + ii.
-  std::vector<int> vecIEN_p ( vecIEN );
 
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -124,9 +124,8 @@ int main( int argc, char * argv[] )
     }
   }
 
-  IIEN * IEN_p = new IEN_FEM( nElem, vecIEN_p );
-
-  VEC_T::clean( vecIEN ); VEC_T::clean( vecIEN_p );
+  IIEN * IEN_p = new IEN_FEM( nElem, std::move(vecIEN_p) );
+ 
   // --------------------------------------------------------------------------
 
   // Generate the list of nodes for fluid and solid
@@ -302,7 +301,7 @@ int main( int argc, char * argv[] )
     delete part_v;
 
     mytimer -> Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
   }
 
   // Clean up Memory

@@ -1,16 +1,14 @@
 #include "Global_Part_Reload.hpp"
+#include "HDF5_Reader.hpp"
 
-Global_Part_Reload::Global_Part_Reload( const int &cpu_size, 
-    const int &in_ncommon, const bool &isDualGraph,
+Global_Part_Reload::Global_Part_Reload( int cpu_size, 
+    int in_ncommon, bool isDualGraph,
     const std::string &element_part_name,
     const std::string &node_part_name )
 {
-  // --------------------------------------------------------------------------
   const std::string efName = element_part_name + ".h5";
 
-  hid_t efile_id = H5Fopen( efName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  HDF5_Reader * eh5r = new HDF5_Reader( efile_id );
+  auto eh5r = SYS_T::make_unique<HDF5_Reader>(efName);
   
   int temp = eh5r -> read_intScalar("/", "isMETIS");
   if( temp == 1 ) isMETIS = true;
@@ -30,32 +28,20 @@ Global_Part_Reload::Global_Part_Reload( const int &cpu_size,
 
   epart = eh5r -> read_intVector("/", "part");
 
-  delete eh5r; H5Fclose( efile_id );
-
   // --------------------------------------------------------------------------
   const std::string nfName = node_part_name + ".h5";
 
-  hid_t nfile_id = H5Fopen( nfName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  HDF5_Reader * nh5r = new HDF5_Reader( nfile_id );
+  auto nh5r = SYS_T::make_unique<HDF5_Reader>(nfName);
 
   npart = nh5r -> read_intVector("/", "part");
   
   field_offset = nh5r -> read_intVector("/", "field_offset");
-
-  delete nh5r; H5Fclose( nfile_id );
-  // --------------------------------------------------------------------------
 
   SYS_T::print_fatal_if( cpu_size != cpusize, "Error: Global_Part_Reload cpu_size is incompatible with prior partition.\n" );
   SYS_T::print_fatal_if( in_ncommon != dual_edge_ncommon, "Error: Global_Part_Reload in_ncommon is incompatible with prior partition.\n" );
   SYS_T::print_fatal_if( isDualGraph != isDual, "Error: Global_Part_Reload isDualGraph is incompatible with prior partition.\n" );
 
   std::cout<<"=== Global partition loaded from "<<efName<<" and "<<nfName<<std::endl;
-}
-
-Global_Part_Reload::~Global_Part_Reload()
-{
-  VEC_T::clean(epart); VEC_T::clean(npart); VEC_T::clean(field_offset);
 }
 
 // EOF

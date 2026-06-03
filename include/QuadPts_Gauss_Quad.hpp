@@ -2,7 +2,7 @@
 #define QUADPTS_GAUSS_QUAD_HPP
 // ============================================================================
 // QuadPts_Gauss_Quad.hpp
-// The Gaussian quadrature rule for a quadrilateral domain defined by 
+// The Gaussian quadrature rule for a quadrilateral domain defined by
 //                  [r_min, r_max] x [s_min, s_max]
 //
 // Date Created: Sep. 7 2023
@@ -12,18 +12,18 @@
 class QuadPts_Gauss_Quad final : public IQuadPts
 {
   public:
-    // Construct a quadrature rule with in_num_pts_x points in the r-direction 
-    // and in_num_pts_y in the s-direction 
-    QuadPts_Gauss_Quad( const int &in_num_pts_x, const int &in_num_pts_y, 
-        const double &r_min = 0.0, const double &r_max = 1.0, 
-        const double &s_min = 0.0, const double &s_max = 1.0 );
-    
+    // Construct a quadrature rule with in_num_pts_x points in the r-direction
+    // and in_num_pts_y in the s-direction
+    QuadPts_Gauss_Quad( int in_num_pts_x, int in_num_pts_y,
+        double r_min = 0.0, double r_max = 1.0,
+        double s_min = 0.0, double s_max = 1.0 );
+
     // Construct a quadrature rule with given number of quadrature points in
     // both directions.
-    QuadPts_Gauss_Quad( const int &in_num_pts_1d, 
-        const double &r_min = 0.0, const double &r_max = 1.0, 
-        const double &s_min = 0.0, const double &s_max = 1.0 );
-   
+    QuadPts_Gauss_Quad( int in_num_pts_1d,
+        double r_min = 0.0, double r_max = 1.0,
+        double s_min = 0.0, double s_max = 1.0 );
+
     ~QuadPts_Gauss_Quad() override = default;
 
     void print_info() const override;
@@ -36,10 +36,10 @@ class QuadPts_Gauss_Quad final : public IQuadPts
 
     int get_num_quadPts_y() const override {return num_pts_y;}
 
-    double get_qp(const int &ii, const int &comp) const override 
+    double get_qp(int ii, int comp) const override
     {return qp[2*ii+comp];}
 
-    double get_qw(const int &ii) const override {return qw[ii];}
+    double get_qw(int ii) const override {return qw[ii];}
 
   private:
     const int num_pts, num_pts_x, num_pts_y;

@@ -4,21 +4,21 @@ PDNSolution_NS::PDNSolution_NS(
     const APart_Node * const &pNode,
     const FEANode * const &fNode_ptr,
     const ALocal_InflowBC * const &infbc,
-    const int &type, const bool &isprint ) 
-: PDNSolution( pNode ), is_print(isprint)
+    const int &type, bool isprint ) 
+: PDNSolution( pNode )
 {
   if( pNode->get_dof() != 4 ) SYS_T::print_fatal("Error: PDNSolution_NS : the APart_Node gives wrong dof number. \n");
 
   switch(type)
   {
     case 0:
-      Init_zero( pNode );
+      Init_zero( pNode, isprint );
       break;
     case 1:
-      Init_flow_parabolic( pNode, fNode_ptr, infbc );
+      Init_flow_parabolic( pNode, fNode_ptr, infbc, isprint );
       break;
     case 2:
-      Init_pipe_parabolic( pNode, fNode_ptr );
+      Init_pipe_parabolic( pNode, fNode_ptr, isprint );
       break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_NS: No such type of initional condition.\n");
@@ -28,15 +28,15 @@ PDNSolution_NS::PDNSolution_NS(
 
 PDNSolution_NS::PDNSolution_NS( 
     const APart_Node * const &pNode,
-    const int &type, const bool &isprint ) 
-: PDNSolution( pNode ), is_print( isprint )
+    const int &type, bool isprint ) 
+: PDNSolution( pNode )
 {
   if( pNode->get_dof() != 4 ) SYS_T::print_fatal("Error: PDNSolution_NS : the APart_Node gives wrong dof number. \n");
 
   switch(type)
   {
     case 0:
-      Init_zero( pNode );
+      Init_zero( pNode, isprint );
       break;
     default:
       SYS_T::print_fatal("Error: PDNSolution_NS : No such type of initional condition.\n");
@@ -44,7 +44,9 @@ PDNSolution_NS::PDNSolution_NS(
   }
 }
 
-void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
+void PDNSolution_NS::Init_zero(
+    const APart_Node * const &pNode_ptr,
+    bool isprint )
 {
   const double value[4] = {0.0, 0.0, 0.0, 0.0};
 
@@ -57,7 +59,7 @@ void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
 
   Assembly_GhostUpdate();
 
-  if( is_print )
+  if( isprint )
   {
     SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
     SYS_T::commPrint("                       velo_x = 0.0 \n");
@@ -69,7 +71,8 @@ void PDNSolution_NS::Init_zero(const APart_Node * const &pNode_ptr)
 void PDNSolution_NS::Init_flow_parabolic(
     const APart_Node * const &pNode_ptr,
     const FEANode * const &fNode_ptr,
-    const ALocal_InflowBC * const &infbc )
+    const ALocal_InflowBC * const &infbc,
+    bool isprint )
 {
   double value[4] = {0.0, 0.0, 0.0, 0.0};
 
@@ -81,7 +84,7 @@ void PDNSolution_NS::Init_flow_parabolic(
     VecSetValues(solution, 4, location, value, INSERT_VALUES);
   }
 
-  if(is_print)
+  if(isprint)
   {
     SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
     SYS_T::commPrint("                       velo_x = parabolic \n");
@@ -129,7 +132,7 @@ void PDNSolution_NS::Init_flow_parabolic(
       }
     }
 
-    if(is_print)
+    if(isprint)
     {
       SYS_T::commPrint("                       -- nbc_id = %d \n", nbc_id);
       SYS_T::commPrint("                          max speed %e.\n", vmax);
@@ -143,7 +146,8 @@ void PDNSolution_NS::Init_flow_parabolic(
 
 void PDNSolution_NS::Init_pipe_parabolic(
     const APart_Node * const &pNode_ptr,
-    const FEANode * const &fNode_ptr )
+    const FEANode * const &fNode_ptr,
+    bool isprint )
 {
   double value[4] = {0.0, 0.0, 0.0, 0.0};
 
@@ -188,7 +192,7 @@ void PDNSolution_NS::Init_pipe_parabolic(
 
   Assembly_GhostUpdate();
 
-  if(is_print)
+  if(isprint)
   {
     SYS_T::commPrint("===> Initial solution: pres   = 0.0 \n");
     SYS_T::commPrint("                       velo_x = parabolic \n");

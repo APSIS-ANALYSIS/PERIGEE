@@ -1,13 +1,12 @@
 #include "ALocal_EBC.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_EBC::ALocal_EBC( const std::string &fileBaseName, 
-    const int &cpu_rank, const std::string &gname )
+    int cpu_rank, const std::string &gname )
 {
   std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   num_ebc = h5r -> read_intScalar(gname.c_str(), "num_ebc");
 
@@ -52,7 +51,6 @@ ALocal_EBC::ALocal_EBC( const std::string &fileBaseName,
     }
   }
 
-  H5Fclose( file_id );
 }
 
 ALocal_EBC::ALocal_EBC( const HDF5_Reader * const &h5r,
@@ -102,8 +100,8 @@ ALocal_EBC::ALocal_EBC( const HDF5_Reader * const &h5r,
   }
 }
 
-void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
-    const int &eindex, double * const &ctrl_x,
+void ALocal_EBC::get_ctrlPts_xyz(int ii,
+    int eindex, double * const &ctrl_x,
     double * const &ctrl_y, double * const &ctrl_z ) const
 {
   const int len = cell_nLocBas[ii];
@@ -116,8 +114,8 @@ void ALocal_EBC::get_ctrlPts_xyz(const int &ii,
   }
 }
 
-void ALocal_EBC::get_SIEN( const int &ii,
-    const int &eindex, int * const &sien ) const
+void ALocal_EBC::get_SIEN( int ii,
+    int eindex, int * const &sien ) const
 {
   const int len = cell_nLocBas[ii];
   for(int jj=0; jj<len; ++jj)
@@ -127,7 +125,7 @@ void ALocal_EBC::get_SIEN( const int &ii,
   }
 }
 
-std::vector<int> ALocal_EBC::get_SIEN( const int &ii, const int &eindex ) const
+std::vector<int> ALocal_EBC::get_SIEN( int ii, int eindex ) const
 {
   const int len = cell_nLocBas[ii];
   std::vector<int> out (len, 0);

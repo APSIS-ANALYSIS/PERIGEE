@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 #include <sstream>
 #include <string>
 #include <ctime>
@@ -47,6 +48,9 @@
 #else
   #define ASSERT(cond, ...) ((void)0)
 #endif
+
+// UNUSED makes a var x as intentionally unused to suppress compiler warnings.
+#define UNUSED(x) (void)(x)
 
 namespace SYS_T
 {
@@ -93,18 +97,7 @@ namespace SYS_T
       int rank )
   {
     std::ostringstream ss;
-    ss << baseName <<"_p";
-
-    if( rank / 10 == 0 )
-      ss<<"0000";
-    else if( rank / 100 == 0 )
-      ss<<"000";
-    else if( rank / 1000 == 0 )
-      ss<<"00";
-    else if( rank / 10000 == 0 )
-      ss<<"0";
-
-    ss<<rank<<".h5";
+    ss << baseName << "_p" << std::setfill('0') << std::setw(5) << rank << ".h5";
     return ss.str();
   }
 
@@ -116,13 +109,7 @@ namespace SYS_T
       int index, const std::string &filename )
   {
     std::ostringstream ss;
-    ss<<baseName;
-
-    if( index/10 == 0 ) ss<<"00";
-    else if( index/100 == 0 ) ss<<"0";
-
-    ss<<index<<filename;
-
+    ss << baseName << std::setfill('0') << std::setw(3) << index << filename;
     return ss.str();
   }
 
@@ -151,33 +138,7 @@ namespace SYS_T
   // ================================================================
   // The following are used in processor.
   // ================================================================
-  // 1. Synchronized print on screen. Here we use petsc functions:
-  //    PetscSynchronizedPrintf() and PetscSynchronizedFlush().
-  //    The output should be lised from proc 0, 1, ... to n in sequence.
-  inline void synPrint(const std::string &output, int cpu_rank)
-  {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
-    PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
-  }
-  inline void synPrint(const char * const &output, int cpu_rank)
-  {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "Proc %d: ", cpu_rank);
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
-    PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
-  }
-  inline void synPrint(const std::string &output)
-  {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output.c_str());
-    PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
-  }
-  inline void synPrint(const char * const &output)
-  {
-    PetscSynchronizedPrintf(PETSC_COMM_WORLD, "%s", output);
-    PetscSynchronizedFlush(PETSC_COMM_WORLD, PETSC_STDOUT);
-  }
-
-  // 2. print from processor 0, other preprocessors are ignored.
+  // 1. print from processor 0, other preprocessors are ignored.
   inline void commPrint(const char output[], ...)
   {
     int mpi_flag {-1};
@@ -213,7 +174,7 @@ namespace SYS_T
     }
   }
 
-  // 3. Print the data name and its value on screen using PetscPrintf
+  // 2. Print the data name and its value on screen using PetscPrintf
   //    and PETSC_COMM_WORLD. This is particularly designed to print
   //    command line arguments.
   inline void cmdPrint(const char * const &dataname, int datavalue)
@@ -223,7 +184,7 @@ namespace SYS_T
   inline void cmdPrint(const char * const &dataname, const std::string &datavalue)
   {std::ostringstream ss; ss<<dataname<<" "<<datavalue<<"\n"; PetscPrintf(PETSC_COMM_WORLD, "%s", ss.str().c_str());}
 
-  // 4. Print fatal error message and terminate the MPI process
+  // 3. Print fatal error message and terminate the MPI process
   inline void print_fatal( const char output[], ... )
   { 
     int mpi_flag {-1};
@@ -350,7 +311,7 @@ namespace SYS_T
     }
   }
 
-  // 5. print the number of threads used in openmp
+  // 4. print the number of threads used in openmp
   inline void print_omp_info()
   {
 #ifdef _OPENMP
@@ -387,7 +348,7 @@ namespace SYS_T
     std::tm     *time = std::localtime(&time1);
 
     std::ostringstream o;
-    o << time->tm_hour << ":"
+    o << (time->tm_hour < 10 ? "0" : "") << time->tm_hour << ":"
       << (time->tm_min < 10 ? "0" : "") << time->tm_min << ":"
       << (time->tm_sec < 10 ? "0" : "") << time->tm_sec;
 
@@ -395,7 +356,7 @@ namespace SYS_T
   }
 
   // ----------------------------------------------------------------
-  // 2. get_date: return the present date as YYYY/MM/DD
+  // 2. get_date: return the present date as YYYY-MM-DD
   // ----------------------------------------------------------------
   inline std::string get_date()
   {
@@ -403,9 +364,9 @@ namespace SYS_T
     std::tm     *time = std::localtime(&time1);
 
     std::ostringstream o;
-    o << time->tm_year + 1900 << "/"
-      << time->tm_mon + 1 << "/"
-      << time->tm_mday;
+    o << time->tm_year + 1900 << "-"
+      << (time->tm_mon < 9 ? "0" : "") << time->tm_mon + 1 << "-"
+      << (time->tm_mday < 10 ? "0" : "") << time->tm_mday;
 
     return o.str();
   }
@@ -557,7 +518,7 @@ namespace SYS_T
     if(flg) outdata = char_outdata;
   }
 
-  inline void InsertFileYAML( const std::string &filename, const bool &require )
+  inline void InsertFileYAML( const std::string &filename, bool require )
   {
 #if PETSC_VERSION_GE(3,15,0)
     if( require )
@@ -577,43 +538,6 @@ namespace SYS_T
     commPrint("Warning: YAML is unsupported in this PETSc.\n");
 #endif
   }
-
-  // ================================================================
-  // SYS_T::Timer class defines a timer tool that one can use to
-  // measure the time spent on events
-  // ================================================================
-  class Timer
-  {
-    public:
-      Timer() { startedAt = 0; stoppedAt = 0; }
-
-      ~Timer() = default;
-
-      void Reset() { startedAt = 0; stoppedAt = 0; }
-
-#ifdef _OPENMP
-      void Start() { startedAt = omp_get_wtime(); }
-      void Stop()  { stoppedAt = omp_get_wtime(); }
-      double get_sec() const
-      {
-        return (stoppedAt - startedAt);
-      }
-#else
-      void Start() { startedAt = clock(); }
-      void Stop()  { stoppedAt = clock(); }
-      double get_sec() const
-      {
-        return (double)(stoppedAt - startedAt)/(double)CLOCKS_PER_SEC;
-      }
-#endif
-
-    private:
-#ifdef _OPENMP
-      double startedAt, stoppedAt;
-#else
-      clock_t startedAt, stoppedAt;
-#endif
-  };
 
   // Print ASCII art text for the code
   inline void print_perigee_art()

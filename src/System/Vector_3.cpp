@@ -1,23 +1,23 @@
 #include "Vector_3.hpp"
 
-Vector_3& Vector_3::operator= (const Vector_3 &source)
+Vector_3& Vector_3::operator= (const Vector_3 &source) noexcept
 {
   if(this != &source) vec = source.vec;
 
   return *this;
 }
 
-Vector_3 operator+( const Vector_3 &left, const Vector_3 &right )
+Vector_3 operator+( const Vector_3 &left, const Vector_3 &right ) noexcept
 {
   return Vector_3( left.vec[0] + right.vec[0], left.vec[1] + right.vec[1], left.vec[2] + right.vec[2] );
 }
 
-Vector_3 operator-( const Vector_3 &left, const Vector_3 &right )
+Vector_3 operator-( const Vector_3 &left, const Vector_3 &right ) noexcept
 {
   return Vector_3( left.vec[0] - right.vec[0], left.vec[1] - right.vec[1], left.vec[2] - right.vec[2] );
 }
 
-Vector_3& Vector_3::operator+=( const Vector_3 &source )
+Vector_3& Vector_3::operator+=( const Vector_3 &source ) noexcept
 {
   vec[0] += source.vec[0];
   vec[1] += source.vec[1];
@@ -26,7 +26,7 @@ Vector_3& Vector_3::operator+=( const Vector_3 &source )
   return *this;
 }
 
-Vector_3& Vector_3::operator-=( const Vector_3 &source )
+Vector_3& Vector_3::operator-=( const Vector_3 &source ) noexcept
 {
   vec[0] -= source.vec[0];
   vec[1] -= source.vec[1];
@@ -35,7 +35,7 @@ Vector_3& Vector_3::operator-=( const Vector_3 &source )
   return *this;
 }
 
-Vector_3& Vector_3::operator*=( const double &val )
+Vector_3& Vector_3::operator*=( double val ) noexcept
 {
   vec[0] *= val;
   vec[1] *= val;
@@ -44,7 +44,7 @@ Vector_3& Vector_3::operator*=( const double &val )
   return *this;
 }
 
-Vector_3 Vector_3::operator-() const
+Vector_3 Vector_3::operator-() const noexcept
 {
   return Vector_3( -vec[0], -vec[1], -vec[2] );
 }
@@ -55,7 +55,7 @@ void Vector_3::print(std::ostream& os, const std::string& delimiter) const
   os<<vec[0]<<delimiter<<vec[1]<<delimiter<<vec[2]<<std::endl;
 }
 
-void Vector_3::gen_rand(const double &left, const double &right)
+void Vector_3::gen_rand(double left, double right)
 {
   std::random_device rd;
   std::mt19937_64 gen( rd() );
@@ -65,7 +65,7 @@ void Vector_3::gen_rand(const double &left, const double &right)
   vec[2] = dis(gen);
 }
 
-double Vector_3::normalize()
+double Vector_3::normalize() noexcept
 {
   const double len = norm2();
   const double inv_len = 1.0 / len;
@@ -76,12 +76,12 @@ double Vector_3::normalize()
   return len;
 }
 
-double Vector_3::dot_product( const Vector_3 &source ) const
+double Vector_3::dot_product( const Vector_3 &source ) const noexcept
 {
   return vec[0]*source.vec[0] + vec[1]*source.vec[1] + vec[2]*source.vec[2];
 }
 
-double Vec3::dist( const Vector_3 &a, const Vector_3 &b )
+double Vec3::dist( const Vector_3 &a, const Vector_3 &b ) noexcept
 {
   const double dist_x = a.x() - b.x();
   const double dist_y = a.y() - b.y();
@@ -89,12 +89,12 @@ double Vec3::dist( const Vector_3 &a, const Vector_3 &b )
   return std::sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
 }
 
-double Vec3::dot_product( const Vector_3 &a, const Vector_3 &b )
+double Vec3::dot_product( const Vector_3 &a, const Vector_3 &b ) noexcept
 {
   return a(0)*b(0) + a(1)*b(1) + a(2)*b(2);
 }
 
-int Vector_3::get_dominant_comp() const
+int Vector_3::get_dominant_comp() const noexcept
 {
   int dominant_comp = 0;
   double dominant_val = -INFINITY;
@@ -111,18 +111,18 @@ int Vector_3::get_dominant_comp() const
   return dominant_comp;
 }
 
-Vector_3 Vec3::cross_product( const Vector_3 &a, const Vector_3 &b )
+Vector_3 Vec3::cross_product( const Vector_3 &a, const Vector_3 &b ) noexcept
 {
   return Vector_3( a(1) * b(2) - a(2) * b(1), 
       a(2) * b(0) - a(0) * b(2), a(0) * b(1) - a(1) * b(0) );
 }
 
-Vector_3 operator*( const double &val, const Vector_3 &source )
+Vector_3 operator*( double val, const Vector_3 &source ) noexcept
 {
   return Vector_3( source.x() * val, source.y() * val, source.z() * val );
 }
 
-Vector_3 Vec3::normalize( const Vector_3 &val )
+Vector_3 Vec3::normalize( const Vector_3 &val ) noexcept
 {
   const double len = val.norm2();
   return (1.0/len) * val;

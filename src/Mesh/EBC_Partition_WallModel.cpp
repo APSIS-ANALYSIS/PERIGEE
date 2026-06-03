@@ -1,4 +1,7 @@
 #include "EBC_Partition_WallModel.hpp"
+#include "Vec_Tools.hpp"
+#include "HDF5_Group.hpp"
+#include "HDF5_Writer.hpp"
 
 EBC_Partition_WallModel::EBC_Partition_WallModel(const IPart * const &part,
     const Map_Node_Index * const &mnindex, const ElemBC * const &ebc)
@@ -29,26 +32,24 @@ void EBC_Partition_WallModel::write_hdf5(const std::string &FileName) const
 {
   const std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+  const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, "/weak", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  auto weak_group = HDF5_Group::create( file_id, "/weak" );
 
-  HDF5_Writer * h5w = new HDF5_Writer( file_id );
-
-  h5w -> write_intScalar( g_id, "wall_model_type", wall_model_type );
+  h5w -> write_intScalar( weak_group.id(), "wall_model_type", wall_model_type );
 
   if(wall_model_type > 0)
   {
-    h5w -> write_intScalar( g_id, "num_local_cell", num_local_cell[0] );
+    h5w -> write_intScalar( weak_group.id(), "num_local_cell", num_local_cell[0] );
 
-    h5w -> write_intVector( g_id, "part_volume_cell_id", part_vol_ele_id );
+    h5w -> write_intVector( weak_group.id(), "part_volume_cell_id", part_vol_ele_id );
 
-    h5w -> write_intVector( g_id, "cell_face_id", ele_face_id );
+    h5w -> write_intVector( weak_group.id(), "cell_face_id", ele_face_id );
   }
   else
     ;   // stop writing if wall_model_type = 0
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 // EOF

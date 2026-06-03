@@ -1,24 +1,23 @@
 #include "FEANode.hpp"
+#include "HDF5_Reader.hpp"
 
-FEANode::FEANode( const std::string &fileBaseName, const int &cpu_rank )
+FEANode::FEANode( const std::string &fileBaseName, int cpu_rank )
 {
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   ctrlPts_x = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_x_loc");
   ctrlPts_y = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_y_loc");
   ctrlPts_z = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_z_loc");
+
+  const auto file_id = h5r -> get_file_id();
 
   // Detect if the weights is in the h5 file, and read if yes
   if( H5Lexists(file_id, "/ctrlPts_loc/ctrlPts_w_loc", H5P_DEFAULT) )
     ctrlPts_w = h5r -> read_doubleVector("ctrlPts_loc", "ctrlPts_w_loc");
   else
     VEC_T::clean( ctrlPts_w );
-
-  H5Fclose( file_id );
 }
 
 FEANode::FEANode( const HDF5_Reader * const &h5r )
@@ -46,9 +45,8 @@ void FEANode::print_info() const
   VEC_T::print(ctrlPts_w);
 }
 
-void FEANode::get_ctrlPts_xyz( 
-    const int &num, const int * const &index,
-    double * const &ctrl_x, double * const &ctrl_y, double * const &ctrl_z ) const
+void FEANode::get_ctrlPts_xyz( int num, const int * index,
+    double * ctrl_x, double * ctrl_y, double * ctrl_z ) const
 {
   for(int ii=0; ii<num; ++ii)
   {
@@ -76,10 +74,9 @@ std::array<std::vector<double>, 3> FEANode::get_ctrlPts_xyz(
   return out;
 }
 
-void FEANode::get_ctrlPts_xyzw( 
-    const int &num, const int * const &index,
-    double * const &ctrl_x, double * const &ctrl_y, 
-    double * const &ctrl_z, double * const &ctrl_w ) const
+void FEANode::get_ctrlPts_xyzw( int num, const int * index,
+    double * ctrl_x, double * ctrl_y, 
+    double * ctrl_z, double * ctrl_w ) const
 {
   for(int ii=0; ii<num; ++ii)
   {
@@ -90,10 +87,9 @@ void FEANode::get_ctrlPts_xyzw(
   }
 }
 
-void FEANode::get_ctrlPts_xyw( 
-    const int &num, const int * const &index,
-    double * const &ctrl_x, double * const &ctrl_y, 
-    double * const &ctrl_w ) const
+void FEANode::get_ctrlPts_xyw( int num, const int * index,
+    double * ctrl_x, double * ctrl_y, 
+    double * ctrl_w ) const
 {
   for(int ii=0; ii<num; ++ii)
   {
@@ -103,9 +99,8 @@ void FEANode::get_ctrlPts_xyw(
   }
 }
 
-void FEANode::get_ctrlPts_xy( 
-    const int &num, const int * const &index,
-    double * const &ctrl_x, double * const &ctrl_y ) const
+void FEANode::get_ctrlPts_xy( int num, const int * index,
+    double * ctrl_x, double * ctrl_y ) const
 {
   for(int ii=0; ii<num; ++ii)
   {

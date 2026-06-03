@@ -102,7 +102,6 @@ SET( perigee_analysis_lib_src
   ${perigee_source}/Model/FlowRate_Unsteady.cpp
   ${perigee_source}/Model/FlowRate_Linear2Steady.cpp
   ${perigee_source}/Model/FlowRate_Cosine2Steady.cpp
-  ${perigee_source}/Model/FlowRateDot_Sine2Zero.cpp
   ${perigee_source}/Solver/PDNSolution.cpp
   ${perigee_source}/Solver/PDNTimeStep.cpp
   ${perigee_source}/Solver/TimeMethod_GenAlpha.cpp
@@ -111,8 +110,6 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_VMS_NS_GenAlpha_WeakBC.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
-  ${perigee_SOURCE_DIR}/src/PDNSolution_V.cpp
-  ${perigee_SOURCE_DIR}/src/PDNSolution_P.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Block_VMS_NS_HERK.cpp

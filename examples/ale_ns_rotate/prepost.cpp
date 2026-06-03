@@ -5,6 +5,7 @@
 //
 // Date: Jan. 24 2017
 // ==================================================================
+#include "Timer.hpp"
 #include "HDF5_Reader.hpp"
 #include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"
@@ -24,9 +25,8 @@ int main( int argc, char * argv[] )
   SYS_T::print_fatal_if(sysret != 0, "ERROR: system call failed. \n");
 
   // Read preprocessor command-line arguements recorded in the .h5 file
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "preprocessor_cmd.h5" );
 
   std::string fixed_geo_file = cmd_h5r -> read_string("/", "fixed_geo_file");
   std::string rotated_geo_file = cmd_h5r -> read_string("/", "rotated_geo_file");
@@ -36,7 +36,7 @@ int main( int argc, char * argv[] )
   int in_ncommon = cmd_h5r -> read_intScalar("/","in_ncommon");
   const FEType elemType = FE_T::to_FEType(elemType_str);
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // The user can specify the new mesh partition options from the yaml file
   const std::string yaml_file("ns_prepost.yml");
@@ -50,17 +50,17 @@ int main( int argc, char * argv[] )
   const bool isDualGraph = paras["is_dualgraph"].as<bool>();  
   const std::string part_file = paras["part_file"].as<std::string>();
 
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -METIS_isDualGraph: true \n";
-  else cout<<" -METIS_isDualGraph: false \n";
-  cout<<"----------------------------------\n";
-  cout<<"part_file: "<<part_file<<endl;
-  cout<<"fixed_geo_file: "<<fixed_geo_file<<endl;
-  cout<<"rotated_geo_file: "<<rotated_geo_file<<endl;
-  cout<<"elemType: "<<elemType_str<<endl;
-  cout<<"dof_num: "<<dofNum<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -METIS_isDualGraph: true \n";
+  else std::cout<<" -METIS_isDualGraph: false \n";
+  std::cout<<"----------------------------------\n";
+  std::cout<<"part_file: "<<part_file<<std::endl;
+  std::cout<<"fixed_geo_file: "<<fixed_geo_file<<std::endl;
+  std::cout<<"rotated_geo_file: "<<rotated_geo_file<<std::endl;
+  std::cout<<"elemType: "<<elemType_str<<std::endl;
+  std::cout<<"dof_num: "<<dofNum<<std::endl;
 
   // Read the fixed_geo_file
   int nFunc, nElem;
@@ -88,8 +88,7 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(vecIEN, rotated_vecIEN);
   VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
 
-  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
-  VEC_T::clean( vecIEN ); // clean the vector
+  IIEN * IEN = new IEN_FEM(nElem, std::move(vecIEN));
 
   const int nLocBas = FE_T::to_nLocBas(elemType);
 
@@ -106,7 +105,7 @@ int main( int argc, char * argv[] )
   Map_Node_Index * mnindex = new Map_Node_Index(global_part, cpu_size, nFunc);
   mnindex->write_hdf5("post_node_mapping");
 
-  cout<<"=== Start Partition ... \n";
+  std::cout<<"=== Start Partition ... \n";
   int proc_size = cpu_size;
   SYS_T::Timer * mytimer = new SYS_T::Timer();
   for(int proc_rank = 0; proc_rank < proc_size; ++proc_rank)
@@ -116,12 +115,12 @@ int main( int argc, char * argv[] )
         ctrlPts, proc_rank, proc_size, elemType, {0, dofNum, true, "NS"} );
     part->write(part_file.c_str());
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
     delete part;
   }
 
   // Clean memory
-  cout<<"=== Clean memory. \n";
+  std::cout<<"=== Clean memory. \n";
   delete mnindex; delete global_part; delete IEN; delete mytimer;
   return EXIT_SUCCESS;
 }

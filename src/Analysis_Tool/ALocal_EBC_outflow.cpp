@@ -1,14 +1,14 @@
 #include "ALocal_EBC_outflow.hpp"
+#include "HDF5_Reader.hpp"
 
 ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
-    const int &cpu_rank, const std::string &gname )
+    int cpu_rank, const std::string &gname )
 : ALocal_EBC( fileBaseName, cpu_rank, gname )
 {
   // Read in the integral of basis function, LID, and outward normal vector
   // for the faces with id ebc
   const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-  auto h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
   
   intNA.resize(  num_ebc ); LID.resize( num_ebc );
   outvec.resize( num_ebc ); num_face_nodes.resize( num_ebc );
@@ -34,7 +34,6 @@ ALocal_EBC_outflow::ALocal_EBC_outflow( const std::string &fileBaseName,
     }
   }
 
-  H5Fclose( file_id );
 }
 
 ALocal_EBC_outflow::ALocal_EBC_outflow( const HDF5_Reader * const &h5r,

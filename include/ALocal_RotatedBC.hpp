@@ -8,14 +8,15 @@
 // Date Created: Sep 11 2024
 // Author: Yujie Sun
 // ============================================================================
-#include "HDF5_Reader.hpp"
-#include "Math_Tools.hpp"
 #include "Vector_3.hpp"
+#include "Vec_Tools.hpp"
+
+class HDF5_Reader;
 
 class ALocal_RotatedBC
 {
   public:
-    ALocal_RotatedBC( const std::string &fileBaseName, const int &cpu_rank );
+    ALocal_RotatedBC( const std::string &fileBaseName, int cpu_rank );
 
     ALocal_RotatedBC( const HDF5_Reader * const &h5r );
 
@@ -26,7 +27,7 @@ class ALocal_RotatedBC
     // 0 <= node < Num_LD
     // Note: make sure that Num_LD > 0 before calling this get function
     // ------------------------------------------------------------------------
-    virtual int get_LDN( const int &node ) const
+    virtual int get_LDN( int node ) const
     {return LDN[node];}
 
     // ------------------------------------------------------------------------
@@ -37,7 +38,7 @@ class ALocal_RotatedBC
     // ------------------------------------------------------------------------
     // determine whether a given index belongs to the LDN vector
     // ------------------------------------------------------------------------
-    virtual bool is_inLDN( const int &ii ) const 
+    virtual bool is_inLDN( int ii ) const 
     { return VEC_T::is_invec(LDN, ii); }
 
     // ------------------------------------------------------------------------
@@ -64,7 +65,7 @@ class ALocal_RotatedBC
     // 0 <= ii < num_local_node
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual Vector_3 get_local_pt_xyz( const int &ii) const
+    virtual Vector_3 get_local_pt_xyz( int ii) const
     {return local_pt_xyz[ii];}
 
     // ------------------------------------------------------------------------
@@ -72,7 +73,7 @@ class ALocal_RotatedBC
     // the LDN_pt_xyz array
     // 0 <= ii < Num_LD
     // Note: make sure Num_LD > 0 before using this get function
-    virtual Vector_3 get_LDN_pt_xyz( const int &ii ) const
+    virtual Vector_3 get_LDN_pt_xyz( int ii ) const
     {return LDN_pt_xyz[ii];}
 
     // ------------------------------------------------------------------------
@@ -80,7 +81,7 @@ class ALocal_RotatedBC
     // 0 <= ii < cell_nLocBas x num_local_cell
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien( const int &ii ) const
+    virtual int get_local_cell_ien( int ii ) const
     {return local_cell_ien[ii];}
 
     // ------------------------------------------------------------------------
@@ -89,9 +90,7 @@ class ALocal_RotatedBC
     // 0 <= ee < num_local_cell, 0 <= ii < cell_nLocBas
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual int get_local_cell_ien( 
-        const int &ee, 
-        const int &ii ) const
+    virtual int get_local_cell_ien(  int ee, int ii ) const
     { return local_cell_ien[ee * cell_nLocBas + ii]; }
 
     // ------------------------------------------------------------------------
@@ -102,7 +101,7 @@ class ALocal_RotatedBC
     // ctrl_x/y/z : output coordinate arrays, each of length cell_nLocBas.
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual void get_ctrlPts_xyz( const int &eindex,
+    virtual void get_ctrlPts_xyz( int eindex,
         double * const &ctrl_x, double * const &ctrl_y,
         double * const &ctrl_z ) const;
 
@@ -113,10 +112,10 @@ class ALocal_RotatedBC
     // sien : length cell_nLocBas.
     // Note: make sure num_local_cell > 0 before using this get function
     // ------------------------------------------------------------------------
-    virtual void get_SIEN( const int &eindex,
+    virtual void get_SIEN( int eindex,
         int * const &sien ) const;
 
-    virtual std::vector<int> get_SIEN( const int &eindex ) const;
+    virtual std::vector<int> get_SIEN( int eindex ) const;
 
 
   private:

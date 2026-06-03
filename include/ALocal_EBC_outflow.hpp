@@ -16,14 +16,14 @@ class ALocal_EBC_outflow : public ALocal_EBC
 {
   public:
     ALocal_EBC_outflow( const std::string &fileBaseName,
-        const int &cpu_rank, const std::string &gname="/ebc" );
+        int cpu_rank, const std::string &gname="/ebc" );
 
     ALocal_EBC_outflow( const HDF5_Reader * const &h5r,
         const std::string &gname="/ebc" );
 
-    virtual ~ALocal_EBC_outflow() = default;
+    ~ALocal_EBC_outflow() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
     // ------------------------------------------------------------------------
     // The following get functions will give meaningful data if the
@@ -31,13 +31,13 @@ class ALocal_EBC_outflow : public ALocal_EBC
     // surface
     // Note, the get functions do NOT check the range of the ii index
     // ------------------------------------------------------------------------
-    virtual int get_num_face_nodes(const int &ii) const {return num_face_nodes[ii];}
+    int get_num_face_nodes(int ii) const override {return num_face_nodes[ii];}
 
-    virtual std::vector<double> get_intNA(const int &ii) const {return intNA[ii];}
+    std::vector<double> get_intNA(int ii) const override {return intNA[ii];}
 
-    virtual std::vector<int> get_LID(const int &ii) const {return LID[ii];}
+    std::vector<int> get_LID(int ii) const override {return LID[ii];}
 
-    virtual Vector_3 get_outvec( const int &ii ) const {return outvec[ii];}
+    Vector_3 get_outvec( int ii ) const override {return outvec[ii];}
 
   protected:
     // Length num_ebc.

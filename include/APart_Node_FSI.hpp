@@ -29,26 +29,26 @@
 class APart_Node_FSI : public APart_Node
 {
   public:
-    APart_Node_FSI(const std::string &fileBaseName, const int &rank );
+    APart_Node_FSI(const std::string &fileBaseName, int rank );
 
     APart_Node_FSI(const HDF5_Reader * const &h5r);
 
-    virtual ~APart_Node_FSI() = default;
+    ~APart_Node_FSI() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
     // Get the solid local node number and indices
-    virtual int get_nlocalnode_solid() const 
+    int get_nlocalnode_solid() const override
     {return nlocalnode_solid;}
 
-    virtual int get_node_loc_solid(const int &index) const
+    int get_node_loc_solid(int index) const override
     {return node_loc_solid[index];}
 
     // Get the fluid local node number and indices
-    virtual int get_nlocalnode_fluid() const 
+    int get_nlocalnode_fluid() const override
     {return nlocalnode_fluid;}
 
-    virtual int get_node_loc_fluid(const int &index) const
+    int get_node_loc_fluid(int index) const override
     {return node_loc_fluid[index];}
 
   private:

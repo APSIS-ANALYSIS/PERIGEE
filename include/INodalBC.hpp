@@ -13,7 +13,8 @@
 // ============================================================================
 #include "Sys_Tools.hpp"
 #include "Vector_3.hpp"
-#include "IIEN.hpp"
+
+class IIEN;
 
 class INodalBC
 {

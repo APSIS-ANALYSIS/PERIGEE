@@ -29,6 +29,8 @@
 #include "vtkUnstructuredGridWriter.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 
+#include "petscvec.h"
+
 namespace VIS_T
 {
   // ================================================================
@@ -204,7 +206,30 @@ namespace VIS_T
   //                    the array with size esize, and deleting it after
   //                    usage.
   // --------------------------------------------------------------
-  std::vector<int> read_epart( const std::string &epart_file, const int &esize );
+  std::vector<int> read_epart( const std::string &epart_file, int esize );
+
+  // ------------------------------------------------------------------------
+  // ! readPETSc_vec: read a PETSc vector into memory as a double array
+  //
+  // Note: this function is rarely used alone, since the solution vector usually
+  // needs to be renumbered based on the nodemap.
+  // ------------------------------------------------------------------------
+  std::vector<double> readPETSc_vec( const std::string &solution_file_name );
+  
+  // ------------------------------------------------------------------------
+  // ! readPETSc_vec: read a PETSc vector into memory as a
+  //   double array, and map the solution to the correct location based
+  //   on the given nodemap.
+  // \para nodemap: the mapping from local node index to global node
+  //                 index.
+  // \para vec_size: the total length of the PETSc vector. This is used
+  //                   to check the correcness of the reading.
+  // \para in_dof: the dof per node for the solution vector.
+  // Note: the length of nodemap * in_dof should be equal to vec_size.
+  // ------------------------------------------------------------------------
+  std::vector<double> readPETSc_vec( const std::string &solution_file_name,
+      const std::vector<int> &nodemap,
+      int in_dof );
 }
 
 #endif

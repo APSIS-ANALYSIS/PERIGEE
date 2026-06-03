@@ -1,7 +1,8 @@
 #include "PDNTimeStep.hpp"
+#include "Sys_Tools.hpp"
 
-PDNTimeStep::PDNTimeStep( const int &input_index, const double &input_time,
-    const double &input_step ) : time_index( input_index ), 
+PDNTimeStep::PDNTimeStep( int input_index, double input_time,
+    double input_step ) : time_index( input_index ), 
   time( input_time ), time_step( input_step )
 {
   index_history.clear();
@@ -23,7 +24,7 @@ void PDNTimeStep::TimeIncrement()
   index_history.push_back(time_index);
 }
 
-void PDNTimeStep::TimeIncrement(const double &input_time_step)
+void PDNTimeStep::TimeIncrement(double input_time_step)
 {
   time_step = input_time_step;
   time = time + time_step;

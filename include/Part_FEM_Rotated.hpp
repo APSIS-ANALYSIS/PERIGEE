@@ -31,9 +31,9 @@ class Part_FEM_Rotated : public Part_FEM
         const FEType &in_elemType,
         const Field_Property &in_fp );
 
-    virtual ~Part_FEM_Rotated() = default;
+    ~Part_FEM_Rotated() override = default;
 
-    virtual void write( const std::string &inputFileName ) const;
+    void write( const std::string &inputFileName ) const override;
 
   protected:
     std::vector<int> elem_tag {};

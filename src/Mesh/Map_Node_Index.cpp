@@ -1,4 +1,6 @@
 #include "Map_Node_Index.hpp"
+#include "HDF5_Writer.hpp"
+#include "HDF5_Reader.hpp"
 
 Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
     const int &cpu_size, const int &nFunc, const int &field )
@@ -31,18 +33,13 @@ Map_Node_Index::Map_Node_Index( const IGlobal_Part * const &gpart,
 Map_Node_Index::Map_Node_Index( const char * const &fileName )
 {
   std::cout<<"-- loading old2new & new2old index mapping from disk. \n";
-  std::string fName( fileName );
-  fName.append(".h5");
+  const std::string fName = std::string(fileName) + ".h5";
 
-  hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-  HDF5_Reader * h5r = new HDF5_Reader( file_id );
+  auto h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
   old_2_new = h5r -> read_intVector("/", "old_2_new");
   new_2_old = h5r -> read_intVector("/", "new_2_old");
 
-  delete h5r; H5Fclose( file_id );
-  
   std::cout<<"-- mapping generated. Memory usage: ";
   SYS_T::print_mem_size( double(old_2_new.size())*2.0*sizeof(int) );
   std::cout<<std::endl<<"=== Node index mapping loaded.\n";
@@ -62,18 +59,12 @@ void Map_Node_Index::print_info() const
 
 void Map_Node_Index::write_hdf5( const std::string &fileName ) const
 {
-  std::string fName(fileName);
-  fName.append(".h5");
+  const std::string fName = fileName + ".h5";
   
-  // file creation
-  hid_t file_id = H5Fcreate( fName.c_str(), H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT );
-
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>( fName );
 
   h5w -> write_intVector( "old_2_new", old_2_new );
   h5w -> write_intVector( "new_2_old", new_2_old );
-
-  delete h5w; H5Fclose(file_id);
 }
 
 // EOF

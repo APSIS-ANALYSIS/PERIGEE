@@ -8,7 +8,7 @@
 //
 // We use four points at [0,0,0], [1,0,0], [0,1,0], [0,0,1].
 // They are the vertex points of the tetrahedron.
-// 
+//
 // Note: We store them in area-coordinates like what we did in
 //       QuadPts_Gauss_Tet class, so the dim = 4.
 //
@@ -34,13 +34,13 @@ class QuadPts_vis_tet4 final : public IQuadPts
 
     int get_num_quadPts() const override {return 4;}
 
-    double get_qp(const int &ii, const int &comp) const override 
+    double get_qp(int ii, int comp) const override
     {return qp[4*ii+comp];}
 
-    double get_qw(const int &ii) const override {return 0.25/6.0;}
+    double get_qw(int ii) const override {return 0.25/6.0;}
 
   private:
-    const double qp[16] { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 
+    const double qp[16] { 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0,
       0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0 };
 };
 

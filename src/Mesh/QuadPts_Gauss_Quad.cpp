@@ -1,9 +1,9 @@
 #include "QuadPts_Gauss_Quad.hpp"
 
-QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
-    const int &in_num_pts_y, 
-    const double &x_min, const double &x_max, 
-    const double &y_min, const double &y_max )
+QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( int in_num_pts_x,
+    int in_num_pts_y,
+    double x_min, double x_max,
+    double y_min, double y_max )
 : num_pts( in_num_pts_x * in_num_pts_y ), num_pts_x( in_num_pts_x ), num_pts_y( in_num_pts_y )
 {
   qp.clear(); qw.clear();
@@ -26,9 +26,9 @@ QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_x,
   qw.shrink_to_fit();
 }
 
-QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( const int &in_num_pts_1d, 
-    const double &x_min, const double &x_max, 
-    const double &y_min, const double &y_max )
+QuadPts_Gauss_Quad::QuadPts_Gauss_Quad( int in_num_pts_1d,
+    double x_min, double x_max,
+    double y_min, double y_max )
 : QuadPts_Gauss_Quad(in_num_pts_1d, in_num_pts_1d, x_min, x_max, y_min, y_max)
 {}
 
@@ -39,7 +39,7 @@ void QuadPts_Gauss_Quad::print_info() const
   SYS_T::commPrint("qp.size() = %d\n", qp.size());
   SYS_T::commPrint("qw.size() = %d\n", qw.size());
   for(int ii=0; ii<num_pts; ++ii)
-    SYS_T::commPrint("  %.15f %.15f %.15f\n", 
+    SYS_T::commPrint("  %.15f %.15f %.15f\n",
         qp[2*ii], qp[2*ii+1], qw[ii]);
   SYS_T::commPrint("====================================\n");
 }

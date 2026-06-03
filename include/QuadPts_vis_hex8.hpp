@@ -8,8 +8,8 @@
 //
 // We use four points at [0,0,0], [1,0,0], [1,1,0], [0,1,0], [0,0,1], [1,0,1], [1,1,1], [0,1,1].
 // They are the vertex points of the hexahedron.
-// 
-// Note: We store them like what we did in QuadPts_Gauss_Hex class, so the dim = 3.       
+//
+// Note: We store them like what we did in QuadPts_Gauss_Hex class, so the dim = 3.
 //
 // Date Created: Oct. 24 2023
 // ==================================================================
@@ -19,7 +19,7 @@ class QuadPts_vis_hex8 final : public IQuadPts
 {
   public:
     QuadPts_vis_hex8() = default;
-    
+
     ~QuadPts_vis_hex8() override = default;
 
     void print_info() const override
@@ -29,7 +29,7 @@ class QuadPts_vis_hex8 final : public IQuadPts
       SYS_T::commPrint("========================================= \n");
     }
 
-    // it stores the coordinate of the quadrature points 
+    // it stores the coordinate of the quadrature points
     // in the sequence of x-y-z, so the dim is 4
     int get_dim() const override {return 3;}
 
@@ -42,10 +42,10 @@ class QuadPts_vis_hex8 final : public IQuadPts
 
     int get_num_quadPts_z() const override {return 2;}
 
-    double get_qp(const int &ii, const int &comp) const override
+    double get_qp(int ii, int comp) const override
     {return qp[3*ii+comp];}
 
-    double get_qw(const int &ii) const override {return 0.5;}
+    double get_qw(int ii) const override {return 0.5;}
 
   private:
     const double qp[24] {0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0,

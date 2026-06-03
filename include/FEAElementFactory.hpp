@@ -22,7 +22,7 @@ class ElementFactory
 {
   public:
     static std::unique_ptr<FEAElement> createVolElement(const FEType &elemType,
-        const int &nqp)
+        int nqp)
     {
       switch(elemType)
       {
@@ -41,7 +41,7 @@ class ElementFactory
     }
 
     static std::unique_ptr<FEAElement> createSurElement(const FEType &elemType,
-        const int &nqp)
+        int nqp)
     {
       switch (elemType)
       {

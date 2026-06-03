@@ -8,6 +8,7 @@
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
 #include "QuadPtsFactory.hpp"
+#include "APart_Node.hpp"
 #include "FEAElementFactory.hpp"
 #include "VisDataPrep_Hyperelastic.hpp"  
 #include "VTK_Writer_FSI.hpp"   
@@ -15,10 +16,6 @@
 int main ( int argc , char * argv[] )
 {
   const std::string element_part_file = "epart.h5";
-  const std::string an_v_mapping_file = "node_mapping_v.h5";
-  const std::string an_p_mapping_file = "node_mapping_p.h5";
-  const std::string pn_v_mapping_file = "post_node_mapping_v.h5";
-  const std::string pn_p_mapping_file = "post_node_mapping_p.h5";
   const std::string part_v_file="./ppart/postpart_v";
   const std::string part_p_file="./ppart/postpart_p";
 
@@ -35,15 +32,14 @@ int main ( int argc , char * argv[] )
   bool isClean = true;
 
   // Load analysis code parameter from solver_cmd.h5 file
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
 
   const int sol_rec_freq = cmd_h5r -> read_intScalar("/", "sol_record_freq");
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // ===== PETSc Initialization =====
 #if PETSC_VERSION_LT(3,19,0)
@@ -154,6 +150,14 @@ int main ( int argc , char * argv[] )
 
   std::ostringstream time_index;
 
+  // Velocity and displacement node mappings
+  const auto an_v_mapping = HDF5_T::read_intVector("node_mapping_v.h5", "/", "old_2_new");
+  const auto pn_v_mapping = HDF5_T::read_intVector("post_node_mapping_v.h5", "/", "new_2_old");
+
+  // Pressure node mappings
+  const auto an_p_mapping = HDF5_T::read_intVector("node_mapping_p.h5", "/", "old_2_new");
+  const auto pn_p_mapping = HDF5_T::read_intVector("post_node_mapping_p.h5", "/", "new_2_old");
+
   for(int time = time_start; time<=time_end; time += time_step)
   {
     std::string disp_name_to_read(disp_sol_bname);
@@ -172,9 +176,9 @@ int main ( int argc , char * argv[] )
         velo_name_to_read.c_str(), name_to_write.c_str() );
 
     visprep->get_pointArray(disp_name_to_read, pres_name_to_read,
-        velo_name_to_read, an_v_mapping_file, an_p_mapping_file,
-        pn_v_mapping_file, pn_p_mapping_file,
-        pNode_v.get(), pNode_p.get(), GMIptr_v->get_nFunc(), GMIptr_p->get_nFunc(),
+        velo_name_to_read, an_v_mapping, an_p_mapping,
+        pn_v_mapping, pn_p_mapping,
+        pNode_v.get(), pNode_p.get(),
         pointArrays);
 
     if( isRef )

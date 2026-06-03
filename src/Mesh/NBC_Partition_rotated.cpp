@@ -1,11 +1,14 @@
 #include "NBC_Partition_rotated.hpp"
+#include "HDF5_Writer.hpp"
+#include "HDF5_Group.hpp"
+#include "Vec_Tools.hpp"
 
 NBC_Partition_rotated::NBC_Partition_rotated(
     const IPart * const &part,
     const Map_Node_Index * const &mnindex,
-    const INodalBC * const &nbc ) 
+    const INodalBC * const &nbc )
 : cpu_rank(part->get_cpu_rank())
-{  
+{
   // Collect the Dirichlet nodes on the rotated boundary surface
   LDN.clear();
   Num_LD = 0;
@@ -68,13 +71,13 @@ NBC_Partition_rotated::NBC_Partition_rotated(
   for(int jj=0; jj<Num_LD; ++jj)
   {
     const int LDN_old_index = mnindex->get_new2old(LDN[jj]);
-    
+
     // LDN_old_pos: the position of old_LDN_index in local_global_node
     int LDN_old_pos = VEC_T::get_pos(local_global_node, LDN_old_index);
 
-    LDN_pt_xyz[3*jj+0] = local_pt_xyz[ 3 * LDN_old_pos + 0 ]; 
-    LDN_pt_xyz[3*jj+1] = local_pt_xyz[ 3 * LDN_old_pos + 1 ]; 
-    LDN_pt_xyz[3*jj+2] = local_pt_xyz[ 3 * LDN_old_pos + 2 ]; 
+    LDN_pt_xyz[3*jj+0] = local_pt_xyz[ 3 * LDN_old_pos + 0 ];
+    LDN_pt_xyz[3*jj+1] = local_pt_xyz[ 3 * LDN_old_pos + 1 ];
+    LDN_pt_xyz[3*jj+2] = local_pt_xyz[ 3 * LDN_old_pos + 2 ];
   }
 
   // create new IEN
@@ -95,44 +98,42 @@ void NBC_Partition_rotated::write_hdf5( const std::string &FileName ) const
 {
   std::string fName = SYS_T::gen_partfile_name( FileName, cpu_rank );
 
-  hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+  auto h5w = SYS_T::make_unique<HDF5_Writer>(fName, H5F_ACC_RDWR);
+  const hid_t file_id = h5w->get_file_id();
 
-  hid_t g_id = H5Gcreate(file_id, "/rotated_nbc", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  auto rotated_group = HDF5_Group::create( file_id, "/rotated_nbc" );
 
-  HDF5_Writer * h5w = new HDF5_Writer(file_id);
+  h5w->write_intScalar( rotated_group.id(), "Num_LD", Num_LD );
 
-  h5w->write_intScalar( g_id, "Num_LD", Num_LD );
-  
   if( Num_LD > 0 )
   {
-    h5w->write_intVector( g_id, "LDN", LDN );
-    
-    h5w->write_doubleVector( g_id, "LDN_pt_xyz", LDN_pt_xyz );
+    h5w->write_intVector( rotated_group.id(), "LDN", LDN );
+
+    h5w->write_doubleVector( rotated_group.id(), "LDN_pt_xyz", LDN_pt_xyz );
   }
 
-  h5w->write_intScalar( g_id, "num_local_node", num_local_node );
+  h5w->write_intScalar( rotated_group.id(), "num_local_node", num_local_node );
 
   if( num_local_node > 0 )
   {
-    h5w->write_doubleVector( g_id, "local_pt_xyz", local_pt_xyz );
-    
-    h5w->write_intVector( g_id, "local_node_pos", local_node_pos );
-    
-    h5w->write_intVector( g_id, "local_global_node", local_global_node );        
+    h5w->write_doubleVector( rotated_group.id(), "local_pt_xyz", local_pt_xyz );
+
+    h5w->write_intVector( rotated_group.id(), "local_node_pos", local_node_pos );
+
+    h5w->write_intVector( rotated_group.id(), "local_global_node", local_global_node );
   }
 
-  h5w->write_intScalar( g_id, "num_local_cell", num_local_cell );
+  h5w->write_intScalar( rotated_group.id(), "num_local_cell", num_local_cell );
 
-  h5w->write_intScalar( g_id, "cell_nLocBas", cell_nLocBas );
+  h5w->write_intScalar( rotated_group.id(), "cell_nLocBas", cell_nLocBas );
 
   if( num_local_cell > 0 )
-  {  
-    h5w->write_intVector( g_id, "local_cell_ien", local_cell_ien );
+  {
+    h5w->write_intVector( rotated_group.id(), "local_cell_ien", local_cell_ien );
 
-    h5w->write_intVector( g_id, "local_global_cell", local_global_cell );   
+    h5w->write_intVector( rotated_group.id(), "local_global_cell", local_global_cell );
   }
 
-  delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
 }
 
 // EOF

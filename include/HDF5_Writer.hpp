@@ -7,19 +7,14 @@
 // This is a collection of functions for writing int/double scalar/
 // vector/tensor into HDF5 files.
 // 
-// The users should generate a file_id first by calling H5Fcreate or
-// H5Fopen. After the output job is done by calling the HDF5_Writer member
-// functions, the user should call H5Fclose.
+// The users should provide the h5 file name and open/create mode when
+// constructing HDF5_Writer. The HDF5 file will be closed in the destructor.
 // 
 // A typical usage is:
 // 
-// hid_t file_id = H5Fcreate(name_of_h5_file, mode, H5P_DEFAULT, H5P_DEFAULT)
-// or 
-// hid_t file_id = H5Fopen(name_of_h5_file, mode, H5P_DEFAULT)
+// HDF5_Writer h5w(name_of_h5_file, mode)
 //
-// call HDF5_Writer::functions
-// 
-// H5Fclose(file_id)
+// call h5w.functions
 // 
 // There are two modes for the H5Fcreate:
 // H5F_ACC_TRUNC: if the file exists, the content will be deleted and
@@ -36,12 +31,11 @@
 // Author: Ju Liu
 // Date: Oct. 23 2013
 // ==================================================================
-#include <string>
 #include <cstdlib>
 #include <climits>
-#include <iostream>
 #include <vector>
 #include <array>
+#include "Sys_Tools.hpp"
 #include "hdf5.h"
 
 class HDF5_Writer
@@ -49,41 +43,41 @@ class HDF5_Writer
   public:
     // --------------------------------------------------------------
     // constructor:
-    // read in file_id. The user should call H5Fcreate to generate a 
-    // valid file_id. After the writing, the user is also responsible 
-    // to call H5Fclose to close the h5 file.
+    // open/create a h5 file from file name and mode.
+    // for create modes (H5F_ACC_TRUNC/H5F_ACC_EXCL), call H5Fcreate;
+    // for open modes (H5F_ACC_RDONLY/H5F_ACC_RDWR), call H5Fopen.
+    // default mode is H5F_ACC_TRUNC.
     // --------------------------------------------------------------
-    HDF5_Writer( const hid_t &in_file_id ) : file_id(in_file_id) {}
+    HDF5_Writer( const std::string &in_file_name,
+        const unsigned in_mode = H5F_ACC_TRUNC );
     
-    virtual ~HDF5_Writer() = default;
+    virtual ~HDF5_Writer();
+
+    hid_t get_file_id() const { return file_id; }
   
     // --------------------------------------------------------------
     // Scalar writer 
     // --------------------------------------------------------------
     // --- Write an int (H5T_NATIVE_INT) scalar as /data_name
-    void write_intScalar( const char * const &data_name, 
-        const int &value ) const; 
+    void write_intScalar( const char * data_name, int value ) const; 
 
     // --- Write an int (H5T_NATIVE_INT) scalar as /group_id/data_name
-    void write_intScalar( const hid_t &group_id, 
-        const char * const &data_name, const int &value ) const; 
+    void write_intScalar( hid_t group_id, const char * data_name, int value ) const; 
 
     // --- Write a double (H5T_NATIVE_DOUBLE) scalar as /file_id/group_id
-    void write_doubleScalar( const hid_t &group_id, 
-        const char * const &data_name, const double &value ) const; 
+    void write_doubleScalar( hid_t group_id, const char * data_name, 
+        double value ) const; 
     
     // --- Write a double (H5T_NATIVE_DOUBLE) scalar as /file_id
-    void write_doubleScalar( const char * const &data_name, 
-        const double &value ) const; 
+    void write_doubleScalar( const char * data_name, double value ) const;
     
     // --- Write an int64_t (H5T_NATIVE_LLONG) scalar as /data_name
-    void write_int64Scalar( const char * const &data_name, 
-        const int64_t &value ) const; 
+    void write_int64Scalar( const char * data_name, int64_t value ) const;
    
     // --- Write an unsigned int (H5T_NATIVE_UINT) scalar at 
     //     /group_id/data_name
-    void write_uintScalar( const hid_t &group_id,
-        const char * const &data_name, const unsigned int &value ) const;
+    void write_uintScalar( hid_t group_id, const char * data_name, 
+        unsigned int value ) const;
 
     // --------------------------------------------------------------
     // Array writer
@@ -91,13 +85,12 @@ class HDF5_Writer
     // --------------------------------------------------------------
     // --- write an int array with given length and saved as 
     //     /group/data_name
-    void write_intVector( const hid_t &group_id,
-        const char * const &data_name, const int * const &value, 
-        const int &length ) const;
+    void write_intVector( hid_t group_id, const char * data_name,
+        const int * value, int length ) const;
     
     // --- write an int array with given length and saved as /data_name
-    void write_intVector( const char * const &data_name, 
-        const int * const &value, const int &length ) const;
+    void write_intVector( const char * data_name, const int * value,
+        int length ) const;
 
     // --------------------------------------------------------------
     // Array writer
@@ -105,14 +98,12 @@ class HDF5_Writer
     // --------------------------------------------------------------
     // --- write an int array with given length and saved as 
     //     /group/data_name
-    void write_int64Vector( const hid_t &group_id, 
-        const char * const &data_name, 
-        const int64_t * const &value, const int64_t &length ) const;
+    void write_int64Vector( hid_t group_id, const char * data_name, 
+        const int64_t * value, int64_t length ) const;
     
     // --- write an int array with given length and saved as /data_name
-    void write_int64Vector( const char * const &data_name, 
-        const int64_t * const &value, 
-        const int64_t &length ) const;
+    void write_int64Vector( const char * data_name, 
+        const int64_t * value, int64_t length ) const;
 
     // --------------------------------------------------------------
     // Array writer
@@ -120,79 +111,79 @@ class HDF5_Writer
     // --------------------------------------------------------------
     // --- write a double array with given length and save as 
     //     /group/data_name
-    void write_doubleVector( const hid_t &group_id, 
-        const char * const &data_name,
-        const double * const &value, const int &length ) const;
+    void write_doubleVector( hid_t group_id, 
+        const char * data_name,
+        const double * value, int length ) const;
 
     // --- write a double array with given length at /data_name
-    void write_doubleVector( const char * const &data_name,
-        const double * const &value, const int &length ) const;
+    void write_doubleVector( const char * data_name,
+        const double * value, int length ) const;
 
     // --------------------------------------------------------------
     // std::vector
     // --------------------------------------------------------------
     // --- write an int vector at /group_id/data_name
-    void write_intVector( const hid_t &group_id,
-        const char * const &data_name, const std::vector<int> &value ) const;
+    void write_intVector( hid_t group_id,
+        const char * data_name, const std::vector<int> &value ) const;
 
     // --- write an int vector at /data_name
-    void write_intVector( const char * const &data_name, 
+    void write_intVector( const char * data_name, 
         const std::vector<int> &value ) const;
     
     // --- write an unsigned int vector at /group_id/data_name
-    void write_uintVector( const hid_t &group_id,
-        const char * const &data_name, 
+    void write_uintVector( hid_t group_id, const char * data_name, 
         const std::vector<unsigned int> &value ) const;
 
     // --- write a double vector at /group_id/data_name
-    void write_doubleVector( const hid_t &group_id,
-        const char * const &data_name, const std::vector<double> &value ) const;
+    void write_doubleVector( hid_t group_id, const char * data_name,
+        const std::vector<double> &value ) const;
 
     // --- write a double vector at /data_name
-    void write_doubleVector( const char * const &data_name, 
+    void write_doubleVector( const char * data_name, 
         const std::vector<double> &value ) const;
 
     // --------------------------------------------------------------
     // Vector_3
     // --------------------------------------------------------------
-    void write_Vector_3( const hid_t &group_id, const char * const &data_name,
+    void write_Vector_3( hid_t group_id, const char * data_name,
         const std::array<double, 3> &value ) const;
 
-    void write_Vector_3( const char * const &data_name, const std::array<double, 3> &value ) const;
+    void write_Vector_3( const char * data_name, 
+        const std::array<double, 3> &value ) const;
 
     // --------------------------------------------------------------
     // Tensor2_3D
     // --------------------------------------------------------------
-    void write_Tensor2_3D( const hid_t &group_id, const char * const &data_name,
+    void write_Tensor2_3D( hid_t group_id, const char * data_name,
         const std::array<double, 9> &value ) const;
 
-    void write_Tensor2_3D( const char * const &data_name, const std::array<double, 9> &value ) const;
+    void write_Tensor2_3D( const char * data_name, 
+        const std::array<double, 9> &value ) const;
 
     // --------------------------------------------------------------
     // Matrix writer
     // --------------------------------------------------------------
-    void write_intMatrix( const hid_t &group_id,
-        const char * const &data_name, const std::vector<int> &value,
-        const int &row_num, const int &col_num ) const;
+    void write_intMatrix( hid_t group_id,
+        const char * data_name, const std::vector<int> &value,
+        int row_num, int col_num ) const;
 
-    void write_doubleMatrix( const hid_t &group_id, 
-        const char * const &data_name, const std::vector<double> &value,
-        const int &row_num, const int &col_num ) const;
+    void write_doubleMatrix( hid_t group_id, 
+        const char * data_name, const std::vector<double> &value,
+        int row_num, int col_num ) const;
 
     // --------------------------------------------------------------
     // String
     // --------------------------------------------------------------
-    void write_string( const char * const &data_name, 
+    void write_string( const char * data_name, 
         const std::string &string_input ) const;
 
-    void write_string( const hid_t &group_id,
-        const char * const &data_name, 
+    void write_string( hid_t group_id, const char * data_name, 
         const std::string &string_input ) const;
 
   private:
-    const hid_t file_id;
+    hid_t file_id;
 
-    void check_error(const herr_t &status, const char * const &funname ) const
+    void check_error(herr_t status, const char * funname ) const
     {
       if(status < 0) 
       {
@@ -201,20 +192,20 @@ class HDF5_Writer
       }
     }
 
-    void write_string_impl(hid_t location_id, const char * const &data_name, 
+    void write_string_impl(hid_t location_id, const char * data_name, 
         const std::string& string_input ) const;
 
-    void write_intScalar_impl( hid_t location_id, const char * const &data_name, 
-        const int &value ) const; 
+    void write_intScalar_impl( hid_t location_id, const char * data_name, 
+        int value ) const; 
 
-    void write_doubleScalar_impl( hid_t location_id, const char * const &data_name, 
-        const double &value ) const; 
+    void write_doubleScalar_impl( hid_t location_id, const char * data_name, 
+        double value ) const; 
 
-    void write_intVector_impl( hid_t location_id, const char * const &data_name, 
-        const int * const &value, const int &length ) const;
+    void write_intVector_impl( hid_t location_id, const char * data_name, 
+        const int * value, int length ) const;
 
-    void write_doubleVector_impl( hid_t location_id, const char * const &data_name,
-        const double * const &value, const int &length ) const;
+    void write_doubleVector_impl( hid_t location_id, const char * data_name,
+        const double * value, int length ) const;
 };
 
 #endif

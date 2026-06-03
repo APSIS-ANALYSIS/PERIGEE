@@ -9,6 +9,7 @@
 // Date: Jan. 12 2017
 // ============================================================================
 #include "IPart.hpp"
+#include "Vec_Tools.hpp"
 #include "Map_Node_Index.hpp"
 #include "IIEN.hpp"
 #include "Field_Property.hpp"

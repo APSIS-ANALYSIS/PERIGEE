@@ -108,6 +108,12 @@ class PLinear_Solver_PETSc
     }
 
     // ------------------------------------------------------------------------
+    // ! Print the KSP converged reason on screen
+    // ------------------------------------------------------------------------
+    void print_convergence_reason() const
+    {KSPConvergedReasonView(ksp, PETSC_VIEWER_STDOUT_WORLD);}
+
+    // ------------------------------------------------------------------------
     // ! Monitor the Krylov subspace method behavior
     // ------------------------------------------------------------------------
     void Monitor() const;

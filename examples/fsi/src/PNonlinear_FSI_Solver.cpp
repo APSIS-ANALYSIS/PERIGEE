@@ -28,7 +28,16 @@ PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
   flrate(std::move(in_flrate)),
   sol_base(std::move(in_sol_base)),
   pnode_v(std::move(in_pnode_v))
-{}
+{
+#ifdef PETSC_USE_LOG
+  PetscClassIdRegister("user-log-info", &classid);
+  PetscLogEventRegister("assembly_0", classid, &assem_event_0);
+  PetscLogEventRegister("assembly_1", classid, &assem_event_1);
+  PetscLogEventRegister("assembly_2", classid, &assem_event_2);
+  PetscLogEventRegister("lin_solve_mech", classid, &solve_mech_event);
+  PetscLogEventRegister("lin_solve_mesh", classid, &solve_mesh_event);
+#endif
+}
 
 PNonlinear_FSI_Solver::PNonlinear_FSI_Solver(
     std::unique_ptr<IPGAssem> in_gassem_prestress,
@@ -153,18 +162,6 @@ void PNonlinear_FSI_Solver::GenAlpha_Seg_solve_FSI(
     PDNSolution * const &pres,
     bool &conv_flag, int &nl_counter ) const
 {
-#ifdef PETSC_USE_LOG
-  PetscLogEvent assem_event_0, assem_event_1, assem_event_2;
-  PetscLogEvent solve_mech_event, solve_mesh_event;
-  PetscClassId classid;
-  PetscClassIdRegister("user-log-info", &classid);
-  PetscLogEventRegister("assembly_0", classid, &assem_event_0);
-  PetscLogEventRegister("assembly_1", classid, &assem_event_1);
-  PetscLogEventRegister("assembly_2", classid, &assem_event_2);
-  PetscLogEventRegister("lin_solve_mech", classid, &solve_mech_event);
-  PetscLogEventRegister("lin_solve_mesh", classid, &solve_mesh_event);
-#endif
-
   // Initialization
   nl_counter = 0;
   double residual_norm = 0.0, initial_norm = 0.0, relative_error = 0.0;

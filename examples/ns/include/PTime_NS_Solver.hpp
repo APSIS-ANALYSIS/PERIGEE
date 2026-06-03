@@ -80,9 +80,15 @@ class PTime_NS_Solver
 
     const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
 
-    std::string Name_Generator( const int &counter ) const;
+    std::string Name_Generator(const int &counter) const
+    {
+      return pb_name + std::to_string(900000000 + counter);
+    }
 
-    std::string Name_dot_Generator( const int &counter ) const;
+    std::string Name_dot_Generator(const int &counter) const
+    {
+      return "dot_" + pb_name + std::to_string(900000000 + counter);
+    }
 
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;

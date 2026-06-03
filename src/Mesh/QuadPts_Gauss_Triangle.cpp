@@ -1,6 +1,6 @@
 #include "QuadPts_Gauss_Triangle.hpp"
 
-QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pts( in_num_pts )
+QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( int in_num_pts ) : num_pts( in_num_pts )
 {
   qp.resize( 3 * num_pts );
   qw.resize( num_pts );
@@ -79,7 +79,7 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       qp[3] = a; qp[4] = b; qp[5] = b; qw[1] = w;
       qp[6] = b; qp[7] = a; qp[8] = b; qw[2] = w;
       qp[9] = b; qp[10] = b; qp[11] = a; qw[3] = w;
-      
+
       a = 0.869739794195568;
       b = 0.065130102902216;
       w = 0.053347235608839;
@@ -116,7 +116,7 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       w = 0.078357352244117;
       qp[12] = a; qp[13] = b; qp[14] = b; qw[4] = w;
       qp[15] = b; qp[16] = a; qp[17] = b; qw[5] = w;
-      qp[18] = b; qp[19] = b; qp[20] = a; qw[6] = w;  
+      qp[18] = b; qp[19] = b; qp[20] = a; qw[6] = w;
 
       a = 0.535795346449899;
       b = 0.232102326775050;
@@ -154,58 +154,58 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       w = 0.008007799555564801597804123460;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
-  
+
       a = 0.171614914923835347556304795551;
       b = 0.414192542538082326221847602214;
       w = 0.046868898981821644823226732071;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
- 
+
       a = 0.539412243677190440263092985511;
       b = 0.230293878161404779868453507244;
-      w = 0.046590940183976487960361770070; 
+      w = 0.046590940183976487960361770070;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
 
       a = 0.772160036676532561750285570113;
       b = 0.113919981661733719124857214943;
-      w = 0.031016943313796381407646220131; 
+      w = 0.031016943313796381407646220131;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
 
       a = 0.009085399949835353883572964740;
-      b = 0.495457300025082323058213517632; 
+      b = 0.495457300025082323058213517632;
       w = 0.010791612736631273623178240136;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
 
@@ -214,10 +214,10 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       w = 0.032195534242431618819414482205;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
 
@@ -227,41 +227,41 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       w = 0.015445834210701583817692900053;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = c; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = c; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = c; qw[idx] = w;
 
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = c; qp[3*idx+2] = a; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = c; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = c; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
 
       a = 0.018620522802520968955913511549;
       b = 0.689441970728591295496647976487;
-      c = 0.291937506468887771754472382212;  
+      c = 0.291937506468887771754472382212;
       w = 0.017822989923178661888748319485;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = c; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = c; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = c; qw[idx] = w;
 
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = c; qp[3*idx+2] = a; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = c; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = c; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
 
@@ -271,19 +271,19 @@ QuadPts_Gauss_Triangle::QuadPts_Gauss_Triangle( const int &in_num_pts ) : num_pt
       w = 0.037038683681384627918546472190;
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = b; qp[3*idx+2] = c; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = a; qp[3*idx+1] = c; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = a; qp[3*idx+2] = c; qw[idx] = w;
 
       idx += 1;
       qp[3*idx] = b; qp[3*idx+1] = c; qp[3*idx+2] = a; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = c; qp[3*idx+1] = a; qp[3*idx+2] = b; qw[idx] = w;
-      
+
       idx += 1;
       qp[3*idx] = c; qp[3*idx+1] = b; qp[3*idx+2] = a; qw[idx] = w;
       break;
@@ -307,7 +307,7 @@ void QuadPts_Gauss_Triangle::print_info() const
   SYS_T::commPrint("qp.size() = %d\n", qp.size());
   SYS_T::commPrint("qw.size() = %d\n", qw.size());
   for(int ii=0; ii<num_pts; ++ii)
-    SYS_T::commPrint("  %.15f %.15f %.15f %.15f\n", 
+    SYS_T::commPrint("  %.15f %.15f %.15f %.15f\n",
         qp[3*ii], qp[3*ii+1], qp[3*ii+2], qw[ii]);
   SYS_T::commPrint("========================================\n");
 }

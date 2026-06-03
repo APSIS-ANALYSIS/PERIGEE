@@ -6,10 +6,13 @@
 //
 // Date Created: Jan 01 2020
 // ==================================================================
+#include "Timer.hpp"
 #include "Math_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
+#include "HDF5_Writer.hpp"
 #include "Part_FEM_Rotated.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_inflow.hpp"
@@ -24,6 +27,7 @@
 #include "EBC_Partition_WallModel.hpp"
 #include "Interface_Partition.hpp"
 #include "yaml-cpp/yaml.h"
+#include "HDF5_Group.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -93,36 +97,36 @@ int main( int argc, char * argv[] )
   if( elemType != FEType::Tet4 && elemType != FEType::Tet10 && elemType != FEType::Hex8 && elemType != FEType::Hex27 ) SYS_T::print_fatal("ERROR: unknown element type %s.\n", elemType_str.c_str());
 
   // Print the command line arguments
-  cout<<"==== Command Line Arguments ===="<<endl;
-  cout<<" -elem_type: "<<elemType_str<<endl;
-  cout<<" -wall_model_type: "<<wall_model_type<<endl;
-  cout<<" -num_outlet: "<<num_outlet<<endl;
-  cout<<" -fixed_geo_file: "<<fixed_geo_file<<endl;
-  cout<<" -rotated_geo_file: "<<fixed_geo_file<<endl;
-  cout<<" -sur_file_in_base: "<<sur_file_in_base<<endl;
-  cout<<" -sur_file_inner_wall: "<<sur_file_inner_wall<<endl;
-  cout<<" -sur_file_outer_wall: "<<sur_file_outer_wall<<endl;
-  cout<<" -sur_file_out_base: "<<sur_file_out_base<<endl;
-  cout<<" -fixed_interface_base: "<<fixed_interface_base<<endl;
-  cout<<" -rotated_interface_base: "<<rotated_interface_base<<endl;
-  cout<<" -part_file: "<<part_file<<endl;
-  cout<<" -cpu_size: "<<cpu_size<<endl;
-  cout<<" -in_ncommon: "<<in_ncommon<<endl;
-  if(isDualGraph) cout<<" -isDualGraph: true \n";
-  else cout<<" -isDualGraph: false \n";
-  cout<<"---- Problem definition ----\n";
-  cout<<" dofNum: "<<dofNum<<endl;
-  cout<<" dofMat: "<<dofMat<<endl;
-  cout<<"====  Command Line Arguments/ ===="<<endl;
+  std::cout<<"==== Command Line Arguments ===="<<std::endl;
+  std::cout<<" -elem_type: "<<elemType_str<<std::endl;
+  std::cout<<" -wall_model_type: "<<wall_model_type<<std::endl;
+  std::cout<<" -num_outlet: "<<num_outlet<<std::endl;
+  std::cout<<" -fixed_geo_file: "<<fixed_geo_file<<std::endl;
+  std::cout<<" -rotated_geo_file: "<<fixed_geo_file<<std::endl;
+  std::cout<<" -sur_file_in_base: "<<sur_file_in_base<<std::endl;
+  std::cout<<" -sur_file_inner_wall: "<<sur_file_inner_wall<<std::endl;
+  std::cout<<" -sur_file_outer_wall: "<<sur_file_outer_wall<<std::endl;
+  std::cout<<" -sur_file_out_base: "<<sur_file_out_base<<std::endl;
+  std::cout<<" -fixed_interface_base: "<<fixed_interface_base<<std::endl;
+  std::cout<<" -rotated_interface_base: "<<rotated_interface_base<<std::endl;
+  std::cout<<" -part_file: "<<part_file<<std::endl;
+  std::cout<<" -cpu_size: "<<cpu_size<<std::endl;
+  std::cout<<" -in_ncommon: "<<in_ncommon<<std::endl;
+  if(isDualGraph) std::cout<<" -isDualGraph: true \n";
+  else std::cout<<" -isDualGraph: false \n";
+  std::cout<<"---- Problem definition ----\n";
+  std::cout<<" dofNum: "<<dofNum<<std::endl;
+  std::cout<<" dofMat: "<<dofMat<<std::endl;
+  std::cout<<"====  Command Line Arguments/ ===="<<std::endl;
 
   // Check if the vtu geometry files exist on disk
-  SYS_T::file_check(fixed_geo_file); cout<<fixed_geo_file<<" found. \n";
+  SYS_T::file_check(fixed_geo_file); std::cout<<fixed_geo_file<<" found. \n";
 
-  SYS_T::file_check(rotated_geo_file); cout<<rotated_geo_file<<" found. \n";
+  SYS_T::file_check(rotated_geo_file); std::cout<<rotated_geo_file<<" found. \n";
 
-  SYS_T::file_check(sur_file_inner_wall); cout<<sur_file_outer_wall<<" found. \n";
+  SYS_T::file_check(sur_file_inner_wall); std::cout<<sur_file_outer_wall<<" found. \n";
 
-  SYS_T::file_check(sur_file_outer_wall); cout<<sur_file_inner_wall<<" found. \n";
+  SYS_T::file_check(sur_file_outer_wall); std::cout<<sur_file_inner_wall<<" found. \n";
 
   // Generate the inlet file names and check existance
   std::vector< std::string > sur_file_in;
@@ -138,7 +142,7 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the inlet file names. \n"); 
   
     SYS_T::file_check(sur_file_in[ii]);
-    cout<<sur_file_in[ii]<<" found. \n";
+    std::cout<<sur_file_in[ii]<<" found. \n";
   }
 
   // Generate the outlet file names and check existance
@@ -155,7 +159,7 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
 
     SYS_T::file_check(sur_file_out[ii]);
-    cout<<sur_file_out[ii]<<" found. \n";
+    std::cout<<sur_file_out[ii]<<" found. \n";
   }
 
   std::vector< std::string > fixed_interface_file(num_interface_pair);
@@ -176,34 +180,33 @@ int main( int argc, char * argv[] )
       SYS_T::print_fatal("Error: unknown element type occurs when generating the outlet file names. \n");
 
     SYS_T::file_check(fixed_interface_file[ii]);
-    cout<<fixed_interface_file[ii]<<" found. \n";
+    std::cout<<fixed_interface_file[ii]<<" found. \n";
 
     SYS_T::file_check(rotated_interface_file[ii]);
-    cout<<rotated_interface_file[ii]<<" found. \n";
+    std::cout<<rotated_interface_file[ii]<<" found. \n";
   }
 
   // Record the problem setting into a HDF5 file: preprocessor_cmd.h5
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  {
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("preprocessor_cmd.h5");
 
-  cmdh5w->write_intScalar("num_inlet", num_inlet);
-  cmdh5w->write_intScalar("num_outlet", num_outlet);
-  cmdh5w->write_intScalar("cpu_size", cpu_size);
-  cmdh5w->write_intScalar("in_ncommon", in_ncommon);
-  cmdh5w->write_intScalar("dofNum", dofNum);
-  cmdh5w->write_intScalar("dofMat", dofMat);
-  cmdh5w->write_string("elemType", elemType_str);
-  cmdh5w->write_string("fixed_geo_file", fixed_geo_file);
-  cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
-  cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
-  cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
-  cmdh5w->write_string("sur_file_inner_wall", sur_file_inner_wall);
-  cmdh5w->write_string("sur_file_outer_wall", sur_file_outer_wall);
-  cmdh5w->write_string("fixed_interface_base", fixed_interface_base);
-  cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
-  cmdh5w->write_string("part_file", part_file);
-
-  delete cmdh5w; H5Fclose(cmd_file_id);
+    cmdh5w->write_intScalar("num_inlet", num_inlet);
+    cmdh5w->write_intScalar("num_outlet", num_outlet);
+    cmdh5w->write_intScalar("cpu_size", cpu_size);
+    cmdh5w->write_intScalar("in_ncommon", in_ncommon);
+    cmdh5w->write_intScalar("dofNum", dofNum);
+    cmdh5w->write_intScalar("dofMat", dofMat);
+    cmdh5w->write_string("elemType", elemType_str);
+    cmdh5w->write_string("fixed_geo_file", fixed_geo_file);
+    cmdh5w->write_string("rotated_geo_file", rotated_geo_file);
+    cmdh5w->write_string("sur_file_in_base", sur_file_in_base);
+    cmdh5w->write_string("sur_file_out_base", sur_file_out_base);
+    cmdh5w->write_string("sur_file_inner_wall", sur_file_inner_wall);
+    cmdh5w->write_string("sur_file_outer_wall", sur_file_outer_wall);
+    cmdh5w->write_string("fixed_interface_base", fixed_interface_base);
+    cmdh5w->write_string("rotated_interface_base", rotated_interface_base);
+    cmdh5w->write_string("part_file", part_file);
+  }
 
   // Read the volumetric mesh file from the vtu file: fixed_geo_file
   int nFunc, nElem;
@@ -234,8 +237,7 @@ int main( int argc, char * argv[] )
   VEC_T::insert_end(vecIEN, rotated_vecIEN);
   VEC_T::insert_end(ctrlPts, rotated_ctrlPts);
 
-  IIEN * IEN = new IEN_FEM(nElem, vecIEN);
-  VEC_T::clean( vecIEN );
+  IIEN * IEN = new IEN_FEM(nElem, std::move(vecIEN));
   VEC_T::clean( rotated_vecIEN );
   VEC_T::clean( rotated_ctrlPts );
 
@@ -276,11 +278,9 @@ int main( int argc, char * argv[] )
     VTK_T::read_grid(fixed_interface_file[ii], sur_fixed_nFunc, sur_fixed_nElem, sur_fixed_ctrlPts, sur_fixed_vecIEN);
     VTK_T::read_grid(rotated_interface_file[ii], sur_rotated_nFunc, sur_rotated_nElem, sur_rotated_ctrlPts, sur_rotated_vecIEN);
 
-    IIEN * sur_fixed_IEN = new IEN_FEM(sur_fixed_nElem, sur_fixed_vecIEN);
-    VEC_T::clean(sur_fixed_vecIEN);
+    IIEN * sur_fixed_IEN = new IEN_FEM(sur_fixed_nElem, std::move(sur_fixed_vecIEN));
 
-    IIEN * sur_rotated_IEN = new IEN_FEM(sur_rotated_nElem, sur_rotated_vecIEN);
-    VEC_T::clean(sur_rotated_vecIEN);
+    IIEN * sur_rotated_IEN = new IEN_FEM(sur_rotated_nElem, std::move(sur_rotated_vecIEN));
 
     // Assume sur_fixed_nLocBas = sur_rotated_nLocBas
     const int sur_nLocBas = sur_fixed_IEN->get_nLocBas();
@@ -314,7 +314,7 @@ int main( int argc, char * argv[] )
   }
 
   // Setup Nodal i.e. Dirichlet type Boundary Conditions
-  std::vector<INodalBC *> NBC_list( dofMat, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list( dofMat );
 
   std::vector<std::string> dir_list {};
   std::vector<std::string> weak_list {};
@@ -333,10 +333,10 @@ int main( int argc, char * argv[] )
   else
     SYS_T::print_fatal("Unknown wall model type.");
 
-  NBC_list[0] = new NodalBC( nFunc );
-  NBC_list[1] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
-  NBC_list[2] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
-  NBC_list[3] = new NodalBC( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[0] = SYS_T::make_unique<NodalBC>( nFunc );
+  NBC_list[1] = SYS_T::make_unique<NodalBC>( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[2] = SYS_T::make_unique<NodalBC>( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
+  NBC_list[3] = SYS_T::make_unique<NodalBC>( dir_list, rotated_sur_file, sur_file_inner_wall, fixed_geo_file, nFunc );
 
   // Rotated BC info
   INodalBC * RotBC = new NodalBC_3D_rotated( rotated_sur_file, fixed_geo_file,
@@ -435,7 +435,7 @@ int main( int argc, char * argv[] )
         {0, dofNum, true, "ROTATED_NS"} );
     
     mytimer->Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     // write the part h5 file
     part -> write( part_file );
@@ -469,13 +469,13 @@ int main( int argc, char * argv[] )
 
     // Writed the info of rotation axis into h5 file
     const std::string fName = SYS_T::gen_partfile_name( part_file, part->get_cpu_rank() );
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
-    hid_t g_id = H5Gcreate(file_id, "/rotation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * h5w = new HDF5_Writer( file_id );
-    h5w -> write_Vector_3( g_id, "point_rotated", point_rotated.to_std_array() );
-    h5w -> write_Vector_3( g_id, "angular_direction", angular_direction.to_std_array() );
-
-    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
+    {
+      auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
+      const hid_t file_id = h5w->get_file_id();
+      auto rotation_group = HDF5_Group::create(file_id, "/rotation");
+      h5w -> write_Vector_3( rotation_group.id(), "point_rotated", point_rotated.to_std_array() );
+      h5w -> write_Vector_3( rotation_group.id(), "angular_direction", angular_direction.to_std_array() );
+    }
 
     // Partition sliding interface and write to h5 file
     Interface_Partition * itfpart = new Interface_Partition(part, mnindex, interfaces, NBC_list);
@@ -557,15 +557,15 @@ int main( int argc, char * argv[] )
 
     const std::string GroupName = "/sliding";
 
-    hid_t file_id = H5Fopen(fName.c_str(), H5F_ACC_RDWR, H5P_DEFAULT);
+    auto h5w = SYS_T::make_unique<HDF5_Writer>( fName, H5F_ACC_RDWR );
 
-    hid_t g_id = H5Gopen( file_id, GroupName.c_str(), H5P_DEFAULT );
+    const hid_t file_id = h5w->get_file_id();
 
-    HDF5_Writer * h5w = new HDF5_Writer( file_id );
+    auto sliding_group = HDF5_Group::open( file_id, GroupName );
 
-    h5w -> write_intVector( g_id, "max_num_local_fixed_cell", max_fixed_nlocalele );
+    h5w -> write_intVector( sliding_group.id(), "max_num_local_fixed_cell", max_fixed_nlocalele );
 
-    h5w -> write_intVector( g_id, "max_num_local_rotated_cell", max_rotated_nlocalele );
+    h5w -> write_intVector( sliding_group.id(), "max_num_local_rotated_cell", max_rotated_nlocalele );
 
     const std::string groupbase("interfaceid_");
 
@@ -574,39 +574,33 @@ int main( int argc, char * argv[] )
       std::string subgroup_name(groupbase);
       subgroup_name.append( std::to_string(ii) );
 
-      hid_t group_id = H5Gopen(g_id, subgroup_name.c_str(), H5P_DEFAULT);
+      auto interface_group = HDF5_Group::open(sliding_group.id(), subgroup_name);
 
-      h5w -> write_intVector( group_id, "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
+      h5w -> write_intVector( interface_group.id(), "fixed_node_part_tag", fixed_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
+      h5w -> write_intVector( interface_group.id(), "fixed_node_loc_pos", fixed_node_loc_pos[ii] );
 
-      h5w -> write_intVector( group_id, "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
+      h5w -> write_intVector( interface_group.id(), "rotated_node_part_tag", rotated_node_vol_part_tag[ii] );
 
-      h5w -> write_intVector( group_id, "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
-
-      H5Gclose( group_id );
+      h5w -> write_intVector( interface_group.id(), "rotated_node_loc_pos", rotated_node_loc_pos[ii] );
     }
-
-    delete h5w; H5Gclose( g_id ); H5Fclose( file_id );
   }
 
-  cout<<"\n===> Mesh Partition Quality: "<<endl;
-  cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<endl;
-  cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<endl;
-  cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<endl;
-  cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<endl;
+  std::cout<<"\n===> Mesh Partition Quality: "<<std::endl;
+  std::cout<<"The largest ghost / local node ratio is: "<<VEC_T::max(list_ratio_g2l)<<std::endl;
+  std::cout<<"The smallest ghost / local node ratio is: "<<VEC_T::min(list_ratio_g2l)<<std::endl;
+  std::cout<<"The summation of the number of ghost nodes is: "<<sum_nghostnode<<std::endl;
+  std::cout<<"The maximum badnode number is: "<<VEC_T::max(list_nbadnode)<<std::endl;
 
   const int maxpart_nlocalnode = VEC_T::max(list_nlocalnode); 
   const int minpart_nlocalnode = VEC_T::min(list_nlocalnode);
 
-  cout<<"The maximum and minimum local node numbers are ";
-  cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<endl;
-  cout<<"The maximum / minimum of local node is: ";
-  cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<endl;
+  std::cout<<"The maximum and minimum local node numbers are ";
+  std::cout<<maxpart_nlocalnode<<"\t"<<minpart_nlocalnode<<std::endl;
+  std::cout<<"The maximum / minimum of local node is: ";
+  std::cout<<(double) maxpart_nlocalnode / (double) minpart_nlocalnode<<std::endl;
 
   // Finalize the code and exit
-  for(auto &it_nbc : NBC_list) delete it_nbc;
-
   delete InFBC; delete RotBC; delete ebc; delete wbc; delete mytimer;
   delete mnindex; delete global_part; delete IEN;
 

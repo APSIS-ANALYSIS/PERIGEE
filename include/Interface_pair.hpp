@@ -28,6 +28,7 @@
 // ============================================================================
 #include "HDF5_Tools.hpp"
 #include "Hex_Tools.hpp"
+#include "FEType.hpp"
 
 class Interface_pair
 {

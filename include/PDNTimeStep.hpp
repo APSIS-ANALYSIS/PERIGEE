@@ -10,13 +10,11 @@
 // Date: Dec 9 2013
 // ==================================================================
 #include <vector>
-#include "Sys_Tools.hpp"
 
 class PDNTimeStep
 {
   public:
-    PDNTimeStep( const int &input_index, const double &input_time,
-        const double &input_step );
+    PDNTimeStep( int input_index, double input_time, double input_step );
 
     ~PDNTimeStep() = default;
 
@@ -31,10 +29,10 @@ class PDNTimeStep
     void TimeIncrement();
 
     // Perform time increment with the given time step
-    void TimeIncrement(const double &input_time_step);
+    void TimeIncrement(double input_time_step);
 
     // Change the time step size
-    void UpdateTimeStep(const double &new_time_step)
+    void UpdateTimeStep(double new_time_step)
     {time_step = new_time_step;}
 
     // ! Write the three _history vectors to file on proc 0

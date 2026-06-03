@@ -1,4 +1,6 @@
 #include "NodalBC_3D_rotated.hpp"
+#include "Vec_Tools.hpp"
+#include "VTK_Tools.hpp"
 
 NodalBC_3D_rotated::NodalBC_3D_rotated( 
     const std::string &rotated_file,

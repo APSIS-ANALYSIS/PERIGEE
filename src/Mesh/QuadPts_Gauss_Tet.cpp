@@ -1,10 +1,10 @@
 #include "QuadPts_Gauss_Tet.hpp"
 
-QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_pts )
+QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( int in_num_pts ) : num_pts( in_num_pts )
 {
   qp.resize( 4 * num_pts );
   qw.resize( num_pts );
-  
+
   int offset;
   double a,b,c,w;
   std::vector<double> temp;
@@ -41,7 +41,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       c = (1.0 - a - b) / 2.0;
       temp = gen_permutations(a,b,c);
       for(int ii=0; ii<48; ++ii) qp[ii] = temp[ii];
-      
+
       for(int ii=0; ii<12; ++ii) qw[ii] = 0.04528559236327399;
 
       a = 0.7316369079576180;
@@ -61,7 +61,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       qp[offset+12] = b; qp[offset+13] = b; qp[offset+14] = b; qp[offset+15] = a;
       qw[15] = w;
 
-      qp[offset+16] = 0.25; qp[offset+17] = 0.25; 
+      qp[offset+16] = 0.25; qp[offset+17] = 0.25;
       qp[offset+18] = 0.25; qp[offset+19] = 0.25;
       qw[16] = 0.1884185567365411;
 
@@ -84,7 +84,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       temp = gen_permutations(a,b,c);
       offset = 48;
       for(int ii=0; ii<48; ++ii) qp[offset+ii] = temp[ii];
-      
+
       for(int ii=0; ii<12; ++ii) qw[12+ii] = w;
 
       a = 0.8277192480479295;
@@ -104,7 +104,7 @@ QuadPts_Gauss_Tet::QuadPts_Gauss_Tet( const int &in_num_pts ) : num_pts( in_num_
       qp[offset+12] = b; qp[offset+13] = b; qp[offset+14] = b; qp[offset+15] = a;
       qw[27] = w;
 
-      qp[offset+16] = 0.25; qp[offset+17] = 0.25; 
+      qp[offset+16] = 0.25; qp[offset+17] = 0.25;
       qp[offset+18] = 0.25; qp[offset+19] = 0.25;
       qw[28] = 0.09040129046014750;
 
@@ -128,13 +128,13 @@ void QuadPts_Gauss_Tet::print_info() const
   SYS_T::commPrint("qp.size() = %d\n", qp.size());
   SYS_T::commPrint("qw.size() = %d\n", qw.size());
   for(int ii=0; ii<num_pts; ++ii)
-    SYS_T::commPrint("  %.15f %.15f %.15f %.15f %.15f\n", 
+    SYS_T::commPrint("  %.15f %.15f %.15f %.15f %.15f\n",
         qp[4*ii], qp[4*ii+1], qp[4*ii+2], qp[4*ii+3], qw[ii]);
   SYS_T::commPrint("===========================================\n");
 }
 
-std::vector<double> QuadPts_Gauss_Tet::gen_permutations(const double &a,
-    const double &b, const double &c ) const
+std::vector<double> QuadPts_Gauss_Tet::gen_permutations(double a,
+    double b, double c ) const
 {
   return {a,b,c,c,
     a,c,b,c,

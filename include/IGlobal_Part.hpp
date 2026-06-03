@@ -22,9 +22,9 @@ class IGlobal_Part
     
     virtual ~IGlobal_Part() = default;
 
-    virtual idx_t get_epart( const int &ee ) const = 0;
+    virtual idx_t get_epart( int ee ) const = 0;
     
-    virtual idx_t get_npart( const int &nn, const int &field = 0 ) const = 0;
+    virtual idx_t get_npart( int nn, int field = 0 ) const = 0;
 
     virtual bool get_isMETIS() const = 0;
     

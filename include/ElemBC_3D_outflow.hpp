@@ -29,14 +29,14 @@ class ElemBC_3D_outflow : public ElemBC_3D
        const std::vector< Vector_3 > &outlet_normal_vec,
        const FEType &in_elemtype );
 
-    virtual ~ElemBC_3D_outflow() = default;
+    ~ElemBC_3D_outflow() override = default;
 
-    virtual void print_info() const;
+    void print_info() const override;
 
-    virtual Vector_3 get_normal_vec( const int &ebc_id ) const
+    Vector_3 get_normal_vec( int ebc_id ) const override
     { return outNormal[ebc_id]; }
 
-    virtual std::vector<double> get_intNA( const int &ebc_id ) const
+    std::vector<double> get_intNA( int ebc_id ) const override
     { return intNA[ebc_id]; }
 
   private:

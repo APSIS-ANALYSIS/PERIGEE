@@ -7,11 +7,14 @@
 // Author: Ju Liu
 // Date: Dec. 13 2021
 // ============================================================================
+#include "Timer.hpp"
 #include "Math_Tools.hpp"
+#include "VTK_Tools.hpp"
 #include "IEN_FEM.hpp"
 #include "Global_Part_METIS.hpp"
 #include "Global_Part_Serial.hpp"
 #include "Global_Part_Reload.hpp"
+#include "HDF5_Writer.hpp"
 #include "Part_FEM_FSI.hpp"
 #include "NodalBC.hpp"
 #include "NodalBC_3D_FSI.hpp"
@@ -153,16 +156,15 @@ int main( int argc, char * argv[] )
   // If we can still detect additional files on disk, throw an warning
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_in_base, num_inlet, ".vtp")) ||
       SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_in_base, num_inlet, ".vtp")) )
-    cout<<endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
+    std::cout<<std::endl<<"Warning: there are additional inlet surface files on disk. Check num_inlet please.\n\n";
 
   if( SYS_T::file_exist(SYS_T::gen_capfile_name(sur_f_file_out_base, num_outlet, ".vtp")) ||
       SYS_T::file_exist(SYS_T::gen_capfile_name(sur_s_file_out_base, num_outlet, ".vtp")) )
-    cout<<endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
+    std::cout<<std::endl<<"Warning: there are additional outlet surface files on disk. Check num_outlet please.\n\n";
 
   // ----- Write the input argument into a HDF5 file
   SYS_T::execute("rm -rf preprocessor_cmd.h5");
-  hid_t cmd_file_id = H5Fcreate("preprocessor_cmd.h5", H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-  HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+  HDF5_Writer * cmdh5w = new HDF5_Writer("preprocessor_cmd.h5");
 
   cmdh5w->write_intScalar("num_outlet",       num_outlet);
   cmdh5w->write_intScalar("num_inlet",        num_inlet);
@@ -186,7 +188,7 @@ int main( int argc, char * argv[] )
   cmdh5w->write_string("date",                SYS_T::get_date() );
   cmdh5w->write_string("time",                SYS_T::get_time() );
 
-  delete cmdh5w; H5Fclose(cmd_file_id);
+  delete cmdh5w;
   // ----- Finish writing
 
   // Read the geometry file for the whole FSI domain for the velocity /
@@ -204,9 +206,14 @@ int main( int argc, char * argv[] )
     if(phy_tag[ii] != 0 && phy_tag[ii] != 1) SYS_T::print_fatal("Error: FSI problem, the physical tag for element should be 0 (fluid domain) or 1 (solid domain).\n");
   }
 
-  // Generate IEN
-  IIEN * IEN_v = new IEN_FEM( nElem, vecIEN );
+  // We will generate a new IEN array for the pressure variable by updating the
+  // IEN for the solid element. If the solid element has node on the fluid-solid
+  // interface, it will be mapped to the new index, that is nFunc + ii.
+  std::vector<int> vecIEN_p ( vecIEN );
 
+  // Generate IEN
+  IIEN * IEN_v = new IEN_FEM( nElem, std::move(vecIEN) );
+  
   // --------------------------------------------------------------------------
   // The fluid-solid interface file will be read and the nodal index will be
   // mapped to a new value by the following rule. The ii-th node in the
@@ -217,10 +224,6 @@ int main( int argc, char * argv[] )
   const int nFunc_interface = static_cast<int>( wall_node_id.size() );
   const int nFunc_p = nFunc_v + nFunc_interface;
 
-  // We will generate a new IEN array for the pressure variable by updating the
-  // IEN for the solid element. If the solid element has node on the fluid-solid
-  // interface, it will be mapped to the new index, that is nFunc + ii.
-  std::vector<int> vecIEN_p ( vecIEN );
   PERIGEE_OMP_PARALLEL_FOR
   for(int ee=0; ee<nElem; ++ee)
   {
@@ -249,9 +252,8 @@ int main( int argc, char * argv[] )
     }
   }
 
-  IIEN * IEN_p = new IEN_FEM( nElem, vecIEN_p );
-
-  VEC_T::clean( vecIEN ); VEC_T::clean( vecIEN_p );
+  IIEN * IEN_p = new IEN_FEM( nElem, std::move(vecIEN_p) );
+ 
   // --------------------------------------------------------------------------
 
   // Generate the list of nodes for fluid and solid
@@ -427,29 +429,29 @@ int main( int argc, char * argv[] )
   // Physical NodalBC
   std::cout<<"===== Boundary Conditions =====\n";
   std::cout<<"1. Nodal boundary condition for the implicit solver: \n";
-  std::vector<INodalBC *> NBC_list_p( 1, nullptr );
-  std::vector<INodalBC *> NBC_list_v( 3, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list_p( 1 );
+  std::vector<std::unique_ptr<INodalBC>> NBC_list_v( 3 );
 
   // Here we assumed that the pressure mesh fluid nodal indices are identical to
   // that in the velocity mesh.
-  NBC_list_p[0] = new NodalBC_3D_FSI( geo_f_file, nFunc_p, fsiBC_type );
+  NBC_list_p[0] = SYS_T::make_unique<NodalBC_3D_FSI>( geo_f_file, nFunc_p, fsiBC_type );
 
   for( int ii=0; ii<3; ++ii )
-    NBC_list_v[ii] = new NodalBC_3D_FSI( geo_f_file, geo_s_file, sur_f_file_wall, 
+    NBC_list_v[ii] = SYS_T::make_unique<NodalBC_3D_FSI>( geo_f_file, geo_s_file, sur_f_file_wall, 
         sur_s_file_wall, sur_f_file_in, sur_f_file_out, sur_s_file_in, sur_s_file_out, 
         nFunc_v, ii, ringBC_type, fsiBC_type );
 
   // Mesh solver NodalBC
   std::cout<<"2. Nodal boundary condition for the mesh motion: \n";
-  std::vector<INodalBC *> meshBC_list( 3, nullptr );
+  std::vector<std::unique_ptr<INodalBC>> meshBC_list( 3 );
 
   std::vector<std::string> meshdir_file_list { geo_s_file };
   VEC_T::insert_end( meshdir_file_list, sur_f_file_in );
   VEC_T::insert_end( meshdir_file_list, sur_f_file_out );
 
-  meshBC_list[0] = new NodalBC( meshdir_file_list, nFunc_v );
-  meshBC_list[1] = new NodalBC( meshdir_file_list, nFunc_v );
-  meshBC_list[2] = new NodalBC( meshdir_file_list, nFunc_v );
+  meshBC_list[0] = SYS_T::make_unique<NodalBC>( meshdir_file_list, nFunc_v );
+  meshBC_list[1] = SYS_T::make_unique<NodalBC>( meshdir_file_list, nFunc_v );
+  meshBC_list[2] = SYS_T::make_unique<NodalBC>( meshdir_file_list, nFunc_v );
 
   // InflowBC info
   std::cout<<"3. Inflow cap surfaces: \n";
@@ -472,7 +474,7 @@ int main( int argc, char * argv[] )
   InFBC -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
   
   // Physical ElemBC
-  cout<<"4. Elem boundary for the implicit solver: \n";
+  std::cout<<"4. Elem boundary for the implicit solver: \n";
   std::vector< Vector_3 > outlet_outvec( num_outlet );
 
   if(elemType == FEType::Tet4)
@@ -500,7 +502,7 @@ int main( int argc, char * argv[] )
   ebc -> resetSurIEN_outwardnormal( IEN_v ); // assign outward orientation for triangles
 
   // Mesh solver ElemBC
-  cout<<"5. Elem boundary for the mesh solver: \n";
+  std::cout<<"5. Elem boundary for the mesh solver: \n";
   std::vector<std::string> mesh_ebclist;
   mesh_ebclist.clear();
   ElemBC * mesh_ebc = new ElemBC_3D( mesh_ebclist, elemType );
@@ -531,7 +533,7 @@ int main( int argc, char * argv[] )
     part_v -> write( part_file_v );
 
     mytimer -> Stop();
-    cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
+    std::cout<<"-- proc "<<proc_rank<<" Time taken: "<<mytimer->get_sec()<<" sec. \n";
 
     NBC_Partition * nbcpart_p = new NBC_Partition_MF(part_p, mnindex_p, NBC_list_p, mapper_p);
     nbcpart_p -> write_hdf5( part_file_p );
@@ -571,17 +573,11 @@ int main( int argc, char * argv[] )
   }
 
   // Clean up the memory
-  for(auto &it_nbc : NBC_list_v) delete it_nbc;
-  
-  for(auto &it_nbc : NBC_list_p) delete it_nbc;
-
-  for(auto &it_nbc : meshBC_list) delete it_nbc;
-
   delete ebc; delete InFBC; delete mesh_ebc; 
   delete mnindex_p; delete mnindex_v;
   delete IEN_p; delete IEN_v; delete mytimer; delete global_part; 
 
-  cout<<"===> Preprocessing completes successfully!\n";
+  std::cout<<"===> Preprocessing completes successfully!\n";
   return EXIT_SUCCESS;
 }
 

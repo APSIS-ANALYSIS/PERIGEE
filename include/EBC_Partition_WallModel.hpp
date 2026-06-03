@@ -19,10 +19,10 @@ class EBC_Partition_WallModel : public EBC_Partition
         const Map_Node_Index * const &mnidex,
         const ElemBC * const &ebc );
 
-    virtual ~EBC_Partition_WallModel() = default;
+    ~EBC_Partition_WallModel() override = default;
 
     // write the data to hdf5 file in folder /weak
-    virtual void write_hdf5( const std::string &FileName ) const;
+    void write_hdf5( const std::string &FileName ) const override;
 
   protected:
     const int wall_model_type;

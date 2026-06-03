@@ -24,7 +24,7 @@ class QuadPts_vis_quad4 final : public IQuadPts
       SYS_T::commPrint("========================================== \n");
     }
 
-    // it stores the coordinate of the quadrature points 
+    // it stores the coordinate of the quadrature points
     // in the sequence of x-y, so the dim is 2
     int get_dim() const override {return 2;}
 
@@ -35,10 +35,10 @@ class QuadPts_vis_quad4 final : public IQuadPts
 
     int get_num_quadPts_y() const override {return 2;}
 
-    double get_qp(const int &ii, const int &comp) const override
+    double get_qp(int ii, int comp) const override
     {return qp[2*ii+comp];}
 
-    double get_qw(const int &ii) const override {return 0.5;}
+    double get_qw(int ii) const override {return 0.5;}
 
   private:
     const double qp[8] { 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0 };

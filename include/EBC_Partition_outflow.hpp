@@ -24,13 +24,13 @@ class EBC_Partition_outflow : public EBC_Partition
     EBC_Partition_outflow( const IPart * const &part,
         const Map_Node_Index * const &mnindex,
         const ElemBC * const &ebc,
-        const std::vector<INodalBC *> &nbc_list );
+        const std::vector<std::unique_ptr<INodalBC>> &nbc_list );
 
-    virtual ~EBC_Partition_outflow() = default;
+    ~EBC_Partition_outflow() override = default;
 
     // write the data to hdf5 file in group /ebc/ebcid_xxx, 
     // xxx is the ebc_id
-    virtual void write_hdf5( const std::string &FileName ) const
+    void write_hdf5( const std::string &FileName ) const override
     { write_hdf5(FileName, "/ebc"); }
 
   protected:
@@ -54,8 +54,8 @@ class EBC_Partition_outflow : public EBC_Partition
     // write the data to hdf5 file in group /group-name/ebcid_xxx, 
     // xxx is the ebc_id
     // We do not give users the access to this function out of the class
-    virtual void write_hdf5( const std::string &FileName, 
-        const std::string &GroupName ) const;
+    void write_hdf5( const std::string &FileName, 
+        const std::string &GroupName ) const override;
 
 };
 

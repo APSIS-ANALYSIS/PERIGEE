@@ -1,4 +1,7 @@
 #include "ElemBC_3D_WallModel.hpp"
+#include "Tet_Tools.hpp"
+#include "Hex_Tools.hpp"
+#include "Vec_Tools.hpp"
 
 ElemBC_3D_WallModel::ElemBC_3D_WallModel( 
     const std::vector<std::string> &vtkfileList,

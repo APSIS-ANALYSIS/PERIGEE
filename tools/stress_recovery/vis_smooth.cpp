@@ -31,13 +31,12 @@ int main( int argc, char * argv[] )
   bool isXML = true, isRestart = false;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
-  hid_t prepcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
 
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( prepcmd_file );
+  HDF5_Reader * cmd_h5r = new HDF5_Reader( "solver_cmd.h5" );
 
   double dt = cmd_h5r -> read_doubleScalar("/","init_step");
 
-  delete cmd_h5r; H5Fclose(prepcmd_file);
+  delete cmd_h5r;
 
   // ===== Initialize the MPI run =====
 #if PETSC_VERSION_LT(3,19,0)

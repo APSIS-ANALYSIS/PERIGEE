@@ -17,17 +17,13 @@ class AGlobal_Mesh_Info
     {
       const std::string fName = SYS_T::gen_partfile_name( fileBaseName, cpu_rank );
 
-      hid_t file_id = H5Fopen( fName.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
-
-      std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>(file_id);
+      std::unique_ptr<HDF5_Reader> h5r = SYS_T::make_unique<HDF5_Reader>(fName);
 
       nElem    = h5r -> read_intScalar("Global_Mesh_Info", "nElem");
       nFunc    = h5r -> read_intScalar("Global_Mesh_Info", "nFunc");
       nLocBas  = h5r -> read_intScalar("Global_Mesh_Info", "nLocBas");
       probDim  = h5r -> read_intScalar("Global_Mesh_Info", "probDim");
       elemType = FE_T::to_FEType(h5r -> read_string("Global_Mesh_Info", "elemType"));
-
-      H5Fclose( file_id );
     }
 
     AGlobal_Mesh_Info( const HDF5_Reader * const &h5r )
