@@ -115,7 +115,6 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PLocAssem_Block_VMS_NS_HERK.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Block_NS_FEM_HERK.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_HERK_Solver.cpp
-  ${perigee_SOURCE_DIR}/src/PTime_NS_HERK_Solver_AccurateA.cpp
   )
 
 SET( perigee_postprocess_lib_src
@@ -156,7 +155,6 @@ INCLUDE(../../conf/message_compiler_setup.cmake)
 ADD_EXECUTABLE( preprocess3d preprocess.cpp)
 ADD_EXECUTABLE( ns3d driver.cpp)
 ADD_EXECUTABLE( ns3dherk ns_herk_driver.cpp)
-ADD_EXECUTABLE( ns3dherkA ns_herk_driver_accurateA.cpp)
 ADD_EXECUTABLE( ns3dcalP pres_cal_herk.cpp)
 ADD_EXECUTABLE( prepost3d prepost.cpp)
 ADD_EXECUTABLE( vis_ns vis.cpp)
