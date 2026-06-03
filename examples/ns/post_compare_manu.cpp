@@ -14,6 +14,7 @@
 #include "Post_error_ES.hpp"
 #include "FEAElementFactory.hpp"
 #include "QuadPtsFactory.hpp"
+#include "HDF5_Tools.hpp"
 
 int main( int argc, char * argv[] )
 {
@@ -79,9 +80,11 @@ int main( int argc, char * argv[] )
 
   const std::unique_ptr<FEAElement> elementv = ElementFactory::createVolElement(elemType, nqpv);
   const std::unique_ptr<IQuadPts> quadv = QuadPtsFactory::createVolQuadrature(elemType, nqpv);
+
+  const auto anode_mapping = HDF5_T::read_intVector("node_mapping.h5", "/", "old_2_new");
   
   PostVectSolution * pSolu = new PostVectSolution( sol_name,
-      "node_mapping.h5", "node_mapping.h5", pNode, GMIptr->get_nFunc(), dof );
+      anode_mapping, anode_mapping, pNode, dof );
 
   const int nLoc_max = 27;
   int IEN_e[nLoc_max];

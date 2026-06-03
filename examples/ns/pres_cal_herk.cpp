@@ -35,26 +35,19 @@ int main(int argc, char *argv[])
   // Read analysis code parameter if the solver_cmd.h5 exists
   SYS_T::commPrint("===> Data from HDF5 files are read from disk.\n");
  
-  hid_t solcmd_file = H5Fopen("solver_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-
-  HDF5_Reader * cmd_h5r = new HDF5_Reader( solcmd_file );
-
+  auto cmd_h5r = SYS_T::make_unique<HDF5_Reader>("solver_cmd.h5");
+  
   double initial_step = cmd_h5r -> read_doubleScalar("/","init_step");
   int nqp_vol         = cmd_h5r -> read_intScalar("/", "nqp_vol");
   int nqp_sur         = cmd_h5r -> read_intScalar("/", "nqp_sur");
   double fluid_density = cmd_h5r -> read_doubleScalar("/", "fl_density");
   double fluid_mu = cmd_h5r -> read_doubleScalar("/", "fl_mu");
 
-  delete cmd_h5r; H5Fclose(solcmd_file);
-
-  hid_t prepcmd_file = H5Fopen("preprocessor_cmd.h5", H5F_ACC_RDONLY, H5P_DEFAULT);
-  HDF5_Reader * pcmd_h5r = new HDF5_Reader( prepcmd_file );
+  auto pcmd_h5r = SYS_T::make_unique<HDF5_Reader>("preprocessor_cmd.h5");
 
   std::string part_file = pcmd_h5r -> read_string("/", "part_file" );
   const std::string elemType_str = pcmd_h5r -> read_string("/","elemType");
   
-  delete pcmd_h5r; H5Fclose(prepcmd_file);
-
   // Estimate of the nonzero per row for the sparse matrix
   int nz_estimate = 300;
 
@@ -136,9 +129,7 @@ int main(int argc, char *argv[])
   // ===== Record important solver options =====
   if(rank == 0)
   {
-    hid_t cmd_file_id = H5Fcreate("solver_pres_cmd.h5",
-        H5F_ACC_TRUNC, H5P_DEFAULT, H5P_DEFAULT);
-    HDF5_Writer * cmdh5w = new HDF5_Writer(cmd_file_id);
+    auto cmdh5w = SYS_T::make_unique<HDF5_Writer>("solver_pres_cmd.h5");
 
     cmdh5w->write_doubleScalar("fl_density", fluid_density);
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
@@ -148,7 +139,6 @@ int main(int argc, char *argv[])
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("dot_inflow_file", dot_inflow_file);
     cmdh5w->write_string("sol_bName", sol_bname);
-    delete cmdh5w; H5Fclose(cmd_file_id);
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -221,11 +211,11 @@ int main(int argc, char *argv[])
   
   // pres sol stores pressure
   std::unique_ptr<PDNSolution> pres =
-    SYS_T::make_unique<PDNSolution_P>( pNode.get(), 0, true, "pres" );
+    PDNSolution::Gen_zero_ptr( pNode.get(), 1 );
   
   // dot_velo stores dot velocity
   std::unique_ptr<PDNSolution> dot_velo =
-    SYS_T::make_unique<PDNSolution_V>( pNode.get(), 0, true, "dot_velo" );
+    PDNSolution::Gen_zero_ptr( pNode.get(), 3 );
 
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");

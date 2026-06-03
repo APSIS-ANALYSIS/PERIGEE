@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
   // Stabilization para for Darcy problem
   double L0 = 0.1;
   double cu = 2.0;
-  double cp = 2.0;
+  double cp = 0.0;
 
   // inflow file
   std::string inflow_file("inflow_fourier_series.txt");
@@ -159,7 +159,6 @@ int main(int argc, char *argv[])
     cmdh5w->write_intScalar("nqp_sur", nqp_sur);
     // cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
-    cmdh5w->write_string("c", dot_inflow_file);
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
