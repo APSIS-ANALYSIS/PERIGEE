@@ -1,5 +1,6 @@
 #include "PTime_NS_HERK_Solver.hpp"
 #include "Math_Tools.hpp"
+#include "LoadData.hpp"
 
 PTime_NS_HERK_Solver::PTime_NS_HERK_Solver(
     std::unique_ptr<PGAssem_Block_NS_FEM_HERK> in_gassem,
@@ -201,7 +202,7 @@ void PTime_NS_HERK_Solver::Cal_NS_pres(
   SYS_T::commPrint(" ==> Start calculating the pressure: \n");
 
   // Make the dot_velo meet the Dirchlet boundary
-  rescale_dot_inflow_velo(time_index*dt, flrate.get(), cur_dot_velo);
+  LoadData::rescale_dot_inflow_value(time_index*dt, infnbc.get(), flrate.get(), sol_base.get(), cur_dot_velo);
 
   gassem->Clear_G();
 
@@ -273,8 +274,8 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   for(int ii = 1; ii < ss; ++ii)
   {
     // Make the velo in each sub step meet the Dirchlet boundary
-    rescale_inflow_velo(curr_time + tmRK->get_RK_c(ii) * dt, flrate.get(), cur_velo_sols[ii]);
-  
+    LoadData::rescale_inflow_value(curr_time + tmRK->get_RK_c(ii) * dt, infnbc.get(), flrate.get(), sol_base.get(), cur_velo_sols[ii]);
+
     gassem->Clear_G();  // K uses Matrix-free
      
     gassem->Assem_residual_substep( ii, cur_velo_sols, cur_pres_sols,
@@ -313,8 +314,8 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
   
     // Make the velo in the last step meet the Dirchlet boundary
-    rescale_inflow_velo(curr_time + dt, flrate.get(), cur_velo);
-  
+    LoadData::rescale_inflow_value(curr_time + dt, infnbc.get(), flrate.get(), sol_base.get(), cur_velo);
+
     gassem->Clear_G();
   
     gassem->Assem_residual_finalstep( cur_velo_sols, cur_velo, 
@@ -350,84 +351,6 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     // Assemble velo and pres at the (n+1)-th time step into a solution vector
     Update_solutions(cur_velo, cur_pres, cur_sol);
     VecDestroy( &sol_vp );
-}
-
-void PTime_NS_HERK_Solver::rescale_inflow_velo( const double &stime,
-    const IFlowRate * const &flowrate, PDNSolution * const &velo ) const
-{
-  const int num_nbc = infnbc -> get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    const int numnode = infnbc -> get_Num_LD( nbc_id );
-
-    const double factor  = flowrate -> get_flow_rate( nbc_id, stime );
-    const double std_dev = flowrate -> get_flow_TI_std_dev( nbc_id );
-
-    for(int ii=0; ii<numnode; ++ii)
-    {
-      const int node_index = infnbc -> get_LDN( nbc_id, ii );
-
-      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
-
-      double base_vals[3];
-
-      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
-
-      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
-
-      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
-        base_vals[1] * factor * (1.0 + perturb_y),
-        base_vals[2] * factor * (1.0 + perturb_z) };
-
-      const int velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
-
-      VecSetValues(velo->solution, 3, velo_idx, vals, INSERT_VALUES);
-    }
-  }
-
-  velo->Assembly_GhostUpdate();
-}
-
-void PTime_NS_HERK_Solver::rescale_dot_inflow_velo( const double &stime,
-    const IFlowRate * const &flowrate, PDNSolution * const &dot_velo ) const
-{
-  const int num_nbc = infnbc -> get_num_nbc();
-
-  for(int nbc_id=0; nbc_id<num_nbc; ++nbc_id)
-  {
-    const int numnode = infnbc -> get_Num_LD( nbc_id );
-
-    const double factor  = flowrate -> get_dot_flow_rate( nbc_id, stime );
-    const double std_dev = flowrate -> get_flow_TI_std_dev( nbc_id );
-
-    for(int ii=0; ii<numnode; ++ii)
-    {
-      const int node_index = infnbc -> get_LDN( nbc_id, ii );
-
-      const int base_idx[3] = { node_index*4+1, node_index*4+2, node_index*4+3 };
-
-      double base_vals[3];
-
-      VecGetValues(sol_base->solution, 3, base_idx, base_vals);
-
-      const double perturb_x = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_y = MATH_T::gen_double_rand_normal(0, std_dev);
-      const double perturb_z = MATH_T::gen_double_rand_normal(0, std_dev);
-
-      const double vals[3] = { base_vals[0] * factor * (1.0 + perturb_x), 
-        base_vals[1] * factor * (1.0 + perturb_y),
-        base_vals[2] * factor * (1.0 + perturb_z) };
-
-      const int dot_velo_idx[3] = { node_index*3, node_index*3+1, node_index*3+2 };
-
-      VecSetValues(dot_velo->solution, 3, dot_velo_idx, vals, INSERT_VALUES);
-    }
-  }
-
-  dot_velo->Assembly_GhostUpdate();
 }
 
 // Please make sure the Vec vp is VecNest before using the function
