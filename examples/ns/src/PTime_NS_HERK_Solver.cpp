@@ -202,7 +202,7 @@ void PTime_NS_HERK_Solver::Cal_NS_pres(
   SYS_T::commPrint(" ==> Start calculating the pressure: \n");
 
   // Make the dot_velo meet the Dirchlet boundary
-  LoadData::rescale_dot_inflow_value(time_index*dt, infnbc.get(), flrate.get(), sol_base.get(), cur_dot_velo);
+  LoadData::rescale_dot_inflow_velo(time_index*dt, infnbc.get(), flrate.get(), sol_base.get(), cur_dot_velo);
 
   gassem->Clear_G();
 
@@ -274,7 +274,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
   for(int ii = 1; ii < ss; ++ii)
   {
     // Make the velo in each sub step meet the Dirchlet boundary
-    LoadData::rescale_inflow_value(curr_time + tmRK->get_RK_c(ii) * dt, infnbc.get(), flrate.get(), sol_base.get(), cur_velo_sols[ii]);
+    LoadData::rescale_inflow_velo(curr_time + tmRK->get_RK_c(ii) * dt, infnbc.get(), flrate.get(), sol_base.get(), cur_velo_sols[ii]);
 
     gassem->Clear_G();  // K uses Matrix-free
      
@@ -314,7 +314,7 @@ void PTime_NS_HERK_Solver::HERK_Solve_NS(
     SYS_T::commPrint(" ==> Start solving the FinalStep: \n");
   
     // Make the velo in the last step meet the Dirchlet boundary
-    LoadData::rescale_inflow_value(curr_time + dt, infnbc.get(), flrate.get(), sol_base.get(), cur_velo);
+    LoadData::rescale_inflow_velo(curr_time + dt, infnbc.get(), flrate.get(), sol_base.get(), cur_velo);
 
     gassem->Clear_G();
   
