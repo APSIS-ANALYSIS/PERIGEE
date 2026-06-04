@@ -56,10 +56,8 @@ class PGAssem_Block_NS_FEM_HERK
     void Fix_nonzero_str()
     {
       MatSetOption(subK[0], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-      MatSetOption(subK[1], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
       MatSetOption(subK[2], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
       MatSetOption(subK[3], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-      MatSetOption(subK[4], MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
     }
 
     // ------------------------------------------------------------------------
@@ -70,10 +68,8 @@ class PGAssem_Block_NS_FEM_HERK
     void Fix_nonzero_err_str()
     {
       MatSetOption(subK[0], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-      MatSetOption(subK[1], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
       MatSetOption(subK[2], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
       MatSetOption(subK[3], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
-      MatSetOption(subK[4], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_TRUE);
     }
     
     // ------------------------------------------------------------------------
@@ -83,10 +79,8 @@ class PGAssem_Block_NS_FEM_HERK
     void Release_nonzero_err_str()
     {
       MatSetOption(subK[0], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-      MatSetOption(subK[1], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
       MatSetOption(subK[2], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
       MatSetOption(subK[3], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
-      MatSetOption(subK[4], MAT_NEW_NONZERO_ALLOCATION_ERR, PETSC_FALSE);
     }
 
     // ------------------------------------------------------------------------
@@ -95,10 +89,8 @@ class PGAssem_Block_NS_FEM_HERK
     void Keep_nonzero_pattern()
     {
       MatSetOption(subK[0], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
-      MatSetOption(subK[1], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
       MatSetOption(subK[2], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
       MatSetOption(subK[3], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
-      MatSetOption(subK[4], MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
     }
 
     void Clear_G() {VecSet(G, 0.0);}
@@ -106,10 +98,8 @@ class PGAssem_Block_NS_FEM_HERK
     void Clear_subKG()
     {
       MatZeroEntries(subK[0]);
-      MatZeroEntries(subK[1]);
       MatZeroEntries(subK[2]);
       MatZeroEntries(subK[3]);
-      MatZeroEntries(subK[4]);
       VecSet(G, 0.0);
     }
 
@@ -122,9 +112,7 @@ class PGAssem_Block_NS_FEM_HERK
     void Assem_nonzero_estimate();
     
     // Assembly the tangent block matrix for the HERK
-    void Assem_tangent_matrix(
-        // const ITimeMethod_RungeKutta * const &tm_RK_ptr,
-        const double &dt );
+    void Assem_tangent_matrix( const double &dt );
 
     // Assembly the residual vector for the sub-step of HERK        
     void Assem_residual_substep(

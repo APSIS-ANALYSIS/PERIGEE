@@ -237,14 +237,6 @@ int main(int argc, char *argv[])
 
   gloAssem->Assem_tangent_matrix(1.0);
 
-  // ===== Initialize the shell tangent matrix =====
-  Mat K_shell;
-  
-  MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
-    PETSC_DETERMINE, PETSC_DETERMINE, (void *)gloAssem.get(), &K_shell);
-
-  MatShellSetOperation(K_shell, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
-
   // ===== Linear solver context =====
   auto lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>();
 
@@ -266,6 +258,14 @@ int main(int argc, char *argv[])
   
   auto solverCtx = SYS_T::make_unique<MF_T::SolverContext>(gloAssem.get(), std::move(lsolver_A), std::move(lsolver_S));
 
+  // ===== Initialize the shell tangent matrix =====
+  Mat K_shell;
+  
+  MatCreateShell( PETSC_COMM_WORLD, local_row_size, local_col_size,
+    PETSC_DETERMINE, PETSC_DETERMINE, (void *)solverCtx.get(), &K_shell);
+
+  MatShellSetOperation(K_shell, MATOP_MULT, (void(*)(void))MF_T::MF_MatMult);
+
   // ===== Initialize the shell preconditioner =====
   PC pc_shell;
 
@@ -273,6 +273,7 @@ int main(int argc, char *argv[])
   PCSetType( pc_shell, PCSHELL );
   PCShellSetContext(pc_shell, solverCtx.get());
   PCShellSetApply(pc_shell, MF_T::MF_PCSchurApply);
+  PCShellSetSetUp(pc_shell, MF_T::MF_PCSchurSetup);
 
   KSPSetPC( lsolver->ksp, pc_shell ); 
   

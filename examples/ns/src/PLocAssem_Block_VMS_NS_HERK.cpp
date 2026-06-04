@@ -706,8 +706,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Sub(
       const double NA_xx = d2R_dxx[A], NA_yy = d2R_dyy[A], NA_zz = d2R_dzz[A];
       const double NA_xy = d2R_dxy[A], NA_xz = d2R_dxz[A], NA_yz = d2R_dyz[A];
     
-      Residual0[ A     ] += gwts * ( NA * div_vel - NA_x * u_prime[subindex]
-                                   - NA_y * v_prime[subindex] - NA_z * w_prime[subindex] );
+      Residual0[ A     ] -= tm_RK_ptr->get_RK_a(subindex, subindex-1) * gwts * ( NA * div_vel - NA_x * u_prime[subindex] - NA_y * v_prime[subindex] - NA_z * w_prime[subindex] );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0/dt * u[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p[subindex-1]
                                    + NA * rho0/dt * u_prime[subindex] - NA_x * tm_RK_ptr->get_RK_a(subindex, subindex-1) * p_prime[subindex-1]
@@ -1170,8 +1169,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_Final(
       const double NA_xx = d2R_dxx[A], NA_yy = d2R_dyy[A], NA_zz = d2R_dzz[A];
       const double NA_xy = d2R_dxy[A], NA_xz = d2R_dxz[A], NA_yz = d2R_dyz[A];
 
-      Residual0[  A    ] += gwts * ( NA * div_vel_np1 - NA_x * u_np1_prime
-                                   - NA_y * v_np1_prime - NA_z * w_np1_prime );
+      Residual0[  A    ] -= tm_RK_ptr->get_RK_b(num_steps-1) * gwts * ( NA * div_vel_np1 - NA_x * u_np1_prime - NA_y * v_np1_prime - NA_z * w_np1_prime );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0/dt * u_np1 - NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * p[num_steps-1]
                                    + NA * rho0/dt * u_np1_prime - NA_x * tm_RK_ptr->get_RK_b(num_steps-1) * p_prime[num_steps-1] 
@@ -1373,7 +1371,7 @@ void PLocAssem_Block_VMS_NS_HERK::Assem_Residual_CalPres(
     {
       const double NA = R[A], NA_x = dR_dx[A], NA_y = dR_dy[A], NA_z = dR_dz[A];
       
-      Residual0[ A     ] += gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime
+      Residual0[ A     ] -= gwts * ( NA * div_dot_vel_np1 - NA_x * dot_u_np1_prime
                                    - NA_y * dot_v_np1_prime - NA_z * dot_w_np1_prime );
 
       Residual1[3*A + 0] += gwts * ( NA * rho0 * dot_u_np1 - NA_x * p_np1 + NA * rho0 * dot_u_np1_prime 

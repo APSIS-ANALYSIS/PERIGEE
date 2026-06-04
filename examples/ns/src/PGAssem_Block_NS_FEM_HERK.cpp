@@ -46,11 +46,6 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
       PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL,
       dof_mat_p*in_nz_estimate, NULL, &subK[0]);
 
-  // C matrix
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_v, PETSC_DETERMINE,
-    PETSC_DETERMINE, dof_mat_p*in_nz_estimate, NULL, 
-    dof_mat_v*in_nz_estimate, NULL, &subK[1]);
-
   // B matrix
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_p, PETSC_DETERMINE,
     PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
@@ -60,11 +55,6 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
       PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
       dof_mat_v*in_nz_estimate, NULL, &subK[3]);
-
-  // A_tilde matrix
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
-    PETSC_DETERMINE, dof_mat_v*in_nz_estimate, NULL, 
-    dof_mat_v*in_nz_estimate, NULL, &subK[4]);
 
   // Allocate the sub-vectors
   VecCreate(PETSC_COMM_WORLD, &subG[0]);
@@ -98,11 +88,6 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_p, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[0]);
   
-  PETSc_T::Get_dnz_onz(subK[1], Kdnz, Konz);
-  MatDestroy(&subK[1]);
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_p, nlocrow_v, PETSC_DETERMINE,
-      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[1]);
-  
   PETSc_T::Get_dnz_onz(subK[2], Kdnz, Konz);
   MatDestroy(&subK[2]);
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_p, PETSC_DETERMINE,
@@ -112,13 +97,12 @@ PGAssem_Block_NS_FEM_HERK::PGAssem_Block_NS_FEM_HERK(
   MatDestroy(&subK[3]);
   MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
       PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[3]);
- 
-  PETSc_T::Get_dnz_onz(subK[4], Kdnz, Konz);
-  MatDestroy(&subK[4]);
-  MatCreateAIJ(PETSC_COMM_WORLD, nlocrow_v, nlocrow_v, PETSC_DETERMINE,
-      PETSC_DETERMINE, 0, &Kdnz[0], 0, &Konz[0], &subK[4]);
 
-  subK[5] = NULL;
+  subK[1] = nullptr;
+
+  subK[4] = nullptr;
+
+  subK[5] = nullptr;
 }
 
 PGAssem_Block_NS_FEM_HERK::~PGAssem_Block_NS_FEM_HERK()
@@ -318,10 +302,8 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
       row_idx_p[ii] = nbc->get_LID( 0, loc_index );
     }
     MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES); 
-    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
     MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
-    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);    
-    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES); 
+    MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
   }
 
   delete [] row_idx_v; row_idx_v = nullptr;
@@ -330,12 +312,9 @@ void PGAssem_Block_NS_FEM_HERK::Assem_nonzero_estimate()
   EssBC_KG();
 
   MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
   MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
   MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
@@ -373,10 +352,8 @@ void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
     }
   
     MatSetValues(subK[0], loc_dof_p, row_idx_p, loc_dof_p, row_idx_p, locassem->Tangent0, ADD_VALUES);
-    MatSetValues(subK[1], loc_dof_p, row_idx_p, loc_dof_v, row_idx_v, locassem->Tangent1, ADD_VALUES);
     MatSetValues(subK[2], loc_dof_v, row_idx_v, loc_dof_p, row_idx_p, locassem->Tangent2, ADD_VALUES);
     MatSetValues(subK[3], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent3, ADD_VALUES);
-    MatSetValues(subK[4], loc_dof_v, row_idx_v, loc_dof_v, row_idx_v, locassem->Tangent4, ADD_VALUES);
   }
 
   delete [] ectrl_x; ectrl_x = nullptr;
@@ -388,10 +365,8 @@ void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
   EssBC_K();
   
   MatAssemblyBegin(subK[0], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[0], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[1], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[1], MAT_FINAL_ASSEMBLY);
   MatAssemblyBegin(subK[2], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[2], MAT_FINAL_ASSEMBLY);
   MatAssemblyBegin(subK[3], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[3], MAT_FINAL_ASSEMBLY);
-  MatAssemblyBegin(subK[4], MAT_FINAL_ASSEMBLY); MatAssemblyEnd(subK[4], MAT_FINAL_ASSEMBLY);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_residual_substep(
@@ -488,13 +463,11 @@ void PGAssem_Block_NS_FEM_HERK::Assem_residual_substep(
 
   NatBC_G_HERK_Sub( curr_time, dt, substep_index, tm_RK_ptr );
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   EssBC_G();
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_residual_finalstep(
@@ -586,13 +559,11 @@ void PGAssem_Block_NS_FEM_HERK::Assem_residual_finalstep(
 
   NatBC_G_HERK_Final( curr_time, dt, tm_RK_ptr );
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   EssBC_G();
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
 void PGAssem_Block_NS_FEM_HERK::Assem_residual_calpres(
@@ -650,13 +621,11 @@ void PGAssem_Block_NS_FEM_HERK::Assem_residual_calpres(
 
   NatBC_G_HERK_Pressure( curr_time, 0.0 );
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 
   EssBC_G();
 
-  VecAssemblyBegin(subG[0]); VecAssemblyEnd(subG[0]);
-  VecAssemblyBegin(subG[1]); VecAssemblyEnd(subG[1]);
+  VecAssemblyBegin(G); VecAssemblyEnd(G);
 }
 
 void PGAssem_Block_NS_FEM_HERK::NatBC_G_HERK_Sub( const double &curr_time, const double &dt,
