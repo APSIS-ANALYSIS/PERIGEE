@@ -189,14 +189,6 @@ void PTime_NS_HERK_Solver::Cal_NS_pres(
 
   Update_velocity_from_sol(cur_velo, cur_sol);
 
-  #ifdef PETSC_USE_LOG
-    PetscLogEvent K_solve, update_dotstep;
-    PetscClassId classid_solve;
-    PetscClassIdRegister("matsolve", &classid_solve);
-    PetscLogEventRegister("K_solve", classid_solve, &K_solve);
-    PetscLogEventRegister("update_dotstep", classid_solve, &update_dotstep);
-  #endif
-
   auto dot_step = SYS_T::make_unique<PDNSolution>( cur_sol );
 
   SYS_T::commPrint(" ==> Start calculating the pressure: \n");
