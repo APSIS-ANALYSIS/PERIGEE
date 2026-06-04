@@ -43,7 +43,7 @@ namespace MF_T
     void *ptr;
     SolverContext *ctx;
     MatShellGetContext(shell, &ptr);
-    ctx = (SolverContext*) ptr;    
+    ctx = (SolverContext*) ptr;
 
     Vec x1, x2, y1, y2;
 
