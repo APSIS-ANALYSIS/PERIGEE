@@ -336,8 +336,7 @@ void PGAssem_Block_NS_FEM_HERK::Assem_tangent_matrix(
     const std::vector<int> IEN_e = locien->get_LIEN(ee);
 
     fnode->get_ctrlPts_xyz(nLocBas, &IEN_e[0], ectrl_x, ectrl_y, ectrl_z);
-  
-    // locassem->Assem_Tangent_Matrix(dt, tm_RK_ptr, ectrl_x, ectrl_y, ectrl_z);
+ 
     locassem->Assem_Tangent_Matrix(dt, ectrl_x, ectrl_y, ectrl_z);
 
     for(int ii=0; ii<nLocBas; ++ii)
