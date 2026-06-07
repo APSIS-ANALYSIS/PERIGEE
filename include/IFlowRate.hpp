@@ -10,7 +10,8 @@
 // Author: Ju Liu
 // Date created: Aug. 6 2017
 // ============================================================================
-#include <sstream>
+#include "Sys_Tools.hpp"
+
 #include <string>
 
 class IFlowRate
@@ -43,14 +44,8 @@ class IFlowRate
     // ------------------------------------------------------------------------
     virtual std::string gen_flowfile_name(int nbc_id) const
     {
-      std::ostringstream ss;
-      ss << "Inlet_";
-      if( nbc_id/10 == 0 ) ss << "00";
-      else if( nbc_id/100 == 0 ) ss << "0";
-
-      ss << nbc_id << "_precalculated_flowrate.txt";
-
-      return ss.str();
+      return "Inlet_" + SYS_T::fixed_length_index(nbc_id, 3)
+        + "_precalculated_flowrate.txt";
     }
 };
 
