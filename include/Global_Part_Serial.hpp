@@ -16,11 +16,11 @@
 class Global_Part_Serial : public IGlobal_Part
 {
   public:
-    Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
+    Global_Part_Serial( int in_nelem, int in_nfunc,
         const std::string &element_part_name = "epart",
         const std::string &node_part_name = "npart" );
 
-    Global_Part_Serial( const int &num_fields,
+    Global_Part_Serial( int num_fields,
         const std::vector<int> &in_nelem_list,
         const std::vector<int> &in_nfunc_list,
         const std::string &element_part_name = "epart",
@@ -47,7 +47,7 @@ class Global_Part_Serial : public IGlobal_Part
     std::vector<int> field_offset;
 
     virtual void write_part_hdf5( const std::string &fileName, 
-        const idx_t * const &part_in, const int &part_size ) const;
+        const idx_t * part_in, int part_size ) const;
 };
 
 #endif

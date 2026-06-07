@@ -2,10 +2,10 @@
 #include "Sys_Tools.hpp"
 #include "HDF5_Writer.hpp"
 
-Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
-    const int &in_ncommon, const bool &isDualGraph,
-    const int &in_nelem, const int &in_nfunc, const int &in_nlocbas, 
-    const IIEN * const &IEN,
+Global_Part_METIS::Global_Part_METIS( int cpu_size,
+    int in_ncommon, bool isDualGraph,
+    int in_nelem, int in_nfunc, int in_nlocbas,
+    const IIEN * IEN,
     const std::string &element_part_name,
     const std::string &node_part_name )
 : isDual(isDualGraph), dual_edge_ncommon(in_ncommon)
@@ -123,8 +123,8 @@ Global_Part_METIS::Global_Part_METIS( const int &cpu_size,
   std::cout<<"=== Global partition generated. \n";
 }
 
-Global_Part_METIS::Global_Part_METIS( const int &num_fields,
-    const int &cpu_size, const int &in_ncommon, const bool &isDualGraph,
+Global_Part_METIS::Global_Part_METIS( int num_fields,
+    int cpu_size, int in_ncommon, bool isDualGraph,
     const std::vector<int> &nelem_list,
     const std::vector<int> &nfunc_list,
     const std::vector<int> &nlocbas_list,
@@ -303,8 +303,8 @@ Global_Part_METIS::~Global_Part_METIS()
 }
 
 void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
-    const idx_t * const &part_in,
-    const int &part_size, const int &cpu_size ) const
+    const idx_t * part_in,
+    int part_size, int cpu_size ) const
 {
   const std::string fName = fileName + ".h5";
 
@@ -325,8 +325,8 @@ void Global_Part_METIS::write_part_hdf5( const std::string &fileName,
 }
 
 void Global_Part_METIS::write_part_hdf5_64bit( const std::string &fileName,
-    const int64_t * const &part_in,
-    const int64_t &part_size, const int &cpu_size ) const
+    const int64_t * part_in,
+    const int64_t &part_size, int cpu_size ) const
 {
   const std::string fName = fileName + ".h5";
 
