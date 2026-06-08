@@ -45,7 +45,7 @@ class PTime_NS_HERK_Solver
         std::unique_ptr<PDNSolution> init_pres,
         std::unique_ptr<PDNTimeStep> time_info ) const;
 
-    void Cal_NS_pres(
+    void PRES_NS_HERK(
         const PDNSolution * const &init_sol,
         const PDNSolution * const &init_dot_velo,
         const PDNSolution * const &init_pres,

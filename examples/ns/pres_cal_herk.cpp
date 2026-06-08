@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
     SYS_T::file_check(name_to_read);
       sol->ReadBinary(name_to_read);
 
-    tsolver->Cal_NS_pres(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), time, initial_step);
+    tsolver->PRES_NS_HERK(sol.get(), dot_velo.get(), pres.get(), dot_sol.get(), time, initial_step);
   }
 
   // ===== Print complete solver info =====

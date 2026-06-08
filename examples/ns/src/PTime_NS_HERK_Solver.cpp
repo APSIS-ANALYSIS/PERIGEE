@@ -164,7 +164,7 @@ void PTime_NS_HERK_Solver::TM_NS_HERK(
   delete pre_velo; delete pre_pres; delete pre_velo_before;
 }
 
-void PTime_NS_HERK_Solver::Cal_NS_pres(
+void PTime_NS_HERK_Solver::PRES_NS_HERK(
     const PDNSolution * const &init_sol,
     const PDNSolution * const &init_dot_velo,
     const PDNSolution * const &init_pres,
