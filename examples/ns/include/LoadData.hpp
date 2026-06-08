@@ -38,7 +38,7 @@ namespace LoadData
         return Vector_3(0.0, 0.0, 0.0);
     }
   }
-  
+
   // --------------------------------------------------------------------------
   // rescale_inflow_value
   //   Rescale the baseline inflow velocity profile using time-dependent
