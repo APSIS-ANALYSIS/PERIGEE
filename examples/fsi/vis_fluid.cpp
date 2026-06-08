@@ -143,7 +143,6 @@ int main( int argc, char * argv[] )
   auto vtk_w = SYS_T::make_unique<VTK_Writer_FSI>( GMIptr_v->get_nElem(),
       element->get_nLocBas(), element_part_file );
 
-  std::ostringstream time_index;
 
   // Velocity and displacement node mappings
   const auto an_v_mapping = HDF5_T::read_intVector("node_mapping_v.h5", "/", "old_2_new");
@@ -155,16 +154,11 @@ int main( int argc, char * argv[] )
 
   for(int time = time_start; time<=time_end; time += time_step)
   {
-    std::string disp_name_to_read(disp_sol_bname);
-    std::string velo_name_to_read(velo_sol_bname);
-    std::string pres_name_to_read(pres_sol_bname);
-    std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index<< 900000000 + time;
-    disp_name_to_read.append(time_index.str());
-    velo_name_to_read.append(time_index.str());
-    pres_name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string time_suffix = SYS_T::fixed_length_index(time);
+    const std::string disp_name_to_read = disp_sol_bname + time_suffix;
+    const std::string velo_name_to_read = velo_sol_bname + time_suffix;
+    const std::string pres_name_to_read = pres_sol_bname + time_suffix;
+    const std::string name_to_write = out_bname + time_suffix;
 
     SYS_T::commPrint("Time %d: Read %s %s %s and Write %s \n",
         time, disp_name_to_read.c_str(), pres_name_to_read.c_str(),

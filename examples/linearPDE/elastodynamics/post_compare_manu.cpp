@@ -21,7 +21,7 @@ int main( int argc, char * argv[] )
   int nqp_vol = 29;
 
   double sol_time = 1.0;
-  std::string sol_name("SOL_900000000");
+  std::string sol_name("SOL_" + SYS_T::fixed_length_index(0));
   std::string part_file("./ppart/part");
   const int dof = 3;
 

@@ -12,11 +12,11 @@
 // Example:
 // ./sol_converter -old_nmap ../build_ns/node_mapping.h5 
 //                 -new_nmap ../build_ns2/node_mapping.h5 
-//                 -sol_name SOL_900000001 
-//                 -out_name NEW_900000001
+//                 -sol_name SOL_000000001 
+//                 -out_name NEW_000000001
 //
-//  SOL_900000001 is compatible with old nmap nodes;
-//  NEW_900000001 is compatible with new nmap nodes.
+//  SOL_000000001 is compatible with old nmap nodes;
+//  NEW_000000001 is compatible with new nmap nodes.
 //
 // Author: Ju Liu
 // Date: Mar. 13 2019
@@ -28,8 +28,8 @@ int main( int argc, char * argv[] )
 {
   std::string old_nmap("old_node_mapping.h5");
   std::string new_nmap("new_node_mapping.h5");
-  std::string sol_name("SOL_900000000");
-  std::string out_name("NEW_900000000");
+  std::string sol_name("SOL_" + SYS_T::fixed_length_index(0));
+  std::string out_name("NEW_" + SYS_T::fixed_length_index(0));
   
 
   PetscInitialize(&argc, &argv, (char *)0, PETSC_NULL);

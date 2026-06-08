@@ -2,7 +2,7 @@
 #include "Sys_Tools.hpp"
 #include "HDF5_Writer.hpp"
 
-Global_Part_Serial::Global_Part_Serial( const int &in_nelem, const int &in_nfunc,
+Global_Part_Serial::Global_Part_Serial( int in_nelem, int in_nfunc,
    const std::string &element_part_name, const std::string &node_part_name )
 {
   // This is a partition for a single mesh (field)
@@ -25,7 +25,7 @@ Global_Part_Serial::Global_Part_Serial( const int &in_nelem, const int &in_nfunc
   std::cout<<"=== Global partition generated. \n";
 }
 
-Global_Part_Serial::Global_Part_Serial( const int &num_fields,
+Global_Part_Serial::Global_Part_Serial( int num_fields,
     const std::vector<int> &nelem_list,
     const std::vector<int> &nfunc_list,
     const std::string &element_part_name, const std::string &node_part_name )
@@ -80,7 +80,7 @@ Global_Part_Serial::~Global_Part_Serial()
 }
 
 void Global_Part_Serial::write_part_hdf5( const std::string &fileName,
-    const idx_t * const &part_in, const int &part_size ) const
+    const idx_t * part_in, int part_size ) const
 {
   const std::string fName = fileName + ".h5";
 

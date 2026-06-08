@@ -75,8 +75,7 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-time_step", time_step);
   SYS_T::GetOptionInt("-time_end", time_end);  
 
-  std::string out_bname = sol_bname;
-  out_bname.append("WSS_");
+  const std::string out_bname = sol_bname + "WSS_";
 
   // Print the key data on screen
   cout<<"==== Command Line Arguments ===="<<endl;
@@ -197,8 +196,6 @@ int main( int argc, char * argv[] )
   const auto analysis_new2old = HDF5_T::read_intVector("node_mapping.h5", "/", "new_2_old");
 
   // Read solutions
-  std::ostringstream time_index;
-
   // Container for TAWSS & OSI
   std::vector<double> tawss( nFunc, 0.0 ); 
   std::vector<double> osi( nFunc, 0.0 ); 
@@ -209,12 +206,9 @@ int main( int argc, char * argv[] )
   for(int time = time_start; time <= time_end; time += time_step)
   {
     // Generate the file name
-    std::string name_to_read(sol_bname);
-    std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index << 900000000 + time;
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string time_suffix = SYS_T::fixed_length_index(time);
+    const std::string name_to_read = sol_bname + time_suffix;
+    const std::string name_to_write = out_bname + time_suffix;
 
     std::cout<<"Time "<<time<<": Read "<<name_to_read<<" and Write "<<name_to_write<<std::endl;
 

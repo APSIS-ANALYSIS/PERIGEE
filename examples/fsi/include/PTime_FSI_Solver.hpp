@@ -37,14 +37,7 @@ class PTime_FSI_Solver
     // ------------------------------------------------------------------------
     std::string gen_flowfile_name(const std::string &prefix, const int &id) const
     {
-      std::ostringstream ss;
-      ss << prefix;
-
-      if(id < 10) ss << "00";
-      else if(id < 100) ss << "0";
-
-      ss << id << "_data.txt";
-      return ss.str();
+      return prefix + SYS_T::fixed_length_index(id, 3) + "_data.txt";
     }
 
     // ------------------------------------------------------------------------

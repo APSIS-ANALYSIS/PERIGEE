@@ -31,13 +31,11 @@ namespace SI_T
     nLocBas = h5r -> read_intScalar(mesh_info.c_str(), "nLocBas");
     dof_sol = h5r -> read_intScalar(mesh_info.c_str(), "dofNum");
 
-    std::string groupbase(gname);
-    groupbase.append("/interfaceid_");
+    const std::string groupbase = gname + "/interfaceid_";
 
     for(int ii=0; ii<num_itf; ++ii)
     {
-      std::string subgroup_name(groupbase);
-      subgroup_name.append( std::to_string(ii) );
+      const std::string subgroup_name = groupbase + std::to_string(ii);
       
       num_fixed_node[ii] = VEC_T::get_size(h5r -> read_intVector( subgroup_name.c_str(), "fixed_node_map" ));
 

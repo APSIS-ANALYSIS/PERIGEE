@@ -1,5 +1,24 @@
 #include "SV_Tools.hpp"
 
+#include "DataVecStr.hpp"
+#include "Math_Tools.hpp"
+#include "Sys_Tools.hpp"
+#include "Tet_Tools.hpp"
+#include "Vec_Tools.hpp"
+#include "VTK_Tools.hpp"
+
+#include "vtkCell.h"
+#include "vtkCellData.h"
+#include "vtkDataArray.h"
+#include "vtkPointData.h"
+#include "vtkPolyData.h"
+#include "vtkUnstructuredGrid.h"
+#include "vtkXMLPolyDataReader.h"
+#include "vtkXMLUnstructuredGridReader.h"
+
+#include <algorithm>
+#include <iostream>
+
 void SV_T::update_sv_vtu( const std::string &filename,
     const std::string &write_name,
     int &sv_node_start, int &sv_elem_start )

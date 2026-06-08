@@ -108,7 +108,7 @@ int main( int argc, char * argv[] )
 
   for(int time = time_start; time<=time_end; time+= time_step)
   {
-    const std::string suffix = std::to_string(900000000 + time);
+    const std::string suffix = SYS_T::fixed_length_index(time);
     const std::string name_to_read  = sol_bname + suffix;
     const std::string name_to_write = out_bname + suffix;
 

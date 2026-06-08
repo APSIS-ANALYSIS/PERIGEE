@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <random>
 #include <cmath>
+#include <cassert>
 
 #include "Sys_Tools.hpp"
 #include "HDF5_Tools.hpp"
@@ -65,6 +66,14 @@ std::vector<int> ReadNodeMapping_2( const char * const &node_mapping_file,
 
 int main()
 {
+  assert(SYS_T::fixed_length_index(12) == "000000012");
+  assert(SYS_T::fixed_length_index(12, 3) == "012");
+  assert(SYS_T::fixed_length_index(0, 8) == "00000000");
+  assert(SYS_T::fixed_length_index(123, 3) == "123");
+  assert(SYS_T::fixed_length_index(1234, 3) == "1234");
+  assert(SYS_T::gen_partfile_name("part", 12) == "part_p00012.h5");
+  assert(SYS_T::gen_capfile_name("cap_", 12, ".vtp") == "cap_012.vtp");
+
   const std::string node_mapping_file = "node_mapping.h5";
   
   const int nNode = 3456;

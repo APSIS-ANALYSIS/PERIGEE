@@ -1,5 +1,13 @@
 #ifndef TIMER_HPP
 #define TIMER_HPP
+// ============================================================================
+// Timer.hpp
+// ----------------------------------------------------------------------------
+// This file defines a steady-clock timer for measuring elapsed wall-clock time.
+//
+// Author: Ju Liu
+// Date Created: June 1 2026
+// ============================================================================
 
 #include <chrono>
 

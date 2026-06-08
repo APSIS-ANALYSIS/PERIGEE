@@ -31,14 +31,7 @@ class PTime_NS_Solver
     // ------------------------------------------------------------------------
     std::string gen_flowfile_name(const std::string &prefix, const int &id) const
     {
-      std::ostringstream ss;
-      ss << prefix;
-
-      if(id < 10) ss << "00";
-      else if(id < 100) ss << "0";
-
-      ss << id << "_data.txt";
-      return ss.str();
+      return prefix + SYS_T::fixed_length_index(id, 3) + "_data.txt";
     }
 
     // ------------------------------------------------------------------------
@@ -82,12 +75,12 @@ class PTime_NS_Solver
 
     std::string Name_Generator(const int &counter) const
     {
-      return pb_name + std::to_string(900000000 + counter);
+      return pb_name + SYS_T::fixed_length_index(counter);
     }
 
     std::string Name_dot_Generator(const int &counter) const
     {
-      return "dot_" + pb_name + std::to_string(900000000 + counter);
+      return "dot_" + pb_name + SYS_T::fixed_length_index(counter);
     }
 
     void Write_restart_file(const PDNTimeStep * const &timeinfo,

@@ -35,14 +35,7 @@ class PTime_NS_Solver
     // ------------------------------------------------------------------------
     std::string gen_flowfile_name(const std::string &prefix, const int &id) const
     {
-      std::ostringstream ss;
-      ss << prefix;
-
-      if(id < 10) ss << "00";
-      else if(id < 100) ss << "0";
-
-      ss << id << "_data.txt";
-      return ss.str();
+      return prefix + SYS_T::fixed_length_index(id, 3) + "_data.txt";
     }
     
     void TM_NS_GenAlpha(
@@ -68,7 +61,7 @@ class PTime_NS_Solver
     const std::unique_ptr<PNonlinear_NS_Solver> nsolver;
 
     std::string generateNumericSuffix(const int &counter) const 
-    { return std::to_string(900000000 + counter); }
+    { return SYS_T::fixed_length_index(counter); }
 
     std::string Name_Generator( const int &counter ) const
     { return pb_name + generateNumericSuffix(counter); }

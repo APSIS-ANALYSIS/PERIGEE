@@ -138,16 +138,14 @@ int main( int argc, char * argv[] )
   VTK_Writer_Stress_Recovery * vtk_w = new VTK_Writer_Stress_Recovery( GMIptr->get_nElem(), 
       GMIptr->get_nLocBas(), element_part_file );
   
-  std::ostringstream time_index;
 
   for(int time = time_start; time<=time_end; time+= time_step)
   {
     std::string name_to_read(sol_bname);
     std::string name_to_write(out_bname);
-    time_index.str("");
-    time_index<< 900000000 + time;
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string time_suffix = SYS_T::fixed_length_index(time);
+    name_to_read.append(time_suffix);
+    name_to_write.append(time_suffix);
 
     SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );
