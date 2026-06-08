@@ -103,7 +103,6 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionString("-part_file", part_file);
 
   // time stepping parameters
-  // Assuming SOL_900000000 corresponds to a time of 0.0s
   double initial_time = time_start * initial_step;
   int initial_index = time_start;
   double final_time = initial_time + time_end * initial_step;
@@ -293,15 +292,11 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
   
   // Read the sol
-  std::ostringstream time_index;
   for (int time = time_start; time<=time_end; time += time_step)
   {
-    std::string name_to_read(read_sol_bname);
-    std::string name_to_write(sol_bname);
-    time_index.str("");
-    time_index<< 900000000 + time;
-    name_to_read.append(time_index.str());
-    name_to_write.append(time_index.str());
+    const std::string time_index = SYS_T::fixed_length_index(time);
+    const std::string name_to_read = read_sol_bname + time_index;
+    const std::string name_to_write = sol_bname + time_index;
 
     SYS_T::commPrint("Time %f: Read %s, Write %s.\n", 
       time*initial_step, name_to_read.c_str(), name_to_write.c_str() );
