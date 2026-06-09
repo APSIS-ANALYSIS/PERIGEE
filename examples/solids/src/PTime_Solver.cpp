@@ -28,6 +28,7 @@ void PTime_Solver::print_info() const
 
 void PTime_Solver::TM_Solid_GenAlpha(
     const bool &restart_init_assembly_flag,
+    IS is_velo, IS is_pres,
     std::unique_ptr<PDNSolution> init_dot_disp,
     std::unique_ptr<PDNSolution> init_dot_velo,
     std::unique_ptr<PDNSolution> init_dot_pres,
@@ -96,6 +97,7 @@ void PTime_Solver::TM_Solid_GenAlpha(
 
     nsolver->GenAlpha_Seg_solve_Solid( renew_flag,
         time_info->get_time(), time_info->get_step(),
+        is_velo, is_pres,
         pre_dot_disp.get(), pre_dot_velo.get(), pre_dot_pres.get(),
         pre_disp.get(), pre_velo.get(), pre_pres.get(),
         cur_dot_disp.get(), cur_dot_velo.get(), cur_dot_pres.get(),

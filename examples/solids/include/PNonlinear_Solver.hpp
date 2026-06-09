@@ -27,7 +27,7 @@ class PNonlinear_Solver
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq, const int &input_renew_threshold );
 
-    ~PNonlinear_Solver();
+    ~PNonlinear_Solver() = default;
 
     int get_non_max_its() const {return nmaxits;}
 
@@ -39,6 +39,7 @@ class PNonlinear_Solver
         const bool &new_tangent_flag,
         const double &curr_time,
         const double &dt,
+        IS is_velo, IS is_pres,
         const PDNSolution * const &pre_dot_disp,
         const PDNSolution * const &pre_dot_velo,
         const PDNSolution * const &pre_dot_pres,
@@ -62,7 +63,6 @@ class PNonlinear_Solver
     const std::unique_ptr<Matrix_PETSc> bc_mat;
     const std::unique_ptr<TimeMethod_GenAlpha> tmga;
     const std::unique_ptr<ALocal_NBC> nbc_disp;
-    IS is_velo, is_pres;
 
     void Print_convergence_info( const int &count,
         const double &rel_err, const double &abs_err ) const

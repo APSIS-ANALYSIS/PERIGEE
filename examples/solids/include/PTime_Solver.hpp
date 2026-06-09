@@ -31,6 +31,7 @@ class PTime_Solver
 
     void TM_Solid_GenAlpha(
         const bool &restart_init_assembly_flag,
+        IS is_velo, IS is_pres,
         std::unique_ptr<PDNSolution> init_dot_disp,
         std::unique_ptr<PDNSolution> init_dot_velo,
         std::unique_ptr<PDNSolution> init_dot_pres,

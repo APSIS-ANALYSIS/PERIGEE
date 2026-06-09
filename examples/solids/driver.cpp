@@ -219,6 +219,9 @@ int main(int argc, char *argv[])
       disp, velo, pres, dot_disp, dot_velo, dot_pres,
       initial_index, initial_time, initial_step );
 
+  IS is_velo, is_pres;
+  SOLID_INIT::generate_subvector_is(pNode.get(), is_velo, is_pres);
+
   // ===== Global Assembly Routine =====
   std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
@@ -232,6 +235,7 @@ int main(int argc, char *argv[])
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
   SOLID_INIT::initialize_dot_solution( is_restart, gloAssem_ptr.get(),
+      is_velo, is_pres,
       dot_disp.get(), dot_velo.get(), dot_pres.get(),
       disp.get(), velo.get(), pres.get() );
 
@@ -254,12 +258,14 @@ int main(int argc, char *argv[])
 
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
 
-  tsolver->TM_Solid_GenAlpha( is_restart,
+  tsolver->TM_Solid_GenAlpha( is_restart, is_velo, is_pres,
       std::move(dot_disp), std::move(dot_velo), std::move(dot_pres),
       std::move(disp), std::move(velo), std::move(pres) );
 
   // Ensure PETSc objects are destroyed before PetscFinalize
   tsolver.reset();
+  ISDestroy(&is_velo);
+  ISDestroy(&is_pres);
 
   PetscFinalize();
   return EXIT_SUCCESS;

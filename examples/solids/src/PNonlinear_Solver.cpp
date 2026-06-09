@@ -17,23 +17,8 @@ PNonlinear_Solver::PNonlinear_Solver(
   lsolver(std::move(in_lsolver)),
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
-  nbc_disp(std::move(in_nbc_disp)),
-  is_velo(nullptr), is_pres(nullptr)
-{
-  std::vector<PetscInt> idx_v, idx_p;
-  gassem->GetSubVecIndex_vp(idx_v, idx_p);
-
-  ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()),
-      idx_v.data(), PETSC_COPY_VALUES, &is_velo);
-  ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()),
-      idx_p.data(), PETSC_COPY_VALUES, &is_pres);
-}
-
-PNonlinear_Solver::~PNonlinear_Solver()
-{
-  ISDestroy(&is_velo);
-  ISDestroy(&is_pres);
-}
+  nbc_disp(std::move(in_nbc_disp))
+{}
 
 void PNonlinear_Solver::print_info() const
 {
@@ -131,6 +116,7 @@ void PNonlinear_Solver::GenAlpha_Seg_solve_Solid(
     const bool &new_tangent_flag,
     const double &curr_time,
     const double &dt,
+    IS is_velo, IS is_pres,
     const PDNSolution * const &pre_dot_disp,
     const PDNSolution * const &pre_dot_velo,
     const PDNSolution * const &pre_dot_pres,
