@@ -104,8 +104,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
     const double * const &pres,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const double * const &qua_prestress )
+    const double * const &eleCtrlPts_z )
 {
   elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -189,15 +188,6 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Residual(
 
     Tensor2_3D P_iso = matmodel->get_PK_1st( F );
 
-    // ------------------------------------------------------------------------
-    // 1st PK stress corrected by prestress
-    const Tensor2_3D prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
-        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
-        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
-
-    P_iso += prestress * Ten2::cofactor( F );
-    // ------------------------------------------------------------------------
-
     const double rho = matmodel->get_rho(p);
     const double mbeta = matmodel->get_beta(p);
     const double detF = F.det();
@@ -252,8 +242,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
         const double * const &pres,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress )
+        const double * const &eleCtrlPts_z )
 {
   elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -349,15 +338,6 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Tangent_Residual(
     SymmTensor2_3D S_iso;
     const Tensor4_3D AA_iso = matmodel->get_PK_FFStiffness(F, P_iso, S_iso);
     
-    // ------------------------------------------------------------------------
-    // 1st PK stress corrected by prestress
-    const Tensor2_3D prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
-        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
-        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
-
-    P_iso += prestress * Ten2::cofactor( F );
-    // ------------------------------------------------------------------------
-
     const double rho = matmodel->get_rho(p);
     const double drho = matmodel->get_drho_dp(p);
 
@@ -558,8 +538,7 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
     const double * const &pres,
     const double * const &eleCtrlPts_x,
     const double * const &eleCtrlPts_y,
-    const double * const &eleCtrlPts_z,
-    const double * const &qua_prestress )
+    const double * const &eleCtrlPts_z )
 {
   elementv->buildBasis( quadv.get(), eleCtrlPts_x, eleCtrlPts_y, eleCtrlPts_z );
 
@@ -631,15 +610,6 @@ void PLocAssem_2x2Block_VMS_Hyperelasticity::Assem_Mass_Residual(
 
     Tensor2_3D P_iso = matmodel->get_PK_1st( F );
     
-    // ------------------------------------------------------------------------
-    // 1st PK stress corrected by prestress
-    const Tensor2_3D prestress( qua_prestress[qua*6+0], qua_prestress[qua*6+5], qua_prestress[qua*6+4],
-        qua_prestress[qua*6+5], qua_prestress[qua*6+1], qua_prestress[qua*6+3],
-        qua_prestress[qua*6+4], qua_prestress[qua*6+3], qua_prestress[qua*6+2] );
-
-    P_iso += prestress * Ten2::cofactor( F );
-    // ------------------------------------------------------------------------
-
     double mbeta = matmodel->get_beta(p);
 
     // use 1.0 in case of fully incompressible. 

@@ -62,8 +62,7 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const double * const &pres,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Tangent_Residual(
         const double &time, const double &dt,
@@ -75,8 +74,7 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const double * const &pres,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress );
+        const double * const &eleCtrlPts_z );
  
     virtual void Assem_Mass_Residual(
         const double * const &disp,
@@ -84,8 +82,7 @@ class PLocAssem_2x2Block_VMS_Hyperelasticity : public IPLocAssem_2x2Block
         const double * const &pres,
         const double * const &eleCtrlPts_x,
         const double * const &eleCtrlPts_y,
-        const double * const &eleCtrlPts_z,
-        const double * const &qua_prestress );
+        const double * const &eleCtrlPts_z );
 
     virtual void Assem_Residual_EBC(
         const int &ebc_id,

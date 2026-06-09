@@ -20,8 +20,7 @@ PGAssem_Solid_FEM::PGAssem_Solid_FEM(
   nLocBas( locassem->get_nLocBas_0() ),
   snLocBas( locassem->get_snLocBas_0() ),
   dof_mat( locassem->get_dof_0() + locassem->get_dof_1() ),
-  nlgn( pnode->get_nlocghonode() ),
-  nqpv( locassem->get_nqpv() )
+  nlgn( pnode->get_nlocghonode() )
 {
   SYS_T::print_fatal_if( dof_mat != nbc->get_dof_LID(),
       "Error: PGAssem_Solid_FEM, dof_mat and nbc dof mismatch.\n" );
@@ -30,8 +29,6 @@ PGAssem_Solid_FEM::PGAssem_Solid_FEM(
     SYS_T::print_fatal_if( snLocBas != ebc->get_cell_nLocBas(ebc_id),
         "Error: PGAssem_Solid_FEM, snLocBas has to be uniform.\n" );
   }
-
-  zero_prestress.assign( nqpv * 6, 0.0 );
 
   const int nlocrow = dof_mat * pnode -> get_nlocalnode();
 
@@ -242,7 +239,7 @@ void PGAssem_Solid_FEM::Assem_mass_residual(
     const std::vector<double> local_p = GetLocal( array_p, IEN, nLocBas, 1 );
 
     locassem -> Assem_Mass_Residual( &local_d[0], &local_v[0], &local_p[0],
-        ectrl_x, ectrl_y, ectrl_z, &zero_prestress[0] );
+        ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -328,7 +325,7 @@ void PGAssem_Solid_FEM::Assem_Residual(
 
     locassem -> Assem_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
         &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0],
-        ectrl_x, ectrl_y, ectrl_z, &zero_prestress[0] );
+        ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {
@@ -400,7 +397,7 @@ void PGAssem_Solid_FEM::Assem_Tangent_Residual(
 
     locassem -> Assem_Tangent_Residual( curr_time, dt, &local_dot_d[0], &local_dot_v[0],
         &local_dot_p[0], &local_d[0], &local_v[0], &local_p[0],
-        ectrl_x, ectrl_y, ectrl_z, &zero_prestress[0] );
+        ectrl_x, ectrl_y, ectrl_z );
 
     for(int ii=0; ii<nLocBas; ++ii)
     {

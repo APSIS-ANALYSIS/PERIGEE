@@ -65,9 +65,7 @@ class PGAssem_Solid_FEM : public IPGAssem
     const std::unique_ptr<IPLocAssem_2x2Block> locassem;
 
     const int num_ebc;
-    const int nLocBas, snLocBas, dof_mat, nlgn, nqpv;
-
-    std::vector<double> zero_prestress;
+    const int nLocBas, snLocBas, dof_mat, nlgn;
 
     void EssBC_KG( const int &field );
     void EssBC_G( const int &field );
