@@ -26,19 +26,6 @@ void PTime_Solver::print_info() const
   SYS_T::commPrint("----------------------------------------------------------- \n");
 }
 
-std::string PTime_Solver::Name_Generator( const std::string &middle_name,
-    const int &counter ) const
-{
-  return pb_name + middle_name + SYS_T::fixed_length_index(counter);
-}
-
-std::string PTime_Solver::Name_dot_Generator( const std::string &middle_name,
-    const int &counter ) const
-{
-  return std::string("dot_") + pb_name + middle_name
-      + SYS_T::fixed_length_index(counter);
-}
-
 void PTime_Solver::TM_Solid_GenAlpha(
     const bool &restart_init_assembly_flag,
     std::unique_ptr<PDNSolution> init_dot_disp,
@@ -66,22 +53,24 @@ void PTime_Solver::TM_Solid_GenAlpha(
 
   if( restart_init_assembly_flag == false )
   {
-    std::string sol_name = Name_Generator("disp_", time_info->get_index());
+    const std::string index_name =
+        SYS_T::fixed_length_index(time_info->get_index());
+    std::string sol_name = pb_name + "disp_" + index_name;
     cur_disp->WriteBinary(sol_name.c_str());
 
-    sol_name = Name_Generator("velo_", time_info->get_index());
+    sol_name = pb_name + "velo_" + index_name;
     cur_velo->WriteBinary(sol_name.c_str());
 
-    sol_name = Name_Generator("pres_", time_info->get_index());
+    sol_name = pb_name + "pres_" + index_name;
     cur_pres->WriteBinary(sol_name.c_str());
 
-    std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+    std::string sol_dot_name = "dot_" + pb_name + "disp_" + index_name;
     cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
-    sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
+    sol_dot_name = "dot_" + pb_name + "velo_" + index_name;
     cur_dot_velo->WriteBinary(sol_dot_name.c_str());
 
-    sol_dot_name = Name_dot_Generator("pres_", time_info->get_index());
+    sol_dot_name = "dot_" + pb_name + "pres_" + index_name;
     cur_dot_pres->WriteBinary(sol_dot_name.c_str());
   }
 
@@ -121,22 +110,24 @@ void PTime_Solver::TM_Solid_GenAlpha(
 
     if( time_info->get_index() % sol_record_freq == 0 )
     {
-      std::string sol_name = Name_Generator("disp_", time_info->get_index());
+      const std::string index_name =
+          SYS_T::fixed_length_index(time_info->get_index());
+      std::string sol_name = pb_name + "disp_" + index_name;
       cur_disp->WriteBinary(sol_name.c_str());
 
-      sol_name = Name_Generator("velo_", time_info->get_index());
+      sol_name = pb_name + "velo_" + index_name;
       cur_velo->WriteBinary(sol_name.c_str());
 
-      sol_name = Name_Generator("pres_", time_info->get_index());
+      sol_name = pb_name + "pres_" + index_name;
       cur_pres->WriteBinary(sol_name.c_str());
 
-      std::string sol_dot_name = Name_dot_Generator("disp_", time_info->get_index());
+      std::string sol_dot_name = "dot_" + pb_name + "disp_" + index_name;
       cur_dot_disp->WriteBinary(sol_dot_name.c_str());
 
-      sol_dot_name = Name_dot_Generator("velo_", time_info->get_index());
+      sol_dot_name = "dot_" + pb_name + "velo_" + index_name;
       cur_dot_velo->WriteBinary(sol_dot_name.c_str());
 
-      sol_dot_name = Name_dot_Generator("pres_", time_info->get_index());
+      sol_dot_name = "dot_" + pb_name + "pres_" + index_name;
       cur_dot_pres->WriteBinary(sol_dot_name.c_str());
     }
 

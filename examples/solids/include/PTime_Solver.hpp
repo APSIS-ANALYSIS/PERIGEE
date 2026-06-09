@@ -47,12 +47,6 @@ class PTime_Solver
     const std::unique_ptr<PNonlinear_Solver> nsolver;
     std::unique_ptr<PDNTimeStep> time_info;
 
-    std::string Name_Generator( const std::string &middle_name,
-        const int &counter ) const;
-
-    std::string Name_dot_Generator( const std::string &middle_name,
-        const int &counter ) const;
-
     PTime_Solver() = delete;
 };
 
