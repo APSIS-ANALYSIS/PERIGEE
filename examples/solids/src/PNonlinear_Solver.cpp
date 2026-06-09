@@ -7,6 +7,7 @@ PNonlinear_Solver::PNonlinear_Solver(
     std::unique_ptr<Matrix_PETSc> in_bc_mat,
     std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
     std::unique_ptr<ALocal_NBC> in_nbc_disp,
+    IS in_is_velo, IS in_is_pres,
     const double &input_nrtol, const double &input_natol,
     const double &input_ndtol, const int &input_max_iteration,
     const int &input_renew_freq, const int &input_renew_threshold )
@@ -18,15 +19,10 @@ PNonlinear_Solver::PNonlinear_Solver(
   bc_mat(std::move(in_bc_mat)),
   tmga(std::move(in_tmga)),
   nbc_disp(std::move(in_nbc_disp)),
-  is_velo(nullptr), is_pres(nullptr)
+  is_velo(in_is_velo), is_pres(in_is_pres)
 {
-  std::vector<PetscInt> idx_v, idx_p;
-  gassem->GetSubVecIndex_vp(idx_v, idx_p);
-
-  ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()),
-      idx_v.data(), PETSC_COPY_VALUES, &is_velo);
-  ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()),
-      idx_p.data(), PETSC_COPY_VALUES, &is_pres);
+  PetscObjectReference(reinterpret_cast<PetscObject>(is_velo));
+  PetscObjectReference(reinterpret_cast<PetscObject>(is_pres));
 }
 
 PNonlinear_Solver::~PNonlinear_Solver()

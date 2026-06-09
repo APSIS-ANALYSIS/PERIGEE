@@ -219,6 +219,9 @@ int main(int argc, char *argv[])
       disp, velo, pres, dot_disp, dot_velo, dot_pres,
       initial_index, initial_time, initial_step );
 
+  IS is_velo, is_pres;
+  SOLID_INIT::create_vp_index_sets(*pNode, is_velo, is_pres);
+
   // ===== Global Assembly Routine =====
   std::unique_ptr<PGAssem_Solid_FEM> gloAssem_ptr =
     SYS_T::make_unique<PGAssem_Solid_FEM>(
@@ -232,7 +235,7 @@ int main(int argc, char *argv[])
 
   // ===== Initialize the dot_sol vectors by solving mass matrix =====
   SOLID_INIT::initialize_dot_solution( is_restart, gloAssem_ptr.get(),
-      dot_disp.get(), dot_velo.get(), dot_pres.get(),
+      is_velo, is_pres, dot_disp.get(), dot_velo.get(), dot_pres.get(),
       disp.get(), velo.get(), pres.get() );
 
   // ===== Linear and nonlinear solver context =====
@@ -240,8 +243,11 @@ int main(int argc, char *argv[])
 
   auto nsolver = SYS_T::make_unique<PNonlinear_Solver>(
       std::move(gloAssem_ptr), std::move(lsolver), std::move(pmat),
-      std::move(tm_galpha), std::move(locnbc_disp),
+      std::move(tm_galpha), std::move(locnbc_disp), is_velo, is_pres,
       nl_rtol, nl_atol, nl_dtol, nl_maxits, nl_refreq, nl_threshold );
+
+  ISDestroy(&is_velo);
+  ISDestroy(&is_pres);
 
   nsolver->print_info();
 

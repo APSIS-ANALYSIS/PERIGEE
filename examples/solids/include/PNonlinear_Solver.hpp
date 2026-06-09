@@ -23,6 +23,7 @@ class PNonlinear_Solver
         std::unique_ptr<Matrix_PETSc> in_bc_mat,
         std::unique_ptr<TimeMethod_GenAlpha> in_tmga,
         std::unique_ptr<ALocal_NBC> in_nbc_disp,
+        IS in_is_velo, IS in_is_pres,
         const double &input_nrtol, const double &input_natol,
         const double &input_ndtol, const int &input_max_iteration,
         const int &input_renew_freq, const int &input_renew_threshold );

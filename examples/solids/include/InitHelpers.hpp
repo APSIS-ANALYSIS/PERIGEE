@@ -11,6 +11,27 @@
 
 namespace SOLID_INIT
 {
+  inline void create_vp_index_sets( const APart_Node &pnode,
+      IS &is_velo, IS &is_pres )
+  {
+    const int nlocal = pnode.get_nlocalnode();
+    std::vector<PetscInt> idx_v(3 * nlocal), idx_p(nlocal);
+
+    for(int ii=0; ii<nlocal; ++ii)
+    {
+      const PetscInt gid = pnode.get_node_loc(ii);
+      idx_p[ii] = 4 * gid;
+      idx_v[3*ii  ] = 4 * gid + 1;
+      idx_v[3*ii+1] = 4 * gid + 2;
+      idx_v[3*ii+2] = 4 * gid + 3;
+    }
+
+    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()),
+        idx_v.data(), PETSC_COPY_VALUES, &is_velo);
+    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()),
+        idx_p.data(), PETSC_COPY_VALUES, &is_pres);
+  }
+
   inline void initialize_solution_state( bool is_restart,
       int restart_index, double restart_time, double restart_step,
       const std::string &restart_disp_name,
@@ -69,8 +90,9 @@ namespace SOLID_INIT
     }
   }
 
-  inline void initialize_dot_solution( bool is_restart, 
+  inline void initialize_dot_solution( bool is_restart,
       PGAssem_Solid_FEM * const gloAssem,
+      IS is_velo, IS is_pres,
       PDNSolution * const &dot_disp,
       PDNSolution * const &dot_velo,
       PDNSolution * const &dot_pres,
@@ -101,13 +123,6 @@ namespace SOLID_INIT
     lsolver_acce->Solve( gloAssem->K, gloAssem->G, dot_vp );
     VecScale(dot_vp, -1.0);
 
-    std::vector<PetscInt> idx_v, idx_p;
-    gloAssem->GetSubVecIndex_vp(idx_v, idx_p);
-
-    IS is_velo, is_pres;
-    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_v.size()), idx_v.data(), PETSC_COPY_VALUES, &is_velo);
-    ISCreateGeneral(PETSC_COMM_WORLD, static_cast<PetscInt>(idx_p.size()), idx_p.data(), PETSC_COPY_VALUES, &is_pres);
-
     Vec sol_v, sol_p;
     VecGetSubVector(dot_vp, is_velo, &sol_v);
     VecGetSubVector(dot_vp, is_pres, &sol_p);
@@ -120,8 +135,6 @@ namespace SOLID_INIT
 
     VecRestoreSubVector(dot_vp, is_velo, &sol_v);
     VecRestoreSubVector(dot_vp, is_pres, &sol_p);
-    ISDestroy(&is_velo);
-    ISDestroy(&is_pres);
     VecDestroy(&dot_vp);
 
     dot_disp->Copy( velo );
