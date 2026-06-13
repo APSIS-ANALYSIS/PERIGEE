@@ -8,12 +8,8 @@
 //
 // The data contained in this class include:
 // dir_nodes : the nodal indices for the Dirichlet nodes;
-// num_dir_nodes : the number of the Dirichlet nodes, i.e., the length
-//                 of the dir_nodes array;
 // per_slave_nodes : the nodal indices for the slave nodes;
 // per_master_nodes : the nodal indices for the master nodes;
-// num_per_nodes : the number of periodic-type nodes, i.e., the length 
-//                 of the per_slave_nodes / per_master_nodes.
 //
 // ID : the vector for the ID array, which is generated based on the 
 //      nFunc, the number of total basis functions, and the dir_nodes
@@ -31,8 +27,8 @@ class NodalBC : public INodalBC
   public:
     // --------------------------------------------------------------
     // Default constructor: clear the dir_nodes, per_slave_nodes,
-    // per_master_nodes; set num_dir_nodes, num_per_nodes to be zero;
-    // set ID based on the above "no-nodal bc" setting.
+    // and per_master_nodes vectors; set ID based on the above
+    // "no-nodal bc" setting.
     // --------------------------------------------------------------
     NodalBC( const int &nFunc );
     
@@ -85,16 +81,16 @@ class NodalBC : public INodalBC
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
     {return per_master_nodes[ii];}
 
-    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
+    virtual unsigned int get_num_dir_nodes() const
+    {return static_cast<unsigned int>(dir_nodes.size());}
 
-    virtual unsigned int get_num_per_nodes() const {return num_per_nodes;}
+    virtual unsigned int get_num_per_nodes() const
+    {return static_cast<unsigned int>(per_slave_nodes.size());}
 
   private:
     std::vector<unsigned int> dir_nodes {};
-    unsigned int num_dir_nodes {};
 
     std::vector<unsigned int> per_slave_nodes {}, per_master_nodes {};
-    unsigned int num_per_nodes {};
     
     NodalBC() = delete;
 

@@ -7,8 +7,6 @@ NodalBC::NodalBC( const int &nFunc )
   dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_dir_nodes = 0;
-  num_per_nodes = 0;
 
   Create_ID( nFunc );
   
@@ -21,7 +19,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
 
   for( int ii{0}; ii < VEC_T::get_size(vtkfileList); ++ii )
   {
@@ -40,7 +37,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   
   VEC_T::sort_unique_resize(dir_nodes);
 
-  num_dir_nodes = dir_nodes.size();
 
   Create_ID( nFunc );
 
@@ -57,7 +53,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
 
   for( int ii{0}; ii < VEC_T::get_size(vtkfileList); ++ii )
   {
@@ -76,7 +71,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  num_dir_nodes = dir_nodes.size();
 
   for( int ii{0}; ii < VEC_T::get_size(slafileList); ++ii )
   {
@@ -96,7 +90,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
     }
   }
 
-  num_per_nodes = per_slave_nodes.size();
 
   Create_ID( nFunc );
 
@@ -119,7 +112,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
 
   for( const auto &vtkfile : vtkfileList )
   {
@@ -155,7 +147,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  num_dir_nodes = dir_nodes.size();
 
   Create_ID( nFunc );
 
@@ -175,7 +166,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   dir_nodes.clear();
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
 
   for( const auto &vtkfile : vtkfileList )
   {
@@ -224,7 +214,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  num_dir_nodes = dir_nodes.size();
 
   Create_ID( nFunc );
 
@@ -244,8 +233,6 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_slave_nodes.clear();
   per_master_nodes.clear();
 
-  num_dir_nodes = 0;
-  num_per_nodes = 0;
 
   switch( type )
   {
@@ -286,7 +273,6 @@ void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
     }
   }
 
-  num_per_nodes = per_slave_nodes.size();
   std::cout<<"-----> Master slave relations: \n";
   for( const auto &vtkfile : vtkfileList )
     std::cout<<"     "<<vtkfile<<" follows 0th node in the file "<<std::endl;
@@ -321,8 +307,6 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
     per_master_nodes.push_back( static_cast<unsigned int>( gnode[ 0 ]) );
   }
 
-  num_dir_nodes = dir_nodes.size();
-  num_per_nodes = per_slave_nodes.size();
 
   std::cout<<"-----> Dirichlet nodes from "<<vtkfileList[0]<<std::endl;
   std::cout<<"       Master-slave from "<<vtkfileList[1]<<" with 0th node master."<<std::endl;
@@ -343,10 +327,8 @@ void NodalBC::BC_type_3( const std::vector<std::string> &vtkfileList,
 
   dir_nodes.resize(1);
   dir_nodes[0] = static_cast<unsigned int>( gnode[0] );
-  num_dir_nodes = 1;
   per_slave_nodes.clear();
   per_master_nodes.clear();
-  num_per_nodes = 0;
   std::cout<<"-----> Dirichlet node "<<gnode[0]<<
     " from "<<vtkfileList[0]<<std::endl;
 }

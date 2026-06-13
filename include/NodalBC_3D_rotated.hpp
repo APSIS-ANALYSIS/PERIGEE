@@ -33,7 +33,8 @@ class NodalBC_3D_rotated : public INodalBC
     virtual unsigned int get_dir_nodes(const unsigned int &ii) const
     {return dir_nodes[ii];}
 
-    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}    
+    virtual unsigned int get_num_dir_nodes() const
+    {return static_cast<unsigned int>(dir_nodes.size());}
 
     virtual unsigned int get_per_master_nodes(const unsigned int &ii) const
     {
@@ -54,7 +55,7 @@ class NodalBC_3D_rotated : public INodalBC
     { return dir_nodes_on_rotated_surface[ii]; }
 
     virtual unsigned int get_num_dir_nodes_on_rotated_surface() const
-    { return num_dir_nodes_on_rotated_surface; }    
+    { return static_cast<unsigned int>(dir_nodes_on_rotated_surface.size()); }
 
     // Access to num_node
     virtual int get_num_node() const {return num_node;}
@@ -88,20 +89,16 @@ class NodalBC_3D_rotated : public INodalBC
     NodalBC_3D_rotated() = delete;
 
     // The dirichlet nodes on rotated surface
-    // length = num_dir_nodes_on_rotated_surface
     std::vector<unsigned int> dir_nodes_on_rotated_surface;
-    unsigned int num_dir_nodes_on_rotated_surface; 
 
     // The dirichlet nodes
-    // length = num_dir_nodes
     std::vector<unsigned int> dir_nodes;
-    unsigned int num_dir_nodes; 
 
     // number of moving surfaces and element type
     const FEType elem_type;
 
     // number of nodes and cells on rotated surface.
-    // Note: num_node equal num_dir_nodes in this class.
+    // Note: num_node equals get_num_dir_nodes() in this class.
     // nLocBas is 3, 6, 4 or 9.
     int num_node, num_cell, nLocBas;
 

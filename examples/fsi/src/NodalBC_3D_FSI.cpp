@@ -84,9 +84,6 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       break;
   }
 
-  // count the number of dirichlet nodes
-  num_dir_nodes = dir_nodes.size();
-
   // generate the ID array
   Create_ID( nFunc );
 }
@@ -118,9 +115,6 @@ NodalBC_3D_FSI::NodalBC_3D_FSI( const std::string &fluid_file,
       SYS_T::print_fatal( "NodalBC_3D_FSI Error: No such type of FSI BC.\n" );
       break;
   }
-
-  // count the number of dirichlet nodes
-  num_dir_nodes = dir_nodes.size();
 
   // generate the ID array
   Create_ID( nFunc );

@@ -20,12 +20,9 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
 { 
   // 1. Clear the container for Dirichlet nodes
   dir_nodes.clear();
-  num_dir_nodes = 0;
 
   dir_nodes_on_inlet.resize( num_nbc );
   for(int ii=0; ii<num_nbc; ++ii) dir_nodes_on_inlet[ii].clear();
-
-  num_dir_nodes_on_inlet.resize( num_nbc );
 
   // 2. Analyze the file type and read in the data
   num_node.resize( num_nbc );
@@ -86,8 +83,6 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
         dir_nodes_on_inlet[ii].push_back( global_node[ii][jj] );
       }
     }
-
-    num_dir_nodes_on_inlet[ii] = dir_nodes_on_inlet[ii].size();
 
     // Calculate the centroid of the surface
     centroid[ii] = Vec3::gen_zero();
@@ -303,11 +298,11 @@ void NodalBC_3D_inflow::init( const std::vector<std::string> &inffileList,
     delete [] temp_sol; temp_sol = nullptr;
   } // end ii-loop
 
-  num_dir_nodes = dir_nodes.size();
+  const auto num_dir_nodes_before_dedup = dir_nodes.size();
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  SYS_T::print_fatal_if( num_dir_nodes != dir_nodes.size(), "Error: NodalBC_3D_inflow::init function: there are repeated nodes in the inflow file list.\n" );
+  SYS_T::print_fatal_if( num_dir_nodes_before_dedup != dir_nodes.size(), "Error: NodalBC_3D_inflow::init function: there are repeated nodes in the inflow file list.\n" );
 
   // Generate ID array
   Create_ID( nFunc );

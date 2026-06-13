@@ -15,7 +15,6 @@ NodalBC_3D_rotated::NodalBC_3D_rotated(
   // Clear the container for Dirichlet nodes
   dir_nodes_on_rotated_surface.clear();
   dir_nodes.clear();
-  num_dir_nodes_on_rotated_surface = 0;
 
   // Analyze the file type and read in the data
   num_node = 0;
@@ -56,15 +55,13 @@ NodalBC_3D_rotated::NodalBC_3D_rotated(
     dir_nodes.push_back( global_node[jj] );
   }
 
-  num_dir_nodes_on_rotated_surface = dir_nodes_on_rotated_surface.size();
-
-  num_dir_nodes = dir_nodes.size();
+  const auto num_dir_nodes_before_dedup = dir_nodes_on_rotated_surface.size();
  
   VEC_T::sort_unique_resize(dir_nodes_on_rotated_surface);
 
   VEC_T::sort_unique_resize(dir_nodes);
 
-  SYS_T::print_fatal_if( num_dir_nodes_on_rotated_surface != dir_nodes_on_rotated_surface.size(), "Error: NodalBC_3D_rotated::NodalBC_3D_rotated: there are repeated nodes in the rotated file list.\n" );
+  SYS_T::print_fatal_if( num_dir_nodes_before_dedup != dir_nodes_on_rotated_surface.size(), "Error: NodalBC_3D_rotated::NodalBC_3D_rotated: there are repeated nodes in the rotated file list.\n" );
 
   // Generate ID array
   Create_ID( nFunc );

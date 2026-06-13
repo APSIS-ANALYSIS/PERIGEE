@@ -51,7 +51,8 @@ class NodalBC_3D_inflow : public INodalBC
       return 0;
     }
 
-    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
+    virtual unsigned int get_num_dir_nodes() const
+    {return static_cast<unsigned int>(dir_nodes.size());}
 
     virtual unsigned int get_num_per_nodes() const {return 0;}
 
@@ -60,7 +61,7 @@ class NodalBC_3D_inflow : public INodalBC
         const unsigned int &ii ) const { return dir_nodes_on_inlet[nbc_id][ii]; }
 
     virtual unsigned int get_num_dir_nodes_on_inlet( const int &nbc_id ) const
-    { return num_dir_nodes_on_inlet[nbc_id]; }
+    { return static_cast<unsigned int>(dir_nodes_on_inlet[nbc_id].size()); }
 
     virtual double get_inf_active_area(const int &nbc_id) const {return inf_active_area[nbc_id];}
 
@@ -143,14 +144,11 @@ class NodalBC_3D_inflow : public INodalBC
     NodalBC_3D_inflow() = delete;
     
     // The dirichlet nodes on each inlet surface
-    // length num_nbc x num_dir_nodes_on_inlet[ii]
+    // length num_nbc x get_num_dir_nodes_on_inlet(ii)
     std::vector< std::vector<unsigned int> > dir_nodes_on_inlet;
-    std::vector<unsigned int> num_dir_nodes_on_inlet;
 
-    // All dirichlet nodes stored in a row and the total number of dirichlet
-    // nodes
+    // All dirichlet nodes stored in a row
     std::vector<unsigned int> dir_nodes;
-    unsigned int num_dir_nodes;
 
     // number of inlet surfaces and element type
     const int num_nbc;
@@ -185,7 +183,7 @@ class NodalBC_3D_inflow : public INodalBC
     std::vector< std::vector<double> > intNA;
 
     // number of nodes and cells on each surface. Length num_nbc.
-    // Note: num_node[ii] does not equal num_dir_nodes[ii] in this class.
+    // Note: num_node[ii] does not equal get_num_dir_nodes_on_inlet(ii).
     // nLocBas[ii] is 3, 6, 4 or 9.
     std::vector<int> num_node, num_cell, nLocBas;
 

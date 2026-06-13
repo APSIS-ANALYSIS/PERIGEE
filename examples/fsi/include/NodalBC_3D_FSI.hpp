@@ -46,13 +46,13 @@ class NodalBC_3D_FSI : public INodalBC
       return 0;
     }
 
-    virtual unsigned int get_num_dir_nodes() const {return num_dir_nodes;}
+    virtual unsigned int get_num_dir_nodes() const
+    {return static_cast<unsigned int>(dir_nodes.size());}
 
     virtual unsigned int get_num_per_nodes() const {return 0;}
 
   private:
     std::vector<unsigned int> dir_nodes;
-    unsigned int num_dir_nodes;
 
     NodalBC_3D_FSI() {};
 
