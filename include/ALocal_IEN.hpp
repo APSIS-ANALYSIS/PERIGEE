@@ -61,9 +61,9 @@ class ALocal_IEN
     
     virtual std::vector<int> get_LIEN( int ee ) const
     {
-      std::vector<int> elem_ien(nLocBas, 0);
-      for(int ii=0; ii<nLocBas; ++ii) elem_ien[ii] = LIEN[ee * nLocBas + ii];
-    
+      std::vector<int> elem_ien(nLocBas);
+      std::copy_n(LIEN.cbegin() + ee * nLocBas, nLocBas, elem_ien.begin());
+
       return elem_ien;
     }
 
@@ -73,7 +73,7 @@ class ALocal_IEN
     // ------------------------------------------------------------------------
     virtual void get_LIEN(int ee, int * const &elem_ien) const
     {
-      for(int ii=0; ii<nLocBas; ++ii) elem_ien[ii] = LIEN[ee * nLocBas + ii];
+      std::copy_n(LIEN.cbegin() + ee * nLocBas, nLocBas, elem_ien);
     }
 
     // ------------------------------------------------------------------------
@@ -85,9 +85,9 @@ class ALocal_IEN
     // ------------------------------------------------------------------------
     virtual bool isNode_in_Elem(int elem, int node) const
     {
-      const std::vector<int> eIEN = get_LIEN( elem );
-      std::vector<int>::const_iterator it = std::find(eIEN.begin(), eIEN.end(), node);
-      return (it != eIEN.end());
+      const auto elem_begin = LIEN.cbegin() + elem * nLocBas;
+      const auto elem_end = elem_begin + nLocBas;
+      return std::find(elem_begin, elem_end, node) != elem_end;
     }
 
     // ------------------------------------------------------------------------
