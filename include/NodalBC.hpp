@@ -94,6 +94,11 @@ class NodalBC : public INodalBC
     
     NodalBC() = delete;
 
+    // Read GlobalNodeID from a VTK file, apply an optional offset,
+    // validate each node, and append it to dir_nodes.
+    void append_dir_nodes( const std::string &vtkfile,
+        const int &nFunc, const int &node_offset = 0 );
+
     // --------------------------------------------------------------
     // BC_type_1 is a master-slave driven implementation. It is 
     // identical to the NodalBC(vtkfilelist, nFunc, master_idx),

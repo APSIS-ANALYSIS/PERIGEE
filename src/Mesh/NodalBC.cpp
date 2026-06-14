@@ -20,20 +20,8 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_slave_nodes.clear();
   per_master_nodes.clear();
 
-  for( int ii{0}; ii < VEC_T::get_size(vtkfileList); ++ii )
-  {
-    const auto vtkfile = vtkfileList[ii];
-    SYS_T::file_check( vtkfile );
-
-    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
-  
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
-
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-    }
-  }
+  for( const auto &vtkfile : vtkfileList )
+    append_dir_nodes( vtkfile, nFunc );
   
   VEC_T::sort_unique_resize(dir_nodes);
 
@@ -53,20 +41,8 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_slave_nodes.clear();
   per_master_nodes.clear();
 
-  for( int ii{0}; ii < VEC_T::get_size(vtkfileList); ++ii )
-  {
-    const auto vtkfile = vtkfileList[ii];
-    SYS_T::file_check( vtkfile );
-
-    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
-
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
-
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-    }
-  }
+  for( const auto &vtkfile : vtkfileList )
+    append_dir_nodes( vtkfile, nFunc );
 
   VEC_T::sort_unique_resize(dir_nodes);
 
@@ -111,36 +87,14 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_master_nodes.clear();
 
   for( const auto &vtkfile : vtkfileList )
-  {
-    SYS_T::file_check( vtkfile );
-
-    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
-  
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
-
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-    }
-  }
+    append_dir_nodes( vtkfile, nFunc );
   
   // Prepare the numbers that need to be shifted
-  SYS_T::file_check( rotated_file ); 
   SYS_T::file_check( fixed_file );  
 
   const int fixed_nFunc = VTK_T::read_num_pt(fixed_file);
 
-  auto rot_gnode = VTK_T::read_int_PointData(rotated_file, "GlobalNodeID");
-
-  for(int &nodeid : rot_gnode)
-    nodeid += fixed_nFunc;
-
-  for(unsigned int jj=0; jj<rot_gnode.size(); ++jj)
-  {
-    SYS_T::print_fatal_if( rot_gnode[jj]<0 || rot_gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", rot_gnode[jj], nFunc);
-
-    dir_nodes.push_back( static_cast<unsigned int>( rot_gnode[jj]) );
-  }
+  append_dir_nodes( rotated_file, nFunc, fixed_nFunc );
 
   VEC_T::sort_unique_resize(dir_nodes);
 
@@ -164,49 +118,15 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   per_master_nodes.clear();
 
   for( const auto &vtkfile : vtkfileList )
-  {
-    SYS_T::file_check( vtkfile );
-
-    const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
-  
-    for(unsigned int jj=0; jj<gnode.size(); ++jj)
-    {
-      SYS_T::print_fatal_if( gnode[jj]<0 || gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[jj], nFunc);
-
-      dir_nodes.push_back( static_cast<unsigned int>( gnode[jj]) );
-    }
-  }
+    append_dir_nodes( vtkfile, nFunc );
   
   // Prepare the numbers that need to be shifted
-  // SYS_T::file_check( rotated_file );
-  SYS_T::file_check( rotated_wall_file ); 
   SYS_T::file_check( fixed_file );  
 
   const int fixed_nFunc = VTK_T::read_num_pt(fixed_file);
 
-  auto rot_gnode = VTK_T::read_int_PointData(rotated_file, "GlobalNodeID");
-
-  for(int &nodeid : rot_gnode)
-    nodeid += fixed_nFunc;
-
-  auto rot_wall_gnode = VTK_T::read_int_PointData(rotated_wall_file, "GlobalNodeID");
-
-  for(int &nodeid : rot_wall_gnode)
-    nodeid += fixed_nFunc;
-
-  for(unsigned int jj=0; jj<rot_gnode.size(); ++jj)
-  {
-    SYS_T::print_fatal_if( rot_gnode[jj]<0 || rot_gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", rot_gnode[jj], nFunc);
-
-    dir_nodes.push_back( static_cast<unsigned int>( rot_gnode[jj]) );
-  }
-
-  for(unsigned int jj=0; jj<rot_wall_gnode.size(); ++jj)
-  {
-    SYS_T::print_fatal_if( rot_wall_gnode[jj]<0 || rot_wall_gnode[jj]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", rot_wall_gnode[jj], nFunc);
-
-    dir_nodes.push_back( static_cast<unsigned int>( rot_wall_gnode[jj]) );
-  }
+  append_dir_nodes( rotated_file, nFunc, fixed_nFunc );
+  append_dir_nodes( rotated_wall_file, nFunc, fixed_nFunc );
 
   VEC_T::sort_unique_resize(dir_nodes);
 
@@ -249,6 +169,25 @@ NodalBC::NodalBC( const std::vector<std::string> &vtkfileList,
   std::cout<<"===> NodalBC, type = "<<type<<" is generated.\n";
 }
 
+void NodalBC::append_dir_nodes( const std::string &vtkfile,
+    const int &nFunc, const int &node_offset )
+{
+  SYS_T::file_check( vtkfile );
+
+  const auto gnode = VTK_T::read_int_PointData(vtkfile, "GlobalNodeID");
+
+  for( const int &node : gnode )
+  {
+    const int node_id = node + node_offset;
+
+    SYS_T::print_fatal_if( node_id < 0 || node_id >= nFunc,
+        "Error: the nodal index %d is not in the range [0, %d)! \n",
+        node_id, nFunc);
+
+    dir_nodes.push_back( static_cast<unsigned int>( node_id ) );
+  }
+}
+
 void NodalBC::BC_type_1( const std::vector<std::string> &vtkfileList,
     const int &nFunc )
 {
@@ -277,21 +216,11 @@ void NodalBC::BC_type_2( const std::vector<std::string> &vtkfileList,
 {
   SYS_T::print_fatal_if(vtkfileList.size() != 2, "Error: NodalBC::BC_type_2 the number of vtk files is wrong. \n");
 
-  SYS_T::file_check( vtkfileList[0] );
-
-  std::vector<int> gnode = VTK_T::read_int_PointData(vtkfileList[0], "GlobalNodeID");
-
-  dir_nodes.resize( gnode.size() );
-  for(unsigned int ii=0; ii<gnode.size(); ++ii)
-  {
-    SYS_T::print_fatal_if( gnode[ii]<0 || gnode[ii]>=nFunc, "Error: the nodal index %d is not in the range [0, %d)! \n", gnode[ii], nFunc);
-
-    dir_nodes[ii] = static_cast<unsigned int>( gnode[ii] );
-  }
+  append_dir_nodes( vtkfileList[0], nFunc );
 
   SYS_T::file_check( vtkfileList[1] );
 
-  gnode = VTK_T::read_int_PointData(vtkfileList[1], "GlobalNodeID");
+  const auto gnode = VTK_T::read_int_PointData(vtkfileList[1], "GlobalNodeID");
 
   for(unsigned int jj=1; jj<gnode.size(); ++jj)
   {
