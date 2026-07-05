@@ -59,30 +59,20 @@ void VTK_Writer_NS::writeOutput(
   
     std::vector<double> inputInfo; inputInfo.clear();
     
-    // Interpolating pressure
-    int asize = vdata_ptr -> get_arraySizes(0);
-
-    for(int jj=0; jj<nLocBas; ++jj)
+    for(int array_id=0; array_id<numDArrays; ++array_id)
     {
-      int pt_index = IEN_e[jj];
-      for(int kk=0; kk<asize; ++kk)
-        inputInfo.push_back( pointArrays[0][pt_index * asize + kk] );
-    }
- 
-    Interp::VTKData( asize, &IEN_e[0], &inputInfo[0],
-        elemptr, dataVecs[0] ); 
+      inputInfo.clear();
+      const int asize = vdata_ptr->get_arraySizes(array_id);
 
-    // Interpolate velocity vector
-    inputInfo.clear();
-    asize = vdata_ptr->get_arraySizes(1);
-    for(int jj=0; jj<nLocBas; ++jj)
-    {
-      int pt_index = IEN_e[jj];
-      for(int kk=0; kk<asize; ++kk)
-        inputInfo.push_back( pointArrays[1][pt_index * asize + kk ] );
+      for(int jj=0; jj<nLocBas; ++jj)
+      {
+        const int pt_index = IEN_e[jj];
+        for(int kk=0; kk<asize; ++kk)
+          inputInfo.push_back(pointArrays[array_id][pt_index * asize + kk]);
+      }
+
+      Interp::VTKData(asize, &IEN_e[0], &inputInfo[0], elemptr, dataVecs[array_id]);
     }
-    Interp::VTKData( asize, &IEN_e[0], &inputInfo[0],
-        elemptr, dataVecs[1] );
 
     // Set mesh connectivity
     if( elemptr->get_Type() == FEType::Tet4 )

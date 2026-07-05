@@ -33,6 +33,12 @@ class PNonlinear_NS_Solver
 
     int get_non_max_its() const {return nmaxits;}
 
+    double get_alpha_f() const { return tmga->get_alpha_f(); }
+
+    double get_alpha_m() const { return tmga->get_alpha_m(); }
+
+    double get_gamma() const { return tmga->get_gamma(); }
+
     void print_info() const;
 
     void print_lsolver_info() const {lsolver->print_info();}

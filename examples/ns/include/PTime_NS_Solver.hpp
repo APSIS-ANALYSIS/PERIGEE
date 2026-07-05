@@ -9,7 +9,10 @@
 // Date: May 23 2017
 // ==================================================================
 #include "PDNTimeStep.hpp"
+#include "HITools.hpp"
 #include "PNonlinear_NS_Solver.hpp"
+#include "PGAssem_Transport_NS_FEM.hpp"
+#include "PLinear_Solver_PETSc.hpp"
 
 class PTime_NS_Solver
 {
@@ -65,6 +68,21 @@ class PTime_NS_Solver
         IGenBC * const &gbc, 
         IPGAssem * const &gassem_ptr ) const;
 
+    void TM_NS_Transport_GenAlpha(
+        const bool &restart_init_assembly_flag,
+        std::unique_ptr<PDNSolution> init_dot_sol,
+        std::unique_ptr<PDNSolution> init_sol,
+        std::unique_ptr<PDNSolution> init_dot_transport,
+        std::unique_ptr<PDNSolution> init_transport,
+        std::unique_ptr<PDNTimeStep> time_info,
+        const ALocal_InflowBC * const &infnbc_part,
+        IGenBC * const &gbc,
+        IPGAssem * const &gassem_ptr,
+        PGAssem_Transport_NS_FEM * const &transport_gassem,
+        PLinear_Solver_PETSc * const &transport_lsolver,
+        const std::string &transport_name,
+        const double &fluid_density ) const;
+
   private:
     const double final_time;
     const int sol_record_freq; // the frequency for writing solutions
@@ -82,6 +100,42 @@ class PTime_NS_Solver
     {
       return "dot_" + pb_name + SYS_T::fixed_length_index(counter);
     }
+
+    std::string Transport_Name_Generator(
+        const std::string &base_name, const int &counter ) const
+    {
+      return base_name + SYS_T::fixed_length_index(counter);
+    }
+
+    std::string Transport_Name_dot_Generator(
+        const std::string &base_name, const int &counter ) const
+    {
+      return "dot_" + base_name + SYS_T::fixed_length_index(counter);
+    }
+
+    std::string Outlet_HI_Name_Generator(const int &id) const
+    {
+      return "OutletHI_" + SYS_T::fixed_length_index(id, 3) + "_data.txt";
+    }
+
+    void write_transport_solution(
+        const PDNSolution * const &transport_sol,
+        const std::string &file_name,
+        const PGAssem_Transport_NS_FEM * const &transport_gassem ) const;
+
+  public:
+    void record_outlet_HI_data(
+        const PDNSolution * const &flow_sol,
+        const PDNSolution * const &transport_sol,
+        const PDNTimeStep * const &time_info,
+        IGenBC * const &gbc,
+        const IPGAssem * const &gassem_ptr,
+        const PGAssem_Transport_NS_FEM * const &transport_gassem,
+        const double &fluid_density,
+        bool is_driver,
+        bool is_restart ) const;
+
+  private:
 
     void Write_restart_file(const PDNTimeStep * const &timeinfo,
         const std::string &solname ) const;

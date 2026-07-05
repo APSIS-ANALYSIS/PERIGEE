@@ -12,8 +12,12 @@
 #include "ANL_Tools.hpp"
 #include "FlowRateFactory.hpp"
 #include "GenBCFactory.hpp"
+#include "HIModelFactory.hpp"
+#include "HITools.hpp"
 #include "InitHelpers.hpp"
+#include "PLocAssem_Transport_VMS_NS_GenAlpha.hpp"
 #include "PLocAssem_VMS_NS_GenAlpha_WeakBC.hpp"
+#include "PGAssem_Transport_NS_FEM.hpp"
 #include "PGAssem_NS_FEM.hpp"
 #include "PTime_NS_Solver.hpp"
 
@@ -69,6 +73,12 @@ int main(int argc, char *argv[])
   std::string sol_bName("SOL_"); // base name of the solution file
   int ttan_renew_freq = 1;   // frequency of tangent matrix renewal
   int sol_record_freq = 1;   // frequency of recording the solution
+
+  // Optional weakly coupled scalar transport solve
+  bool is_transport = false;
+  double transport_ct = 1.0;
+  std::string transport_name("TRNS_");
+  std::string hi_model_name("none");
 
   // Restart options
   bool is_restart = false;
@@ -127,6 +137,10 @@ int main(int argc, char *argv[])
   SYS_T::GetOptionInt("-ttan_freq", ttan_renew_freq);
   SYS_T::GetOptionInt("-sol_rec_freq", sol_record_freq);
   SYS_T::GetOptionString("-sol_name", sol_bName);
+  SYS_T::GetOptionBool("-is_transport", is_transport);
+  SYS_T::GetOptionReal("-transport_ct", transport_ct);
+  SYS_T::GetOptionString("-transport_name", transport_name);
+  SYS_T::GetOptionString("-hi_model", hi_model_name);
   SYS_T::GetOptionBool("-is_restart", is_restart);
   SYS_T::GetOptionInt("-restart_index", restart_index);
   SYS_T::GetOptionReal("-restart_time", restart_time);
@@ -164,6 +178,11 @@ int main(int argc, char *argv[])
   SYS_T::cmdPrint("-ttan_freq:", ttan_renew_freq);
   SYS_T::cmdPrint("-sol_rec_freq:", sol_record_freq);
   SYS_T::cmdPrint("-sol_name:", sol_bName);
+  SYS_T::cmdPrint("-transport_ct:", transport_ct);
+  SYS_T::cmdPrint("-transport_name:", transport_name);
+  SYS_T::cmdPrint("-hi_model:", hi_model_name);
+  if(is_transport) SYS_T::commPrint("-is_transport: true \n");
+  else SYS_T::commPrint("-is_transport: false \n");
   if(is_restart)
   {
     SYS_T::commPrint("-is_restart: true \n");
@@ -174,6 +193,9 @@ int main(int argc, char *argv[])
   }
   else SYS_T::commPrint("-is_restart: false \n");
 
+  std::unique_ptr<IHIModel> restart_hi_model = nullptr;
+  if( is_transport ) restart_hi_model = HIModelFactory::createModel(hi_model_name);
+
   // ===== Record important solver options =====
   if(rank == 0)
   {
@@ -183,8 +205,14 @@ int main(int argc, char *argv[])
     cmdh5w->write_doubleScalar("fl_mu", fluid_mu);
     cmdh5w->write_doubleScalar("init_step", initial_step);
     cmdh5w->write_intScalar("sol_record_freq", sol_record_freq);
+    cmdh5w->write_intScalar("is_transport", is_transport ? 1 : 0);
     cmdh5w->write_string("lpn_file", lpn_file);
     cmdh5w->write_string("inflow_file", inflow_file);
+    cmdh5w->write_string("sol_bName", sol_bName);
+    cmdh5w->write_string("transport_name", transport_name);
+    cmdh5w->write_string("hi_model", hi_model_name);
+    cmdh5w->write_doubleScalar("hi_beta",
+        restart_hi_model == nullptr ? 1.0 : restart_hi_model->get_beta());
   }
 
   MPI_Barrier(PETSC_COMM_WORLD);
@@ -280,6 +308,41 @@ int main(int argc, char *argv[])
       restart_index, restart_time, restart_step, restart_name, 
       sol, dot_sol, initial_index, initial_time, initial_step);
 
+  std::unique_ptr<PDNSolution> transport_sol = nullptr;
+  std::unique_ptr<PDNSolution> transport_dot_sol = nullptr;
+  std::unique_ptr<PGAssem_Transport_NS_FEM> transport_gassem = nullptr;
+  std::unique_ptr<PLinear_Solver_PETSc> transport_lsolver = nullptr;
+
+  if( is_transport )
+  {
+    transport_sol = SYS_T::make_unique<PDNSolution>( pNode.get(), 1 );
+    transport_dot_sol = SYS_T::make_unique<PDNSolution>( pNode.get(), 1 );
+    VecSet(transport_sol->solution, 0.0);
+    transport_sol->Assembly_GhostUpdate();
+    VecSet(transport_dot_sol->solution, 0.0);
+    transport_dot_sol->Assembly_GhostUpdate();
+
+    if( is_restart )
+    {
+      const std::string transport_restart_name =
+          transport_name + SYS_T::fixed_length_index(restart_index);
+      const std::string dot_transport_restart_name =
+          "dot_" + transport_name + SYS_T::fixed_length_index(restart_index);
+
+      if( SYS_T::file_exist(transport_restart_name) )
+      {
+        transport_sol->ReadBinary(transport_restart_name);
+        if( restart_hi_model != nullptr )
+          HI_T::convert_HI_to_D(transport_sol.get(), restart_hi_model->get_beta());
+      }
+
+      if( SYS_T::file_exist(dot_transport_restart_name) )
+      {
+        transport_dot_sol->ReadBinary(dot_transport_restart_name);
+      }
+    }
+  }
+
   // ===== Global assembly =====
   SYS_T::commPrint("===> Initializing Mat K and Vec G ... \n");
   std::unique_ptr<IPGAssem> gloAssem = SYS_T::make_unique<PGAssem_NS_FEM>( 
@@ -293,6 +356,33 @@ int main(int argc, char *argv[])
   SYS_T::commPrint("===> Matrix nonzero structure fixed. \n");
   gloAssem->Fix_nonzero_err_str();
   gloAssem->Clear_KG();
+
+  if( is_transport )
+  {
+    auto transport_locIEN = SYS_T::make_unique<ALocal_IEN>(part_file, rank);
+    auto transport_locElem = SYS_T::make_unique<ALocal_Elem>(part_file, rank);
+    auto transport_fNode = SYS_T::make_unique<FEANode>(part_file, rank);
+    auto transport_pNode = SYS_T::make_unique<APart_Node>(part_file, rank);
+    auto transport_locebc = SYS_T::make_unique<ALocal_EBC_outflow>(part_file, rank);
+    auto transport_locAssem =
+      SYS_T::make_unique<PLocAssem_Transport_VMS_NS_GenAlpha>(
+          ANL_T::get_elemType(part_file, rank), nqp_vol, transport_ct,
+          fluid_mu, tm_galpha.get(), std::move(restart_hi_model) );
+
+    transport_gassem = SYS_T::make_unique<PGAssem_Transport_NS_FEM>(
+        locinfnbc.get(), std::move(transport_locebc),
+        std::move(transport_locIEN), std::move(transport_locElem),
+        std::move(transport_fNode), std::move(transport_pNode),
+        ANL_T::get_elemType(part_file, rank), nqp_sur,
+        std::move(transport_locAssem), nz_estimate );
+
+    transport_gassem->Fix_nonzero_err_str();
+    transport_gassem->Clear_KG();
+
+    transport_lsolver = SYS_T::make_unique<PLinear_Solver_PETSc>(
+        1.0e-5, 1.0e-50, 1.0e50, 10000,
+        "transport_", "transport_" );
+  }
 
   // ===== Initialize the dot_sol vector by solving mass matrix =====
   NS_INIT::initialize_dot_solution(gloAssem.get(), sol.get(), dot_sol.get(), is_restart);
@@ -335,10 +425,27 @@ int main(int argc, char *argv[])
   tsolver->record_inlet_data(sol.get(), timeinfo.get(), locinfnbc.get(), 
       gloAssem.get(), true, is_restart);
 
+  if( is_transport && transport_gassem->has_hi_model() )
+  {
+    tsolver->record_outlet_HI_data(sol.get(), transport_sol.get(), timeinfo.get(),
+        gbc.get(), gloAssem.get(), transport_gassem.get(), fluid_density,
+        true, is_restart);
+  }
+
   // ===== FEM analysis =====
   SYS_T::commPrint("===> Start Finite Element Analysis:\n");
-  tsolver->TM_NS_GenAlpha(is_restart, std::move(dot_sol), std::move(sol), 
-      std::move(timeinfo), locinfnbc.get(), gbc.get(), gloAssem.get() );
+  if( is_transport )
+  {
+    tsolver->TM_NS_Transport_GenAlpha(is_restart, std::move(dot_sol), std::move(sol),
+        std::move(transport_dot_sol), std::move(transport_sol), std::move(timeinfo),
+        locinfnbc.get(), gbc.get(), gloAssem.get(), transport_gassem.get(),
+        transport_lsolver.get(), transport_name, fluid_density );
+  }
+  else
+  {
+    tsolver->TM_NS_GenAlpha(is_restart, std::move(dot_sol), std::move(sol),
+        std::move(timeinfo), locinfnbc.get(), gbc.get(), gloAssem.get() );
+  }
 
   // ===== Print complete solver info =====
   tsolver -> print_lsolver_info();

@@ -1,5 +1,22 @@
 #include "PTime_NS_Solver.hpp"
 
+void PTime_NS_Solver::write_transport_solution(
+    const PDNSolution * const &transport_sol,
+    const std::string &file_name,
+    const PGAssem_Transport_NS_FEM * const &transport_gassem ) const
+{
+  if(transport_gassem->has_hi_model())
+  {
+    PDNSolution hi_sol(*transport_sol);
+    HI_T::convert_D_to_HI(&hi_sol, transport_gassem->get_hi_beta());
+    hi_sol.WriteBinary(file_name);
+  }
+  else
+  {
+    transport_sol->WriteBinary(file_name);
+  }
+}
+
 PTime_NS_Solver::PTime_NS_Solver(
     std::unique_ptr<PNonlinear_NS_Solver> in_nsolver,
     const std::string &input_name,
@@ -115,6 +132,176 @@ void PTime_NS_Solver::TM_NS_GenAlpha(
     // Prepare for next time step
     pre_sol->Copy(*cur_sol);
     pre_dot_sol->Copy(*cur_dot_sol);
+  }
+}
+
+void PTime_NS_Solver::TM_NS_Transport_GenAlpha(
+    const bool &restart_init_assembly_flag,
+    std::unique_ptr<PDNSolution> init_dot_sol,
+    std::unique_ptr<PDNSolution> init_sol,
+    std::unique_ptr<PDNSolution> init_dot_transport,
+    std::unique_ptr<PDNSolution> init_transport,
+    std::unique_ptr<PDNTimeStep> time_info,
+    const ALocal_InflowBC * const &infnbc_part,
+    IGenBC * const &gbc,
+    IPGAssem * const &gassem_ptr,
+    PGAssem_Transport_NS_FEM * const &transport_gassem,
+    PLinear_Solver_PETSc * const &transport_lsolver,
+    const std::string &transport_name,
+    const double &fluid_density ) const
+{
+  auto pre_sol = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto cur_sol = SYS_T::make_unique<PDNSolution>(*init_sol);
+  auto pre_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+  auto cur_dot_sol = SYS_T::make_unique<PDNSolution>(*init_dot_sol);
+
+  auto pre_transport = SYS_T::make_unique<PDNSolution>(*init_transport);
+  auto cur_transport = SYS_T::make_unique<PDNSolution>(*init_transport);
+  auto pre_dot_transport = SYS_T::make_unique<PDNSolution>(*init_dot_transport);
+  auto cur_dot_transport = SYS_T::make_unique<PDNSolution>(*init_dot_transport);
+
+  if(restart_init_assembly_flag == false)
+  {
+    cur_sol->WriteBinary(Name_Generator(time_info->get_index()));
+    cur_dot_sol->WriteBinary(Name_dot_Generator(time_info->get_index()));
+    write_transport_solution(cur_transport.get(),
+        Transport_Name_Generator(transport_name, time_info->get_index()),
+        transport_gassem);
+    cur_dot_transport->WriteBinary(Transport_Name_dot_Generator(transport_name, time_info->get_index()));
+  }
+
+  bool renew_flag;
+  int nl_counter = 0;
+  bool rest_flag = restart_init_assembly_flag;
+
+  const double alpha_f = nsolver->get_alpha_f();
+  const double alpha_m = nsolver->get_alpha_m();
+  const double gamma = nsolver->get_gamma();
+
+  SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
+      time_info->get_time(), time_info->get_step(), time_info->get_index(),
+      SYS_T::get_time().c_str());
+
+  while( time_info->get_time() < final_time )
+  {
+    if(time_info->get_index() % renew_tang_freq == 0 || rest_flag )
+    {
+      renew_flag = true;
+      rest_flag = false;
+    }
+    else renew_flag = false;
+
+    if( nl_counter == 1 ) renew_flag = false;
+
+    nl_counter = nsolver->GenAlpha_Solve_NS( renew_flag,
+        time_info->get_time(), time_info->get_step(), pre_dot_sol.get(),
+        pre_sol.get(), cur_dot_sol.get(), cur_sol.get(), infnbc_part,
+        gbc, gassem_ptr );
+
+    // Predictor for the scalar transport equation.
+    cur_transport->Copy(*pre_transport);
+    cur_dot_transport->Copy(*pre_dot_transport);
+    cur_dot_transport->ScaleValue((gamma - 1.0) / gamma);
+
+    PDNSolution dot_transport_alpha(*pre_dot_transport);
+    dot_transport_alpha.ScaleValue(1.0 - alpha_m);
+    dot_transport_alpha.PlusAX(*cur_dot_transport, alpha_m);
+
+    PDNSolution transport_alpha(*pre_transport);
+    transport_alpha.ScaleValue(1.0 - alpha_f);
+    transport_alpha.PlusAX(*cur_transport, alpha_f);
+
+    PDNSolution flow_alpha(*pre_sol);
+    flow_alpha.ScaleValue(1.0 - alpha_f);
+    flow_alpha.PlusAX(*cur_sol, alpha_f);
+
+    transport_gassem->Clear_KG();
+    transport_gassem->Assem_tangent_residual(
+        &dot_transport_alpha, &transport_alpha, &flow_alpha,
+        time_info->get_time(), time_info->get_step() );
+
+    transport_lsolver->SetOperator(transport_gassem->K);
+
+    PDNSolution transport_step(pre_transport.get());
+    transport_lsolver->Solve(transport_gassem->G, &transport_step);
+
+    cur_dot_transport->PlusAX(&transport_step, -1.0);
+    cur_transport->PlusAX(&transport_step, -gamma * time_info->get_step());
+
+    time_info->TimeIncrement();
+
+    SYS_T::commPrint("Time = %e, dt = %e, index = %d, %s \n",
+        time_info->get_time(), time_info->get_step(), time_info->get_index(),
+        SYS_T::get_time().c_str());
+
+    if( time_info->get_index()%sol_record_freq == 0 )
+    {
+      cur_sol->WriteBinary(Name_Generator(time_info->get_index()));
+      cur_dot_sol->WriteBinary(Name_dot_Generator(time_info->get_index()));
+      write_transport_solution(cur_transport.get(),
+          Transport_Name_Generator(transport_name, time_info->get_index()),
+          transport_gassem);
+      cur_dot_transport->WriteBinary(Transport_Name_dot_Generator(transport_name, time_info->get_index()));
+    }
+
+    record_outlet_data(cur_sol.get(), cur_dot_sol.get(), time_info.get(), gbc, gassem_ptr, false, true);
+    record_inlet_data(cur_sol.get(), time_info.get(), infnbc_part, gassem_ptr, false, true);
+    record_outlet_HI_data(cur_sol.get(), cur_transport.get(), time_info.get(), gbc,
+        gassem_ptr, transport_gassem, fluid_density, false, true);
+
+    pre_sol->Copy(*cur_sol);
+    pre_dot_sol->Copy(*cur_dot_sol);
+    pre_transport->Copy(*cur_transport);
+    pre_dot_transport->Copy(*cur_dot_transport);
+  }
+}
+
+void PTime_NS_Solver::record_outlet_HI_data(
+    const PDNSolution * const &flow_sol,
+    const PDNSolution * const &transport_sol,
+    const PDNTimeStep * const &time_info,
+    IGenBC * const &gbc,
+    const IPGAssem * const &gassem_ptr,
+    const PGAssem_Transport_NS_FEM * const &transport_gassem,
+    const double &fluid_density,
+    bool is_driver,
+    bool is_restart ) const
+{
+  if(transport_gassem == nullptr || !transport_gassem->has_hi_model()) return;
+
+  auto mode = is_restart ? std::ofstream::app : std::ofstream::trunc;
+
+  for(int ff=0; ff<gbc->get_num_ebc(); ++ff)
+  {
+    const double flowrate = gassem_ptr->Assem_surface_flowrate(flow_sol, ff);
+    const double hi_area_int = transport_gassem->Assem_surface_HI_integral(transport_sol, ff);
+    const double hi_flux_int = fluid_density
+        * transport_gassem->Assem_surface_HI_flowrate(transport_sol, flow_sol, ff);
+    const double hi_ave = std::abs(flowrate) > 1.0e-14
+        ? hi_flux_int / (fluid_density * flowrate) : 0.0;
+
+    if( SYS_T::get_MPI_rank() == 0 )
+    {
+      std::ofstream ofile;
+      ofile.open(Outlet_HI_Name_Generator(ff).c_str(), std::ofstream::out | mode);
+
+      if( !is_driver )
+      {
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+             <<flowrate<<'\t'<<hi_area_int<<'\t'<<hi_flux_int<<'\t'<<hi_ave<<std::endl;
+      }
+      else if( !is_restart )
+      {
+        ofile<<"Time index"<<'\t'<<"Time"<<'\t'<<"Flow rate"<<'\t'
+             <<"HI surface integral"<<'\t'<<"HI flux integral"<<'\t'
+             <<"Flow-weighted HI"<<'\n';
+        ofile<<time_info->get_index()<<'\t'<<time_info->get_time()<<'\t'
+             <<flowrate<<'\t'<<hi_area_int<<'\t'<<hi_flux_int<<'\t'<<hi_ave<<std::endl;
+      }
+
+      ofile.close();
+    }
+    MPI_Barrier(PETSC_COMM_WORLD);
   }
 }
 

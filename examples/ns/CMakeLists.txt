@@ -112,6 +112,8 @@ SET( perigee_analysis_lib_src
   ${perigee_SOURCE_DIR}/src/PDNSolution_NS.cpp
   ${perigee_SOURCE_DIR}/src/PNonlinear_NS_Solver.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_Solver.cpp
+  ${perigee_SOURCE_DIR}/src/PLocAssem_Transport_VMS_NS_GenAlpha.cpp
+  ${perigee_SOURCE_DIR}/src/PGAssem_Transport_NS_FEM.cpp
   ${perigee_SOURCE_DIR}/src/PLocAssem_Block_VMS_NS_HERK.cpp
   ${perigee_SOURCE_DIR}/src/PGAssem_Block_NS_FEM_HERK.cpp
   ${perigee_SOURCE_DIR}/src/PTime_NS_HERK_Solver.cpp

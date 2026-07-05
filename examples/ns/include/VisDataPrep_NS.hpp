@@ -13,13 +13,13 @@
 class VisDataPrep_NS : public IVisDataPrep
 {
   public:
-    VisDataPrep_NS();
+    VisDataPrep_NS(const bool &in_is_transport = false);
 
     virtual ~VisDataPrep_NS() = default;
 
     // Return the number of physical fields to be read from solution
     // vector
-    virtual int get_ptarray_size() const {return 2;}
+    virtual int get_ptarray_size() const {return is_transport ? 3 : 2;}
    
     // Return the number of components for each physical field
     virtual int get_ptarray_comp_length( const int &ii ) const
@@ -32,7 +32,15 @@ class VisDataPrep_NS : public IVisDataPrep
         const APart_Node * const &nNode_ptr,
         double ** &solArrays ) const;
 
+    virtual void get_pointArray(
+        const std::vector<std::string> solution_file_names,
+        const std::vector<int> &analysis_node_mapping,
+        const std::vector<int> &post_node_mapping,
+        const APart_Node * const &nNode_ptr,
+        double ** &solArrays ) const;
+
   private:
+    const bool is_transport;
     std::vector<int> pt_array_len;
 };
 

@@ -6,6 +6,7 @@
 // Author: Ju Liu, liujuy@gmail.com
 // Date Created: Feb. 12 2020
 // ============================================================================
+#include "HDF5_Reader.hpp"
 #include "AGlobal_Mesh_Info.hpp"
 #include "ANL_Tools.hpp"
 #include "APart_Node.hpp"
@@ -20,12 +21,21 @@ int main( int argc, char * argv[] )
   const std::string part_file="postpart";
   
   std::string sol_bname("SOL_");
+  std::string hi_bname("TRNS_");
   std::string out_bname = sol_bname;
   int time_start = 0, time_step = 1, time_end = 1;
   bool isXML = true, isRestart = false;
+  bool is_transport = false;
 
   // Read analysis code parameter if the solver_cmd.h5 exists
-  double dt = HDF5_T::read_doubleScalar("solver_cmd.h5", "/", "init_step"); 
+  double dt = 1.0e-3;
+  if( SYS_T::file_exist("solver_cmd.h5") )
+  {
+    auto cmd_h5r = SYS_T::make_unique<HDF5_Reader>("solver_cmd.h5");
+    dt = cmd_h5r->read_doubleScalar("/", "init_step");
+    is_transport = cmd_h5r->read_intScalar("/", "is_transport") == 1;
+    hi_bname = cmd_h5r->read_string("/", "transport_name");
+  }
 
   // ===== Initialize the MPI run =====
 #if PETSC_VERSION_LT(3,19,0)
@@ -42,12 +52,14 @@ int main( int argc, char * argv[] )
   SYS_T::GetOptionInt("-time_end", time_end);
   SYS_T::GetOptionReal("-dt", dt);
   SYS_T::GetOptionString("-sol_bname", sol_bname);
+  SYS_T::GetOptionString("-hi_bname", hi_bname);
   SYS_T::GetOptionString("-out_bname", out_bname);
   SYS_T::GetOptionBool("-xml", isXML);
   SYS_T::GetOptionBool("-restart", isRestart);
   
   SYS_T::commPrint("=== Command line arguments ===\n");
   SYS_T::cmdPrint("-sol_bname:", sol_bname);
+  SYS_T::cmdPrint("-hi_bname:", hi_bname);
   SYS_T::cmdPrint("-out_bname:", out_bname);
   SYS_T::cmdPrint("-time_start:", time_start);
   SYS_T::cmdPrint("-time_step:", time_step);
@@ -58,6 +70,8 @@ int main( int argc, char * argv[] )
 
   if(isRestart) SYS_T::commPrint("-restart: true \n");
   else SYS_T::commPrint("-restart: false \n");
+  if(is_transport) SYS_T::commPrint("-is_transport: true \n");
+  else SYS_T::commPrint("-is_transport: false \n");
   SYS_T::commPrint("==============================\n");
   
   // Clean the visualization files if not restart
@@ -92,7 +106,7 @@ int main( int argc, char * argv[] )
   quad -> print_info();
 
   // Create the visualization data object
-  std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_NS>();
+  std::unique_ptr<IVisDataPrep> visprep = SYS_T::make_unique<VisDataPrep_NS>(is_transport);
 
   visprep->print_info();
  
@@ -115,8 +129,22 @@ int main( int argc, char * argv[] )
     SYS_T::commPrint("Time %d: Read %s and Write %s \n",
         time, name_to_read.c_str(), name_to_write.c_str() );
 
-    visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
-        pNode.get(), solArrays);
+    if(is_transport)
+    {
+      const std::vector<std::string> names_to_read =
+      {
+        name_to_read,
+        hi_bname + suffix
+      };
+
+      visprep->get_pointArray(names_to_read, anode_mapping, pnode_mapping,
+          pNode.get(), solArrays);
+    }
+    else
+    {
+      visprep->get_pointArray(name_to_read, anode_mapping, pnode_mapping,
+          pNode.get(), solArrays);
+    }
 
     VTK_Writer_NS::writeOutput( fNode.get(), locIEN.get(), locElem.get(),
         visprep.get(), element.get(), quad.get(), solArrays, epart_map,
