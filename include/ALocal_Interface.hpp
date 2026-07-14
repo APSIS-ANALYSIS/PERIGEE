@@ -19,6 +19,7 @@
 // Author: Xuanming Huang
 // Date Created: Jun. 24  2024
 // ============================================================================
+#include <string>
 #include <vector>
 
 class HDF5_Reader;

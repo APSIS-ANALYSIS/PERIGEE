@@ -388,15 +388,15 @@ int main( int argc, char * argv[] )
   ElemBC * wbc = new ElemBC_3D_WallModel( weak_list, wall_model_type, IEN, elemType );
 
   // Set up interface info
-  std::vector<double> intervals_0 {0.0, 6.0};
+  std::vector<double> intervals_0 {0.0, 20.0, 40.0, 60.0};
 
   Interface_pair itf_0(fixed_interface_file[0], rotated_interface_file[0], "epart_000_fixed_itf.h5", "epart_000_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, Vector_3(18.5, 0.0, 0.0));
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_0, Vector_3(0.0, 0.0, 230));
 
-  std::vector<double> intervals_1 {-4.5, 4.5};
+  std::vector<double> intervals_1 {0, 30, 60, 90};
 
   Interface_pair itf_1(fixed_interface_file[1], rotated_interface_file[1], "epart_001_fixed_itf.h5", "epart_001_rotated_itf.h5",
-    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_1, 0);
+    fixed_nElem, fixed_nFunc, ctrlPts, IEN, elemType, intervals_1, 2);
 
   std::vector<Interface_pair> interfaces {itf_0, itf_1};
  
