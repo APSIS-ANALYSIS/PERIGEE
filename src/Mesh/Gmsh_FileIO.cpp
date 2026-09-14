@@ -72,7 +72,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   phy_1d_nElem.resize(num_phy_domain_1d);
 
   for(int ii=0; ii<num_phy_domain_1d; ++ii)
-    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare
+    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare, refer to the .msh phy part
 
   for(int ii=0; ii<num_phy_domain_2d; ++ii)
     phy_2d_nElem[ ii ] = phy_domain_nElem[ phy_2d_index[ii] ];
