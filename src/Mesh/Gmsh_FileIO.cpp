@@ -72,7 +72,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   phy_1d_nElem.resize(num_phy_domain_1d);
 
   for(int ii=0; ii<num_phy_domain_1d; ++ii)
-    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare, refer to the .msh phy part
+    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare
 
   for(int ii=0; ii<num_phy_domain_2d; ++ii)
     phy_2d_nElem[ ii ] = phy_domain_nElem[ phy_2d_index[ii] ];
@@ -483,7 +483,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     for(int ii=0; ii<bcnumpt; ++ii) bcmap[bcpt[ii]] = 1;
 
     // use the bcmap to obtain the vol element that has its face on this surface
-    std::vector<int> gelem {};//???
+    std::vector<int> gelem {};
 
     for( int ee=0; ee<numcel; ++ee )//vol element
     {
@@ -491,7 +491,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
       for (int jj=0; jj < nlocbas_3d; ++jj)//vol basic element
         total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
       if(total >= nlocbas_2d)
-        gelem.push_back(ee);//cal the num of overlapping part of two type elements
+        gelem.push_back(ee);//cal the num of overlapping part of two type elements, the elements both in face element and volume elements
     }
 
     delete [] bcmap; bcmap = nullptr;
@@ -507,7 +507,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
       bool got_sur_elem = false;
       int ee = -1;
       while( !got_sur_elem && ee < VEC_T::get_size(gelem) - 1 )
-      {//
+      {
         ee += 1;
         const int vol_elem = gelem[ee];
 
@@ -557,12 +557,12 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     input_vtk_data.push_back({master_id, "MasterNodeID", AssociateObject::Node});
   }
 
-  if (nlocbas_2d == 3)//into 3
+  if (nlocbas_2d == 3)
   {
     TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
   }
-  else if (nlocbas_2d == 4)//into 4
+  else if (nlocbas_2d == 4)
   {
     HEX_T::write_quad_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
@@ -642,7 +642,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
     {
       for(int jj=0; jj<nloc; ++jj)
       {
-        const int target = eIEN[ domain_index ][ ee*nloc + jj ];//?
+        const int target = eIEN[ domain_index ][ ee*nloc + jj ];
         domain_IEN[ ee * nloc + jj ] = VEC_T::get_pos( local_node_idx, target );
       }
     } 
