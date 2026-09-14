@@ -4,6 +4,11 @@
 #include "Tet_Tools.hpp"
 #include "HDF5_Group.hpp"
 
+// workflow of Gmsh_FileIO: 
+// 1. Read in the mesh, tell the element type. If the mesh format is incorrect,throw out the error part  
+// 2. If peroredic, read in peroedic way, then calculate 1d, 2d, 3d elements, get their index and name.
+// 3. Turn the whole ele index into three new index arrays.
+// 4. Tell you where the elements start to count.
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 : filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
     10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
