@@ -3,9 +3,12 @@
 //
 // Code that handles the gmsh msh file and write the volumetric and surface data
 // into vtk files.
+// Need to pay attention on Gmesh_FileIO.cpp's subrountine( writevtp, update_quadratic_tet_IEN, write_quadratic_sur_vtu, writevtu)
+// 
 // ============================================================================
 #include "Gmsh_FileIO.hpp"
 #include "yaml-cpp/yaml.h"
+#include <memory>
 
 int main( int argc, char * argv[] )
 {
@@ -13,39 +16,38 @@ int main( int argc, char * argv[] )
   SYS_T::print_omp_info();
   SYS_T::set_omp_num_threads();
 
-  const std::string input_yaml_file("input_gmsh2vtk.yml");
+  const std::string input_yaml_file("input_gmsh2vtk.yml");//ymal's name 
   
-  SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );
+  SYS_T::print_fatal_if( !SYS_T::file_exist( input_yaml_file ), "ERROR: the file %s does not exist on disk.\n", input_yaml_file.c_str() );// ymal exit
 
   // Get element type from GIO
-  YAML::Node config = YAML::LoadFile( input_yaml_file );
+  YAML::Node config = YAML::LoadFile( input_yaml_file );  //ymal in Node config
 
   const std::string gmshFile = config["gmsh_file"].as<std::string>();
   const double isFSI = config["isFSI"].as<bool>();
 
-  SYS_T::print_fatal_if( !SYS_T::file_exist( gmshFile ), "ERROR: the file %s does not exist on disk.\n", gmshFile.c_str() );
+  SYS_T::print_fatal_if( !SYS_T::file_exist( gmshFile ), "ERROR: the file %s does not exist on disk.\n", gmshFile.c_str() );//gmsh 
 
-  Gmsh_FileIO * GIO = new Gmsh_FileIO( gmshFile );
-
+  auto GIO = SYS_T::make_unique<Gmsh_FileIO>( gmshFile );//see src/msh/Gmsh_FileIO.cpp
   if( isFSI ) GIO -> check_FSI_ordering();
 
   GIO -> print_info();
 
-  const std::vector<int> nbc_face_id = config["nbc_face_id"].as<std::vector<int>>();
+  const std::vector<int> nbc_face_id = config["nbc_face_id"].as<std::vector<int>>();//read from ymal, nbc part  nbc mean Dirichlet boundary condition(checked from preprocess)
   const std::vector<std::string> nbc_face_name = config["nbc_face_name"].as<std::vector<std::string>>();
   const std::vector<int> nbc_vol_id = config["nbc_vol_id"].as<std::vector<int>>();
   const std::vector<std::string> nbc_face_file_name = config["nbc_face_file_name"].as<std::vector<std::string>>();
   const std::vector<bool> nbc_isXML = config["nbc_isXML"].as<std::vector<bool>>();
-  const std::vector<bool> nbc_isSlave = config["nbc_isSlave"].as<std::vector<bool>>();
+  const std::vector<bool> nbc_isSlave = config["nbc_isSlave"].as<std::vector<bool>>();//serve for fsi, tell the difference of slave surface and main surface
 
-  const std::vector<int> ebc_face_id = config["ebc_face_id"].as<std::vector<int>>();
+  const std::vector<int> ebc_face_id = config["ebc_face_id"].as<std::vector<int>>();//ebc part,ebc mean Neumann bc
   const std::vector<std::string> ebc_face_name = config["ebc_face_name"].as<std::vector<std::string>>();
   const std::vector<int> ebc_vol_id = config["ebc_vol_id"].as<std::vector<int>>();
   const std::vector<std::string> ebc_face_file_name = config["ebc_face_file_name"].as<std::vector<std::string>>();
   const std::vector<bool> ebc_isXML = config["ebc_isXML"].as<std::vector<bool>>();
 
   const int eleType = GIO -> get_eleType(0);
-  const int num_phy_domain_1d = GIO -> get_num_phy_domain_1d();
+  const int num_phy_domain_1d = GIO -> get_num_phy_domain_1d();//1D line element checeked
   const int num_phy_domain_2d = GIO -> get_num_phy_domain_2d();
   
   // check whether it is a 3d problem or not
@@ -61,6 +63,8 @@ int main( int argc, char * argv[] )
       std::cout<<GIO->get_phy_name_3d(nbc_vol_id[ii])<<std::endl;
       GIO -> write_vtp( nbc_face_file_name[ii], nbc_face_id[ii], nbc_vol_id[ii], nbc_isXML[ii], nbc_isSlave[ii] );
     }
+    //read ymal's nbc face id
+    //write out nbc,then write into vtp
 
     for( unsigned int ii=0; ii<ebc_face_id.size(); ++ii )
     {
@@ -73,7 +77,7 @@ int main( int argc, char * argv[] )
   }
   else if( eleType==9 )
   {
-    GIO -> update_quadratic_tet_IEN(0);
+    GIO -> update_quadratic_tet_IEN(0);// wait
     if( isFSI ) GIO -> update_quadratic_tet_IEN(1);
     for( unsigned int ii=0; ii<nbc_face_id.size(); ++ii )
     {
@@ -125,7 +129,7 @@ int main( int argc, char * argv[] )
   const bool isXML = config["isXML"].as<bool>();
   GIO -> write_vtu( wmname, isXML );
 
-  delete GIO;
+
   return EXIT_SUCCESS;
 }
 
