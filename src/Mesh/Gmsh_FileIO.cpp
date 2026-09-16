@@ -4,11 +4,6 @@
 #include "Tet_Tools.hpp"
 #include "HDF5_Group.hpp"
 
-// workflow of Gmsh_FileIO: 
-// 1. Read in the mesh, tell the element type. If the mesh format is incorrect,throw out the error part  
-// 2. If peroredic, read in peroedic way, then calculate 1d, 2d, 3d elements, get their index and name.
-// 3. Turn the whole ele index into three new index arrays.
-// 4. Tell you where the elements start to count.
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 : filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
     10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
@@ -77,7 +72,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   phy_1d_nElem.resize(num_phy_domain_1d);
 
   for(int ii=0; ii<num_phy_domain_1d; ++ii)
-    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare, refer to the .msh phy part
+    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare
 
   for(int ii=0; ii<num_phy_domain_2d; ++ii)
     phy_2d_nElem[ ii ] = phy_domain_nElem[ phy_2d_index[ii] ];
@@ -432,7 +427,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
   std::string ele_2d {};
   std::string ele_3d {};
-  if (nlocbas_2d == 3 && nlocbas_3d == 4)
+  if (nlocbas_2d == 3 && nlocbas_3d == 4)// check the element type
   {
     ele_2d = static_cast<std::string>("triangle");
     ele_3d = static_cast<std::string>("tetrahedron");
@@ -450,6 +445,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
   VEC_T::sort_unique_resize( bcpt ); // unique ascending order nodal id
 
+  // global node ID → search in bcpt  → local node ID 
   const int bcnumpt = VEC_T::get_size( bcpt );
 
   std::cout<<"      num of bc pt = "<<bcnumpt<<'\n';
@@ -496,7 +492,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
       for (int jj=0; jj < nlocbas_3d; ++jj)//vol basic element
         total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
       if(total >= nlocbas_2d)
-        gelem.push_back(ee);//cal the num of overlapping part of two type elements, the elements both in face element and volume elements
+        gelem.push_back(ee);//cal the num of overlapping part of two type elements
     }
 
     delete [] bcmap; bcmap = nullptr;
@@ -512,7 +508,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
       bool got_sur_elem = false;
       int ee = -1;
       while( !got_sur_elem && ee < VEC_T::get_size(gelem) - 1 )
-      {
+      {//
         ee += 1;
         const int vol_elem = gelem[ee];
 
@@ -562,12 +558,12 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     input_vtk_data.push_back({master_id, "MasterNodeID", AssociateObject::Node});
   }
 
-  if (nlocbas_2d == 3)
+  if (nlocbas_2d == 3)//into 3
   {
     TET_T::write_triangle_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
   }
-  else if (nlocbas_2d == 4)
+  else if (nlocbas_2d == 4)//into 4
   {
     HEX_T::write_quad_grid( vtp_filename, bcnumpt, bcnumcl,
       sur_pt, sur_ien, input_vtk_data );
@@ -594,6 +590,7 @@ void Gmsh_FileIO::write_vtp(const std::string &vtp_filename,
 
   write_vtp(vtp_filename, index_sur, index_vol, isf2e, is_slave);//back 
 }
+
 
 void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) const
 {
@@ -647,7 +644,7 @@ void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) cons
     {
       for(int jj=0; jj<nloc; ++jj)
       {
-        const int target = eIEN[ domain_index ][ ee*nloc + jj ];
+        const int target = eIEN[ domain_index ][ ee*nloc + jj ];//?
         domain_IEN[ ee * nloc + jj ] = VEC_T::get_pos( local_node_idx, target );
       }
     } 
