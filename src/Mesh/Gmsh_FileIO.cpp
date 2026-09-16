@@ -4,6 +4,11 @@
 #include "Tet_Tools.hpp"
 #include "HDF5_Group.hpp"
 
+// workflow of Gmsh_FileIO: 
+// 1. Read in the mesh, tell the element type. If the mesh format is incorrect,throw out the error part  
+// 2. If peroredic, read in peroedic way, then calculate 1d, 2d, 3d elements, get their index and name.
+// 3. Turn the whole ele index into three new index arrays.
+// 4. Tell you where the elements start to count.
 Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 : filename( in_file_name ), elem_nlocbas{{ 0, 2, 3, 4, 4, 8, 6, 5, 3, 6, 9,
     10, 27, 18, 14, 1, 8, 20, 15, 13, 9, 10, 12, 15, 15, 21, 
@@ -11,12 +16,11 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
 {
   // Setup the file instream
   std::ifstream infile( filename.c_str(), std::ifstream::in );
-
   std::istringstream sstrm;
   std::string sline;
 
   // First four lines are Gmsh default file format 
-  getline(infile, sline); 
+  getline(infile, sline); //read file line by line
   SYS_T::print_fatal_if(sline.compare("$MeshFormat") != 0, 
       "Error: .msh format first line should be $MeshFormat. \n");
 
@@ -49,9 +53,9 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
   {
     if(phy_dim[ii] == 1)
     {
-      num_phy_domain_1d += 1;
-      phy_1d_index.push_back( phy_index[ii] );
-      phy_1d_name.push_back( phy_name[ii] );
+      num_phy_domain_1d += 1;//cal the num of puy_domain
+      phy_1d_index.push_back( phy_index[ii] );//store the id of phy_domain
+      phy_1d_name.push_back( phy_name[ii] );//store the name of phy_domain
     }
     else if(phy_dim[ii] == 2)
     {
@@ -66,14 +70,14 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
       phy_3d_name.push_back( phy_name[ii] );
     }
   }
-
+//
   phy_3d_nElem.clear(); phy_2d_nElem.clear(); phy_1d_nElem.clear();
   phy_3d_nElem.resize(num_phy_domain_3d);
   phy_2d_nElem.resize(num_phy_domain_2d);
   phy_1d_nElem.resize(num_phy_domain_1d);
 
   for(int ii=0; ii<num_phy_domain_1d; ++ii)
-    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];
+    phy_1d_nElem[ ii ] = phy_domain_nElem[ phy_1d_index[ii] ];//unknown declare, refer to the .msh phy part
 
   for(int ii=0; ii<num_phy_domain_2d; ++ii)
     phy_2d_nElem[ ii ] = phy_domain_nElem[ phy_2d_index[ii] ];
@@ -87,7 +91,7 @@ Gmsh_FileIO::Gmsh_FileIO( const std::string &in_file_name )
     phy_3d_start_index.resize(num_phy_domain_3d);
     phy_3d_start_index[0] = 0;
     for(int ii=1; ii<num_phy_domain_3d; ++ii)
-      phy_3d_start_index[ii] = phy_3d_start_index[ii-1] + phy_domain_nElem[ phy_3d_index[ii-1] ];
+      phy_3d_start_index[ii] = phy_3d_start_index[ii-1] + phy_domain_nElem[ phy_3d_index[ii-1] ];//element index, start from 0, so -1
   }
 
   phy_2d_start_index.clear();
@@ -236,6 +240,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   }
 
   // generate the local surface IEN array
+  // global node ID → search in bcpt → local node ID 
   std::vector<int> sur_ien {};
   for(int ee=0; ee<bcnumcl; ++ee)
   {
@@ -379,6 +384,7 @@ void Gmsh_FileIO::write_interior_vtp( int index_sur,
   write_interior_vtp(vtp_file_name, index_sur, index_vol1, index_vol2);
 }
 
+//gmsh2vtk here
 void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   int index_sur, int index_vol, bool isf2e, bool is_slave ) const
 {
@@ -418,7 +424,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   const int nlocbas_3d {ele_nlocbas[phy_index_vol]};
 
   const int bcnumcl = phy_2d_nElem[index_sur];
-  SYS_T::print_fatal_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,
+  SYS_T::print_fatal_if( VEC_T::get_size(sur_ien_global) != nlocbas_2d * bcnumcl,//IEN should be same to local basic func(single element) * boundary conditions num(total num of elements)
       "Error: Gmsh_FileIO::write_vtp, sur IEN size wrong. \n" );
 
   const int numcel = phy_3d_nElem[index_vol];
@@ -465,7 +471,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   for(int ee=0; ee<bcnumcl; ++ee)
   {
     for (int ii{0}; ii < nlocbas_2d; ++ii)
-      sur_ien.push_back( VEC_T::get_pos(bcpt, sur_ien_global[nlocbas_2d * ee + ii]) );
+      sur_ien.push_back( VEC_T::get_pos(bcpt, sur_ien_global[nlocbas_2d * ee + ii]) ); //find the index of bcpt
   }
   std::cout<<"      " << ele_2d <<" IEN generated. \n";
 
@@ -473,6 +479,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   // meaning this face needs boundary integral); otherwise, set
   // the face2elem as -1, since we will only need the nodal indices
   // for Dirichlet type face.
+  //
   std::vector<int> face2elem( bcnumcl, -1 );
   if( isf2e )
   {
@@ -484,13 +491,13 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     // use the bcmap to obtain the vol element that has its face on this surface
     std::vector<int> gelem {};
 
-    for( int ee=0; ee<numcel; ++ee )
+    for( int ee=0; ee<numcel; ++ee )//vol element
     {
       int total = 0;
-      for (int jj=0; jj < nlocbas_3d; ++jj)
+      for (int jj=0; jj < nlocbas_3d; ++jj)//vol basic element
         total += bcmap[ vol_IEN[nlocbas_3d  * ee + jj] ];
       if(total >= nlocbas_2d)
-        gelem.push_back(ee);
+        gelem.push_back(ee);//cal the num of overlapping part of two type elements, the elements both in face element and volume elements
     }
 
     delete [] bcmap; bcmap = nullptr;
@@ -501,7 +508,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
     {
       std::vector<int> snode( nlocbas_2d, -1);
       for (int ii{0}; ii < nlocbas_2d; ++ii)
-        snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];
+        snode[ii] = sur_ien_global[nlocbas_2d * ff + ii];//global turn into basic, store in snode
 
       bool got_sur_elem = false;
       int ee = -1;
@@ -518,7 +525,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
 
         for (int ii{0}; ii < nlocbas_2d; ++ii)
         {
-          const bool got_each_node = VEC_T::is_invec(vnode, snode[ii]);
+          const bool got_each_node = VEC_T::is_invec(vnode, snode[ii]);//adjust
           got_all_nodes = got_all_nodes && got_each_node;
         }
         got_sur_elem = got_all_nodes;
@@ -573,6 +580,7 @@ void Gmsh_FileIO::write_vtp( const std::string &vtp_filename,
   std::cout<<"      Time taken "<<mytimer->get_sec()<<" sec. \n";
 }
 
+
 void Gmsh_FileIO::write_vtp(const std::string &vtp_filename,
   const std::string &phy_name_sur, const std::string &phy_name_vol,
   bool isf2e, bool is_slave) const
@@ -585,7 +593,7 @@ void Gmsh_FileIO::write_vtp(const std::string &vtp_filename,
   SYS_T::print_fatal_if(index_vol == -1,
     "Error: Gmsh_FileIO::write_vtp, wrong physical name of volume.\n");
 
-  write_vtp(vtp_filename, index_sur, index_vol, isf2e, is_slave);
+  write_vtp(vtp_filename, index_sur, index_vol, isf2e, is_slave);//back 
 }
 
 void Gmsh_FileIO::write_each_vtu( const std::vector<std::string> name_list) const
@@ -880,6 +888,9 @@ void Gmsh_FileIO::write_sur_h5( int index_2d,
     // Hence, we only need to treat all elements as if they are linear
     // line/triangle/quadrilateral elements. Once the end points match with
     // the vertices, the edge is on the surface boundary.
+
+    //stop here
+    
     std::vector<int> face2elem(num_1d_cell, -1);
     for(int ff=0; ff<num_1d_cell; ++ff)
     {
