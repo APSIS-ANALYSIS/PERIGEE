@@ -240,6 +240,7 @@ void Gmsh_FileIO::write_interior_vtp( const std::string &vtp_filename,
   }
 
   // generate the local surface IEN array
+  // global node ID → search in bcpt → local node ID 
   std::vector<int> sur_ien {};
   for(int ee=0; ee<bcnumcl; ++ee)
   {
